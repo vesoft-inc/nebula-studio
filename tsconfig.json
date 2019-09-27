@@ -1,7 +1,7 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "target": "es2017",
+    "target": "esnext",
     "module": "commonjs",
     "strict": true,
     "jsx": "react",
@@ -20,9 +20,10 @@
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "inlineSourceMap": true,
+    "sourceMap": true,
     "importHelpers": true,
     "esModuleInterop": true,
+    "moduleResolution": "node",
     "resolveJsonModule": true
   },
   "exclude": [

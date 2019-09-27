@@ -1,15 +1,23 @@
 {
     "presets": [
-        "@babel/preset-react",
         ["@babel/preset-env", {
+            "modules": "commonjs",
             "targets": {
                 "chrome": "58",
                 "ie": "11"
-            },
-            "useBuiltIns": "entry"
-        }]
+            }
+        }],
+        "@babel/preset-react"
     ],
     "plugins": [
+        "react-hot-loader/babel",
+        [
+            "import",
+            {
+                "libraryName": "antd",
+                "style": "css"
+            }
+        ],
         [
             "@babel/plugin-proposal-decorators",
             {
@@ -17,16 +25,7 @@
             }
         ],
         "@babel/plugin-proposal-class-properties",
-        "react-hot-loader/babel",
         "@babel/plugin-transform-runtime",
-        "@babel/plugin-syntax-dynamic-import",
-        [
-            "import",
-            {
-                "libraryName": "antd",
-                "libraryDirectory": "es",
-                "style": "css"
-            }
-        ]
+        "@babel/plugin-syntax-dynamic-import"
     ]
 }

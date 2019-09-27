@@ -1,5 +1,4 @@
 import path from 'path';
-import webpack from 'webpack';
 import merge from 'webpack-merge';
 import commonConfig from './webpack.base';
 
@@ -33,12 +32,6 @@ const devConfig = {
     host: 'localhost',
     disableHostCheck: true,
   },
-
-  plugins: [
-    new webpack.DefinePlugin({
-      MOCK: false,
-    }),
-  ],
 };
 
 module.exports = merge({

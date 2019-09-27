@@ -11,7 +11,17 @@ const commonConfig = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: ['babel-loader?cacheDirectory=true', 'ts-loader'],
+        use: [
+          'babel-loader',
+          'ts-loader',
+          {
+            loader: 'ui-component-loader',
+            options: {
+              lib: 'antd',
+              style: 'style/index.css'
+            }
+          }
+        ],
         include: path.join(__dirname, '../app/assets'),
       },
       {
@@ -21,6 +31,9 @@ const commonConfig = {
           'css-loader',
           {
             loader: 'less-loader',
+            options: {
+              javascriptEnabled: true
+            }
           },
         ],
       },
