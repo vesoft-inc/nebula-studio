@@ -1,10 +1,9 @@
-import { Layout, Select, Spin } from 'antd';
-import React from 'react';
+import React from 'react'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
+import { Layout, Select, Spin, Icon } from 'antd'
 import intl from 'react-intl-universal';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
-
+import { CodeMirror } from './components'
 import './App.less';
-import { Hello } from './components';
 import { INTL_LOCALE_SELECT, INTL_LOCALES } from './config';
 import { LanguageContext } from './context';
 import { updateQueryStringParameter } from './utils';
@@ -13,16 +12,21 @@ const { Header, Content } = Layout;
 const { Option } = Select;
 
 interface IState {
-  loading: boolean;
+  loading: boolean,
+  code: string,
+  isUpDown:boolean
 }
 
 type IProps = RouteComponentProps;
+ 
 
 class App extends React.Component<IProps, IState> {
   currentLocale;
-
+  codemirror;
+  editor;
   constructor(props: IProps) {
     super(props);
+ 
 
     const regx = /lang=(\w+)/g;
     const match = regx.exec(props.history.location.search);
@@ -32,6 +36,8 @@ class App extends React.Component<IProps, IState> {
     this.currentLocale = defaultLocale;
     this.state = {
       loading: true,
+       code: 'The default statement',
+      isUpDown:true
     };
   }
 
@@ -56,13 +62,31 @@ class App extends React.Component<IProps, IState> {
       });
   }
 
+  getInstance = (instance) => {
+    if (instance) {
+      this.codemirror = instance.codemirror;
+      this.editor = instance.editor;
+    }
+  }
+
   componentDidMount() {
     this.loadIntlLocale();
   }
 
-  render() {
-    const { loading } = this.state;
+  codeEditr = (value) => {
+    this.setState({
+      code:value
+    })
+  }
 
+  isUpDown=()=>{
+    this.setState({
+      isUpDown:!this.state.isUpDown
+    })
+  }
+ 
+  render() {
+    const { loading, isUpDown } = this.state
     return (
       <LanguageContext.Provider
         value={{
@@ -91,7 +115,23 @@ class App extends React.Component<IProps, IState> {
               </div>
             </Header>
             <Content>
-              <Hello />
+              <div className="ngql-content">
+                <CodeMirror
+                  value={this.state.code}
+                  ref={this.getInstance}
+                  onChange={(e) => this.codeEditr(e)}
+                  height={isUpDown?'120px':'240px'}
+                  options={{
+                    theme: 'monokai',
+                    keyMap: 'sublime',
+                    fullScreen: true,
+                    mode: 'nebula',
+                  }}
+                />
+                {isUpDown &&<Icon type="caret-up" style={{ position: 'absolute',fontSize:'18px',cursor:'pointer', bottom: 0, right:"28px",color:'#ffffff',outline:'none'}} onClick={()=>this.isUpDown()}/>}
+                {!isUpDown &&<Icon type="caret-down" style={{ position: 'absolute',fontSize:'18px',cursor:'pointer', bottom: 0, right:"28px",color:'#ffffff',outline:'none'}} onClick={()=>this.isUpDown()}/>}
+                <Icon type="play-circle"   style={{ position: 'absolute',fontSize:'36px',cursor:'pointer', top: "50%", marginTop: '-18px',right:"20px",color:'#ffffff'}}/>
+              </div>
             </Content>
           </Layout>
         </Spin>
