@@ -43,6 +43,8 @@
     "@babel/preset-env": "^7.1.0",
     "@babel/preset-react": "^7.0.0",
     "@babel/runtime": "^7.1.2",
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
     "@types/mocha": "^2.2.40",
     "@types/node": "^7.0.12",
     "@types/react": "^16.9.3",
@@ -69,6 +71,7 @@
     "eslint-plugin-prettier": "^2.6.2",
     "eslint-plugin-react": "^7.11.1",
     "html-webpack-plugin": "^3.2.0",
+    "husky": "^3.0.7",
     "less": "^3.10.3",
     "less-loader": "^5.0.0",
     "mini-css-extract-plugin": "^0.4.0",
@@ -89,6 +92,13 @@
   },
   "engines": {
     "node": ">=8.9.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run test",
+      "pre-push": "npm run test",
+      "commit-msg": "commitlint --config ./.commitlint.js -E HUSKY_GIT_PARAMS"
+    }
   },
   "ci": {
     "version": "8"

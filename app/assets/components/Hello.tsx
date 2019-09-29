@@ -1,5 +1,5 @@
-import React from 'react'
+import React from 'react';
 
-const Hello = () => <div>Hello Component</div>
+const Hello = () => <div>Hello Component</div>;
 
-export default Hello
+export default Hello;

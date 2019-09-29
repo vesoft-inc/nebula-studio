@@ -18,9 +18,9 @@ const commonConfig = {
             loader: 'ui-component-loader',
             options: {
               lib: 'antd',
-              style: 'style/index.css'
-            }
-          }
+              style: 'style/index.css',
+            },
+          },
         ],
         include: path.join(__dirname, '../app/assets'),
       },
@@ -32,8 +32,8 @@ const commonConfig = {
           {
             loader: 'less-loader',
             options: {
-              javascriptEnabled: true
-            }
+              javascriptEnabled: true,
+            },
           },
         ],
       },
@@ -72,8 +72,8 @@ const commonConfig = {
     new webpack.HashedModuleIdsPlugin(),
   ],
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
-  }
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+  },
 };
 
 if (process.env.npm_config_report) {

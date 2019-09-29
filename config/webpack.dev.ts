@@ -13,7 +13,7 @@ const devConfig = {
 
   output: {
     filename: '[name].js',
-    publicPath: 'http://127.0.0.1:8888'
+    publicPath: 'http://127.0.0.1:8888',
   },
 
   module: {
