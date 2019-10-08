@@ -1,8 +1,8 @@
-# 基于 egg + react + webpack 的全栈模板
+# Nebula Web Console
 
 ## QuickStart
 
-### 开发
+### Dev
 
 ```bash
 $ npm i
@@ -10,21 +10,23 @@ $ npm run dev
 $ open http://localhost:7001/
 ```
 
-### 部署
+### Deploy
 
 ```bash
-$ npm run build - 静态资源构建打包
-$ npm run tsc - ts编译
-$ npm start - 服务器启动
+$ npm run build - build
+$ npm start - start server
 ```
 
-### 相关命令
+### Relative Commands
 
 - Use `npm run lint` to check code style
 - Use `npm test` to run unit test
 - se `npm run clean` to clean compiled js at development mode once
 
-### 要求
+### Required
 
 - Node.js 8.x
 - Typescript 2.8+
+
+### Docs
+- Style Required: https://github.com/vesoft-inc/nebula-web-console/blob/master/docs/style.md
