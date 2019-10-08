@@ -1,5 +1,6 @@
 {
   "common": {
-    "languageSelect": "语言" 
+    "languageSelect": "语言" ,
+    "SeeTheHistory":"查看历史"
   }
 }

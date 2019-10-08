@@ -1,6 +1,6 @@
 import React from 'react'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
-import { Layout, Select, Spin, Icon } from 'antd'
+import { Layout, Select, Spin, Icon, Button, Modal, message, List } from 'antd'
 import intl from 'react-intl-universal';
 import { CodeMirror } from './components'
 import './App.less';
@@ -14,7 +14,8 @@ const { Option } = Select;
 interface IState {
   loading: boolean,
   code: string,
-  isUpDown:boolean
+  isUpDown: boolean,
+  history: boolean,
 }
 
 type IProps = RouteComponentProps;
@@ -37,7 +38,8 @@ class App extends React.Component<IProps, IState> {
     this.state = {
       loading: true,
        code: 'The default statement',
-      isUpDown:true
+      isUpDown: true,
+      history:false
     };
   }
 
@@ -73,7 +75,7 @@ class App extends React.Component<IProps, IState> {
     this.loadIntlLocale();
   }
 
-  codeEditr = (value) => {
+  codeEditr = (value:string) => {
     this.setState({
       code:value
     })
@@ -84,9 +86,34 @@ class App extends React.Component<IProps, IState> {
       isUpDown:!this.state.isUpDown
     })
   }
+
+  getLocalStorage = () => {
+    let value: string | null = localStorage.getItem('history');
+    if (value && value != "undefined" && value != "null") {
+      return  JSON.parse(value);
+    }
+    return [];    
+  }
+
+  runNgql = () => {
+    if (!this.state.code) {
+      message.error('Sorry, NGQL cannot be empty')
+      return
+    }
+    let history = this.getLocalStorage()
+    history.push(this.state.code)
+    localStorage.setItem('history', JSON.stringify(history));
+  }
+
+  onHistoryItem = (value:string) => {
+    this.setState({
+      code: value,
+      history: false
+    })
+  }
  
   render() {
-    const { loading, isUpDown } = this.state
+    const { loading, isUpDown, code, history } = this.state
     return (
       <LanguageContext.Provider
         value={{
@@ -117,7 +144,7 @@ class App extends React.Component<IProps, IState> {
             <Content>
               <div className="ngql-content">
                 <CodeMirror
-                  value={this.state.code}
+                  value={code}
                   ref={this.getInstance}
                   onChange={(e) => this.codeEditr(e)}
                   height={isUpDown?'120px':'240px'}
@@ -130,8 +157,27 @@ class App extends React.Component<IProps, IState> {
                 />
                 {isUpDown &&<Icon type="caret-up" style={{ position: 'absolute',fontSize:'18px',cursor:'pointer', bottom: 0, right:"28px",color:'#ffffff',outline:'none'}} onClick={()=>this.isUpDown()}/>}
                 {!isUpDown &&<Icon type="caret-down" style={{ position: 'absolute',fontSize:'18px',cursor:'pointer', bottom: 0, right:"28px",color:'#ffffff',outline:'none'}} onClick={()=>this.isUpDown()}/>}
-                <Icon type="play-circle"   style={{ position: 'absolute',fontSize:'36px',cursor:'pointer', top: "50%", marginTop: '-18px',right:"20px",color:'#ffffff'}}/>
+                <Icon type="play-circle" style={{ position: 'absolute', fontSize: '36px', cursor: 'pointer', top: "50%", marginTop: '-18px', right: "20px", color: '#ffffff', outline: 'none'}} onClick={() => this.runNgql()}/>
               </div>
+              <Button className="ngql-history" onClick={() => { this.setState({history:true})}}>{intl.get('common.SeeTheHistory')}</Button>
+              <Modal
+                title="NGQL History"
+                visible={history}
+                footer={null}
+                onCancel={() => {this.setState({ history: false })}}
+              >
+                {
+                  <List
+                    itemLayout="horizontal"
+                    dataSource={this.getLocalStorage()}
+                    renderItem={(item:string) => (
+                      <List.Item style={{ cursor: 'pointer' }} onClick={() => this.onHistoryItem(item)}>
+                        {item}
+                      </List.Item>
+                    )}
+                  />
+                }
+              </Modal>
             </Content>
           </Layout>
         </Spin>

@@ -34,12 +34,6 @@ export default class ReactCodeMirror extends React.Component<Props, IState> {
     this.renderCodeMirror();
     CodeMirror.defineMode('nebula', () => {
       return {
-        /**
-            这个token方法就是用来标亮关键字的，
-            CodeMirror会自上而下，从左往右得遍历每一个字符，依次调用token方法。
-            stream参数可以用来控制遍历的粒度，比如我调用方法 stream.eatWhile(/\s/),
-            那么当前cursor后面所有的空格会被匹配到stream中，stream.current()的值就是所有匹配到的空格。
-        **/
         token: (stream) => {
           if (stream.eatSpace()) { return null }
           stream.eatWhile(/[\$\w\u4e00-\u9fa5]/)
@@ -60,7 +54,7 @@ export default class ReactCodeMirror extends React.Component<Props, IState> {
     })
   }
   renderCodeMirror() {
-    //参数合并
+    //parameters of the combined
     const options = Object.assign({
       tabSize: 2,
       fontSize:28,
@@ -68,20 +62,18 @@ export default class ReactCodeMirror extends React.Component<Props, IState> {
       matchBrackets: true,
       showCursorWhenSelecting: true,
       lineWrapping: true,
-      // 显示行号
+      // show number of rows
       lineNumbers: true,
       fullScreen: true,
     }, this.props.options)
     this.editor = CodeMirror.fromTextArea(this.textarea, options);
-    // 获取CodeMirror用于获取其中的一些常量
+    // Getting CodeMirror is used to get some of these constants
     this.codemirror = CodeMirror;
-    // 事件处理映射
+    // event
     this.editor.on('change', this.codemirrorValueChange)  
-    const { value, width, height } = this.props;
-    // 初始化值
-    this.editor.setValue(value || '');
+    const {width, height } = this.props;
     if (width || height) {
-      // 设置尺寸
+      // set size
       this.editor.setSize(width, height);
     }
     
@@ -94,8 +86,9 @@ export default class ReactCodeMirror extends React.Component<Props, IState> {
   }
 
   async componentWillReceiveProps(nextProps) {
-    const { options, width, height } = nextProps;
+    const { options, width, height, value } = nextProps;
     await this.setOptions(options);
+    this.editor.setValue(value || '');
     this.editor.setSize(width, height);
   }
 

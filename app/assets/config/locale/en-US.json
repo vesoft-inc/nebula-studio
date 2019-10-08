@@ -1,5 +1,6 @@
 {
   "common": {
-    "languageSelect": "language"
+    "languageSelect": "language",
+    "SeeTheHistory": "historical record"
   }
 }
