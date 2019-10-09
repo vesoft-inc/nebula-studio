@@ -2,7 +2,7 @@ import React from 'react'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { Layout, Select, Spin, Icon, Button, Modal, message, List } from 'antd'
 import intl from 'react-intl-universal';
-import { CodeMirror } from './components'
+import { CodeMirror, OutputBox} from './components'
 import './App.less';
 import { INTL_LOCALE_SELECT, INTL_LOCALES } from './config';
 import { LanguageContext } from './context';
@@ -75,13 +75,13 @@ class App extends React.Component<IProps, IState> {
     this.loadIntlLocale();
   }
 
-  codeEditr = (value:string) => {
+  handleCodeEditr = (value:string) => {
     this.setState({
       code:value
     })
   }
 
-  isUpDown=()=>{
+  handleUpDown=()=>{
     this.setState({
       isUpDown:!this.state.isUpDown
     })
@@ -95,17 +95,20 @@ class App extends React.Component<IProps, IState> {
     return [];    
   }
 
-  runNgql = () => {
+  handleRunNgql = () => {
     if (!this.state.code) {
-      message.error('Sorry, NGQL cannot be empty')
+      message.error(intl.get('common.SorryNGQLCannotBeEmpty'))
       return
     }
     let history = this.getLocalStorage()
     history.push(this.state.code)
+    this.setState({
+      loading:false
+    })
     localStorage.setItem('history', JSON.stringify(history));
   }
 
-  onHistoryItem = (value:string) => {
+  handleHistoryItem = (value:string) => {
     this.setState({
       code: value,
       history: false
@@ -146,8 +149,8 @@ class App extends React.Component<IProps, IState> {
                 <CodeMirror
                   value={code}
                   ref={this.getInstance}
-                  onChange={(e) => this.codeEditr(e)}
-                  height={isUpDown?'120px':'240px'}
+                  onChange={(e) => this.handleCodeEditr(e)}
+                  height={isUpDown?'180px':'360px'}
                   options={{
                     theme: 'monokai',
                     keyMap: 'sublime',
@@ -155,13 +158,17 @@ class App extends React.Component<IProps, IState> {
                     mode: 'nebula',
                   }}
                 />
-                {isUpDown &&<Icon type="caret-up" style={{ position: 'absolute',fontSize:'18px',cursor:'pointer', bottom: 0, right:"28px",color:'#ffffff',outline:'none'}} onClick={()=>this.isUpDown()}/>}
-                {!isUpDown &&<Icon type="caret-down" style={{ position: 'absolute',fontSize:'18px',cursor:'pointer', bottom: 0, right:"28px",color:'#ffffff',outline:'none'}} onClick={()=>this.isUpDown()}/>}
-                <Icon type="play-circle" style={{ position: 'absolute', fontSize: '36px', cursor: 'pointer', top: "50%", marginTop: '-18px', right: "20px", color: '#ffffff', outline: 'none'}} onClick={() => this.runNgql()}/>
+                {isUpDown && <Icon type="caret-up" style={{ position: 'absolute', fontSize: '18px', cursor: 'pointer', bottom: 0, right: "28px", color: '#ffffff', outline: 'none', zIndex: 99 }} onClick={() => this.handleUpDown()}/>}
+                {!isUpDown && <Icon type="caret-down" style={{ position: 'absolute', fontSize: '18px', cursor: 'pointer', bottom: 0, right: "28px", color: '#ffffff', outline: 'none', zIndex: 99 }} onClick={() => this.handleUpDown()}/>}
+                <Icon type="play-circle" style={{ position: 'absolute', fontSize: '36px', cursor: 'pointer', top: "50%", marginTop: '-18px', right: "20px", color: '#ffffff', outline: 'none', zIndex: 99 }} onClick={() => this.handleRunNgql()}/>
               </div>
-              <Button className="ngql-history" onClick={() => { this.setState({history:true})}}>{intl.get('common.SeeTheHistory')}</Button>
+              <Button className="ngql-history" type="primary" onClick={() => { this.setState({ history: true }) }}>{intl.get('common.SeeTheHistory')}</Button>
+              <OutputBox
+                value={this.getLocalStorage().pop()}
+                onHistoryItem={e=>this.handleHistoryItem(e)}
+              />
               <Modal
-                title="NGQL History"
+                title={intl.get('common.NGQLHistoryList')}
                 visible={history}
                 footer={null}
                 onCancel={() => {this.setState({ history: false })}}
@@ -171,7 +178,7 @@ class App extends React.Component<IProps, IState> {
                     itemLayout="horizontal"
                     dataSource={this.getLocalStorage()}
                     renderItem={(item:string) => (
-                      <List.Item style={{ cursor: 'pointer' }} onClick={() => this.onHistoryItem(item)}>
+                      <List.Item style={{ cursor: 'pointer' }} onClick={() => this.handleHistoryItem(item)}>
                         {item}
                       </List.Item>
                     )}

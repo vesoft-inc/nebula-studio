@@ -1,1 +1,4 @@
-export { default as CodeMirror } from './CodeMirror'
+import CodeMirror from './CodeMirror'
+import OutputBox from './OutputBox'
+
+export { CodeMirror, OutputBox } 

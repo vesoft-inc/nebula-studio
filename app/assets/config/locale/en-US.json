@@ -1,6 +1,11 @@
 {
   "common": {
     "languageSelect": "language",
-    "SeeTheHistory": "historical record"
+    "SeeTheHistory": "History List",
+    "Table": "table",
+    "Log": "log",
+    "Record": "record",
+    "SorryNGQLCannotBeEmpty": "Sorry, NGQL cannot be empty",
+    "NGQLHistoryList": "NGQL History List"
   }
 }

@@ -57,21 +57,22 @@ export default class ReactCodeMirror extends React.Component<Props, IState> {
     //parameters of the combined
     const options = Object.assign({
       tabSize: 2,
-      fontSize:28,
+      fontSize:'28px',
       autoCloseBrackets: true,
       matchBrackets: true,
       showCursorWhenSelecting: true,
       lineWrapping: true,
       // show number of rows
       lineNumbers: true,
-      fullScreen: true,
+      fullScreen: true
     }, this.props.options)
     this.editor = CodeMirror.fromTextArea(this.textarea, options);
     // Getting CodeMirror is used to get some of these constants
     this.codemirror = CodeMirror;
     // event
     this.editor.on('change', this.codemirrorValueChange)  
-    const {width, height } = this.props;
+    const { value, width, height } = this.props;
+    this.editor.setValue(value || '');
     if (width || height) {
       // set size
       this.editor.setSize(width, height);
@@ -88,7 +89,9 @@ export default class ReactCodeMirror extends React.Component<Props, IState> {
   async componentWillReceiveProps(nextProps) {
     const { options, width, height, value } = nextProps;
     await this.setOptions(options);
-    this.editor.setValue(value || '');
+    if (value != this.editor.getValue()) {
+      this.editor.setValue(value || '');
+    }
     this.editor.setSize(width, height);
   }
 
