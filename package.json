@@ -12,7 +12,7 @@
     "dev": "egg-bin dev -r egg-ts-helper/register",
     "debug": "egg-bin debug -r egg-ts-helper/register",
     "test-local": "egg-bin test -r egg-ts-helper/register",
-    "test": "npm run lint -- --fix && npm run test-local",
+    "test": "npm run lint -- --fix",
     "cov": "egg-bin cov -r egg-ts-helper/register",
     "tsc": "ets && tsc -p tsconfig.json",
     "ci": "npm run lint && npm run cov && npm run tsc",

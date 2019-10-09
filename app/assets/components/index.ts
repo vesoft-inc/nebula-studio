@@ -1,4 +1,4 @@
-import CodeMirror from './CodeMirror'
-import OutputBox from './OutputBox'
+import CodeMirror from './CodeMirror';
+import OutputBox from './OutputBox';
 
-export { CodeMirror, OutputBox } 
+export { CodeMirror, OutputBox };

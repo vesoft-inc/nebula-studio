@@ -7,5 +7,5 @@ export const HighLightList = [
   'hello',
   'test',
   '$aaa$',
-  'ssss'
-]
+  'ssss',
+];

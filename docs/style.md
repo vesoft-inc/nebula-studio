@@ -40,6 +40,28 @@ This is a full stack project including front and back end.
   const APP_NAME = 'nebula-web-console'
   ```
 
+- Event Methods Naming
+```javascript
+class Example extends React.Component {
+  // if the method is defined by compnent itself, use handleXXX naming method:
+  handleSave = () => {
+    ...
+  }
+  ...
+  render () {
+    // if the method is pass from the parent to the component, use onXXX naming method:
+    const { onCancel } = this.props
+    return (
+      <div>
+        ...
+        <Button onClick={this.handleSave}>Save<Button>
+        <Button onClick={onCancel}>Cancel<Button>
+      <div>
+    )
+  }
+}
+```
+
 - Props Comment Required in `components/` folder
   ```javascript
   interface IProps {

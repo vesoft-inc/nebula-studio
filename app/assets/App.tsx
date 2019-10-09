@@ -1,9 +1,9 @@
-import React from 'react'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
-import { Layout, Select, Spin, Icon, Button, Modal, message, List } from 'antd'
+import { Button, Icon, Layout, List, message, Modal, Select, Spin } from 'antd';
+import React from 'react';
 import intl from 'react-intl-universal';
-import { CodeMirror, OutputBox} from './components'
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 import './App.less';
+import { CodeMirror, OutputBox } from './components';
 import { INTL_LOCALE_SELECT, INTL_LOCALES } from './config';
 import { LanguageContext } from './context';
 import { updateQueryStringParameter } from './utils';
@@ -12,14 +12,13 @@ const { Header, Content } = Layout;
 const { Option } = Select;
 
 interface IState {
-  loading: boolean,
-  code: string,
-  isUpDown: boolean,
-  history: boolean,
+  loading: boolean;
+  code: string;
+  isUpDown: boolean;
+  history: boolean;
 }
 
 type IProps = RouteComponentProps;
- 
 
 class App extends React.Component<IProps, IState> {
   currentLocale;
@@ -27,7 +26,6 @@ class App extends React.Component<IProps, IState> {
   editor;
   constructor(props: IProps) {
     super(props);
- 
 
     const regx = /lang=(\w+)/g;
     const match = regx.exec(props.history.location.search);
@@ -37,9 +35,9 @@ class App extends React.Component<IProps, IState> {
     this.currentLocale = defaultLocale;
     this.state = {
       loading: true,
-       code: 'The default statement',
+      code: 'The default statement',
       isUpDown: true,
-      history:false
+      history: false,
     };
   }
 
@@ -75,48 +73,48 @@ class App extends React.Component<IProps, IState> {
     this.loadIntlLocale();
   }
 
-  handleCodeEditr = (value:string) => {
+  handleCodeEditr = (value: string) => {
     this.setState({
-      code:value
-    })
+      code: value,
+    });
   }
 
-  handleUpDown=()=>{
+  handleUpDown = () => {
     this.setState({
-      isUpDown:!this.state.isUpDown
-    })
+      isUpDown: !this.state.isUpDown,
+    });
   }
 
   getLocalStorage = () => {
-    let value: string | null = localStorage.getItem('history');
-    if (value && value != "undefined" && value != "null") {
-      return  JSON.parse(value);
+    const value: string | null = localStorage.getItem('history');
+    if (value && value !== 'undefined' && value !== 'null') {
+      return JSON.parse(value);
     }
-    return [];    
+    return [];
   }
 
   handleRunNgql = () => {
     if (!this.state.code) {
-      message.error(intl.get('common.SorryNGQLCannotBeEmpty'))
-      return
+      message.error(intl.get('common.SorryNGQLCannotBeEmpty'));
+      return;
     }
-    let history = this.getLocalStorage()
-    history.push(this.state.code)
+    const history = this.getLocalStorage();
+    history.push(this.state.code);
     this.setState({
-      loading:false
-    })
+      loading: false,
+    });
     localStorage.setItem('history', JSON.stringify(history));
   }
 
-  handleHistoryItem = (value:string) => {
+  handleHistoryItem = (value: string) => {
     this.setState({
       code: value,
-      history: false
-    })
+      history: false,
+    });
   }
- 
+
   render() {
-    const { loading, isUpDown, code, history } = this.state
+    const { loading, isUpDown, code, history } = this.state;
     return (
       <LanguageContext.Provider
         value={{
@@ -150,7 +148,7 @@ class App extends React.Component<IProps, IState> {
                   value={code}
                   ref={this.getInstance}
                   onChange={(e) => this.handleCodeEditr(e)}
-                  height={isUpDown?'180px':'360px'}
+                  height={isUpDown ? '180px' : '360px'}
                   options={{
                     theme: 'monokai',
                     keyMap: 'sublime',
@@ -158,27 +156,84 @@ class App extends React.Component<IProps, IState> {
                     mode: 'nebula',
                   }}
                 />
-                {isUpDown && <Icon type="caret-up" style={{ position: 'absolute', fontSize: '18px', cursor: 'pointer', bottom: 0, right: "28px", color: '#ffffff', outline: 'none', zIndex: 99 }} onClick={() => this.handleUpDown()}/>}
-                {!isUpDown && <Icon type="caret-down" style={{ position: 'absolute', fontSize: '18px', cursor: 'pointer', bottom: 0, right: "28px", color: '#ffffff', outline: 'none', zIndex: 99 }} onClick={() => this.handleUpDown()}/>}
-                <Icon type="play-circle" style={{ position: 'absolute', fontSize: '36px', cursor: 'pointer', top: "50%", marginTop: '-18px', right: "20px", color: '#ffffff', outline: 'none', zIndex: 99 }} onClick={() => this.handleRunNgql()}/>
+                {isUpDown && (
+                  <Icon
+                    type="caret-up"
+                    style={{
+                      position: 'absolute',
+                      fontSize: '18px',
+                      cursor: 'pointer',
+                      bottom: 0,
+                      right: '28px',
+                      color: '#ffffff',
+                      outline: 'none',
+                      zIndex: 99,
+                    }}
+                    onClick={() => this.handleUpDown()}
+                  />
+                )}
+                {!isUpDown && (
+                  <Icon
+                    type="caret-down"
+                    style={{
+                      position: 'absolute',
+                      fontSize: '18px',
+                      cursor: 'pointer',
+                      bottom: 0,
+                      right: '28px',
+                      color: '#ffffff',
+                      outline: 'none',
+                      zIndex: 99,
+                    }}
+                    onClick={() => this.handleUpDown()}
+                  />
+                )}
+                <Icon
+                  type="play-circle"
+                  style={{
+                    position: 'absolute',
+                    fontSize: '36px',
+                    cursor: 'pointer',
+                    top: '50%',
+                    marginTop: '-18px',
+                    right: '20px',
+                    color: '#ffffff',
+                    outline: 'none',
+                    zIndex: 99,
+                  }}
+                  onClick={() => this.handleRunNgql()}
+                />
               </div>
-              <Button className="ngql-history" type="primary" onClick={() => { this.setState({ history: true }) }}>{intl.get('common.SeeTheHistory')}</Button>
+              <Button
+                className="ngql-history"
+                type="primary"
+                onClick={() => {
+                  this.setState({ history: true });
+                }}
+              >
+                {intl.get('common.SeeTheHistory')}
+              </Button>
               <OutputBox
                 value={this.getLocalStorage().pop()}
-                onHistoryItem={e=>this.handleHistoryItem(e)}
+                onHistoryItem={(e) => this.handleHistoryItem(e)}
               />
               <Modal
                 title={intl.get('common.NGQLHistoryList')}
                 visible={history}
                 footer={null}
-                onCancel={() => {this.setState({ history: false })}}
+                onCancel={() => {
+                  this.setState({ history: false });
+                }}
               >
                 {
                   <List
                     itemLayout="horizontal"
                     dataSource={this.getLocalStorage()}
-                    renderItem={(item:string) => (
-                      <List.Item style={{ cursor: 'pointer' }} onClick={() => this.handleHistoryItem(item)}>
+                    renderItem={(item: string) => (
+                      <List.Item
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => this.handleHistoryItem(item)}
+                      >
                         {item}
                       </List.Item>
                     )}
