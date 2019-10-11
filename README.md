@@ -3,12 +3,15 @@
 ## QuickStart
 
 ### Dev
-
+#### node server
 ```bash
 $ npm i
 $ npm run dev
 $ open http://localhost:7001/
 ```
+#### go server
+this is for nebula database service for lack of nebula node client which proxy our node relative nebula apis 
+[go server start](./go-api/README.md)
 
 ### Deploy
 
