@@ -7,5 +7,6 @@ import (
 )
 
 func init() {
-	beego.Router("/api/connect", &controllers.DatabaseController{}, "*:Connect")
+	beego.Router("/api/db/connect", &controllers.DatabaseController{}, "*:Connect")
+	beego.Router("/api/db/exec", &controllers.DatabaseController{}, "*:Execute")
 }
