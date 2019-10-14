@@ -25,3 +25,5 @@ app/public/
 !.commitlint.js
 !app/assets/**/*.js
 config/manifest.json
+
+go-api/tmp
