@@ -13,6 +13,9 @@ $ open http://localhost:7001/
 this is for nebula database service for lack of nebula node client which proxy our node relative nebula apis 
 [go server start](./go-api/README.md)
 
+#### nebula sample data init
+[sample data init](./docs/data-init.md)
+
 ### Deploy
 
 ```bash
@@ -30,6 +33,7 @@ $ npm start - start server
 
 - Node.js 8.x
 - Typescript 2.8+
+- docker
 
 ### Docs
 - Style Required: https://github.com/vesoft-inc/nebula-web-console/blob/master/docs/style.md

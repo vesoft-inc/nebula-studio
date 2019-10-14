@@ -1,0 +1,7 @@
+CREATE SPACE my_test(partition_num=1, replica_factor=1);
+use my_test;
+CREATE TAG course(name string, credits int);
+CREATE TAG building(name string);
+CREATE TAG student(name string, age int, gender string);
+CREATE EDGE like(likeness double);
+CREATE EDGE select(grade int);
