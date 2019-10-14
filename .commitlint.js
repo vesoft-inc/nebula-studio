@@ -8,6 +8,7 @@ module.exports = {
       // [feat|fix|docs|refactor|test|chore|revert]: your message
       [
         'feat', // add function (添加功能)
+        'mod', // modify changes (修改)
         'fix', // fix bugs
         'docs', // docs modify
         'refactor', // refactor (重构)
