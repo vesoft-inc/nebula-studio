@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	graphdb "go-api/service"
 
 	"github.com/astaxie/beego"
@@ -16,11 +17,20 @@ type Response struct {
 	Message string `json:"message"`
 }
 
+type Request struct {
+	Username string `json:username`
+	Password string `json:password`
+	Host     string `json:host`
+	Gql      string `json:host`
+}
+
 type Data map[string]interface{}
 
 func (this *DatabaseController) Connect() {
 	var res Response
-	ok := graphdb.Connect("127.0.0.1:3699", "user", "password")
+	var params Request
+	json.Unmarshal(this.Ctx.Input.RequestBody, &params)
+	ok := graphdb.Connect(params.Host, params.Username, params.Password)
 	if ok {
 		res.Code = "0"
 	} else {
@@ -33,11 +43,9 @@ func (this *DatabaseController) Connect() {
 
 func (this *DatabaseController) Execute() {
 	var res Response
-	host := this.GetString("host")
-	username := this.GetString("username")
-	password := this.GetString("password")
-	gql := this.GetString("gql")
-	result, err := graphdb.Execute(host, username, password, gql)
+	var params Request
+	json.Unmarshal(this.Ctx.Input.RequestBody, &params)
+	result, err := graphdb.Execute(params.Host, params.Username, params.Password, params.Gql)
 	if err == nil {
 		res.Code = "0"
 		res.Data = &result
