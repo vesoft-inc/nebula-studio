@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	graphdb "go-api/service"
+	common "go-api/utils"
 
 	"github.com/astaxie/beego"
 )
@@ -12,9 +13,9 @@ type DatabaseController struct {
 }
 
 type Response struct {
-	Code    string `json:"code"`
-	Data    Any    `json:"data"`
-	Message string `json:"message"`
+	Code    string     `json:"code"`
+	Data    common.Any `json:"data"`
+	Message string     `json:"message"`
 }
 
 type Request struct {
@@ -36,7 +37,7 @@ func (this *DatabaseController) Connect() {
 	} else {
 		res.Code = "-1"
 	}
-	res.Data = make(map[string]Any)
+	res.Data = make(map[string]common.Any)
 	this.Data["json"] = &res
 	this.ServeJSON()
 }
