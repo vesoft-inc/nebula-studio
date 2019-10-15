@@ -25,5 +25,5 @@ app/public/
 !.commitlint.js
 !app/assets/**/*.js
 config/manifest.json
-go-api/go-api
-go-api/tmp
+nebula-go-api/nebula-go-api
+nebula-go-api/tmp

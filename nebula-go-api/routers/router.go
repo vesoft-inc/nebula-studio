@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"go-api/controllers"
+	"nebula-go-api/controllers"
 
 	"github.com/astaxie/beego"
 )

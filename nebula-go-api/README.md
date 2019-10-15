@@ -1,4 +1,4 @@
-# go-api
+# nebula-go-api
 this is a back end client service for nebula data server
 
 ## Run

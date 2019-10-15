@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "go-api/routers"
+	_ "nebula-go-api/routers"
 
 	"github.com/astaxie/beego"
 )

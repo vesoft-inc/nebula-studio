@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	graphdb "go-api/service"
-	common "go-api/utils"
+	graphdb "nebula-go-api/service"
+	common "nebula-go-api/utils"
 
 	"github.com/astaxie/beego"
 )

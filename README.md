@@ -11,7 +11,7 @@ $ open http://localhost:7001/
 ```
 #### go server
 this is for nebula database service for lack of nebula node client which proxy our node relative nebula apis 
-[go server start](./go-api/README.md)
+[go server start](./nebula-go-api/README.md)
 
 #### nebula sample data init
 [sample data init](./docs/data-init.md)
@@ -29,11 +29,12 @@ $ npm start - start server
 - Use `npm test` to run unit test
 - se `npm run clean` to clean compiled js at development mode once
 
-### Required
+## Required
 
 - Node.js 8.x
 - Typescript 2.8+
 - docker
 
-### Docs
-- Style Required: https://github.com/vesoft-inc/nebula-web-console/blob/master/docs/style.md
+## Docs
+- [Project Style Introduction](./docs/style.md)
+- [Nebula Server Data Init](./docs/data-init.md)

@@ -2,7 +2,7 @@ package graphdb
 
 import (
 	"errors"
-	common "go-api/utils"
+	common "nebula-go-api/utils"
 	"log"
 
 	nebula "github.com/vesoft-inc/nebula-go"

@@ -1,4 +1,4 @@
-module go-api
+module nebula-go-api
 
 go 1.13
 
