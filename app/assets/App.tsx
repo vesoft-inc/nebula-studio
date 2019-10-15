@@ -17,6 +17,7 @@ interface IState {
   code: string;
   isUpDown: boolean;
   history: boolean;
+  data: any[];
 }
 
 type IProps = RouteComponentProps;
@@ -35,6 +36,7 @@ class App extends React.Component<IProps, IState> {
       : INTL_LOCALE_SELECT.EN_US.NAME;
     this.currentLocale = defaultLocale;
     this.state = {
+      data: [],
       loading: true,
       code: 'The default statement',
       isUpDown: true,
@@ -101,9 +103,6 @@ class App extends React.Component<IProps, IState> {
     }
     const history = this.getLocalStorage().slice(-15);
     history.push(this.state.code);
-    this.setState({
-      loading: false,
-    });
 
     service
       .execNGQL({
@@ -113,7 +112,9 @@ class App extends React.Component<IProps, IState> {
         gql: 'SHOW SPACES;',
       })
       .then((res) => {
-        console.log(res, 'xxxxxxxx');
+        this.setState({
+          data: res.data,
+        });
       });
     localStorage.setItem('history', JSON.stringify(history));
   }
@@ -126,7 +127,7 @@ class App extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { loading, isUpDown, code, history } = this.state;
+    const { loading, isUpDown, code, history, data } = this.state;
     return (
       <LanguageContext.Provider
         value={{
@@ -225,6 +226,7 @@ class App extends React.Component<IProps, IState> {
                 {intl.get('common.SeeTheHistory')}
               </Button>
               <OutputBox
+                data={data}
                 value={this.getLocalStorage().pop()}
                 onHistoryItem={(e) => this.handleHistoryItem(e)}
               />
