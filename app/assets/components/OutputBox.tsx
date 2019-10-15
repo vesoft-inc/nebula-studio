@@ -1,7 +1,7 @@
 import { Table, Tabs } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
-import { codeLog } from '../config/codeLog'
+import { codeLog } from '../config/codeLog';
 
 interface IProps {
   value: string;
