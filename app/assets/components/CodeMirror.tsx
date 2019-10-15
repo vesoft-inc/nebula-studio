@@ -16,7 +16,7 @@ interface IProps {
   ref: any;
   width?: string;
   height?: string;
-  onChange?: () => void;
+  onChange?: (value: string) => void;
 }
 
 export default class ReactCodeMirror extends React.Component<IProps, any> {
@@ -82,7 +82,7 @@ export default class ReactCodeMirror extends React.Component<IProps, any> {
 
   codemirrorValueChange = (doc, change) => {
     if (this.props.onChange && change.origin !== 'setValue') {
-      this.props.onChange(doc.getValue(), change);
+      this.props.onChange(doc.getValue());
     }
   }
 

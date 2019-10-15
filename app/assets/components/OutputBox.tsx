@@ -4,7 +4,7 @@ import intl from 'react-intl-universal';
 
 interface IProps {
   value: string;
-  onHistoryItem: () => void;
+  onHistoryItem: (value: string) => void;
 }
 
 export default class OutputBox extends React.Component<IProps, {}> {

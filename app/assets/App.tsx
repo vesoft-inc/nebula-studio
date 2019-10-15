@@ -5,6 +5,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 import './App.less';
 import { CodeMirror, OutputBox } from './components';
 import { INTL_LOCALE_SELECT, INTL_LOCALES } from './config';
+import service from './config/service';
 import { LanguageContext } from './context';
 import { updateQueryStringParameter } from './utils';
 
@@ -98,11 +99,22 @@ class App extends React.Component<IProps, IState> {
       message.error(intl.get('common.SorryNGQLCannotBeEmpty'));
       return;
     }
-    const history = this.getLocalStorage();
+    const history = this.getLocalStorage().slice(-15);
     history.push(this.state.code);
     this.setState({
       loading: false,
     });
+
+    service
+      .execNGQL({
+        username: 'user',
+        password: 'password',
+        host: '127.0.0.1:3699',
+        gql: 'SHOW SPACES;',
+      })
+      .then((res) => {
+        console.log(res, 'xxxxxxxx');
+      });
     localStorage.setItem('history', JSON.stringify(history));
   }
 
@@ -148,9 +160,8 @@ class App extends React.Component<IProps, IState> {
                   value={code}
                   ref={this.getInstance}
                   onChange={(e) => this.handleCodeEditr(e)}
-                  height={isUpDown ? '180px' : '360px'}
+                  height={isUpDown ? '300px' : '600px'}
                   options={{
-                    theme: 'monokai',
                     keyMap: 'sublime',
                     fullScreen: true,
                     mode: 'nebula',
@@ -165,7 +176,7 @@ class App extends React.Component<IProps, IState> {
                       cursor: 'pointer',
                       bottom: 0,
                       right: '28px',
-                      color: '#ffffff',
+                      color: '#dddddd',
                       outline: 'none',
                       zIndex: 99,
                     }}
@@ -181,7 +192,7 @@ class App extends React.Component<IProps, IState> {
                       cursor: 'pointer',
                       bottom: 0,
                       right: '28px',
-                      color: '#ffffff',
+                      color: '#dddddd',
                       outline: 'none',
                       zIndex: 99,
                     }}
@@ -197,7 +208,7 @@ class App extends React.Component<IProps, IState> {
                     top: '50%',
                     marginTop: '-18px',
                     right: '20px',
-                    color: '#ffffff',
+                    color: '#dddddd',
                     outline: 'none',
                     zIndex: 99,
                   }}

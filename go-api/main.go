@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "go-api/routers"
+
 	"github.com/astaxie/beego"
 )
 
