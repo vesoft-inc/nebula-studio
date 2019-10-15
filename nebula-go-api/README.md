@@ -5,6 +5,7 @@ this is a back end client service for nebula data server
 ```bash
 // dev
 // run nebula server docker
+$ cd scripts/
 $ docker-compose up -d
 
 
@@ -17,4 +18,3 @@ $ fresh main.go
 - Go 11+
 - [beego](https://beego.me/)
 - docker
-- [nebula docker](https://github.com/vesoft-inc/nebula/tree/master/docker)
