@@ -1,10 +1,11 @@
 import { Table, Tabs } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
+import { codeLog } from '../config/codeLog'
 
 interface IProps {
   value: string;
-  data: any[];
+  data: any;
   onHistoryItem: (value: string) => void;
 }
 
@@ -53,14 +54,14 @@ export default class OutputBox extends React.Component<IProps, IState> {
 
   render() {
     const { columns, dataSource } = this.state;
-    console.log(columns, dataSource);
+    const { value, data } = this.props;
     return (
       <div className="output-box">
         <p
           className="output-value"
-          onClick={() => this.props.onHistoryItem(this.props.value)}
+          onClick={() => this.props.onHistoryItem(value)}
         >
-          {this.props.value}
+          {value}
         </p>
         <div className="tab-container">
           <Tabs defaultActiveKey="1" size={'large'}>
@@ -68,7 +69,7 @@ export default class OutputBox extends React.Component<IProps, IState> {
               <Table columns={columns} dataSource={dataSource} />
             </Tabs.TabPane>
             <Tabs.TabPane tab={intl.get('common.Log')} key="2">
-              Log 2
+              {data.code === undefined ? '' : codeLog[data.code]}
             </Tabs.TabPane>
             <Tabs.TabPane tab={intl.get('common.Record')} key="3">
               Record 3
