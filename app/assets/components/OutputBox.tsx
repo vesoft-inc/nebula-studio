@@ -32,7 +32,7 @@ export default class OutputBox extends React.Component<IProps, IState> {
       });
     });
     return columns;
-  };
+  }
 
   getDataSource = (data: any[]) => {
     const dataSource: any[] = [];
@@ -41,7 +41,7 @@ export default class OutputBox extends React.Component<IProps, IState> {
       dataSource.push(value);
     });
     return dataSource;
-  };
+  }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.data.data) {
