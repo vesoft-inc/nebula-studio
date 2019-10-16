@@ -1,60 +1,37 @@
 import { Table, Tabs } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
-import { codeLog } from '../config/codeLog';
 
 interface IProps {
   value: string;
-  data: any;
+  result: any;
   onHistoryItem: (value: string) => void;
 }
 
-interface IState {
-  dataSource: any[];
-  columns: any[];
-}
-
-export default class OutputBox extends React.Component<IProps, IState> {
+export default class OutputBox extends React.Component<IProps, {}> {
   constructor(props) {
     super(props);
-    this.state = {
-      columns: [],
-      dataSource: [],
-    };
-  }
-
-  getColumns = (data: any[]) => {
-    const columns: any[] = [];
-    data.forEach((value: string) => {
-      columns.push({
-        title: value,
-        dataIndex: value,
-      });
-    });
-    return columns;
-  }
-
-  getDataSource = (data: any[]) => {
-    const dataSource: any[] = [];
-    data.forEach((value: any, index: number) => {
-      value.key = index;
-      dataSource.push(value);
-    });
-    return dataSource;
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.data.data) {
-      this.setState({
-        columns: this.getColumns(nextProps.data.data.headers),
-        dataSource: this.getDataSource(nextProps.data.data.tables),
-      });
-    }
   }
 
   render() {
-    const { columns, dataSource } = this.state;
-    const { value, data } = this.props;
+    const { value, result= {} } = this.props;
+    let columns = [];
+    let dataSource = [];
+    if (result.code === '0') {
+      if (result.data && result.data.headers) {
+        columns = result.data.headers.map((column) => {
+          return {
+            title: column,
+            dataIndex: column,
+          };
+        });
+      }
+
+      if (result.data && result.data.tables) {
+        dataSource = result.data.tables;
+      }
+    }
+
     return (
       <div className="output-box">
         <p
@@ -64,16 +41,16 @@ export default class OutputBox extends React.Component<IProps, IState> {
           {value}
         </p>
         <div className="tab-container">
-          <Tabs defaultActiveKey="1" size={'large'}>
-            <Tabs.TabPane tab={intl.get('common.Table')} key="1">
+          <Tabs defaultActiveKey="log" size={'large'}>
+            {result.code === '0' && <Tabs.TabPane tab={intl.get('common.table')} key="table">
               <Table columns={columns} dataSource={dataSource} />
+            </Tabs.TabPane>}
+            <Tabs.TabPane tab={intl.get('common.log')} key="log">
+              {result.code === '0' ? intl.get('NGQLOutput.success') : result.message}
             </Tabs.TabPane>
-            <Tabs.TabPane tab={intl.get('common.Log')} key="2">
-              {data.code === undefined ? '' : codeLog[data.code]}
-            </Tabs.TabPane>
-            <Tabs.TabPane tab={intl.get('common.Record')} key="3">
+            {/* <Tabs.TabPane tab={intl.get('common.record')} key="3">
               Record 3
-            </Tabs.TabPane>
+            </Tabs.TabPane> */}
           </Tabs>
         </div>
       </div>

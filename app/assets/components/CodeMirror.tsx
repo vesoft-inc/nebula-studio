@@ -19,7 +19,7 @@ interface IProps {
   onChange?: (value: string) => void;
 }
 
-export default class ReactCodeMirror extends React.Component<IProps, any> {
+export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
   codemirror;
   editor;
   textarea;

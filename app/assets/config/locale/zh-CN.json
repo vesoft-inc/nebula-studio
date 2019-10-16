@@ -1,11 +1,14 @@
 {
   "common": {
     "languageSelect": "语言" ,
-    "SeeTheHistory":"查看历史",
-    "Table": "表格",
-    "Log":"日志",
-    "Record": "记录",
-    "SorryNGQLCannotBeEmpty": "对不起， NGQL语句不能为空",
-    "NGQLHistoryList": "NGQL 历史列表"
+    "seeTheHistory":"查看历史",
+    "table": "表格",
+    "log":"日志",
+    "record": "记录",
+    "sorryNGQLCannotBeEmpty": "对不起， NGQL语句不能为空",
+    "NGQlHistoryList": "NGQL 历史列表"
+  },
+  "NGQLOutput": {
+    "success": "执行成功"
   }
 }

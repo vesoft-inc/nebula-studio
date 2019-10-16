@@ -1,11 +1,19 @@
 
+const nebulaWords = [
+  'SHOW',
+  'GO',
+  'VERTEX',
+  'EDGE',
+  'VALUES',
+  'OVER',
+  'FROM',
+  'YIELD',
+  'SPACES',
+  'SPACE',
+  'YIELD',
+];
+
 export const HighLightList = [
-  'hint1',
-  'hint2',
-  'ha2',
-  'ha3',
-  'hello',
-  'test',
-  '$aaa$',
-  'ssss',
+  ...nebulaWords,
+  ...nebulaWords.map((w) => w.toLowerCase()),
 ];

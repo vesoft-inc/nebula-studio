@@ -17,7 +17,7 @@ interface IState {
   code: string;
   isUpDown: boolean;
   history: boolean;
-  data: any[];
+  result: any;
 }
 
 type IProps = RouteComponentProps;
@@ -36,9 +36,9 @@ class App extends React.Component<IProps, IState> {
       : INTL_LOCALE_SELECT.EN_US.NAME;
     this.currentLocale = defaultLocale;
     this.state = {
-      data: [],
+      result: {},
       loading: true,
-      code: 'The default statement',
+      code: 'SHOW SPACES;',
       isUpDown: true,
       history: false,
     };
@@ -76,12 +76,6 @@ class App extends React.Component<IProps, IState> {
     this.loadIntlLocale();
   }
 
-  handleCodeEditr = (value: string) => {
-    this.setState({
-      code: value,
-    });
-  }
-
   handleUpDown = () => {
     this.setState({
       isUpDown: !this.state.isUpDown,
@@ -97,26 +91,28 @@ class App extends React.Component<IProps, IState> {
   }
 
   handleRunNgql = () => {
-    if (!this.state.code) {
-      message.error(intl.get('common.SorryNGQLCannotBeEmpty'));
+    const code = this.editor.getValue();
+    if (!code) {
+      message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
       return;
     }
     const history = this.getLocalStorage().slice(-15);
-    history.push(this.state.code);
+    history.push(code);
+    localStorage.setItem('history', JSON.stringify(history));
 
     service
       .execNGQL({
         username: 'user',
         password: 'password',
         host: '127.0.0.1:3699',
-        gql: 'SHOW SPACES;',
+        gql: code,
       })
       .then((res) => {
         this.setState({
-          data: res.data,
+          code,
+          result: res.data,
         });
       });
-    localStorage.setItem('history', JSON.stringify(history));
   }
 
   handleHistoryItem = (value: string) => {
@@ -127,7 +123,7 @@ class App extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { loading, isUpDown, code, history, data } = this.state;
+    const { loading, isUpDown, code, history, result } = this.state;
     return (
       <LanguageContext.Provider
         value={{
@@ -160,7 +156,6 @@ class App extends React.Component<IProps, IState> {
                 <CodeMirror
                   value={code}
                   ref={this.getInstance}
-                  onChange={(e) => this.handleCodeEditr(e)}
                   height={isUpDown ? '300px' : '600px'}
                   options={{
                     keyMap: 'sublime',
@@ -223,10 +218,10 @@ class App extends React.Component<IProps, IState> {
                   this.setState({ history: true });
                 }}
               >
-                {intl.get('common.SeeTheHistory')}
+                {intl.get('common.seeTheHistory')}
               </Button>
               <OutputBox
-                data={data}
+                result={result}
                 value={this.getLocalStorage().pop()}
                 onHistoryItem={(e) => this.handleHistoryItem(e)}
               />
