@@ -10,15 +10,13 @@ const commonConfig = {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         use: [
           'babel-loader',
-          'ts-loader',
           {
-            loader: 'ui-component-loader',
+            loader: 'ts-loader',
             options: {
-              lib: 'antd',
-              style: 'style/index.css',
+              configFile: path.join(__dirname, '../tsconfig.front.json'),
             },
           },
         ],

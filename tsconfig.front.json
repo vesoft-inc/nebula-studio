@@ -2,8 +2,9 @@
   "compileOnSave": true,
   "compilerOptions": {
     "target": "esnext",
-    "module": "commonjs",
+    "module": "esnext",
     "strict": true,
+    "jsx": "react",
     "noImplicitAny": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -25,5 +26,6 @@
     "moduleResolution": "node",
     "resolveJsonModule": true
   },
-  "exclude": ["app/public", "app/assets", "node_modules*"]
+  "exclude": ["node_modules*"],
+  "include": ["app/assets"]
 }

@@ -1,31 +1,35 @@
 {
-    "presets": [
-        ["@babel/preset-env", {
-            "modules": "commonjs",
-            "targets": {
-                "chrome": "58",
-                "ie": "11"
-            }
-        }],
-        "@babel/preset-react"
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "modules": "commonjs",
+        "targets": {
+          "chrome": "58",
+          "ie": "11"
+        }
+      }
     ],
-    "plugins": [
-        "react-hot-loader/babel",
-        [
-            "import",
-            {
-                "libraryName": "antd",
-                "style": "css"
-            }
-        ],
-        [
-            "@babel/plugin-proposal-decorators",
-            {
-                "legacy": true
-            }
-        ],
-        "@babel/plugin-proposal-class-properties",
-        "@babel/plugin-transform-runtime",
-        "@babel/plugin-syntax-dynamic-import"
-    ]
+    "@babel/preset-react"
+  ],
+  "plugins": [
+    "react-hot-loader/babel",
+    [
+      "import",
+      {
+        "libraryName": "antd",
+        "libraryDirectory": "es",
+        "style": true
+      }
+    ],
+    [
+      "@babel/plugin-proposal-decorators",
+      {
+        "legacy": true
+      }
+    ],
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-transform-runtime",
+    "@babel/plugin-syntax-dynamic-import"
+  ]
 }
