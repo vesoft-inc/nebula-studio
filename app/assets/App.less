@@ -1,8 +1,29 @@
-html body , p{
+html body {
+  height: 100%;
   padding:0;
   margin:0;
 }
+
+p {
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  height: 100%;
+  > .ant-spin-nested-loading {
+    height: 100%;
+    > .ant-spin-container {
+      height: 100%;
+      > .ant-layout {
+        height: 100%;
+      }
+    }
+  }
+}
 .nebula-web-console {
+  background: #d2d5da;
+
   .lang-select {
     float: right;
     > span {
@@ -16,34 +37,9 @@ html body , p{
       width: 100px;
     }
   }
-  .ngql-content{
-    position: relative;
-    font-size: 18px;
-    width: 90%;
-    margin: 0 auto;
-  }
-  .ngql-history{
-    float: right;
-    margin:65px 6% 0;
-  }
-  .output-box{
-    width: 90%;
-    border: 2px solid #dddddd;
-    margin: 50px auto 0;
-    .output-value{
-      padding: 0 12px;
-      width: 60%;
-      cursor: pointer;
-      font-size: 20px;
-      white-space: nowrap;
-      text-overflow:ellipsis;
-      overflow:hidden;
-      line-height: 60px;
-    }
-    .tab-container{
-      border-top: 1px solid #dddddd;
-      margin-bottom: 20px;
-      padding: 0 10px;
-    }
+
+  .ant-layout-content {
+    padding: 0 4% 24px 4%;
+    overflow: auto;
   }
 }

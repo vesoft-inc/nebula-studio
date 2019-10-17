@@ -1,0 +1,73 @@
+.nebula-console {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .ngql-content{
+    position: relative;
+    display: flex;
+    background: #efeff4;
+    padding: 16px 8px;
+    font-size: 16px;
+    > .mirror-wrap {
+        flex: 1;
+        > .expand {
+          height: 14px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: #f9f9f9;
+          cursor: pointer;
+
+          &:hover {
+            background: #f7f7f7;
+          }
+
+          > .anticon {
+            font-size: 12px;
+          }
+        }
+    }
+    > .anticon-play-circle {
+      display: flex;
+      width: 64px;
+      justify-content: center;
+      align-items: center;
+      font-size: 32px;
+    }
+  }
+
+  .result-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-top: 32px;
+
+    .ngql-history {
+      width: 100px;
+    }
+
+    .output-box{
+      flex: 1;
+      margin-top: 12px;
+      overflow: hidden;
+      background: #f7f7f7;
+
+      .output-value{
+        padding: 0 12px;
+        cursor: pointer;
+        font-size: 12px;
+        white-space: nowrap;
+        text-overflow:ellipsis;
+        overflow:hidden;
+        line-height: 32px;
+      }
+
+      .tab-container{
+        border-top: 1px solid #dddddd;
+        margin-bottom: 20px;
+        padding: 0 10px;
+      }
+    }
+  }
+}

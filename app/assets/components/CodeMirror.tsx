@@ -56,7 +56,7 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
     const options = Object.assign(
       {
         tabSize: 2,
-        fontSize: '28px',
+        fontSize: '14px',
         autoCloseBrackets: true,
         matchBrackets: true,
         showCursorWhenSelecting: true,
