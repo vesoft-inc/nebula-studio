@@ -19,10 +19,10 @@ type Response struct {
 }
 
 type Request struct {
-	Username string `json:username`
-	Password string `json:password`
-	Host     string `json:host`
-	Gql      string `json:host`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Host string `json:"host"`
+	Gql string `json:"gql"`
 }
 
 type Data map[string]interface{}
