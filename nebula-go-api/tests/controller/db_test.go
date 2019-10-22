@@ -37,7 +37,8 @@ func Test_DB_Connect(t *testing.T) {
 
 		client := &http.Client{}
 		fmt.Println("client :", client)
-    resp, err := client.Do(req)
+		resp, err := client.Do(req)
+		
     if err != nil {
         panic(err)
     }
