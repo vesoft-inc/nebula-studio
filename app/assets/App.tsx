@@ -1,5 +1,6 @@
 import { Layout, Select, Spin } from 'antd';
 import React from 'react';
+import { hot } from 'react-hot-loader/root';
 import intl from 'react-intl-universal';
 import { BrowserRouter as Router, Redirect, Route, RouteComponentProps, Switch, withRouter } from 'react-router-dom';
 import './App.less';
@@ -104,4 +105,4 @@ class App extends React.Component<IProps, IState> {
   }
 }
 
-export default withRouter(App);
+export default withRouter(hot(App));

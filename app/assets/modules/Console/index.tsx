@@ -89,68 +89,68 @@ export default class Console extends React.Component<IProps, IState> {
 
     return (
       <div className="nebula-console">
-      <div className="ngql-content">
-          <div className="mirror-wrap">
-            <CodeMirror
-              value={code}
-              ref={this.getInstance}
-              height={isUpDown ? '34px' : '600px'}
-              options={{
-                keyMap: 'sublime',
-                fullScreen: true,
-                mode: 'nebula',
-              }}
-            />
-            <div className="expand" onClick={this.handleUpDown}>
-              {
-               isUpDown ? <Icon type="down" /> : <Icon type="up" />
-              }
+        <div className="ngql-content">
+            <div className="mirror-wrap">
+              <CodeMirror
+                value={code}
+                ref={this.getInstance}
+                height={isUpDown ? '34px' : '600px'}
+                options={{
+                  keyMap: 'sublime',
+                  fullScreen: true,
+                  mode: 'nebula',
+                }}
+              />
+              <div className="expand" onClick={this.handleUpDown}>
+                {
+                isUpDown ? <Icon type="down" /> : <Icon type="up" />
+                }
+              </div>
             </div>
+            <Icon
+              type="play-circle"
+              onClick={() => this.handleRunNgql()}
+            />
           </div>
-          <Icon
-            type="play-circle"
-            onClick={() => this.handleRunNgql()}
+        <div className="result-wrap">
+          <Button
+            className="ngql-history"
+            type="primary"
+            onClick={() => {
+              this.setState({ history: true });
+            }}
+          >
+            {intl.get('common.seeTheHistory')}
+          </Button>
+          <OutputBox
+            result={result}
+            value={this.getLocalStorage().pop()}
+            onHistoryItem={(e) => this.handleHistoryItem(e)}
           />
         </div>
-      <div className="result-wrap">
-        <Button
-          className="ngql-history"
-          type="primary"
-          onClick={() => {
-            this.setState({ history: true });
+        <Modal
+          title={intl.get('common.NGQLHistoryList')}
+          visible={history}
+          footer={null}
+          onCancel={() => {
+            this.setState({ history: false });
           }}
         >
-          {intl.get('common.seeTheHistory')}
-        </Button>
-        <OutputBox
-          result={result}
-          value={this.getLocalStorage().pop()}
-          onHistoryItem={(e) => this.handleHistoryItem(e)}
-        />
-      </div>
-      <Modal
-        title={intl.get('common.NGQLHistoryList')}
-        visible={history}
-        footer={null}
-        onCancel={() => {
-          this.setState({ history: false });
-        }}
-      >
-        {
-          <List
-            itemLayout="horizontal"
-            dataSource={this.getLocalStorage()}
-            renderItem={(item: string) => (
-              <List.Item
-                style={{ cursor: 'pointer' }}
-                onClick={() => this.handleHistoryItem(item)}
-              >
-                {item}
-              </List.Item>
-            )}
-          />
-        }
-      </Modal>
+          {
+            <List
+              itemLayout="horizontal"
+              dataSource={this.getLocalStorage()}
+              renderItem={(item: string) => (
+                <List.Item
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => this.handleHistoryItem(item)}
+                >
+                  {item}
+                </List.Item>
+              )}
+            />
+          }
+        </Modal>
       </div>
     );
   }

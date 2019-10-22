@@ -17,7 +17,8 @@
     "tsc": "ets && tsc -p tsconfig.json",
     "ci": "npm run lint && npm run cov && npm run tsc",
     "autod": "autod",
-    "lint": "tslint --project . -c tslint.json --fix",
+    "lint": "tslint --project . -c tslint.json",
+    "lint-fix": "tslint --project . -c tslint.json --fix",
     "clean": "ets clean",
     "build": "webpack --config config/webpack.prod.ts"
   },
@@ -99,7 +100,6 @@
   "husky": {
     "hooks": {
       "pre-commit": "npm run test",
-      "pre-push": "npm run test",
       "commit-msg": "commitlint --config ./.commitlint.js -E HUSKY_GIT_PARAMS"
     }
   },
@@ -113,6 +113,5 @@
   "eslintIgnore": [
     "coverage"
   ],
-  "author": "ljracm@gmail.com",
   "license": "MIT"
 }
