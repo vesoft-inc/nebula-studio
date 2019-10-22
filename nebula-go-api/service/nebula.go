@@ -17,13 +17,13 @@ type ExecuteResult struct {
 func connect(host, username, password string) (client *nebula.GraphClient, err error) {
 	client, err = nebula.NewClient(host)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return client, err
 	}
 
 	err = client.Connect(username, password)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return client, err
 	}
 
@@ -55,7 +55,7 @@ func getColumnValue(p *graph.ColumnValue) common.Any {
 func Connect(host, username, password string) bool {
 	client, err := connect(host, username, password)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return false
 	}
 	defer client.Disconnect()
@@ -66,12 +66,12 @@ func Execute(host, username, password, gql string) (result ExecuteResult, err er
 	client, err := connect(host, username, password)
 	defer client.Disconnect()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return result, err
 	}
 	resp, err := client.Execute(gql)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return result, err
 	} else {
 		if resp.GetErrorCode() != graph.ErrorCode_SUCCEEDED {
