@@ -47,7 +47,7 @@ export default class OutputBox extends React.Component<IProps, {}> {
           style={NGQLStyle}
           onClick={() => this.props.onHistoryItem(value)}
         >
-          {value}
+          $ {value}
         </p>
         <div className="tab-container">
           <Tabs defaultActiveKey={'log'} size={'large'} tabPosition={'left'}>

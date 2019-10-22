@@ -1,16 +1,24 @@
 import { Button, Icon, List, message, Modal } from 'antd';
+import cookies from 'js-cookie';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { RouteComponentProps } from 'react-router-dom';
 import { CodeMirror, OutputBox } from '../../components';
 import service from '../../config/service';
+import Command from '../Command';
 import './index.less';
+
+enum OutType {
+  nGQL = 'NGQL',
+  command = 'command',
+}
 
 interface IState {
   code: string;
   isUpDown: boolean;
   history: boolean;
   result: any;
+  outType: OutType;
 }
 
 type IProps = RouteComponentProps;
@@ -27,46 +35,71 @@ export default class Console extends React.Component<IProps, IState> {
       code: 'SHOW SPACES;',
       isUpDown: true,
       history: false,
+      outType: OutType.nGQL,
     };
   }
 
   getLocalStorage = () => {
     const value: string | null = localStorage.getItem('history');
     if (value && value !== 'undefined' && value !== 'null') {
-      return JSON.parse(value);
+      return JSON.parse(value).reverse();
     }
     return [];
   }
 
-  handleRunNgql = () => {
+  handleRun = async () => {
     const code = this.editor.getValue();
     if (!code) {
       message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
       return;
     }
-    const history = this.getLocalStorage().slice(-15);
+    const history = this.getLocalStorage().slice(0, 15);
     history.push(code);
     localStorage.setItem('history', JSON.stringify(history));
 
-    service
-      .execNGQL({
-        username: 'user',
-        password: 'password',
-        host: '127.0.0.1:3699',
-        gql: code,
-      })
-      .then((res) => {
-        this.setState({
-          code,
-          result: res.data,
-          isUpDown: true,
-        });
+    if (code.length && code.trim()[0] === ':') {
+      this.setState({
+        outType: OutType.command,
+        code,
       });
+    } else {
+      this.setState({
+        outType: OutType.nGQL,
+        code,
+      });
+      await this.runNGQL(code);
+    }
+  }
+
+  runNGQL = async (code: string) => {
+    const username = cookies.get('username');
+    const password = cookies.get('password');
+    const host = cookies.get('host');
+    if (!username || !password || !host) {
+      message.warning(intl.get('warning.configServer'));
+      this.setState({
+        code: ':connect server',
+        outType: OutType.command,
+      });
+      return;
+    }
+    const result = await service
+      .execNGQL({
+        username,
+        password,
+        host,
+        gql: code,
+      });
+    this.setState({
+      result,
+      isUpDown: true,
+    });
   }
 
   handleHistoryItem = (value: string) => {
     this.setState({
       code: value,
+      outType: value[0] === ':' ? OutType.command : OutType.nGQL,
       history: false,
     });
   }
@@ -85,7 +118,7 @@ export default class Console extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { isUpDown, code, history, result } = this.state;
+    const { isUpDown, code, history, result, outType } = this.state;
 
     return (
       <div className="nebula-console">
@@ -109,7 +142,7 @@ export default class Console extends React.Component<IProps, IState> {
             </div>
             <Icon
               type="play-circle"
-              onClick={() => this.handleRunNgql()}
+              onClick={() => this.handleRun()}
             />
           </div>
         <div className="result-wrap">
@@ -122,11 +155,18 @@ export default class Console extends React.Component<IProps, IState> {
           >
             {intl.get('common.seeTheHistory')}
           </Button>
-          <OutputBox
-            result={result}
-            value={this.getLocalStorage().pop()}
-            onHistoryItem={(e) => this.handleHistoryItem(e)}
-          />
+          {
+            outType === OutType.nGQL ? (
+              <OutputBox
+                result={result}
+                value={this.getLocalStorage().pop()}
+                onHistoryItem={(e) => this.handleHistoryItem(e)}
+              />
+            ) : (
+              <Command command={code.substr(1)} />
+            )
+          }
+
         </div>
         <Modal
           title={intl.get('common.NGQLHistoryList')}

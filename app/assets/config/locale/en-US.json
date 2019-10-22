@@ -10,5 +10,22 @@
   },
   "NGQLOutput": {
     "success": "execute success!"
+  },
+  "warning": {
+    "configServer": "Please config server"
+  },
+  "configServer": {
+    "connect": "Connect",
+    "host": "Host",
+    "username": "Username",
+    "password": "Password",
+    "success": "succeed",
+    "fail": "Failed",
+    "clear": "Clear config"
+  },
+  "formRules": {
+    "hostRequired": "Host required",
+    "usernameRequired": "Username required",
+    "passwordRequired": "Password required"
   }
 }

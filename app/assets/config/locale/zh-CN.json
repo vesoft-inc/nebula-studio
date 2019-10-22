@@ -8,7 +8,24 @@
     "sorryNGQLCannotBeEmpty": "对不起， NGQL语句不能为空",
     "NGQlHistoryList": "NGQL 历史列表"
   },
+  "warning": {
+    "configServer": "请先配置服务器"
+  },
   "NGQLOutput": {
     "success": "执行成功"
+  },
+  "configServer": {
+    "connect": "连接",
+    "host": "Host",
+    "username": "用户名",
+    "password": "密码",
+    "success": "配置成功",
+    "fail": "配置失败",
+    "clear": "清除配置"
+  },
+  "formRules": {
+    "hostRequired": "请填写 host",
+    "usernameRequired": "请填写用户名",
+    "passwordRequired": "请填写密码"
   }
 }
