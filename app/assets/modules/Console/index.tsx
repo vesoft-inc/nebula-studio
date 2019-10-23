@@ -78,7 +78,7 @@ export default class Console extends React.Component<IProps, IState> {
     if (!username || !password || !host) {
       message.warning(intl.get('warning.configServer'));
       this.setState({
-        code: ':connect server',
+        code: ':config server',
         outType: OutType.command,
       });
       return;
