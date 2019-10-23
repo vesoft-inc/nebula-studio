@@ -2,13 +2,15 @@ import CodeMirror from 'codemirror';
 import 'codemirror/addon/comment/comment';
 import 'codemirror/addon/display/autorefresh';
 import 'codemirror/addon/edit/matchbrackets';
+import 'codemirror/addon/hint/show-hint';
+import 'codemirror/addon/hint/show-hint.css';
 import 'codemirror/keymap/sublime';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/meta';
 import 'codemirror/theme/monokai.css';
 
 import React from 'react';
-import { HighLightList } from '../config/nebulaQL';
+import { highLightList, hints  } from '../config/nebulaQL';
 
 interface IProps {
   options: object;
@@ -27,7 +29,6 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
     super(props);
   }
   public componentDidMount() {
-    this.renderCodeMirror();
     CodeMirror.defineMode('nebula', () => {
       return {
         token: (stream) => {
@@ -36,7 +37,7 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
           }
           stream.eatWhile(/[\$\w\u4e00-\u9fa5]/);
           const cur = stream.current();
-          const exist = HighLightList.some((item) => {
+          const exist = highLightList.some((item) => {
             return item === cur;
           });
           if (exist) {
@@ -50,6 +51,27 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
         closeBrackets: '()[]{}\'\'""``',
       };
     });
+
+    CodeMirror.registerHelper('hint', 'nebula', (cm) => {
+      const cur = cm.getCursor();
+      const token = cm.getTokenAt(cur);
+      const start = token.start;
+      const end = cur.ch;
+      const str = token.string;
+
+      const list = hints.filter((item) => {
+          return item.indexOf(str) === 0;
+      });
+
+      if (list.length) {
+        return {
+            list,
+            from: CodeMirror.Pos(cur.line, start),
+            to: CodeMirror.Pos(cur.line, end),
+        };
+      }
+    });
+    this.renderCodeMirror();
   }
   renderCodeMirror() {
     // parameters of the combined
@@ -64,6 +86,7 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
         // show number of rows
         lineNumbers: true,
         fullScreen: true,
+        mode: 'nebula',
       },
       this.props.options,
     );
@@ -81,8 +104,13 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
   }
 
   codemirrorValueChange = (doc, change) => {
-    if (this.props.onChange && change.origin !== 'setValue') {
-      this.props.onChange(doc.getValue());
+    if (change.origin !== 'setValue') {
+      if (this.props.onChange) {
+        this.props.onChange(doc.getValue());
+      }
+    }
+    if (change.origin === '+input') {
+      this.editor.execCommand('autocomplete');
     }
   }
 

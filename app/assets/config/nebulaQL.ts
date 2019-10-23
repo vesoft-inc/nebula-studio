@@ -1,5 +1,5 @@
 
-const nebulaWords = [
+const nebulaWordsUppercase = [
   'SHOW',
   'GO',
   'VERTEX',
@@ -11,9 +11,17 @@ const nebulaWords = [
   'SPACES',
   'SPACE',
   'YIELD',
+  'CREATE',
 ];
 
-export const HighLightList = [
-  ...nebulaWords,
-  ...nebulaWords.map((w) => w.toLowerCase()),
+const nebulaWordsLowercase = nebulaWordsUppercase.map((w) => w.toLowerCase());
+
+export const highLightList = [
+  ...nebulaWordsUppercase,
+  ...nebulaWordsLowercase,
+];
+
+export const hints = [
+  ...nebulaWordsUppercase,
+  ...nebulaWordsLowercase,
 ];
