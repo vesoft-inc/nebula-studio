@@ -13,15 +13,21 @@ export default class OutputBox extends React.Component<IProps, {}> {
     super(props);
   }
 
+  outputClass = (code: any) => {
+    if (code !== undefined) {
+      if (code === '0') {
+        return 'output-success';
+      }
+      return 'output-error';
+    }
+    return '';
+  }
+
   render() {
     const { value, result= {} } = this.props;
     let columns = [];
     let dataSource = [];
-    let NGQLStyle = {};
     if (result.code === '0') {
-      NGQLStyle = {
-        color: '#00f',
-      };
       if (result.data && result.data.headers) {
         columns = result.data.headers.map((column) => {
           return {
@@ -34,17 +40,11 @@ export default class OutputBox extends React.Component<IProps, {}> {
       if (result.data && result.data.tables) {
         dataSource = result.data.tables;
       }
-    } else if (result.code === '-1') {
-      NGQLStyle = {
-        color: '#f44336',
-      };
     }
-
     return (
       <div className="output-box">
         <p
-          className="output-value"
-          style={NGQLStyle}
+          className={`output-value ${this.outputClass(result.code)}`}
           onClick={() => this.props.onHistoryItem(value)}
         >
           $ {value}

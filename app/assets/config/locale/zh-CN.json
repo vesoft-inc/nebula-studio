@@ -6,7 +6,9 @@
     "log":"日志",
     "record": "记录",
     "sorryNGQLCannotBeEmpty": "对不起， NGQL语句不能为空",
-    "NGQlHistoryList": "NGQL 历史列表"
+    "NGQlHistoryList": "NGQL 历史列表",
+    "empty": "清空",
+    "run":"运行"
   },
   "warning": {
     "configServer": "请先配置服务器"

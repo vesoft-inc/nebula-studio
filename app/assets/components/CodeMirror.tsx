@@ -10,7 +10,7 @@ import 'codemirror/mode/meta';
 import 'codemirror/theme/monokai.css';
 
 import React from 'react';
-import { highLightList, hints  } from '../config/nebulaQL';
+import { highLightList, hints, lineNum  } from '../config/nebulaQL';
 
 interface IProps {
   options: object;
@@ -19,6 +19,7 @@ interface IProps {
   width?: string;
   height?: string;
   onChange?: (value: string) => void;
+  onChangeLine?: () => void;
 }
 
 export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
@@ -112,15 +113,19 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
     if (change.origin === '+input') {
       this.editor.execCommand('autocomplete');
     }
+    if (this.props.onChangeLine && (change.origin === '+delete' || change.origin === '+input')) {
+      this.props.onChangeLine();
+    }
   }
 
   async componentWillReceiveProps(nextProps) {
-    const { options, width, height, value } = nextProps;
+    const { options, value } = nextProps;
     await this.setOptions(options);
     if (value !== this.editor.getValue()) {
       this.editor.setValue(value || '');
+      const line = this.editor.lineCount() > lineNum ? lineNum : this.editor.lineCount();
+      this.editor.setSize(undefined, line * 24 + 10 + 'px');
     }
-    this.editor.setSize(width, height);
   }
 
   async setOptions(options) {

@@ -12,28 +12,29 @@
     > .mirror-wrap {
         flex: 1;
         > .expand {
-          height: 14px;
+          height: 21px;
           display: flex;
           justify-content: center;
           align-items: center;
           background: #f9f9f9;
           cursor: pointer;
-
           &:hover {
             background: #f7f7f7;
           }
 
           > .anticon {
-            font-size: 12px;
+            font-size: 20px;
           }
         }
     }
-    > .anticon-play-circle {
+    >.anticon-play-circle, .anticon-edit {
       display: flex;
       width: 64px;
+      height: 52px;
       justify-content: center;
       align-items: center;
       font-size: 32px;
+      cursor: pointer;
     }
   }
 
@@ -63,6 +64,14 @@
         overflow:hidden;
         line-height: 42px;
         width: 95%;
+      }
+
+      .output-success{
+        color: #00f;
+      }
+
+      .output-error{
+        color: #f44336;
       }
 
       .tab-container{

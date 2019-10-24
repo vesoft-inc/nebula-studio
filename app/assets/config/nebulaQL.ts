@@ -25,3 +25,5 @@ export const hints = [
   ...nebulaWordsUppercase,
   ...nebulaWordsLowercase,
 ];
+
+export const lineNum = 20;

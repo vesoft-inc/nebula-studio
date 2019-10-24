@@ -6,7 +6,9 @@
     "log": "log",
     "record": "record",
     "sorryNGQLCannotBeEmpty": "Sorry, NGQL cannot be empty",
-    "NGQLHistoryList": "NGQL History List"
+    "NGQLHistoryList": "NGQL History List",
+    "empty": "Empty",
+    "run": "Run"
   },
   "NGQLOutput": {
     "success": "execute success!"

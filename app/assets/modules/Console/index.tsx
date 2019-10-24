@@ -1,9 +1,10 @@
-import { Button, Icon, List, message, Modal } from 'antd';
+import { Button, Icon, List, message, Modal, Tooltip } from 'antd';
 import cookies from 'js-cookie';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { RouteComponentProps } from 'react-router-dom';
 import { CodeMirror, OutputBox } from '../../components';
+import { lineNum } from '../../config/nebulaQL';
 import service from '../../config/service';
 import Command from '../Command';
 import './index.less';
@@ -53,6 +54,7 @@ export default class Console extends React.Component<IProps, IState> {
       message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
       return;
     }
+    this.editor.execCommand('goDocEnd');
     const history = this.getLocalStorage().slice(0, 15);
     history.push(code);
     localStorage.setItem('history', JSON.stringify(history));
@@ -104,6 +106,12 @@ export default class Console extends React.Component<IProps, IState> {
     });
   }
 
+  handleEmptyNgql = () => {
+    this.setState({
+      code: '',
+    });
+  }
+
   getInstance = (instance) => {
     if (instance) {
       this.codemirror = instance.codemirror;
@@ -117,34 +125,47 @@ export default class Console extends React.Component<IProps, IState> {
     });
   }
 
+  handleLineCount = () => {
+    const line = this.editor.lineCount() > lineNum ? lineNum : this.editor.lineCount();
+    this.editor.setSize(undefined, line * 24 + 10 + 'px');
+  }
+
   render() {
     const { isUpDown, code, history, result, outType } = this.state;
-
     return (
       <div className="nebula-console">
         <div className="ngql-content">
             <div className="mirror-wrap">
               <CodeMirror
                 value={code}
+                onChangeLine={() => this.handleLineCount()}
                 ref={this.getInstance}
-                height={isUpDown ? '34px' : '600px'}
+                height={isUpDown ? '34px' : 24 * lineNum + 'px'}
                 options={{
                   keyMap: 'sublime',
                   fullScreen: true,
                   mode: 'nebula',
                 }}
               />
-              <div className="expand" onClick={this.handleUpDown}>
+              {/*<div className="expand" onClick={this.handleUpDown}>
                 {
-                isUpDown ? <Icon type="down" /> : <Icon type="up" />
+                  isUpDown ? <Icon type="down" /> : <Icon type="up" />
                 }
-              </div>
+              </div>*/}
             </div>
-            <Icon
-              type="play-circle"
-              onClick={() => this.handleRun()}
-            />
-          </div>
+            <Tooltip title={intl.get('common.empty')} placement="bottom">
+              <Icon
+                type="edit"
+                onClick={() => this.handleEmptyNgql()}
+              />
+            </Tooltip>
+            <Tooltip title={intl.get('common.run')}placement="bottom">
+              <Icon
+                type="play-circle"
+                onClick={() => this.handleRun()}
+              />
+            </Tooltip>
+        </div>
         <div className="result-wrap">
           <Button
             className="ngql-history"
