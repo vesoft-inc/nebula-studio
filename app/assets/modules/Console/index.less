@@ -1,84 +1,89 @@
 .nebula-console {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
 
-  .ngql-content{
-    position: relative;
-    display: flex;
-    background: #efeff4;
-    padding: 16px 8px;
-    font-size: 16px;
-    > .mirror-wrap {
-        flex: 1;
-        > .expand {
-          height: 21px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background: #f9f9f9;
-          cursor: pointer;
-          &:hover {
-            background: #f7f7f7;
-          }
+	.ngql-content {
+		position: relative;
+		display: flex;
+		background: #efeff4;
+		padding: 16px 8px;
+		font-size: 16px;
 
-          > .anticon {
-            font-size: 20px;
-          }
-        }
-    }
-    >.anticon-play-circle, .anticon-edit {
-      display: flex;
-      width: 64px;
-      height: 52px;
-      justify-content: center;
-      align-items: center;
-      font-size: 32px;
-      cursor: pointer;
-    }
-  }
+		> .mirror-wrap {
+			flex: 1;
 
-  .result-wrap {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    margin-top: 32px;
+			> .expand {
+				height: 21px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				background: #f9f9f9;
+				cursor: pointer;
 
-    .ngql-history {
-      width: 110px;
-      text-align: center;
-      margin-bottom: 12px;
-    }
+				&:hover {
+					background: #f7f7f7;
+				}
 
-    .output-box{
-      flex: 1;
-      overflow: hidden;
-      background: #f7f7f7;
+				> .anticon {
+					font-size: 20px;
+				}
+			}
+		}
 
-      .output-value{
-        padding: 0 12px;
-        cursor: pointer;
-        font-size: 16px;
-        white-space: nowrap;
-        text-overflow:ellipsis;
-        overflow:hidden;
-        line-height: 42px;
-        width: 95%;
-      }
+		> .anticon-play-circle,
+		.anticon-edit {
+			display: flex;
+			width: 64px;
+			height: 52px;
+			justify-content: center;
+			align-items: center;
+			font-size: 32px;
+			cursor: pointer;
+		}
+	}
 
-      .output-success{
-        color: #00f;
-      }
+	.result-wrap {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		margin-top: 32px;
 
-      .output-error{
-        color: #f44336;
-      }
+		.ngql-history {
+			width: 110px;
+			text-align: center;
+			margin-bottom: 12px;
+		}
 
-      .tab-container{
-        border-top: 1px solid #dddddd;
-        margin-bottom: 20px;
-        padding: 20px;
-      }
-    }
-  }
+		.output-box {
+			flex: 1;
+			overflow: hidden;
+			background: #f7f7f7;
+
+			.output-value {
+				padding: 0 12px;
+				cursor: pointer;
+				font-size: 16px;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				line-height: 42px;
+				width: 95%;
+			}
+
+			.output-success {
+				color: #00f;
+			}
+
+			.output-error {
+				color: #f44336;
+			}
+
+			.tab-container {
+				border-top: 1px solid #ddd;
+				margin-bottom: 20px;
+				padding: 20px;
+			}
+		}
+	}
 }

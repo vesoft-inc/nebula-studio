@@ -1,59 +1,66 @@
 html body {
-  height: 100%;
-  padding:0;
-  margin:0;
+	height: 100%;
+	padding: 0;
+	margin: 0;
 }
 
 p {
-  margin: 0;
-  padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 #app {
-  height: 100%;
-  > .ant-spin-nested-loading {
-    height: 100%;
-    > .ant-spin-container {
-      height: 100%;
-      > .ant-layout {
-        height: 100%;
-      }
-    }
-  }
+	height: 100%;
+
+	> .ant-spin-nested-loading {
+		height: 100%;
+
+		> .ant-spin-container {
+			height: 100%;
+
+			> .ant-layout {
+				height: 100%;
+			}
+		}
+	}
 }
+
 .nebula-web-console {
-  background: #d2d5da;
+	background: #d2d5da;
 
-  .lang-select {
-    float: right;
-    > span {
-      display: inline-block;
-      padding-right: 16px;
-      text-align: right;
-      width: 100px;
-      color: #fff;
-    }
-    > .ant-select {
-      width: 100px;
-    }
-  }
+	.lang-select {
+		float: right;
 
-  .ant-layout-content {
-    padding: 0 4% 24px 4%;
-    overflow: auto;
-  }
+		> span {
+			display: inline-block;
+			padding-right: 16px;
+			text-align: right;
+			width: 100px;
+			color: #fff;
+		}
+
+		> .ant-select {
+			width: 100px;
+		}
+	}
+
+	.ant-layout-content {
+		padding: 0 4% 24px 4%;
+		overflow: auto;
+	}
 }
- 
-table {
-  background: #f8f8fa;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .2);
-  border-radius: 8px;
-  width: 100%;
-  thead > tr > th{
-    background: #dddddd !important;
-  }
 
-  tr:nth-child(2n) {
-    background: #ffffff
-  }
+table {
+	background: #f8f8fa;
+	box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+	border-radius: 8px;
+	width: 100%;
+
+	thead > tr > th {
+		background: #ddd !important;
+	}
+
+	tr:nth-child(2n) {
+		background: #fff;
+	}
 }
