@@ -43,7 +43,7 @@ export default class Console extends React.Component<IProps, IState> {
   getLocalStorage = () => {
     const value: string | null = localStorage.getItem('history');
     if (value && value !== 'undefined' && value !== 'null') {
-      return JSON.parse(value).reverse();
+      return JSON.parse(value).slice(-15);
     }
     return [];
   }
@@ -55,7 +55,7 @@ export default class Console extends React.Component<IProps, IState> {
       return;
     }
     this.editor.execCommand('goDocEnd');
-    const history = this.getLocalStorage().slice(0, 15);
+    const history = this.getLocalStorage();
     history.push(code);
     localStorage.setItem('history', JSON.stringify(history));
 
@@ -200,7 +200,7 @@ export default class Console extends React.Component<IProps, IState> {
           {
             <List
               itemLayout="horizontal"
-              dataSource={this.getLocalStorage()}
+              dataSource={this.getLocalStorage().reverse()}
               renderItem={(item: string) => (
                 <List.Item
                   style={{ cursor: 'pointer' }}

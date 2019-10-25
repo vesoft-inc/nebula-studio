@@ -1,6 +1,7 @@
-import { Table, Tabs } from 'antd';
+import { Alert, Icon, Table, Tabs } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
+import './index.less';
 
 interface IProps {
   value: string;
@@ -16,11 +17,11 @@ export default class OutputBox extends React.Component<IProps, {}> {
   outputClass = (code: any) => {
     if (code !== undefined) {
       if (code === '0') {
-        return 'output-success';
+        return 'success';
       }
-      return 'output-error';
+      return 'error';
     }
-    return '';
+    return 'info';
   }
 
   render() {
@@ -43,18 +44,25 @@ export default class OutputBox extends React.Component<IProps, {}> {
     }
     return (
       <div className="output-box">
-        <p
+        {/* <p
           className={`output-value ${this.outputClass(result.code)}`}
           onClick={() => this.props.onHistoryItem(value)}
         >
           $ {value}
-        </p>
+        </p> */}
+        <Alert
+          message={<p className="gql"  onClick={() => this.props.onHistoryItem(value)}>$ {value}</p>}
+          className="output-value"
+          type={this.outputClass(result.code)}
+        />
         <div className="tab-container">
           <Tabs defaultActiveKey={'log'} size={'large'} tabPosition={'left'}>
-            {result.code === '0' && <Tabs.TabPane tab={intl.get('common.table')} key="table">
-              <Table columns={columns} dataSource={dataSource} />
-            </Tabs.TabPane>}
-            {result.code !== '0' && <Tabs.TabPane tab={intl.get('common.log')} key="log">
+            {result.code === '0' && (
+              <Tabs.TabPane tab={<><Icon type="table" />{intl.get('common.table')}</>} key="table">
+                <Table bordered columns={columns} dataSource={dataSource} />
+              </Tabs.TabPane>
+            )}
+            {result.code !== '0' && <Tabs.TabPane tab={<><Icon type="alert" />{intl.get('common.log')}</>} key="log">
               {result.message}
             </Tabs.TabPane>}
             {/* <Tabs.TabPane tab={intl.get('common.record')} key="3">

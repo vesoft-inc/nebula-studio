@@ -56,9 +56,13 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
     CodeMirror.registerHelper('hint', 'nebula', (cm) => {
       const cur = cm.getCursor();
       const token = cm.getTokenAt(cur);
+      const str = token.string;
       const start = token.start;
       const end = cur.ch;
-      const str = token.string;
+
+      if (str === '') {
+        return;
+      }
 
       const list = hints.filter((item) => {
           return item.indexOf(str) === 0;
