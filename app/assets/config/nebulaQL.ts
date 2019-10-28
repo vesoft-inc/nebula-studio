@@ -1,4 +1,3 @@
-
 const nebulaWordsUppercase = [
   'SHOW',
   'GO',
@@ -14,16 +13,10 @@ const nebulaWordsUppercase = [
   'CREATE',
 ];
 
-const nebulaWordsLowercase = nebulaWordsUppercase.map((w) => w.toLowerCase());
+const nebulaWordsLowercase = nebulaWordsUppercase.map(w => w.toLowerCase());
 
-export const highLightList = [
-  ...nebulaWordsUppercase,
-  ...nebulaWordsLowercase,
-];
+export const highLightList = [...nebulaWordsUppercase, ...nebulaWordsLowercase];
 
-export const hints = [
-  ...nebulaWordsUppercase,
-  ...nebulaWordsLowercase,
-];
+export const hints = [...nebulaWordsUppercase, ...nebulaWordsLowercase];
 
 export const lineNum = 20;

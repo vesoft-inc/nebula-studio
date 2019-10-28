@@ -1,12 +1,26 @@
 {
-  "extends": "tslint:latest",
+  "extends": [ 
+    "tslint:latest",
+    "tslint-react",
+    "tslint-eslint-rules",
+    "tslint-config-prettier",
+    "tslint-plugin-prettier"
+],
   "rules": {
+    "prettier": [true, ".prettierrc.js"],
     "quotemark": [true, "single", "jsx-double"],
     "no-console": [false, "dir", "log", "error", "warn"],
     "space-before-function-paren": false,
     "interface-name": [true, "always-prefix"],
     "adjacent-overload-signatures": true,
     "member-access": [false],
+    "jsx-wrap-multiline": false,
+    "no-implicit-dependencies": [true, "dev"],
+    "no-object-literal-type-assertion": false,
+    "jsx-no-lambda": false,
+    "jsx-no-multiline-js": false,
+    "no-this-assignment": [true, {"allowed-names": ["^self$"], "allow-destructuring": true}],
+    "no-submodule-imports": false,
     "member-ordering": [
       true,
       {

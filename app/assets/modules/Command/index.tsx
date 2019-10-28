@@ -15,7 +15,10 @@ interface IProps {
 
 const Command = (props: IProps) => {
   const { command } = props;
-  const matchCommand = supportCommands.find((item) => command.trim().toLowerCase() === item.command) || {} as any;
+  const matchCommand =
+    supportCommands.find(
+      item => command.trim().toLowerCase() === item.command,
+    ) || ({} as any);
   const MatchComponent = matchCommand.component || Default;
 
   return <MatchComponent {...props} />;

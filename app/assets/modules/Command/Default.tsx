@@ -6,8 +6,10 @@ interface IProps {
 
 const Default = (props: IProps) => {
   return (
-    <div className="command-default">There is not a command: {props.command}</div>
+    <div className="command-default">
+      There is not a command: {props.command}
+    </div>
   );
 };
 
-export default  Default;
+export default Default;

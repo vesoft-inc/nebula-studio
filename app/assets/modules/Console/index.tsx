@@ -46,7 +46,7 @@ export default class Console extends React.Component<IProps, IState> {
       return JSON.parse(value).slice(-15);
     }
     return [];
-  }
+  };
 
   handleRun = async () => {
     const code = this.editor.getValue();
@@ -71,7 +71,7 @@ export default class Console extends React.Component<IProps, IState> {
       });
       await this.runNGQL(code);
     }
-  }
+  };
 
   runNGQL = async (code: string) => {
     const username = cookies.get('username');
@@ -85,18 +85,17 @@ export default class Console extends React.Component<IProps, IState> {
       });
       return;
     }
-    const result = await service
-      .execNGQL({
-        username,
-        password,
-        host,
-        gql: code,
-      });
+    const result = await service.execNGQL({
+      username,
+      password,
+      host,
+      gql: code,
+    });
     this.setState({
       result,
       isUpDown: true,
     });
-  }
+  };
 
   handleHistoryItem = (value: string) => {
     this.setState({
@@ -104,67 +103,62 @@ export default class Console extends React.Component<IProps, IState> {
       outType: value[0] === ':' ? OutType.command : OutType.nGQL,
       history: false,
     });
-  }
+  };
 
   handleEmptyNgql = () => {
     this.setState({
       code: '',
     });
-  }
+  };
 
-  getInstance = (instance) => {
+  getInstance = instance => {
     if (instance) {
       this.codemirror = instance.codemirror;
       this.editor = instance.editor;
     }
-  }
+  };
 
   handleUpDown = () => {
     this.setState({
       isUpDown: !this.state.isUpDown,
     });
-  }
+  };
 
   handleLineCount = () => {
-    const line = this.editor.lineCount() > lineNum ? lineNum : this.editor.lineCount();
+    const line =
+      this.editor.lineCount() > lineNum ? lineNum : this.editor.lineCount();
     this.editor.setSize(undefined, line * 24 + 10 + 'px');
-  }
+  };
 
   render() {
     const { isUpDown, code, history, result, outType } = this.state;
     return (
       <div className="nebula-console">
         <div className="ngql-content">
-            <div className="mirror-wrap">
-              <CodeMirror
-                value={code}
-                onChangeLine={() => this.handleLineCount()}
-                ref={this.getInstance}
-                height={isUpDown ? '34px' : 24 * lineNum + 'px'}
-                options={{
-                  keyMap: 'sublime',
-                  fullScreen: true,
-                  mode: 'nebula',
-                }}
-              />
-              {/*<div className="expand" onClick={this.handleUpDown}>
+          <div className="mirror-wrap">
+            <CodeMirror
+              value={code}
+              onChangeLine={() => this.handleLineCount()}
+              ref={this.getInstance}
+              height={isUpDown ? '34px' : 24 * lineNum + 'px'}
+              options={{
+                keyMap: 'sublime',
+                fullScreen: true,
+                mode: 'nebula',
+              }}
+            />
+            {/*<div className="expand" onClick={this.handleUpDown}>
                 {
                   isUpDown ? <Icon type="down" /> : <Icon type="up" />
                 }
               </div>*/}
-            </div>
-            <Tooltip title={intl.get('common.empty')} placement="bottom">
-              <Icon
-                type="edit"
-                onClick={() => this.handleEmptyNgql()}
-              />
-            </Tooltip>
-            <Tooltip title={intl.get('common.run')}placement="bottom">
-              <Icon
-                type="play-circle"
-                onClick={() => this.handleRun()}
-              />
-            </Tooltip>
+          </div>
+          <Tooltip title={intl.get('common.empty')} placement="bottom">
+            <Icon type="edit" onClick={() => this.handleEmptyNgql()} />
+          </Tooltip>
+          <Tooltip title={intl.get('common.run')} placement="bottom">
+            <Icon type="play-circle" onClick={() => this.handleRun()} />
+          </Tooltip>
         </div>
         <div className="result-wrap">
           <Button
@@ -176,18 +170,15 @@ export default class Console extends React.Component<IProps, IState> {
           >
             {intl.get('common.seeTheHistory')}
           </Button>
-          {
-            outType === OutType.nGQL ? (
-              <OutputBox
-                result={result}
-                value={this.getLocalStorage().pop()}
-                onHistoryItem={(e) => this.handleHistoryItem(e)}
-              />
-            ) : (
-              <Command command={code.substr(1)} />
-            )
-          }
-
+          {outType === OutType.nGQL ? (
+            <OutputBox
+              result={result}
+              value={this.getLocalStorage().pop()}
+              onHistoryItem={e => this.handleHistoryItem(e)}
+            />
+          ) : (
+            <Command command={code.substr(1)} />
+          )}
         </div>
         <Modal
           title={intl.get('common.NGQLHistoryList')}

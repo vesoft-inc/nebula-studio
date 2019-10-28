@@ -10,7 +10,7 @@ import 'codemirror/mode/meta';
 import 'codemirror/theme/monokai.css';
 
 import React from 'react';
-import { highLightList, hints, lineNum  } from '../config/nebulaQL';
+import { highLightList, hints, lineNum } from '../config/nebulaQL';
 
 interface IProps {
   options: object;
@@ -32,13 +32,13 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
   public componentDidMount() {
     CodeMirror.defineMode('nebula', () => {
       return {
-        token: (stream) => {
+        token: stream => {
           if (stream.eatSpace()) {
             return null;
           }
           stream.eatWhile(/[\$\w\u4e00-\u9fa5]/);
           const cur = stream.current();
-          const exist = highLightList.some((item) => {
+          const exist = highLightList.some(item => {
             return item === cur;
           });
           if (exist) {
@@ -46,14 +46,14 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
           }
           stream.next();
         },
-        blockCommentStart: '/*',
-        blockCommentEnd: '*/',
-        lineComment: '//' ? '#' : '--',
-        closeBrackets: '()[]{}\'\'""``',
+        // blockCommentStart: '/*',
+        // blockCommentEnd: '*/',
+        // lineComment: '//' ? '#' : '--',
+        // closeBrackets: '()[]{}\'\'""``',
       };
     });
 
-    CodeMirror.registerHelper('hint', 'nebula', (cm) => {
+    CodeMirror.registerHelper('hint', 'nebula', cm => {
       const cur = cm.getCursor();
       const token = cm.getTokenAt(cur);
       const str = token.string;
@@ -64,15 +64,15 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
         return;
       }
 
-      const list = hints.filter((item) => {
-          return item.indexOf(str) === 0;
+      const list = hints.filter(item => {
+        return item.indexOf(str) === 0;
       });
 
       if (list.length) {
         return {
-            list,
-            from: CodeMirror.Pos(cur.line, start),
-            to: CodeMirror.Pos(cur.line, end),
+          list,
+          from: CodeMirror.Pos(cur.line, start),
+          to: CodeMirror.Pos(cur.line, end),
         };
       }
     });
@@ -80,21 +80,19 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
   }
   renderCodeMirror() {
     // parameters of the combined
-    const options = Object.assign(
-      {
-        tabSize: 2,
-        fontSize: '14px',
-        autoCloseBrackets: true,
-        matchBrackets: true,
-        showCursorWhenSelecting: true,
-        lineWrapping: true,
-        // show number of rows
-        lineNumbers: true,
-        fullScreen: true,
-        mode: 'nebula',
-      },
-      this.props.options,
-    );
+    const options = {
+      tabSize: 2,
+      fontSize: '14px',
+      autoCloseBrackets: true,
+      matchBrackets: true,
+      showCursorWhenSelecting: true,
+      lineWrapping: true,
+      // show number of rows
+      lineNumbers: true,
+      fullScreen: true,
+      mode: 'nebula',
+      ...this.props.options,
+    };
     this.editor = CodeMirror.fromTextArea(this.textarea, options);
     // Getting CodeMirror is used to get some of these constants
     this.codemirror = CodeMirror;
@@ -117,17 +115,21 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
     if (change.origin === '+input') {
       this.editor.execCommand('autocomplete');
     }
-    if (this.props.onChangeLine && (change.origin === '+delete' || change.origin === '+input')) {
+    if (
+      this.props.onChangeLine &&
+      (change.origin === '+delete' || change.origin === '+input')
+    ) {
       this.props.onChangeLine();
     }
-  }
+  };
 
   async componentWillReceiveProps(nextProps) {
     const { options, value } = nextProps;
     await this.setOptions(options);
     if (value !== this.editor.getValue()) {
       this.editor.setValue(value || '');
-      const line = this.editor.lineCount() > lineNum ? lineNum : this.editor.lineCount();
+      const line =
+        this.editor.lineCount() > lineNum ? lineNum : this.editor.lineCount();
       this.editor.setSize(undefined, line * 24 + 10 + 'px');
     }
   }
@@ -141,7 +143,7 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
       if (mode) {
         options.mode = mode.mime;
       }
-      Object.keys(options).forEach((name) => {
+      Object.keys(options).forEach(name => {
         if (options[name] && JSON.stringify(options[name])) {
           this.editor.setOption(name, options[name]);
         }
@@ -158,7 +160,7 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
   render() {
     return (
       <textarea
-        ref={(instance) => {
+        ref={instance => {
           this.textarea = instance;
         }}
       />

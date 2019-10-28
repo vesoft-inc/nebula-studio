@@ -1,4 +1,4 @@
 /**
  * this folder for utils
  */
-export * from './url'
+export * from './url';

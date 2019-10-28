@@ -3,7 +3,11 @@ import { FormComponentProps } from 'antd/lib/form';
 import cookies from 'js-cookie';
 import React from 'react';
 import intl from 'react-intl-universal';
-import { hostRulesFn, passwordRulesFn, usernameRulesFn } from '../../config/rules';
+import {
+  hostRulesFn,
+  passwordRulesFn,
+  usernameRulesFn,
+} from '../../config/rules';
 import service from '../../config/service';
 import './ConfigServer.less';
 
@@ -35,11 +39,11 @@ class ConfigServer extends React.Component<FormComponentProps, IState> {
     this.props.form.validateFields(async (errs, data) => {
       if (!errs) {
         const { host, username, password } = data;
-        const result = await service.connectDB({
+        const result = (await service.connectDB({
           username,
           host,
           password,
-        }) as any;
+        })) as any;
         if (result.code === '0') {
           message.success(intl.get('configServer.success'));
 
@@ -60,7 +64,7 @@ class ConfigServer extends React.Component<FormComponentProps, IState> {
         }
       }
     });
-  }
+  };
 
   handleClear = () => {
     cookies.remove('username');
@@ -69,24 +73,28 @@ class ConfigServer extends React.Component<FormComponentProps, IState> {
     this.setState({
       success: false,
     });
-  }
+  };
 
   renderSuccess = () => {
     const { host, username } = this.connectInfo;
-    return <div className="connect-server">
-      <div className="icon-wrapper">
-        <Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a" />
-        <h3>{intl.get('configServer.success')}</h3>
-        <p>
-          <strong>{intl.get('configServer.host')}:</strong>
-          <span>{host}</span>
-          <strong>{intl.get('configServer.username')}:</strong> 
-          <span>{username}</span>
-        </p>
-        <Button size="small" onClick={this.handleClear}>{intl.get('configServer.clear')}</Button>
+    return (
+      <div className="connect-server">
+        <div className="icon-wrapper">
+          <Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a" />
+          <h3>{intl.get('configServer.success')}</h3>
+          <p>
+            <strong>{intl.get('configServer.host')}:</strong>
+            <span>{host}</span>
+            <strong>{intl.get('configServer.username')}:</strong>
+            <span>{username}</span>
+          </p>
+          <Button size="small" onClick={this.handleClear}>
+            {intl.get('configServer.clear')}
+          </Button>
+        </div>
       </div>
-    </div>;
-  }
+    );
+  };
 
   render() {
     const { success } = this.state;
@@ -100,32 +108,30 @@ class ConfigServer extends React.Component<FormComponentProps, IState> {
       wrapperCol: { span: 14 },
     };
 
-    return <div className="connect-server">
-      <Form layout="horizontal" {...fomrItemLayout}>
-        <FormItem label={intl.get('configServer.host')}>
-          {
-            getFieldDecorator('host', {
+    return (
+      <div className="connect-server">
+        <Form layout="horizontal" {...fomrItemLayout}>
+          <FormItem label={intl.get('configServer.host')}>
+            {getFieldDecorator('host', {
               rules: hostRulesFn(intl),
-            })(<Input></Input>)
-          }
-        </FormItem>
-        <FormItem label={intl.get('configServer.username')}>
-          {
-            getFieldDecorator('username', {
+            })(<Input />)}
+          </FormItem>
+          <FormItem label={intl.get('configServer.username')}>
+            {getFieldDecorator('username', {
               rules: usernameRulesFn(intl),
-            })(<Input />)
-          }
-        </FormItem>
-        <FormItem label={intl.get('configServer.password')}>
-          {
-            getFieldDecorator('password', {
+            })(<Input />)}
+          </FormItem>
+          <FormItem label={intl.get('configServer.password')}>
+            {getFieldDecorator('password', {
               rules: passwordRulesFn(intl),
-            })(<Input />)
-          }
-        </FormItem>
-        <Button type="primary" onClick={this.handleConnect}>{intl.get('configServer.connect')}</Button>
-      </Form>
-    </div>;
+            })(<Input />)}
+          </FormItem>
+          <Button type="primary" onClick={this.handleConnect}>
+            {intl.get('configServer.connect')}
+          </Button>
+        </Form>
+      </div>
+    );
   }
 }
 

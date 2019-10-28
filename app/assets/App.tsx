@@ -2,7 +2,14 @@ import { Layout, Select, Spin } from 'antd';
 import React from 'react';
 import { hot } from 'react-hot-loader/root';
 import intl from 'react-intl-universal';
-import { BrowserRouter as Router, Redirect, Route, RouteComponentProps, Switch, withRouter } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Redirect,
+  Route,
+  RouteComponentProps,
+  Switch,
+  withRouter,
+} from 'react-router-dom';
 import './App.less';
 import { INTL_LOCALE_SELECT, INTL_LOCALES } from './config';
 import { LanguageContext } from './context';
@@ -41,7 +48,7 @@ class App extends React.Component<IProps, IState> {
       'lang',
       locale,
     );
-  }
+  };
 
   loadIntlLocale = () => {
     intl
@@ -54,7 +61,7 @@ class App extends React.Component<IProps, IState> {
           loading: false,
         });
       });
-  }
+  };
 
   componentDidMount() {
     this.loadIntlLocale();
@@ -65,41 +72,41 @@ class App extends React.Component<IProps, IState> {
 
     return (
       <Router>
-      <LanguageContext.Provider
-        value={{
-          currentLocale: this.currentLocale,
-          toggleLanguage: this.toggleLanguage,
-        }}
-      >
-        <Spin spinning={loading}>
-          <Layout className="nebula-web-console">
-            <Header>
-              <div className="lang-select">
-                <span>{intl.get('common.languageSelect')}: </span>
-                <Select
-                  value={this.currentLocale}
-                  onChange={this.toggleLanguage}
-                >
-                  {Object.keys(INTL_LOCALE_SELECT).map((locale) => (
-                    <Option
-                      key={locale}
-                      value={INTL_LOCALE_SELECT[locale].NAME}
-                    >
-                      {INTL_LOCALE_SELECT[locale].TEXT}
-                    </Option>
-                  ))}
-                </Select>
-              </div>
-            </Header>
-            <Content>
-              <Switch>
-                <Route path="/" component={Console}></Route>
-                <Redirect to="/"></Redirect>
-              </Switch>
-            </Content>
-          </Layout>
-        </Spin>
-      </LanguageContext.Provider>
+        <LanguageContext.Provider
+          value={{
+            currentLocale: this.currentLocale,
+            toggleLanguage: this.toggleLanguage,
+          }}
+        >
+          <Spin spinning={loading}>
+            <Layout className="nebula-web-console">
+              <Header>
+                <div className="lang-select">
+                  <span>{intl.get('common.languageSelect')}: </span>
+                  <Select
+                    value={this.currentLocale}
+                    onChange={this.toggleLanguage}
+                  >
+                    {Object.keys(INTL_LOCALE_SELECT).map(locale => (
+                      <Option
+                        key={locale}
+                        value={INTL_LOCALE_SELECT[locale].NAME}
+                      >
+                        {INTL_LOCALE_SELECT[locale].TEXT}
+                      </Option>
+                    ))}
+                  </Select>
+                </div>
+              </Header>
+              <Content>
+                <Switch>
+                  <Route path="/" component={Console} />
+                  <Redirect to="/" />
+                </Switch>
+              </Content>
+            </Layout>
+          </Spin>
+        </LanguageContext.Provider>
       </Router>
     );
   }

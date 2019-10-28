@@ -22,15 +22,15 @@ export default class OutputBox extends React.Component<IProps, {}> {
       return 'error';
     }
     return 'info';
-  }
+  };
 
   render() {
-    const { value, result= {} } = this.props;
+    const { value, result = {} } = this.props;
     let columns = [];
     let dataSource = [];
     if (result.code === '0') {
       if (result.data && result.data.headers) {
-        columns = result.data.headers.map((column) => {
+        columns = result.data.headers.map(column => {
           return {
             title: column,
             dataIndex: column,
@@ -51,23 +51,46 @@ export default class OutputBox extends React.Component<IProps, {}> {
           $ {value}
         </p> */}
         <Alert
-          message={<p className="gql"  onClick={() => this.props.onHistoryItem(value)}>$ {value}</p>}
+          message={
+            <p className="gql" onClick={() => this.props.onHistoryItem(value)}>
+              $ {value}
+            </p>
+          }
           className="output-value"
           type={this.outputClass(result.code)}
         />
         <div className="tab-container">
           <Tabs defaultActiveKey={'log'} size={'large'} tabPosition={'left'}>
             {result.code === '0' && (
-              <Tabs.TabPane tab={<><Icon type="table" />{intl.get('common.table')}</>} key="table">
-                <Table bordered columns={columns} dataSource={dataSource} />
+              <Tabs.TabPane
+                tab={
+                  <>
+                    <Icon type="table" />
+                    {intl.get('common.table')}
+                  </>
+                }
+                key="table"
+              >
+                <Table
+                  bordered={true}
+                  columns={columns}
+                  dataSource={dataSource}
+                />
               </Tabs.TabPane>
             )}
-            {result.code !== '0' && <Tabs.TabPane tab={<><Icon type="alert" />{intl.get('common.log')}</>} key="log">
-              {result.message}
-            </Tabs.TabPane>}
-            {/* <Tabs.TabPane tab={intl.get('common.record')} key="3">
-              Record 3
-            </Tabs.TabPane> */}
+            {result.code !== '0' && (
+              <Tabs.TabPane
+                tab={
+                  <>
+                    <Icon type="alert" />
+                    {intl.get('common.log')}
+                  </>
+                }
+                key="log"
+              >
+                {result.message}
+              </Tabs.TabPane>
+            )}
           </Tabs>
         </div>
       </div>
