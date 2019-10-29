@@ -17,6 +17,13 @@ type Response struct {
 	Message string     `json:"message"`
 }
 
+func assert(t *testing.T, code interface{}) {
+	t.Helper()
+	if code != "-1" && code != "0"{
+		log.Fatal(code)
+	}
+}
+
 func Test_DB_Connect(t *testing.T) {
 	var Response Response
 	cases := []struct {
@@ -45,25 +52,19 @@ func Test_DB_Connect(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 
 		client := &http.Client{}
-		fmt.Println("client :", client)
 		resp, err := client.Do(req)
 		
     if err != nil {
-        panic(err)
+        log.Fatal(err)
     }
 
 		defer req.Body.Close()
-		body, _ := ioutil.ReadAll(resp.Body)
-		 
-    json.Unmarshal([]byte(body), &Response)
-		if Response.Code == "-1" {
-			fmt.Println("code = -1 :", string(body))
-		}else if Response.Code == "0"{
-			fmt.Println("code = 0")
-		}else {
-			log.Fatal(string(body))
-		}
 		
+		body, _ := ioutil.ReadAll(resp.Body)
+		json.Unmarshal([]byte(body), &Response)
+		
+		assert(t,Response.Code)
+		fmt.Println("Response :", string(body))
 	}
 }
 
@@ -93,6 +94,7 @@ func Test_DB_Execute(t *testing.T) {
 		client := &http.Client{}
 		resp, err := client.Do(req)
 
+		fmt.Println(err)
     if err != nil {
         log.Fatal(err)
 		}
@@ -100,15 +102,9 @@ func Test_DB_Execute(t *testing.T) {
 		defer resp.Body.Close()
 		
 		body, _ := ioutil.ReadAll(resp.Body)
-
 		json.Unmarshal([]byte(body), &Response)
-		if Response.Code == "-1" {
-			fmt.Println("code = -1 :", string(body))
-		}else if Response.Code == "0"{
-			fmt.Println("code = 0")
-		}else {
-			log.Fatal(string(body))
-		}
 
+		assert(t, Response.Code)
+		fmt.Println("Response :", string(body))
 	}
 }
