@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"io/ioutil"
 	"encoding/json"
-	"fmt"
 	common "nebula-go-api/utils"
 	"log"
 )
@@ -15,13 +14,6 @@ type Response struct {
 	Code    string     `json:"code"`
 	Data    common.Any `json:"data"`
 	Message string     `json:"message"`
-}
-
-func assert(t *testing.T, code interface{}) {
-	t.Helper()
-	if code != "-1" && code != "0"{
-		log.Fatal(code)
-	}
 }
 
 func Test_DB_Connect(t *testing.T) {
@@ -55,16 +47,17 @@ func Test_DB_Connect(t *testing.T) {
 		resp, err := client.Do(req)
 		
     if err != nil {
-        log.Fatal(err)
+        t.Fail()
     }
 
 		defer req.Body.Close()
-		
 		body, _ := ioutil.ReadAll(resp.Body)
+		 
 		json.Unmarshal([]byte(body), &Response)
 		
-		assert(t,Response.Code)
-		fmt.Println("Response :", string(body))
+		if Response.Code != "-1" && Response.Code != "0" {
+			t.Fail()
+		}
 	}
 }
 
@@ -94,7 +87,6 @@ func Test_DB_Execute(t *testing.T) {
 		client := &http.Client{}
 		resp, err := client.Do(req)
 
-		fmt.Println(err)
     if err != nil {
         log.Fatal(err)
 		}
@@ -102,9 +94,10 @@ func Test_DB_Execute(t *testing.T) {
 		defer resp.Body.Close()
 		
 		body, _ := ioutil.ReadAll(resp.Body)
-		json.Unmarshal([]byte(body), &Response)
 
-		assert(t, Response.Code)
-		fmt.Println("Response :", string(body))
+		json.Unmarshal([]byte(body), &Response)
+		if Response.Code != "-1" && Response.Code != "0" {
+			t.Fail()
+		}
 	}
 }
