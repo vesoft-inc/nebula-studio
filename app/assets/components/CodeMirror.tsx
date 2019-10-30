@@ -10,7 +10,7 @@ import 'codemirror/mode/meta';
 import 'codemirror/theme/monokai.css';
 
 import React from 'react';
-import { highLightList, hints, lineNum } from '../config/nebulaQL';
+import { keyWords, lineNum, operators } from '../config/nebulaQL';
 
 interface IProps {
   options: object;
@@ -38,10 +38,9 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
           }
           stream.eatWhile(/[\$\w\u4e00-\u9fa5]/);
           const cur = stream.current();
-          const exist = highLightList.some(item => {
-            return item === cur;
-          });
-          if (exist) {
+          if (keyWords.some(item => item === cur)) {
+            return 'keyword';
+          } else if (operators.some(item => item === cur)) {
             return 'def';
           }
           stream.next();
@@ -64,7 +63,7 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
         return;
       }
 
-      const list = hints.filter(item => {
+      const list = [...keyWords, ...operators].filter(item => {
         return item.indexOf(str) === 0;
       });
 
@@ -113,7 +112,9 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
       }
     }
     if (change.origin === '+input') {
-      this.editor.execCommand('autocomplete');
+      CodeMirror.commands.autocomplete(this.editor, null, {
+        completeSingle: false,
+      });
     }
     if (
       this.props.onChangeLine &&

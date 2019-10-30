@@ -1,8 +1,10 @@
 const nebulaWordsUppercase = [
   'SHOW',
   'GO',
+  'DROP',
   'VERTEX',
   'EDGE',
+  'EDGES',
   'VALUES',
   'OVER',
   'FROM',
@@ -11,12 +13,104 @@ const nebulaWordsUppercase = [
   'SPACE',
   'YIELD',
   'CREATE',
+  'DESCRIBE',
+  'FETCH',
+  'PROP',
+  'YIELD',
+  'TAG',
+  'ALTER',
+  'INSERT',
+  'UPDATE',
+  'SET',
+  'WHERE',
+  'FIND',
+  'DELETE',
+];
+
+export const operators = [
+  // Bitwise Operator
+  '&',
+  '|',
+  '^',
+  // Math
+  'abs',
+  'floor',
+  'ceil',
+  'round',
+  'sqrt',
+  'cbrt',
+  'hypot',
+  'pow',
+  'exp',
+  'exp2',
+  'log',
+  'log2',
+  'sin',
+  'asin',
+  'cos',
+  'acos',
+  'tan',
+  'atan',
+  'rand32',
+  'rand64',
+  // String
+  'strcasecmp',
+  'lower',
+  'upper',
+  'length',
+  'trim',
+  'ltrim',
+  'rtrim',
+  'left',
+  'right',
+  'lpad',
+  'rpad',
+  'substr',
+  'hash',
+  // Timestamp
+  'now',
+  // Comparison Functions And Operators
+  '=',
+  '/',
+  '==',
+  '!=',
+  '<',
+  '<=',
+  '-',
+  '%',
+  '+',
+  '*',
+  '-',
+  'udf_is_in',
+  // Aggregate
+  'AVG',
+  'COUNT',
+  'MAX',
+  'MIN',
+  'STD',
+  'SUM',
+  // Logical Operator
+  '&&',
+  '!',
+  '||',
+  'XOR',
+  // Order by Function
+  'ORDER',
+  'BY',
+  'DESC',
+  'ASC',
+  // Limit
+  'LIMIT',
+  // Set Operations
+  'UNION',
+  'INTERSECT',
+  'MINUS',
+  // uuid
+  'uuid',
 ];
 
 const nebulaWordsLowercase = nebulaWordsUppercase.map(w => w.toLowerCase());
 
-export const highLightList = [...nebulaWordsUppercase, ...nebulaWordsLowercase];
-
-export const hints = [...nebulaWordsUppercase, ...nebulaWordsLowercase];
+export const keyWords = [...nebulaWordsUppercase, ...nebulaWordsLowercase];
 
 export const lineNum = 20;
