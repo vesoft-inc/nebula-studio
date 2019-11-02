@@ -7,8 +7,8 @@ import {
   hostRulesFn,
   passwordRulesFn,
   usernameRulesFn,
-} from '../../config/rules';
-import service from '../../config/service';
+} from '../../../config/rules';
+import service from '../../../config/service';
 import './ConfigServer.less';
 
 const FormItem = Form.Item;

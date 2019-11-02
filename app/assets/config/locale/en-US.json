@@ -8,7 +8,9 @@
     "sorryNGQLCannotBeEmpty": "Sorry, NGQL cannot be empty",
     "NGQLHistoryList": "NGQL History List",
     "empty": "Empty",
-    "run": "Run"
+    "run": "Run",
+    "console": "console",
+    "explore": "explore"
   },
   "NGQLOutput": {
     "success": "execute success!"

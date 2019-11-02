@@ -29,8 +29,6 @@ p {
 	background: #d2d5da;
 
 	.lang-select {
-		float: right;
-
 		> span {
 			display: inline-block;
 			padding-right: 16px;
@@ -41,6 +39,51 @@ p {
 
 		> .ant-select {
 			width: 100px;
+		}
+	}
+
+	.ant-layout-header {
+		display: flex;
+
+		> ul {
+			flex: 1;
+			height: 100%;
+			line-height: 64px;
+			font-size: 20px;
+			background: #00152a;
+			border: none;
+
+			a,
+			span,
+			i {
+				color: #fff;
+				font-size: 16px;
+			}
+
+			a:hover,
+			i:hover {
+				color: #efefef;
+			}
+
+			.ant-menu-item {
+				top: 0;
+				border-bottom: none;
+
+				&:hover {
+					color: #00152a;
+					border-bottom: 000;
+				}
+
+				&.ant-menu-item-selected {
+					background: #fff;
+
+					a,
+					span,
+					i {
+						color: #00152a;
+					}
+				}
+			}
 		}
 	}
 

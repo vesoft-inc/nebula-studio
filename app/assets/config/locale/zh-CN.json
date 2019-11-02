@@ -8,7 +8,9 @@
     "sorryNGQLCannotBeEmpty": "对不起， NGQL语句不能为空",
     "NGQlHistoryList": "NGQL 历史列表",
     "empty": "清空",
-    "run":"运行"
+    "run":"运行",
+    "console": "控制台",
+    "explore": "图探索"
   },
   "warning": {
     "configServer": "请先配置服务器"

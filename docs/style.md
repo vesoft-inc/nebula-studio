@@ -6,6 +6,8 @@ This is a full stack project including front and back end.
     - components ---------------------------- components can be reused
     - config ---------------------------------- front end common config
     - context --------------------------------- React context
+    - modules -------------------------------- React page component with model
+    - models --------------------------------- page models inspired by rematch(redux)
     - utils ------------------------------------ front end utils
     - index.html ----------------------------- entry template index.html
     - index.tsx ------------------------------- entry to all js* files
