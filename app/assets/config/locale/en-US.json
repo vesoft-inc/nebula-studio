@@ -31,5 +31,12 @@
     "hostRequired": "Host required",
     "usernameRequired": "Username required",
     "passwordRequired": "Password required"
+  },
+  "explore": {
+    "clear": "Clear",
+    "importNode": "Import Nodes",
+    "import": "Import",
+    "fileImport": "File Import",
+    "importPlaceholder": "id1\nid2\nid3\n1 node per line, split by \\n"
   }
 }

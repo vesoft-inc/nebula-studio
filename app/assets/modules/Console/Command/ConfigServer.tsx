@@ -1,5 +1,5 @@
 import { Button, Form, Icon, Input, message } from 'antd';
-import { FormComponentProps } from 'antd/lib/form';
+import { FormComponentProps } from 'antd/lib/form/Form';
 import cookies from 'js-cookie';
 import React from 'react';
 import intl from 'react-intl-universal';

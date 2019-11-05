@@ -31,5 +31,12 @@
     "hostRequired": "请填写 host",
     "usernameRequired": "请填写用户名",
     "passwordRequired": "请填写密码"
+  },
+  "explore": {
+    "clear": "清除",
+    "importNode": "导入节点",
+    "import": "导入",
+    "fileImport": "文件导入",
+    "importPlaceholder": "id1\nid2\nid3\n每行1个节点id，以回车分开"
   }
 }
