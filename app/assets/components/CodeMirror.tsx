@@ -8,9 +8,9 @@ import 'codemirror/keymap/sublime';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/meta';
 import 'codemirror/theme/monokai.css';
-
 import React from 'react';
-import { keyWords, lineNum, operators } from '../config/nebulaQL';
+
+import { keyWords, lineNum, operators } from '#assets/config/nebulaQL';
 
 interface IProps {
   options: object;

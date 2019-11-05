@@ -15,12 +15,27 @@
     "adjacent-overload-signatures": true,
     "member-access": [false],
     "jsx-wrap-multiline": false,
-    "no-implicit-dependencies": [true, "dev"],
+    "no-implicit-dependencies": [true, ["#assets"]],
     "no-object-literal-type-assertion": false,
     "jsx-no-lambda": false,
     "jsx-no-multiline-js": false,
     "no-this-assignment": [true, {"allowed-names": ["^self$"], "allow-destructuring": true}],
     "no-submodule-imports": false,
+    "ordered-imports": [
+      true,
+      {
+        "import-sources-order": "case-insensitive",
+        "named-imports-order": "case-insensitive",
+        "grouped-imports": true,
+        "groups": [
+            { "match": "^[@a-zA-Z]+", "order": 0 },
+            { "match": "^#assets", "order": 1 },
+            { "name": "current dir", "match": "^[.]", "order": 2 },
+            { "name": "parent_dir", "match": "^[.][.]", "order": 3 },
+            { "match": ".less", "order": 4 }
+        ]
+      }
+    ],
     "member-ordering": [
       true,
       {

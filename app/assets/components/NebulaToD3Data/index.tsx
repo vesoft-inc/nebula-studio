@@ -5,7 +5,10 @@ import * as React from 'react';
 interface Props {
   width: number;
   height: number;
-  data: any;
+  data: {
+    nodes: Array<{ name: string; group: number }>;
+    links: Array<{ source: number; target: number; value: number }>;
+  };
 }
 
 // tslint:disable-next-line: interface-name

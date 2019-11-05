@@ -2,11 +2,11 @@
   "compileOnSave": true,
   "compilerOptions": {
     "target": "esnext",
-    "module": "commonjs",
     "strict": true,
     "noImplicitAny": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "jsx": "react",
     "charset": "utf8",
     "allowJs": false,
     "pretty": true,
@@ -23,7 +23,10 @@
     "importHelpers": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "resolveJsonModule": true
-  },
-  "exclude": ["app/public", "app/assets", "node_modules*"]
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "#assets/*": ["app/assets/*"]
+    }
+  }
 }

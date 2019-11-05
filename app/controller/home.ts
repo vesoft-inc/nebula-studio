@@ -1,4 +1,5 @@
 import { Controller } from 'egg';
+
 import manifestMap from '../../config/manifest.json';
 
 export default class HomeController extends Controller {

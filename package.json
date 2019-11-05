@@ -14,7 +14,7 @@
     "test-local": "egg-bin test -r egg-ts-helper/register",
     "test": "npm run lint",
     "cov": "egg-bin cov -r egg-ts-helper/register",
-    "tsc": "ets && tsc -p tsconfig.json",
+    "tsc": "ets && tsc -p tsconfig.server.json",
     "ci": "npm run lint && npm run cov && npm run tsc",
     "autod": "autod",
     "lint": "tslint -c tslint.json 'app/**/*.{ts,tsx}' && stylelint **/*.{html,css,less}",
@@ -23,6 +23,7 @@
     "build": "webpack --config config/webpack.prod.ts"
   },
   "dependencies": {
+    "@rematch/core": "^1.2.0",
     "antd": "^3.23.6",
     "axios": "^0.19.0",
     "codemirror": "^5.49.0",
