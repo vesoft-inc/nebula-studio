@@ -1,9 +1,10 @@
-import { Layout, Select, Spin } from 'antd';
+import { Icon, Layout, Menu, Select, Spin } from 'antd';
 import React from 'react';
 import { hot } from 'react-hot-loader/root';
 import intl from 'react-intl-universal';
 import {
   BrowserRouter as Router,
+  Link,
   Redirect,
   Route,
   RouteComponentProps,
@@ -16,12 +17,14 @@ import { LanguageContext } from './context';
 import { updateQueryStringParameter } from './utils';
 
 import Console from './modules/Console';
+import Explore from './modules/Explore';
 
 const { Header, Content } = Layout;
 const { Option } = Select;
 
 interface IState {
   loading: boolean;
+  activeMenu: string;
 }
 
 type IProps = RouteComponentProps;
@@ -39,6 +42,7 @@ class App extends React.Component<IProps, IState> {
     this.currentLocale = defaultLocale;
     this.state = {
       loading: true,
+      activeMenu: props.location.pathname.split('/').pop() || '',
     };
   }
 
@@ -63,12 +67,18 @@ class App extends React.Component<IProps, IState> {
       });
   };
 
+  handleMenuClick = ({ key }) => {
+    this.setState({
+      activeMenu: key,
+    });
+  };
+
   componentDidMount() {
     this.loadIntlLocale();
   }
 
   render() {
-    const { loading } = this.state;
+    const { loading, activeMenu } = this.state;
 
     return (
       <Router>
@@ -81,6 +91,24 @@ class App extends React.Component<IProps, IState> {
           <Spin spinning={loading}>
             <Layout className="nebula-web-console">
               <Header>
+                <Menu
+                  mode="horizontal"
+                  selectedKeys={[activeMenu]}
+                  onClick={this.handleMenuClick as any}
+                >
+                  <Menu.Item key="console">
+                    <Link to="/console">
+                      <Icon type="code" />
+                      {intl.get('common.console')}
+                    </Link>
+                  </Menu.Item>
+                  <Menu.Item key="explore">
+                    <Link to="explore">
+                      <Icon type="eye" />
+                      {intl.get('common.explore')}
+                    </Link>
+                  </Menu.Item>
+                </Menu>
                 <div className="lang-select">
                   <span>{intl.get('common.languageSelect')}: </span>
                   <Select
@@ -100,8 +128,9 @@ class App extends React.Component<IProps, IState> {
               </Header>
               <Content>
                 <Switch>
-                  <Route path="/" component={Console} />
-                  <Redirect to="/" />
+                  <Route path="/console" component={Console} />
+                  <Route path="/explore" component={Explore} />
+                  <Redirect to="/console" />
                 </Switch>
               </Content>
             </Layout>

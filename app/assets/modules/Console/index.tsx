@@ -6,7 +6,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { CodeMirror, NebulaToD3Data, OutputBox } from '../../components';
 import { lineNum } from '../../config/nebulaQL';
 import service from '../../config/service';
-import Command from '../Command';
+import Command from './Command';
 import './index.less';
 
 enum OutType {
