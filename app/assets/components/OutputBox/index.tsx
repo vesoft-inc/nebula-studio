@@ -1,6 +1,7 @@
 import { Alert, Icon, Table, Tabs } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
+
 import './index.less';
 
 interface IProps {

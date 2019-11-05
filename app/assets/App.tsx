@@ -11,13 +11,14 @@ import {
   Switch,
   withRouter,
 } from 'react-router-dom';
-import './App.less';
-import { INTL_LOCALE_SELECT, INTL_LOCALES } from './config';
-import { LanguageContext } from './context';
-import { updateQueryStringParameter } from './utils';
 
-import Console from './modules/Console';
-import Explore from './modules/Explore';
+import { INTL_LOCALE_SELECT, INTL_LOCALES } from '#assets/config';
+import { LanguageContext } from '#assets/context';
+import Console from '#assets/modules/Console';
+import Explore from '#assets/modules/Explore';
+import { updateQueryStringParameter } from '#assets/utils';
+
+import './App.less';
 
 const { Header, Content } = Layout;
 const { Option } = Select;

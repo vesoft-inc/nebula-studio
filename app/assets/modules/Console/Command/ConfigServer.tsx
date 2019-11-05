@@ -3,6 +3,7 @@ import { FormComponentProps } from 'antd/lib/form';
 import cookies from 'js-cookie';
 import React from 'react';
 import intl from 'react-intl-universal';
+
 import {
   hostRulesFn,
   passwordRulesFn,

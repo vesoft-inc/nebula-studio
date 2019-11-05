@@ -3,9 +3,11 @@ import cookies from 'js-cookie';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { RouteComponentProps } from 'react-router-dom';
-import { CodeMirror, OutputBox } from '../../components';
-import { lineNum } from '../../config/nebulaQL';
-import service from '../../config/service';
+
+import { CodeMirror, OutputBox } from '#assets/components';
+import { lineNum } from '#assets/config/nebulaQL';
+import service from '#assets/config/service';
+
 import Command from './Command';
 import './index.less';
 

@@ -71,6 +71,9 @@ const commonConfig = {
   ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+    alias: {
+      '#assets': path.join(__dirname, '../app/assets/')
+    }
   },
 };
 
