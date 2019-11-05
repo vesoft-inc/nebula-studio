@@ -122,7 +122,7 @@ export default class NebulaToD3Data extends React.Component<IProps, {}> {
         .attr('transform', (d: any, i: any) => {
           const cirX = d.x;
           const cirY = d.y;
-          return 'translate(" + cirX + "," + cirY + ")';
+          return 'translate(' + cirX + ',' + cirY + ')';
         })
         .call(
           d3
