@@ -3,7 +3,7 @@ import * as React from 'react';
 
 // tslint:disable-next-line: interface-name
 interface Props {
-  width: number;
+  width: any;
   height: number;
   data: {
     nodes: Array<{ name: string; group: number }>;
@@ -40,7 +40,8 @@ class NebulaToD3Data extends React.Component<Props, {}> {
       .enter()
       .append('line')
       .style('stroke', '#999999')
-      .style('stroke-opacity', 0.6);
+      .style('stroke-opacity', 0.6)
+      .attr('stroke-width', 2);
 
     function dragStarted(d) {
       // tslint:disable-next-line: no-unused-expression
@@ -67,10 +68,38 @@ class NebulaToD3Data extends React.Component<Props, {}> {
       .data(data.nodes)
       .enter()
       .append<SVGCircleElement>('circle')
-      .attr('r', 5)
+      .attr('r', 20)
       .style('stroke', '#FFFFFF')
-      .style('stroke-width', 1.5)
+      .style('stroke-width', 2.5)
+      .style('cursor', 'pointer')
       .style('fill', (d: any) => color(d.group))
+      .on('click', (d: any) => {
+        console.log(d);
+      })
+      .call(
+        d3
+          .drag()
+          .on('start', dragStarted)
+          .on('drag', dragged)
+          .on('end', dragEnded),
+      );
+
+    const label = svg
+      .append('g')
+      .attr('class', 'labels')
+      .selectAll('text')
+      .data(data.nodes)
+      .enter()
+      .append('text')
+      .text((d: any) => {
+        return d.name;
+      })
+      .on('click', (d: any) => {
+        console.log(d);
+      })
+      .style('font-size', '12px')
+      .style('cursor', 'pointer')
+      .style('fill', '#fff')
       .call(
         d3
           .drag()
@@ -87,6 +116,14 @@ class NebulaToD3Data extends React.Component<Props, {}> {
         .attr('y2', (d: any) => d.target.y);
 
       node.attr('cx', (d: any) => d.x).attr('cy', (d: any) => d.y);
+
+      label
+        .attr('x', (d: any) => {
+          return d.x - 12;
+        })
+        .attr('y', (d: any) => {
+          return d.y + 5;
+        });
     });
   }
 
@@ -96,6 +133,7 @@ class NebulaToD3Data extends React.Component<Props, {}> {
       width,
       height,
       backgroundColor: '#fff',
+      margin: '0 auto',
     };
     return (
       <div

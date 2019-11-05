@@ -53,7 +53,7 @@ class Explore extends React.Component<IProps, {}> {
               ))}
             </Select>
           </FormItem>
-          {<NebulaToD3Data width={900} height={900} data={data} />}
+          {<NebulaToD3Data width={1200} height={900} data={data} />}
         </div>
       </div>
     );

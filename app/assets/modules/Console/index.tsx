@@ -181,7 +181,6 @@ export default class Console extends React.Component<IProps, IState> {
           ) : (
             <Command command={code.substr(1)} />
           )}
-          {<NebulaToD3Data width={900} height={900} data={data} />}
         </div>
         <Modal
           title={intl.get('common.NGQLHistoryList')}
