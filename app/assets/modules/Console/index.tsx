@@ -3,7 +3,7 @@ import cookies from 'js-cookie';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { RouteComponentProps } from 'react-router-dom';
-import { CodeMirror, OutputBox } from '../../components';
+import { CodeMirror, NebulaToD3Data, OutputBox } from '../../components';
 import { lineNum } from '../../config/nebulaQL';
 import service from '../../config/service';
 import Command from '../Command';
@@ -179,6 +179,7 @@ export default class Console extends React.Component<IProps, IState> {
           ) : (
             <Command command={code.substr(1)} />
           )}
+          {<NebulaToD3Data width={900} height={900} result={result} />}
         </div>
         <Modal
           title={intl.get('common.NGQLHistoryList')}
