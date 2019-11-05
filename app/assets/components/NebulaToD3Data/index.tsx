@@ -71,7 +71,7 @@ export default class NebulaToD3Data extends React.Component<IProps, {}> {
       this.svg = d3.select('svg');
       const g = this.svg
         .append('g')
-        .attr('transform', 'translate(" + 60 + "," + 60 + ")');
+        .attr('transform', 'translate(' + 60 + ',' + 60 + ')');
       const colorScale = d3.scaleOrdinal().range(d3.schemeCategory10);
 
       this.forceSimulation = d3
