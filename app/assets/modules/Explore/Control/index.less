@@ -1,0 +1,31 @@
+.nebula-explore .control {
+	padding: 12px;
+	display: flex;
+
+	> .ant-form-item {
+		flex: 1;
+
+		&.left {
+			display: flex;
+
+			> .ant-form-item-label {
+				width: 100px;
+			}
+
+			> .ant-form-item-control-wrapper {
+				.ant-select {
+					width: 200px;
+				}
+			}
+		}
+
+		&.right {
+			text-align: right;
+
+			.ant-btn {
+				margin: 0 16px;
+				width: 150px;
+			}
+		}
+	}
+}
