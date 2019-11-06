@@ -1,15 +1,16 @@
 interface IState {
-  name: string;
+  nodes: any[];
 }
 
 export const explore = {
   state: {
-    name: 'explore',
+    nodes: [],
   },
   reducers: {
-    updateName: (state: IState, payload: string): IState => {
+    update: (state: IState, payload: object): IState => {
       return {
-        name: state.name + payload,
+        ...state,
+        ...payload,
       };
     },
   },

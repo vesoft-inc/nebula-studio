@@ -30,7 +30,8 @@
   "formRules": {
     "hostRequired": "请填写 host",
     "usernameRequired": "请填写用户名",
-    "passwordRequired": "请填写密码"
+    "passwordRequired": "请填写密码",
+    "nodeIdError": "格式不正确，id1\nid2\nid3\n每行1个节点id，以回车分开"
   },
   "explore": {
     "clear": "清除",
