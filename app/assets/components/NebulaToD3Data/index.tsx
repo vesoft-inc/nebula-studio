@@ -1,9 +1,10 @@
 import * as d3 from 'd3';
 import * as React from 'react';
 
-// tslint:disable-next-line: interface-name
-interface Props {
-  width: any;
+import './index.less';
+
+interface IProps {
+  width: number;
   height: number;
   data: {
     nodes: Array<{ name: string; group: number }>;
@@ -11,13 +12,12 @@ interface Props {
   };
 }
 
-// tslint:disable-next-line: interface-name
-interface Refs {
+interface IRefs {
   mountPoint?: HTMLDivElement;
 }
 
-class NebulaToD3Data extends React.Component<Props, {}> {
-  ctrls: Refs = {};
+class NebulaToD3Data extends React.Component<IProps, {}> {
+  ctrls: IRefs = {};
 
   componentDidMount() {
     const { width, height, data } = this.props;
@@ -40,12 +40,9 @@ class NebulaToD3Data extends React.Component<Props, {}> {
       .enter()
       .append('line')
       .style('stroke', '#999999')
-      .style('stroke-opacity', 0.6)
       .attr('stroke-width', 2);
 
     function dragStarted(d) {
-      // tslint:disable-next-line: no-unused-expression
-      !d3.event.active && force.alphaTarget(0.3).restart();
       d.fx = d.x;
       d.fy = d.y;
     }
@@ -56,8 +53,6 @@ class NebulaToD3Data extends React.Component<Props, {}> {
     }
 
     function dragEnded(d) {
-      // tslint:disable-next-line: no-unused-expression
-      !d3.event.active && force.alphaTarget(0);
       d.fx = null;
       d.fy = null;
     }
@@ -128,16 +123,9 @@ class NebulaToD3Data extends React.Component<Props, {}> {
   }
 
   render() {
-    const { width, height } = this.props;
-    const style = {
-      width,
-      height,
-      backgroundColor: '#fff',
-      margin: '0 auto',
-    };
     return (
       <div
-        style={style}
+        className="output-graph"
         ref={mountPoint => (this.ctrls.mountPoint = mountPoint)}
       />
     );
