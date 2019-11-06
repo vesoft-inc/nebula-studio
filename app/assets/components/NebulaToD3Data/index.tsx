@@ -3,29 +3,51 @@ import * as React from 'react';
 
 import './index.less';
 
+interface INode extends d3.SimulationNodeDatum {
+  name: string;
+  group: number;
+}
+
+interface ILink extends d3.SimulationLinkDatum<INode> {
+  value: number;
+}
+
 interface IProps {
   width: number;
   height: number;
   data: {
-    nodes: Array<{ name: string; group: number }>;
-    links: Array<{ source: number; target: number; value: number }>;
+    nodes: INode[];
+    links: ILink[];
   };
 }
 
 interface IRefs {
-  mountPoint?: HTMLDivElement;
+  mountPoint?: HTMLDivElement | null;
 }
 
 class NebulaToD3Data extends React.Component<IProps, {}> {
   ctrls: IRefs = {};
 
   componentDidMount() {
+    if (!this.ctrls.mountPoint) {
+      return;
+    }
     const { width, height, data } = this.props;
+
+    const linkForce = d3
+      .forceLink(data.links)
+      .id((d: any) => {
+        return d.name;
+      })
+      .distance((d: any) => {
+        return d.value * 30;
+      });
+
     const force = d3
       .forceSimulation()
       .nodes(data.nodes)
       .force('charge', d3.forceManyBody().strength(-120))
-      .force('link', d3.forceLink(data.links).distance(50))
+      .force('link', linkForce)
       .force('center', d3.forceCenter(width / 2, height / 2));
 
     const svg = d3
@@ -34,12 +56,29 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
       .attr('width', width)
       .attr('height', height);
 
+    svg
+      .append('defs')
+      .append('marker')
+      .attr('id', 'marker')
+      .attr('viewBox', '-0 -5 10 10')
+      .attr('refX', 30)
+      .attr('refY', 0)
+      .attr('orient', 'auto')
+      .attr('markerWidth', 6)
+      .attr('markerHeight', 6)
+      .attr('xoverflow', 'visible')
+      .append('path')
+      .attr('d', 'M 0,-5 L 12 ,0 L 0,5')
+      .attr('fill', '#999')
+      .attr('stroke', '#999');
+
     const link = svg
       .selectAll('line')
       .data(data.links)
       .enter()
       .append('line')
       .style('stroke', '#999999')
+      .attr('marker-end', 'url(#marker)')
       .attr('stroke-width', 2);
 
     function dragStarted(d) {
@@ -48,6 +87,8 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
       }
       d.fx = d.x;
       d.fy = d.y;
+
+      return d;
     }
 
     function dragged(d) {
@@ -66,7 +107,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
     const color = d3.scaleOrdinal(d3.schemeCategory10);
     const node = svg
       .selectAll('circle')
-      .data(data.nodes)
+      .data<INode>(data.nodes)
       .enter()
       .append<SVGCircleElement>('circle')
       .attr('r', 20)
@@ -75,37 +116,41 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
       .on('click', (d: any) => {
         console.log(d);
       })
-      .call(
-        d3
-          .drag()
-          .on('start', dragStarted)
-          .on('drag', dragged)
-          .on('end', dragEnded),
-      );
+      .call(d3
+        .drag()
+        .on('start', dragStarted)
+        .on('drag', dragged)
+        .on('end', dragEnded) as any);
 
-    const label = svg
+    const linksText = svg
       .append('g')
-      .attr('class', 'labels')
       .selectAll('text')
-      .data(data.nodes)
+      .data(data.links)
       .enter()
       .append('text')
       .text((d: any) => {
+        return d.type;
+      });
+
+    const nodeText = svg
+      .append('g')
+      .attr('class', 'labels')
+      .selectAll('text')
+      .data<INode>(data.nodes)
+      .enter()
+      .append('text')
+      .text((d: INode) => {
         return d.name;
       })
-      .on('click', (d: any) => {
+      .on('click', (d: INode) => {
         console.log(d);
       })
-      .style('font-size', '12px')
-      .style('cursor', 'pointer')
       .attr('text-anchor', 'middle')
-      .call(
-        d3
-          .drag()
-          .on('start', dragStarted)
-          .on('drag', dragged)
-          .on('end', dragEnded),
-      );
+      .call(d3
+        .drag()
+        .on('start', dragStarted)
+        .on('drag', dragged)
+        .on('end', dragEnded) as any);
 
     force.on('tick', () => {
       link
@@ -116,12 +161,20 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
 
       node.attr('cx', (d: any) => d.x).attr('cy', (d: any) => d.y);
 
-      label
+      nodeText
         .attr('x', (d: any) => {
           return d.x;
         })
         .attr('y', (d: any) => {
           return d.y + 5;
+        });
+
+      linksText
+        .attr('x', (d: any) => {
+          return (d.source.x + d.target.x) / 2;
+        })
+        .attr('y', (d: any) => {
+          return (d.source.y + d.target.y) / 2;
         });
     });
   }

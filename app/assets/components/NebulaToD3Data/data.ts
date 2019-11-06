@@ -7,11 +7,11 @@ export default {
     { name: '205', group: 4 },
   ],
   links: [
-    { source: 2, target: 1, value: 3 },
-    { source: 3, target: 2, value: 2 },
-    { source: 3, target: 4, value: 5 },
-    { source: 1, target: 0, value: 8 },
-    { source: 3, target: 0, value: 8 },
+    { source: 200, target: 201, value: 3, type: 'like' },
+    { source: 200, target: 202, value: 5, type: 'like' },
+    { source: 202, target: 205, value: 5, type: 'like' },
+    { source: 200, target: 205, value: 8, type: 'like' },
+    { source: 203, target: 201, value: 8, type: 'like' },
   ],
 };
 
