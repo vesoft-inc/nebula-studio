@@ -43,6 +43,9 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
       .attr('stroke-width', 2);
 
     function dragStarted(d) {
+      if (!d3.event.active) {
+        force.alphaTarget(0.3).restart();
+      }
       d.fx = d.x;
       d.fy = d.y;
     }
@@ -53,6 +56,9 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
     }
 
     function dragEnded(d) {
+      if (!d3.event.active) {
+        force.alphaTarget(0);
+      }
       d.fx = null;
       d.fy = null;
     }
@@ -64,9 +70,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
       .enter()
       .append<SVGCircleElement>('circle')
       .attr('r', 20)
-      .style('stroke', '#FFFFFF')
-      .style('stroke-width', 2.5)
-      .style('cursor', 'pointer')
+      .attr('class', 'nodes')
       .style('fill', (d: any) => color(d.group))
       .on('click', (d: any) => {
         console.log(d);
@@ -94,7 +98,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
       })
       .style('font-size', '12px')
       .style('cursor', 'pointer')
-      .style('fill', '#fff')
+      .attr('text-anchor', 'middle')
       .call(
         d3
           .drag()
@@ -114,7 +118,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
 
       label
         .attr('x', (d: any) => {
-          return d.x - 12;
+          return d.x;
         })
         .attr('y', (d: any) => {
           return d.y + 5;
