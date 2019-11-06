@@ -21,6 +21,11 @@ const mapState = (state: IRootState) => ({
 
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetSpaces: dispatch.nebula.asyncGetSpaces,
+  clearNodes: () =>
+    dispatch.explore.update({
+      nodes: [],
+      edges: [],
+    }),
 });
 
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
@@ -50,7 +55,9 @@ class Control extends React.Component<IProps, {}> {
           </Select>
         </FormItem>
         <FormItem className="right">
-          <Button type="default">{intl.get('explore.clear')}</Button>
+          <Button type="default" onClick={this.props.clearNodes}>
+            {intl.get('explore.clear')}
+          </Button>
           <Button
             type="primary"
             onClick={() => {
