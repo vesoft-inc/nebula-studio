@@ -24,7 +24,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
   clearNodes: () =>
     dispatch.explore.update({
       nodes: [],
-      edges: [],
+      links: [],
     }),
 });
 
