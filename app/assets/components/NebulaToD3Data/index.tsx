@@ -3,23 +3,35 @@ import * as React from 'react';
 
 import './index.less';
 
+interface INode extends d3.SimulationNodeDatum {
+  name: string;
+  group: number;
+}
+
+interface ILink extends d3.SimulationLinkDatum<INode> {
+  value: number;
+}
+
 interface IProps {
   width: number;
   height: number;
   data: {
-    nodes: Array<{ name: string; group: number }>;
-    links: Array<{ source: number; target: number; value: number }>;
+    nodes: INode[];
+    links: ILink[];
   };
 }
 
 interface IRefs {
-  mountPoint?: HTMLDivElement;
+  mountPoint?: HTMLDivElement | null;
 }
 
 class NebulaToD3Data extends React.Component<IProps, {}> {
   ctrls: IRefs = {};
 
   componentDidMount() {
+    if (!this.ctrls.mountPoint) {
+      return;
+    }
     const { width, height, data } = this.props;
     const force = d3
       .forceSimulation()
@@ -45,6 +57,8 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
     function dragStarted(d) {
       d.fx = d.x;
       d.fy = d.y;
+
+      return d;
     }
 
     function dragged(d) {
@@ -60,7 +74,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
     const color = d3.scaleOrdinal(d3.schemeCategory10);
     const node = svg
       .selectAll('circle')
-      .data(data.nodes)
+      .data<INode>(data.nodes)
       .enter()
       .append<SVGCircleElement>('circle')
       .attr('r', 20)
@@ -71,37 +85,33 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
       .on('click', (d: any) => {
         console.log(d);
       })
-      .call(
-        d3
-          .drag()
-          .on('start', dragStarted)
-          .on('drag', dragged)
-          .on('end', dragEnded),
-      );
+      .call(d3
+        .drag()
+        .on('start', dragStarted)
+        .on('drag', dragged)
+        .on('end', dragEnded) as any);
 
     const label = svg
       .append('g')
       .attr('class', 'labels')
       .selectAll('text')
-      .data(data.nodes)
+      .data<INode>(data.nodes)
       .enter()
       .append('text')
-      .text((d: any) => {
+      .text((d: INode) => {
         return d.name;
       })
-      .on('click', (d: any) => {
+      .on('click', (d: INode) => {
         console.log(d);
       })
       .style('font-size', '12px')
       .style('cursor', 'pointer')
       .style('fill', '#fff')
-      .call(
-        d3
-          .drag()
-          .on('start', dragStarted)
-          .on('drag', dragged)
-          .on('end', dragEnded),
-      );
+      .call(d3
+        .drag()
+        .on('start', dragStarted)
+        .on('drag', dragged)
+        .on('end', dragEnded) as any);
 
     force.on('tick', () => {
       link
