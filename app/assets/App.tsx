@@ -89,7 +89,9 @@ class App extends React.Component<IProps, IState> {
             toggleLanguage: this.toggleLanguage,
           }}
         >
-          <Spin spinning={loading}>
+          {loading ? (
+            <Spin />
+          ) : (
             <Layout className="nebula-web-console">
               <Header>
                 <Menu
@@ -135,7 +137,7 @@ class App extends React.Component<IProps, IState> {
                 </Switch>
               </Content>
             </Layout>
-          </Spin>
+          )}
         </LanguageContext.Provider>
       </Router>
     );
