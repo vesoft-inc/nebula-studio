@@ -26,6 +26,11 @@ const mapDispatch = (dispatch: IDispatch) => ({
       nodes: [],
       links: [],
     }),
+  updateSpace: space => {
+    dispatch.nebula.update({
+      currentSpace: space,
+    });
+  },
 });
 
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
@@ -46,7 +51,7 @@ class Control extends React.Component<IProps, {}> {
     return (
       <div className="control">
         <FormItem className="left" label="Spaces: ">
-          <Select>
+          <Select onChange={this.props.updateSpace as any}>
             {spaces.map(space => (
               <Option value={space} key={space}>
                 {space}

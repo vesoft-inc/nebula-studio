@@ -37,7 +37,12 @@
     "clear": "清除",
     "importNode": "导入节点",
     "import": "导入",
+    "expand": "拓展",
     "fileImport": "文件导入",
-    "importPlaceholder": "id1\nid2\nid3\n每行1个节点id，以回车分开"
+    "importPlaceholder": "id1\nid2\nid3\n每行1个节点id，以回车分开",
+    "fitler": "筛选",
+    "field": "字段",
+    "operator": "操作符",
+    "value": "值"
   }
 }

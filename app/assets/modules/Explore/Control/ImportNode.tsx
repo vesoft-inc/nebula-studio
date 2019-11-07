@@ -1,4 +1,4 @@
-import { Button, Form, Input, Upload } from 'antd';
+import { Button, Form, Input, Spin, Upload } from 'antd';
 import { FormComponentProps } from 'antd/lib/form/Form';
 import _ from 'lodash';
 import React from 'react';
@@ -31,9 +31,17 @@ interface IProps
   handler: any;
 }
 
-class ImportNodes extends React.Component<IProps> {
+interface IState {
+  loading: boolean;
+}
+
+class ImportNodes extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
+
+    this.state = {
+      loading: false,
+    };
   }
 
   handleImport = () => {
@@ -63,7 +71,13 @@ class ImportNodes extends React.Component<IProps> {
   };
 
   handleFileImport = async ({ file }) => {
+    this.setState({
+      loading: true,
+    });
     const ids = await readFileContent(file);
+    this.setState({
+      loading: false,
+    });
     this.props.form.setFieldsValue({
       ids,
     });
@@ -71,36 +85,39 @@ class ImportNodes extends React.Component<IProps> {
 
   render() {
     const { getFieldDecorator } = this.props.form;
+    const { loading } = this.state;
 
     return (
-      <div className="import-node">
-        <h3>{intl.get('explore.importNode')}</h3>
-        <Form>
-          <Form.Item>
-            {getFieldDecorator('ids', {
-              rules: nodeIdRulesFn(intl),
-            })(
-              <TextArea
-                placeholder={intl.get('explore.importPlaceholder')}
-                rows={20}
-              />,
-            )}
-          </Form.Item>
-          <Form.Item className="btn-wrap">
-            {/* <Input type="file" onChange={this.handleFileImport} id="ids-file"></Input> */}
-            <Upload
-              beforeUpload={() => false}
-              onChange={this.handleFileImport}
-              showUploadList={false}
-            >
-              <Button>{intl.get('explore.fileImport')}</Button>
-            </Upload>
-            <Button type="primary" onClick={this.handleImport}>
-              {intl.get('explore.import')}
-            </Button>
-          </Form.Item>
-        </Form>
-      </div>
+      <Spin spinning={loading}>
+        <div className="import-node">
+          <h3>{intl.get('explore.importNode')}</h3>
+          <Form>
+            <Form.Item>
+              {getFieldDecorator('ids', {
+                rules: nodeIdRulesFn(intl),
+              })(
+                <TextArea
+                  placeholder={intl.get('explore.importPlaceholder')}
+                  rows={20}
+                />,
+              )}
+            </Form.Item>
+            <Form.Item className="btn-wrap">
+              {/* <Input type="file" onChange={this.handleFileImport} id="ids-file"></Input> */}
+              <Upload
+                beforeUpload={() => false}
+                onChange={this.handleFileImport}
+                showUploadList={false}
+              >
+                <Button>{intl.get('explore.fileImport')}</Button>
+              </Upload>
+              <Button type="primary" onClick={this.handleImport}>
+                {intl.get('explore.import')}
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
+      </Spin>
     );
   }
 }

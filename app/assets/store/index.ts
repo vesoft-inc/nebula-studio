@@ -1,7 +1,7 @@
 /**
  * inspired by rematch: https://github.com/rematch/rematch
  */
-import { init, RematchRootState } from '@rematch/core';
+import { init, RematchDispatch, RematchRootState } from '@rematch/core';
 
 import * as models from './models';
 
@@ -10,5 +10,5 @@ export const store = init({
 });
 
 export type IStore = typeof store;
-export type IDispatch = typeof store.dispatch;
+export type IDispatch = RematchDispatch<typeof models>;
 export type IRootState = RematchRootState<typeof models>;

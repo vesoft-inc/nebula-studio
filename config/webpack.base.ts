@@ -72,7 +72,9 @@ const commonConfig = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     alias: {
-      '#assets': path.join(__dirname, '../app/assets/')
+      '#assets': path.join(__dirname, '../app/assets/'),
+      // fix this: https://github.com/react-component/table/issues/368
+      'react-dom': '@hot-loader/react-dom'
     }
   },
 };

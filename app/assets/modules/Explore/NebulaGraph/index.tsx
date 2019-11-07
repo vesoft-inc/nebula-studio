@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import { NebulaToD3Data } from '#assets/components';
 import { IRootState } from '#assets/store';
 
+import Panel from './Pannel';
+
 const mapState = (state: IRootState) => ({
   nodes: state.explore.nodes,
   links: state.explore.links,
@@ -19,7 +21,12 @@ interface IProps {
 const NebulaGraph = (props: IProps) => {
   const { nodes, links } = props;
 
-  return <NebulaToD3Data width={1200} height={900} data={{ nodes, links }} />;
+  return (
+    <div className="graph-wrap">
+      <Panel />
+      <NebulaToD3Data width={1200} height={900} data={{ nodes, links }} />;
+    </div>
+  );
 };
 
 export default connect(
