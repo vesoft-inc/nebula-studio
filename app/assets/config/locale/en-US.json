@@ -30,7 +30,8 @@
   "formRules": {
     "hostRequired": "Host required",
     "usernameRequired": "Username required",
-    "passwordRequired": "Password required"
+    "passwordRequired": "Password required",
+    "nodeIdError": "The format is not right, id1\nid2\nid3\n1 node per line, split by \\n"
   },
   "explore": {
     "clear": "Clear",

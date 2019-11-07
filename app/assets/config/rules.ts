@@ -18,3 +18,10 @@ export const passwordRulesFn = intl => [
     message: intl.get('formRules.passwordRequired'),
   },
 ];
+
+export const nodeIdRulesFn = intl => [
+  {
+    pattern: /^([a-zA-Z\d]+)*(\n[a-zA-Z\d]+)*(\n)*$/,
+    message: intl.get('formRules.nodeIdError'),
+  },
+];
