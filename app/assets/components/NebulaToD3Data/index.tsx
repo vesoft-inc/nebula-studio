@@ -206,7 +206,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
         .on('mouseup', () => {
           const nodes = data.nodes;
           for (let _i: number = 0; _i < nodes.length; _i++) {
-            const nodePoint = data.nodes[_i];
+            const nodePoint: any = data.nodes[_i];
             if (
               (nodePoint.x > startPoint.x && nodePoint.x > d3.event.offsetX) ||
               (nodePoint.x < startPoint.x && nodePoint.x < d3.event.offsetX) ||
