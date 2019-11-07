@@ -3,6 +3,10 @@
   "compilerOptions": {
     "module": "esnext"
   },
-  "exclude": ["node_modules*"],
+  "linterOptions":{
+    "exclude": ["node_modules*",
+      "app/assets/components/NebulaToD3Data/index.tsx"
+    ]
+  },
   "include": ["app/assets"]
 }
