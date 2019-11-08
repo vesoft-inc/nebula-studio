@@ -10,7 +10,9 @@
     "empty": "清空",
     "run":"运行",
     "console": "控制台",
-    "explore": "图探索"
+    "explore": "图探索",
+    "ok": "确认",
+    "cancel": "取消"
   },
   "warning": {
     "configServer": "请先配置服务器"
@@ -31,7 +33,8 @@
     "hostRequired": "请填写 host",
     "usernameRequired": "请填写用户名",
     "passwordRequired": "请填写密码",
-    "nodeIdError": "格式不正确，id1\nid2\nid3\n每行1个节点id，以回车分开"
+    "nodeIdError": "格式不正确，id1\nid2\nid3\n每行1个节点id，以回车分开",
+    "idRequired": "请输入导入的节点id"
   },
   "explore": {
     "clear": "清除",
@@ -43,6 +46,8 @@
     "fitler": "筛选",
     "field": "字段",
     "operator": "操作符",
-    "value": "值"
+    "value": "值",
+    "selectSpace": "请选择 space",
+    "selectReminder": "切换将会清除当前数据，确定？"
   }
 }

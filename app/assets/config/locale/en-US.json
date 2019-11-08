@@ -10,7 +10,9 @@
     "empty": "Empty",
     "run": "Run",
     "console": "console",
-    "explore": "explore"
+    "explore": "explore",
+    "ok": "ok",
+    "cancel": "cancel"
   },
   "NGQLOutput": {
     "success": "execute success!"
@@ -31,7 +33,8 @@
     "hostRequired": "Host required",
     "usernameRequired": "Username required",
     "passwordRequired": "Password required",
-    "nodeIdError": "The format is not right, id1\nid2\nid3\n1 node per line, split by \\n"
+    "nodeIdError": "The format is not right, id1\nid2\nid3\n1 node per line, split by \\n",
+    "idRequired": "The ids is required"
   },
   "explore": {
     "clear": "Clear",
@@ -43,6 +46,8 @@
     "filter": "filter",
     "field": "field",
     "operator": "operator",
-    "value": "value"
+    "value": "value",
+    "selectSpace": "Please select the space",
+    "selectReminder": "This will clear the existed graph data, are you sure?"
   }
 }

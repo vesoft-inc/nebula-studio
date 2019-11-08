@@ -2,6 +2,7 @@ import React from 'react';
 
 import Control from './Control';
 import './index.less';
+import Init from './Init';
 import NebulaGraph from './NebulaGraph';
 
 const Explore = () => {
@@ -9,6 +10,7 @@ const Explore = () => {
     <div className="nebula-explore">
       <Control />
       <NebulaGraph />
+      <Init />
     </div>
   );
 };
