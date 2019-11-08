@@ -177,6 +177,58 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
           return (d.source.y + d.target.y) / 2;
         });
     });
+
+    function notSelected(nodePoint, startPoint) {
+      if (
+        (nodePoint.x > startPoint.x && nodePoint.x > d3.event.offsetX) ||
+        (nodePoint.x < startPoint.x && nodePoint.x < d3.event.offsetX) ||
+        (nodePoint.y > startPoint.y && nodePoint.y > d3.event.offsetY) ||
+        (nodePoint.y < startPoint.y && nodePoint.y < d3.event.offsetY)
+      ) {
+        return true;
+      }
+      return false;
+    }
+    if (data.nodes.length !== 0) {
+      const startPoint = {
+        x: 0,
+        y: 0,
+      };
+      const rect = svg
+        .append('rect')
+        .style('stroke', 'gray')
+        .style('stroke-width', '0.6')
+        .style('fill', 'transparent')
+        .style('stroke-opacity', '0.6');
+      d3.selectAll('svg')
+        .on('mousedown', () => {
+          startPoint.x = d3.event.offsetX;
+          startPoint.y = d3.event.offsetY;
+        })
+        .on('mousemove', () => {
+          if (startPoint.x !== 0) {
+            rect
+              .attr('x', Math.min(d3.event.offsetX, startPoint.x))
+              .attr('y', Math.min(d3.event.offsetY, startPoint.y))
+              .attr('width', Math.abs(d3.event.offsetX - startPoint.x))
+              .attr('height', Math.abs(d3.event.offsetY - startPoint.y));
+          }
+        })
+        .on('mouseup', () => {
+          const nodes = data.nodes;
+          const len = nodes.length;
+          for (let _i: number = 0; _i < len; _i++) {
+            const nodePoint: any = data.nodes[_i];
+            if (notSelected(nodePoint, startPoint)) {
+              continue;
+            }
+            console.log(nodePoint);
+          }
+          startPoint.x = 0;
+          startPoint.y = 0;
+          rect.attr('width', 0).attr('height', 0);
+        });
+    }
   }
 
   render() {
