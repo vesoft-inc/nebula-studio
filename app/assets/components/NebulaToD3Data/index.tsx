@@ -178,6 +178,17 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
         });
     });
 
+    function notSelected(nodePoint, startPoint) {
+      if (
+        (nodePoint.x > startPoint.x && nodePoint.x > d3.event.offsetX) ||
+        (nodePoint.x < startPoint.x && nodePoint.x < d3.event.offsetX) ||
+        (nodePoint.y > startPoint.y && nodePoint.y > d3.event.offsetY) ||
+        (nodePoint.y < startPoint.y && nodePoint.y < d3.event.offsetY)
+      ) {
+        return true;
+      }
+      return false;
+    }
     if (data.nodes.length !== 0) {
       const startPoint = {
         x: 0,
@@ -205,14 +216,10 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
         })
         .on('mouseup', () => {
           const nodes = data.nodes;
-          for (let _i: number = 0; _i < nodes.length; _i++) {
+          const len = nodes.length;
+          for (let _i: number = 0; _i < len; _i++) {
             const nodePoint: any = data.nodes[_i];
-            if (
-              (nodePoint.x > startPoint.x && nodePoint.x > d3.event.offsetX) ||
-              (nodePoint.x < startPoint.x && nodePoint.x < d3.event.offsetX) ||
-              (nodePoint.y > startPoint.y && nodePoint.y > d3.event.offsetY) ||
-              (nodePoint.y < startPoint.y && nodePoint.y < d3.event.offsetY)
-            ) {
+            if (notSelected(nodePoint, startPoint)) {
               continue;
             }
             console.log(nodePoint);
