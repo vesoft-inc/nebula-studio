@@ -16,9 +16,10 @@ interface IProps {
   width: number;
   height: number;
   data: {
-    nodes: INode[];
-    links: ILink[];
+    vertexs: INode[];
+    edges: ILink[];
   };
+  onSelectVertex: (vertex: any[]) => void;
 }
 
 interface IRefs {
@@ -35,7 +36,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
     const { width, height, data } = this.props;
 
     const linkForce = d3
-      .forceLink(data.links)
+      .forceLink(data.edges)
       .id((d: any) => {
         return d.name;
       })
@@ -45,7 +46,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
 
     const force = d3
       .forceSimulation()
-      .nodes(data.nodes)
+      .nodes(data.vertexs)
       .force('charge', d3.forceManyBody().strength(-120))
       .force('link', linkForce)
       .force('center', d3.forceCenter(width / 2, height / 2));
@@ -60,7 +61,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
       .append('defs')
       .append('marker')
       .attr('id', 'marker')
-      .attr('viewBox', '-0 -5 10 10')
+      .attr('viewBox', '1 -5 10 10')
       .attr('refX', 30)
       .attr('refY', 0)
       .attr('orient', 'auto')
@@ -74,7 +75,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
 
     const link = svg
       .selectAll('line')
-      .data(data.links)
+      .data(data.edges)
       .enter()
       .append('line')
       .style('stroke', '#999999')
@@ -107,7 +108,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
     const color = d3.scaleOrdinal(d3.schemeCategory10);
     const node = svg
       .selectAll('circle')
-      .data<INode>(data.nodes)
+      .data<INode>(data.vertexs)
       .enter()
       .append<SVGCircleElement>('circle')
       .attr('r', 20)
@@ -125,7 +126,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
     const linksText = svg
       .append('g')
       .selectAll('text')
-      .data(data.links)
+      .data(data.edges)
       .enter()
       .append('text')
       .text((d: any) => {
@@ -136,14 +137,14 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
       .append('g')
       .attr('class', 'labels')
       .selectAll('text')
-      .data<INode>(data.nodes)
+      .data<INode>(data.vertexs)
       .enter()
       .append('text')
       .text((d: INode) => {
         return d.name;
       })
       .on('click', (d: INode) => {
-        console.log(d);
+        this.props.onSelectVertex([d.name]);
       })
       .attr('text-anchor', 'middle')
       .call(d3
@@ -178,7 +179,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
         });
     });
 
-    function notSelected(nodePoint, startPoint) {
+    function isNotSelected(nodePoint, startPoint) {
       if (
         (nodePoint.x > startPoint.x && nodePoint.x > d3.event.offsetX) ||
         (nodePoint.x < startPoint.x && nodePoint.x < d3.event.offsetX) ||
@@ -189,7 +190,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
       }
       return false;
     }
-    if (data.nodes.length !== 0) {
+    if (data.vertexs.length !== 0) {
       const startPoint = {
         x: 0,
         y: 0,
@@ -215,11 +216,11 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
           }
         })
         .on('mouseup', () => {
-          const nodes = data.nodes;
+          const nodes = data.vertexs;
           const len = nodes.length;
           for (let _i: number = 0; _i < len; _i++) {
-            const nodePoint: any = data.nodes[_i];
-            if (notSelected(nodePoint, startPoint)) {
+            const nodePoint: any = nodes[_i];
+            if (isNotSelected(nodePoint, startPoint)) {
               continue;
             }
             console.log(nodePoint);

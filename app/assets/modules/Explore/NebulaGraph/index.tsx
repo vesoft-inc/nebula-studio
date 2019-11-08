@@ -2,32 +2,45 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { NebulaToD3Data } from '#assets/components';
-import { IRootState } from '#assets/store';
+import { IDispatch, IRootState } from '#assets/store';
 
 import Panel from './Pannel';
 
 const mapState = (state: IRootState) => ({
-  nodes: state.explore.nodes,
-  links: state.explore.links,
+  vertexs: state.explore.vertexs,
+  edges: state.explore.edges,
 });
 
-const mapDispatch = () => ({});
+const mapDispatch = (dispatch: IDispatch) => ({
+  updateIds: (ids: any) => {
+    dispatch.explore.update({
+      ids,
+    });
+  },
+});
 
-interface IProps {
-  nodes: any[];
-  links: any[];
+type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
+class NebulaGraph extends React.Component<IProps, {}> {
+  handleSelectVertex = (ids: any[]) => {
+    this.props.updateIds(ids);
+  };
+
+  render() {
+    const { vertexs, edges } = this.props;
+    return (
+      <div className="graph-wrap">
+        <Panel />
+        <NebulaToD3Data
+          width={1200}
+          height={900}
+          data={{ vertexs, edges }}
+          onSelectVertex={ids => this.handleSelectVertex(ids)}
+        />
+        ;
+      </div>
+    );
+  }
 }
-
-const NebulaGraph = (props: IProps) => {
-  const { nodes, links } = props;
-
-  return (
-    <div className="graph-wrap">
-      <Panel />
-      <NebulaToD3Data width={1200} height={900} data={{ nodes, links }} />;
-    </div>
-  );
-};
 
 export default connect(
   mapState,
