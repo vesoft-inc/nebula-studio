@@ -1,4 +1,4 @@
-import { Button, Form, Select } from 'antd';
+import { Button, Form, Modal as AntdModal, Select } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
@@ -17,6 +17,7 @@ const mapState = (state: IRootState) => ({
   username: state.nebula.username,
   password: state.nebula.password,
   spaces: state.nebula.spaces,
+  currentSpace: state.nebula.currentSpace,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -45,13 +46,25 @@ class Control extends React.Component<IProps, {}> {
     });
   }
 
+  handleSelect = space => {
+    AntdModal.confirm({
+      content: intl.get('explore.selectReminder'),
+      okText: intl.get('common.ok'),
+      cancelText: intl.get('common.cancel'),
+      onOk: () => {
+        this.props.updateSpace(space);
+        this.props.clearNodes();
+      },
+    });
+  };
+
   render() {
-    const { spaces } = this.props;
+    const { spaces, currentSpace } = this.props;
 
     return (
       <div className="control">
         <FormItem className="left" label="Spaces: ">
-          <Select onChange={this.props.updateSpace as any}>
+          <Select onChange={this.handleSelect} value={currentSpace}>
             {spaces.map(space => (
               <Option value={space} key={space}>
                 {space}

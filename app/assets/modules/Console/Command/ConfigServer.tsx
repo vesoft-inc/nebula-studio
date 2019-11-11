@@ -1,85 +1,54 @@
-import { Button, Form, Icon, Input, message } from 'antd';
-import { FormComponentProps } from 'antd/lib/form/Form';
-import cookies from 'js-cookie';
+import { Button, Icon } from 'antd';
+import { WrappedFormUtils } from 'antd/lib/form/Form';
 import React from 'react';
 import intl from 'react-intl-universal';
+import { connect } from 'react-redux';
 
-import {
-  hostRulesFn,
-  passwordRulesFn,
-  usernameRulesFn,
-} from '../../../config/rules';
-import service from '../../../config/service';
+import ConfigServerForm from '#assets/components/ConfigServerForm';
+import { IDispatch, IRootState } from '#assets/store';
+
 import './ConfigServer.less';
-
-const FormItem = Form.Item;
 
 interface IState {
   success: boolean;
 }
 
-class ConfigServer extends React.Component<FormComponentProps, IState> {
-  connectInfo;
-  constructor(props: FormComponentProps) {
-    super(props);
+const mapDispatch = (dispatch: IDispatch) => ({
+  asyncClearConfig: dispatch.nebula.asyncClearConfig,
+  asyncConfigServer: dispatch.nebula.asyncConfigServer,
+});
 
-    const host = cookies.get('host');
-    const username = cookies.get('username');
-    const password = cookies.get('password');
-    this.connectInfo = {
-      host,
-      username,
-      password,
-    };
-    this.state = {
-      success: !!host && !!username && !!password,
-    };
+const mapState = (state: IRootState) => ({
+  host: state.nebula.host,
+  username: state.nebula.username,
+  password: state.nebula.password,
+});
+
+interface IProps
+  extends ReturnType<typeof mapDispatch>,
+    ReturnType<typeof mapState> {}
+
+class ConfigServer extends React.Component<IProps, IState> {
+  constructor(props: IProps) {
+    super(props);
   }
 
-  handleConnect = () => {
-    this.props.form.validateFields(async (errs, data) => {
+  handleConfig = (form: WrappedFormUtils) => {
+    form.validateFields(async (errs, data) => {
       if (!errs) {
-        const { host, username, password } = data;
-        const result = (await service.connectDB({
-          username,
-          host,
-          password,
-        })) as any;
-        if (result.code === '0') {
-          message.success(intl.get('configServer.success'));
-
-          // save the nebula server info in cookie
-          cookies.set('host', host);
-          cookies.set('username', username);
-          cookies.set('password', password);
-          this.connectInfo = {
-            host,
-            username,
-            password,
-          };
-          this.setState({
-            success: true,
-          });
-        } else {
-          message.error(`${intl.get('configServer.fail')}: ${result.message}`);
-        }
+        this.props.asyncConfigServer(data);
       }
     });
   };
 
   handleClear = () => {
-    cookies.remove('username');
-    cookies.remove('password');
-    cookies.remove('host');
-    this.setState({
-      success: false,
-    });
+    this.props.asyncClearConfig();
   };
 
   renderSuccess = () => {
-    const { host, username } = this.connectInfo;
+    const { host, username } = this.props;
     return (
-      <div className="connect-server">
+      <div className="config-server command">
         <div className="icon-wrapper">
           <Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a" />
           <h3>{intl.get('configServer.success')}</h3>
@@ -98,42 +67,20 @@ class ConfigServer extends React.Component<FormComponentProps, IState> {
   };
 
   render() {
-    const { success } = this.state;
-    if (success) {
+    const { host, username, password } = this.props;
+    if (host && username && password) {
       return this.renderSuccess();
     }
 
-    const { getFieldDecorator } = this.props.form;
-    const fomrItemLayout = {
-      labelCol: { span: 6 },
-      wrapperCol: { span: 14 },
-    };
-
     return (
-      <div className="connect-server">
-        <Form layout="horizontal" {...fomrItemLayout}>
-          <FormItem label={intl.get('configServer.host')}>
-            {getFieldDecorator('host', {
-              rules: hostRulesFn(intl),
-            })(<Input />)}
-          </FormItem>
-          <FormItem label={intl.get('configServer.username')}>
-            {getFieldDecorator('username', {
-              rules: usernameRulesFn(intl),
-            })(<Input />)}
-          </FormItem>
-          <FormItem label={intl.get('configServer.password')}>
-            {getFieldDecorator('password', {
-              rules: passwordRulesFn(intl),
-            })(<Input />)}
-          </FormItem>
-          <Button type="primary" onClick={this.handleConnect}>
-            {intl.get('configServer.connect')}
-          </Button>
-        </Form>
+      <div className="config-server">
+        <ConfigServerForm onConfig={this.handleConfig} />
       </div>
     );
   }
 }
 
-export default Form.create()(ConfigServer);
+export default connect(
+  mapState,
+  mapDispatch,
+)(ConfigServer);

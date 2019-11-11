@@ -1,8 +1,9 @@
 import { createModel } from '@rematch/core';
+import { message } from 'antd';
 import cookies from 'js-cookie';
+import intl from 'react-intl-universal';
 
 import service from '#assets/config/service';
-// import { IDispatch } from '#assets/store'
 
 interface IState {
   spaces: string[];
@@ -31,6 +32,43 @@ export const nebula = createModel({
     },
   },
   effects: {
+    async asyncConfigServer(payload: {
+      host: string;
+      username: string;
+      password: string;
+    }) {
+      const { code, message: errorMessage } = (await service.connectDB(
+        payload,
+      )) as any;
+      if (code === '0') {
+        const { host, username, password } = payload;
+        cookies.set('host', host);
+        cookies.set('username', username);
+        cookies.set('password', password);
+        this.update({
+          host,
+          username,
+          password,
+        });
+        message.success(intl.get('configServer.success'));
+        return true;
+      } else {
+        message.error(`${intl.get('configServer.fail')}: ${errorMessage}`);
+        return false;
+      }
+    },
+
+    async asyncClearConfig() {
+      cookies.remove('host');
+      cookies.remove('username');
+      cookies.remove('password');
+      this.update({
+        host: '',
+        username: '',
+        password: '',
+      });
+    },
+
     async asyncGetSpaces(payload: {
       host: string;
       username: string;
