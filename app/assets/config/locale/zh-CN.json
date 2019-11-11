@@ -27,7 +27,8 @@
     "password": "密码",
     "success": "配置成功",
     "fail": "配置失败",
-    "clear": "清除配置"
+    "clear": "清除配置",
+    "title": "配置数据库"
   },
   "formRules": {
     "hostRequired": "请填写 host",

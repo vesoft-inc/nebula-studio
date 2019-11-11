@@ -27,7 +27,8 @@
     "password": "Password",
     "success": "succeed",
     "fail": "Failed",
-    "clear": "Clear config"
+    "clear": "Clear config",
+    "title": "Config server"
   },
   "formRules": {
     "hostRequired": "Host required",

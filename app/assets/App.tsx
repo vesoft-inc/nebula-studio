@@ -19,6 +19,8 @@ import Explore from '#assets/modules/Explore';
 import { updateQueryStringParameter } from '#assets/utils';
 
 import './App.less';
+import ConfigServer from './modules/ConfigServer';
+import PrivateRoute from './PrivateRoute';
 
 const { Header, Content } = Layout;
 const { Option } = Select;
@@ -131,8 +133,9 @@ class App extends React.Component<IProps, IState> {
               </Header>
               <Content>
                 <Switch>
-                  <Route path="/console" component={Console} />
-                  <Route path="/explore" component={Explore} />
+                  <PrivateRoute path="/console" component={Console} />
+                  <PrivateRoute path="/explore" component={Explore} />
+                  <Route path="/config-server" component={ConfigServer} />
                   <Redirect to="/console" />
                 </Switch>
               </Content>
