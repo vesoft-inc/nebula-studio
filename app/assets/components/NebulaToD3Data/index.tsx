@@ -2,6 +2,9 @@ import * as d3 from 'd3';
 import * as React from 'react';
 
 import './index.less';
+import Labels from './labels';
+import Links from './links';
+import Nodes from './nodes';
 
 interface INode extends d3.SimulationNodeDatum {
   name: string;
@@ -23,11 +26,12 @@ interface IProps {
 }
 
 interface IRefs {
-  mountPoint?: HTMLDivElement | null;
+  mountPoint?: SVGSVGElement | null;
 }
 
 class NebulaToD3Data extends React.Component<IProps, {}> {
   ctrls: IRefs = {};
+  force: any;
 
   componentDidMount() {
     if (!this.ctrls.mountPoint) {
@@ -44,16 +48,8 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
         return d.value * 30;
       });
 
-    const force = d3
-      .forceSimulation()
-      .nodes(data.vertexs)
-      .force('charge', d3.forceManyBody().strength(-120))
-      .force('link', linkForce)
-      .force('center', d3.forceCenter(width / 2, height / 2));
-
     const svg = d3
       .select(this.ctrls.mountPoint)
-      .append('svg')
       .attr('width', width)
       .attr('height', height);
 
@@ -73,87 +69,37 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
       .attr('fill', '#999')
       .attr('stroke', '#999');
 
-    const link = svg
-      .selectAll('line')
-      .data(data.edges)
-      .enter()
-      .append('line')
-      .style('stroke', '#999999')
-      .attr('marker-end', 'url(#marker)')
-      .attr('stroke-width', 2);
+    this.force = d3
+      .forceSimulation()
+      .nodes(data.vertexs)
+      .force('charge', d3.forceManyBody().strength(-120))
+      .force('link', linkForce)
+      .force('center', d3.forceCenter(width / 2, height / 2));
 
-    function dragStarted(d) {
-      if (!d3.event.active) {
-        force.alphaTarget(0.3).restart();
-      }
-      d.fx = d.x;
-      d.fy = d.y;
-
-      return d;
-    }
-
-    function dragged(d) {
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
-    }
-
-    function dragEnded(d) {
-      if (!d3.event.active) {
-        force.alphaTarget(0);
-      }
-      d.fx = null;
-      d.fy = null;
-    }
-
-    const color = d3.scaleOrdinal(d3.schemeCategory10);
-    const node = svg
-      .selectAll('circle')
-      .data<INode>(data.vertexs)
-      .enter()
-      .append<SVGCircleElement>('circle')
-      .attr('r', 20)
-      .attr('class', 'nodes')
-      .style('fill', (d: any) => color(d.group))
+    const link = d3.selectAll('.link').attr('marker-end', 'url(#marker)');
+    const linksText = d3.selectAll('.text');
+    const node = d3
+      .selectAll('.node')
       .on('click', (d: any) => {
-        console.log(d);
-      })
-      .call(d3
-        .drag()
-        .on('start', dragStarted)
-        .on('drag', dragged)
-        .on('end', dragEnded) as any);
-
-    const linksText = svg
-      .append('g')
-      .selectAll('text')
-      .data(data.edges)
-      .enter()
-      .append('text')
-      .text((d: any) => {
-        return d.type;
-      });
-
-    const nodeText = svg
-      .append('g')
-      .attr('class', 'labels')
-      .selectAll('text')
-      .data<INode>(data.vertexs)
-      .enter()
-      .append('text')
-      .text((d: INode) => {
-        return d.name;
-      })
-      .on('click', (d: INode) => {
         this.props.onSelectVertex([d.name]);
       })
-      .attr('text-anchor', 'middle')
       .call(d3
         .drag()
-        .on('start', dragStarted)
-        .on('drag', dragged)
-        .on('end', dragEnded) as any);
+        .on('start', d => this.dragstart(d))
+        .on('drag', d => this.dragged(d))
+        .on('end', d => this.dragEnded(d)) as any);
+    const nodeText = d3
+      .selectAll('.label')
+      .on('click', (d: any) => {
+        this.props.onSelectVertex([d.name]);
+      })
+      .call(d3
+        .drag()
+        .on('start', d => this.dragstart(d))
+        .on('drag', d => this.dragged(d))
+        .on('end', d => this.dragEnded(d)) as any);
 
-    force.on('tick', () => {
+    this.force.on('tick', () => {
       link
         .attr('x1', (d: any) => d.source.x)
         .attr('y1', (d: any) => d.source.y)
@@ -179,17 +125,6 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
         });
     });
 
-    function isNotSelected(nodePoint, startPoint) {
-      if (
-        (nodePoint.x > startPoint.x && nodePoint.x > d3.event.offsetX) ||
-        (nodePoint.x < startPoint.x && nodePoint.x < d3.event.offsetX) ||
-        (nodePoint.y > startPoint.y && nodePoint.y > d3.event.offsetY) ||
-        (nodePoint.y < startPoint.y && nodePoint.y < d3.event.offsetY)
-      ) {
-        return true;
-      }
-      return false;
-    }
     if (data.vertexs.length !== 0) {
       const startPoint = {
         x: 0,
@@ -220,7 +155,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
           const len = nodes.length;
           for (let _i: number = 0; _i < len; _i++) {
             const nodePoint: any = nodes[_i];
-            if (isNotSelected(nodePoint, startPoint)) {
+            if (this.isNotSelected(nodePoint, startPoint)) {
               continue;
             }
             console.log(nodePoint);
@@ -232,12 +167,52 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
     }
   }
 
+  isNotSelected(nodePoint, startPoint) {
+    if (
+      (nodePoint.x > startPoint.x && nodePoint.x > d3.event.offsetX) ||
+      (nodePoint.x < startPoint.x && nodePoint.x < d3.event.offsetX) ||
+      (nodePoint.y > startPoint.y && nodePoint.y > d3.event.offsetY) ||
+      (nodePoint.y < startPoint.y && nodePoint.y < d3.event.offsetY)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  dragged(d) {
+    d.fx = d3.event.x;
+    d.fy = d3.event.y;
+  }
+
+  dragstart = (d: any) => {
+    if (!d3.event.active) {
+      this.force.alphaTarget(0.3).restart();
+    }
+    d.fx = d.x;
+    d.fy = d.y;
+
+    return d;
+  };
+
+  dragEnded(d) {
+    if (!d3.event.active) {
+      this.force.alphaTarget(0);
+    }
+    d.fx = null;
+    d.fy = null;
+  }
+
   render() {
+    const { data } = this.props;
     return (
-      <div
+      <svg
         className="output-graph"
         ref={mountPoint => (this.ctrls.mountPoint = mountPoint)}
-      />
+      >
+        <Links links={data.edges} />
+        <Nodes nodes={data.vertexs} />
+        <Labels nodes={data.vertexs} />
+      </svg>
     );
   }
 }
