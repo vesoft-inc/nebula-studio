@@ -2,6 +2,8 @@ import { createModel } from '@rematch/core';
 
 import service from '#assets/config/service';
 
+import NebulaToD3Data from '../../utils/nebulaToData';
+
 interface IState {
   vertexs: any[];
   edges: any[];
@@ -34,14 +36,17 @@ export const explore = createModel({
     },
   },
   effects: {
-    async asyncGetExpand(payload: {
-      host: string;
-      username: string;
-      password: string;
-      space: string;
-      ids: any;
-      edgetype: string;
-    }) {
+    async asyncGetExpand(
+      payload: {
+        host: string;
+        username: string;
+        password: string;
+        space: string;
+        ids: any[];
+        edgetype: string;
+      },
+      state,
+    ) {
       const { host, username, password, space, ids, edgetype } = payload;
       const { code, data } = (await service.execNGQL({
         host,
@@ -49,11 +54,17 @@ export const explore = createModel({
         password,
         gql: `
           use ${space};
-          GO FROM ${ids} OVER ${edgetype} yield ${edgetype}._src as sourceid, ${edgetype}._dst as destid;;
+          GO FROM ${ids} OVER ${edgetype} yield ${edgetype}._src as sourceid, ${edgetype}._dst as destid;
         `,
       })) as any;
       if (code === '0') {
-        console.log(data);
+        const d3data = NebulaToD3Data(state.explore.vertexs, data, edgetype);
+        const edges = state.explore.edges.concat(d3data.edges);
+        const vertexs = d3data.vertexs;
+        this.update({
+          vertexs,
+          edges,
+        });
       }
     },
   },

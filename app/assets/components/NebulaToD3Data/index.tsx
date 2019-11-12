@@ -2,9 +2,9 @@ import * as d3 from 'd3';
 import * as React from 'react';
 
 import './index.less';
-import Labels from './labels';
 import Links from './links';
 import Nodes from './nodes';
+import Labels from './nodeText';
 import Rect from './rect';
 
 interface INode extends d3.SimulationNodeDatum {
@@ -89,6 +89,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
         .on('start', d => this.dragstart(d))
         .on('drag', d => this.dragged(d))
         .on('end', d => this.dragEnded(d)) as any);
+
     const nodeText = d3
       .selectAll('.label')
       .on('click', (d: any) => {

@@ -6,34 +6,34 @@ interface INode extends d3.SimulationNodeDatum {
   group: number;
 }
 
-class Node extends React.Component<{ node: INode; color: string }, {}> {
-  ref: SVGCircleElement;
+export default class Nodes extends React.Component<{ nodes: INode[] }, {}> {
+  ref: SVGGElement;
 
   componentDidMount() {
-    d3.select(this.ref).data([this.props.node]);
+    this.nodeRender(this.props.nodes);
   }
 
-  render() {
-    return (
-      <circle
-        className="node"
-        r={20}
-        fill={this.props.color}
-        ref={(ref: SVGCircleElement) => (this.ref = ref)}
-      />
-    );
-  }
-}
-
-export default class Nodes extends React.Component<{ nodes: any }, {}> {
-  render() {
+  nodeRender(nodes: INode[]) {
+    console.log(nodes);
     const color = d3.scaleOrdinal(d3.schemeCategory10);
-    const nodes = this.props.nodes.map((node: INode, index: number) => {
-      return (
-        <Node key={index} node={node} color={color(node.group.toString())} />
-      );
-    });
+    d3.select(this.ref)
+      .selectAll('circle')
+      .data(nodes)
+      .enter()
+      .append<SVGCircleElement>('circle')
+      .attr('r', 20)
+      .attr('class', 'node')
+      .style('stroke', '#FFFFFF')
+      .style('stroke-width', 1.5)
+      .style('fill', (d: any) => color(d.group));
+  }
 
-    return <g className="nodes">{nodes}</g>;
+  render() {
+    if (this.ref) {
+      this.nodeRender(this.props.nodes);
+    }
+    return (
+      <g ref={(ref: SVGCircleElement) => (this.ref = ref)} className="nodes" />
+    );
   }
 }
