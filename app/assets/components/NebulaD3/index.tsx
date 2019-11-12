@@ -5,7 +5,7 @@ import './index.less';
 import Links from './links';
 import Nodes from './nodes';
 import Labels from './nodeText';
-import Rect from './rect';
+import SelectIds from './selectIds';
 
 interface INode extends d3.SimulationNodeDatum {
   name: string;
@@ -161,7 +161,7 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
         <Links links={data.edges} />
         <Nodes nodes={data.vertexs} />
         <Labels nodes={data.vertexs} />
-        <Rect nodes={data.vertexs} />
+        <SelectIds nodes={data.vertexs} />
       </svg>
     );
   }

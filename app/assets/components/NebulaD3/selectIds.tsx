@@ -6,7 +6,7 @@ interface INode extends d3.SimulationNodeDatum {
   group: number;
 }
 
-export default class Labels extends React.Component<{ nodes: INode[] }, {}> {
+export default class SelectIds extends React.Component<{ nodes: INode[] }, {}> {
   componentDidMount() {
     const { nodes } = this.props;
     if (nodes.length !== 0) {

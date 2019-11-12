@@ -7,7 +7,7 @@ If you want to try web console with some sample data. You can use the relative i
 ### Step 1 - start the nebula server
 ```bash
 $ cd scripts/
-$   
+$ docker-compose up -d
 ```
 [more details about nebula docker image](https://github.com/vesoft-inc/nebula/tree/master/docker)
 
