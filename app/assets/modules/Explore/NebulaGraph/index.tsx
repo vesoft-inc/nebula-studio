@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { NebulaToD3Data } from '#assets/components';
+import { NebulaD3 } from '#assets/components';
 import { IDispatch, IRootState } from '#assets/store';
 
 import Panel from './Pannel';
@@ -31,7 +31,7 @@ class NebulaGraph extends React.Component<IProps, {}> {
     return (
       <div className="graph-wrap">
         {ids.length !== 0 && <Panel />}
-        <NebulaToD3Data
+        <NebulaD3
           width={1200}
           height={900}
           data={{ vertexs, edges }}

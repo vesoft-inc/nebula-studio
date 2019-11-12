@@ -30,7 +30,7 @@ interface IRefs {
   mountPoint?: SVGSVGElement | null;
 }
 
-class NebulaToD3Data extends React.Component<IProps, {}> {
+class NebulaD3 extends React.Component<IProps, {}> {
   ctrls: IRefs = {};
   force: any;
 
@@ -167,4 +167,4 @@ class NebulaToD3Data extends React.Component<IProps, {}> {
   }
 }
 
-export default NebulaToD3Data;
+export default NebulaD3;

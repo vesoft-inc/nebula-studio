@@ -14,7 +14,6 @@ export default class Nodes extends React.Component<{ nodes: INode[] }, {}> {
   }
 
   nodeRender(nodes: INode[]) {
-    console.log(nodes);
     const color = d3.scaleOrdinal(d3.schemeCategory10);
     d3.select(this.ref)
       .selectAll('circle')
