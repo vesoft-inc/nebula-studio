@@ -83,7 +83,7 @@ class Expand extends React.Component<IProps, IState> {
 
   handleExpand = () => {
     const { host, username, password, currentSpace, ids } = this.props;
-    const { getFieldsValue } = this.props.form;
+    const { getFieldValue } = this.props.form;
     this.props.asyncGetExpand(
       {
         host,
@@ -91,7 +91,7 @@ class Expand extends React.Component<IProps, IState> {
         password,
         space: currentSpace,
         ids,
-        edgetype: getFieldsValue().edgeType,
+        edgetype: getFieldValue('edgeType'),
       },
       this.props,
     );
@@ -99,7 +99,7 @@ class Expand extends React.Component<IProps, IState> {
 
   render() {
     const { edgeTypes } = this.props;
-    const { getFieldDecorator, getFieldsValue } = this.props.form;
+    const { getFieldDecorator, getFieldValue } = this.props.form;
     const { filters } = this.state;
     const columns = [
       {
@@ -181,7 +181,7 @@ class Expand extends React.Component<IProps, IState> {
         </Form>
         <Button
           onClick={this.handleExpand}
-          disabled={!getFieldsValue().edgeType}
+          disabled={!getFieldValue('edgeType')}
         >
           {intl.get('explore.expand')}
         </Button>

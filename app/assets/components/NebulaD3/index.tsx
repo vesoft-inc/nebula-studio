@@ -23,7 +23,7 @@ interface IProps {
     vertexs: INode[];
     edges: ILink[];
   };
-  onSelectVertex: (vertex: any[]) => void;
+  onSelectVertex: (vertexs: any[]) => void;
 }
 
 interface IRefs {

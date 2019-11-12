@@ -22,8 +22,8 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
 class NebulaGraph extends React.Component<IProps, {}> {
-  handleSelectVertex = (ids: any[]) => {
-    this.props.updateIds(ids);
+  handleSelectVertex = (_ids: any[]) => {
+    this.props.updateIds(_ids);
   };
 
   render() {
@@ -35,7 +35,7 @@ class NebulaGraph extends React.Component<IProps, {}> {
           width={1200}
           height={900}
           data={{ vertexs, edges }}
-          onSelectVertex={(id: any[]) => this.handleSelectVertex(id)}
+          onSelectVertex={(_ids: any[]) => this.handleSelectVertex(_ids)}
         />
       </div>
     );
