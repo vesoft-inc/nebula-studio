@@ -2,8 +2,8 @@ package graphdb
 
 import (
 	"errors"
-	common "nebula-go-api/utils"
 	"log"
+	common "nebula-go-api/utils"
 
 	nebula "github.com/vesoft-inc/nebula-go"
 	"github.com/vesoft-inc/nebula-go/graph"
@@ -63,6 +63,10 @@ func Connect(host, username, password string) bool {
 }
 
 func Execute(host, username, password, gql string) (result ExecuteResult, err error) {
+	result = ExecuteResult{
+		Headers: make([]string, 0),
+		Tables:  make([]map[string]common.Any, 0),
+	}
 	client, err := connect(host, username, password)
 	defer client.Disconnect()
 	if err != nil {
