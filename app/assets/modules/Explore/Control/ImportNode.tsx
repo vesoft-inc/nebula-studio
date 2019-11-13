@@ -53,7 +53,7 @@ class ImportNodes extends React.Component<IProps, IState> {
           _.uniqBy(
             [
               ...vertexs,
-              ids
+              ...ids
                 .trim()
                 .split('\n')
                 .map(id => ({

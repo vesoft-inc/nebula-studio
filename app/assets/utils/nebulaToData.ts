@@ -18,7 +18,7 @@ export default function nebulaToData(
     edges.push({
       source: item.sourceid,
       target: item.destid,
-      value: 3,
+      value: 6,
       type: edgetype,
     });
   }

@@ -1,7 +1,10 @@
 import * as d3 from 'd3';
 import * as React from 'react';
 
-export default class Links extends React.Component<{ links: any[] }, {}> {
+export default class Links extends React.Component<
+  { links: any[]; onUpdataLinks: () => void },
+  {}
+> {
   ref: SVGGElement;
 
   componentDidMount() {
@@ -27,6 +30,7 @@ export default class Links extends React.Component<{ links: any[] }, {}> {
       .text((d: any) => {
         return d.type;
       });
+    this.props.onUpdataLinks();
   }
 
   render() {

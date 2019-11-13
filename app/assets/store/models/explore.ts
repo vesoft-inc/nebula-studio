@@ -11,20 +11,8 @@ interface IState {
 
 export const explore = createModel({
   state: {
-    vertexs: [
-      { name: '200', group: 1 },
-      { name: '201', group: 2 },
-      { name: '202', group: 4 },
-      { name: '203', group: 3 },
-      { name: '205', group: 4 },
-    ],
-    edges: [
-      { source: '200', target: '201', value: 3, type: 'like' },
-      { source: '200', target: '202', value: 5, type: 'like' },
-      { source: '202', target: '205', value: 5, type: 'like' },
-      { source: '200', target: '205', value: 8, type: 'like' },
-      { source: '203', target: '201', value: 8, type: 'like' },
-    ],
+    vertexs: [],
+    edges: [],
     ids: [],
   },
   reducers: {
@@ -57,7 +45,7 @@ export const explore = createModel({
           GO FROM ${ids} OVER ${edgetype} yield ${edgetype}._src as sourceid, ${edgetype}._dst as destid;
         `,
       })) as any;
-      if (code === '0') {
+      if (code === '0' && data.tables.length !== 0) {
         const d3data = NebulaToD3Data(state.explore.vertexs, data, edgetype);
         const edges = state.explore.edges.concat(d3data.edges);
         const vertexs = d3data.vertexs;

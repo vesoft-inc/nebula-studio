@@ -6,7 +6,10 @@ interface INode extends d3.SimulationNodeDatum {
   group: number;
 }
 
-export default class Nodes extends React.Component<{ nodes: INode[] }, {}> {
+export default class Nodes extends React.Component<
+  { nodes: INode[]; onUpDataNodes: () => void },
+  {}
+> {
   ref: SVGGElement;
 
   componentDidMount() {
@@ -25,6 +28,7 @@ export default class Nodes extends React.Component<{ nodes: INode[] }, {}> {
       .style('stroke', '#FFFFFF')
       .style('stroke-width', 1.5)
       .style('fill', (d: any) => color(d.group));
+    this.props.onUpDataNodes();
   }
 
   render() {

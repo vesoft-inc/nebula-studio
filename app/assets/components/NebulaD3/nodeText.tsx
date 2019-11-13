@@ -6,7 +6,10 @@ interface INode extends d3.SimulationNodeDatum {
   group: number;
 }
 
-export default class NodeText extends React.Component<{ nodes: INode[] }, {}> {
+export default class NodeText extends React.Component<
+  { nodes: INode[]; onUpDataNodeTexts: () => void },
+  {}
+> {
   ref: SVGGElement;
 
   componentDidMount() {
@@ -24,6 +27,7 @@ export default class NodeText extends React.Component<{ nodes: INode[] }, {}> {
       .text((d: INode) => {
         return d.name;
       });
+    this.props.onUpDataNodeTexts();
   }
   render() {
     if (this.ref) {
