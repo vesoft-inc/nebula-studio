@@ -15,12 +15,16 @@ $ docker-compose up -d
 ```bash
 $ cd scripts/
 $ cat ngql/init-schema.ngql | docker-compose run console bash;
+// demo relationship graph schema
+$ cat ngql/relationship-schema.ngql | docker-compose run console bash;
 ```
 
 ### Step 3 - init nebula data 
 ```bash
 $ cd scripts/
 $ cat ngql/init-data.ngql | docker-compose run console bash;
+// demo relationship grap data
+$ cat ngql/relationship-data.ngql | docker-compose run console bash;
 ```
 
 ### Finaly - Run the console, Have fun
