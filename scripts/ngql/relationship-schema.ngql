@@ -1,0 +1,4 @@
+CREATE SPACE relationship(partition_num=1, replica_factor=1);
+use relationship;
+CREATE TAG person(name string, gender string);
+CREATE EDGE love(degree double);
