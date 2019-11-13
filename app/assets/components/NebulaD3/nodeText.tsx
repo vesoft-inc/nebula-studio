@@ -37,10 +37,6 @@ export default class NodeText extends React.Component<IProps, {}> {
     this.props.onUpDataNodeTexts();
   }
   render() {
-    if (this.ref) {
-      this.labelRender(this.props.nodes);
-    }
-
     return (
       <g className="labels" ref={(ref: SVGGElement) => (this.ref = ref)} />
     );
