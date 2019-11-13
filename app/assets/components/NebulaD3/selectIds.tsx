@@ -6,7 +6,12 @@ interface INode extends d3.SimulationNodeDatum {
   group: number;
 }
 
-export default class SelectIds extends React.Component<{ nodes: INode[] }, {}> {
+interface IProps {
+  nodes: INode[];
+  onSelectVertexes: (vertexes: any[]) => void;
+}
+
+export default class SelectIds extends React.Component<IProps, {}> {
   componentDidMount() {
     const { nodes } = this.props;
     if (nodes.length !== 0) {
@@ -36,14 +41,9 @@ export default class SelectIds extends React.Component<{ nodes: INode[] }, {}> {
           }
         })
         .on('mouseup', () => {
-          const len = nodes.length;
-          for (let _i: number = 0; _i < len; _i++) {
-            const nodePoint: any = nodes[_i];
-            if (this.isNotSelected(nodePoint, startPoint)) {
-              continue;
-            }
-            console.log(nodePoint);
-          }
+          this.props.onSelectVertexes(
+            nodes.filter(node => !this.isNotSelected(node, startPoint)),
+          );
           startPoint.x = 0;
           startPoint.y = 0;
           rect.attr('width', 0).attr('height', 0);

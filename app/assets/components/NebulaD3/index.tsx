@@ -22,8 +22,9 @@ interface IProps {
   data: {
     vertexs: INode[];
     edges: ILink[];
+    selectIdsMap: Map<string, boolean>;
   };
-  onSelectVertex: (vertexs: any[]) => void;
+  onSelectVertexes: (vertexes: INode[]) => void;
 }
 
 interface IRefs {
@@ -82,7 +83,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
     const node = d3
       .selectAll('.node')
       .on('click', (d: any) => {
-        this.props.onSelectVertex([d.name]);
+        this.props.onSelectVertexes([d]);
       })
       .call(d3
         .drag()
@@ -93,7 +94,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
     const nodeText = d3
       .selectAll('.label')
       .on('click', (d: any) => {
-        this.props.onSelectVertex([d.name]);
+        this.props.onSelectVertexes([d]);
       })
       .call(d3
         .drag()
@@ -159,9 +160,12 @@ class NebulaD3 extends React.Component<IProps, {}> {
         ref={mountPoint => (this.ctrls.mountPoint = mountPoint)}
       >
         <Links links={data.edges} />
-        <Nodes nodes={data.vertexs} />
+        <Nodes nodes={data.vertexs} selectIdsMap={data.selectIdsMap} />
         <Labels nodes={data.vertexs} />
-        <SelectIds nodes={data.vertexs} />
+        <SelectIds
+          nodes={data.vertexs}
+          onSelectVertexes={this.props.onSelectVertexes}
+        />
       </svg>
     );
   }

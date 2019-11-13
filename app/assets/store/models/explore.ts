@@ -25,7 +25,7 @@ export const explore = createModel({
       { source: '200', target: '205', value: 8, type: 'like' },
       { source: '203', target: '201', value: 8, type: 'like' },
     ],
-    ids: [],
+    selectIds: [],
   },
   reducers: {
     update: (state: IState, payload: object): IState => {

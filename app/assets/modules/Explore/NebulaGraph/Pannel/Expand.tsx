@@ -16,7 +16,7 @@ const mapState = (state: IRootState) => ({
   username: state.nebula.username,
   password: state.nebula.password,
   currentSpace: state.nebula.currentSpace,
-  ids: state.explore.ids,
+  ids: state.explore.selectIds,
 });
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetEdgeTypes: dispatch.nebula.asyncGetEdgeTypes,
