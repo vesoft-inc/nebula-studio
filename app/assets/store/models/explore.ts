@@ -13,7 +13,7 @@ export const explore = createModel({
   state: {
     vertexs: [],
     edges: [],
-    ids: [],
+    selectIds: [],
   },
   reducers: {
     update: (state: IState, payload: object): IState => {

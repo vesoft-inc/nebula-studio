@@ -9,33 +9,40 @@ import Panel from './Pannel';
 const mapState = (state: IRootState) => ({
   vertexs: state.explore.vertexs,
   edges: state.explore.edges,
-  ids: state.explore.ids,
+  selectIds: state.explore.selectIds,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
-  updateIds: (ids: any) => {
+  updateSelectIds: (ids: any) => {
     dispatch.explore.update({
-      ids,
+      selectIds: ids,
     });
   },
 });
 
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
 class NebulaGraph extends React.Component<IProps, {}> {
-  handleSelectVertex = (_ids: any[]) => {
-    this.props.updateIds(_ids);
+  handleSelectVertexes = (nodes: any[]) => {
+    this.props.updateSelectIds(nodes.map(n => n.name));
   };
 
   render() {
-    const { vertexs, edges, ids } = this.props;
+    const { vertexs, edges, selectIds } = this.props;
     return (
       <div className="graph-wrap">
-        {ids.length !== 0 && <Panel />}
+        {selectIds.length !== 0 && <Panel />}
         <NebulaD3
           width={1200}
           height={900}
-          data={{ vertexs, edges }}
-          onSelectVertex={(_ids: any[]) => this.handleSelectVertex(_ids)}
+          data={{
+            vertexs,
+            edges,
+            selectIdsMap: selectIds.reduce((dict: any, id) => {
+              dict[id] = true;
+              return dict;
+            }, {}),
+          }}
+          onSelectVertexes={(nodes: any[]) => this.handleSelectVertexes(nodes)}
         />
       </div>
     );

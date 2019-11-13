@@ -5,15 +5,22 @@ interface INode extends d3.SimulationNodeDatum {
   name: string;
   group: number;
 }
+interface IProps {
+  nodes: INode[];
+  onUpDataNodeTexts: () => void;
+}
 
-export default class NodeText extends React.Component<
-  { nodes: INode[]; onUpDataNodeTexts: () => void },
-  {}
-> {
+export default class NodeText extends React.Component<IProps, {}> {
   ref: SVGGElement;
 
   componentDidMount() {
     this.labelRender(this.props.nodes);
+  }
+
+  componentDidUpdate() {
+    if (this.ref) {
+      this.labelRender(this.props.nodes);
+    }
   }
 
   labelRender(nodes) {

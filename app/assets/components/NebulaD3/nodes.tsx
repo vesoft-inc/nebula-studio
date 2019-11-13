@@ -6,15 +6,34 @@ interface INode extends d3.SimulationNodeDatum {
   group: number;
 }
 
-export default class Nodes extends React.Component<
-  { nodes: INode[]; onUpDataNodes: () => void },
-  {}
-> {
+interface IProps {
+  nodes: INode[];
+  selectIdsMap: Map<string, boolean>;
+  onUpDataNodes: () => void;
+}
+
+export default class Nodes extends React.Component<IProps, {}> {
   ref: SVGGElement;
 
   componentDidMount() {
     this.nodeRender(this.props.nodes);
   }
+
+  componentDidUpdate() {
+    this.updateSelectNodes();
+  }
+
+  updateSelectNodes = () => {
+    const selectIdsMap = this.props.selectIdsMap;
+    d3.select(this.ref)
+      .selectAll('circle')
+      .attr('class', (d: any) => {
+        if (selectIdsMap[d.name]) {
+          return 'node active';
+        }
+        return 'node';
+      });
+  };
 
   nodeRender(nodes: INode[]) {
     const color = d3.scaleOrdinal(d3.schemeCategory10);
@@ -23,10 +42,8 @@ export default class Nodes extends React.Component<
       .data(nodes)
       .enter()
       .append<SVGCircleElement>('circle')
-      .attr('r', 20)
       .attr('class', 'node')
-      .style('stroke', '#FFFFFF')
-      .style('stroke-width', 1.5)
+      .attr('id', (d: any) => `node-${d.name}`)
       .style('fill', (d: any) => color(d.group));
     this.props.onUpDataNodes();
   }
