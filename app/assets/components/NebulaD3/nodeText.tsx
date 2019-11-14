@@ -17,8 +17,8 @@ export default class NodeText extends React.Component<IProps, {}> {
     this.labelRender(this.props.nodes);
   }
 
-  componentDidUpdate(props) {
-    if (props.nodes.length !== 0 && this.props.nodes.length === 0) {
+  componentDidUpdate(prevProps) {
+    if (prevProps.nodes.length !== 0 && this.props.nodes.length === 0) {
       d3.selectAll('.label').remove();
     } else {
       this.labelRender(this.props.nodes);

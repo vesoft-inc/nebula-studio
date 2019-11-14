@@ -19,8 +19,8 @@ export default class Nodes extends React.Component<IProps, {}> {
     this.nodeRender(this.props.nodes);
   }
 
-  componentDidUpdate(props) {
-    if (props.nodes.length !== 0 && this.props.nodes.length === 0) {
+  componentDidUpdate(prevProps) {
+    if (prevProps.nodes.length !== 0 && this.props.nodes.length === 0) {
       d3.selectAll('.node').remove();
     } else {
       this.updateSelectNodes();
