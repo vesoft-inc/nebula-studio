@@ -1,20 +1,27 @@
 import _ from 'lodash';
 
-export default function nebulaToData(
+export function nebulaToData(
   vertexs: Array<{ name: any; group: number }>,
-  data: { tables: any[] },
+  data: any[],
   edgetype: string,
 ) {
   const edges: any = [];
 
-  const len = data.tables.length;
+  const len = data.length;
   for (let _i: number = 0; _i < len; _i++) {
-    const item: any = data.tables[_i];
-    vertexs.push({
-      name: item.destid,
-      group: 6,
+    const item: any = data[_i];
+    let isSave = false;
+    vertexs.map(vertex => {
+      if (vertex.name === item.destid) {
+        isSave = true;
+      }
     });
-    vertexs = _.uniqBy(vertexs, 'name');
+    if (!isSave) {
+      vertexs.push({
+        name: item.destid,
+        group: 6,
+      });
+    }
     edges.push({
       source: item.sourceid,
       target: item.destid,
@@ -26,4 +33,11 @@ export default function nebulaToData(
     vertexs,
     edges,
   };
+}
+
+export function idToSrting(data: any) {
+  data.map((item: { destid: string }) => {
+    item.destid = String(item.destid);
+  });
+  return data;
 }

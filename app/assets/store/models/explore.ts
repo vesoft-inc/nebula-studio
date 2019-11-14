@@ -2,7 +2,7 @@ import { createModel } from '@rematch/core';
 
 import service from '#assets/config/service';
 
-import NebulaToD3Data from '../../utils/nebulaToData';
+import { idToSrting, nebulaToData } from '../../utils/nebulaToData';
 
 interface IState {
   vertexs: any[];
@@ -46,7 +46,11 @@ export const explore = createModel({
         `,
       })) as any;
       if (code === '0' && data.tables.length !== 0) {
-        const d3data = NebulaToD3Data(state.explore.vertexs, data, edgetype);
+        const d3data = nebulaToData(
+          state.explore.vertexs,
+          idToSrting(data.tables),
+          edgetype,
+        );
         const edges = state.explore.edges.concat(d3data.edges);
         const vertexs = d3data.vertexs;
         this.update({
