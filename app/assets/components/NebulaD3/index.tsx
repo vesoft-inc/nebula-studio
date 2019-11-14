@@ -44,21 +44,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
     if (!this.ctrls.mountPoint) {
       return;
     }
-    const { width, height, data } = this.props;
-
-    const linkForce = d3
-      .forceLink(data.edges)
-      .id((d: any) => {
-        return d.name;
-      })
-      .distance((d: any) => {
-        return d.value * 30;
-      });
-
-    this.svg = d3
-      .select(this.ctrls.mountPoint)
-      .attr('width', width)
-      .attr('height', height);
+    this.svg = d3.select(this.ctrls.mountPoint);
 
     this.svg
       .append('defs')
@@ -75,13 +61,6 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .attr('d', 'M 0,-5 L 12 ,0 L 0,5')
       .attr('fill', '#999')
       .attr('stroke', '#999');
-
-    this.force = d3
-      .forceSimulation()
-      .nodes(data.vertexs)
-      .force('charge', d3.forceManyBody().strength(-120))
-      .force('link', linkForce)
-      .force('center', d3.forceCenter(width / 2, height / 2));
 
     this.link = d3.selectAll('.link').attr('marker-end', 'url(#marker)');
     this.linksText = d3.selectAll('.text');
@@ -133,7 +112,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
     d.fy = null;
   }
 
-  tick() {
+  tick = () => {
     this.link
       .attr('x1', (d: any) => d.source.x)
       .attr('y1', (d: any) => d.source.y)
@@ -159,7 +138,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .attr('y', (d: any) => {
         return (d.source.y + d.target.y) / 2;
       });
-  }
+  };
 
   handleUpdataNodes() {
     if (this.force) {
@@ -199,29 +178,38 @@ class NebulaD3 extends React.Component<IProps, {}> {
     }
   }
 
-  render() {
+  // compute to get (x,y ) of the nodes by d3-force: https://github.com/d3/d3-force/blob/v1.2.1/README.md#d3-force
+  // it will change the data.edges and data.vertexes passed in
+  computeDataByD3Force() {
     const { width, height, data } = this.props;
-    if (data.vertexs.length !== 0) {
-      const linkForce = d3
-        .forceLink(data.edges)
-        .id((d: any) => {
-          return d.name;
-        })
-        .distance((d: any) => {
-          return d.value * 30;
-        });
+    const linkForce = d3
+      .forceLink(data.edges)
+      .id((d: any) => {
+        return d.name;
+      })
+      .distance((d: any) => {
+        return d.value * 30;
+      });
 
-      this.force = d3
-        .forceSimulation()
-        .nodes(data.vertexs)
-        .force('charge', d3.forceManyBody())
-        .force('link', linkForce)
-        .force('center', d3.forceCenter(width / 2, height / 2));
-    }
+    this.force = d3
+      .forceSimulation()
+      .nodes(data.vertexs)
+      .force('charge', d3.forceManyBody())
+      .force('link', linkForce)
+      .force('center', d3.forceCenter(width / 2, height / 2))
+      .on('tick', this.tick);
+  }
+
+  render() {
+    this.computeDataByD3Force();
+    const { width, height, data } = this.props;
+
     return (
       <svg
         className="output-graph"
         ref={mountPoint => (this.ctrls.mountPoint = mountPoint)}
+        width={width}
+        height={height}
       >
         <Links
           links={data.edges}
