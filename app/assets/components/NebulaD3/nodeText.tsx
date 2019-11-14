@@ -32,7 +32,11 @@ export default class NodeText extends React.Component<IProps, {}> {
       .attr('class', 'label')
       .attr('text-anchor', 'middle')
       .text((d: INode) => d.name);
-    this.props.onUpDataNodeTexts();
+    if (nodes.length === 0) {
+      d3.selectAll('.label').remove();
+    } else {
+      this.props.onUpDataNodeTexts();
+    }
   }
   render() {
     return (

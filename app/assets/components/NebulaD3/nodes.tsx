@@ -45,7 +45,11 @@ export default class Nodes extends React.Component<IProps, {}> {
       .attr('class', 'node')
       .attr('id', (d: any) => `node-${d.name}`)
       .style('fill', (d: any) => color(d.group));
-    this.props.onUpDataNodes();
+    if (nodes.length === 0) {
+      d3.selectAll('.node').remove();
+    } else {
+      this.props.onUpDataNodes();
+    }
   }
 
   render() {

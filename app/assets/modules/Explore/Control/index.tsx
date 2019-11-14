@@ -22,10 +22,11 @@ const mapState = (state: IRootState) => ({
 
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetSpaces: dispatch.nebula.asyncGetSpaces,
-  clearNodes: () =>
+  clear: () =>
     dispatch.explore.update({
-      nodes: [],
-      links: [],
+      vertexs: [],
+      edges: [],
+      selectIds: [],
     }),
   updateSpace: space => {
     dispatch.nebula.update({
@@ -53,7 +54,7 @@ class Control extends React.Component<IProps, {}> {
       cancelText: intl.get('common.cancel'),
       onOk: () => {
         this.props.updateSpace(space);
-        this.props.clearNodes();
+        this.props.clear();
       },
     });
   };
@@ -73,7 +74,7 @@ class Control extends React.Component<IProps, {}> {
           </Select>
         </FormItem>
         <FormItem className="right">
-          <Button type="default" onClick={this.props.clearNodes}>
+          <Button type="default" onClick={this.props.clear}>
             {intl.get('explore.clear')}
           </Button>
           <Button
