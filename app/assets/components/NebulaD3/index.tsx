@@ -2,10 +2,10 @@ import * as d3 from 'd3';
 import * as React from 'react';
 
 import './index.less';
-import Links from './links';
-import Nodes from './nodes';
-import Labels from './nodeText';
-import SelectIds from './selectIds';
+import Links from './Links';
+import Nodes from './Nodes';
+import Labels from './NodeTexts';
+import SelectIds from './SelectIds';
 
 interface INode extends d3.SimulationNodeDatum {
   name: string;
