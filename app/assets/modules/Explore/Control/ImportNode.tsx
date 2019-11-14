@@ -14,12 +14,12 @@ import './ImportNode.less';
 const TextArea = Input.TextArea;
 
 const mapState = (state: IRootState) => ({
-  nodes: state.explore.nodes,
+  vertexes: state.explore.vertexes,
 });
 const mapDispatch = (dispatch: IDispatch) => ({
-  updateNodes: nodes => {
+  updateNodes: vertexes => {
     dispatch.explore.update({
-      nodes,
+      vertexes,
     });
   },
 });
@@ -47,13 +47,13 @@ class ImportNodes extends React.Component<IProps, IState> {
   handleImport = () => {
     this.props.form.validateFields((err, data) => {
       if (!err) {
-        const { nodes } = this.props;
+        const { vertexes } = this.props;
         const { ids } = data;
         this.props.updateNodes(
           _.uniqBy(
             [
-              ...nodes,
-              ids
+              ...vertexes,
+              ...ids
                 .trim()
                 .split('\n')
                 .map(id => ({

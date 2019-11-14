@@ -1,9 +1,9 @@
 use relationship;
-INSERT VERTEX person(name, gender) VALUE 0:("A", "female")
-INSERT VERTEX person(name, gender) VALUE 1:("B", "female")
-INSERT VERTEX person(name, gender) VALUE 2:("C", "male")
-INSERT VERTEX person(name, gender) VALUE 3:("D", "male")
-INSERT VERTEX person(name, gender) VALUE 4:("E", "female")
+INSERT VERTEX person(name, gender) VALUE 0:("A", "female");
+INSERT VERTEX person(name, gender) VALUE 1:("B", "female");
+INSERT VERTEX person(name, gender) VALUE 2:("C", "male");
+INSERT VERTEX person(name, gender) VALUE 3:("D", "male");
+INSERT VERTEX person(name, gender) VALUE 4:("E", "female");
 INSERT EDGE love(degree) VALUES 0 -> 2:(1.0);
 INSERT EDGE love(degree) VALUES 1 -> 2:(2.0);
 INSERT EDGE love(degree) VALUES 2 -> 4:(1.0);

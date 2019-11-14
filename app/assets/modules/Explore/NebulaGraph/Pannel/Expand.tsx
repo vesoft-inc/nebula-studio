@@ -16,9 +16,11 @@ const mapState = (state: IRootState) => ({
   username: state.nebula.username,
   password: state.nebula.password,
   currentSpace: state.nebula.currentSpace,
+  ids: state.explore.selectIds,
 });
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetEdgeTypes: dispatch.nebula.asyncGetEdgeTypes,
+  asyncGetExpand: dispatch.explore.asyncGetExpand,
 });
 
 interface IProps
@@ -79,9 +81,22 @@ class Expand extends React.Component<IProps, IState> {
     });
   };
 
+  handleExpand = () => {
+    const { host, username, password, currentSpace, ids } = this.props;
+    const { getFieldValue } = this.props.form;
+    this.props.asyncGetExpand({
+      host,
+      username,
+      password,
+      space: currentSpace,
+      ids,
+      edgetype: getFieldValue('edgeType'),
+    });
+  };
+
   render() {
     const { edgeTypes } = this.props;
-    const { getFieldDecorator } = this.props.form;
+    const { getFieldDecorator, getFieldValue } = this.props.form;
     const { filters } = this.state;
     const columns = [
       {
@@ -161,7 +176,12 @@ class Expand extends React.Component<IProps, IState> {
             footer={() => <Icon onClick={this.handleFilterAdd} type="plus" />}
           />
         </Form>
-        <Button>{intl.get('explore.expand')}</Button>
+        <Button
+          onClick={this.handleExpand}
+          disabled={!getFieldValue('edgeType')}
+        >
+          {intl.get('explore.expand')}
+        </Button>
       </div>
     );
   }
