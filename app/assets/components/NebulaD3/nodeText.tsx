@@ -31,9 +31,7 @@ export default class NodeText extends React.Component<IProps, {}> {
       .append('text')
       .attr('class', 'label')
       .attr('text-anchor', 'middle')
-      .text((d: INode) => {
-        return d.name;
-      });
+      .text((d: INode) => d.name);
     this.props.onUpDataNodeTexts();
   }
   render() {
