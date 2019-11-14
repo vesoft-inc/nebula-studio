@@ -13,8 +13,11 @@ export default class Links extends React.Component<IProps, {}> {
     this.linkRender(this.props.links);
   }
 
-  componentDidUpdate() {
-    if (this.ref) {
+  componentDidUpdate(props) {
+    if (props.links.length !== 0 && this.props.links.length === 0) {
+      d3.selectAll('.link').remove();
+      d3.selectAll('.text').remove();
+    } else {
       this.linkRender(this.props.links);
     }
   }
@@ -38,10 +41,7 @@ export default class Links extends React.Component<IProps, {}> {
       .text((d: any) => {
         return d.type;
       });
-    if (links.length === 0) {
-      d3.selectAll('.link').remove();
-      d3.selectAll('.text').remove();
-    } else {
+    if (this.ref) {
       this.props.onUpdataLinks();
     }
   }

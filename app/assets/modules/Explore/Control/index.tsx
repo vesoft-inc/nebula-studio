@@ -24,7 +24,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetSpaces: dispatch.nebula.asyncGetSpaces,
   clear: () =>
     dispatch.explore.update({
-      vertexs: [],
+      vertexes: [],
       edges: [],
       selectIds: [],
     }),

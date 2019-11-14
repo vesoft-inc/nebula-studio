@@ -170,14 +170,12 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .nodes(data.vertexes)
       .force('charge', d3.forceManyBody())
       .force('link', linkForce)
-      .force('center', d3.forceCenter(width / 2, height / 2))
-      .on('tick', this.tick);
+      .force('center', d3.forceCenter(width / 2, height / 2));
   }
 
   render() {
     this.computeDataByD3Force();
     const { width, height, data } = this.props;
-
     return (
       <svg
         className="output-graph"

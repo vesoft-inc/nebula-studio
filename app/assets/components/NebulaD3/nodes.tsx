@@ -19,8 +19,13 @@ export default class Nodes extends React.Component<IProps, {}> {
     this.nodeRender(this.props.nodes);
   }
 
-  componentDidUpdate() {
-    this.updateSelectNodes();
+  componentDidUpdate(props) {
+    if (props.nodes.length !== 0 && this.props.nodes.length === 0) {
+      d3.selectAll('.node').remove();
+    } else {
+      this.updateSelectNodes();
+      this.nodeRender(this.props.nodes);
+    }
   }
 
   updateSelectNodes = () => {
@@ -45,17 +50,12 @@ export default class Nodes extends React.Component<IProps, {}> {
       .attr('class', 'node')
       .attr('id', (d: any) => `node-${d.name}`)
       .style('fill', (d: any) => color(d.group));
-    if (nodes.length === 0) {
-      d3.selectAll('.node').remove();
-    } else {
+    if (this.ref) {
       this.props.onUpDataNodes();
     }
   }
 
   render() {
-    if (this.ref) {
-      this.nodeRender(this.props.nodes);
-    }
     return (
       <g ref={(ref: SVGCircleElement) => (this.ref = ref)} className="nodes" />
     );
