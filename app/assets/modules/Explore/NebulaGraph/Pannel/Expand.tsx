@@ -84,17 +84,14 @@ class Expand extends React.Component<IProps, IState> {
   handleExpand = () => {
     const { host, username, password, currentSpace, ids } = this.props;
     const { getFieldValue } = this.props.form;
-    this.props.asyncGetExpand(
-      {
-        host,
-        username,
-        password,
-        space: currentSpace,
-        ids,
-        edgetype: getFieldValue('edgeType'),
-      },
-      this.props,
-    );
+    this.props.asyncGetExpand({
+      host,
+      username,
+      password,
+      space: currentSpace,
+      ids,
+      edgetype: getFieldValue('edgeType'),
+    });
   };
 
   render() {

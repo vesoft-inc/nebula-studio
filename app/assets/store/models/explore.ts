@@ -1,17 +1,18 @@
 import { createModel } from '@rematch/core';
+import _ from 'lodash';
 
 import service from '#assets/config/service';
 
 import { idToSrting, nebulaToData } from '../../utils/nebulaToData';
 
 interface IState {
-  vertexs: any[];
+  vertexes: any[];
   edges: any[];
 }
 
 export const explore = createModel({
   state: {
-    vertexs: [],
+    vertexes: [],
     edges: [],
     selectIds: [],
   },
@@ -22,19 +23,31 @@ export const explore = createModel({
         ...payload,
       };
     },
+    addNodesAndEdges: (state: IState, payload: IState): IState => {
+      const { vertexes: originVertexes, edges: originEdges } = state;
+      const { vertexes: addVertexes, edges: addEdges } = payload;
+      const edges = [...originEdges, ...addEdges];
+      const vertexes = _.uniqBy(
+        [...originVertexes, ...addVertexes],
+        v => v.name,
+      );
+
+      return {
+        ...state,
+        edges,
+        vertexes,
+      };
+    },
   },
   effects: {
-    async asyncGetExpand(
-      payload: {
-        host: string;
-        username: string;
-        password: string;
-        space: string;
-        ids: any[];
-        edgetype: string;
-      },
-      state,
-    ) {
+    async asyncGetExpand(payload: {
+      host: string;
+      username: string;
+      password: string;
+      space: string;
+      ids: any[];
+      edgetype: string;
+    }) {
       const { host, username, password, space, ids, edgetype } = payload;
       const { code, data } = (await service.execNGQL({
         host,
@@ -45,16 +58,15 @@ export const explore = createModel({
           GO FROM ${ids} OVER ${edgetype} yield ${edgetype}._src as sourceid, ${edgetype}._dst as destid;
         `,
       })) as any;
+
       if (code === '0' && data.tables.length !== 0) {
-        const d3data = nebulaToData(
-          state.explore.vertexs,
+        const { edges, vertexes } = nebulaToData(
           idToSrting(data.tables),
           edgetype,
         );
-        const edges = state.explore.edges.concat(d3data.edges);
-        const vertexs = d3data.vertexs;
-        this.update({
-          vertexs,
+
+        this.addNodesAndEdges({
+          vertexes,
           edges,
         });
       }

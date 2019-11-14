@@ -1,43 +1,34 @@
 import _ from 'lodash';
 
-export function nebulaToData(
-  vertexs: Array<{ name: any; group: number }>,
-  data: any[],
-  edgetype: string,
-) {
-  const edges: any = [];
-
-  const len = data.length;
-  for (let _i: number = 0; _i < len; _i++) {
-    const item: any = data[_i];
-    let isSave = false;
-    vertexs.map(vertex => {
-      if (vertex.name === item.destid) {
-        isSave = true;
-      }
-    });
-    if (!isSave) {
-      vertexs.push({
-        name: item.destid,
+export function nebulaToData(table: any[], edgeType: string) {
+  return table.reduce(
+    (result, { sourceid, destid }) => {
+      result.edges.push({
+        source: sourceid,
+        target: destid,
+        value: 6,
+        type: edgeType,
+      });
+      result.vertexes.push({
+        name: destid,
         group: 6,
       });
-    }
-    edges.push({
-      source: item.sourceid,
-      target: item.destid,
-      value: 6,
-      type: edgetype,
-    });
-  }
-  return {
-    vertexs,
-    edges,
-  };
+
+      return result;
+    },
+    {
+      edges: [],
+      vertexes: [],
+    },
+  );
 }
 
+// translate nebula data id type from int to string
 export function idToSrting(data: any) {
-  data.map((item: { destid: string }) => {
+  return data.map((item: { destid: string; sourceid: string }) => {
     item.destid = String(item.destid);
+    item.sourceid = String(item.sourceid);
+
+    return item;
   });
-  return data;
 }
