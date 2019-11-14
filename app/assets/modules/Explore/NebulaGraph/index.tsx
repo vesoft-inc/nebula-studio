@@ -7,7 +7,7 @@ import { IDispatch, IRootState } from '#assets/store';
 import Panel from './Pannel';
 
 const mapState = (state: IRootState) => ({
-  vertexs: state.explore.vertexs,
+  vertexes: state.explore.vertexes,
   edges: state.explore.edges,
   selectIds: state.explore.selectIds,
 });
@@ -27,7 +27,7 @@ class NebulaGraph extends React.Component<IProps, {}> {
   };
 
   render() {
-    const { vertexs, edges, selectIds } = this.props;
+    const { vertexes, edges, selectIds } = this.props;
     return (
       <div className="graph-wrap">
         {selectIds.length !== 0 && <Panel />}
@@ -35,7 +35,7 @@ class NebulaGraph extends React.Component<IProps, {}> {
           width={1200}
           height={900}
           data={{
-            vertexs,
+            vertexes,
             edges,
             selectIdsMap: selectIds.reduce((dict: any, id) => {
               dict[id] = true;

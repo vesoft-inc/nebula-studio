@@ -20,7 +20,7 @@ interface IProps {
   width: number;
   height: number;
   data: {
-    vertexs: INode[];
+    vertexes: INode[];
     edges: ILink[];
     selectIdsMap: Map<string, boolean>;
   };
@@ -61,32 +61,6 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .attr('d', 'M 0,-5 L 12 ,0 L 0,5')
       .attr('fill', '#999')
       .attr('stroke', '#999');
-
-    this.link = d3.selectAll('.link').attr('marker-end', 'url(#marker)');
-    this.linksText = d3.selectAll('.text');
-    this.node = d3
-      .selectAll('.node')
-      .on('click', (d: any) => {
-        this.props.onSelectVertexes([d]);
-      })
-      .call(d3
-        .drag()
-        .on('start', d => this.dragstart(d))
-        .on('drag', d => this.dragged(d))
-        .on('end', d => this.dragEnded(d)) as any);
-
-    this.nodeText = d3
-      .selectAll('.label')
-      .on('click', (d: any) => {
-        this.props.onSelectVertexes([d]);
-      })
-      .call(d3
-        .drag()
-        .on('start', d => this.dragstart(d))
-        .on('drag', d => this.dragged(d))
-        .on('end', d => this.dragEnded(d)) as any);
-
-    this.force.on('tick', () => this.tick());
   }
 
   dragged(d) {
@@ -193,7 +167,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
 
     this.force = d3
       .forceSimulation()
-      .nodes(data.vertexs)
+      .nodes(data.vertexes)
       .force('charge', d3.forceManyBody())
       .force('link', linkForce)
       .force('center', d3.forceCenter(width / 2, height / 2))
@@ -216,16 +190,16 @@ class NebulaD3 extends React.Component<IProps, {}> {
           onUpdataLinks={() => this.handleUpdataLinks()}
         />
         <Nodes
-          nodes={data.vertexs}
+          nodes={data.vertexes}
           selectIdsMap={data.selectIdsMap}
           onUpDataNodes={() => this.handleUpdataNodes()}
         />
         <Labels
-          nodes={data.vertexs}
+          nodes={data.vertexes}
           onUpDataNodeTexts={() => this.handleUpdataNodeTexts()}
         />
         <SelectIds
-          nodes={data.vertexs}
+          nodes={data.vertexes}
           onSelectVertexes={this.props.onSelectVertexes}
         />
       </svg>
