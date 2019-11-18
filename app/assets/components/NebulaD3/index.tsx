@@ -93,9 +93,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .attr('x2', (d: any) => d.target.x)
       .attr('y2', (d: any) => d.target.y);
 
-    this.node.attr('transform', (d: any) => {
-      return 'translate(' + d.x + ',' + d.y + ')';
-    });
+    this.node.attr('cx', d => d.x).attr('cy', d => d.y);
 
     this.nodeText
       .attr('x', (d: any) => {
@@ -164,13 +162,15 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .distance((d: any) => {
         return d.value * 30;
       });
-
-    this.force = d3
-      .forceSimulation()
-      .nodes(data.vertexes)
-      .force('charge', d3.forceManyBody())
-      .force('link', linkForce)
-      .force('center', d3.forceCenter(width / 2, height / 2));
+    if (!this.force) {
+      this.force = d3
+        .forceSimulation()
+        .force('charge', d3.forceManyBody().strength(-300))
+        .force('x', d3.forceX())
+        .force('y', d3.forceY())
+        .force('center', d3.forceCenter(width / 2, height / 2));
+    }
+    this.force.nodes(data.vertexes).force('link', linkForce);
   }
 
   render() {
