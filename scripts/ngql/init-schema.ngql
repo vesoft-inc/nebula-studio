@@ -1,7 +1,8 @@
-CREATE SPACE my_test(partition_num=1, replica_factor=1);
-use my_test;
-CREATE TAG course(name string, credits int);
-CREATE TAG building(name string);
-CREATE TAG student(name string, age int, gender string);
-CREATE EDGE like(likeness double);
-CREATE EDGE select(grade int);
+CREATE SPACE commercial_relations(partition_num=1, replica_factor=1);
+use commercial_relations;
+CREATE TAG person(name string, age int);
+CREATE TAG company(name string, industry string, value int);
+CREATE TAG investment(name string, count int);
+CREATE EDGE own(share int);
+CREATE EDGE invested(money int);
+CREATE EDGE employed(long int);
