@@ -162,15 +162,14 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .distance((d: any) => {
         return d.value * 30;
       });
-    if (!this.force) {
-      this.force = d3
-        .forceSimulation()
-        .force('charge', d3.forceManyBody().strength(-300))
-        .force('x', d3.forceX())
-        .force('y', d3.forceY())
-        .force('center', d3.forceCenter(width / 2, height / 2));
-    }
-    this.force.nodes(data.vertexes).force('link', linkForce);
+    this.force = d3
+      .forceSimulation()
+      .force('charge', d3.forceManyBody().strength(-300))
+      .force('x', d3.forceX())
+      .force('y', d3.forceY())
+      .nodes(data.vertexes)
+      .force('link', linkForce)
+      .force('center', d3.forceCenter(width / 2, height / 2));
   }
 
   render() {
