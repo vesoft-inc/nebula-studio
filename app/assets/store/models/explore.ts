@@ -5,16 +5,22 @@ import service from '#assets/config/service';
 
 import { idToSrting, nebulaToData } from '../../utils/nebulaToData';
 
+interface INode extends d3.SimulationNodeDatum {
+  name: string;
+  group: number;
+}
+
 interface IState {
-  vertexes: any[];
+  vertexes: INode[];
   edges: any[];
+  selectVertexes: INode[];
 }
 
 export const explore = createModel({
   state: {
     vertexes: [],
     edges: [],
-    selectIds: [],
+    selectVertexes: [],
   },
   reducers: {
     update: (state: IState, payload: object): IState => {
@@ -27,6 +33,10 @@ export const explore = createModel({
       const { vertexes: originVertexes, edges: originEdges } = state;
       const { vertexes: addVertexes, edges: addEdges } = payload;
       const edges = [...originEdges, ...addEdges];
+      addVertexes.map(d => {
+        d.x = 500;
+        d.y = 600;
+      });
       const vertexes = _.uniqBy(
         [...originVertexes, ...addVertexes],
         v => v.name,
@@ -45,17 +55,26 @@ export const explore = createModel({
       username: string;
       password: string;
       space: string;
-      ids: any[];
+      selectVertexes: INode[];
       edgetype: string;
     }) {
-      const { host, username, password, space, ids, edgetype } = payload;
+      const {
+        host,
+        username,
+        password,
+        space,
+        selectVertexes,
+        edgetype,
+      } = payload;
       const { code, data } = (await service.execNGQL({
         host,
         username,
         password,
         gql: `
           use ${space};
-          GO FROM ${ids} OVER ${edgetype} yield ${edgetype}._src as sourceid, ${edgetype}._dst as destid;
+          GO FROM ${selectVertexes.map(
+            d => d.name,
+          )} OVER ${edgetype} yield ${edgetype}._src as sourceid, ${edgetype}._dst as destid;
         `,
       })) as any;
 

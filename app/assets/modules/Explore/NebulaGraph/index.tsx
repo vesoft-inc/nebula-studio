@@ -9,13 +9,13 @@ import Panel from './Pannel';
 const mapState = (state: IRootState) => ({
   vertexes: state.explore.vertexes,
   edges: state.explore.edges,
-  selectIds: state.explore.selectIds,
+  selectVertexes: state.explore.selectVertexes,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
-  updateSelectIds: (ids: any) => {
+  updateSelectIds: (vertexes: any) => {
     dispatch.explore.update({
-      selectIds: ids,
+      selectVertexes: vertexes,
     });
   },
 });
@@ -23,22 +23,22 @@ const mapDispatch = (dispatch: IDispatch) => ({
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
 class NebulaGraph extends React.Component<IProps, {}> {
   handleSelectVertexes = (nodes: any[]) => {
-    this.props.updateSelectIds(nodes.map(n => n.name));
+    this.props.updateSelectIds(nodes);
   };
 
   render() {
-    const { vertexes, edges, selectIds } = this.props;
+    const { vertexes, edges, selectVertexes } = this.props;
     return (
       <div className="graph-wrap">
-        {selectIds.length !== 0 && <Panel />}
+        {selectVertexes.length !== 0 && <Panel />}
         <NebulaD3
           width={1200}
           height={900}
           data={{
             vertexes,
             edges,
-            selectIdsMap: selectIds.reduce((dict: any, id) => {
-              dict[id] = true;
+            selectIdsMap: selectVertexes.reduce((dict: any, vertexe) => {
+              dict[vertexe.name] = true;
               return dict;
             }, {}),
           }}

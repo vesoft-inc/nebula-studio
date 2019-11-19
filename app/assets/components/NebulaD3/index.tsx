@@ -3,7 +3,6 @@ import * as React from 'react';
 
 import './index.less';
 import Links from './Links';
-import Nodes from './Nodes';
 import Labels from './NodeTexts';
 import SelectIds from './SelectIds';
 
@@ -33,12 +32,14 @@ interface IRefs {
 
 class NebulaD3 extends React.Component<IProps, {}> {
   ctrls: IRefs = {};
+  nodeRef: SVGCircleElement;
   force: any;
   svg: any;
   node: any;
   link: any;
   linksText: any;
   nodeText: any;
+  selectNode: INode[];
 
   componentDidMount() {
     if (!this.ctrls.mountPoint) {
@@ -112,20 +113,36 @@ class NebulaD3 extends React.Component<IProps, {}> {
       });
   };
 
-  handleUpdataNodes() {
-    if (this.force) {
-      this.node = d3
-        .selectAll('.node')
-        .on('click', (d: any) => {
-          this.props.onSelectVertexes([d]);
-        })
-        .call(d3
-          .drag()
-          .on('start', d => this.dragstart(d))
-          .on('drag', d => this.dragged(d))
-          .on('end', d => this.dragEnded(d)) as any);
-      this.force.on('tick', () => this.tick());
-    }
+  handleUpdataNodes(nodes, selectIdsMap) {
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+    d3.select(this.nodeRef)
+      .selectAll('circle')
+      .data(nodes)
+      .enter()
+      .append<SVGCircleElement>('circle')
+      .attr('class', 'node')
+      .attr('id', (d: any) => `node-${d.name}`)
+      .style('fill', (d: any) => color(d.group));
+
+    d3.select(this.nodeRef)
+      .selectAll('circle')
+      .attr('class', (d: any) => {
+        if (selectIdsMap[d.name]) {
+          return 'node active';
+        }
+        return 'node';
+      });
+    this.node = d3
+      .selectAll('.node')
+      .on('click', (d: any) => {
+        this.props.onSelectVertexes([d]);
+      })
+      .call(d3
+        .drag()
+        .on('start', d => this.dragstart(d))
+        .on('drag', d => this.dragged(d))
+        .on('end', d => this.dragEnded(d)) as any);
+    this.force.on('tick', () => this.tick()).restart();
   }
 
   handleUpdataNodeTexts() {
@@ -162,14 +179,23 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .distance((d: any) => {
         return d.value * 30;
       });
-    this.force = d3
-      .forceSimulation()
-      .force('charge', d3.forceManyBody().strength(-300))
-      .force('x', d3.forceX())
-      .force('y', d3.forceY())
-      .nodes(data.vertexes)
-      .force('link', linkForce)
-      .force('center', d3.forceCenter(width / 2, height / 2));
+    if (!this.force) {
+      this.force = d3
+        .forceSimulation()
+        .force('charge', d3.forceManyBody().strength(-300))
+        .force('x', d3.forceX())
+        .force('y', d3.forceY())
+        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force(
+          'collide',
+          d3
+            .forceCollide()
+            .radius(60)
+            .iterations(2),
+        );
+    }
+    this.force.nodes(data.vertexes).force('link', linkForce);
+    this.handleUpdataNodes(data.vertexes, data.selectIdsMap);
   }
 
   render() {
@@ -186,10 +212,9 @@ class NebulaD3 extends React.Component<IProps, {}> {
           links={data.edges}
           onUpdataLinks={() => this.handleUpdataLinks()}
         />
-        <Nodes
-          nodes={data.vertexes}
-          selectIdsMap={data.selectIdsMap}
-          onUpDataNodes={() => this.handleUpdataNodes()}
+        <g
+          ref={(ref: SVGCircleElement) => (this.nodeRef = ref)}
+          className="nodes"
         />
         <Labels
           nodes={data.vertexes}

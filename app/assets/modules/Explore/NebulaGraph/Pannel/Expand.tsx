@@ -16,7 +16,7 @@ const mapState = (state: IRootState) => ({
   username: state.nebula.username,
   password: state.nebula.password,
   currentSpace: state.nebula.currentSpace,
-  ids: state.explore.selectIds,
+  selectVertexes: state.explore.selectVertexes,
 });
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetEdgeTypes: dispatch.nebula.asyncGetEdgeTypes,
@@ -82,14 +82,20 @@ class Expand extends React.Component<IProps, IState> {
   };
 
   handleExpand = () => {
-    const { host, username, password, currentSpace, ids } = this.props;
+    const {
+      host,
+      username,
+      password,
+      currentSpace,
+      selectVertexes,
+    } = this.props;
     const { getFieldValue } = this.props.form;
     this.props.asyncGetExpand({
       host,
       username,
       password,
       space: currentSpace,
-      ids,
+      selectVertexes,
       edgetype: getFieldValue('edgeType'),
     });
   };
