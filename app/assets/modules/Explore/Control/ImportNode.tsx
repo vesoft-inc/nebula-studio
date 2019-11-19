@@ -58,7 +58,7 @@ class ImportNodes extends React.Component<IProps, IState> {
                 .split('\n')
                 .map(id => ({
                   name: id,
-                  group: 1,
+                  group: 0,
                 })),
             ],
             'name',

@@ -25,6 +25,8 @@ interface IProps {
     selectIdsMap: Map<string, boolean>;
   };
   onSelectVertexes: (vertexes: INode[]) => void;
+  onMouseInNode: (node: INode) => void;
+  onMouseOutNode: () => void;
 }
 
 interface IRefs {
@@ -63,10 +65,10 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .attr('stroke', '#999');
   }
 
-  dragged(d) {
+  dragged = d => {
     d.fx = d3.event.x;
     d.fy = d3.event.y;
-  }
+  };
 
   dragstart = (d: any) => {
     if (!d3.event.active) {
@@ -78,13 +80,13 @@ class NebulaD3 extends React.Component<IProps, {}> {
     return d;
   };
 
-  dragEnded(d) {
+  dragEnded = d => {
     if (!d3.event.active) {
       this.force.alphaTarget(0);
     }
     d.fx = null;
     d.fy = null;
-  }
+  };
 
   tick = () => {
     this.link
@@ -114,7 +116,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
       });
   };
 
-  handleUpdataNodes() {
+  handleUpdataNodes = () => {
     if (this.force) {
       this.node = d3
         .selectAll('.node')
@@ -128,9 +130,9 @@ class NebulaD3 extends React.Component<IProps, {}> {
           .on('end', d => this.dragEnded(d)) as any);
       this.force.on('tick', () => this.tick());
     }
-  }
+  };
 
-  handleUpdataNodeTexts() {
+  handleUpdataNodeTexts = () => {
     if (this.force) {
       this.nodeText = d3
         .selectAll('.label')
@@ -143,14 +145,14 @@ class NebulaD3 extends React.Component<IProps, {}> {
           .on('drag', d => this.dragged(d))
           .on('end', d => this.dragEnded(d)) as any);
     }
-  }
+  };
 
-  handleUpdataLinks() {
+  handleUpdataLinks = () => {
     if (this.force) {
       this.link = d3.selectAll('.link').attr('marker-end', 'url(#marker)');
       this.linksText = d3.selectAll('.text');
     }
-  }
+  };
 
   // compute to get (x,y ) of the nodes by d3-force: https://github.com/d3/d3-force/blob/v1.2.1/README.md#d3-force
   // it will change the data.edges and data.vertexes passed in
@@ -183,18 +185,17 @@ class NebulaD3 extends React.Component<IProps, {}> {
         width={width}
         height={height}
       >
-        <Links
-          links={data.edges}
-          onUpdataLinks={() => this.handleUpdataLinks()}
-        />
+        <Links links={data.edges} onUpdataLinks={this.handleUpdataLinks} />
         <Nodes
           nodes={data.vertexes}
           selectIdsMap={data.selectIdsMap}
-          onUpDataNodes={() => this.handleUpdataNodes()}
+          onUpDataNodes={this.handleUpdataNodes}
+          onMouseInNode={this.props.onMouseInNode}
+          onMouseOutNode={this.props.onMouseOutNode}
         />
         <Labels
           nodes={data.vertexes}
-          onUpDataNodeTexts={() => this.handleUpdataNodeTexts()}
+          onUpDataNodeTexts={this.handleUpdataNodeTexts}
         />
         <SelectIds
           nodes={data.vertexes}

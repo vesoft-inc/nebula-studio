@@ -1,6 +1,18 @@
 import _ from 'lodash';
 
+const statNodeTypes = {};
+let nodeTypeNum = 0;
+
 export function nebulaToData(table: any[], edgeType: string) {
+  const nodeOut = `${edgeType}-out`;
+
+  if (!statNodeTypes[nodeOut]) {
+    nodeTypeNum++;
+    statNodeTypes[nodeOut] = nodeTypeNum;
+  }
+
+  const groupNum = statNodeTypes[nodeOut];
+
   return table.reduce(
     (result, { sourceid, destid }) => {
       result.edges.push({
@@ -11,7 +23,7 @@ export function nebulaToData(table: any[], edgeType: string) {
       });
       result.vertexes.push({
         name: destid,
-        group: 6,
+        group: groupNum,
       });
 
       return result;
