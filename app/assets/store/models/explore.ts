@@ -30,12 +30,16 @@ export const explore = createModel({
       };
     },
     addNodesAndEdges: (state: IState, payload: IState): IState => {
-      const { vertexes: originVertexes, edges: originEdges } = state;
+      const {
+        vertexes: originVertexes,
+        edges: originEdges,
+        selectVertexes,
+      } = state;
       const { vertexes: addVertexes, edges: addEdges } = payload;
       const edges = [...originEdges, ...addEdges];
       addVertexes.map(d => {
-        d.x = 500;
-        d.y = 600;
+        d.x = _.meanBy(selectVertexes, 'x') || window.screen.width / 2;
+        d.y = _.meanBy(selectVertexes, 'y') || window.screen.height / 2;
       });
       const vertexes = _.uniqBy(
         [...originVertexes, ...addVertexes],

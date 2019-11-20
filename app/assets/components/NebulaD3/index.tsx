@@ -114,6 +114,10 @@ class NebulaD3 extends React.Component<IProps, {}> {
   };
 
   handleUpdataNodes(nodes, selectIdsMap) {
+    if (nodes.length === 0) {
+      d3.selectAll('.node').remove();
+      return;
+    }
     const color = d3.scaleOrdinal(d3.schemeCategory10);
     d3.select(this.nodeRef)
       .selectAll('circle')
@@ -142,7 +146,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
         .on('start', d => this.dragstart(d))
         .on('drag', d => this.dragged(d))
         .on('end', d => this.dragEnded(d)) as any);
-    this.force.on('tick', () => this.tick()).restart();
+    this.force.on('tick', () => this.tick());
   }
 
   handleUpdataNodeTexts() {
@@ -185,16 +189,19 @@ class NebulaD3 extends React.Component<IProps, {}> {
         .force('charge', d3.forceManyBody().strength(-300))
         .force('x', d3.forceX())
         .force('y', d3.forceY())
-        .force('center', d3.forceCenter(width / 2, height / 2))
         .force(
           'collide',
           d3
             .forceCollide()
-            .radius(60)
+            .radius(90)
             .iterations(2),
         );
     }
-    this.force.nodes(data.vertexes).force('link', linkForce);
+    this.force
+      .nodes(data.vertexes)
+      .force('link', linkForce)
+      .force('center', d3.forceCenter(width / 2, height / 2))
+      .restart();
     this.handleUpdataNodes(data.vertexes, data.selectIdsMap);
   }
 
