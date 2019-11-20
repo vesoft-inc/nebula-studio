@@ -1,4 +1,4 @@
-import { Button, Form, Icon, Input, Select, Table } from 'antd';
+import { Button, Form, Icon, Input, message, Select, Table } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 import React from 'react';
 import intl from 'react-intl-universal';
@@ -26,7 +26,9 @@ const mapDispatch = (dispatch: IDispatch) => ({
 interface IProps
   extends FormComponentProps,
     ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {}
+    ReturnType<typeof mapDispatch> {
+  close: () => void;
+}
 
 interface IFilter {
   field: string;
@@ -90,14 +92,28 @@ class Expand extends React.Component<IProps, IState> {
       selectVertexes,
     } = this.props;
     const { getFieldValue } = this.props.form;
-    this.props.asyncGetExpand({
-      host,
-      username,
-      password,
-      space: currentSpace,
-      selectVertexes,
-      edgetype: getFieldValue('edgeType'),
-    });
+    const { filters } = this.state;
+    this.props
+      .asyncGetExpand({
+        host,
+        username,
+        password,
+        space: currentSpace,
+        filters,
+        selectVertexes,
+        edgeType: getFieldValue('edgeType'),
+      })
+      .then(
+        () => {
+          message.success(intl.get('common.success'));
+        },
+        (e: any) => {
+          message.error(intl.get('common.fail'));
+          console.error(e.message);
+        },
+      );
+
+    this.props.close();
   };
 
   render() {

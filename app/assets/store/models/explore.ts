@@ -36,11 +36,11 @@ export const explore = createModel({
         selectVertexes,
       } = state;
       const { vertexes: addVertexes, edges: addEdges } = payload;
-      const edges = [...originEdges, ...addEdges];
       addVertexes.map(d => {
         d.x = _.meanBy(selectVertexes, 'x') || window.screen.width / 2;
         d.y = _.meanBy(selectVertexes, 'y') || window.screen.height / 2;
       });
+      const edges = _.uniqBy([...originEdges, ...addEdges], e => e.id);
       const vertexes = _.uniqBy(
         [...originVertexes, ...addVertexes],
         v => v.name,
@@ -59,8 +59,9 @@ export const explore = createModel({
       username: string;
       password: string;
       space: string;
-      selectVertexes: INode[];
-      edgetype: string;
+      selectVertexes: any[];
+      edgeType: string;
+      filters: any[];
     }) {
       const {
         host,
@@ -68,30 +69,38 @@ export const explore = createModel({
         password,
         space,
         selectVertexes,
-        edgetype,
+        edgeType,
+        filters,
       } = payload;
-      const { code, data } = (await service.execNGQL({
+      const wheres = filters
+        .filter(filter => filter.field && filter.operator && filter.value)
+        .map(filter => `${filter.field} ${filter.operator} ${filter.value}`)
+        .join(' AND ');
+      const gql = `
+        use ${space};
+        GO FROM ${selectVertexes.map(d => d.name)} OVER ${edgeType} ${
+        wheres ? `WHERE ${wheres}` : ''
+      } yield ${edgeType}._src as sourceId, ${edgeType}._dst as destId, ${edgeType}._rank as rank;
+      `;
+      const { code, data, message } = (await service.execNGQL({
         host,
         username,
         password,
-        gql: `
-          use ${space};
-          GO FROM ${selectVertexes.map(
-            d => d.name,
-          )} OVER ${edgetype} yield ${edgetype}._src as sourceid, ${edgetype}._dst as destid;
-        `,
+        gql,
       })) as any;
 
       if (code === '0' && data.tables.length !== 0) {
         const { edges, vertexes } = nebulaToData(
           idToSrting(data.tables),
-          edgetype,
+          edgeType,
         );
 
         this.addNodesAndEdges({
           vertexes,
           edges,
         });
+      } else {
+        throw new Error(message);
       }
     },
   },

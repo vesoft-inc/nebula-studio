@@ -1,9 +1,11 @@
+import * as d3 from 'd3';
 import React from 'react';
 import { connect } from 'react-redux';
 
 import { NebulaD3 } from '#assets/components';
 import { IDispatch, IRootState } from '#assets/store';
 
+import './index.less';
 import Panel from './Pannel';
 
 const mapState = (state: IRootState) => ({
@@ -26,7 +28,9 @@ interface IState {
 }
 
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
+
 class NebulaGraph extends React.Component<IProps, IState> {
+  $tooltip;
   ref: HTMLDivElement;
 
   constructor(props: IProps) {
@@ -42,12 +46,44 @@ class NebulaGraph extends React.Component<IProps, IState> {
   };
 
   componentDidMount() {
+    // render tootlip into dom
+
     const { clientWidth, clientHeight } = this.ref;
+    this.$tooltip = d3
+      .select(this.ref)
+      .append('div')
+      .attr('class', 'tooltip')
+      .style('opacity', 0);
+
+    this.$tooltip.on('mouseout', this.hideTooltip);
+
     this.setState({
       width: clientWidth,
       height: clientHeight,
     });
   }
+
+  handleMouseInNode = node => {
+    this.$tooltip
+      .transition()
+      .duration(200)
+      .style('opacity', 0.95);
+    this.$tooltip
+      .html(`<p>${node.name}</p>`)
+      .style('left', `${node.x}px`)
+      .style('top', `${node.y - 80}px`);
+  };
+
+  handleMouseOutNode = () => {
+    this.$tooltip
+      .transition()
+      .duration(500)
+      .style('opacity', 0);
+  };
+
+  hideTooltip = () => {
+    this.$tooltip.style('opacity', 0);
+  };
 
   render() {
     const { vertexes, edges, selectVertexes } = this.props;
@@ -69,7 +105,9 @@ class NebulaGraph extends React.Component<IProps, IState> {
               return dict;
             }, {}),
           }}
-          onSelectVertexes={(nodes: any[]) => this.handleSelectVertexes(nodes)}
+          onMouseInNode={this.handleMouseInNode}
+          onMouseOutNode={this.handleMouseOutNode}
+          onSelectVertexes={this.handleSelectVertexes}
         />
       </div>
     );

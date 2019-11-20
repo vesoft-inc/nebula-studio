@@ -12,6 +12,8 @@
     "console": "控制台",
     "explore": "图探索",
     "ok": "确认",
+    "success": "成功",
+    "fail": "失败",
     "cancel": "取消"
   },
   "warning": {
