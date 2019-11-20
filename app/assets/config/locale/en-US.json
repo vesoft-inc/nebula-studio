@@ -14,6 +14,7 @@
     "ok": "ok",
     "success": "success",
     "fail": "fail",
+    "noData": "There is no data",
     "cancel": "cancel"
   },
   "NGQLOutput": {

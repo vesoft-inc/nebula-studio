@@ -106,7 +106,7 @@ class Expand extends React.Component<IProps, IState> {
         message.success(intl.get('common.success'));
       },
       (e: any) => {
-        message.error(intl.get('common.fail'));
+        message.info(intl.get('common.noData'));
         console.error(e.message);
       },
     );
