@@ -47,20 +47,25 @@ class NebulaGraph extends React.Component<IProps, IState> {
 
   componentDidMount() {
     // render tootlip into dom
-
     const { clientWidth, clientHeight } = this.ref;
+    this.setState({
+      width: clientWidth,
+      height: clientHeight,
+    });
+
     this.$tooltip = d3
       .select(this.ref)
       .append('div')
       .attr('class', 'tooltip')
       .style('opacity', 0);
 
-    this.$tooltip.on('mouseout', this.hideTooltip);
+    window.addEventListener('resize', this.handleResize);
 
-    this.setState({
-      width: clientWidth,
-      height: clientHeight,
-    });
+    this.$tooltip.on('mouseout', this.hideTooltip);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
   }
 
   handleMouseInNode = node => {
@@ -68,10 +73,7 @@ class NebulaGraph extends React.Component<IProps, IState> {
       .transition()
       .duration(200)
       .style('opacity', 0.95);
-    this.$tooltip
-      .html(`<p>${node.name}</p>`)
-      .style('left', `${node.x}px`)
-      .style('top', `${node.y - 80}px`);
+    this.$tooltip.html(`<p>id: ${node.name}</p>`);
   };
 
   handleMouseOutNode = () => {
@@ -83,6 +85,14 @@ class NebulaGraph extends React.Component<IProps, IState> {
 
   hideTooltip = () => {
     this.$tooltip.style('opacity', 0);
+  };
+
+  handleResize = () => {
+    const { clientWidth, clientHeight } = this.ref;
+    this.setState({
+      width: clientWidth,
+      height: clientHeight,
+    });
   };
 
   render() {

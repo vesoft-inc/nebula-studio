@@ -226,7 +226,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
           'collide',
           d3
             .forceCollide()
-            .radius(50)
+            .radius(80)
             .iterations(2),
         );
     }
