@@ -18,8 +18,9 @@ const mapState = (state: IRootState) => ({
 });
 const mapDispatch = (dispatch: IDispatch) => ({
   updateNodes: vertexes => {
-    dispatch.explore.update({
+    dispatch.explore.addNodesAndEdges({
       vertexes,
+      edges: [],
     });
   },
 });
@@ -47,26 +48,18 @@ class ImportNodes extends React.Component<IProps, IState> {
   handleImport = () => {
     this.props.form.validateFields((err, data) => {
       if (!err) {
-        const { vertexes } = this.props;
         const { ids } = data;
-        this.props.updateNodes(
-          _.uniqBy(
-            [
-              ...vertexes,
-              ...ids
-                .trim()
-                .split('\n')
-                .map(id => ({
-                  name: id,
-                  group: 0,
-                })),
-            ],
-            'name',
-          ),
-        );
-
-        this.props.handler.hide();
+        this.props.updateNodes([
+          ...ids
+            .trim()
+            .split('\n')
+            .map(id => ({
+              name: id,
+              group: 0,
+            })),
+        ]);
       }
+      this.props.handler.hide();
     });
   };
 

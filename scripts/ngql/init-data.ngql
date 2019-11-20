@@ -4,7 +4,7 @@ INSERT VERTEX person(name, age) VALUES 2:('Liyanghong', 50);
 INSERT VERTEX person(name, age) VALUES 3:('Wangxing', 45);
 INSERT VERTEX person(name, age) VALUES 4:('Huangzheng', 30);
 INSERT VERTEX person(name, age) VALUES 5:('Mayun', 40);
-INSERT VERTEX person(name, age) VALUES 6:('Tony');
+INSERT VERTEX person(name, age) VALUES 6:('Tony', 60);
 INSERT VERTEX person(name, age) VALUES 7:('Zhangchaoyang', 50);
 INSERT VERTEX person(name, age) VALUES 8:('Liuchuanzhi', 60);
 INSERT VERTEX person(name, age) VALUES 9:('Wangjianlin', 50);

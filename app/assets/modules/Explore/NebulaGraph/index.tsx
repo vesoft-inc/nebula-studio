@@ -11,33 +11,69 @@ import Panel from './Pannel';
 const mapState = (state: IRootState) => ({
   vertexes: state.explore.vertexes,
   edges: state.explore.edges,
-  selectIds: state.explore.selectIds,
+  selectVertexes: state.explore.selectVertexes,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
-  updateSelectIds: (ids: any) => {
+  updateSelectIds: (vertexes: any) => {
     dispatch.explore.update({
-      selectIds: ids,
+      selectVertexes: vertexes,
     });
   },
 });
 
+interface IState {
+  width: number;
+  height: number;
+}
+
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
-class NebulaGraph extends React.Component<IProps, {}> {
+
+class NebulaGraph extends React.Component<IProps, IState> {
   $tooltip;
+  ref: HTMLDivElement;
+
+  constructor(props: IProps) {
+    super(props);
+    this.state = {
+      width: 0,
+      height: 0,
+    };
+  }
+
   handleSelectVertexes = (nodes: any[]) => {
-    this.props.updateSelectIds(nodes.map(n => n.name));
+    this.props.updateSelectIds(nodes);
   };
+
+  componentDidMount() {
+    // render tootlip into dom
+    const { clientWidth, clientHeight } = this.ref;
+    this.setState({
+      width: clientWidth,
+      height: clientHeight,
+    });
+
+    this.$tooltip = d3
+      .select(this.ref)
+      .append('div')
+      .attr('class', 'tooltip')
+      .style('opacity', 0);
+
+    window.addEventListener('resize', this.handleResize);
+
+    this.$tooltip.on('mouseout', this.hideTooltip);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
+  }
 
   handleMouseInNode = node => {
     this.$tooltip
       .transition()
       .duration(200)
       .style('opacity', 0.95);
-    this.$tooltip
-      .html(`<p>${node.name}</p>`)
-      .style('left', `${node.x}px`)
-      .style('top', `${node.y - 80}px`);
+    this.$tooltip.html(`<p>id: ${node.name}</p>`);
   };
 
   handleMouseOutNode = () => {
@@ -51,30 +87,31 @@ class NebulaGraph extends React.Component<IProps, {}> {
     this.$tooltip.style('opacity', 0);
   };
 
-  componentDidMount() {
-    // render tootlip into dom
-    this.$tooltip = d3
-      .select('#J_Graph')
-      .append('div')
-      .attr('class', 'tooltip')
-      .style('opacity', 0);
-
-    this.$tooltip.on('mouseout', this.hideTooltip);
-  }
+  handleResize = () => {
+    const { clientWidth, clientHeight } = this.ref;
+    this.setState({
+      width: clientWidth,
+      height: clientHeight,
+    });
+  };
 
   render() {
-    const { vertexes, edges, selectIds } = this.props;
+    const { vertexes, edges, selectVertexes } = this.props;
+    const { width, height } = this.state;
     return (
-      <div className="graph-wrap" id="J_Graph">
-        {selectIds.length !== 0 && <Panel />}
+      <div
+        className="graph-wrap"
+        ref={(ref: HTMLDivElement) => (this.ref = ref)}
+      >
+        {selectVertexes.length !== 0 && <Panel />}
         <NebulaD3
-          width={1200}
-          height={900}
+          width={width}
+          height={height}
           data={{
             vertexes,
             edges,
-            selectIdsMap: selectIds.reduce((dict: any, id) => {
-              dict[id] = true;
+            selectIdsMap: selectVertexes.reduce((dict: any, vertexe) => {
+              dict[vertexe.name] = true;
               return dict;
             }, {}),
           }}

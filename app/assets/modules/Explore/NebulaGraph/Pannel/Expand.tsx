@@ -16,7 +16,7 @@ const mapState = (state: IRootState) => ({
   username: state.nebula.username,
   password: state.nebula.password,
   currentSpace: state.nebula.currentSpace,
-  ids: state.explore.selectIds,
+  selectVertexes: state.explore.selectVertexes,
 });
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetEdgeTypes: dispatch.nebula.asyncGetEdgeTypes,
@@ -84,28 +84,32 @@ class Expand extends React.Component<IProps, IState> {
   };
 
   handleExpand = () => {
-    const { host, username, password, currentSpace, ids } = this.props;
+    const {
+      host,
+      username,
+      password,
+      currentSpace,
+      selectVertexes,
+    } = this.props;
     const { getFieldValue } = this.props.form;
     const { filters } = this.state;
-    this.props
-      .asyncGetExpand({
-        host,
-        username,
-        password,
-        space: currentSpace,
-        filters,
-        ids,
-        edgeType: getFieldValue('edgeType'),
-      })
-      .then(
-        () => {
-          message.success(intl.get('common.success'));
-        },
-        (e: any) => {
-          message.error(intl.get('common.fail'));
-          console.error(e.message);
-        },
-      );
+    (this.props.asyncGetExpand({
+      host,
+      username,
+      password,
+      space: currentSpace,
+      filters,
+      selectVertexes,
+      edgeType: getFieldValue('edgeType'),
+    }) as any).then(
+      () => {
+        message.success(intl.get('common.success'));
+      },
+      (e: any) => {
+        message.error(intl.get('common.fail'));
+        console.error(e.message);
+      },
+    );
 
     this.props.close();
   };

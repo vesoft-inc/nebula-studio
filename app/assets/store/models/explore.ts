@@ -5,16 +5,22 @@ import service from '#assets/config/service';
 
 import { idToSrting, nebulaToData } from '../../utils/nebulaToData';
 
+interface INode extends d3.SimulationNodeDatum {
+  name: string;
+  group: number;
+}
+
 interface IState {
-  vertexes: any[];
+  vertexes: INode[];
   edges: any[];
+  selectVertexes: INode[];
 }
 
 export const explore = createModel({
   state: {
     vertexes: [],
     edges: [],
-    selectIds: [],
+    selectVertexes: [],
   },
   reducers: {
     update: (state: IState, payload: object): IState => {
@@ -24,8 +30,16 @@ export const explore = createModel({
       };
     },
     addNodesAndEdges: (state: IState, payload: IState): IState => {
-      const { vertexes: originVertexes, edges: originEdges } = state;
+      const {
+        vertexes: originVertexes,
+        edges: originEdges,
+        selectVertexes,
+      } = state;
       const { vertexes: addVertexes, edges: addEdges } = payload;
+      addVertexes.map(d => {
+        d.x = _.meanBy(selectVertexes, 'x') || window.screen.width / 2;
+        d.y = _.meanBy(selectVertexes, 'y') || window.screen.height / 2;
+      });
       const edges = _.uniqBy([...originEdges, ...addEdges], e => e.id);
       const vertexes = _.uniqBy(
         [...originVertexes, ...addVertexes],
@@ -45,7 +59,7 @@ export const explore = createModel({
       username: string;
       password: string;
       space: string;
-      ids: any[];
+      selectVertexes: any[];
       edgeType: string;
       filters: any[];
     }) {
@@ -54,7 +68,7 @@ export const explore = createModel({
         username,
         password,
         space,
-        ids,
+        selectVertexes,
         edgeType,
         filters,
       } = payload;
@@ -64,7 +78,7 @@ export const explore = createModel({
         .join(' AND ');
       const gql = `
         use ${space};
-        GO FROM ${ids} OVER ${edgeType} ${
+        GO FROM ${selectVertexes.map(d => d.name)} OVER ${edgeType} ${
         wheres ? `WHERE ${wheres}` : ''
       } yield ${edgeType}._src as sourceId, ${edgeType}._dst as destId, ${edgeType}._rank as rank;
       `;
