@@ -93,25 +93,23 @@ class Expand extends React.Component<IProps, IState> {
     } = this.props;
     const { getFieldValue } = this.props.form;
     const { filters } = this.state;
-    this.props
-      .asyncGetExpand({
-        host,
-        username,
-        password,
-        space: currentSpace,
-        filters,
-        selectVertexes,
-        edgeType: getFieldValue('edgeType'),
-      })
-      .then(
-        () => {
-          message.success(intl.get('common.success'));
-        },
-        (e: any) => {
-          message.error(intl.get('common.fail'));
-          console.error(e.message);
-        },
-      );
+    (this.props.asyncGetExpand({
+      host,
+      username,
+      password,
+      space: currentSpace,
+      filters,
+      selectVertexes,
+      edgeType: getFieldValue('edgeType'),
+    }) as any).then(
+      () => {
+        message.success(intl.get('common.success'));
+      },
+      (e: any) => {
+        message.error(intl.get('common.fail'));
+        console.error(e.message);
+      },
+    );
 
     this.props.close();
   };
