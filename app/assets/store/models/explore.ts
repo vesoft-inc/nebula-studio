@@ -26,7 +26,7 @@ export const explore = createModel({
     addNodesAndEdges: (state: IState, payload: IState): IState => {
       const { vertexes: originVertexes, edges: originEdges } = state;
       const { vertexes: addVertexes, edges: addEdges } = payload;
-      const edges = [...originEdges, ...addEdges];
+      const edges = _.uniqBy([...originEdges, ...addEdges], e => e.id);
       const vertexes = _.uniqBy(
         [...originVertexes, ...addVertexes],
         v => v.name,
@@ -46,29 +46,47 @@ export const explore = createModel({
       password: string;
       space: string;
       ids: any[];
-      edgetype: string;
+      edgeType: string;
+      filters: any[];
     }) {
-      const { host, username, password, space, ids, edgetype } = payload;
-      const { code, data } = (await service.execNGQL({
+      const {
         host,
         username,
         password,
-        gql: `
-          use ${space};
-          GO FROM ${ids} OVER ${edgetype} yield ${edgetype}._src as sourceid, ${edgetype}._dst as destid;
-        `,
+        space,
+        ids,
+        edgeType,
+        filters,
+      } = payload;
+      const wheres = filters
+        .filter(filter => filter.field && filter.operator && filter.value)
+        .map(filter => `${filter.field} ${filter.operator} ${filter.value}`)
+        .join(' AND ');
+      const gql = `
+        use ${space};
+        GO FROM ${ids} OVER ${edgeType} ${
+        wheres ? `WHERE ${wheres}` : ''
+      } yield ${edgeType}._src as sourceId, ${edgeType}._dst as destId, ${edgeType}._rank as rank;
+      `;
+      const { code, data, message } = (await service.execNGQL({
+        host,
+        username,
+        password,
+        gql,
       })) as any;
 
       if (code === '0' && data.tables.length !== 0) {
         const { edges, vertexes } = nebulaToData(
           idToSrting(data.tables),
-          edgetype,
+          edgeType,
         );
 
         this.addNodesAndEdges({
           vertexes,
           edges,
         });
+      } else {
+        throw new Error(message);
       }
     },
   },

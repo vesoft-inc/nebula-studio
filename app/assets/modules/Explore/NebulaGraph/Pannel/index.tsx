@@ -9,16 +9,22 @@ import './index.less';
 
 export default class Panel extends React.Component {
   modalHandler;
-  handlerExpand = () => {
+  handleExpand = () => {
     if (this.modalHandler) {
       this.modalHandler.show();
+    }
+  };
+
+  handleClose = () => {
+    if (this.modalHandler) {
+      this.modalHandler.hide();
     }
   };
 
   render() {
     return (
       <div className="panel">
-        <Button onClick={this.handlerExpand}>
+        <Button onClick={this.handleExpand}>
           {intl.get('explore.expand')}
         </Button>
         <Modal
@@ -26,7 +32,7 @@ export default class Panel extends React.Component {
           width={800}
           footer={null}
         >
-          <Expand />
+          <Expand close={this.handleClose} />
         </Modal>
       </div>
     );
