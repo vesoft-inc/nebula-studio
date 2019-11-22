@@ -27,6 +27,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
       vertexes: [],
       edges: [],
       selectIds: [],
+      actionData: [],
     }),
   updateSpace: space => {
     dispatch.nebula.update({

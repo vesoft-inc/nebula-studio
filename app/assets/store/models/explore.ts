@@ -1,4 +1,5 @@
 import { createModel } from '@rematch/core';
+import * as d3 from 'd3';
 import _ from 'lodash';
 
 import service from '#assets/config/service';
@@ -40,9 +41,10 @@ export const explore = createModel({
         actionData,
       } = state;
       const { vertexes: addVertexes, edges: addEdges } = payload;
+      const svg: any = d3.select('.output-graph');
       addVertexes.map(d => {
-        d.x = _.meanBy(selectVertexes, 'x') || window.screen.width / 2;
-        d.y = _.meanBy(selectVertexes, 'y') || window.screen.height / 2;
+        d.x = _.meanBy(selectVertexes, 'x') || svg.style('width') / 2;
+        d.y = _.meanBy(selectVertexes, 'y') || svg.style('heigth') / 2;
       });
       const edges = _.uniqBy([...originEdges, ...addEdges], e => e.id);
       const vertexes = _.uniqBy(
