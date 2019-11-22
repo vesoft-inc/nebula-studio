@@ -1,5 +1,8 @@
+import { Button } from 'antd';
 import * as d3 from 'd3';
+import _ from 'lodash';
 import React from 'react';
+import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
 import { NebulaD3 } from '#assets/components';
@@ -12,12 +15,21 @@ const mapState = (state: IRootState) => ({
   vertexes: state.explore.vertexes,
   edges: state.explore.edges,
   selectVertexes: state.explore.selectVertexes,
+  actionData: state.explore.actionData,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
   updateSelectIds: (vertexes: any) => {
     dispatch.explore.update({
       selectVertexes: vertexes,
+    });
+  },
+  updateActionData: (actionData, edges, vertexes) => {
+    dispatch.explore.update({
+      actionData,
+      edges,
+      vertexes,
+      selectVertexes: [],
     });
   },
 });
@@ -95,8 +107,18 @@ class NebulaGraph extends React.Component<IProps, IState> {
     });
   };
 
+  handleUndo = () => {
+    const { actionData, vertexes, edges } = this.props;
+    const data = actionData.pop();
+    this.props.updateActionData(
+      actionData,
+      _.differenceBy(edges, data.edges, e => e.id),
+      _.differenceBy(vertexes, data.vertexes, v => v.name),
+    );
+  };
+
   render() {
-    const { vertexes, edges, selectVertexes } = this.props;
+    const { vertexes, edges, selectVertexes, actionData } = this.props;
     const { width, height } = this.state;
     return (
       <div
@@ -104,6 +126,11 @@ class NebulaGraph extends React.Component<IProps, IState> {
         ref={(ref: HTMLDivElement) => (this.ref = ref)}
       >
         {selectVertexes.length !== 0 && <Panel />}
+        {actionData.length !== 0 && (
+          <Button className="history-undo" onClick={this.handleUndo}>
+            {intl.get('explore.undo')}
+          </Button>
+        )}
         <NebulaD3
           width={width}
           height={height}

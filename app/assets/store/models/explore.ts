@@ -14,6 +14,7 @@ interface IState {
   vertexes: INode[];
   edges: any[];
   selectVertexes: INode[];
+  actionData: any[];
 }
 
 export const explore = createModel({
@@ -21,6 +22,7 @@ export const explore = createModel({
     vertexes: [],
     edges: [],
     selectVertexes: [],
+    actionData: [],
   },
   reducers: {
     update: (state: IState, payload: object): IState => {
@@ -29,11 +31,13 @@ export const explore = createModel({
         ...payload,
       };
     },
+
     addNodesAndEdges: (state: IState, payload: IState): IState => {
       const {
         vertexes: originVertexes,
         edges: originEdges,
         selectVertexes,
+        actionData,
       } = state;
       const { vertexes: addVertexes, edges: addEdges } = payload;
       addVertexes.map(d => {
@@ -45,11 +49,16 @@ export const explore = createModel({
         [...originVertexes, ...addVertexes],
         v => v.name,
       );
-
+      actionData.push({
+        type: 'ADD',
+        vertexes: _.differenceBy(addVertexes, originVertexes, v => v.name),
+        edges: _.differenceBy(addEdges, originEdges, v => v.id),
+      });
       return {
         ...state,
         edges,
         vertexes,
+        actionData,
       };
     },
   },
