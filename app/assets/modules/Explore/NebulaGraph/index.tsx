@@ -112,8 +112,8 @@ class NebulaGraph extends React.Component<IProps, IState> {
     const data = actionData.pop();
     this.props.updateActionData(
       actionData,
-      _.differenceBy(edges, data.edges, e => e.id),
-      _.differenceBy(vertexes, data.vertexes, v => v.name),
+      _.differenceBy(edges, data.edges, (e: any) => e.id),
+      _.differenceBy(vertexes, data.vertexes, (v: any) => v.name),
     );
   };
 
