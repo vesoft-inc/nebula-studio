@@ -13,13 +13,8 @@ export default class Links extends React.Component<IProps, {}> {
     this.linkRender(this.props.links);
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.links.length !== 0 && this.props.links.length === 0) {
-      d3.selectAll('.link').remove();
-      d3.selectAll('.text').remove();
-    } else {
-      this.linkRender(this.props.links);
-    }
+  componentDidUpdate() {
+    this.linkRender(this.props.links);
   }
 
   linkRender(links) {
@@ -32,6 +27,13 @@ export default class Links extends React.Component<IProps, {}> {
       .style('stroke', '#999999')
       .style('stroke-opacity', 0.6)
       .style('stroke-width', 2);
+
+    d3.select(this.ref)
+      .selectAll('line')
+      .data(links)
+      .exit()
+      .remove();
+
     d3.select(this.ref)
       .selectAll('text')
       .data(links)
@@ -41,6 +43,13 @@ export default class Links extends React.Component<IProps, {}> {
       .text((d: any) => {
         return d.type;
       });
+
+    d3.select(this.ref)
+      .selectAll('text')
+      .data(links)
+      .exit()
+      .remove();
+
     if (this.ref) {
       this.props.onUpdataLinks();
     }

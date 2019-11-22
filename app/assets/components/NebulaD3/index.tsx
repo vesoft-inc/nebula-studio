@@ -145,6 +145,12 @@ class NebulaD3 extends React.Component<IProps, {}> {
     d3.select(this.nodeRef)
       .selectAll('circle')
       .data(nodes)
+      .attr('class', (d: any) => {
+        if (selectIdsMap[d.name]) {
+          return 'node active';
+        }
+        return 'node';
+      })
       .enter()
       .append<SVGCircleElement>('circle')
       .on('mouseover', (d: INode) => {
@@ -163,12 +169,10 @@ class NebulaD3 extends React.Component<IProps, {}> {
 
     d3.select(this.nodeRef)
       .selectAll('circle')
-      .attr('class', (d: any) => {
-        if (selectIdsMap[d.name]) {
-          return 'node active';
-        }
-        return 'node';
-      });
+      .data(nodes)
+      .exit()
+      .remove();
+
     this.node = d3
       .selectAll('.node')
       .on('click', (d: any) => {

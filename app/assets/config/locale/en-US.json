@@ -45,6 +45,7 @@
     "importNode": "Import Nodes",
     "import": "Import",
     "expand": "Expand",
+    "undo": "Undo",
     "fileImport": "File Import",
     "importPlaceholder": "id1\nid2\nid3\n1 node per line, split by \\n",
     "filter": "filter",

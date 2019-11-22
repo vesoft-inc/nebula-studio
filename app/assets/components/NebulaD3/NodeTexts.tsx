@@ -17,12 +17,8 @@ export default class NodeTexts extends React.Component<IProps, {}> {
     this.labelRender(this.props.nodes);
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.nodes.length !== 0 && this.props.nodes.length === 0) {
-      d3.selectAll('.label').remove();
-    } else {
-      this.labelRender(this.props.nodes);
-    }
+  componentDidUpdate() {
+    this.labelRender(this.props.nodes);
   }
 
   labelRender(nodes) {
@@ -34,6 +30,13 @@ export default class NodeTexts extends React.Component<IProps, {}> {
       .attr('class', 'label')
       .attr('text-anchor', 'middle')
       .text((d: INode) => d.name);
+
+    d3.select(this.ref)
+      .selectAll('text')
+      .data<INode>(nodes)
+      .exit()
+      .remove();
+
     if (this.ref) {
       this.props.onUpDataNodeTexts();
     }
