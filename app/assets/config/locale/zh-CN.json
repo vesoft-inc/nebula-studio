@@ -15,7 +15,8 @@
     "success": "成功",
     "fail": "失败",
     "noData": "没有相应数据",
-    "cancel": "取消"
+    "cancel": "取消",
+    "import": "导入"
   },
   "warning": {
     "configServer": "请先配置服务器"

@@ -16,6 +16,7 @@ import { INTL_LOCALE_SELECT, INTL_LOCALES } from '#assets/config';
 import { LanguageContext } from '#assets/context';
 import Console from '#assets/modules/Console';
 import Explore from '#assets/modules/Explore';
+import Import from '#assets/modules/Import';
 import { updateQueryStringParameter } from '#assets/utils';
 
 import './App.less';
@@ -113,6 +114,12 @@ class App extends React.Component<IProps, IState> {
                       {intl.get('common.explore')}
                     </Link>
                   </Menu.Item>
+                  <Menu.Item key="import">
+                    <Link to="import">
+                      <Icon type="import" />
+                      {intl.get('common.import')}
+                    </Link>
+                  </Menu.Item>
                 </Menu>
                 <div className="lang-select">
                   <span>{intl.get('common.languageSelect')}: </span>
@@ -135,6 +142,7 @@ class App extends React.Component<IProps, IState> {
                 <Switch>
                   <PrivateRoute path="/console" component={Console} />
                   <PrivateRoute path="/explore" component={Explore} />
+                  <PrivateRoute path="/import" component={Import} />
                   <Route path="/config-server" component={ConfigServer} />
                   <Redirect to="/console" />
                 </Switch>
