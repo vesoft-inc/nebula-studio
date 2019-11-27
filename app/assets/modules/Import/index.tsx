@@ -1,5 +1,6 @@
 import React from 'react';
 
+import './index.less';
 import Progress from './Progress';
 import Tasks from './Tasks';
 

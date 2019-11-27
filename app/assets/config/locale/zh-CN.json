@@ -55,5 +55,11 @@
     "value": "值",
     "selectSpace": "请选择 space",
     "selectReminder": "切换将会清除当前数据，确定？"
+  },
+  "import": {
+    "init": "初始化",
+    "upload": "文件上传" ,
+    "vertex": "配置点",
+    "edge": "配置边"
   }
 }

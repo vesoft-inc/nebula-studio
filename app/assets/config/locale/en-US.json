@@ -55,5 +55,11 @@
     "value": "value",
     "selectSpace": "Please select the space",
     "selectReminder": "This will clear the existed graph data, are you sure?"
+  },
+  "import": {
+    "init": "Init",
+    "upload": "Upload" ,
+    "vertex": "Config Vertexes",
+    "edge": "Config Edges"
   }
 }

@@ -7,9 +7,10 @@ import ConfigEdge from './ConfigEdge';
 import ConfigNode from './ConfigNode';
 import Import from './Import';
 import Init from './Init';
+import Upload from './Upload';
 
 const mapState = (state: IRootState) => ({
-  currentStep: state.importData.progress.currentStep,
+  currentStep: state.importData.currentStep,
 });
 
 const mapDispatch = () => ({});
@@ -20,13 +21,15 @@ interface IProps
 
 const Tasks = (props: IProps) => {
   switch (props.currentStep) {
-    case 'init':
+    case 0:
       return <Init />;
-    case 'configNode':
+    case 1:
+      return <Upload />;
+    case 2:
       return <ConfigNode />;
-    case 'configEdge':
+    case 3:
       return <ConfigEdge />;
-    case 'import':
+    case 4:
       return <Import />;
   }
 };
