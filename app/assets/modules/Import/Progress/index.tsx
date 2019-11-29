@@ -8,13 +8,14 @@ import { IDispatch, IRootState } from '#assets/store';
 const { Step } = Steps;
 
 const mapState = (state: IRootState) => ({
+  activeStep: state.importData.activeStep,
   currentStep: state.importData.currentStep,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
-  updateStep: step => {
+  updateActiveStep: step => {
     dispatch.importData.update({
-      currentStep: step,
+      activeStep: step,
     });
   },
 });
@@ -25,7 +26,10 @@ interface IProps
 
 class Progress extends React.Component<IProps, {}> {
   handleSwitchStep = step => {
-    this.props.updateStep(step);
+    const { currentStep } = this.props;
+    if (step <= currentStep) {
+      this.props.updateActiveStep(step);
+    }
   };
 
   render() {
@@ -46,12 +50,20 @@ class Progress extends React.Component<IProps, {}> {
         title: intl.get('common.import'),
       },
     ];
-    const { currentStep } = this.props;
+    const { currentStep, activeStep } = this.props;
 
     return (
-      <Steps onChange={this.handleSwitchStep} current={currentStep}>
+      <Steps
+        type="navigation"
+        onChange={this.handleSwitchStep}
+        current={activeStep}
+      >
         {steps.map((step, index) => (
-          <Step title={step.title} key={index} />
+          <Step
+            title={step.title}
+            key={index}
+            status={index <= currentStep ? 'finish' : 'wait'}
+          />
         ))}
       </Steps>
     );

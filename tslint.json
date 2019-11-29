@@ -20,6 +20,7 @@
     "jsx-no-lambda": false,
     "jsx-no-multiline-js": false,
     "no-this-assignment": [true, {"allowed-names": ["^self$"], "allow-destructuring": true}],
+    "no-shadowed-variable": false,
     "no-submodule-imports": false,
     "ordered-imports": [
       true,

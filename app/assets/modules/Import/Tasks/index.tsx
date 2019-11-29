@@ -10,7 +10,7 @@ import Init from './Init';
 import Upload from './Upload';
 
 const mapState = (state: IRootState) => ({
-  currentStep: state.importData.currentStep,
+  activeStep: state.importData.activeStep,
 });
 
 const mapDispatch = () => ({});
@@ -20,7 +20,7 @@ interface IProps
     ReturnType<typeof mapDispatch> {}
 
 const Tasks = (props: IProps) => {
-  switch (props.currentStep) {
+  switch (props.activeStep) {
     case 0:
       return <Init />;
     case 1:

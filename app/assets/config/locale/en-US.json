@@ -60,6 +60,17 @@
     "init": "Init",
     "upload": "Upload" ,
     "vertex": "Config Vertexes",
-    "edge": "Config Edges"
+    "edge": "Config Edges",
+    "next": "Next",
+    "mountPath": "Mount Path",
+    "mountPathPlaceholder": "Please input the docker data mount path",
+    "fileName": "Name",
+    "withHeader": "WithHeader",
+    "fileType": "Type",
+    "fileSize": "Size",
+    "operation": "Operation",
+    "fileTitle": "Files Uploaded",
+    "preview": "Preview",
+    "delete": "Delete"
   }
 }
