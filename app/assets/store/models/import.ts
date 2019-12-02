@@ -5,6 +5,7 @@ interface IState {
   activeStep: number;
   mountPath: string;
   files: object[];
+  vertexesConfig: object[];
 }
 
 export const importData = createModel({
@@ -13,12 +14,27 @@ export const importData = createModel({
     currentStep: 5,
     mountPath: '',
     files: [] as any[],
+    vertexesConfig: [] as any[],
   },
   reducers: {
     update: (state: IState, payload: any) => {
       return {
         ...state,
         ...payload,
+      };
+    },
+    newVertexConfig: (state: IState, payload?: any) => {
+      const { file } = payload;
+      const { vertexesConfig } = state;
+      return {
+        ...state,
+        vertexesConfig: [
+          ...vertexesConfig,
+          {
+            name: `Vertex ${vertexesConfig.length}`,
+            file,
+          },
+        ],
       };
     },
     nextStep: (state: IState, payload?: any) => {
