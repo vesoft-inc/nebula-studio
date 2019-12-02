@@ -1,4 +1,4 @@
-import { Button, Tabs } from 'antd';
+import { Button, Icon, Tabs } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
@@ -33,6 +33,20 @@ interface IProps
     ReturnType<typeof mapDispatch> {}
 
 class ConfigNode extends React.PureComponent<IProps> {
+  handleDelete = vertexName => {
+    const { vertexesConfig, activeVertex } = this.props;
+    const newVertexesConfig = vertexesConfig.filter(
+      config => config.name !== vertexName,
+    );
+
+    this.props.updateVertexesConfig(newVertexesConfig);
+    if (activeVertex === vertexName) {
+      this.props.updateActiveVertex(
+        newVertexesConfig[0] && newVertexesConfig[0].name,
+      );
+    }
+  };
+
   render() {
     const { vertexesConfig, activeVertex } = this.props;
 
@@ -48,7 +62,23 @@ class ConfigNode extends React.PureComponent<IProps> {
             onTabClick={this.props.updateActiveVertex}
           >
             {vertexesConfig.map(vertex => (
-              <TabPane tab={vertex.name} key={vertex.name}>
+              <TabPane
+                tab={
+                  <p className="tab-content">
+                    {vertex.name}
+                    <Button
+                      type="link"
+                      onClick={e => {
+                        e.stopPropagation();
+                        this.handleDelete(vertex.name);
+                      }}
+                    >
+                      <Icon type="close" />
+                    </Button>
+                  </p>
+                }
+                key={vertex.name}
+              >
                 <CSVPreviewLink file={vertex.file}>
                   {vertex.file.name}
                 </CSVPreviewLink>

@@ -9,45 +9,49 @@ interface IProps {
   children: string;
 }
 
-const CSVPreviewLink = (props: IProps) => {
-  const { content } = props.file;
-  const csvData = content.split('\n').map(row => row.split(','));
-  const columns = csvData.length
-    ? csvData[0].map((_, index) => ({
-        title: `column ${index + 1}`,
-        dataIndex: index,
-      }))
-    : [];
-  let modalHandler = null as any;
+class CSVPreviewLink extends React.PureComponent<IProps> {
+  modalHandler;
+  render() {
+    const { content } = this.props.file;
+    const csvData = content.split('\n').map(row => row.split(','));
+    const columns = csvData.length
+      ? csvData[0].map((_, index) => ({
+          title: `column ${index + 1}`,
+          dataIndex: index,
+        }))
+      : [];
 
-  return (
-    <Button
-      type="link"
-      onClick={() => {
-        if (modalHandler) {
-          modalHandler.show();
-        }
-      }}
-    >
-      {props.children}
-      <Modal
-        handlerRef={handler => {
-          modalHandler = handler;
-        }}
-        footer={false}
-        width={800}
-      >
-        <div className="csv-preview">
-          <Table
-            dataSource={csvData}
-            columns={columns}
-            pagination={false}
-            rowKey={(_, index) => index.toString()}
-          />
-        </div>
-      </Modal>
-    </Button>
-  );
-};
+    return (
+      <>
+        <Button
+          type="link"
+          onClick={() => {
+            if (this.modalHandler) {
+              this.modalHandler.show();
+            }
+          }}
+        >
+          {this.props.children}
+        </Button>
+        <Modal
+          handlerRef={handler => {
+            this.modalHandler = handler;
+          }}
+          footer={false}
+          width={800}
+        >
+          <div className="csv-preview">
+            <Table
+              dataSource={csvData}
+              columns={columns}
+              pagination={false}
+              rowKey={(_, index) => index.toString()}
+            />
+          </div>
+        </Modal>
+      </>
+    );
+  }
+}
 
 export default CSVPreviewLink;
