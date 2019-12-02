@@ -38,12 +38,13 @@ class Add extends React.PureComponent<IProps> {
   modalHandle;
 
   handleSubmit = () => {
-    const { type } = this.props;
+    const { type, files } = this.props;
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        const { file } = values;
+        const { fileIndex } = values;
+        const file = files.filter(f => f.dataType === type)[fileIndex];
         if (type === AddType.vertex) {
-          this.props.newVertexConfig({ file });
+          this.props.newVertexConfig(file);
           this.modalHandle.hide();
         }
       }
@@ -76,7 +77,7 @@ class Add extends React.PureComponent<IProps> {
         >
           <Form>
             <FormItem label={intl.get('import.fileName')}>
-              {getFieldDecorator('file', {
+              {getFieldDecorator('fileIndex', {
                 rules: [
                   {
                     required: true,
@@ -86,8 +87,8 @@ class Add extends React.PureComponent<IProps> {
                 <Select>
                   {files
                     .filter(file => file.dataType === type)
-                    .map(file => (
-                      <Option value={file} key={file.name}>
+                    .map((file, index) => (
+                      <Option value={index} key={file.name}>
                         {file.name}
                       </Option>
                     ))}

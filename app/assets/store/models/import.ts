@@ -6,6 +6,7 @@ interface IState {
   mountPath: string;
   files: object[];
   vertexesConfig: object[];
+  activeVertex: string;
 }
 
 export const importData = createModel({
@@ -15,6 +16,7 @@ export const importData = createModel({
     mountPath: '',
     files: [] as any[],
     vertexesConfig: [] as any[],
+    activeVertex: '',
   },
   reducers: {
     update: (state: IState, payload: any) => {
@@ -23,18 +25,20 @@ export const importData = createModel({
         ...payload,
       };
     },
-    newVertexConfig: (state: IState, payload?: any) => {
+    newVertexConfig: (state: IState, payload: any) => {
       const { file } = payload;
       const { vertexesConfig } = state;
+      const vertexName = `Vertex ${vertexesConfig.length}`;
       return {
         ...state,
         vertexesConfig: [
           ...vertexesConfig,
           {
-            name: `Vertex ${vertexesConfig.length}`,
+            name: vertexName,
             file,
           },
         ],
+        activeVertex: vertexName,
       };
     },
     nextStep: (state: IState, payload?: any) => {
