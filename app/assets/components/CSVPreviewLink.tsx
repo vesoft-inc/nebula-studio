@@ -11,6 +11,11 @@ interface IProps {
 
 class CSVPreviewLink extends React.PureComponent<IProps> {
   modalHandler;
+  handleLinkClick = () => {
+    if (this.modalHandler) {
+      this.modalHandler.show();
+    }
+  };
   render() {
     const { content } = this.props.file;
     const csvData = content.split('\n').map(row => row.split(','));
@@ -23,14 +28,7 @@ class CSVPreviewLink extends React.PureComponent<IProps> {
 
     return (
       <>
-        <Button
-          type="link"
-          onClick={() => {
-            if (this.modalHandler) {
-              this.modalHandler.show();
-            }
-          }}
-        >
+        <Button type="link" onClick={this.handleLinkClick}>
           {this.props.children}
         </Button>
         <Modal
