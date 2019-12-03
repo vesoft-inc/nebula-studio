@@ -71,6 +71,8 @@
     "operation": "操作",
     "fileTitle": "上传文件列表",
     "preview": "预览",
-    "delete": "删除"
+    "delete": "删除",
+    "addVertex": "添加 Vertex",
+    "addEdge": "添加 Edge"
   }
 }

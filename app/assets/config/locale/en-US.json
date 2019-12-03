@@ -71,6 +71,8 @@
     "operation": "Operation",
     "fileTitle": "Files Uploaded",
     "preview": "Preview",
-    "delete": "Delete"
+    "delete": "Delete",
+    "addVertex": "Add Vertex",
+    "addEdge": "Add Edge"
   }
 }

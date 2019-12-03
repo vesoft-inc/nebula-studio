@@ -4,8 +4,7 @@ import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
-import { Modal } from '#assets/components';
-import CSVPreview from '#assets/components/CSVPreview';
+import CSVPreviewLink from '#assets/components/CSVPreviewLink';
 import { IDispatch, IRootState } from '#assets/store';
 import readFileContent from '#assets/utils/file';
 
@@ -31,18 +30,10 @@ interface IProps
   extends ReturnType<typeof mapState>,
     ReturnType<typeof mapDispatch> {}
 
-interface IState {
-  previewFile: any;
-}
-
-class Import extends React.Component<IProps, IState> {
+class Import extends React.Component<IProps> {
   previewHandler;
   constructor(props) {
     super(props);
-
-    this.state = {
-      previewFile: null,
-    };
   }
 
   handleNext = () => {
@@ -78,17 +69,6 @@ class Import extends React.Component<IProps, IState> {
   handleFileDelete = index => {
     const { files } = this.props;
     this.props.updateFiles(files.filter((_, i) => i !== index));
-  };
-
-  handlePreview = file => {
-    this.setState(
-      {
-        previewFile: file,
-      },
-      () => {
-        this.previewHandler.show();
-      },
-    );
   };
 
   renderFileTable = () => {
@@ -141,9 +121,9 @@ class Import extends React.Component<IProps, IState> {
         key: 'operation',
         render: (_1, file, index) => (
           <div className="operation">
-            <Button type="link" onClick={() => this.handlePreview(file)}>
+            <CSVPreviewLink file={file}>
               {intl.get('import.preview')}
-            </Button>
+            </CSVPreviewLink>
             <Button type="link" onClick={() => this.handleFileDelete(index)}>
               {intl.get('import.delete')}
             </Button>
@@ -172,7 +152,6 @@ class Import extends React.Component<IProps, IState> {
 
   render() {
     const { files } = this.props;
-    const { previewFile } = this.state;
     return (
       <div className="upload task">
         <div className="files">
@@ -193,16 +172,6 @@ class Import extends React.Component<IProps, IState> {
               {intl.get('import.upload')}
             </Button>
           </Upload>
-          <Modal
-            handlerRef={handler => (this.previewHandler = handler)}
-            footer={false}
-            width={800}
-          >
-            <CSVPreview
-              file={previewFile}
-              close={this.previewHandler && this.previewHandler.hide}
-            />
-          </Modal>
         </div>
         <Button
           type="primary"
