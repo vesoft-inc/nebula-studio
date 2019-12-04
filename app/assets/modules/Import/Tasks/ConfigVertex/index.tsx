@@ -27,6 +27,12 @@ const mapDispatch = (dispatch: IDispatch) => ({
       activeVertexIndex: vertexIndex,
     });
   },
+  deleteVertexConfig: vertexName => {
+    dispatch.importData.deleteVertexConfig({
+      vertexName,
+    });
+  },
+  nextStep: dispatch.importData.nextStep,
 });
 
 interface IProps
@@ -34,25 +40,6 @@ interface IProps
     ReturnType<typeof mapDispatch> {}
 
 class ConfigNode extends React.PureComponent<IProps> {
-  handleDelete = vertexName => {
-    const { vertexesConfig, activeVertexIndex } = this.props;
-    const newVertexesConfig = vertexesConfig.filter(
-      config => config.name !== vertexName,
-    );
-
-    this.props.updateVertexesConfig(newVertexesConfig);
-    if (
-      vertexesConfig[activeVertexIndex] &&
-      vertexesConfig[activeVertexIndex].name === vertexName
-    ) {
-      if (newVertexesConfig.length === 0) {
-        this.props.updateActiveVertexIndex(-1);
-      } else {
-        this.props.updateActiveVertexIndex(0);
-      }
-    }
-  };
-
   handleTabClick = key => {
     const index = Number(key.split('#')[1]);
     this.props.updateActiveVertexIndex(index);
@@ -83,7 +70,7 @@ class ConfigNode extends React.PureComponent<IProps> {
                       type="link"
                       onClick={e => {
                         e.stopPropagation();
-                        this.handleDelete(vertex.name);
+                        this.props.deleteVertexConfig(vertex.name);
                       }}
                     >
                       <Icon type="close" />
@@ -103,7 +90,7 @@ class ConfigNode extends React.PureComponent<IProps> {
             ))}
           </Tabs>
         </div>
-        <Button type="primary" className="next">
+        <Button type="primary" className="next" onClick={this.props.nextStep}>
           {intl.get('import.next')}
         </Button>
       </div>

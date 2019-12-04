@@ -1,4 +1,4 @@
-import { Form, Icon, Radio, Select, Table, Tooltip } from 'antd';
+import { Button, Form, Icon, Radio, Select, Table, Tooltip } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
@@ -24,7 +24,8 @@ const mapState = (state: IRootState) => {
 
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncUpdateTagConfig: dispatch.importData.asyncUpdateTagConfig,
-  refresh: dispatch.importData.refreshVertexesConfig,
+  refresh: dispatch.importData.refresh,
+  deleteTag: dispatch.importData.deleteTag,
 });
 
 interface IProps
@@ -54,6 +55,10 @@ class Tag extends React.Component<IProps> {
       tagIndex,
       tag,
     });
+  };
+
+  handleTagDelete = () => {
+    this.props.deleteTag(this.props.index);
   };
 
   handlePropChange = (index, field, value) => {
@@ -161,19 +166,26 @@ class Tag extends React.Component<IProps> {
     return (
       <div className="tag-config">
         <h3>TAG{index}</h3>
-        <FormItem label="TAG">
-          <Select
-            className="tag-select"
-            value={data.name}
-            onChange={this.handleTagChange}
-          >
-            {tags.map(t => (
-              <Option value={t} key={t}>
-                {t}
-              </Option>
-            ))}
-          </Select>
-        </FormItem>
+        <div className="tag-operation">
+          <FormItem className="left" label="TAG">
+            <Select
+              className="tag-select"
+              value={data.name}
+              onChange={this.handleTagChange}
+            >
+              {tags.map(t => (
+                <Option value={t} key={t}>
+                  {t}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+          <FormItem className="right">
+            <Button type="danger" onClick={this.handleTagDelete}>
+              {intl.get('import.delete')}
+            </Button>
+          </FormItem>
+        </div>
         {this.renderPropsTable(data.props, data.name)}
       </div>
     );

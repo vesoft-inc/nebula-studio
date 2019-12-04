@@ -5,22 +5,33 @@
 			padding: 4px;
 		}
 
-		> .ant-form-item {
+		> .tag-operation {
 			display: flex;
-			align-items: center;
 			margin-bottom: 8px;
 
-			.ant-form-item-control-wrapper {
-				width: 120px;
+			> .ant-form-item {
+				flex: 1;
+				display: flex;
+				align-items: center;
 
-				> .ant-form-item-control {
-					line-height: 1;
+				&.left {
+					.ant-form-item-control-wrapper {
+						width: 150px;
 
-					.tag-select {
-						width: 100%;
-						overflow: hidden;
-						text-overflow: ellipsis;
+						> .ant-form-item-control {
+							line-height: 1;
+
+							.tag-select {
+								width: 100%;
+								overflow: hidden;
+								text-overflow: ellipsis;
+							}
+						}
 					}
+				}
+
+				&.right {
+					justify-content: flex-end;
 				}
 			}
 		}

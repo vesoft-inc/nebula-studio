@@ -12,6 +12,7 @@
     "no-console": [false, "dir", "log", "error", "warn"],
     "space-before-function-paren": false,
     "interface-name": [true, "always-prefix"],
+    "prefer-conditional-expression": false,
     "adjacent-overload-signatures": true,
     "member-access": [false],
     "jsx-wrap-multiline": false,

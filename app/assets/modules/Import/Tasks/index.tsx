@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { IRootState } from '#assets/store';
 
 import ConfigEdge from './ConfigEdge';
-import ConfigNode from './ConfigNode';
+import ConfigNode from './ConfigVertex';
 import Import from './Import';
 import Init from './Init';
 import Upload from './Upload';

@@ -18,6 +18,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
       vertexesConfig: config,
     });
   },
+  addTag: dispatch.importData.addTag,
 });
 
 interface IProps
@@ -25,17 +26,6 @@ interface IProps
     ReturnType<typeof mapDispatch> {}
 
 class TagList extends React.Component<IProps> {
-  handlerAddTag = () => {
-    const { vertexesConfig, activeVertexIndex } = this.props;
-    const vertex = vertexesConfig[activeVertexIndex];
-
-    vertex.tags.push({
-      name: '',
-      props: [],
-    });
-    this.props.updateVertexesConfig([...vertexesConfig]);
-  };
-
   render() {
     const { vertexesConfig, activeVertexIndex } = this.props;
     const vertex = vertexesConfig[activeVertexIndex];
@@ -48,7 +38,7 @@ class TagList extends React.Component<IProps> {
           ))}
         </div>
         <div className="operation">
-          <Button type="default" onClick={this.handlerAddTag}>
+          <Button type="default" onClick={this.props.addTag}>
             + Tag
           </Button>
         </div>

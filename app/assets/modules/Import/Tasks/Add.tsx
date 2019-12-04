@@ -17,6 +17,9 @@ const mapDispatch = (dispatch: IDispatch) => ({
   newVertexConfig: file => {
     dispatch.importData.newVertexConfig({ file });
   },
+  newEdgeConfig: file => {
+    dispatch.importData.newEdgeConfig({ file });
+  },
 });
 
 export enum AddType {
@@ -46,6 +49,9 @@ class Add extends React.PureComponent<IProps> {
         if (type === AddType.vertex) {
           this.props.newVertexConfig(file);
           this.modalHandle.hide();
+        } else {
+          this.props.newEdgeConfig(file);
+          this.modalHandle.hide();
         }
       }
     });
@@ -67,6 +73,7 @@ class Add extends React.PureComponent<IProps> {
       type === AddType.vertex
         ? intl.get('import.addVertex')
         : intl.get('import.addEdge');
+
     return (
       <div className={`add-${type}`}>
         <Button onClick={this.handleAdd}>{addText}</Button>
