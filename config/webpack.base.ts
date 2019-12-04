@@ -75,7 +75,7 @@ const commonConfig = {
       '#assets': path.join(__dirname, '../app/assets/'),
       // fix this: https://github.com/react-component/table/issues/368
       'react-dom': '@hot-loader/react-dom'
-    }
+    },
   },
 };
 

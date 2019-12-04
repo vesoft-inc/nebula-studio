@@ -86,12 +86,26 @@ export const importData = createModel({
             ...state,
             activeStep: 2,
           };
+        case 4:
+          return {
+            ...state,
+            activeStep: 0,
+          };
         default:
           return state;
       }
     },
   },
   effects: {
+    async importData(payload: { config: string; localDir: string }) {
+      const { config, localDir } = payload;
+      const { data, code } = (await service.importData({
+        config,
+        localDir,
+      })) as any;
+      console.log(data, code);
+    },
+
     async asyncUpdateTagConfig(payload: {
       host: string;
       username: string;
