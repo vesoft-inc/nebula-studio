@@ -23,10 +23,10 @@ service.interceptors.response.use(
   },
 );
 
-const get = (api: string) => (params: object, config = {}) =>
+const get = (api: string) => (params?: object, config = {}) =>
   service.get(api, { params, ...config });
 
-const post = (api: string) => (params: object, config = {}) =>
+const post = (api: string) => (params?: object, config = {}) =>
   service.post(api, params, config);
 
 export { get, post };

@@ -77,6 +77,7 @@
     "addEdge": "Add Edge",
     "importResults": "Import Results",
     "newImport": "New Import",
+    "endImport": "End Import",
     "againImport": "Import Again",
     "prop": "Prop",
     "propTip": "{tag}'s property",
