@@ -8,12 +8,13 @@ import { IDispatch, IRootState } from '#assets/store';
 
 import Add, { AddType } from '../Add';
 import './index.less';
+import TagList from './TagList';
 
 const { TabPane } = Tabs;
 
 const mapState = (state: IRootState) => ({
   vertexesConfig: state.importData.vertexesConfig,
-  activeVertex: state.importData.activeVertex,
+  activeVertexIndex: state.importData.activeVertexIndex,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -21,9 +22,9 @@ const mapDispatch = (dispatch: IDispatch) => ({
     dispatch.importData.update({
       vertexesConfig: config,
     }),
-  updateActiveVertex: vertex => {
+  updateActiveVertexIndex: vertexIndex => {
     dispatch.importData.update({
-      activeVertex: vertex,
+      activeVertexIndex: vertexIndex,
     });
   },
 });
@@ -34,21 +35,31 @@ interface IProps
 
 class ConfigNode extends React.PureComponent<IProps> {
   handleDelete = vertexName => {
-    const { vertexesConfig, activeVertex } = this.props;
+    const { vertexesConfig, activeVertexIndex } = this.props;
     const newVertexesConfig = vertexesConfig.filter(
       config => config.name !== vertexName,
     );
 
     this.props.updateVertexesConfig(newVertexesConfig);
-    if (activeVertex === vertexName) {
-      this.props.updateActiveVertex(
-        newVertexesConfig[0] && newVertexesConfig[0].name,
-      );
+    if (
+      vertexesConfig[activeVertexIndex] &&
+      vertexesConfig[activeVertexIndex].name === vertexName
+    ) {
+      if (newVertexesConfig.length === 0) {
+        this.props.updateActiveVertexIndex(-1);
+      } else {
+        this.props.updateActiveVertexIndex(0);
+      }
     }
   };
 
+  handleTabClick = key => {
+    const index = Number(key.split('#')[1]);
+    this.props.updateActiveVertexIndex(index);
+  };
+
   render() {
-    const { vertexesConfig, activeVertex } = this.props;
+    const { vertexesConfig, activeVertexIndex } = this.props;
 
     return (
       <div className="vertex-config task">
@@ -58,10 +69,12 @@ class ConfigNode extends React.PureComponent<IProps> {
             <Add type={AddType.vertex} />
           </div>
           <Tabs
-            activeKey={activeVertex}
-            onTabClick={this.props.updateActiveVertex}
+            className="vertex-tabs"
+            activeKey={`${vertexesConfig[activeVertexIndex] &&
+              vertexesConfig[activeVertexIndex].name}#${activeVertexIndex}`}
+            onTabClick={this.handleTabClick}
           >
-            {vertexesConfig.map(vertex => (
+            {vertexesConfig.map((vertex, index) => (
               <TabPane
                 tab={
                   <p className="tab-content">
@@ -77,11 +90,15 @@ class ConfigNode extends React.PureComponent<IProps> {
                     </Button>
                   </p>
                 }
-                key={vertex.name}
+                key={`${vertex.name}#${index}`}
               >
-                <CSVPreviewLink file={vertex.file}>
-                  {vertex.file.name}
-                </CSVPreviewLink>
+                <span className="csv-file">
+                  File:
+                  <CSVPreviewLink file={vertex.file}>
+                    {vertex.file.name}
+                  </CSVPreviewLink>
+                </span>
+                {index === activeVertexIndex ? <TagList /> : null}
               </TabPane>
             ))}
           </Tabs>

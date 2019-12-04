@@ -23,6 +23,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
       currentSpace: space,
     });
   },
+  asyncGetTags: dispatch.nebula.asyncGetTags,
   nextStep: dispatch.importData.nextStep,
 });
 
@@ -47,8 +48,15 @@ class Init extends React.Component<IProps, {}> {
   handleNext = () => {
     this.props.form.validateFields((err, values: any) => {
       const { space, mountPath } = values;
+      const { username, host, password } = this.props;
       if (!err && space && mountPath) {
         this.props.updateCurrentSpace(space);
+        this.props.asyncGetTags({
+          username,
+          host,
+          password,
+          space,
+        });
         this.props.nextStep({
           mountPath,
         });

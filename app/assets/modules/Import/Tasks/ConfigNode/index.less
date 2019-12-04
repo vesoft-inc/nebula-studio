@@ -1,11 +1,42 @@
 .data-import .vertex-config {
 	> .vertexes {
+		height: 100%;
+
 		h3 {
 			text-align: center;
 		}
 
 		> .operation {
 			text-align: right;
+		}
+
+		> .ant-tabs {
+			height: 100%;
+		}
+
+		> .vertex-tabs {
+			display: flex;
+			flex-direction: column;
+
+			> .ant-tabs-content {
+				flex: 1;
+				margin-bottom: 80px;
+				// Hack: make this to make the tab content with height
+				height: 90%;
+
+				> .ant-tabs-tabpane {
+					display: flex;
+					flex-direction: column;
+					overflow: hidden;
+					background: #f5fbff;
+					padding: 16px;
+
+					> .tag-list-wrap {
+						flex: 1;
+						overflow: hidden;
+					}
+				}
+			}
 		}
 	}
 }

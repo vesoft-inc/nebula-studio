@@ -22,6 +22,7 @@ export const nebula = createModel({
     password: cookies.get('password'),
     currentSpace: '',
     edgeTypes: [],
+    tags: [],
   },
   reducers: {
     update: (state: IState, payload: any) => {
@@ -84,6 +85,30 @@ export const nebula = createModel({
       if (code === '0') {
         this.update({
           spaces: data.tables.map(item => item.Name),
+        });
+      }
+    },
+
+    async asyncGetTags(payload: {
+      host: string;
+      username: string;
+      password: string;
+      space: string;
+    }) {
+      const { host, username, password, space } = payload;
+      const { code, data } = (await service.execNGQL({
+        host,
+        username,
+        password,
+        gql: `
+          use ${space};
+          SHOW TAGS;
+        `,
+      })) as any;
+
+      if (code === '0') {
+        this.update({
+          tags: data.tables.map(item => item.Name),
         });
       }
     },

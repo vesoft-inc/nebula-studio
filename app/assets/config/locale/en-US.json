@@ -73,6 +73,19 @@
     "preview": "Preview",
     "delete": "Delete",
     "addVertex": "Add Vertex",
-    "addEdge": "Add Edge"
+    "addEdge": "Add Edge",
+    "prop": "Prop",
+    "propTip": "{tag}'s property",
+    "mapping": "CSV Index",
+    "mappingTip": "The index of the csv file",
+    "type": "Type",
+    "typeTip": "Prop Type",
+    "setVertexId": "Set ID",
+    "setVertexIdTip": "Set current prop as vertex id",
+    "idHash": "ID Hash",
+    "idHashTip": "Hash method used to prop",
+    "unset": "Primitive",
+    "uuid": "UUID",
+    "hash": "Hash"
   }
 }

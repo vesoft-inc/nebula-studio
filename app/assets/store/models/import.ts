@@ -1,12 +1,14 @@
 import { createModel } from '@rematch/core';
 
+import service from '#assets/config/service';
+
 interface IState {
   currentStep: number;
   activeStep: number;
   mountPath: string;
-  files: object[];
-  vertexesConfig: object[];
-  activeVertex: string;
+  files: any[];
+  vertexesConfig: any[];
+  activeVertexIndex: number;
   vertexAddCount: number;
 }
 
@@ -17,7 +19,7 @@ export const importData = createModel({
     mountPath: '',
     files: [] as any[],
     vertexesConfig: [] as any[],
-    activeVertex: '',
+    activeVertexIndex: -1,
     vertexAddCount: 0,
   },
   reducers: {
@@ -27,21 +29,46 @@ export const importData = createModel({
         ...payload,
       };
     },
+    updateTagConfig: (
+      state: IState,
+      payload: {
+        tagIndex: number;
+        props: any;
+        tag: string;
+      },
+    ) => {
+      const { vertexesConfig, activeVertexIndex } = state;
+      const vertex = vertexesConfig[activeVertexIndex];
+      const { props, tagIndex, tag } = payload;
+      const tagConfig = vertex.tags[tagIndex];
+      tagConfig.name = tag;
+      tagConfig.props = props;
+
+      return {
+        ...state,
+        vertexesConfig,
+      };
+    },
     newVertexConfig: (state: IState, payload: any) => {
       const { file } = payload;
       const { vertexesConfig, vertexAddCount } = state;
       const vertexName = `Vertex ${vertexAddCount}`;
+      vertexesConfig.push({
+        name: vertexName,
+        file,
+        tags: [],
+      });
       return {
         ...state,
-        vertexesConfig: [
-          ...vertexesConfig,
-          {
-            name: vertexName,
-            file,
-          },
-        ],
-        activeVertex: vertexName,
+        vertexesConfig,
+        activeVertexIndex: vertexesConfig.length - 1,
         vertexAddCount: vertexAddCount + 1,
+      };
+    },
+    // just make new copy config to render
+    refreshVertexesConfig: (state: IState) => {
+      return {
+        ...state,
       };
     },
     nextStep: (state: IState, payload?: any) => {
@@ -64,5 +91,39 @@ export const importData = createModel({
       }
     },
   },
-  effects: {},
+  effects: {
+    async asyncUpdateTagConfig(payload: {
+      host: string;
+      username: string;
+      password: string;
+      space: string;
+      tag: string;
+      tagIndex: number;
+    }) {
+      const { host, username, password, space, tag, tagIndex } = payload;
+      const { code, data } = (await service.execNGQL({
+        host,
+        username,
+        password,
+        gql: `
+          use ${space};
+          DESCRIBE TAG ${tag}
+        `,
+      })) as any;
+      if (code === '0') {
+        const props = data.tables.map(attr => ({
+          prop: attr.Field,
+          type: attr.Type,
+          mapping: null,
+          setId: false,
+          idHash: 'unset',
+        }));
+        this.updateTagConfig({
+          tagIndex,
+          tag,
+          props,
+        });
+      }
+    },
+  },
 });

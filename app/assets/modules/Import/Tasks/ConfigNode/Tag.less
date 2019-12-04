@@ -1,0 +1,54 @@
+.tag-list {
+	.tag-config {
+		> h3 {
+			font-size: 16px;
+			padding: 4px;
+		}
+
+		> .ant-form-item {
+			display: flex;
+			align-items: center;
+			margin-bottom: 8px;
+
+			.ant-form-item-control-wrapper {
+				width: 120px;
+
+				> .ant-form-item-control {
+					line-height: 1;
+
+					.tag-select {
+						width: 100%;
+						overflow: hidden;
+						text-overflow: ellipsis;
+					}
+				}
+			}
+		}
+
+		> .props-table {
+			.ant-table-column-title .title-content .anticon-info-circle {
+				margin-left: 4px;
+				cursor: pointer;
+			}
+
+
+			th,
+			td {
+				text-align: center;
+				background: #f5fbff;
+
+				> .ant-select {
+					width: 100px;
+				}
+			}
+		}
+	}
+
+	.tag-config + .tag-config {
+		margin-top: 24px;
+
+		> h3 {
+			border-top: 1px dashed #aaa;
+		}
+	}
+}
