@@ -77,6 +77,7 @@
     "addEdge": "添加 Edge",
     "importResults": "导入结果",
     "newImport": "新建导入",
+    "endImport": "终止导入",
     "againImport": "再次导入",
     "prop": "属性",
     "propTip": "{tag}中拥有的属性",

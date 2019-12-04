@@ -21,36 +21,59 @@ type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
 
 interface IState {
   activeKey: string;
+  isfinish: boolean;
 }
 
 class Import extends React.Component<IProps, IState> {
   ref: HTMLDivElement;
   log: any;
+  finish: any;
+
   constructor(props: IProps) {
     super(props);
     this.state = {
       activeKey: 'log',
+      isfinish: true,
     };
   }
 
+  endImport = () => {
+    service.processKill();
+    this.setState({
+      isfinish: true,
+    });
+  };
+
   handleRunImport = () => {
+    this.setState({
+      isfinish: false,
+    });
     this.props.importData({
       config: '/Users/lidanji/Vesoft/local/config.yaml',
       localDir: '/Users/lidanji/Vesoft/local/',
     });
-    this.log = setInterval(this.redalog, 3000);
+    this.log = setInterval(this.readlog, 1000);
+    this.finish = setInterval(this.refinish, 1000);
   };
 
-  redalog = async () => {
-    const { importLoading } = this.props;
+  refinish = async () => {
+    const result = await service.reFinish();
+    console.log(result);
+    if (result.data) {
+      this.setState({
+        isfinish: true,
+      });
+      clearInterval(this.log);
+      clearInterval(this.finish);
+    }
+  };
+
+  readlog = async () => {
     const result = await service.readLog({
       localDir: '/Users/lidanji/Vesoft/local/',
     });
     this.ref.innerHTML = result.data;
     this.ref.scrollTop = this.ref.scrollHeight;
-    if (!importLoading) {
-      clearInterval(this.log);
-    }
   };
 
   handleTab = (key: string) => {
@@ -65,7 +88,7 @@ class Import extends React.Component<IProps, IState> {
   };
 
   render() {
-    const { activeKey } = this.state;
+    const { activeKey, isfinish } = this.state;
     return (
       <div className="import">
         <div className="imprt-btn">
@@ -81,12 +104,21 @@ class Import extends React.Component<IProps, IState> {
             />
           </TabPane>
           <TabPane tab={intl.get('import.importResults')} key="export">
-            <Button className="import-again" onClick={this.props.nextStep}>
-              {intl.get('import.newImport')}
-            </Button>
-            <Button className="import-again" onClick={this.handleAgainImport}>
-              {intl.get('import.againImport')}
-            </Button>
+            {!isfinish && (
+              <Button className="import-again" onClick={this.endImport}>
+                {intl.get('import.endImport')}
+              </Button>
+            )}
+            {isfinish && (
+              <Button className="import-again" onClick={this.props.nextStep}>
+                {intl.get('import.newImport')}
+              </Button>
+            )}
+            {isfinish && (
+              <Button className="import-again" onClick={this.handleAgainImport}>
+                {intl.get('import.againImport')}
+              </Button>
+            )}
             <div className="import-export">
               <div>
                 配置文件（本地路径 /Users/lidanji/Vesoft/local/config.yaml ）：

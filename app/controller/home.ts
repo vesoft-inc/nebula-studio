@@ -3,6 +3,8 @@ import { Controller } from 'egg';
 import fs from 'fs';
 
 import manifestMap from '../../config/manifest.json';
+let isFinish: boolean = true;
+let importProcess: any;
 
 export default class HomeController extends Controller {
   async index() {
@@ -16,7 +18,8 @@ export default class HomeController extends Controller {
   async import() {
     const { ctx } = this;
     const query = ctx.request.body;
-    exec(
+    isFinish = false;
+    importProcess = exec(
       'docker run --rm --network=host  -v ' +
         query.config +
         ':' +
@@ -31,41 +34,50 @@ export default class HomeController extends Controller {
         maxBuffer: 1024 * 1024 * 1024,
       },
       (error, stdout, stderr) => {
+        isFinish = true;
         console.log(error, stdout, stderr);
       },
     );
     ctx.response.body = {
       message: '',
       data: [],
-      code: 0,
+      code: '0',
     };
   }
 
-  // async refresh() {
-  //   const { ctx } = this;
-  //   const query = ctx.request.body;
+  async processKill() {
+    const { ctx } = this;
+    importProcess.kill();
+    ctx.response.body = {
+      message: '',
+      data: [],
+      code: '0',
+    };
+  }
 
-  //   ctx.response.body = {
-  //     message: '',
-  //     data: [],
-  //     code: 0,
-  //   };
-  // }
+  async refinish() {
+    const { ctx } = this;
+    ctx.response.body = {
+      message: '',
+      data: isFinish,
+      code: '0',
+    };
+  }
 
   async readLog() {
     const { ctx } = this;
     const query = ctx.request.body;
     let data: any;
     try {
-      data = fs.readFileSync(query.localDir + 'err/import.log', 'utf-8');
+      data = fs.readFileSync(query.localDir + 'err/import.log');
     } catch (e) {
       data = 'read file error';
     }
-    const log = data.replace(/\n/g, '<br />');
+    const log = data.toString().replace(/\n/g, '<br />');
     ctx.response.body = {
       message: '',
       data: log,
-      code: 0,
+      code: '0',
     };
   }
 }
