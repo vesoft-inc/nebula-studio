@@ -206,15 +206,15 @@ export const importData = createModel({
             activeStep: 2,
           };
         case 2:
-            return {
-              ...state,
-              activeStep: 3,
-            };
+          return {
+            ...state,
+            activeStep: 3,
+          };
         case 4:
           return {
             ...state,
             activeStep: 0,
-          }
+          };
         default:
           return state;
       }

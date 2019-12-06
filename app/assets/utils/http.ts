@@ -29,4 +29,7 @@ const get = (api: string) => (params?: object, config = {}) =>
 const post = (api: string) => (params?: object, config = {}) =>
   service.post(api, params, config);
 
-export { get, post };
+const _delete = (api: string) => (params?: object) =>
+  service.delete(api, params);
+
+export { get, post, _delete };

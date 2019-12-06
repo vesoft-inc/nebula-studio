@@ -3,9 +3,9 @@ import { Application } from 'egg';
 export default (app: Application) => {
   const { controller, router } = app;
 
-  router.get('/*', controller.home.index);
-  router.post('/import', controller.home.import);
-  router.post('/log', controller.home.readLog);
-  router.post('/refinish', controller.home.refinish);
-  router.post('/process_kill', controller.home.processKill);
+  router.post('/api/import/import', controller.import.import);
+  router.get('/api/import/log', controller.import.readLog);
+  router.get('/api/import/refresh', controller.import.refresh);
+  router.delete('/api/import/process', controller.import.killProcesss);
+  router.get(/^(?!^\/api\/)/, controller.home.index);
 };

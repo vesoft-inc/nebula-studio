@@ -21,58 +21,84 @@ type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
 
 interface IState {
   activeKey: string;
-  isfinish: boolean;
+  isFinish: boolean;
+  startByte: number;
+  endByte: number;
 }
 
 class Import extends React.Component<IProps, IState> {
   ref: HTMLDivElement;
-  log: any;
-  finish: any;
+  logTimer: any;
+  finishTimer: any;
 
   constructor(props: IProps) {
     super(props);
     this.state = {
       activeKey: 'log',
-      isfinish: true,
+      isFinish: true,
+      startByte: 0,
+      endByte: 1000000,
     };
   }
 
   endImport = () => {
-    service.processKill();
+    service.deleteProcess();
     this.setState({
-      isfinish: true,
+      isFinish: true,
     });
   };
 
   handleRunImport = () => {
     this.setState({
-      isfinish: false,
+      isFinish: false,
     });
     this.props.importData({
       config: '/Users/lidanji/Vesoft/local/config.yaml',
       localDir: '/Users/lidanji/Vesoft/local/',
     });
-    this.log = setInterval(this.readlog, 1000);
-    this.finish = setInterval(this.refinish, 1000);
+    this.logTimer = setTimeout(this.readlog, 1000);
+    this.finishTimer = setInterval(this.refresh, 1000);
   };
 
-  refinish = async () => {
-    const result = await service.reFinish();
-    console.log(result);
+  refresh = async () => {
+    const result = await service.refresh();
     if (result.data) {
       this.setState({
-        isfinish: true,
+        isFinish: true,
       });
-      clearInterval(this.log);
-      clearInterval(this.finish);
+      clearInterval(this.finishTimer);
     }
   };
 
   readlog = async () => {
-    const result = await service.readLog({
-      localDir: '/Users/lidanji/Vesoft/local/',
+    const { startByte, endByte } = this.state;
+    const result: any = await service.getLog({
+      dir: '/Users/lidanji/Vesoft/local/',
+      startByte,
+      endByte,
     });
-    this.ref.innerHTML = result.data;
+    if (result.data && result.code === '0') {
+      this.setState(
+        {
+          startByte: endByte,
+          endByte: endByte + 1000000,
+        },
+        () => {
+          this.logTimer = setTimeout(this.readlog, 1000);
+        },
+      );
+      this.ref.innerHTML = result.data;
+    } else {
+      if (result.code === '0') {
+        this.logTimer = setTimeout(this.readlog, 1000);
+      } else {
+        this.setState({
+          startByte: 0,
+          endByte: 1000000,
+        });
+        clearTimeout(this.logTimer);
+      }
+    }
     this.ref.scrollTop = this.ref.scrollHeight;
   };
 
@@ -88,7 +114,7 @@ class Import extends React.Component<IProps, IState> {
   };
 
   render() {
-    const { activeKey, isfinish } = this.state;
+    const { activeKey, isFinish } = this.state;
     return (
       <div className="import">
         <div className="imprt-btn">
@@ -104,17 +130,17 @@ class Import extends React.Component<IProps, IState> {
             />
           </TabPane>
           <TabPane tab={intl.get('import.importResults')} key="export">
-            {!isfinish && (
+            {!isFinish && (
               <Button className="import-again" onClick={this.endImport}>
                 {intl.get('import.endImport')}
               </Button>
             )}
-            {isfinish && (
+            {isFinish && (
               <Button className="import-again" onClick={this.props.nextStep}>
                 {intl.get('import.newImport')}
               </Button>
             )}
-            {isfinish && (
+            {isFinish && (
               <Button className="import-again" onClick={this.handleAgainImport}>
                 {intl.get('import.againImport')}
               </Button>
