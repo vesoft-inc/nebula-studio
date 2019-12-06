@@ -5,7 +5,7 @@ import fs from 'fs';
 let isFinish: boolean = true;
 let importProcess: any;
 
-export class ImportController extends Controller {
+export default class ImportController extends Controller {
   async import() {
     const { ctx } = this;
     const query = ctx.request.body;
