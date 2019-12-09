@@ -118,7 +118,8 @@ class Edge extends React.Component<IProps> {
         ),
         dataIndex: 'useHash',
         render: (value, record, index) => {
-          if (record.useHash) {
+          const { prop } = record;
+          if (prop === 'srcId' || prop === 'dstId') {
             return (
               <Select
                 value={value}

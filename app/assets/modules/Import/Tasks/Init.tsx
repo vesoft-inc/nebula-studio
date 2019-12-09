@@ -14,6 +14,7 @@ const mapState = (state: IRootState) => ({
   password: state.nebula.password,
   spaces: state.nebula.spaces,
   currentSpace: state.nebula.currentSpace,
+  mountPath: state.importData.mountPath,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -75,7 +76,8 @@ class Init extends React.Component<IProps, {}> {
     const {
       spaces,
       currentSpace,
-      form: { getFieldDecorator },
+      mountPath,
+      form: { getFieldDecorator, getFieldValue },
     } = this.props;
 
     return (
@@ -101,6 +103,7 @@ class Init extends React.Component<IProps, {}> {
           </FormItem>
           <FormItem label={intl.get('import.mountPath')}>
             {getFieldDecorator('mountPath', {
+              initialValue: mountPath,
               rules: [
                 {
                   required: true,
@@ -109,7 +112,12 @@ class Init extends React.Component<IProps, {}> {
             })(<Input placeholder={intl.get('import.mountPathPlaceholder')} />)}
           </FormItem>
         </Form>
-        <Button type="primary" className="next" onClick={this.handleNext}>
+        <Button
+          type="primary"
+          className="next"
+          onClick={this.handleNext}
+          disabled={!getFieldValue('space') || !getFieldValue('mountPath')}
+        >
           {intl.get('import.next')}
         </Button>
       </div>

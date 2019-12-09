@@ -99,6 +99,9 @@
     "setDstTip": "Set field's value as edge destination id",
     "setRank": "Set Rank",
     "setRankTip": "Set field's value as edge rank",
-    "ignore": "Ignore"
+    "ignore": "Ignore",
+    "edgeText": "Edge",
+    "vertexText": "Vertex",
+    "all": "All"
   }
 }

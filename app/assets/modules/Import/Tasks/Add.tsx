@@ -40,12 +40,18 @@ const FormItem = Form.Item;
 class Add extends React.PureComponent<IProps> {
   modalHandle;
 
+  getRelativeFiles = files => {
+    const { type } = this.props;
+
+    return files.filter(f => f.dataType === type || f.dataType === 'all');
+  };
+
   handleSubmit = () => {
     const { type, files } = this.props;
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const { fileIndex } = values;
-        const file = files.filter(f => f.dataType === type)[fileIndex];
+        const file = this.getRelativeFiles(files)[fileIndex];
         if (type === AddType.vertex) {
           this.props.newVertexConfig(file);
           this.modalHandle.hide();
@@ -92,13 +98,11 @@ class Add extends React.PureComponent<IProps> {
                 ],
               })(
                 <Select>
-                  {files
-                    .filter(file => file.dataType === type)
-                    .map((file, index) => (
-                      <Option value={index} key={file.name}>
-                        {file.name}
-                      </Option>
-                    ))}
+                  {this.getRelativeFiles(files).map((file, index) => (
+                    <Option value={index} key={file.name}>
+                      {file.name}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>

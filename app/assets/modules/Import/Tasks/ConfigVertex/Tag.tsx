@@ -127,7 +127,7 @@ class Tag extends React.Component<IProps> {
         ),
         dataIndex: 'useHash',
         render: (value, record, index) => {
-          if (record.setId) {
+          if (record.prop === 'vertexId') {
             return (
               <Select
                 value={value}

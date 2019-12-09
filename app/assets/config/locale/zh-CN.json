@@ -99,6 +99,9 @@
     "setDstTip": "将当前字段值作为终点",
     "setRank": "设为Rank",
     "setRankTip": "将当前字段值作为rank",
-    "ignore": "忽略"
+    "ignore": "忽略",
+    "edgeText": "边",
+    "vertexText": "点",
+    "all": "全部"
   }
 }

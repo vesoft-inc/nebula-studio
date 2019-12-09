@@ -36,7 +36,7 @@ interface IState {
 export const importData = createModel({
   state: {
     activeStep: 0,
-    currentStep: 5,
+    currentStep: 0,
     mountPath: '',
     files: [] as any[],
     vertexesConfig: [] as IVertexConfig[],
@@ -206,24 +206,33 @@ export const importData = createModel({
       };
     },
     nextStep: (state: IState, payload?: any) => {
-      const { activeStep } = state;
+      const { activeStep, currentStep } = state;
       switch (activeStep) {
         case 0:
           const { mountPath } = payload;
           return {
             ...state,
             activeStep: 1,
+            currentStep: currentStep > 1 ? currentStep : 1,
             mountPath,
           };
         case 1:
           return {
             ...state,
+            currentStep: currentStep > 2 ? currentStep : 2,
             activeStep: 2,
           };
         case 2:
           return {
             ...state,
+            currentStep: currentStep > 3 ? currentStep : 3,
             activeStep: 3,
+          };
+        case 3:
+          return {
+            ...state,
+            currentStep: currentStep > 4 ? currentStep : 4,
+            activeStep: 4,
           };
         case 4:
           return {

@@ -53,7 +53,7 @@ class Import extends React.Component<IProps> {
       .join('\n');
     file.path = `${mountPath}/${file.name}`;
     file.withHeader = false;
-    file.dataType = 'vertex';
+    file.dataType = 'all';
 
     return file;
   };
@@ -94,8 +94,9 @@ class Import extends React.Component<IProps> {
               value={file.dataType}
               onChange={type => this.handleTypeChange(type, file, index)}
             >
-              <Option value="vertex">Vertex</Option>
-              <Option value="edge">Edge</Option>
+              <Option value="all">{intl.get('import.all')}</Option>
+              <Option value="vertex">{intl.get('import.vertexText')}</Option>
+              <Option value="edge">{intl.get('import.edgeText')}</Option>
             </Select>
           );
         },
