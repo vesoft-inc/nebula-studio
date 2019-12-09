@@ -15,4 +15,11 @@ export const store = init({
 
 export type IStore = typeof store;
 export type IDispatch = RematchDispatch<typeof models>;
-export type IRootState = RematchRootState<typeof models>;
+interface ILoadingPlugin {
+  loading: {
+    models: RematchRootState<typeof models>;
+    // you can use effects here for getting async effect loading state
+    effects: IDispatch;
+  };
+}
+export type IRootState = RematchRootState<typeof models> & ILoadingPlugin;

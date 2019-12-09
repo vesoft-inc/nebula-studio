@@ -185,6 +185,21 @@ export const importData = createModel({
         activeEdgeIndex: newActiveEdgeIndex,
       };
     },
+
+    updateEdgeConfig: (state: IState, payload: any) => {
+      const { edgesConfig, activeEdgeIndex } = state;
+      const { props, edgeType } = payload;
+      const edge = edgesConfig[activeEdgeIndex];
+      edge.props = props;
+      edge.type = edgeType;
+
+      return {
+        ...state,
+        edgesConfig,
+      };
+    },
+
+    // just make new copy config to render
     refresh: (state: IState) => {
       return {
         ...state,
@@ -229,6 +244,56 @@ export const importData = createModel({
       })) as any;
       console.log(data, code);
     },
+    async asyncUpdateEdgeConfig(payload: {
+      host: string;
+      username: string;
+      password: string;
+      space: string;
+      edgeType: string;
+    }) {
+      const { host, username, password, edgeType, space } = payload;
+      const { code, data } = (await service.execNGQL({
+        host,
+        username,
+        password,
+        gql: `
+          use ${space};
+          DESCRIBE EDGE ${edgeType};
+        `,
+      })) as any;
+      if (code === '0') {
+        const props = data.tables.map(item => ({
+          prop: item.Field,
+          type: item.Type,
+          mapping: null,
+        }));
+
+        this.updateEdgeConfig({
+          props: [
+            // each edge must have the three special prop srcId, dstId, rank，put them ahead
+            {
+              prop: 'srcId',
+              type: 'int',
+              mapping: null,
+              useHash: 'unset',
+            },
+            {
+              prop: 'dstId',
+              type: 'int',
+              mapping: null,
+              useHash: 'unset',
+            },
+            {
+              prop: 'rank',
+              type: 'int',
+              mapping: null,
+            },
+            ...props,
+          ],
+          edgeType,
+        });
+      }
+    },
 
     async asyncUpdateTagConfig(payload: {
       host: string;
@@ -253,13 +318,21 @@ export const importData = createModel({
           prop: attr.Field,
           type: attr.Type,
           mapping: null,
-          setId: false,
-          idHash: 'unset',
+          useHash: 'unset',
         }));
         this.updateTagConfig({
+          props: [
+            // each vertex must have vertex id, put it ahead
+            {
+              prop: 'vertexId',
+              type: 'int',
+              mapping: null,
+              useHash: 'unset',
+            },
+            ...props,
+          ],
           tagIndex,
           tag,
-          props,
         });
       }
     },

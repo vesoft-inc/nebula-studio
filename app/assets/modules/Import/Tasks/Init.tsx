@@ -24,6 +24,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
     });
   },
   asyncGetTags: dispatch.nebula.asyncGetTags,
+  asyncGetEdgeTypes: dispatch.nebula.asyncGetEdgeTypes,
   nextStep: dispatch.importData.nextStep,
 });
 
@@ -52,6 +53,12 @@ class Init extends React.Component<IProps, {}> {
       if (!err && space && mountPath) {
         this.props.updateCurrentSpace(space);
         this.props.asyncGetTags({
+          username,
+          host,
+          password,
+          space,
+        });
+        this.props.asyncGetEdgeTypes({
           username,
           host,
           password,

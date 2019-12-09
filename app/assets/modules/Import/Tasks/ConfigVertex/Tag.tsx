@@ -1,9 +1,10 @@
-import { Button, Form, Icon, Radio, Select, Table, Tooltip } from 'antd';
+import { Button, Form, Icon, Select, Table, Tooltip } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
+import CSVPreviewLink from '#assets/components/CSVPreviewLink';
 import { IDispatch, IRootState } from '#assets/store';
 
 import './Tag.less';
@@ -14,11 +15,13 @@ const mapState = (state: IRootState) => {
 
   return {
     // each tag only one configed in per vertex
+    // hack: this will make the component render when state is set
     tags: _.difference(state.nebula.tags, vertex.tags.map(tag => tag.name)),
     host: state.nebula.host,
     username: state.nebula.username,
     password: state.nebula.password,
     currentSpace: state.nebula.currentSpace,
+    file: vertex.file,
   };
 };
 
@@ -63,15 +66,7 @@ class Tag extends React.Component<IProps> {
 
   handlePropChange = (index, field, value) => {
     const { data } = this.props;
-    switch (field) {
-      case 'idHash':
-        data.props[index].idHash = value;
-        break;
-      case 'setId':
-        data.props.forEach(prop => (prop.setId = false));
-        data.props[index].setId = true;
-        break;
-    }
+    data.props[index][field] = value;
 
     this.props.refresh();
   };
@@ -89,11 +84,12 @@ class Tag extends React.Component<IProps> {
 
   renderPropsTable = (props, tag) => {
     const render = this.renderTableTitle;
+    const { file } = this.props;
     const columns = [
       {
         title: render(
           intl.get('import.prop'),
-          intl.get('import.propTip', { tag }),
+          intl.get('import.propTip', { name: tag }),
         ),
         dataIndex: 'prop',
       },
@@ -103,7 +99,17 @@ class Tag extends React.Component<IProps> {
           intl.get('import.mappingTip'),
         ),
         dataIndex: 'mapping',
-        render: () => 1,
+        render: (mappingIndex, prop, propIndex) => (
+          <CSVPreviewLink
+            onMapping={columnIndex =>
+              this.handlePropChange(propIndex, 'mapping', columnIndex)
+            }
+            file={file}
+            prop={prop.field}
+          >
+            {mappingIndex || intl.get('import.ignore')}
+          </CSVPreviewLink>
+        ),
       },
       {
         title: render(intl.get('import.type'), intl.get('import.typeTip')),
@@ -116,26 +122,16 @@ class Tag extends React.Component<IProps> {
       },
       {
         title: render(
-          intl.get('import.setVertexId'),
-          intl.get('import.setVertexIdTip'),
+          intl.get('import.useHash'),
+          intl.get('import.useHashTip'),
         ),
-        dataIndex: 'setId',
-        render: (value, _, index) => (
-          <Radio
-            checked={value}
-            onChange={() => this.handlePropChange(index, 'setId', true)}
-          />
-        ),
-      },
-      {
-        title: render(intl.get('import.idHash'), intl.get('import.idHashTip')),
-        dataIndex: 'idHash',
+        dataIndex: 'useHash',
         render: (value, record, index) => {
           if (record.setId) {
             return (
               <Select
                 value={value}
-                onChange={v => this.handlePropChange(index, 'idHash', v)}
+                onChange={v => this.handlePropChange(index, 'useHash', v)}
               >
                 <Option value="unset">{intl.get('import.unset')}</Option>
                 <Option value="uuid">{intl.get('import.uuid')}</Option>
