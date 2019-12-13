@@ -82,7 +82,7 @@ class Edge extends React.Component<IProps> {
           intl.get('import.prop'),
           intl.get('import.propTip', { name: `Edge ${type}` }),
         ),
-        dataIndex: 'prop',
+        dataIndex: 'name',
       },
       {
         title: render(
@@ -118,8 +118,8 @@ class Edge extends React.Component<IProps> {
         ),
         dataIndex: 'useHash',
         render: (value, record, index) => {
-          const { prop } = record;
-          if (prop === 'srcId' || prop === 'dstId') {
+          const { name } = record;
+          if (name === 'srcId' || name === 'dstId') {
             return (
               <Select
                 value={value}

@@ -1,76 +1,83 @@
-.data-import {
-	display: flex;
-	flex-direction: column;
+.ant-spin-container,
+.spin-import {
+	display: block;
 	height: 100%;
-	padding: 16px;
-	background: #fff;
 
-	.import {
-		.imprt-btn {
-			height: 60px;
-
-			.ant-btn {
-				float: right;
-				height: 30px;
-				margin-top: 15px;
-			}
-		}
-
-		.import-log {
-			height: 900px;
-			overflow: auto;
-			padding: 10px 20px 20px;
-			font-size: 18px;
-			text-align: left;
-			background: #333;
-			color: #fff;
-		}
-
-		.import-again {
-			float: right;
-			margin-right: 20px;
-		}
-
-		.import-export {
-			margin-top: 30px;
-			font-size: 18px;
-			padding: 20px;
-
-			a {
-				line-height: 45px;
-			}
-		}
-	}
-
-	> .task {
-		position: relative;
+	.data-import {
+		display: flex;
+		flex-direction: column;
 		height: 100%;
-		padding-top: 24px;
-		padding-bottom: 50px;
+		padding: 16px;
+		background: #fff;
 
-		.props-table {
-			.ant-table-column-title .title-content .anticon-info-circle {
-				margin-left: 4px;
-				cursor: pointer;
+		.import {
+			.imprt-btn {
+				height: 60px;
+
+				.ant-btn {
+					float: right;
+					height: 30px;
+					margin-top: 15px;
+					margin-right: 20px;
+				}
 			}
 
+			.import-log {
+				height: 900px;
+				overflow: auto;
+				padding: 10px 20px 20px;
+				font-size: 18px;
+				text-align: left;
+				background: #333;
+				color: #fff;
+			}
 
-			th,
-			td {
-				text-align: center;
-				background: #f5fbff;
+			.import-again {
+				float: right;
+				margin-right: 20px;
+			}
 
-				> .ant-select {
-					width: 100px;
+			.import-export {
+				margin-top: 30px;
+				font-size: 18px;
+				padding: 20px;
+
+				a {
+					line-height: 45px;
 				}
 			}
 		}
 
-		> .next {
-			position: absolute;
-			width: 80px;
-			bottom: 16px;
-			right: 16px;
+		> .task {
+			position: relative;
+			height: 100%;
+			padding-top: 24px;
+			padding-bottom: 50px;
+
+			.props-table {
+				.ant-table-column-title .title-content .anticon-info-circle {
+					margin-left: 4px;
+					cursor: pointer;
+				}
+
+
+				th,
+				td {
+					text-align: center;
+					background: #f5fbff;
+
+					> .ant-select {
+						width: 100px;
+					}
+				}
+			}
+
+			> .next {
+				position: absolute;
+				width: 80px;
+				bottom: 16px;
+				right: 16px;
+			}
 		}
 	}
 }

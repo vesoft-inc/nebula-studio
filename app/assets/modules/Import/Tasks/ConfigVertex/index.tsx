@@ -1,12 +1,12 @@
 import { Button, Icon, Tabs } from 'antd';
 import React from 'react';
-import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
 import CSVPreviewLink from '#assets/components/CSVPreviewLink';
 import { IDispatch, IRootState } from '#assets/store';
 
 import Add, { AddType } from '../Add';
+import Next from '../Next';
 import './index.less';
 import TagList from './TagList';
 
@@ -32,12 +32,9 @@ const mapDispatch = (dispatch: IDispatch) => ({
       vertexName,
     });
   },
-  nextStep: dispatch.importData.nextStep,
 });
 
-interface IProps
-  extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {}
+type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
 
 class ConfigNode extends React.PureComponent<IProps> {
   handleTabClick = key => {
@@ -47,7 +44,6 @@ class ConfigNode extends React.PureComponent<IProps> {
 
   render() {
     const { vertexesConfig, activeVertexIndex } = this.props;
-
     return (
       <div className="vertex-config task">
         <div className="vertexes">
@@ -90,9 +86,7 @@ class ConfigNode extends React.PureComponent<IProps> {
             ))}
           </Tabs>
         </div>
-        <Button type="primary" className="next" onClick={this.props.nextStep}>
-          {intl.get('import.next')}
-        </Button>
+        <Next />
       </div>
     );
   }

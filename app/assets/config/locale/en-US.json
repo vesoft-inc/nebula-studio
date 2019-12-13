@@ -102,6 +102,8 @@
     "ignore": "Ignore",
     "edgeText": "Edge",
     "vertexText": "Vertex",
+    "createConfigError": "Create config file error",
+    "importErrorIfno": "Error importing data. Please check the configuration or data file",
     "all": "All"
   }
 }

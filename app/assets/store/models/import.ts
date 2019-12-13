@@ -31,6 +31,7 @@ interface IState {
   activeEdgeIndex: number;
   vertexAddCount: number;
   edgeAddCount: number;
+  isFinish: boolean;
 }
 
 export const importData = createModel({
@@ -45,6 +46,7 @@ export const importData = createModel({
     activeEdgeIndex: -1,
     vertexAddCount: 0,
     edgeAddCount: 0,
+    isFinish: true,
   },
   reducers: {
     update: (state: IState, payload: any) => {
@@ -245,14 +247,24 @@ export const importData = createModel({
     },
   },
   effects: {
-    async importData(payload: { config: string; localDir: string }) {
-      const { config, localDir } = payload;
-      const { data, code } = (await service.importData({
-        config,
-        localDir,
-      })) as any;
-      console.log(data, code);
+    async importData(payload: { localPath: string }) {
+      this.update({
+        isFinish: false,
+      });
+      const { localPath } = payload;
+      service.importData({
+        localPath,
+      });
     },
+
+    async testImport(payload: { localPath: string }) {
+      const { localPath } = payload;
+      const { code } = (await service.testImport({
+        localPath,
+      })) as any;
+      return code;
+    },
+
     async asyncUpdateEdgeConfig(payload: {
       host: string;
       username: string;
@@ -272,7 +284,7 @@ export const importData = createModel({
       })) as any;
       if (code === '0') {
         const props = data.tables.map(item => ({
-          prop: item.Field,
+          name: item.Field,
           type: item.Type,
           mapping: null,
         }));
@@ -281,25 +293,34 @@ export const importData = createModel({
           props: [
             // each edge must have the three special prop srcId, dstId, rank，put them ahead
             {
-              prop: 'srcId',
+              name: 'srcId',
               type: 'int',
               mapping: null,
               useHash: 'unset',
             },
             {
-              prop: 'dstId',
+              name: 'dstId',
               type: 'int',
               mapping: null,
               useHash: 'unset',
             },
             {
-              prop: 'rank',
+              name: 'rank',
               type: 'int',
               mapping: null,
             },
             ...props,
           ],
           edgeType,
+        });
+      }
+    },
+
+    async asyncCheckFinish() {
+      const result = await service.checkImportFinish();
+      if (result.data) {
+        this.update({
+          isFinish: true,
         });
       }
     },
@@ -324,7 +345,7 @@ export const importData = createModel({
       })) as any;
       if (code === '0') {
         const props = data.tables.map(attr => ({
-          prop: attr.Field,
+          name: attr.Field,
           type: attr.Type,
           mapping: null,
           useHash: 'unset',
@@ -333,7 +354,7 @@ export const importData = createModel({
           props: [
             // each vertex must have vertex id, put it ahead
             {
-              prop: 'vertexId',
+              name: 'vertexId',
               type: 'int',
               mapping: null,
               useHash: 'unset',

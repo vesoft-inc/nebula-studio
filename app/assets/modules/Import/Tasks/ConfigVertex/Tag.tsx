@@ -91,7 +91,7 @@ class Tag extends React.Component<IProps> {
           intl.get('import.prop'),
           intl.get('import.propTip', { name: tag }),
         ),
-        dataIndex: 'prop',
+        dataIndex: 'name',
       },
       {
         title: render(
@@ -127,7 +127,7 @@ class Tag extends React.Component<IProps> {
         ),
         dataIndex: 'useHash',
         render: (value, record, index) => {
-          if (record.prop === 'vertexId') {
+          if (record.name === 'vertexId') {
             return (
               <Select
                 value={value}

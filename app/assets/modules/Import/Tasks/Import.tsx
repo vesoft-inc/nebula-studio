@@ -1,4 +1,4 @@
-import { Button, Tabs } from 'antd';
+import { Button, message, Tabs } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
@@ -10,18 +10,26 @@ const { TabPane } = Tabs;
 const mapState = (state: any) => ({
   currentStep: state.importData.currentStep,
   importLoading: state.loading.effects.importData.importData,
+  mountPath: state.importData.mountPath,
+  isFinish: state.importData.isFinish,
+  vertexesConfig: state.importData.vertexesConfig,
+  edgesConfig: state.importData.edgesConfig,
+  currentSpace: state.nebula.currentSpace,
+  username: state.nebula.username,
+  password: state.nebula.password,
+  host: state.nebula.host,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
   importData: dispatch.importData.importData,
   nextStep: dispatch.importData.nextStep,
+  asyncCheckFinish: dispatch.importData.asyncCheckFinish,
 });
 
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
 
 interface IState {
   activeKey: string;
-  isFinish: boolean;
   startByte: number;
   endByte: number;
 }
@@ -35,37 +43,60 @@ class Import extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       activeKey: 'log',
-      isFinish: true,
       startByte: 0,
       endByte: 1000000,
     };
   }
 
+  componentDidMount() {
+    const {
+      currentSpace,
+      username,
+      password,
+      host,
+      vertexesConfig,
+      edgesConfig,
+      mountPath,
+      currentStep,
+    } = this.props;
+    service
+      .createConfigFile({
+        currentSpace,
+        username,
+        password,
+        host,
+        vertexesConfig,
+        edgesConfig,
+        mountPath,
+        currentStep,
+      })
+      .then((result: any) => {
+        if (result.code !== '0') {
+          message.error(intl.get('import.createConfigError'));
+        }
+      });
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.logTimer);
+    clearInterval(this.finishTimer);
+  }
+
   endImport = () => {
     service.deleteProcess();
-    this.setState({
-      isFinish: true,
-    });
   };
 
   handleRunImport = () => {
-    this.setState({
-      isFinish: false,
-    });
-    this.props.importData({
-      config: '/Users/lidanji/Vesoft/local/config.yaml',
-      localDir: '/Users/lidanji/Vesoft/local/',
-    });
+    const { mountPath } = this.props;
+    this.props.importData({ localPath: mountPath });
     this.logTimer = setTimeout(this.readlog, 1000);
-    this.finishTimer = setInterval(this.refresh, 1000);
+    this.finishTimer = setInterval(this.checkFinish, 1000);
   };
 
-  refresh = async () => {
-    const result = await service.refresh();
-    if (result.data) {
-      this.setState({
-        isFinish: true,
-      });
+  checkFinish = async () => {
+    const { isFinish, asyncCheckFinish } = this.props;
+    asyncCheckFinish();
+    if (isFinish) {
       clearInterval(this.finishTimer);
     }
   };
@@ -114,12 +145,24 @@ class Import extends React.Component<IProps, IState> {
   };
 
   render() {
-    const { activeKey, isFinish } = this.state;
+    const { isFinish, vertexesConfig, edgesConfig, mountPath } = this.props;
+    const { activeKey } = this.state;
     return (
       <div className="import">
         <div className="imprt-btn">
-          <Button onClick={this.handleRunImport}>
+          <Button
+            className="import-again"
+            onClick={this.handleRunImport}
+            disabled={!isFinish}
+          >
             {intl.get('import.runImport')}
+          </Button>
+          <Button
+            className="import-again"
+            onClick={this.endImport}
+            disabled={isFinish}
+          >
+            {intl.get('import.endImport')}
           </Button>
         </div>
         <Tabs activeKey={activeKey} size="large" onChange={this.handleTab}>
@@ -130,42 +173,55 @@ class Import extends React.Component<IProps, IState> {
             />
           </TabPane>
           <TabPane tab={intl.get('import.importResults')} key="export">
-            {!isFinish && (
-              <Button className="import-again" onClick={this.endImport}>
-                {intl.get('import.endImport')}
-              </Button>
-            )}
-            {isFinish && (
-              <Button className="import-again" onClick={this.props.nextStep}>
-                {intl.get('import.newImport')}
-              </Button>
-            )}
-            {isFinish && (
-              <Button className="import-again" onClick={this.handleAgainImport}>
-                {intl.get('import.againImport')}
-              </Button>
-            )}
+            <Button
+              className="import-again"
+              onClick={this.props.nextStep}
+              disabled={!isFinish}
+            >
+              {intl.get('import.newImport')}
+            </Button>
+            <Button
+              className="import-again"
+              onClick={this.handleAgainImport}
+              disabled={!isFinish}
+            >
+              {intl.get('import.againImport')}
+            </Button>
             <div className="import-export">
               <div>
-                配置文件（本地路径 /Users/lidanji/Vesoft/local/config.yaml ）：
-                <a href="file:///Users/lidanji/Vesoft/local/config.yaml">
-                  config.yml
-                </a>
+                配置文件：(/Users/lidanji/Vesoft/local/config.yaml) ：
+                <a href={`file://${mountPath}/config.yaml`}>config.yml</a>
               </div>
-              <div>
-                导入数据错误的节点文件（本地路径
-                /Users/lidanji/Vesoft/local/err/vertexFail.yaml ）：
-                <a href="file:///Users/lidanji/Vesoft/local/err/vertexFail.csv">
-                  vertexFail.csv
-                </a>
-              </div>
-              <div>
-                导入数据错误的边文件（本地路径
-                /Users/lidanji/Vesoft/local/err/edgeFail.yaml ）：
-                <a href="file:///Users/lidanji/Vesoft/local/err/edgeFail.csv">
-                  edgeFail.csv
-                </a>
-              </div>
+              {vertexesConfig.map(vertex => {
+                return (
+                  <div key={vertex.name}>
+                    <p>导入数据节点文件：</p>
+                    {`本地数据文件路径： ${
+                      vertex.file.path
+                    } 错误数据文件路径： ${mountPath}/err/${
+                      vertex.name
+                    }Fail.scv`}
+                    ：
+                    <a href={`file://${mountPath}/err/${vertex.name}Fail.scv`}>
+                      {vertex.name}
+                    </a>
+                  </div>
+                );
+              })}
+              {edgesConfig.map(edge => {
+                return (
+                  <div key={edge.name}>
+                    <p>导入数据边文件：</p>
+                    {`本地数据文件路径： ${
+                      edge.file.path
+                    } 错误数据文件路径： ${mountPath}/err/${edge.name}Fail.scv`}
+                    ：
+                    <a href={`file://${mountPath}/err/${edge.name}Fail.scv`}>
+                      {edge.name}
+                    </a>
+                  </div>
+                );
+              })}
             </div>
           </TabPane>
         </Tabs>

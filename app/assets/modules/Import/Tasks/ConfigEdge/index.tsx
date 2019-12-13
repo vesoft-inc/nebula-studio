@@ -1,12 +1,12 @@
 import { Button, Icon, Tabs } from 'antd';
 import React from 'react';
-import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
 import CSVPreviewLink from '#assets/components/CSVPreviewLink';
 import { IDispatch, IRootState } from '#assets/store';
 
 import Add, { AddType } from '../Add';
+import Next from '../Next';
 import Edge from './Edge';
 import './index.less';
 
@@ -83,9 +83,7 @@ class ConfigEdge extends React.Component<IProps> {
             ))}
           </Tabs>
         </div>
-        <Button className="next" type="primary">
-          {intl.get('import.next')}
-        </Button>
+        <Next />
       </div>
     );
   }
