@@ -82,6 +82,9 @@ export default class Import extends Service {
           type: edge.file.dataType,
           [edge.file.dataType]: {
             name: edge.type,
+            srcVID: edge.srcVID,
+            dstVID: edge.dstVID,
+            rank: edge.rank,
             withRanking: false,
             props: edgePorps,
           },
@@ -99,7 +102,8 @@ export default class Import extends Service {
         const propsArr = _.sortBy(tag.props, t => {
           return t.mapping;
         });
-        const porps = propsArr.map(prop => {
+        const props: any[] = [];
+        propsArr.forEach(prop => {
           if (prop.name === 'vertexId') {
             vertex.vid = {
               index: prop.mapping,
@@ -111,12 +115,12 @@ export default class Import extends Service {
               type: prop.type,
               index: prop.mapping,
             };
-            return _prop;
+            props.push(_prop);
           }
         });
         const _tag = {
           name: tag.name,
-          porps,
+          props,
         };
         return _tag;
       });
@@ -132,8 +136,8 @@ export default class Import extends Service {
         },
         schema: {
           type: vertex.file.dataType,
-          vid: vertex.vid,
           [vertex.file.dataType]: {
+            vid: vertex.vid,
             tags,
           },
         },
