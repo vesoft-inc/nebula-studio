@@ -21,15 +21,18 @@ const mapState = (state: IRootState) => {
     username: state.nebula.username,
     password: state.nebula.password,
     currentSpace: state.nebula.currentSpace,
-    file: vertex.file,
+    vertex,
   };
 };
 
-const mapDispatch = (dispatch: IDispatch) => ({
-  asyncUpdateTagConfig: dispatch.importData.asyncUpdateTagConfig,
-  refresh: dispatch.importData.refresh,
-  deleteTag: dispatch.importData.deleteTag,
-});
+const mapDispatch = (dispatch: IDispatch) => {
+  return {
+    asyncUpdateTagConfig: dispatch.importData.asyncUpdateTagConfig,
+    refresh: dispatch.importData.refresh,
+    deleteTag: dispatch.importData.deleteTag,
+    updateVertex: dispatch.importData.updateVertexConfig,
+  };
+};
 
 interface IProps
   extends ReturnType<typeof mapState>,
@@ -71,6 +74,15 @@ class Tag extends React.Component<IProps> {
     this.props.refresh();
   };
 
+  handleVertexChange = (key, value) => {
+    const { vertex } = this.props;
+    vertex[key] = value;
+
+    this.props.updateVertex({
+      ...vertex,
+    });
+  };
+
   renderTableTitle = (title, desc) => {
     return (
       <p className="title-content">
@@ -84,7 +96,7 @@ class Tag extends React.Component<IProps> {
 
   renderPropsTable = (props, tag) => {
     const render = this.renderTableTitle;
-    const { file } = this.props;
+    const { file } = this.props.vertex;
     const columns = [
       {
         title: render(
@@ -105,7 +117,58 @@ class Tag extends React.Component<IProps> {
               this.handlePropChange(propIndex, 'mapping', columnIndex)
             }
             file={file}
-            prop={prop.field}
+            prop={prop.name}
+          >
+            {mappingIndex || intl.get('import.ignore')}
+          </CSVPreviewLink>
+        ),
+      },
+      {
+        title: render(intl.get('import.type'), intl.get('import.typeTip')),
+        dataIndex: 'type',
+        render: value => (
+          <Select value={value} disabled={true}>
+            <Option value={value}>{value}</Option>
+          </Select>
+        ),
+      },
+    ];
+
+    return (
+      <Table
+        className="props-table"
+        dataSource={props}
+        columns={columns}
+        rowKey="name"
+        pagination={false}
+      />
+    );
+  };
+
+  renderIdConfig = () => {
+    const render = this.renderTableTitle;
+    const { vertex } = this.props;
+    const columns = [
+      {
+        title: render(
+          intl.get('import.prop'),
+          intl.get('import.propTip', { name: 'vertex' }),
+        ),
+        dataIndex: 'name',
+      },
+      {
+        title: render(
+          intl.get('import.mapping'),
+          intl.get('import.mappingTip'),
+        ),
+        dataIndex: 'idMapping',
+        render: (mappingIndex, prop) => (
+          <CSVPreviewLink
+            onMapping={columnIndex =>
+              this.handleVertexChange('idMapping', columnIndex)
+            }
+            file={vertex.file}
+            prop={prop.name}
           >
             {mappingIndex || intl.get('import.ignore')}
           </CSVPreviewLink>
@@ -126,32 +189,35 @@ class Tag extends React.Component<IProps> {
           intl.get('import.useHashTip'),
         ),
         dataIndex: 'useHash',
-        render: (value, record, index) => {
-          if (record.name === 'vertexId') {
-            return (
-              <Select
-                value={value}
-                onChange={v => this.handlePropChange(index, 'useHash', v)}
-              >
-                <Option value="unset">{intl.get('import.unset')}</Option>
-                <Option value="uuid">{intl.get('import.uuid')}</Option>
-                <Option value="hash">{intl.get('import.hash')}</Option>
-              </Select>
-            );
-          } else {
-            return '-';
-          }
+        render: value => {
+          return (
+            <Select
+              value={value}
+              onChange={v => this.handleVertexChange('useHash', v)}
+            >
+              <Option value="unset">{intl.get('import.unset')}</Option>
+              <Option value="uuid">{intl.get('import.uuid')}</Option>
+              <Option value="hash">{intl.get('import.hash')}</Option>
+            </Select>
+          );
         },
       },
     ];
 
     return (
       <Table
-        className="props-table"
-        dataSource={props}
+        className="id-config props-table"
         columns={columns}
-        rowKey="prop"
+        dataSource={[
+          {
+            name: 'vertexId',
+            type: 'int',
+            idMapping: vertex.idMapping,
+            useHash: vertex.useHash,
+          },
+        ]}
         pagination={false}
+        rowKey="name"
       />
     );
   };
@@ -161,6 +227,8 @@ class Tag extends React.Component<IProps> {
 
     return (
       <div className="tag-config">
+        {/* vertex id config need only once for each vertex file binding, we put it ahead */}
+        {index === 0 && this.renderIdConfig()}
         <h3>TAG{index}</h3>
         <div className="tag-operation">
           <FormItem className="left" label="TAG">

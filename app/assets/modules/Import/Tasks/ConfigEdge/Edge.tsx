@@ -143,7 +143,7 @@ class Edge extends React.Component<IProps> {
         loading={!!loading}
         dataSource={props}
         columns={columns}
-        rowKey="prop"
+        rowKey="name"
       />
     );
   };

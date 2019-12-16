@@ -11,6 +11,8 @@ interface IVertexConfig {
   name: string;
   file: any;
   tags: ITag[];
+  idMapping: any;
+  useHash: string;
 }
 
 interface IEdgeConfig {
@@ -63,12 +65,23 @@ export const importData = createModel({
         name: vertexName,
         file,
         tags: [],
+        idMapping: null,
+        useHash: 'unset',
       });
       return {
         ...state,
         vertexesConfig,
         activeVertexIndex: vertexesConfig.length - 1,
         vertexAddCount: vertexAddCount + 1,
+      };
+    },
+    updateVertexConfig: (state: IState, vertex: IVertexConfig) => {
+      const { activeVertexIndex, vertexesConfig } = state;
+      vertexesConfig[activeVertexIndex] = vertex;
+
+      return {
+        ...state,
+        vertexesConfig,
       };
     },
     deleteVertexConfig: (state: IState, payload: any) => {
@@ -352,16 +365,7 @@ export const importData = createModel({
           useHash: 'unset',
         }));
         this.updateTagConfig({
-          props: [
-            // each vertex must have vertex id, put it ahead
-            {
-              name: 'vertexId',
-              type: 'int',
-              mapping: null,
-              useHash: 'unset',
-            },
-            ...props,
-          ],
+          props,
           tagIndex,
           tag,
         });

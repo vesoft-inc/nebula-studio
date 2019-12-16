@@ -100,25 +100,15 @@ export default class Import extends Service {
     const limit = currentStep === 2 || currentStep === 3 ? 10 : undefined;
     const files = config.map(vertex => {
       const tags = vertex.tags.map(tag => {
-        const propsArr = _.sortBy(tag.props, t => {
-          return t.mapping;
-        });
-        const props: any[] = [];
-        propsArr.forEach(prop => {
-          if (prop.name === 'vertexId') {
-            vertex.vid = {
-              index: prop.mapping,
-              function: prop.useHash,
-            };
-          } else {
-            const _prop = {
-              name: prop.name,
-              type: prop.type,
-              index: prop.mapping,
-            };
-            props.push(_prop);
-          }
-        });
+        const props = tag.props
+          .sort((p1, p2) => {
+            return p1.mapping - p2.mapping;
+          })
+          .map(prop => ({
+            name: prop.name,
+            type: prop.type,
+            index: prop.mapping,
+          }));
         const _tag = {
           name: tag.name,
           props,
@@ -138,7 +128,10 @@ export default class Import extends Service {
         schema: {
           type: 'vertex',
           vertex: {
-            vid: vertex.vid,
+            vid: {
+              index: vertex.idMapping,
+              function: vertex.useHash,
+            },
             tags,
           },
         },
