@@ -79,7 +79,7 @@ class Import extends React.Component<IProps, IState> {
 
   componentWillUnmount() {
     clearTimeout(this.logTimer);
-    clearInterval(this.finishTimer);
+    clearTimeout(this.finishTimer);
   }
 
   endImport = () => {
@@ -90,21 +90,24 @@ class Import extends React.Component<IProps, IState> {
     const { mountPath } = this.props;
     this.props.importData({ localPath: mountPath });
     this.logTimer = setTimeout(this.readlog, 1000);
-    this.finishTimer = setInterval(this.checkFinish, 1000);
+    this.finishTimer = setTimeout(this.checkFinish, 1000);
   };
 
   checkFinish = async () => {
-    const { isFinish, asyncCheckFinish } = this.props;
-    asyncCheckFinish();
-    if (isFinish) {
-      clearInterval(this.finishTimer);
+    const { asyncCheckFinish } = this.props;
+    const result: any = await asyncCheckFinish();
+    if (result.data) {
+      clearTimeout(this.finishTimer);
+    } else {
+      this.finishTimer = setTimeout(this.checkFinish, 1000);
     }
   };
 
   readlog = async () => {
     const { startByte, endByte } = this.state;
+    const { mountPath } = this.props;
     const result: any = await service.getLog({
-      dir: '/Users/lidanji/Vesoft/local/',
+      dir: mountPath,
       startByte,
       endByte,
     });
