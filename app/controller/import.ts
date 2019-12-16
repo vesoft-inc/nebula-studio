@@ -13,14 +13,14 @@ export default class ImportController extends Controller {
     importProcess = exec(
       'docker run --rm --network=host  -v ' +
         localPath +
-        '/config.yaml:' +
+        '/tmp/config.yaml:' +
         localPath +
-        '/config.yaml -v ' +
+        '/tmp/config.yaml -v ' +
         localPath +
         ':/root ' +
         ' vesoft/nebula-importer --config ' +
         localPath +
-        '/config.yaml',
+        '/tmp/config.yaml',
       {
         cwd: '../nebula-importer',
         maxBuffer: 1024 * 1024 * 1024,
@@ -73,23 +73,23 @@ export default class ImportController extends Controller {
     let readStream: any;
     let code: string = '0';
     try {
-      readStream = fs.createReadStream(dir + 'err/import.log', {
+      readStream = fs.createReadStream(dir + '/tmp/import.log', {
         start: Number(startByte),
         end: Number(endByte),
         encoding: 'utf8',
       });
+      data = await new Promise(resolve => {
+        let _data: any;
+        readStream.on('data', chunk => {
+          _data = chunk.toString();
+        });
+        readStream.on('end', () => {
+          resolve(_data);
+        });
+      });
     } catch (e) {
       data = 'read file error';
     }
-    data = await new Promise(resolve => {
-      let _data: any;
-      readStream.on('data', chunk => {
-        _data = chunk.toString();
-      });
-      readStream.on('end', () => {
-        resolve(_data);
-      });
-    });
     if (!data && isFinish) {
       code = '-1';
     }
@@ -135,12 +135,12 @@ export default class ImportController extends Controller {
           address: host,
         },
       },
-      logPath: './err/import.log',
+      logPath: './tmp/import.log',
       files,
     };
     const content = JSON.stringify(configJson, null, 2);
     const { message, code } = await ctx.service.import.writeFile(
-      mountPath + '/config.yaml',
+      mountPath + '/tmp/config.yaml',
       content,
     );
     ctx.response.body = {

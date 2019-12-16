@@ -49,7 +49,11 @@ class Init extends React.Component<IProps, {}> {
 
   handleNext = () => {
     this.props.form.validateFields((err, values: any) => {
-      const { space, mountPath } = values;
+      let { mountPath } = values;
+      const { space } = values;
+      if (mountPath.endsWith('/')) {
+        mountPath = mountPath.substring(0, mountPath.length - 1);
+      }
       const { username, host, password } = this.props;
       if (!err && space && mountPath) {
         this.props.updateCurrentSpace(space);

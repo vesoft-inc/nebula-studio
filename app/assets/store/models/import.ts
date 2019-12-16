@@ -323,6 +323,7 @@ export const importData = createModel({
           isFinish: true,
         });
       }
+      return result;
     },
 
     async asyncUpdateTagConfig(payload: {

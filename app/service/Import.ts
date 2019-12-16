@@ -15,14 +15,14 @@ export default class Import extends Service {
     const data = await exec(
       'docker run --rm --network=host  -v ' +
         path +
-        '/config.yaml:' +
+        '/tmp/config.yaml:' +
         path +
-        '/config.yaml -v ' +
+        '/tmp/config.yaml -v ' +
         path +
         ':/root ' +
         ' vesoft/nebula-importer --config ' +
         path +
-        '/config.yaml',
+        '/tmp/config.yaml',
       {
         cwd: '../nebula-importer',
         maxBuffer: 1024 * 1024 * 1024,
@@ -64,13 +64,14 @@ export default class Import extends Service {
             const _prop = {
               name: prop.name,
               type: prop.type,
+              index: prop.mapping,
             };
             edgePorps.push(_prop);
         }
       });
       const edgeConfig = {
         path: `./${edge.file.name}`,
-        failDataPath: `./err/${edge.name}Fail.scv`,
+        failDataPath: `./tmp/err/${edge.name}Fail.scv`,
         batchSize: 10,
         limit,
         type: 'csv',
@@ -79,8 +80,8 @@ export default class Import extends Service {
           withLabel: false,
         },
         schema: {
-          type: edge.file.dataType,
-          [edge.file.dataType]: {
+          type: 'edge',
+          edge: {
             name: edge.type,
             srcVID: edge.srcVID,
             dstVID: edge.dstVID,
@@ -126,7 +127,7 @@ export default class Import extends Service {
       });
       const vertexConfig = {
         path: `./${vertex.file.name}`,
-        failDataPath: `./err/${vertex.name}Fail.scv`,
+        failDataPath: `./tmp/err/${vertex.name}Fail.scv`,
         batchSize: 10,
         limit,
         type: 'csv',
@@ -135,8 +136,8 @@ export default class Import extends Service {
           withLabel: false,
         },
         schema: {
-          type: vertex.file.dataType,
-          [vertex.file.dataType]: {
+          type: 'vertex',
+          vertex: {
             vid: vertex.vid,
             tags,
           },
