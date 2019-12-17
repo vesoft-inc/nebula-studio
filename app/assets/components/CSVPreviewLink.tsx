@@ -32,7 +32,7 @@ class CSVPreviewLink extends React.PureComponent<IProps> {
     const csvData = content.split('\n').map(row => row.split(','));
     const columns = csvData.length
       ? csvData[0].map((_, index) => {
-          const textIndex = index + 1;
+          const textIndex = index;
           return {
             title: onMapping ? (
               <>

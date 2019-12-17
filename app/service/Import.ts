@@ -10,33 +10,24 @@ import util from 'util';
 export default class Import extends Service {
   async importTest(path: string) {
     const exec = util.promisify(child_process.exec);
-    let code = '0';
-    let message = '';
+    let code = '-1';
+    let message = 'import error';
     const data = await exec(
-      'docker run --rm --network=host  -v ' +
-        path +
-        '/tmp/config.yaml:' +
-        path +
-        '/tmp/config.yaml -v ' +
-        path +
-        ':/root ' +
-        ' vesoft/nebula-importer --config ' +
-        path +
-        '/tmp/config.yaml',
+      './nebula-importer --config ' + path + '/tmp/config.yaml',
       {
         cwd: '../nebula-importer',
         maxBuffer: 1024 * 1024 * 1024,
       },
     );
-    if (data.stderr) {
-      code = '-1';
-      message = 'import error';
+    if (!!data.stdout) {
+      code = '0';
+      message = '';
     }
     return { code, message };
   }
 
-  async edgeDataToJSON(config: any, currentStep: number) {
-    const limit = currentStep === 2 || currentStep === 3 ? 10 : undefined;
+  async edgeDataToJSON(config: any, activeStep: number, mountPath: string) {
+    const limit = activeStep === 2 || activeStep === 3 ? 10 : undefined;
     const files = config.map(edge => {
       const edgePorps: any[] = [];
       _.sortBy(edge.props, t => {
@@ -70,8 +61,8 @@ export default class Import extends Service {
         }
       });
       const edgeConfig = {
-        path: `./${edge.file.name}`,
-        failDataPath: `./tmp/err/${edge.name}Fail.scv`,
+        path: edge.file.path,
+        failDataPath: `${mountPath}/tmp//err/${edge.name}Fail.scv`,
         batchSize: 10,
         limit,
         type: 'csv',
@@ -96,8 +87,8 @@ export default class Import extends Service {
     return files;
   }
 
-  async vertexDataToJSON(config: any, currentStep: number) {
-    const limit = currentStep === 2 || currentStep === 3 ? 10 : undefined;
+  async vertexDataToJSON(config: any, activeStep: number, mountPath: string) {
+    const limit = activeStep === 2 || activeStep === 3 ? 10 : undefined;
     const files = config.map(vertex => {
       const tags = vertex.tags.map(tag => {
         const props = tag.props
@@ -116,8 +107,8 @@ export default class Import extends Service {
         return _tag;
       });
       const vertexConfig = {
-        path: `./${vertex.file.name}`,
-        failDataPath: `./tmp/err/${vertex.name}Fail.scv`,
+        path: vertex.file.path,
+        failDataPath: `${mountPath}/tmp/err/${vertex.name}Fail.scv`,
         batchSize: 10,
         limit,
         type: 'csv',

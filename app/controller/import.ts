@@ -11,22 +11,10 @@ export default class ImportController extends Controller {
     const { localPath } = ctx.request.body;
     isFinish = false;
     importProcess = exec(
-      'docker run --rm --network=host  -v ' +
-        localPath +
-        '/tmp/config.yaml:' +
-        localPath +
-        '/tmp/config.yaml -v ' +
-        localPath +
-        ':/root ' +
-        ' vesoft/nebula-importer --config ' +
-        localPath +
-        '/tmp/config.yaml',
+      './nebula-importer --config ' + localPath + '/tmp/config.yaml',
       {
         cwd: '../nebula-importer',
         maxBuffer: 1024 * 1024 * 1024,
-      },
-      () => {
-        isFinish = true;
       },
     );
     ctx.response.body = {
@@ -50,6 +38,7 @@ export default class ImportController extends Controller {
   async killProcesss() {
     const { ctx } = this;
     importProcess.kill();
+    isFinish = true;
     ctx.response.body = {
       message: '',
       data: [],
@@ -101,6 +90,16 @@ export default class ImportController extends Controller {
     };
   }
 
+  async callback() {
+    const { ctx } = this;
+    isFinish = true;
+    ctx.response.body = {
+      message: '',
+      data: '',
+      code: '0',
+    };
+  }
+
   async createConfigFile() {
     const { ctx } = this;
     const {
@@ -111,15 +110,17 @@ export default class ImportController extends Controller {
       vertexesConfig,
       edgesConfig,
       mountPath,
-      currentStep,
+      activeStep,
     } = ctx.request.body;
     const vertexToJSON = await ctx.service.import.vertexDataToJSON(
       vertexesConfig,
-      currentStep,
+      activeStep,
+      mountPath,
     );
     const edgeToJSON = await ctx.service.import.edgeDataToJSON(
       edgesConfig,
-      currentStep,
+      activeStep,
+      mountPath,
     );
     const files: any[] = [...vertexToJSON, ...edgeToJSON];
     const configJson = {
@@ -135,7 +136,11 @@ export default class ImportController extends Controller {
           address: host,
         },
       },
-      logPath: './tmp/import.log',
+      httpSettings: {
+        port: 5699,
+        callback: 'http://localhost:7002/api/import/finish',
+      },
+      logPath: mountPath + '/tmp/import.log',
       files,
     };
     const content = JSON.stringify(configJson, null, 2);

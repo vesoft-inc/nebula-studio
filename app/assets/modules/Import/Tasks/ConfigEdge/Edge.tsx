@@ -98,7 +98,7 @@ class Edge extends React.Component<IProps> {
               this.handlePropChange(propIndex, 'mapping', columnIndex)
             }
           >
-            {mappingIndex || intl.get('import.ignore')}
+            {mappingIndex === null ? intl.get('import.ignore') : mappingIndex}
           </CSVPreviewLink>
         ),
       },

@@ -119,7 +119,7 @@ class Tag extends React.Component<IProps> {
             file={file}
             prop={prop.name}
           >
-            {mappingIndex || intl.get('import.ignore')}
+            {mappingIndex === null ? intl.get('import.ignore') : mappingIndex}
           </CSVPreviewLink>
         ),
       },
@@ -170,7 +170,7 @@ class Tag extends React.Component<IProps> {
             file={vertex.file}
             prop={prop.name}
           >
-            {mappingIndex || intl.get('import.ignore')}
+            {mappingIndex === null ? intl.get('import.ignore') : mappingIndex}
           </CSVPreviewLink>
         ),
       },

@@ -8,7 +8,7 @@ import { IDispatch } from '#assets/store';
 
 const { TabPane } = Tabs;
 const mapState = (state: any) => ({
-  currentStep: state.importData.currentStep,
+  activeStep: state.importData.activeStep,
   importLoading: state.loading.effects.importData.importData,
   mountPath: state.importData.mountPath,
   isFinish: state.importData.isFinish,
@@ -57,7 +57,7 @@ class Import extends React.Component<IProps, IState> {
       vertexesConfig,
       edgesConfig,
       mountPath,
-      currentStep,
+      activeStep,
     } = this.props;
     service
       .createConfigFile({
@@ -68,7 +68,7 @@ class Import extends React.Component<IProps, IState> {
         vertexesConfig,
         edgesConfig,
         mountPath,
-        currentStep,
+        activeStep,
       })
       .then((result: any) => {
         if (result.code !== '0') {

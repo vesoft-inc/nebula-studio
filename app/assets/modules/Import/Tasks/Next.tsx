@@ -11,7 +11,7 @@ const mapState = (state: IRootState) => ({
   vertexesConfig: state.importData.vertexesConfig,
   edgesConfig: state.importData.edgesConfig,
   mountPath: state.importData.mountPath,
-  currentStep: state.importData.currentStep,
+  activeStep: state.importData.activeStep,
   currentSpace: state.nebula.currentSpace,
   username: state.nebula.username,
   password: state.nebula.password,
@@ -41,7 +41,7 @@ class Next extends React.Component<IProps> {
       vertexesConfig,
       edgesConfig,
       mountPath,
-      currentStep,
+      activeStep,
     } = this.props;
     const result: any = await service.createConfigFile({
       currentSpace,
@@ -51,7 +51,7 @@ class Next extends React.Component<IProps> {
       vertexesConfig,
       edgesConfig,
       mountPath,
-      currentStep,
+      activeStep,
     });
     if (result.code === '0') {
       const code: any = await this.props.testImport({ localPath: mountPath });
