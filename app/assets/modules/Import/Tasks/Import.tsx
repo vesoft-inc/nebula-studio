@@ -22,7 +22,7 @@ const mapState = (state: any) => ({
 
 const mapDispatch = (dispatch: IDispatch) => ({
   importData: dispatch.importData.importData,
-  nextStep: dispatch.importData.nextStep,
+  resetAllConfig: dispatch.importData.resetAllConfig,
   asyncCheckFinish: dispatch.importData.asyncCheckFinish,
 });
 
@@ -178,7 +178,7 @@ class Import extends React.Component<IProps, IState> {
           <TabPane tab={intl.get('import.importResults')} key="export">
             <Button
               className="import-again"
-              onClick={this.props.nextStep}
+              onClick={this.props.resetAllConfig}
               disabled={!isFinish}
             >
               {intl.get('import.newImport')}

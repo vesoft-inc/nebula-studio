@@ -103,7 +103,8 @@
     "edgeText": "边",
     "vertexText": "点",
     "createConfigError": "创建配置文件错误",
-    "importErrorIfno": "导入数据错误，请检查配置或数据文件",
+    "importErrorInfo": "导入数据错误，请检查配置或数据文件",
+    "clearAllConfigInfo": "是否确定清空所以配置？",
     "all": "全部"
   }
 }

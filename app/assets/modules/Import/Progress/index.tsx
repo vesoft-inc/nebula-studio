@@ -1,4 +1,4 @@
-import { Steps } from 'antd';
+import { Icon, Popconfirm, Steps } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
@@ -18,6 +18,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
       activeStep: step,
     });
   },
+  resetAllConfig: dispatch.importData.resetAllConfig,
 });
 
 interface IProps
@@ -53,19 +54,30 @@ class Progress extends React.Component<IProps, {}> {
     const { currentStep, activeStep } = this.props;
 
     return (
-      <Steps
-        type="navigation"
-        onChange={this.handleSwitchStep}
-        current={activeStep}
-      >
-        {steps.map((step, index) => (
-          <Step
-            title={step.title}
-            key={index}
-            status={index <= currentStep ? 'finish' : 'wait'}
-          />
-        ))}
-      </Steps>
+      <div className="nav-import">
+        <Steps
+          type="navigation"
+          onChange={this.handleSwitchStep}
+          current={activeStep}
+        >
+          {steps.map((step, index) => (
+            <Step
+              title={step.title}
+              key={index}
+              status={index <= currentStep ? 'finish' : 'wait'}
+            />
+          ))}
+        </Steps>
+        <Popconfirm
+          placement="left"
+          title={intl.get('import.clearAllConfigInfo')}
+          onConfirm={this.props.resetAllConfig}
+          okText="Yes"
+          cancelText="No"
+        >
+          <Icon type="delete" className="rest-import" />
+        </Popconfirm>
+      </div>
     );
   }
 }

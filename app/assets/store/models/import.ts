@@ -260,6 +260,21 @@ export const importData = createModel({
     },
   },
   effects: {
+    async resetAllConfig() {
+      this.update({
+        activeStep: 0,
+        currentStep: 0,
+        mountPath: '',
+        files: [] as any[],
+        vertexesConfig: [] as IVertexConfig[],
+        edgesConfig: [] as IEdgeConfig[],
+        activeVertexIndex: -1,
+        activeEdgeIndex: -1,
+        vertexAddCount: 0,
+        edgeAddCount: 0,
+        isFinish: true,
+      });
+    },
     async importData(payload: { localPath: string }) {
       this.update({
         isFinish: false,

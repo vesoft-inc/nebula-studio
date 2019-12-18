@@ -7,6 +7,7 @@ let importProcess: any;
 
 export default class ImportController extends Controller {
   async import() {
+    // rely on nebula-importer in the peer directory
     const { ctx } = this;
     const { localPath } = ctx.request.body;
     isFinish = false;

@@ -58,7 +58,7 @@ class Next extends React.Component<IProps> {
       if (code === '0') {
         this.props.nextStep();
       } else {
-        message.error(intl.get('import.importErrorIfno'));
+        message.error(intl.get('import.importErrorInfo'));
       }
     } else {
       message.error(intl.get('import.createConfigError'));

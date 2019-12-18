@@ -14,6 +14,7 @@ const mapState = (state: IRootState) => ({
   password: state.nebula.password,
   spaces: state.nebula.spaces,
   currentSpace: state.nebula.currentSpace,
+  currentStep: state.importData.currentStep,
   mountPath: state.importData.mountPath,
 });
 
@@ -80,10 +81,10 @@ class Init extends React.Component<IProps, {}> {
     const {
       spaces,
       currentSpace,
+      currentStep,
       mountPath,
       form: { getFieldDecorator, getFieldValue },
     } = this.props;
-
     return (
       <div className="init task">
         <Form layout="inline">
@@ -96,7 +97,7 @@ class Init extends React.Component<IProps, {}> {
                 },
               ],
             })(
-              <Select>
+              <Select disabled={currentStep > 0}>
                 {spaces.map(space => (
                   <Option value={space} key={space}>
                     {space}

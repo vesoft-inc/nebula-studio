@@ -103,7 +103,8 @@
     "edgeText": "Edge",
     "vertexText": "Vertex",
     "createConfigError": "Create config file error",
-    "importErrorIfno": "Error importing data. Please check the configuration or data file",
+    "importErrorInfo": "Error importing data. Please check the configuration or data file",
+    "clearoAllConfigInfo": "Confirm to clear all config？",
     "all": "All"
   }
 }
