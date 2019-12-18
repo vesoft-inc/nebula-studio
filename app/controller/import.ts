@@ -38,7 +38,10 @@ export default class ImportController extends Controller {
 
   async killProcesss() {
     const { ctx } = this;
-    importProcess.kill();
+    const code = await ctx.service.import.stopImport();
+    if (code === '-1') {
+      importProcess.kill();
+    }
     isFinish = true;
     ctx.response.body = {
       message: '',

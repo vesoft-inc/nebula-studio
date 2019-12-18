@@ -2,6 +2,7 @@ import child_process from 'child_process';
 import { Service } from 'egg';
 import fs from 'fs';
 import _ from 'lodash';
+import request from 'request';
 import util from 'util';
 
 /**
@@ -26,6 +27,26 @@ export default class Import extends Service {
     return { code, message };
   }
 
+  async stopImport() {
+    let code: string = '-1';
+    request(
+      {
+        url: 'http://localhost:5699/stop',
+        method: 'post',
+        json: true,
+        headers: {
+          'content-type': 'application/json',
+        },
+      },
+      (error, response, body) => {
+        if (!error && response.statusCode === 200 && body === 'OK') {
+          code = '0';
+        }
+      },
+    );
+    return code;
+  }
+
   async edgeDataToJSON(config: any, activeStep: number, mountPath: string) {
     const limit = activeStep === 2 || activeStep === 3 ? 10 : undefined;
     const files = config.map(edge => {
@@ -42,13 +63,13 @@ export default class Import extends Service {
           case 'srcId':
             edge.srcVID = {
               index: prop.mapping,
-              function: prop.useHash,
+              function: prop.useHash === 'unset' ? undefined : prop.useHash,
             };
             break;
           case 'dstId':
             edge.dstVID = {
               index: prop.mapping,
-              function: prop.useHash,
+              function: prop.useHash === 'unset' ? undefined : prop.useHash,
             };
             break;
           default:
@@ -121,7 +142,7 @@ export default class Import extends Service {
           vertex: {
             vid: {
               index: vertex.idMapping,
-              function: vertex.useHash,
+              function: vertex.useHash === 'unset' ? undefined : vertex.useHash,
             },
             tags,
           },
