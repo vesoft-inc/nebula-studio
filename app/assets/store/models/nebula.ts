@@ -9,6 +9,7 @@ interface IState {
   spaces: string[];
   currentSpace: string;
   edgeTypes: string[];
+  port: string;
   host: string;
   username: string;
   password: string;
@@ -20,6 +21,7 @@ export const nebula = createModel({
     host: cookies.get('host'),
     username: cookies.get('username'),
     password: cookies.get('password'),
+    port: window.location.port,
     currentSpace: '',
     edgeTypes: [],
     tags: [],

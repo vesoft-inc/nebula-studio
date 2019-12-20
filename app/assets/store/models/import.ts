@@ -285,6 +285,13 @@ export const importData = createModel({
       });
     },
 
+    async stopImport() {
+      this.update({
+        isFinish: true,
+      });
+      service.deleteProcess();
+    },
+
     async testImport(payload: { localPath: string }) {
       const { localPath } = payload;
       const { code } = (await service.testImport({

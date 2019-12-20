@@ -7,14 +7,13 @@ let importProcess: any;
 
 export default class ImportController extends Controller {
   async import() {
-    // rely on nebula-importer in the peer directory
     const { ctx } = this;
     const { localPath } = ctx.request.body;
     isFinish = false;
     importProcess = exec(
       './nebula-importer --config ' + localPath + '/tmp/config.yaml',
       {
-        cwd: '../nebula-importer',
+        cwd: '../nebula-importer', // rely on nebula-importer in the peer directory
         maxBuffer: 1024 * 1024 * 1024,
       },
     );
@@ -39,10 +38,10 @@ export default class ImportController extends Controller {
   async killProcesss() {
     const { ctx } = this;
     const code = await ctx.service.import.stopImport();
+    isFinish = true;
     if (code === '-1') {
       importProcess.kill();
     }
-    isFinish = true;
     ctx.response.body = {
       message: '',
       data: [],
@@ -61,29 +60,15 @@ export default class ImportController extends Controller {
 
   async readLog() {
     const { ctx } = this;
-    const { startByte, endByte, dir } = ctx.query;
+    const { dir } = ctx.query;
     let data: any;
-    let readStream: any;
     let code: string = '0';
     try {
-      readStream = fs.createReadStream(dir + '/tmp/import.log', {
-        start: Number(startByte),
-        end: Number(endByte),
-        encoding: 'utf8',
-      });
-      data = await new Promise(resolve => {
-        let _data: any;
-        readStream.on('data', chunk => {
-          _data = chunk.toString();
-        });
-        readStream.on('end', () => {
-          resolve(_data);
-        });
-      });
+      data = fs.readFileSync(dir + '/tmp/import.log', 'utf8');
     } catch (e) {
       data = 'read file error';
     }
-    if (!data && isFinish) {
+    if (isFinish) {
       code = '-1';
     }
     const log = data ? data.replace(/\n/g, '<br />') : '';
@@ -96,7 +81,9 @@ export default class ImportController extends Controller {
 
   async callback() {
     const { ctx } = this;
-    isFinish = true;
+    setTimeout(() => {
+      isFinish = true;
+    }, 2000); // log reading interval 2000ms
     ctx.response.body = {
       message: '',
       data: '',
@@ -115,6 +102,7 @@ export default class ImportController extends Controller {
       edgesConfig,
       mountPath,
       activeStep,
+      port,
     } = ctx.request.body;
     const vertexToJSON = await ctx.service.import.vertexDataToJSON(
       vertexesConfig,
@@ -142,7 +130,7 @@ export default class ImportController extends Controller {
       },
       httpSettings: {
         port: 5699,
-        callback: 'http://localhost:7002/api/import/finish',
+        callback: `http://localhost:${port}/api/import/finish`,
       },
       logPath: mountPath + '/tmp/import.log',
       files,

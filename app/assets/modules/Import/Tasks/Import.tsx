@@ -24,14 +24,13 @@ const mapDispatch = (dispatch: IDispatch) => ({
   importData: dispatch.importData.importData,
   resetAllConfig: dispatch.importData.resetAllConfig,
   asyncCheckFinish: dispatch.importData.asyncCheckFinish,
+  stopImport: dispatch.importData.stopImport,
 });
 
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
 
 interface IState {
   activeKey: string;
-  startByte: number;
-  endByte: number;
 }
 
 class Import extends React.Component<IProps, IState> {
@@ -43,8 +42,6 @@ class Import extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       activeKey: 'log',
-      startByte: 0,
-      endByte: 1000000,
     };
   }
 
@@ -82,14 +79,10 @@ class Import extends React.Component<IProps, IState> {
     clearTimeout(this.finishTimer);
   }
 
-  endImport = () => {
-    service.deleteProcess();
-  };
-
   handleRunImport = () => {
     const { mountPath } = this.props;
     this.props.importData({ localPath: mountPath });
-    this.logTimer = setTimeout(this.readlog, 1000);
+    this.logTimer = setTimeout(this.readlog, 2000);
     this.finishTimer = setTimeout(this.checkFinish, 1000);
   };
 
@@ -104,34 +97,15 @@ class Import extends React.Component<IProps, IState> {
   };
 
   readlog = async () => {
-    const { startByte, endByte } = this.state;
     const { mountPath } = this.props;
     const result: any = await service.getLog({
       dir: mountPath,
-      startByte,
-      endByte,
     });
-    if (result.data && result.code === '0') {
-      this.setState(
-        {
-          startByte: endByte,
-          endByte: endByte + 1000000,
-        },
-        () => {
-          this.logTimer = setTimeout(this.readlog, 1000);
-        },
-      );
+    if (result.code === '0') {
+      this.logTimer = setTimeout(this.readlog, 2000);
       this.ref.innerHTML = result.data;
     } else {
-      if (result.code === '0') {
-        this.logTimer = setTimeout(this.readlog, 1000);
-      } else {
-        this.setState({
-          startByte: 0,
-          endByte: 1000000,
-        });
-        clearTimeout(this.logTimer);
-      }
+      clearTimeout(this.logTimer);
     }
     this.ref.scrollTop = this.ref.scrollHeight;
   };
@@ -162,7 +136,7 @@ class Import extends React.Component<IProps, IState> {
           </Button>
           <Button
             className="import-again"
-            onClick={this.endImport}
+            onClick={this.props.stopImport}
             disabled={isFinish}
           >
             {intl.get('import.endImport')}
@@ -192,8 +166,8 @@ class Import extends React.Component<IProps, IState> {
             </Button>
             <div className="import-export">
               <div>
-                配置文件：(/Users/lidanji/Vesoft/local/config.yaml) ：
-                <a href={`file://${mountPath}/config.yaml`}>config.yml</a>
+                配置文件：({`${mountPath}/tmp/config.yaml`}) ：
+                <a href={`file://${mountPath}/tmp/config.yaml`}>config.yml</a>
               </div>
               {vertexesConfig.map(vertex => {
                 return (
@@ -201,11 +175,15 @@ class Import extends React.Component<IProps, IState> {
                     <p>导入数据节点文件：</p>
                     {`本地数据文件路径： ${
                       vertex.file.path
-                    } 错误数据文件路径： ${mountPath}/err/${
+                    };  错误数据文件路径： ${mountPath}/tmp/err/${
                       vertex.name
                     }Fail.scv`}
                     ：
-                    <a href={`file://${mountPath}/err/${vertex.name}Fail.scv`}>
+                    <a
+                      href={`file://${mountPath}/tmp/err/${
+                        vertex.name
+                      }Fail.scv`}
+                    >
                       {vertex.name}
                     </a>
                   </div>
@@ -217,9 +195,11 @@ class Import extends React.Component<IProps, IState> {
                     <p>导入数据边文件：</p>
                     {`本地数据文件路径： ${
                       edge.file.path
-                    } 错误数据文件路径： ${mountPath}/err/${edge.name}Fail.scv`}
+                    } 错误数据文件路径： ${mountPath}/tmp/err/${
+                      edge.name
+                    }Fail.scv`}
                     ：
-                    <a href={`file://${mountPath}/err/${edge.name}Fail.scv`}>
+                    <a href={`file://${mountPath}tmp/err/${edge.name}Fail.scv`}>
                       {edge.name}
                     </a>
                   </div>

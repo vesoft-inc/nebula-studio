@@ -16,6 +16,7 @@ const mapState = (state: IRootState) => ({
   username: state.nebula.username,
   password: state.nebula.password,
   host: state.nebula.host,
+  port: state.nebula.port,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -42,6 +43,7 @@ class Next extends React.Component<IProps> {
       edgesConfig,
       mountPath,
       activeStep,
+      port,
     } = this.props;
     const result: any = await service.createConfigFile({
       currentSpace,
@@ -52,6 +54,7 @@ class Next extends React.Component<IProps> {
       edgesConfig,
       mountPath,
       activeStep,
+      port,
     });
     if (result.code === '0') {
       const code: any = await this.props.testImport({ localPath: mountPath });
