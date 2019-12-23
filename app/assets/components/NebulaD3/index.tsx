@@ -178,11 +178,13 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .on('click', (d: any) => {
         this.props.onSelectVertexes([d]);
       })
-      .call(d3
-        .drag()
-        .on('start', d => this.dragstart(d))
-        .on('drag', d => this.dragged(d))
-        .on('end', d => this.dragEnded(d)) as any);
+      .call(
+        d3
+          .drag()
+          .on('start', d => this.dragstart(d))
+          .on('drag', d => this.dragged(d))
+          .on('end', d => this.dragEnded(d)) as any,
+      );
     this.force.on('tick', () => this.tick());
   }
 
@@ -193,11 +195,13 @@ class NebulaD3 extends React.Component<IProps, {}> {
         .on('click', (d: any) => {
           this.props.onSelectVertexes([d]);
         })
-        .call(d3
-          .drag()
-          .on('start', d => this.dragstart(d))
-          .on('drag', d => this.dragged(d))
-          .on('end', d => this.dragEnded(d)) as any);
+        .call(
+          d3
+            .drag()
+            .on('start', d => this.dragstart(d))
+            .on('drag', d => this.dragged(d))
+            .on('end', d => this.dragEnded(d)) as any,
+        );
     }
   };
 

@@ -74,7 +74,4 @@ class Next extends React.Component<IProps> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(Next);
+export default connect(mapState, mapDispatch)(Next);

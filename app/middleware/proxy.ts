@@ -3,19 +3,20 @@ import httpProxy from 'http-proxy-middleware';
 import k2c from 'koa2-connect';
 
 export default () => {
-  const nebulaProxy = k2c(
-    httpProxy({
-      target: 'http://127.0.0.1:8080',
-      pathRewrite: {
-        '/api-nebula': '/api',
-      },
-      changeOrigin: true,
-    }),
-  );
   const proxyPath = /\/api-nebula\//;
 
   return async function proxyHandler(ctx: Context, next: any) {
     if (proxyPath.test(ctx.request.url)) {
+      const nebulaProxy = k2c(
+        httpProxy({
+          // to promise that the nebula http client is in the same host with the console
+          target: `http://${ctx.request.header.host.split(':')[0]}:8080`,
+          pathRewrite: {
+            '/api-nebula': '/api',
+          },
+          changeOrigin: true,
+        }),
+      );
       await nebulaProxy(ctx, next);
     } else {
       await next();

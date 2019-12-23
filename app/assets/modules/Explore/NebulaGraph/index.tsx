@@ -151,7 +151,4 @@ class NebulaGraph extends React.Component<IProps, IState> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(NebulaGraph);
+export default connect(mapState, mapDispatch)(NebulaGraph);

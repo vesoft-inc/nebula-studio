@@ -2,14 +2,14 @@ import child_process from 'child_process';
 import { Service } from 'egg';
 import fs from 'fs';
 import _ from 'lodash';
-import util from 'util';
+import { promisify } from 'util';
 
 /**
  * Import Service
  */
 export default class Import extends Service {
   async importTest(path: string) {
-    const exec = util.promisify(child_process.exec);
+    const exec = promisify(child_process.exec);
     let code = '-1';
     let message = 'import error';
     const data = await exec(

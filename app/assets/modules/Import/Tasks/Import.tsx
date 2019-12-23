@@ -199,11 +199,7 @@ class Import extends React.Component<IProps, IState> {
                 return (
                   <div key={vertex.name}>
                     <p>导入数据节点文件：</p>
-                    {`本地数据文件路径： ${
-                      vertex.file.path
-                    } 错误数据文件路径： ${mountPath}/err/${
-                      vertex.name
-                    }Fail.scv`}
+                    {`本地数据文件路径： ${vertex.file.path} 错误数据文件路径： ${mountPath}/err/${vertex.name}Fail.scv`}
                     ：
                     <a href={`file://${mountPath}/err/${vertex.name}Fail.scv`}>
                       {vertex.name}
@@ -215,9 +211,7 @@ class Import extends React.Component<IProps, IState> {
                 return (
                   <div key={edge.name}>
                     <p>导入数据边文件：</p>
-                    {`本地数据文件路径： ${
-                      edge.file.path
-                    } 错误数据文件路径： ${mountPath}/err/${edge.name}Fail.scv`}
+                    {`本地数据文件路径： ${edge.file.path} 错误数据文件路径： ${mountPath}/err/${edge.name}Fail.scv`}
                     ：
                     <a href={`file://${mountPath}/err/${edge.name}Fail.scv`}>
                       {edge.name}
@@ -233,7 +227,4 @@ class Import extends React.Component<IProps, IState> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(Import);
+export default connect(mapState, mapDispatch)(Import);

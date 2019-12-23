@@ -25,7 +25,4 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
   />
 );
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(PrivateRoute);
+export default connect(mapState, mapDispatch)(PrivateRoute);

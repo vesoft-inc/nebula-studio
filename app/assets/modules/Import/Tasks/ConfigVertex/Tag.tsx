@@ -16,7 +16,10 @@ const mapState = (state: IRootState) => {
   return {
     // each tag only one configed in per vertex
     // hack: this will make the component render when state is set
-    tags: _.difference(state.nebula.tags, vertex.tags.map(tag => tag.name)),
+    tags: _.difference(
+      state.nebula.tags,
+      vertex.tags.map(tag => tag.name),
+    ),
     host: state.nebula.host,
     username: state.nebula.username,
     password: state.nebula.password,
@@ -256,7 +259,4 @@ class Tag extends React.Component<IProps> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(Tag);
+export default connect(mapState, mapDispatch)(Tag);

@@ -100,7 +100,4 @@ class Control extends React.Component<IProps, {}> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(Control);
+export default connect(mapState, mapDispatch)(Control);
