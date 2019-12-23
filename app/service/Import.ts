@@ -99,7 +99,6 @@ export default class Import extends Service {
 
   async edgeDataToJSON(config: any, activeStep: number, mountPath: string) {
     const limit = activeStep === 2 || activeStep === 3 ? 10 : undefined;
-    console.log(limit);
     const files = config.map(edge => {
       const edgePorps: any[] = [];
       _.sortBy(edge.props, t => {
@@ -136,7 +135,7 @@ export default class Import extends Service {
         path: edge.file.path,
         failDataPath: `${mountPath}/tmp//err/${edge.name}Fail.scv`,
         batchSize: 10,
-        // limit,
+        limit,
         type: 'csv',
         csv: {
           withHeader: false,
@@ -161,7 +160,6 @@ export default class Import extends Service {
 
   async vertexDataToJSON(config: any, activeStep: number, mountPath: string) {
     const limit = activeStep === 2 || activeStep === 3 ? 10 : undefined;
-    console.log(limit);
     const files = config.map(vertex => {
       const tags = vertex.tags.map(tag => {
         const props = tag.props
@@ -179,11 +177,11 @@ export default class Import extends Service {
         };
         return _tag;
       });
-      const vertexConfig = {
+      const vertexConfig: any = {
         path: vertex.file.path,
         failDataPath: `${mountPath}/tmp/err/${vertex.name}Fail.scv`,
         batchSize: 10,
-        // limit,
+        limit,
         type: 'csv',
         csv: {
           withHeader: false,
@@ -200,6 +198,7 @@ export default class Import extends Service {
           },
         },
       };
+      // activeStep === 2 || activeStep === 3 ? (vertexConfig.limit = 10) : null;
       return vertexConfig;
     });
     return files;

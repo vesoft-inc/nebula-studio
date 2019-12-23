@@ -43,10 +43,7 @@ class ConfigServer extends React.Component<IProps> {
   handleConfigServer = (form: WrappedFormUtils) => {
     form.validateFields(async (err, data) => {
       if (!err) {
-        const isOk = await this.props.asyncConfigServer(data);
-        if (isOk) {
-          this.props.history.goBack();
-        }
+        await this.props.asyncConfigServer(data);
       }
     });
   };

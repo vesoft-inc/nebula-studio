@@ -50,6 +50,7 @@ class Init extends React.Component<IProps> {
         handlerRef={handler => (this.modalHandler = handler)}
         footer={null}
         closable={false}
+        zIndex={8}
         maskClosable={false}
       >
         <h3>{intl.get('explore.selectSpace')}</h3>

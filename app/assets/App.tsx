@@ -64,7 +64,6 @@ class App extends React.Component<IProps, IState> {
   };
 
   loadIntlLocale = () => {
-    console.log(this.currentLocale);
     intl
       .init({
         currentLocale: this.currentLocale,
