@@ -56,8 +56,22 @@ class Next extends React.Component<IProps> {
       activeStep,
       port,
     });
+    if (!vertexesConfig.length && !edgesConfig.length) {
+      this.props.nextStep();
+      return;
+    }
     if (result.code === '0') {
-      const code: any = await this.props.testImport({ localPath: mountPath });
+      const code: any = await this.props.testImport({
+        currentSpace,
+        username,
+        password,
+        host,
+        vertexesConfig,
+        edgesConfig,
+        mountPath,
+        activeStep,
+        port,
+      });
       if (code === '0') {
         this.props.nextStep();
       } else {

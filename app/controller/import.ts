@@ -1,35 +1,27 @@
-import { exec } from 'child_process';
 import { Controller } from 'egg';
 import fs from 'fs';
 
 let isFinish: boolean = true;
-let importProcess: any;
 
 export default class ImportController extends Controller {
   async import() {
     const { ctx } = this;
-    const { localPath } = ctx.request.body;
     isFinish = false;
-    importProcess = exec(
-      './nebula-importer --config ' + localPath + '/tmp/config.yaml',
-      {
-        cwd: '../nebula-importer', // rely on nebula-importer in the peer directory
-        maxBuffer: 1024 * 1024 * 1024,
-      },
-    );
+    console.log('start');
+    const configJson = await ctx.service.import.configToJson(ctx.request.body);
+    console.log(JSON.stringify(configJson));
+    const code = await ctx.service.import.runImport(configJson);
     ctx.response.body = {
-      message: '',
       data: [],
-      code: '0',
+      code,
     };
   }
 
   async testImport() {
     const { ctx } = this;
-    const { localPath } = ctx.request.body;
-    const { message, code } = await ctx.service.import.importTest(localPath);
+    const configJson = await ctx.service.import.configToJson(ctx.request.body);
+    const code = await ctx.service.import.runImport(configJson);
     ctx.response.body = {
-      message,
       data: [],
       code,
     };
@@ -39,13 +31,10 @@ export default class ImportController extends Controller {
     const { ctx } = this;
     const code = await ctx.service.import.stopImport();
     isFinish = true;
-    if (code === '-1') {
-      importProcess.kill();
-    }
     ctx.response.body = {
       message: '',
       data: [],
-      code: '0',
+      code,
     };
   }
 
@@ -81,6 +70,7 @@ export default class ImportController extends Controller {
 
   async callback() {
     const { ctx } = this;
+    console.log('callback');
     setTimeout(() => {
       isFinish = true;
     }, 2000); // log reading interval 2000ms
@@ -93,48 +83,8 @@ export default class ImportController extends Controller {
 
   async createConfigFile() {
     const { ctx } = this;
-    const {
-      currentSpace,
-      username,
-      password,
-      host,
-      vertexesConfig,
-      edgesConfig,
-      mountPath,
-      activeStep,
-      port,
-    } = ctx.request.body;
-    const vertexToJSON = await ctx.service.import.vertexDataToJSON(
-      vertexesConfig,
-      activeStep,
-      mountPath,
-    );
-    const edgeToJSON = await ctx.service.import.edgeDataToJSON(
-      edgesConfig,
-      activeStep,
-      mountPath,
-    );
-    const files: any[] = [...vertexToJSON, ...edgeToJSON];
-    const configJson = {
-      version: 'v1rc1',
-      description: 'web console import',
-      clientSettings: {
-        concurrency: 10,
-        channelBufferSize: 128,
-        space: currentSpace,
-        connection: {
-          user: username,
-          password,
-          address: host,
-        },
-      },
-      httpSettings: {
-        port: 5699,
-        callback: `http://localhost:${port}/api/import/finish`,
-      },
-      logPath: mountPath + '/tmp/import.log',
-      files,
-    };
+    const { mountPath } = ctx.request.body;
+    const configJson = await ctx.service.import.configToJson(ctx.request.body);
     const content = JSON.stringify(configJson, null, 2);
     const { message, code } = await ctx.service.import.writeFile(
       mountPath + '/tmp/config.yaml',

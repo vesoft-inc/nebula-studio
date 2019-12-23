@@ -105,6 +105,15 @@
     "createConfigError": "Create config file error",
     "importErrorInfo": "Error importing data. Please check the configuration or data file",
     "clearAllConfigInfo": "Confirm to clear all config？",
+    "promptConfigInfo": "The configuration cannot be empty",
+    "configFilePath": "Configuration file path:",
+    "logFilePath":"log file path:",
+    "vertexesFilePath": "vertexes file path:",
+    "vertexFilePath": "vertex file path:",
+    "vertexErrorFilePath": "error vertex file path:",
+    "edgesFilePath": "edges file path:",
+    "edgeFilePath": "edge file path:",
+    "edgeErrorFilePath": "error edge file path:",
     "all": "All"
   }
 }

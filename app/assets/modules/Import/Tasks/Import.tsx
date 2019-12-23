@@ -18,6 +18,7 @@ const mapState = (state: any) => ({
   username: state.nebula.username,
   password: state.nebula.password,
   host: state.nebula.host,
+  port: state.nebula.port,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -55,6 +56,7 @@ class Import extends React.Component<IProps, IState> {
       edgesConfig,
       mountPath,
       activeStep,
+      port,
     } = this.props;
     service
       .createConfigFile({
@@ -66,6 +68,7 @@ class Import extends React.Component<IProps, IState> {
         edgesConfig,
         mountPath,
         activeStep,
+        port,
       })
       .then((result: any) => {
         if (result.code !== '0') {
@@ -80,8 +83,28 @@ class Import extends React.Component<IProps, IState> {
   }
 
   handleRunImport = () => {
-    const { mountPath } = this.props;
-    this.props.importData({ localPath: mountPath });
+    const {
+      currentSpace,
+      username,
+      password,
+      host,
+      vertexesConfig,
+      edgesConfig,
+      mountPath,
+      activeStep,
+      port,
+    } = this.props;
+    this.props.importData({
+      currentSpace,
+      username,
+      password,
+      host,
+      vertexesConfig,
+      edgesConfig,
+      mountPath,
+      activeStep,
+      port,
+    });
     this.logTimer = setTimeout(this.readlog, 2000);
     this.finishTimer = setTimeout(this.checkFinish, 1000);
   };
@@ -166,42 +189,58 @@ class Import extends React.Component<IProps, IState> {
             </Button>
             <div className="import-export">
               <div>
-                配置文件：({`${mountPath}/tmp/config.yaml`}) ：
+                {intl.get('import.configFilePath')} (
+                {`${mountPath}/tmp/config.yaml`}) ：
                 <a href={`file://${mountPath}/tmp/config.yaml`}>config.yml</a>
               </div>
+              <div>
+                {intl.get('import.logFilePath')} (
+                {`${mountPath}/tmp/import.log`}) ：
+                <a href={`file://${mountPath}/tmp/import.log`}>import.log</a>
+              </div>
+              <br />
               {vertexesConfig.map(vertex => {
                 return (
                   <div key={vertex.name}>
-                    <p>导入数据节点文件：</p>
-                    {`本地数据文件路径： ${
-                      vertex.file.path
-                    };  错误数据文件路径： ${mountPath}/tmp/err/${
-                      vertex.name
-                    }Fail.scv`}
-                    ：
-                    <a
-                      href={`file://${mountPath}/tmp/err/${
-                        vertex.name
-                      }Fail.scv`}
-                    >
-                      {vertex.name}
-                    </a>
+                    <p>{intl.get('import.vertexesFilePath')}</p>
+                    <br />
+                    <p>
+                      {`${intl.get('import.vertexFilePath')} ${
+                        vertex.file.path
+                      }`}
+                    </p>
+                    <p>
+                      {intl.get('import.vertexErrorFilePath')} ({mountPath}
+                      /tmp/err/${vertex.name}Fail.scv):
+                      <a
+                        href={`file://${mountPath}/tmp/err/${
+                          vertex.name
+                        }Fail.scv`}
+                      >
+                        {vertex.name}
+                      </a>
+                    </p>
                   </div>
                 );
               })}
+              <br />
               {edgesConfig.map(edge => {
                 return (
                   <div key={edge.name}>
-                    <p>导入数据边文件：</p>
-                    {`本地数据文件路径： ${
-                      edge.file.path
-                    } 错误数据文件路径： ${mountPath}/tmp/err/${
-                      edge.name
-                    }Fail.scv`}
-                    ：
-                    <a href={`file://${mountPath}tmp/err/${edge.name}Fail.scv`}>
-                      {edge.name}
-                    </a>
+                    <p>{intl.get('import.edgesFilePath')}</p>
+                    <br />
+                    <p>
+                      {`${intl.get('import.edgeFilePath')} ${edge.file.path}`}
+                    </p>
+                    <p>
+                      {intl.get('import.edgeErrorFilePath')} ({mountPath}
+                      /tmp/err/${edge.name}Fail.scv):
+                      <a
+                        href={`file://${mountPath}tmp/err/${edge.name}Fail.scv`}
+                      >
+                        {edge.name}
+                      </a>
+                    </p>
                   </div>
                 );
               })}

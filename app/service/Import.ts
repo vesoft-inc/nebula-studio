@@ -1,30 +1,34 @@
-import child_process from 'child_process';
 import { Service } from 'egg';
 import fs from 'fs';
 import _ from 'lodash';
 import request from 'request';
-import util from 'util';
 
 /**
  * Import Service
  */
 export default class Import extends Service {
-  async importTest(path: string) {
-    const exec = util.promisify(child_process.exec);
-    let code = '-1';
-    let message = 'import error';
-    const data = await exec(
-      './nebula-importer --config ' + path + '/tmp/config.yaml',
-      {
-        cwd: '../nebula-importer',
-        maxBuffer: 1024 * 1024 * 1024,
-      },
-    );
-    if (!!data.stdout) {
-      code = '0';
-      message = '';
-    }
-    return { code, message };
+  async runImport(config: any) {
+    const code: string = await new Promise((resolve, reject) => {
+      request(
+        {
+          url: 'http://localhost:5699/submit',
+          method: 'post',
+          json: true,
+          headers: {
+            'content-type': 'application/json',
+          },
+          body: config,
+        },
+        (error, response) => {
+          if (!error && response.statusCode === 200) {
+            resolve('0');
+          } else {
+            reject('-1');
+          }
+        },
+      );
+    });
+    return code;
   }
 
   async stopImport() {
@@ -38,8 +42,8 @@ export default class Import extends Service {
           'content-type': 'application/json',
         },
       },
-      (error, response, body) => {
-        if (!error && response.statusCode === 200 && body === 'OK') {
+      (error, response) => {
+        if (!error && response.statusCode === 200) {
           code = '0';
         }
       },
@@ -47,8 +51,55 @@ export default class Import extends Service {
     return code;
   }
 
+  async configToJson(payload) {
+    const {
+      currentSpace,
+      username,
+      password,
+      host,
+      vertexesConfig,
+      edgesConfig,
+      mountPath,
+      activeStep,
+      port,
+    } = payload;
+    const vertexToJSON = await this.vertexDataToJSON(
+      vertexesConfig,
+      activeStep,
+      mountPath,
+    );
+    const edgeToJSON = await this.edgeDataToJSON(
+      edgesConfig,
+      activeStep,
+      mountPath,
+    );
+    const files: any[] = [...vertexToJSON, ...edgeToJSON];
+    const configJson = {
+      version: 'v1rc1',
+      description: 'web console import',
+      clientSettings: {
+        concurrency: 10,
+        channelBufferSize: 128,
+        space: currentSpace,
+        connection: {
+          user: username,
+          password,
+          address: host,
+        },
+      },
+      httpSettings: {
+        port: 5699,
+        callback: `http://localhost:${port}/api/import/finish`,
+      },
+      logPath: mountPath + '/tmp/import.log',
+      files,
+    };
+    return configJson;
+  }
+
   async edgeDataToJSON(config: any, activeStep: number, mountPath: string) {
     const limit = activeStep === 2 || activeStep === 3 ? 10 : undefined;
+    console.log(limit);
     const files = config.map(edge => {
       const edgePorps: any[] = [];
       _.sortBy(edge.props, t => {
@@ -85,7 +136,7 @@ export default class Import extends Service {
         path: edge.file.path,
         failDataPath: `${mountPath}/tmp//err/${edge.name}Fail.scv`,
         batchSize: 10,
-        limit,
+        // limit,
         type: 'csv',
         csv: {
           withHeader: false,
@@ -110,6 +161,7 @@ export default class Import extends Service {
 
   async vertexDataToJSON(config: any, activeStep: number, mountPath: string) {
     const limit = activeStep === 2 || activeStep === 3 ? 10 : undefined;
+    console.log(limit);
     const files = config.map(vertex => {
       const tags = vertex.tags.map(tag => {
         const props = tag.props
@@ -131,7 +183,7 @@ export default class Import extends Service {
         path: vertex.file.path,
         failDataPath: `${mountPath}/tmp/err/${vertex.name}Fail.scv`,
         batchSize: 10,
-        limit,
+        // limit,
         type: 'csv',
         csv: {
           withHeader: false,

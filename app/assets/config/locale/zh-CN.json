@@ -105,6 +105,14 @@
     "createConfigError": "创建配置文件错误",
     "importErrorInfo": "导入数据错误，请检查配置或数据文件",
     "clearAllConfigInfo": "是否确定清空所以配置？",
+    "configFilePath": "配置文件本地路径：",
+    "logFilePath": "log文件本地路径：",
+    "vertexesFilePath": "顶点配置文件路劲：",
+    "vertexFilePath": "该顶点配置文件路劲：",
+    "vertexErrorFilePath": "该顶点错误数据文件路劲：",
+    "edgesFilePath": "边配置文件路劲：",
+    "edgeFilePath": "该边配置文件路劲：",
+    "edgeErrorFilePath": "该边错误数据文件路劲：",
     "all": "全部"
   }
 }

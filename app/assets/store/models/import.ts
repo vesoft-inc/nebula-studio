@@ -275,14 +275,12 @@ export const importData = createModel({
         isFinish: true,
       });
     },
-    async importData(payload: { localPath: string }) {
+    async importData(payload) {
       this.update({
         isFinish: false,
       });
-      const { localPath } = payload;
-      service.importData({
-        localPath,
-      });
+      const { code } = (await service.importData(payload)) as any;
+      return code;
     },
 
     async stopImport() {
@@ -292,11 +290,8 @@ export const importData = createModel({
       service.deleteProcess();
     },
 
-    async testImport(payload: { localPath: string }) {
-      const { localPath } = payload;
-      const { code } = (await service.testImport({
-        localPath,
-      })) as any;
+    async testImport(payload) {
+      const { code } = (await service.importData(payload)) as any;
       return code;
     },
 
