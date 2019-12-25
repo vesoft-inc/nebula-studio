@@ -187,7 +187,4 @@ class Import extends React.Component<IProps> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(Import);
+export default connect(mapState, mapDispatch)(Import);

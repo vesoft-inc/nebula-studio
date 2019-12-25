@@ -34,7 +34,4 @@ const Tasks = (props: IProps) => {
   }
 };
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(Tasks);
+export default connect(mapState, mapDispatch)(Tasks);

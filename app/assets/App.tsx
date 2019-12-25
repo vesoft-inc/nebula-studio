@@ -83,7 +83,7 @@ class App extends React.Component<IProps, IState> {
   };
 
   componentWillMount() {
-    service.deleteProcess();
+    service.stopImport({ taskId: 'all' });
   }
 
   componentDidMount() {

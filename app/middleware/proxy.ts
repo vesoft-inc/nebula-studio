@@ -12,11 +12,23 @@ export default () => {
       changeOrigin: true,
     }),
   );
+  const importProxy = k2c(
+    httpProxy({
+      target: 'http://localhost:5699',
+      pathRewrite: {
+        '/api-import': '/',
+      },
+      changeOrigin: true,
+    }),
+  );
   const proxyPath = /\/api-nebula\//;
+  const importPath = /\/api-import\//;
 
   return async function proxyHandler(ctx: Context, next: any) {
     if (proxyPath.test(ctx.request.url)) {
       await nebulaProxy(ctx, next);
+    } else if (importPath.test(ctx.request.url)) {
+      await importProxy(ctx, next);
     } else {
       await next();
     }

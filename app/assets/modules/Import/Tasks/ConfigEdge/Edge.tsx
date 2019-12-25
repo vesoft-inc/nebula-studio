@@ -174,7 +174,4 @@ class Edge extends React.Component<IProps> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(Edge);
+export default connect(mapState, mapDispatch)(Edge);

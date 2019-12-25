@@ -1,10 +1,14 @@
-import { _delete, get, post } from '../utils/http';
+import { _delete, get, post, put } from '../utils/http';
 
 const execNGQL = post('/api-nebula/db/exec');
 
 const connectDB = post('/api-nebula/db/connect');
 
-const importData = post('/api/import/import');
+const importData = post('/api-import/submit');
+
+const runImport = post('/api/import/import');
+
+const stopImport = put('/api-import/stop');
 
 const testImport = post('/api/import/test');
 
@@ -20,6 +24,8 @@ export default {
   execNGQL,
   connectDB,
   importData,
+  runImport,
+  stopImport,
   testImport,
   createConfigFile,
   getLog,

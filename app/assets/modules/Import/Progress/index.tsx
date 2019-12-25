@@ -95,7 +95,4 @@ class Progress extends React.Component<IProps, {}> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(Progress);
+export default connect(mapState, mapDispatch)(Progress);

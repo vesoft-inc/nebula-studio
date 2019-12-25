@@ -114,7 +114,4 @@ class Add extends React.PureComponent<IProps> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(Form.create()(Add));
+export default connect(mapState, mapDispatch)(Form.create()(Add));

@@ -92,7 +92,4 @@ class ConfigNode extends React.PureComponent<IProps> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(ConfigNode);
+export default connect(mapState, mapDispatch)(ConfigNode);

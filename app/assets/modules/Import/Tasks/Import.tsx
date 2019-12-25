@@ -14,6 +14,7 @@ const mapState = (state: any) => ({
   isFinish: state.importData.isFinish,
   vertexesConfig: state.importData.vertexesConfig,
   edgesConfig: state.importData.edgesConfig,
+  taskId: state.importData.taskId,
   currentSpace: state.nebula.currentSpace,
   username: state.nebula.username,
   password: state.nebula.password,
@@ -145,7 +146,13 @@ class Import extends React.Component<IProps, IState> {
   };
 
   render() {
-    const { isFinish, vertexesConfig, edgesConfig, mountPath } = this.props;
+    const {
+      isFinish,
+      vertexesConfig,
+      edgesConfig,
+      mountPath,
+      taskId,
+    } = this.props;
     const { activeKey } = this.state;
     return (
       <div className="import">
@@ -159,7 +166,7 @@ class Import extends React.Component<IProps, IState> {
           </Button>
           <Button
             className="import-again"
-            onClick={this.props.stopImport}
+            onClick={() => this.props.stopImport({ taskId })}
             disabled={isFinish}
           >
             {intl.get('import.endImport')}
@@ -213,9 +220,7 @@ class Import extends React.Component<IProps, IState> {
                       {intl.get('import.vertexErrorFilePath')} ({mountPath}
                       /tmp/err/${vertex.name}Fail.scv):
                       <a
-                        href={`file://${mountPath}/tmp/err/${
-                          vertex.name
-                        }Fail.scv`}
+                        href={`file://${mountPath}/tmp/err/${vertex.name}Fail.scv`}
                       >
                         {vertex.name}
                       </a>
@@ -252,7 +257,4 @@ class Import extends React.Component<IProps, IState> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(Import);
+export default connect(mapState, mapDispatch)(Import);

@@ -57,7 +57,4 @@ class ConfigServer extends React.Component<IProps> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(ConfigServer);
+export default connect(mapState, mapDispatch)(ConfigServer);

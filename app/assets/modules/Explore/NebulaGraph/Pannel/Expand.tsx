@@ -210,7 +210,4 @@ class Expand extends React.Component<IProps, IState> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(Form.create()(Expand));
+export default connect(mapState, mapDispatch)(Form.create()(Expand));

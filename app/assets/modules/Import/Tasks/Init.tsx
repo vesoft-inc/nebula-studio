@@ -130,7 +130,4 @@ class Init extends React.Component<IProps, {}> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(Form.create()(Init));
+export default connect(mapState, mapDispatch)(Form.create()(Init));

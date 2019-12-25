@@ -22,6 +22,7 @@ const mapState = (state: IRootState) => ({
 const mapDispatch = (dispatch: IDispatch) => ({
   nextStep: dispatch.importData.nextStep,
   testImport: dispatch.importData.testImport,
+  update: dispatch.importData.update,
 });
 
 interface IProps
@@ -61,7 +62,7 @@ class Next extends React.Component<IProps> {
       return;
     }
     if (result.code === '0') {
-      const code: any = await this.props.testImport({
+      const errCode: any = await this.props.testImport({
         currentSpace,
         username,
         password,
@@ -72,7 +73,7 @@ class Next extends React.Component<IProps> {
         activeStep,
         port,
       });
-      if (code === '0') {
+      if (errCode === 0) {
         this.props.nextStep();
       } else {
         message.error(intl.get('import.importErrorInfo'));
@@ -91,7 +92,4 @@ class Next extends React.Component<IProps> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(Next);
+export default connect(mapState, mapDispatch)(Next);

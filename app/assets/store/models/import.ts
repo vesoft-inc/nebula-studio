@@ -1,6 +1,7 @@
 import { createModel } from '@rematch/core';
 
 import service from '#assets/config/service';
+import { configToJson } from '#assets/utils/import';
 
 interface ITag {
   props: any[];
@@ -34,6 +35,7 @@ interface IState {
   vertexAddCount: number;
   edgeAddCount: number;
   isFinish: boolean;
+  taskId: string;
 }
 
 export const importData = createModel({
@@ -49,6 +51,7 @@ export const importData = createModel({
     vertexAddCount: 0,
     edgeAddCount: 0,
     isFinish: true,
+    taskId: 'all',
   },
   reducers: {
     update: (state: IState, payload: any) => {
@@ -276,23 +279,29 @@ export const importData = createModel({
       });
     },
     async importData(payload) {
+      const config: any = configToJson(payload);
+      service.runImport();
+      const { taskId } = (await service.importData(config)) as any;
       this.update({
+        taskId,
         isFinish: false,
       });
-      const { code } = (await service.importData(payload)) as any;
-      return code;
     },
 
-    async stopImport() {
+    async stopImport(payload) {
       this.update({
         isFinish: true,
       });
-      service.deleteProcess();
+      service.stopImport(payload);
     },
 
     async testImport(payload) {
-      const { code } = (await service.importData(payload)) as any;
-      return code;
+      const config: any = configToJson(payload);
+      const { taskId, errCode } = (await service.importData(config)) as any;
+      this.update({
+        taskId,
+      });
+      return errCode;
     },
 
     async asyncUpdateEdgeConfig(payload: {

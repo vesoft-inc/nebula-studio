@@ -7,13 +7,9 @@ export default class ImportController extends Controller {
   async import() {
     const { ctx } = this;
     isFinish = false;
-    console.log('start');
-    const configJson = await ctx.service.import.configToJson(ctx.request.body);
-    console.log(JSON.stringify(configJson));
-    const code = await ctx.service.import.runImport(configJson);
     ctx.response.body = {
       data: [],
-      code,
+      code: '0',
     };
   }
 
@@ -70,10 +66,7 @@ export default class ImportController extends Controller {
 
   async callback() {
     const { ctx } = this;
-    console.log('callback');
-    setTimeout(() => {
-      isFinish = true;
-    }, 2000); // log reading interval 2000ms
+    isFinish = true;
     ctx.response.body = {
       message: '',
       data: '',

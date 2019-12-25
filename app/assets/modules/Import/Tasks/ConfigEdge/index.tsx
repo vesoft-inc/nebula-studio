@@ -89,7 +89,4 @@ class ConfigEdge extends React.Component<IProps> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(ConfigEdge);
+export default connect(mapState, mapDispatch)(ConfigEdge);

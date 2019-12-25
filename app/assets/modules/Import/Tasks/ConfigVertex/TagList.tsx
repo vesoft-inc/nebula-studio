@@ -47,7 +47,4 @@ class TagList extends React.Component<IProps> {
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(TagList);
+export default connect(mapState, mapDispatch)(TagList);
