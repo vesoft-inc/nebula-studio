@@ -74,6 +74,16 @@ export default class ImportController extends Controller {
     };
   }
 
+  async getWorkingDir() {
+    const { ctx } = this;
+    ctx.response.body = {
+      code: '0',
+      data: {
+        dir: (ctx.app.config.env as any).WORKING_DIR || process.env.WORKING_DIR,
+      },
+    };
+  }
+
   async createConfigFile() {
     const { ctx } = this;
     const { mountPath } = ctx.request.body;
