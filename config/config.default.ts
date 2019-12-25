@@ -7,7 +7,7 @@ export default (appInfo: EggAppInfo) => {
   // override config from framework / plugin
   // use for cookie sign key, should change to your own and keep security
   config.keys = appInfo.name + '_1544867050896_3341';
-
+  
   // add your egg config in here
   config.middleware = [];
 
@@ -36,7 +36,7 @@ export default (appInfo: EggAppInfo) => {
   config.cluster = {
     listen: {
       port: 7001,
-      hostname: '127.0.0.1',
+      hostname: '0.0.0.0',
     },
   };
 

@@ -113,6 +113,7 @@
     "edgesFilePath": "边配置文件路劲：",
     "edgeFilePath": "该边配置文件路劲：",
     "edgeErrorFilePath": "该边错误数据文件路劲：",
-    "all": "全部"
+    "all": "全部",
+    "mountPathWarning": "导入数据需在应用启动时配置 WORKING_DIR 环境变量，否则无法进行。"
   }
 }

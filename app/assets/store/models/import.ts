@@ -1,4 +1,6 @@
 import { createModel } from '@rematch/core';
+import { message } from 'antd';
+import intl from 'react-intl-universal';
 
 import service from '#assets/config/service';
 import { configToJson } from '#assets/utils/import';
@@ -42,6 +44,7 @@ export const importData = createModel({
   state: {
     activeStep: 0,
     currentStep: 0,
+    // the mountPath config by the env variable of WORKING_DIR, upload file must be in that dir.
     mountPath: '',
     files: [] as any[],
     vertexesConfig: [] as IVertexConfig[],
@@ -223,16 +226,14 @@ export const importData = createModel({
         ...state,
       };
     },
-    nextStep: (state: IState, payload?: any) => {
+    nextStep: (state: IState) => {
       const { activeStep, currentStep } = state;
       switch (activeStep) {
         case 0:
-          const { mountPath } = payload;
           return {
             ...state,
             activeStep: 1,
             currentStep: currentStep > 1 ? currentStep : 1,
-            mountPath,
           };
         case 1:
           return {
@@ -395,6 +396,18 @@ export const importData = createModel({
           tagIndex,
           tag,
         });
+      }
+    },
+
+    async asyncGetImportWorkingDir() {
+      const { code, data } = (await service.getImportWokingDir()) as any;
+      const { dir } = data;
+      if (code === '0' && dir) {
+        this.update({
+          mountPath: dir.endsWith('/') ? dir.substring(0, dir.length - 1) : dir,
+        });
+      } else {
+        message.warning(intl.get('import.mountPathWarning'), 5);
       }
     },
   },

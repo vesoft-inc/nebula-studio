@@ -1,0 +1,21 @@
+version: '3.4'
+services:
+  client:
+    image: niania/nebula-http-client:0.0.1
+    network_mode: "bridge"
+    environment:
+      USER: root
+    ports:
+      - 8080:8080
+  web:
+    image: niania/nebula-web-console:0.0.4
+    network_mode: "bridge"
+    environment:
+      USER: root
+      WORKING_DIR: ${WORKING_DIR}
+    ports:
+      - 7001:7001
+    depends_on:
+      - client
+    volumes:
+      - ${WORKING_DIR}:${WORKING_DIR}:rw

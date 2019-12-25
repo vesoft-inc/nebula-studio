@@ -114,6 +114,8 @@
     "edgesFilePath": "edges file path:",
     "edgeFilePath": "edge file path:",
     "edgeErrorFilePath": "error edge file path:",
-    "all": "All"
+    "clearoAllConfigInfo": "Confirm to clear all config？",
+    "all": "All",
+    "mountPathWarning": "Import data need to config the WORKING_DIR env variable before starting."
   }
 }

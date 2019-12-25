@@ -68,7 +68,10 @@
 			position: relative;
 			top: 200px;
 		}
-    </style>
+		</style>
+		{% if ENV != 'local' %}
+        {{ helper.assets.getStyle('vendors.css') | safe }}
+		{% endif %}
 </head>
 
 <body style='background: #f0f2f5;'>

@@ -10,5 +10,6 @@ export default (app: Application) => {
   router.delete('/api/import/process', controller.import.killProcesss);
   router.post('/api/import/config', controller.import.createConfigFile);
   router.post('/api/import/finish', controller.import.callback);
+  router.get('/api/import/working_dir', controller.import.getWorkingDir);
   router.get(/^(?!^\/api\/)/, controller.home.index);
 };
