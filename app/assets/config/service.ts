@@ -10,8 +10,6 @@ const runImport = post('/api/import/import');
 
 const stopImport = put('/api-import/stop');
 
-const testImport = post('/api/import/test');
-
 const createConfigFile = post('/api/import/config');
 
 const getLog = get('/api/import/log');
@@ -28,7 +26,6 @@ export default {
   importData,
   runImport,
   stopImport,
-  testImport,
   createConfigFile,
   getLog,
   checkImportFinish,

@@ -1,56 +1,11 @@
 import { Service } from 'egg';
 import fs from 'fs';
 import _ from 'lodash';
-import request from 'request';
 
 /**
  * Import Service
  */
 export default class Import extends Service {
-  async runImport(config: any) {
-    const code: string = await new Promise((resolve, reject) => {
-      request(
-        {
-          url: 'http://localhost:5699/submit',
-          method: 'post',
-          json: true,
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: config,
-        },
-        (error, response) => {
-          if (!error && response.statusCode === 200) {
-            resolve('0');
-          } else {
-            reject('-1');
-          }
-        },
-      );
-    });
-    return code;
-  }
-
-  async stopImport() {
-    let code: string = '-1';
-    request(
-      {
-        url: 'http://localhost:5699/stop',
-        method: 'post',
-        json: true,
-        headers: {
-          'content-type': 'application/json',
-        },
-      },
-      (error, response) => {
-        if (!error && response.statusCode === 200) {
-          code = '0';
-        }
-      },
-    );
-    return code;
-  }
-
   async configToJson(payload) {
     const {
       currentSpace,
@@ -61,7 +16,6 @@ export default class Import extends Service {
       edgesConfig,
       mountPath,
       activeStep,
-      port,
     } = payload;
     const vertexToJSON = await this.vertexDataToJSON(
       vertexesConfig,
@@ -86,10 +40,6 @@ export default class Import extends Service {
           password,
           address: host,
         },
-      },
-      httpSettings: {
-        port: 5699,
-        callback: `http://localhost:${port}/api/import/finish`,
       },
       logPath: mountPath + '/tmp/import.log',
       files,

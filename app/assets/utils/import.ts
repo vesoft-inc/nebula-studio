@@ -11,7 +11,6 @@ export function configToJson(payload) {
     edgesConfig,
     mountPath,
     activeStep,
-    port,
   } = payload;
   const vertexToJSON = vertexDataToJSON(vertexesConfig, activeStep, mountPath);
   const edgeToJSON = edgeDataToJSON(edgesConfig, activeStep, mountPath);
@@ -28,10 +27,6 @@ export function configToJson(payload) {
         password,
         address: host,
       },
-    },
-    httpSettings: {
-      port: 5699,
-      callback: `http://localhost:${port}/api/import/finish`,
     },
     logPath: mountPath + '/tmp/import.log',
     files,
@@ -154,6 +149,7 @@ export function vertexDataToJSON(
   });
   return files;
 }
+
 export function indexJudge(index: number | null) {
   if (index === null) {
     notification.error({
@@ -163,4 +159,18 @@ export function indexJudge(index: number | null) {
     return false;
   }
   return index;
+}
+
+export function getStringByteLength(str: string) {
+  let bytesCount = 0;
+  const len = str.length;
+  for (let i = 0, n = len; i < n; i++) {
+    const c = str.charCodeAt(i);
+    if ((c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f)) {
+      bytesCount += 1;
+    } else {
+      bytesCount += 2;
+    }
+  }
+  return bytesCount;
 }

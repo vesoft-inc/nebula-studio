@@ -356,8 +356,8 @@ export const importData = createModel({
       }
     },
 
-    async asyncCheckFinish() {
-      const result = await service.checkImportFinish();
+    async asyncCheckFinish(payload) {
+      const result = await service.checkImportFinish(payload);
       if (result.data) {
         this.update({
           isFinish: true,

@@ -43,9 +43,11 @@ class App extends React.Component<IProps, IState> {
     const regx = /lang=(\w+)/g;
     const match = regx.exec(props.history.location.search);
 
-    match
-      ? cookies.set('locale', match[1].toUpperCase())
-      : cookies.set('locale', 'ZH_CN');
+    if (match) {
+      cookies.set('locale', match[1].toUpperCase());
+    } else {
+      cookies.set('locale', 'ZH_CN');
+    }
 
     this.currentLocale = cookies.get('locale');
     this.state = {
@@ -83,6 +85,7 @@ class App extends React.Component<IProps, IState> {
   };
 
   componentWillMount() {
+    // Initialize the import task
     service.stopImport({ taskId: 'all' });
   }
 

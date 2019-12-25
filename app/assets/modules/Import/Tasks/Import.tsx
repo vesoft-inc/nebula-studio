@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 
 import service from '#assets/config/service';
 import { IDispatch } from '#assets/store';
+import { getStringByteLength } from '#assets/utils/import';
 
 const { TabPane } = Tabs;
 const mapState = (state: any) => ({
@@ -19,7 +20,6 @@ const mapState = (state: any) => ({
   username: state.nebula.username,
   password: state.nebula.password,
   host: state.nebula.host,
-  port: state.nebula.port,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -33,6 +33,8 @@ type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
 
 interface IState {
   activeKey: string;
+  startByte: number;
+  endByte: number;
 }
 
 class Import extends React.Component<IProps, IState> {
@@ -44,6 +46,8 @@ class Import extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       activeKey: 'log',
+      startByte: 0,
+      endByte: 100000,
     };
   }
 
@@ -57,7 +61,6 @@ class Import extends React.Component<IProps, IState> {
       edgesConfig,
       mountPath,
       activeStep,
-      port,
     } = this.props;
     service
       .createConfigFile({
@@ -69,7 +72,6 @@ class Import extends React.Component<IProps, IState> {
         edgesConfig,
         mountPath,
         activeStep,
-        port,
       })
       .then((result: any) => {
         if (result.code !== '0') {
@@ -93,7 +95,6 @@ class Import extends React.Component<IProps, IState> {
       edgesConfig,
       mountPath,
       activeStep,
-      port,
     } = this.props;
     this.props.importData({
       currentSpace,
@@ -104,32 +105,52 @@ class Import extends React.Component<IProps, IState> {
       edgesConfig,
       mountPath,
       activeStep,
-      port,
     });
-    this.logTimer = setTimeout(this.readlog, 2000);
-    this.finishTimer = setTimeout(this.checkFinish, 1000);
+    this.logTimer = setTimeout(this.readlog, 5000);
+    this.finishTimer = setTimeout(this.checkFinish, 2000);
   };
 
   checkFinish = async () => {
-    const { asyncCheckFinish } = this.props;
-    const result: any = await asyncCheckFinish();
+    const { asyncCheckFinish, taskId } = this.props;
+    const result: any = await asyncCheckFinish({ taskId });
     if (result.data) {
       clearTimeout(this.finishTimer);
     } else {
-      this.finishTimer = setTimeout(this.checkFinish, 1000);
+      this.finishTimer = setTimeout(this.checkFinish, 2000);
     }
   };
 
   readlog = async () => {
-    const { mountPath } = this.props;
+    const { startByte, endByte } = this.state;
+    const { mountPath, taskId } = this.props;
     const result: any = await service.getLog({
       dir: mountPath,
+      startByte,
+      endByte,
+      taskId,
     });
-    if (result.code === '0') {
-      this.logTimer = setTimeout(this.readlog, 2000);
-      this.ref.innerHTML = result.data;
+    const byteLength = getStringByteLength(result.data);
+    if (result.data && result.code === '0') {
+      this.setState(
+        {
+          startByte: byteLength,
+          endByte: byteLength + 100000,
+        },
+        () => {
+          this.logTimer = setTimeout(this.readlog, 5000);
+        },
+      );
+      this.ref.innerHTML += result.data;
     } else {
-      clearTimeout(this.logTimer);
+      if (result.code === '0') {
+        this.logTimer = setTimeout(this.readlog, 5000);
+      } else {
+        this.setState({
+          startByte: 0,
+          endByte: 100000,
+        });
+        clearTimeout(this.logTimer);
+      }
     }
     this.ref.scrollTop = this.ref.scrollHeight;
   };
