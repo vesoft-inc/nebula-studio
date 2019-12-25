@@ -105,6 +105,7 @@
     "createConfigError": "创建配置文件错误",
     "importErrorInfo": "导入数据错误，请检查配置或数据文件",
     "clearAllConfigInfo": "是否确定清空所以配置？",
-    "all": "全部"
+    "all": "全部",
+    "mountPathWarning": "导入数据需在应用启动时配置 WORKING_DIR 环境变量，否则无法进行。"
   }
 }

@@ -105,6 +105,7 @@
     "createConfigError": "Create config file error",
     "importErrorInfo": "Error importing data. Please check the configuration or data file",
     "clearoAllConfigInfo": "Confirm to clear all config？",
-    "all": "All"
+    "all": "All",
+    "mountPathWarning": "Import data need to config the WORKING_DIR env variable before starting."
   }
 }

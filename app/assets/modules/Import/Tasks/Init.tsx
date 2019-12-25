@@ -1,4 +1,4 @@
-import { Button, Form, Input, Select } from 'antd';
+import { Button, Form, Select } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 import React from 'react';
 import intl from 'react-intl-universal';
@@ -26,6 +26,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
     });
   },
   asyncGetTags: dispatch.nebula.asyncGetTags,
+  asyncGetImportWorkingDir: dispatch.importData.asyncGetImportWorkingDir,
   asyncGetEdgeTypes: dispatch.nebula.asyncGetEdgeTypes,
   nextStep: dispatch.importData.nextStep,
 });
@@ -41,6 +42,7 @@ interface IProps
 class Init extends React.Component<IProps, {}> {
   componentDidMount() {
     const { host, username, password } = this.props;
+    this.props.asyncGetImportWorkingDir();
     this.props.asyncGetSpaces({
       host,
       username,
@@ -50,13 +52,9 @@ class Init extends React.Component<IProps, {}> {
 
   handleNext = () => {
     this.props.form.validateFields((err, values: any) => {
-      let { mountPath } = values;
       const { space } = values;
-      if (mountPath.endsWith('/')) {
-        mountPath = mountPath.substring(0, mountPath.length - 1);
-      }
       const { username, host, password } = this.props;
-      if (!err && space && mountPath) {
+      if (!err && space) {
         this.props.updateCurrentSpace(space);
         this.props.asyncGetTags({
           username,
@@ -70,9 +68,7 @@ class Init extends React.Component<IProps, {}> {
           password,
           space,
         });
-        this.props.nextStep({
-          mountPath,
-        });
+        this.props.nextStep();
       }
     });
   };
@@ -106,7 +102,7 @@ class Init extends React.Component<IProps, {}> {
               </Select>,
             )}
           </FormItem>
-          <FormItem label={intl.get('import.mountPath')}>
+          {/* <FormItem label={intl.get('import.mountPath')}>
             {getFieldDecorator('mountPath', {
               initialValue: mountPath,
               rules: [
@@ -115,13 +111,13 @@ class Init extends React.Component<IProps, {}> {
                 },
               ],
             })(<Input placeholder={intl.get('import.mountPathPlaceholder')} />)}
-          </FormItem>
+          </FormItem> */}
         </Form>
         <Button
           type="primary"
           className="next"
           onClick={this.handleNext}
-          disabled={!getFieldValue('space') || !getFieldValue('mountPath')}
+          disabled={!getFieldValue('space') || !mountPath}
         >
           {intl.get('import.next')}
         </Button>

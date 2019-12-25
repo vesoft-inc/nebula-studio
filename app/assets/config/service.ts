@@ -16,6 +16,8 @@ const checkImportFinish = get('/api/import/refresh');
 
 const deleteProcess = _delete('/api/import/process');
 
+const getImportWokingDir = get('/api/import/working_dir');
+
 export default {
   execNGQL,
   connectDB,
@@ -25,4 +27,5 @@ export default {
   getLog,
   checkImportFinish,
   deleteProcess,
+  getImportWokingDir,
 };
