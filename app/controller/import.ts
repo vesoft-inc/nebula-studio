@@ -75,16 +75,15 @@ export default class ImportController extends Controller {
     ctx.response.body = {
       code: '0',
       data: {
-        dir: (ctx.app.config.env as any).WORKING_DIR || process.env.WORKING_DIR,
+        dir: '/Users/lidanji/Vesoft/local',
       },
     };
   }
 
   async createConfigFile() {
     const { ctx } = this;
-    const { mountPath } = ctx.request.body;
-    const configJson = await ctx.service.import.configToJson(ctx.request.body);
-    const content = JSON.stringify(configJson, null, 2);
+    const { mountPath, config } = ctx.request.body;
+    const content = JSON.stringify(config, null, 2);
     const { message, code } = await ctx.service.import.writeFile(
       mountPath + '/tmp/config.yaml',
       content,

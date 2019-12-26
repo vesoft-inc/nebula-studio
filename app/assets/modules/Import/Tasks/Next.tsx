@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 
 import service from '#assets/config/service';
 import { IDispatch, IRootState } from '#assets/store';
+import { configToJson } from '#assets/utils/import';
 
 const mapState = (state: IRootState) => ({
   vertexesConfig: state.importData.vertexesConfig,
@@ -16,7 +17,6 @@ const mapState = (state: IRootState) => ({
   username: state.nebula.username,
   password: state.nebula.password,
   host: state.nebula.host,
-  port: state.nebula.port,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -44,9 +44,8 @@ class Next extends React.Component<IProps> {
       edgesConfig,
       mountPath,
       activeStep,
-      port,
     } = this.props;
-    const result: any = await service.createConfigFile({
+    const config: any = configToJson({
       currentSpace,
       username,
       password,
@@ -55,8 +54,8 @@ class Next extends React.Component<IProps> {
       edgesConfig,
       mountPath,
       activeStep,
-      port,
     });
+    const result: any = await service.createConfigFile({ config, mountPath });
     if (!vertexesConfig.length && !edgesConfig.length) {
       this.props.nextStep();
       return;
@@ -71,7 +70,6 @@ class Next extends React.Component<IProps> {
         edgesConfig,
         mountPath,
         activeStep,
-        port,
       });
       if (errCode === 0) {
         this.props.nextStep();

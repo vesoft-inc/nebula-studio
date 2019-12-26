@@ -10,7 +10,7 @@ const { Step } = Steps;
 const mapState = (state: IRootState) => ({
   activeStep: state.importData.activeStep,
   currentStep: state.importData.currentStep,
-  isFinish: state.importData.isFinish,
+  isImporting: state.importData.isImporting,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -28,8 +28,8 @@ interface IProps
 
 class Progress extends React.Component<IProps, {}> {
   handleSwitchStep = step => {
-    const { currentStep, isFinish } = this.props;
-    if (!isFinish) {
+    const { currentStep, isImporting } = this.props;
+    if (!isImporting) {
       return;
     }
     if (step <= currentStep) {
@@ -38,8 +38,8 @@ class Progress extends React.Component<IProps, {}> {
   };
 
   stepsStatus = index => {
-    const { currentStep, isFinish } = this.props;
-    if (!isFinish) {
+    const { currentStep, isImporting } = this.props;
+    if (!isImporting) {
       return 'wait';
     }
     return index <= currentStep ? 'finish' : 'wait';
@@ -63,7 +63,7 @@ class Progress extends React.Component<IProps, {}> {
         title: intl.get('common.import'),
       },
     ];
-    const { activeStep, isFinish } = this.props;
+    const { activeStep, isImporting } = this.props;
     return (
       <div className="nav-import">
         <Steps
@@ -79,7 +79,7 @@ class Progress extends React.Component<IProps, {}> {
             />
           ))}
         </Steps>
-        {isFinish && (
+        {isImporting && (
           <Popconfirm
             placement="left"
             title={intl.get('import.clearAllConfigInfo')}

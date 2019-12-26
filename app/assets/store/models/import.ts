@@ -36,7 +36,7 @@ interface IState {
   activeEdgeIndex: number;
   vertexAddCount: number;
   edgeAddCount: number;
-  isFinish: boolean;
+  isImporting: boolean;
   taskId: string;
 }
 
@@ -53,7 +53,7 @@ export const importData = createModel({
     activeEdgeIndex: -1,
     vertexAddCount: 0,
     edgeAddCount: 0,
-    isFinish: true,
+    isImporting: true,
     taskId: 'all',
   },
   reducers: {
@@ -276,7 +276,7 @@ export const importData = createModel({
         activeEdgeIndex: -1,
         vertexAddCount: 0,
         edgeAddCount: 0,
-        isFinish: true,
+        isImporting: true,
       });
     },
     async importData(payload) {
@@ -285,13 +285,13 @@ export const importData = createModel({
       const { taskId } = (await service.importData(config)) as any;
       this.update({
         taskId,
-        isFinish: false,
+        isImporting: false,
       });
     },
 
     async stopImport(payload) {
       this.update({
-        isFinish: true,
+        isImporting: true,
       });
       service.stopImport(payload);
     },
@@ -360,7 +360,7 @@ export const importData = createModel({
       const result = await service.checkImportFinish(payload);
       if (result.data) {
         this.update({
-          isFinish: true,
+          isImporting: true,
         });
       }
       return result;

@@ -5,14 +5,14 @@ import { connect } from 'react-redux';
 
 import service from '#assets/config/service';
 import { IDispatch } from '#assets/store';
-import { getStringByteLength } from '#assets/utils/import';
+import { configToJson, getStringByteLength } from '#assets/utils/import';
 
 const { TabPane } = Tabs;
 const mapState = (state: any) => ({
   activeStep: state.importData.activeStep,
   importLoading: state.loading.effects.importData.importData,
   mountPath: state.importData.mountPath,
-  isFinish: state.importData.isFinish,
+  isImporting: state.importData.isImporting,
   vertexesConfig: state.importData.vertexesConfig,
   edgesConfig: state.importData.edgesConfig,
   taskId: state.importData.taskId,
@@ -62,16 +62,20 @@ class Import extends React.Component<IProps, IState> {
       mountPath,
       activeStep,
     } = this.props;
+    const config: any = configToJson({
+      currentSpace,
+      username,
+      password,
+      host,
+      vertexesConfig,
+      edgesConfig,
+      mountPath,
+      activeStep,
+    });
     service
       .createConfigFile({
-        currentSpace,
-        username,
-        password,
-        host,
-        vertexesConfig,
-        edgesConfig,
+        config,
         mountPath,
-        activeStep,
       })
       .then((result: any) => {
         if (result.code !== '0') {
@@ -168,7 +172,7 @@ class Import extends React.Component<IProps, IState> {
 
   render() {
     const {
-      isFinish,
+      isImporting,
       vertexesConfig,
       edgesConfig,
       mountPath,
@@ -181,14 +185,14 @@ class Import extends React.Component<IProps, IState> {
           <Button
             className="import-again"
             onClick={this.handleRunImport}
-            disabled={!isFinish}
+            disabled={!isImporting}
           >
             {intl.get('import.runImport')}
           </Button>
           <Button
             className="import-again"
             onClick={() => this.props.stopImport({ taskId })}
-            disabled={isFinish}
+            disabled={isImporting}
           >
             {intl.get('import.endImport')}
           </Button>
@@ -204,14 +208,14 @@ class Import extends React.Component<IProps, IState> {
             <Button
               className="import-again"
               onClick={this.props.resetAllConfig}
-              disabled={!isFinish}
+              disabled={!isImporting}
             >
               {intl.get('import.newImport')}
             </Button>
             <Button
               className="import-again"
               onClick={this.handleAgainImport}
-              disabled={!isFinish}
+              disabled={!isImporting}
             >
               {intl.get('import.againImport')}
             </Button>
