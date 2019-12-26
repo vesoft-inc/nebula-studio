@@ -75,7 +75,7 @@ export default class ImportController extends Controller {
     ctx.response.body = {
       code: '0',
       data: {
-        dir: '/Users/lidanji/Vesoft/local',
+        dir: (ctx.app.config.env as any).WORKING_DIR || process.env.WORKING_DIR,
       },
     };
   }
