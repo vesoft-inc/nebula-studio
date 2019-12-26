@@ -56,9 +56,11 @@ export default class Import extends Service {
       }).forEach(prop => {
         switch (prop.name) {
           case 'rank':
-            edge.rank = {
-              index: prop.mapping,
-            };
+            if (prop.mapping !== null) {
+              edge.rank = {
+                index: prop.mapping,
+              };
+            }
             break;
           case 'srcId':
             edge.srcVID = {

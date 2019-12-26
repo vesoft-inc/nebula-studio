@@ -47,7 +47,7 @@ class Import extends React.Component<IProps, IState> {
     this.state = {
       activeKey: 'log',
       startByte: 0,
-      endByte: 100000,
+      endByte: 1000000,
     };
   }
 
@@ -133,8 +133,8 @@ class Import extends React.Component<IProps, IState> {
     if (result.data && result.code === '0') {
       this.setState(
         {
-          startByte: byteLength,
-          endByte: byteLength + 100000,
+          startByte: startByte + byteLength,
+          endByte: startByte + byteLength + 1000000,
         },
         () => {
           this.logTimer = setTimeout(this.readlog, 5000);
@@ -147,7 +147,7 @@ class Import extends React.Component<IProps, IState> {
       } else {
         this.setState({
           startByte: 0,
-          endByte: 100000,
+          endByte: 1000000,
         });
         clearTimeout(this.logTimer);
       }

@@ -61,8 +61,7 @@ export default class ImportController extends Controller {
 
   async callback() {
     const { ctx } = this;
-    const { taskId } = ctx.query;
-    console.log('callback:', ctx.query);
+    const { taskId } = ctx.request.body;
     taskList.set(taskId, true);
     ctx.response.body = {
       message: '',
