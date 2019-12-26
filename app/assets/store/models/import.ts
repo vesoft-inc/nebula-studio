@@ -3,6 +3,7 @@ import { message } from 'antd';
 import intl from 'react-intl-universal';
 
 import service from '#assets/config/service';
+import { configToJson } from '#assets/utils/import';
 
 interface ITag {
   props: any[];
@@ -35,7 +36,8 @@ interface IState {
   activeEdgeIndex: number;
   vertexAddCount: number;
   edgeAddCount: number;
-  isFinish: boolean;
+  isImporting: boolean;
+  taskId: string;
 }
 
 export const importData = createModel({
@@ -51,7 +53,8 @@ export const importData = createModel({
     activeEdgeIndex: -1,
     vertexAddCount: 0,
     edgeAddCount: 0,
-    isFinish: true,
+    isImporting: true,
+    taskId: 'all',
   },
   reducers: {
     update: (state: IState, payload: any) => {
@@ -273,25 +276,33 @@ export const importData = createModel({
         activeEdgeIndex: -1,
         vertexAddCount: 0,
         edgeAddCount: 0,
-        isFinish: true,
+        isImporting: true,
       });
     },
-    async importData(payload: { localPath: string }) {
+    async importData(payload) {
+      const config: any = configToJson(payload);
+      service.runImport();
+      const { taskId } = (await service.importData(config)) as any;
       this.update({
-        isFinish: false,
-      });
-      const { localPath } = payload;
-      service.importData({
-        localPath,
+        taskId,
+        isImporting: false,
       });
     },
 
-    async testImport(payload: { localPath: string }) {
-      const { localPath } = payload;
-      const { code } = (await service.testImport({
-        localPath,
-      })) as any;
-      return code;
+    async stopImport(payload) {
+      this.update({
+        isImporting: true,
+      });
+      service.stopImport(payload);
+    },
+
+    async testImport(payload) {
+      const config: any = configToJson(payload);
+      const { taskId, errCode } = (await service.importData(config)) as any;
+      this.update({
+        taskId,
+      });
+      return errCode;
     },
 
     async asyncUpdateEdgeConfig(payload: {
@@ -343,16 +354,6 @@ export const importData = createModel({
           edgeType,
         });
       }
-    },
-
-    async asyncCheckFinish() {
-      const result = await service.checkImportFinish();
-      if (result.data) {
-        this.update({
-          isFinish: true,
-        });
-      }
-      return result;
     },
 
     async asyncUpdateTagConfig(payload: {

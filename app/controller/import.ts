@@ -1,64 +1,22 @@
-import { exec } from 'child_process';
 import { Controller } from 'egg';
 import fs from 'fs';
 
-let isFinish: boolean = true;
-let importProcess: any;
+const taskList = new Map();
 
 export default class ImportController extends Controller {
   async import() {
-    // rely on nebula-importer in the peer directory
     const { ctx } = this;
-    const { localPath } = ctx.request.body;
-    isFinish = false;
-    importProcess = exec(
-      './nebula-importer --config ' + localPath + '/tmp/config.yaml',
-      {
-        cwd: '../nebula-importer',
-        maxBuffer: 1024 * 1024 * 1024,
-      },
-    );
+    const { taskId } = ctx.query;
+    taskList.set(taskId, false);
     ctx.response.body = {
-      message: '',
       data: [],
-      code: '0',
-    };
-  }
-
-  async testImport() {
-    const { ctx } = this;
-    const { localPath } = ctx.request.body;
-    const { message, code } = await ctx.service.import.importTest(localPath);
-    ctx.response.body = {
-      message,
-      data: [],
-      code,
-    };
-  }
-
-  async killProcesss() {
-    const { ctx } = this;
-    importProcess.kill();
-    isFinish = true;
-    ctx.response.body = {
-      message: '',
-      data: [],
-      code: '0',
-    };
-  }
-
-  async refresh() {
-    const { ctx } = this;
-    ctx.response.body = {
-      message: '',
-      data: isFinish,
       code: '0',
     };
   }
 
   async readLog() {
     const { ctx } = this;
-    const { startByte, endByte, dir } = ctx.query;
+    const { startByte, endByte, dir, taskId } = ctx.query;
     let data: any;
     let readStream: any;
     let code: string = '0';
@@ -80,7 +38,7 @@ export default class ImportController extends Controller {
     } catch (e) {
       data = 'read file error';
     }
-    if (!data && isFinish) {
+    if (!data && taskList.get(taskId)) {
       code = '-1';
     }
     const log = data ? data.replace(/\n/g, '<br />') : '';
@@ -93,7 +51,8 @@ export default class ImportController extends Controller {
 
   async callback() {
     const { ctx } = this;
-    isFinish = true;
+    const { taskId } = ctx.request.body;
+    taskList.set(taskId, true);
     ctx.response.body = {
       message: '',
       data: '',
@@ -103,7 +62,6 @@ export default class ImportController extends Controller {
 
   async getWorkingDir() {
     const { ctx } = this;
-    console.log(ctx.app.config.env, 'hhhhh');
     ctx.response.body = {
       code: '0',
       data: {
@@ -114,48 +72,8 @@ export default class ImportController extends Controller {
 
   async createConfigFile() {
     const { ctx } = this;
-    const {
-      currentSpace,
-      username,
-      password,
-      host,
-      vertexesConfig,
-      edgesConfig,
-      mountPath,
-      activeStep,
-    } = ctx.request.body;
-    const vertexToJSON = await ctx.service.import.vertexDataToJSON(
-      vertexesConfig,
-      activeStep,
-      mountPath,
-    );
-    const edgeToJSON = await ctx.service.import.edgeDataToJSON(
-      edgesConfig,
-      activeStep,
-      mountPath,
-    );
-    const files: any[] = [...vertexToJSON, ...edgeToJSON];
-    const configJson = {
-      version: 'v1rc1',
-      description: 'web console import',
-      clientSettings: {
-        concurrency: 10,
-        channelBufferSize: 128,
-        space: currentSpace,
-        connection: {
-          user: username,
-          password,
-          address: host,
-        },
-      },
-      httpSettings: {
-        port: 5699,
-        callback: 'http://localhost:7002/api/import/finish',
-      },
-      logPath: mountPath + '/tmp/import.log',
-      files,
-    };
-    const content = JSON.stringify(configJson, null, 2);
+    const { mountPath, config } = ctx.request.body;
+    const content = JSON.stringify(config, null, 2);
     const { message, code } = await ctx.service.import.writeFile(
       mountPath + '/tmp/config.yaml',
       content,

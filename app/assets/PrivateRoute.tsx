@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Redirect, Route } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 
+import ConfigServer from '#assets/modules/ConfigServer';
 import { IRootState } from '#assets/store';
 
 const mapState = (state: IRootState) => ({
@@ -19,7 +20,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
       rest.host && rest.username && rest.password ? (
         <Component {...props} />
       ) : (
-        <Redirect to="/config-server" />
+        <ConfigServer />
       )
     }
   />

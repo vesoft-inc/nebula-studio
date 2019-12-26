@@ -28,8 +28,10 @@ const get = (api: string) => (params?: object, config = {}) =>
 
 const post = (api: string) => (params?: object, config = {}) =>
   service.post(api, params, config);
+const put = (api: string) => (params?: object, config = {}) =>
+  service.put(api, params, config);
 
 const _delete = (api: string) => (params?: object) =>
   service.delete(api, params);
 
-export { get, post, _delete };
+export { get, post, put, _delete };

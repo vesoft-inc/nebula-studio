@@ -38,16 +38,22 @@ export const nebula = createModel({
       username: string;
       password: string;
     }) {
+      const { host, username, password } = payload;
+      if (host.startsWith('http://')) {
+        payload.host = host.substr(7);
+      }
+      if (host.startsWith('https://')) {
+        payload.host = host.substr(8);
+      }
       const { code, message: errorMessage } = (await service.connectDB(
         payload,
       )) as any;
       if (code === '0') {
-        const { host, username, password } = payload;
-        cookies.set('host', host);
+        cookies.set('host', payload.host);
         cookies.set('username', username);
         cookies.set('password', password);
         this.update({
-          host,
+          host: payload.host,
           username,
           password,
         });

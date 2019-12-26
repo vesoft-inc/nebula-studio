@@ -10,6 +10,7 @@ const { Step } = Steps;
 const mapState = (state: IRootState) => ({
   activeStep: state.importData.activeStep,
   currentStep: state.importData.currentStep,
+  isImporting: state.importData.isImporting,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -27,10 +28,21 @@ interface IProps
 
 class Progress extends React.Component<IProps, {}> {
   handleSwitchStep = step => {
-    const { currentStep } = this.props;
+    const { currentStep, isImporting } = this.props;
+    if (!isImporting) {
+      return;
+    }
     if (step <= currentStep) {
       this.props.updateActiveStep(step);
     }
+  };
+
+  stepsStatus = index => {
+    const { currentStep, isImporting } = this.props;
+    if (!isImporting) {
+      return 'wait';
+    }
+    return index <= currentStep ? 'finish' : 'wait';
   };
 
   render() {
@@ -51,8 +63,7 @@ class Progress extends React.Component<IProps, {}> {
         title: intl.get('common.import'),
       },
     ];
-    const { currentStep, activeStep } = this.props;
-
+    const { activeStep, isImporting } = this.props;
     return (
       <div className="nav-import">
         <Steps
@@ -64,19 +75,21 @@ class Progress extends React.Component<IProps, {}> {
             <Step
               title={step.title}
               key={index}
-              status={index <= currentStep ? 'finish' : 'wait'}
+              status={this.stepsStatus(index)}
             />
           ))}
         </Steps>
-        <Popconfirm
-          placement="left"
-          title={intl.get('import.clearAllConfigInfo')}
-          onConfirm={this.props.resetAllConfig}
-          okText="Yes"
-          cancelText="No"
-        >
-          <Icon type="delete" className="rest-import" />
-        </Popconfirm>
+        {isImporting && (
+          <Popconfirm
+            placement="left"
+            title={intl.get('import.clearAllConfigInfo')}
+            onConfirm={this.props.resetAllConfig}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Icon type="delete" className="rest-import" />
+          </Popconfirm>
+        )}
       </div>
     );
   }

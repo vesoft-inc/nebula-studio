@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 
 import service from '#assets/config/service';
 import { IDispatch, IRootState } from '#assets/store';
+import { configToJson } from '#assets/utils/import';
 
 const mapState = (state: IRootState) => ({
   vertexesConfig: state.importData.vertexesConfig,
@@ -43,7 +44,7 @@ class Next extends React.Component<IProps> {
       mountPath,
       activeStep,
     } = this.props;
-    const result: any = await service.createConfigFile({
+    const config: any = configToJson({
       currentSpace,
       username,
       password,
@@ -53,9 +54,23 @@ class Next extends React.Component<IProps> {
       mountPath,
       activeStep,
     });
+    const result: any = await service.createConfigFile({ config, mountPath });
+    if (!vertexesConfig.length && !edgesConfig.length) {
+      this.props.nextStep();
+      return;
+    }
     if (result.code === '0') {
-      const code: any = await this.props.testImport({ localPath: mountPath });
-      if (code === '0') {
+      const errCode: any = await this.props.testImport({
+        currentSpace,
+        username,
+        password,
+        host,
+        vertexesConfig,
+        edgesConfig,
+        mountPath,
+        activeStep,
+      });
+      if (errCode === 0) {
         this.props.nextStep();
       } else {
         message.error(intl.get('import.importErrorInfo'));

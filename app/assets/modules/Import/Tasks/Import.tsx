@@ -5,15 +5,17 @@ import { connect } from 'react-redux';
 
 import service from '#assets/config/service';
 import { IDispatch } from '#assets/store';
+import { configToJson, getStringByteLength } from '#assets/utils/import';
 
 const { TabPane } = Tabs;
 const mapState = (state: any) => ({
   activeStep: state.importData.activeStep,
   importLoading: state.loading.effects.importData.importData,
   mountPath: state.importData.mountPath,
-  isFinish: state.importData.isFinish,
+  isImporting: state.importData.isImporting,
   vertexesConfig: state.importData.vertexesConfig,
   edgesConfig: state.importData.edgesConfig,
+  taskId: state.importData.taskId,
   currentSpace: state.nebula.currentSpace,
   username: state.nebula.username,
   password: state.nebula.password,
@@ -23,7 +25,8 @@ const mapState = (state: any) => ({
 const mapDispatch = (dispatch: IDispatch) => ({
   importData: dispatch.importData.importData,
   resetAllConfig: dispatch.importData.resetAllConfig,
-  asyncCheckFinish: dispatch.importData.asyncCheckFinish,
+  update: dispatch.importData.update,
+  stopImport: dispatch.importData.stopImport,
 });
 
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
@@ -37,7 +40,6 @@ interface IState {
 class Import extends React.Component<IProps, IState> {
   ref: HTMLDivElement;
   logTimer: any;
-  finishTimer: any;
 
   constructor(props: IProps) {
     super(props);
@@ -59,16 +61,20 @@ class Import extends React.Component<IProps, IState> {
       mountPath,
       activeStep,
     } = this.props;
+    const config: any = configToJson({
+      currentSpace,
+      username,
+      password,
+      host,
+      vertexesConfig,
+      edgesConfig,
+      mountPath,
+      activeStep,
+    });
     service
       .createConfigFile({
-        currentSpace,
-        username,
-        password,
-        host,
-        vertexesConfig,
-        edgesConfig,
+        config,
         mountPath,
-        activeStep,
       })
       .then((result: any) => {
         if (result.code !== '0') {
@@ -79,56 +85,63 @@ class Import extends React.Component<IProps, IState> {
 
   componentWillUnmount() {
     clearTimeout(this.logTimer);
-    clearTimeout(this.finishTimer);
   }
 
-  endImport = () => {
-    service.deleteProcess();
-  };
-
   handleRunImport = () => {
-    const { mountPath } = this.props;
-    this.props.importData({ localPath: mountPath });
-    this.logTimer = setTimeout(this.readlog, 1000);
-    this.finishTimer = setTimeout(this.checkFinish, 1000);
-  };
-
-  checkFinish = async () => {
-    const { asyncCheckFinish } = this.props;
-    const result: any = await asyncCheckFinish();
-    if (result.data) {
-      clearTimeout(this.finishTimer);
-    } else {
-      this.finishTimer = setTimeout(this.checkFinish, 1000);
-    }
+    const {
+      currentSpace,
+      username,
+      password,
+      host,
+      vertexesConfig,
+      edgesConfig,
+      mountPath,
+      activeStep,
+    } = this.props;
+    this.props.importData({
+      currentSpace,
+      username,
+      password,
+      host,
+      vertexesConfig,
+      edgesConfig,
+      mountPath,
+      activeStep,
+    });
+    this.logTimer = setTimeout(this.readlog, 2000);
   };
 
   readlog = async () => {
     const { startByte, endByte } = this.state;
-    const { mountPath } = this.props;
+    const { mountPath, taskId, update } = this.props;
     const result: any = await service.getLog({
       dir: mountPath,
       startByte,
       endByte,
+      taskId,
     });
+    const byteLength = getStringByteLength(result.data);
     if (result.data && result.code === '0') {
       this.setState(
         {
-          startByte: endByte,
-          endByte: endByte + 1000000,
+          startByte: startByte + byteLength,
+          endByte: startByte + byteLength + 1000000,
         },
         () => {
-          this.logTimer = setTimeout(this.readlog, 1000);
+          this.logTimer = setTimeout(this.readlog, 2000);
         },
       );
-      this.ref.innerHTML = result.data;
+      this.ref.innerHTML += result.data;
     } else {
       if (result.code === '0') {
-        this.logTimer = setTimeout(this.readlog, 1000);
+        this.logTimer = setTimeout(this.readlog, 2000);
       } else {
         this.setState({
           startByte: 0,
           endByte: 1000000,
+        });
+        update({
+          isImporting: true,
         });
         clearTimeout(this.logTimer);
       }
@@ -148,7 +161,13 @@ class Import extends React.Component<IProps, IState> {
   };
 
   render() {
-    const { isFinish, vertexesConfig, edgesConfig, mountPath } = this.props;
+    const {
+      isImporting,
+      vertexesConfig,
+      edgesConfig,
+      mountPath,
+      taskId,
+    } = this.props;
     const { activeKey } = this.state;
     return (
       <div className="import">
@@ -156,14 +175,14 @@ class Import extends React.Component<IProps, IState> {
           <Button
             className="import-again"
             onClick={this.handleRunImport}
-            disabled={!isFinish}
+            disabled={!isImporting}
           >
             {intl.get('import.runImport')}
           </Button>
           <Button
             className="import-again"
-            onClick={this.endImport}
-            disabled={isFinish}
+            onClick={() => this.props.stopImport({ taskId })}
+            disabled={isImporting}
           >
             {intl.get('import.endImport')}
           </Button>
@@ -179,43 +198,69 @@ class Import extends React.Component<IProps, IState> {
             <Button
               className="import-again"
               onClick={this.props.resetAllConfig}
-              disabled={!isFinish}
+              disabled={!isImporting}
             >
               {intl.get('import.newImport')}
             </Button>
             <Button
               className="import-again"
               onClick={this.handleAgainImport}
-              disabled={!isFinish}
+              disabled={!isImporting}
             >
               {intl.get('import.againImport')}
             </Button>
             <div className="import-export">
               <div>
-                配置文件：(/Users/lidanji/Vesoft/local/config.yaml) ：
-                <a href={`file://${mountPath}/config.yaml`}>config.yml</a>
+                {intl.get('import.configFilePath')} (
+                {`${mountPath}/tmp/config.yaml`}) ：
+                <a href={`file://${mountPath}/tmp/config.yaml`}>config.yml</a>
               </div>
+              <div>
+                {intl.get('import.logFilePath')} (
+                {`${mountPath}/tmp/import.log`}) ：
+                <a href={`file://${mountPath}/tmp/import.log`}>import.log</a>
+              </div>
+              <br />
               {vertexesConfig.map(vertex => {
                 return (
                   <div key={vertex.name}>
-                    <p>导入数据节点文件：</p>
-                    {`本地数据文件路径： ${vertex.file.path} 错误数据文件路径： ${mountPath}/err/${vertex.name}Fail.scv`}
-                    ：
-                    <a href={`file://${mountPath}/err/${vertex.name}Fail.scv`}>
-                      {vertex.name}
-                    </a>
+                    <p>{intl.get('import.vertexesFilePath')}</p>
+                    <br />
+                    <p>
+                      {`${intl.get('import.vertexFilePath')} ${
+                        vertex.file.path
+                      }`}
+                    </p>
+                    <p>
+                      {intl.get('import.vertexErrorFilePath')} ({mountPath}
+                      /tmp/err/${vertex.name}Fail.scv):
+                      <a
+                        href={`file://${mountPath}/tmp/err/${vertex.name}Fail.scv`}
+                      >
+                        {vertex.name}
+                      </a>
+                    </p>
                   </div>
                 );
               })}
+              <br />
               {edgesConfig.map(edge => {
                 return (
                   <div key={edge.name}>
-                    <p>导入数据边文件：</p>
-                    {`本地数据文件路径： ${edge.file.path} 错误数据文件路径： ${mountPath}/err/${edge.name}Fail.scv`}
-                    ：
-                    <a href={`file://${mountPath}/err/${edge.name}Fail.scv`}>
-                      {edge.name}
-                    </a>
+                    <p>{intl.get('import.edgesFilePath')}</p>
+                    <br />
+                    <p>
+                      {`${intl.get('import.edgeFilePath')} ${edge.file.path}`}
+                    </p>
+                    <p>
+                      {intl.get('import.edgeErrorFilePath')} ({mountPath}
+                      /tmp/err/${edge.name}Fail.scv):
+                      <a
+                        href={`file://${mountPath}tmp/err/${edge.name}Fail.scv`}
+                      >
+                        {edge.name}
+                      </a>
+                    </p>
                   </div>
                 );
               })}

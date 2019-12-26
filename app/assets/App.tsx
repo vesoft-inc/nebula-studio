@@ -1,4 +1,5 @@
 import { Icon, Layout, Menu, Select, Spin } from 'antd';
+import cookies from 'js-cookie';
 import React from 'react';
 import { hot } from 'react-hot-loader/root';
 import intl from 'react-intl-universal';
@@ -13,6 +14,7 @@ import {
 } from 'react-router-dom';
 
 import { INTL_LOCALE_SELECT, INTL_LOCALES } from '#assets/config';
+import service from '#assets/config/service';
 import { LanguageContext } from '#assets/context';
 import Console from '#assets/modules/Console';
 import Explore from '#assets/modules/Explore';
@@ -40,10 +42,14 @@ class App extends React.Component<IProps, IState> {
 
     const regx = /lang=(\w+)/g;
     const match = regx.exec(props.history.location.search);
-    const defaultLocale = match
-      ? match[1].toUpperCase()
-      : INTL_LOCALE_SELECT.EN_US.NAME;
-    this.currentLocale = defaultLocale;
+
+    if (match) {
+      cookies.set('locale', match[1].toUpperCase());
+    } else {
+      cookies.set('locale', 'ZH_CN');
+    }
+
+    this.currentLocale = cookies.get('locale');
     this.state = {
       loading: true,
       activeMenu: props.location.pathname.split('/').pop() || '',
@@ -51,6 +57,7 @@ class App extends React.Component<IProps, IState> {
   }
 
   toggleLanguage = (locale: string) => {
+    cookies.set('locale', locale);
     window.location.href = updateQueryStringParameter(
       window.location.href,
       'lang',
@@ -76,6 +83,11 @@ class App extends React.Component<IProps, IState> {
       activeMenu: key,
     });
   };
+
+  componentWillMount() {
+    // Initialize the import task
+    service.stopImport({ taskId: 'all' });
+  }
 
   componentDidMount() {
     this.loadIntlLocale();
