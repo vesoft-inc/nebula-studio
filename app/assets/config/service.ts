@@ -14,8 +14,6 @@ const createConfigFile = post('/api/import/config');
 
 const getLog = get('/api/import/log');
 
-const checkImportFinish = get('/api/import/refresh');
-
 const deleteProcess = _delete('/api/import/process');
 
 const getImportWokingDir = get('/api/import/working_dir');
@@ -28,7 +26,6 @@ export default {
   stopImport,
   createConfigFile,
   getLog,
-  checkImportFinish,
   deleteProcess,
   getImportWokingDir,
 };

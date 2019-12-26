@@ -14,16 +14,6 @@ export default class ImportController extends Controller {
     };
   }
 
-  async refresh() {
-    const { ctx } = this;
-    const { taskId } = ctx.query;
-    ctx.response.body = {
-      message: '',
-      data: taskList.get(taskId),
-      code: '0',
-    };
-  }
-
   async readLog() {
     const { ctx } = this;
     const { startByte, endByte, dir, taskId } = ctx.query;

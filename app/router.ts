@@ -5,7 +5,6 @@ export default (app: Application) => {
 
   router.post('/api/import/import', controller.import.import);
   router.get('/api/import/log', controller.import.readLog);
-  router.get('/api/import/refresh', controller.import.refresh);
   router.post('/api/import/config', controller.import.createConfigFile);
   router.post('/api/import/finish', controller.import.callback);
   router.get('/api/import/working_dir', controller.import.getWorkingDir);

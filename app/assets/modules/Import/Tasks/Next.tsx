@@ -22,7 +22,6 @@ const mapState = (state: IRootState) => ({
 const mapDispatch = (dispatch: IDispatch) => ({
   nextStep: dispatch.importData.nextStep,
   testImport: dispatch.importData.testImport,
-  update: dispatch.importData.update,
 });
 
 interface IProps

@@ -25,7 +25,7 @@ const mapState = (state: any) => ({
 const mapDispatch = (dispatch: IDispatch) => ({
   importData: dispatch.importData.importData,
   resetAllConfig: dispatch.importData.resetAllConfig,
-  asyncCheckFinish: dispatch.importData.asyncCheckFinish,
+  update: dispatch.importData.update,
   stopImport: dispatch.importData.stopImport,
 });
 
@@ -40,7 +40,6 @@ interface IState {
 class Import extends React.Component<IProps, IState> {
   ref: HTMLDivElement;
   logTimer: any;
-  finishTimer: any;
 
   constructor(props: IProps) {
     super(props);
@@ -86,7 +85,6 @@ class Import extends React.Component<IProps, IState> {
 
   componentWillUnmount() {
     clearTimeout(this.logTimer);
-    clearTimeout(this.finishTimer);
   }
 
   handleRunImport = () => {
@@ -110,23 +108,12 @@ class Import extends React.Component<IProps, IState> {
       mountPath,
       activeStep,
     });
-    this.logTimer = setTimeout(this.readlog, 5000);
-    this.finishTimer = setTimeout(this.checkFinish, 2000);
-  };
-
-  checkFinish = async () => {
-    const { asyncCheckFinish, taskId } = this.props;
-    const result: any = await asyncCheckFinish({ taskId });
-    if (result.data) {
-      clearTimeout(this.finishTimer);
-    } else {
-      this.finishTimer = setTimeout(this.checkFinish, 2000);
-    }
+    this.logTimer = setTimeout(this.readlog, 2000);
   };
 
   readlog = async () => {
     const { startByte, endByte } = this.state;
-    const { mountPath, taskId } = this.props;
+    const { mountPath, taskId, update } = this.props;
     const result: any = await service.getLog({
       dir: mountPath,
       startByte,
@@ -141,17 +128,20 @@ class Import extends React.Component<IProps, IState> {
           endByte: startByte + byteLength + 1000000,
         },
         () => {
-          this.logTimer = setTimeout(this.readlog, 5000);
+          this.logTimer = setTimeout(this.readlog, 2000);
         },
       );
       this.ref.innerHTML += result.data;
     } else {
       if (result.code === '0') {
-        this.logTimer = setTimeout(this.readlog, 5000);
+        this.logTimer = setTimeout(this.readlog, 2000);
       } else {
         this.setState({
           startByte: 0,
           endByte: 1000000,
+        });
+        update({
+          isImporting: true,
         });
         clearTimeout(this.logTimer);
       }

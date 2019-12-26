@@ -356,16 +356,6 @@ export const importData = createModel({
       }
     },
 
-    async asyncCheckFinish(payload) {
-      const result = await service.checkImportFinish(payload);
-      if (result.data) {
-        this.update({
-          isImporting: true,
-        });
-      }
-      return result;
-    },
-
     async asyncUpdateTagConfig(payload: {
       host: string;
       username: string;
