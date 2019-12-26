@@ -1,15 +1,21 @@
 version: '3.4'
 services:
   client:
+    # Dev
+    # build: '../nebula-go-api/'
+    # Prod
     image: niania/nebula-http-client:0.0.1
-    network_mode: "bridge"
     environment:
       USER: root
     ports:
       - 8080:8080
+    networks: 
+      - nebula-web
   web:
-    image: niania/nebula-web-console:0.0.4
-    network_mode: "bridge"
+    # Dev
+    # build: '../.'
+    # Prod
+    image: niania/nebula-web-console:0.0.5
     environment:
       USER: root
       WORKING_DIR: ${WORKING_DIR}
@@ -19,3 +25,19 @@ services:
       - client
     volumes:
       - ${WORKING_DIR}:${WORKING_DIR}:rw
+    networks: 
+      - nebula-web
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nebula.conf
+    depends_on:
+      - client
+      - web
+    networks: 
+      - nebula-web
+    ports:
+      - 80:80
+
+networks: 
+  nebula-web:

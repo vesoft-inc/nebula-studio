@@ -22,7 +22,4 @@ docker-compose down
 ```
 
 ## 应用访问
-请打开浏览器使用本机ip访问：`${你的ip地址}:7001`
-ip地址查看：
-- Mac: Terminal打开输入 `ifconfig`
-- Linux: `ip address`
+http://127.0.0.1
