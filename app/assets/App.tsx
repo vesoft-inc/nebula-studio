@@ -1,4 +1,4 @@
-import { Icon, Layout, Menu, Select, Spin } from 'antd';
+import { Dropdown, Icon, Layout, Menu, Select, Spin } from 'antd';
 import cookies from 'js-cookie';
 import React from 'react';
 import { hot } from 'react-hot-loader/root';
@@ -79,6 +79,9 @@ class App extends React.Component<IProps, IState> {
   };
 
   handleMenuClick = ({ key }) => {
+    if (key === 'newRelease') {
+      return;
+    }
     this.setState({
       activeMenu: key,
     });
@@ -149,6 +152,26 @@ class App extends React.Component<IProps, IState> {
                     ))}
                   </Select>
                 </div>
+                <Dropdown
+                  className="help"
+                  overlay={
+                    <Menu>
+                      <Menu.Item>
+                        <a
+                          href="https://github.com/vesoft-inc/nebula-web-console/blob/master/CHANGELOG.md"
+                          target="_blank"
+                        >
+                          <Icon type="tags" />
+                          {intl.get('common.release')}
+                        </a>
+                      </Menu.Item>
+                    </Menu>
+                  }
+                >
+                  <a className="ant-dropdown-link">
+                    {intl.get('common.help')} <Icon type="down" />
+                  </a>
+                </Dropdown>
               </Header>
               <Content>
                 <Switch>

@@ -16,7 +16,9 @@
     "fail": "失败",
     "noData": "没有相应数据",
     "cancel": "取消",
-    "import": "导入"
+    "import": "导入",
+    "help": "帮助",
+    "release": "新发布"
   },
   "warning": {
     "configServer": "请先配置服务器"
