@@ -15,7 +15,7 @@ services:
     # Dev
     # build: '../.'
     # Prod
-    image: niania/nebula-web-console:0.0.5
+    image: niania/nebula-web-console:0.0.6
     environment:
       USER: root
       WORKING_DIR: ${WORKING_DIR}
@@ -38,6 +38,13 @@ services:
       - nebula-web
     ports:
       - 80:80
+  importer:
+    image: vesoft/nebula-importer:latest
+    networks:
+      - nebula-web
+    ports:
+      - 5699:5699
+    command: nebula-importer --port 5699 --callback http://nginx:80/api/import/callback
 
 networks: 
   nebula-web:
