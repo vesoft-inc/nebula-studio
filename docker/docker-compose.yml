@@ -8,8 +8,8 @@ services:
     environment:
       USER: root
     ports:
-      - 8080:8080
-    networks: 
+      - 8080
+    networks:
       - nebula-web
   web:
     # Dev
@@ -20,13 +20,22 @@ services:
       USER: root
       WORKING_DIR: ${WORKING_DIR}
     ports:
-      - 7001:7001
+      - 7001
     depends_on:
       - client
     volumes:
       - ${WORKING_DIR}:${WORKING_DIR}:rw
-    networks: 
+    networks:
       - nebula-web
+  importer:
+    image: vesoft/nebula-importer:latest
+    networks:
+      - nebula-web
+    ports:
+      - 5699
+    command:
+      - "--port=5699"
+      - "--callback='http://nginx:80/api/import/callback'"
   nginx:
     image: nginx:alpine
     volumes:
@@ -34,17 +43,11 @@ services:
     depends_on:
       - client
       - web
-    networks: 
-      - nebula-web
-    ports:
-      - 80:80
-  importer:
-    image: vesoft/nebula-importer:latest
+      - importer
     networks:
       - nebula-web
     ports:
-      - 5699:5699
-    command: nebula-importer --port 5699 --callback http://nginx:80/api/import/callback
+      - 80:80
 
-networks: 
+networks:
   nebula-web:
