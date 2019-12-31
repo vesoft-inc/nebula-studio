@@ -16,7 +16,9 @@
     "fail": "fail",
     "noData": "There is no data",
     "cancel": "cancel",
-    "import": "import"
+    "import": "import",
+    "help": "help",
+    "release": "New Version"
   },
   "NGQLOutput": {
     "success": "execute success!"
