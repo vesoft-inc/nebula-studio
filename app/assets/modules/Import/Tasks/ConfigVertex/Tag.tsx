@@ -178,15 +178,6 @@ class Tag extends React.Component<IProps> {
         ),
       },
       {
-        title: render(intl.get('import.type'), intl.get('import.typeTip')),
-        dataIndex: 'type',
-        render: value => (
-          <Select value={value} disabled={true}>
-            <Option value={value}>{value}</Option>
-          </Select>
-        ),
-      },
-      {
         title: render(
           intl.get('import.useHash'),
           intl.get('import.useHashTip'),
@@ -208,20 +199,23 @@ class Tag extends React.Component<IProps> {
     ];
 
     return (
-      <Table
-        className="id-config props-table"
-        columns={columns}
-        dataSource={[
-          {
-            name: 'vertexId',
-            type: 'int',
-            idMapping: vertex.idMapping,
-            useHash: vertex.useHash,
-          },
-        ]}
-        pagination={false}
-        rowKey="name"
-      />
+      <>
+        <h3>vertexId</h3>
+        <Table
+          className="id-config props-table"
+          columns={columns}
+          dataSource={[
+            {
+              name: 'vertexId',
+              type: 'int',
+              idMapping: vertex.idMapping,
+              useHash: vertex.useHash,
+            },
+          ]}
+          pagination={false}
+          rowKey="name"
+        />
+      </>
     );
   };
 
