@@ -3,7 +3,7 @@
 ## 快速开始
 
 ### 应用功能尝试
-[Nebula Console工具镜像运行](./docker/README.md)
+[Nebula Console工具镜像运行](../docker/README.md)
 
 ### 开发
 #### Node服务
