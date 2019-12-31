@@ -33,9 +33,11 @@ services:
       - nebula-web
     ports:
       - 5699
+    volumes:
+      - ${WORKING_DIR}:${WORKING_DIR}:rw
     command:
       - "--port=5699"
-      - "--callback='http://nginx:80/api/import/callback'"
+      - "--callback=http://nginx:8888/api/import/finish"
   nginx:
     image: nginx:alpine
     volumes:
@@ -47,7 +49,7 @@ services:
     networks:
       - nebula-web
     ports:
-      - 80:80
+      - 8888:8888
 
 networks:
   nebula-web:
