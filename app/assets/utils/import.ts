@@ -55,13 +55,13 @@ export function edgeDataToJSON(
           break;
         case 'srcId':
           edge.srcVID = {
-            index: indexJudge(prop.mapping),
+            index: indexJudge(prop.mapping, prop.name),
             function: prop.useHash === 'unset' ? undefined : prop.useHash,
           };
           break;
         case 'dstId':
           edge.dstVID = {
-            index: indexJudge(prop.mapping),
+            index: indexJudge(prop.mapping, prop.name),
             function: prop.useHash === 'unset' ? undefined : prop.useHash,
           };
           break;
@@ -69,7 +69,7 @@ export function edgeDataToJSON(
           const _prop = {
             name: prop.name,
             type: prop.type,
-            index: indexJudge(prop.mapping),
+            index: indexJudge(prop.mapping, prop.name),
           };
           edgePorps.push(_prop);
       }
@@ -116,7 +116,7 @@ export function vertexDataToJSON(
         .map(prop => ({
           name: prop.name,
           type: prop.type,
-          index: indexJudge(prop.mapping),
+          index: indexJudge(prop.mapping, prop.name),
         }));
       const _tag = {
         name: tag.name,
@@ -138,7 +138,7 @@ export function vertexDataToJSON(
         type: 'vertex',
         vertex: {
           vid: {
-            index: indexJudge(vertex.idMapping),
+            index: indexJudge(vertex.idMapping, 'vertexId'),
             function: vertex.useHash === 'unset' ? undefined : vertex.useHash,
           },
           tags,
@@ -150,10 +150,10 @@ export function vertexDataToJSON(
   return files;
 }
 
-export function indexJudge(index: number | null) {
+export function indexJudge(index: number | null, name: string) {
   if (index === null) {
     notification.error({
-      message: `CSV Index cannot be null`,
+      message: `${name} Index cannot be null`,
       description: `config error`,
     });
     return false;

@@ -4,9 +4,7 @@ import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
-import service from '#assets/config/service';
 import { IDispatch, IRootState } from '#assets/store';
-import { configToJson } from '#assets/utils/import';
 
 const mapState = (state: IRootState) => ({
   vertexesConfig: state.importData.vertexesConfig,
@@ -44,7 +42,7 @@ class Next extends React.Component<IProps> {
       mountPath,
       activeStep,
     } = this.props;
-    const config: any = configToJson({
+    const errCode: any = await this.props.testImport({
       currentSpace,
       username,
       password,
@@ -54,29 +52,10 @@ class Next extends React.Component<IProps> {
       mountPath,
       activeStep,
     });
-    const result: any = await service.createConfigFile({ config, mountPath });
-    if (!vertexesConfig.length && !edgesConfig.length) {
+    if (errCode === 0) {
       this.props.nextStep();
-      return;
-    }
-    if (result.code === '0') {
-      const errCode: any = await this.props.testImport({
-        currentSpace,
-        username,
-        password,
-        host,
-        vertexesConfig,
-        edgesConfig,
-        mountPath,
-        activeStep,
-      });
-      if (errCode === 0) {
-        this.props.nextStep();
-      } else {
-        message.error(intl.get('import.importErrorInfo'));
-      }
     } else {
-      message.error(intl.get('import.createConfigError'));
+      message.error(intl.get('import.importErrorInfo'));
     }
   };
 
