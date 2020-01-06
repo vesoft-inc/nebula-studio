@@ -31,6 +31,18 @@ export const nebula = createModel({
         ...payload,
       };
     },
+
+    asyncClearConfig: (state: IState) => {
+      cookies.remove('host');
+      cookies.remove('username');
+      cookies.remove('password');
+      return {
+        ...state,
+        host: '',
+        username: '',
+        password: '',
+      };
+    },
   },
   effects: {
     async asyncConfigServer(payload: {
@@ -63,17 +75,6 @@ export const nebula = createModel({
         message.error(`${intl.get('configServer.fail')}: ${errorMessage}`);
         return false;
       }
-    },
-
-    async asyncClearConfig() {
-      cookies.remove('host');
-      cookies.remove('username');
-      cookies.remove('password');
-      this.update({
-        host: '',
-        username: '',
-        password: '',
-      });
     },
 
     async asyncGetSpaces(payload: {

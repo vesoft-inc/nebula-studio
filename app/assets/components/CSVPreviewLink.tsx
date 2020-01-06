@@ -60,7 +60,6 @@ class CSVPreviewLink extends React.PureComponent<IProps> {
 
     return (
       <>
-        {prop && <span className="csv-mark">*</span>}
         <Button type="link" onClick={this.handleLinkClick}>
           {this.props.children}
         </Button>

@@ -19,7 +19,7 @@
     "import": "导入",
     "help": "帮助",
     "release": "新发布",
-    "nebula": "nebula 语法文档",
+    "nebula": "Nebula 语法文档",
     "setting":"设置"
   },
   "warning": {
@@ -48,7 +48,7 @@
   "explore": {
     "clear": "清除",
     "importNode": "添加起点",
-    "add": "确认添加",
+    "addConfirm": "确认添加",
     "undo": "回退",
     "expand": "拓展",
     "fileImport": "文件导入",

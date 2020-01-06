@@ -19,7 +19,7 @@
     "import": "import",
     "help": "help",
     "release": "New Version",
-    "nebula": "nebula syntax doc",
+    "nebula": "Nebula Doc",
     "setting": "setting"
   },
   "NGQLOutput": {
@@ -48,7 +48,7 @@
   "explore": {
     "clear": "Clear",
     "importNode": "Add Vertices",
-    "add": "Add",
+    "addConfirm": "Add",
     "expand": "Expand",
     "undo": "Undo",
     "fileImport": "File Import",
@@ -66,7 +66,7 @@
     "selectFile": "Select Files                                 ",
     "vertex": "Config Vertices",
     "edge": "Config Edges",
-    "runImport": "Run                         Import",
+    "runImport": "Run Import",
     "next": "Next",
     "mountPath": "Mount Path",
     "mountPathPlaceholder": "Please input the docker data mount path",
