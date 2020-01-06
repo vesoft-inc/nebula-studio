@@ -18,7 +18,9 @@
     "cancel": "cancel",
     "import": "import",
     "help": "help",
-    "release": "New Version"
+    "release": "New Version",
+    "nebula": "nebula syntax doc",
+    "setting": "setting"
   },
   "NGQLOutput": {
     "success": "execute success!"
@@ -45,8 +47,8 @@
   },
   "explore": {
     "clear": "Clear",
-    "importNode": "Import Nodes",
-    "import": "Import",
+    "importNode": "Add Vertices",
+    "add": "Add",
     "expand": "Expand",
     "undo": "Undo",
     "fileImport": "File Import",
@@ -59,11 +61,12 @@
     "selectReminder": "This will clear the existed graph data, are you sure?"
   },
   "import": {
+    "import": "Import",
     "init": "Init",
-    "upload": "Upload" ,
-    "vertex": "Config Vertexes",
+    "selectFile": "Select Files                                 ",
+    "vertex": "Config Vertices",
     "edge": "Config Edges",
-    "runImport": "Start Import",
+    "runImport": "Run                         Import",
     "next": "Next",
     "mountPath": "Mount Path",
     "mountPathPlaceholder": "Please input the docker data mount path",
@@ -72,7 +75,7 @@
     "fileType": "Type",
     "fileSize": "Size",
     "operation": "Operation",
-    "fileTitle": "Files Uploaded",
+    "fileTitle": "Select Files",
     "preview": "Preview",
     "delete": "Delete",
     "addVertex": "Add Vertex",
@@ -110,7 +113,7 @@
     "promptConfigInfo": "The configuration cannot be empty",
     "configFilePath": "Configuration file path:",
     "logFilePath":"Log file path:",
-    "vertexesFilePath": "Vertexes file path:",
+    "vertexesFilePath": "Vertices file path:",
     "vertexFilePath": "Vertex file path:",
     "vertexErrorFilePath": "Error vertex file path:",
     "edgesFilePath": "Edges file path:",

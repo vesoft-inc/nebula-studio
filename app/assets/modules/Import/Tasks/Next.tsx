@@ -52,6 +52,10 @@ class Next extends React.Component<IProps> {
       mountPath,
       activeStep,
     });
+    if (!vertexesConfig.length && !edgesConfig.length) {
+      this.props.nextStep();
+      return;
+    }
     if (errCode === 0) {
       this.props.nextStep();
     } else {

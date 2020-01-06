@@ -93,7 +93,7 @@ class Edge extends React.Component<IProps> {
         render: (mappingIndex, prop, propIndex) => (
           <CSVPreviewLink
             file={file}
-            prop={prop.field}
+            prop={prop.name !== 'rank' ? prop.name : undefined}
             onMapping={columnIndex =>
               this.handlePropChange(propIndex, 'mapping', columnIndex)
             }

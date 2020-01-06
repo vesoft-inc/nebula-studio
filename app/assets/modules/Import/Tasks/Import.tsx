@@ -87,7 +87,7 @@ class Import extends React.Component<IProps, IState> {
     clearTimeout(this.logTimer);
   }
 
-  handleRunImport = () => {
+  handleRunImport = async () => {
     const {
       currentSpace,
       username,
@@ -98,7 +98,7 @@ class Import extends React.Component<IProps, IState> {
       mountPath,
       activeStep,
     } = this.props;
-    this.props.importData({
+    const errCode: any = await this.props.importData({
       currentSpace,
       username,
       password,
@@ -108,7 +108,9 @@ class Import extends React.Component<IProps, IState> {
       mountPath,
       activeStep,
     });
-    this.logTimer = setTimeout(this.readlog, 2000);
+    if (errCode === 0) {
+      this.logTimer = setTimeout(this.readlog, 2000);
+    }
   };
 
   readlog = async () => {
@@ -201,13 +203,6 @@ class Import extends React.Component<IProps, IState> {
               disabled={!isImporting}
             >
               {intl.get('import.newImport')}
-            </Button>
-            <Button
-              className="import-again"
-              onClick={this.handleAgainImport}
-              disabled={!isImporting}
-            >
-              {intl.get('import.againImport')}
             </Button>
             <div className="import-export">
               <div>

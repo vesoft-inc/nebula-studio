@@ -170,7 +170,7 @@ class Import extends React.Component<IProps> {
             }}
           >
             <Button className="upload-btn" type="default">
-              {intl.get('import.upload')}
+              {intl.get('import.selectFile')}
             </Button>
           </Upload>
         </div>
