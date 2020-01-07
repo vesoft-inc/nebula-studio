@@ -37,7 +37,8 @@ class CSVPreviewLink extends React.PureComponent<IProps> {
             title: onMapping ? (
               <>
                 <Button
-                  type="link"
+                  type="primary"
+                  className="csv-select-index"
                   onClick={() => this.handleMapping(textIndex)}
                 >{`column ${textIndex}`}</Button>
                 <Tooltip

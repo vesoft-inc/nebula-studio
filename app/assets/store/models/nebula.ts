@@ -31,6 +31,18 @@ export const nebula = createModel({
         ...payload,
       };
     },
+
+    asyncClearConfig: (state: IState) => {
+      cookies.remove('host');
+      cookies.remove('username');
+      cookies.remove('password');
+      return {
+        ...state,
+        host: '',
+        username: '',
+        password: '',
+      };
+    },
   },
   effects: {
     async asyncConfigServer(payload: {
@@ -65,17 +77,6 @@ export const nebula = createModel({
       }
     },
 
-    async asyncClearConfig() {
-      cookies.remove('host');
-      cookies.remove('username');
-      cookies.remove('password');
-      this.update({
-        host: '',
-        username: '',
-        password: '',
-      });
-    },
-
     async asyncGetSpaces(payload: {
       host: string;
       username: string;
@@ -90,7 +91,7 @@ export const nebula = createModel({
       })) as any;
       if (code === '0') {
         this.update({
-          spaces: data.tables.map(item => item.Name),
+          spaces: data.tables.map(item => item.Name).sort(),
         });
       }
     },

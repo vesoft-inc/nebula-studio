@@ -281,12 +281,19 @@ export const importData = createModel({
     },
     async importData(payload) {
       const config: any = configToJson(payload);
-      service.runImport();
-      const { taskId } = (await service.importData(config)) as any;
-      this.update({
-        taskId,
-        isImporting: false,
-      });
+      const { taskId, errCode, errMsg } = (await service.importData(
+        config,
+      )) as any;
+      if (errCode === 0) {
+        service.runImport();
+        this.update({
+          taskId,
+          isImporting: false,
+        });
+      } else {
+        message.error(errMsg);
+      }
+      return errCode;
     },
 
     async stopImport(payload) {

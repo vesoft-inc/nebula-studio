@@ -47,7 +47,7 @@ class ConfigNode extends React.PureComponent<IProps> {
     return (
       <div className="vertex-config task">
         <div className="vertexes">
-          <h3>Vertexes</h3>
+          <h3>Vertices</h3>
           <div className="operation">
             <Add type={AddType.vertex} />
           </div>

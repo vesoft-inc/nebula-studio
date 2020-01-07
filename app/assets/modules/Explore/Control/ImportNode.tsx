@@ -105,7 +105,7 @@ class ImportNodes extends React.Component<IProps, IState> {
                 <Button>{intl.get('explore.fileImport')}</Button>
               </Upload>
               <Button type="primary" onClick={this.handleImport}>
-                {intl.get('explore.import')}
+                {intl.get('explore.addConfirm')}
               </Button>
             </Form.Item>
           </Form>

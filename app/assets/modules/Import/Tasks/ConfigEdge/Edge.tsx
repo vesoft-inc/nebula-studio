@@ -91,15 +91,20 @@ class Edge extends React.Component<IProps> {
         ),
         dataIndex: 'mapping',
         render: (mappingIndex, prop, propIndex) => (
-          <CSVPreviewLink
-            file={file}
-            prop={prop.field}
-            onMapping={columnIndex =>
-              this.handlePropChange(propIndex, 'mapping', columnIndex)
-            }
-          >
-            {mappingIndex === null ? intl.get('import.ignore') : mappingIndex}
-          </CSVPreviewLink>
+          <div>
+            {prop && prop.name !== 'rank' && (
+              <span className="csv-index-mark">*</span>
+            )}
+            <CSVPreviewLink
+              file={file}
+              prop={prop.name}
+              onMapping={columnIndex =>
+                this.handlePropChange(propIndex, 'mapping', columnIndex)
+              }
+            >
+              {mappingIndex === null ? intl.get('import.ignore') : mappingIndex}
+            </CSVPreviewLink>
+          </div>
         ),
       },
       {

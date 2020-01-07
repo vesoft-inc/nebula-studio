@@ -3,6 +3,7 @@ import cookies from 'js-cookie';
 import React from 'react';
 import { hot } from 'react-hot-loader/root';
 import intl from 'react-intl-universal';
+import { connect } from 'react-redux';
 import {
   BrowserRouter as Router,
   Link,
@@ -19,6 +20,7 @@ import { LanguageContext } from '#assets/context';
 import Console from '#assets/modules/Console';
 import Explore from '#assets/modules/Explore';
 import Import from '#assets/modules/Import';
+import { IDispatch } from '#assets/store';
 import { updateQueryStringParameter } from '#assets/utils';
 
 import './App.less';
@@ -33,7 +35,16 @@ interface IState {
   activeMenu: string;
 }
 
-type IProps = RouteComponentProps;
+const mapDispatch = (dispatch: IDispatch) => ({
+  asyncClearConfig: dispatch.nebula.asyncClearConfig,
+});
+
+const mapState = () => ({});
+
+interface IProps
+  extends RouteComponentProps,
+    ReturnType<typeof mapDispatch>,
+    ReturnType<typeof mapState> {}
 
 class App extends React.Component<IProps, IState> {
   currentLocale;
@@ -96,6 +107,10 @@ class App extends React.Component<IProps, IState> {
     this.loadIntlLocale();
   }
 
+  handleClear = () => {
+    this.props.asyncClearConfig();
+  };
+
   render() {
     const { loading, activeMenu } = this.state;
 
@@ -123,16 +138,16 @@ class App extends React.Component<IProps, IState> {
                       {intl.get('common.console')}
                     </Link>
                   </Menu.Item>
-                  <Menu.Item key="explore">
-                    <Link to="explore">
-                      <Icon type="eye" />
-                      {intl.get('common.explore')}
-                    </Link>
-                  </Menu.Item>
                   <Menu.Item key="import">
                     <Link to="import">
                       <Icon type="import" />
                       {intl.get('common.import')}
+                    </Link>
+                  </Menu.Item>
+                  <Menu.Item key="explore">
+                    <Link to="explore">
+                      <Icon type="eye" />
+                      {intl.get('common.explore')}
                     </Link>
                   </Menu.Item>
                 </Menu>
@@ -153,6 +168,23 @@ class App extends React.Component<IProps, IState> {
                   </Select>
                 </div>
                 <Dropdown
+                  className="setting"
+                  overlay={
+                    <Menu>
+                      <Menu.Item>
+                        <a onClick={this.handleClear}>
+                          <Icon type="setting" />
+                          {intl.get('configServer.clear')}
+                        </a>
+                      </Menu.Item>
+                    </Menu>
+                  }
+                >
+                  <a className="ant-dropdown-link">
+                    {intl.get('common.setting')} <Icon type="down" />
+                  </a>
+                </Dropdown>
+                <Dropdown
                   className="help"
                   overlay={
                     <Menu>
@@ -163,6 +195,15 @@ class App extends React.Component<IProps, IState> {
                         >
                           <Icon type="tags" />
                           {intl.get('common.release')}
+                        </a>
+                      </Menu.Item>
+                      <Menu.Item>
+                        <a
+                          href="https://github.com/vesoft-inc/nebula/blob/master/README.md"
+                          target="_blank"
+                        >
+                          <Icon type="tags" />
+                          {intl.get('common.nebula')}
                         </a>
                       </Menu.Item>
                     </Menu>
@@ -190,4 +231,4 @@ class App extends React.Component<IProps, IState> {
   }
 }
 
-export default withRouter(hot(App));
+export default connect(mapState, mapDispatch)(withRouter(hot(App)));

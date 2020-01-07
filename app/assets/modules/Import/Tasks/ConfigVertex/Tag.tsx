@@ -115,15 +115,18 @@ class Tag extends React.Component<IProps> {
         ),
         dataIndex: 'mapping',
         render: (mappingIndex, prop, propIndex) => (
-          <CSVPreviewLink
-            onMapping={columnIndex =>
-              this.handlePropChange(propIndex, 'mapping', columnIndex)
-            }
-            file={file}
-            prop={prop.name}
-          >
-            {mappingIndex === null ? intl.get('import.ignore') : mappingIndex}
-          </CSVPreviewLink>
+          <div>
+            {prop && <span className="csv-index-mark">*</span>}
+            <CSVPreviewLink
+              onMapping={columnIndex =>
+                this.handlePropChange(propIndex, 'mapping', columnIndex)
+              }
+              file={file}
+              prop={prop.name}
+            >
+              {mappingIndex === null ? intl.get('import.ignore') : mappingIndex}
+            </CSVPreviewLink>
+          </div>
         ),
       },
       {
@@ -166,15 +169,18 @@ class Tag extends React.Component<IProps> {
         ),
         dataIndex: 'idMapping',
         render: (mappingIndex, prop) => (
-          <CSVPreviewLink
-            onMapping={columnIndex =>
-              this.handleVertexChange('idMapping', columnIndex)
-            }
-            file={vertex.file}
-            prop={prop.name}
-          >
-            {mappingIndex === null ? intl.get('import.ignore') : mappingIndex}
-          </CSVPreviewLink>
+          <div>
+            {prop && <span className="csv-index-mark">*</span>}
+            <CSVPreviewLink
+              onMapping={columnIndex =>
+                this.handleVertexChange('idMapping', columnIndex)
+              }
+              file={vertex.file}
+              prop={prop.name}
+            >
+              {mappingIndex === null ? intl.get('import.ignore') : mappingIndex}
+            </CSVPreviewLink>
+          </div>
         ),
       },
       {

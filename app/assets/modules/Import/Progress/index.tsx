@@ -51,7 +51,7 @@ class Progress extends React.Component<IProps, {}> {
         title: intl.get('import.init'),
       },
       {
-        title: intl.get('import.upload'),
+        title: intl.get('import.selectFile'),
       },
       {
         title: intl.get('import.vertex'),
@@ -60,7 +60,7 @@ class Progress extends React.Component<IProps, {}> {
         title: intl.get('import.edge'),
       },
       {
-        title: intl.get('common.import'),
+        title: intl.get('import.import'),
       },
     ];
     const { activeStep, isImporting } = this.props;

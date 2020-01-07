@@ -18,7 +18,9 @@
     "cancel": "取消",
     "import": "导入",
     "help": "帮助",
-    "release": "新发布"
+    "release": "新发布",
+    "nebula": "Nebula 语法文档",
+    "setting":"设置"
   },
   "warning": {
     "configServer": "请先配置服务器"
@@ -45,8 +47,8 @@
   },
   "explore": {
     "clear": "清除",
-    "importNode": "导入节点",
-    "import": "导入",
+    "importNode": "添加起点",
+    "addConfirm": "确认添加",
     "undo": "回退",
     "expand": "拓展",
     "fileImport": "文件导入",
@@ -59,11 +61,12 @@
     "selectReminder": "切换将会清除当前数据，确定？"
   },
   "import": {
+    "import":"导入",
     "init": "初始化",
-    "upload": "上传文件" ,
+    "selectFile": "选择文件",
     "vertex": "配置点",
     "edge": "配置边",
-    "runImport": "开始导入",
+    "runImport": "导入",
     "next": "下一步",
     "mountPath": "挂载路径",
     "mountPathPlaceholder": "请输入docker启动的数据挂载路径",
@@ -72,12 +75,12 @@
     "fileType": "类型",
     "fileSize": "大小",
     "operation": "操作",
-    "fileTitle": "上传文件列表",
+    "fileTitle": "选择文件列表",
     "preview": "预览",
     "delete": "删除",
     "addVertex": "添加 Vertex",
     "addEdge": "添加 Edge",
-    "importResults": "导入结果",
+    "importResults": "导入信息",
     "newImport": "新建导入",
     "endImport": "终止导入",
     "againImport": "再次导入",
@@ -106,7 +109,7 @@
     "vertexText": "点",
     "createConfigError": "创建配置文件错误",
     "importErrorInfo": "导入数据错误，请检查配置或数据文件",
-    "clearAllConfigInfo": "是否确定清空所以配置？",
+    "clearAllConfigInfo": "是否确定清空所有配置？",
     "configFilePath": "配置文件本地路径：",
     "logFilePath": "log文件本地路径：",
     "vertexesFilePath": "顶点配置文件路劲：",
