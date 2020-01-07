@@ -11,3 +11,4 @@ tmp
 .gitignore
 package-lock.json
 README.md
+docker/

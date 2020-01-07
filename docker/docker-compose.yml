@@ -4,7 +4,7 @@ services:
     # Dev
     # build: '../nebula-go-api/'
     # Prod
-    image: niania/nebula-http-client:0.0.1
+    image: niania/nebula-http-client:0.0.2
     environment:
       USER: root
     ports:
@@ -15,7 +15,7 @@ services:
     # Dev
     # build: '../.'
     # Prod
-    image: nicolascage/nebula-web-console:0.0.1
+    image: niania/nebula-web-console:0.0.8
     environment:
       USER: root
       WORKING_DIR: ${WORKING_DIR}
