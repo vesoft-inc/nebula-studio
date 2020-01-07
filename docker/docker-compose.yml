@@ -49,7 +49,7 @@ services:
     networks:
       - nebula-web
     ports:
-      - 8888:8888
+      - 7001:7001
 
 networks:
   nebula-web:
