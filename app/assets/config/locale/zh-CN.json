@@ -112,12 +112,12 @@
     "clearAllConfigInfo": "是否确定清空所有配置？",
     "configFilePath": "配置文件本地路径：",
     "logFilePath": "log文件本地路径：",
-    "vertexesFilePath": "顶点配置文件路劲：",
-    "vertexFilePath": "该顶点配置文件路劲：",
-    "vertexErrorFilePath": "该顶点错误数据文件路劲：",
-    "edgesFilePath": "边配置文件路劲：",
-    "edgeFilePath": "该边配置文件路劲：",
-    "edgeErrorFilePath": "该边错误数据文件路劲：",
+    "vertexesFilePath": "顶点配置文件路径：",
+    "vertexFilePath": "该顶点配置文件路路径：",
+    "vertexErrorFilePath": "该顶点错误数据文件路径：",
+    "edgesFilePath": "边配置文件路径：",
+    "edgeFilePath": "该边配置文件路径：",
+    "edgeErrorFilePath": "该边错误数据文件路径：",
     "all": "全部",
     "mountPathWarning": "导入数据需在应用启动时配置 WORKING_DIR 环境变量，否则无法进行。"
   }
