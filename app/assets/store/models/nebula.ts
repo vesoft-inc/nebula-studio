@@ -91,7 +91,7 @@ export const nebula = createModel({
       })) as any;
       if (code === '0') {
         this.update({
-          spaces: data.tables.map(item => item.Name),
+          spaces: data.tables.map(item => item.Name).sort(),
         });
       }
     },
