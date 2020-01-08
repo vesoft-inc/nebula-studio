@@ -207,13 +207,11 @@ class Import extends React.Component<IProps, IState> {
             <div className="import-export">
               <div>
                 {intl.get('import.configFilePath')} (
-                {`${mountPath}/tmp/config.yaml`}) ：
-                <a href={`file://${mountPath}/tmp/config.yaml`}>config.yml</a>
+                {`${mountPath}/tmp/config.yaml`})
               </div>
               <div>
                 {intl.get('import.logFilePath')} (
-                {`${mountPath}/tmp/import.log`}) ：
-                <a href={`file://${mountPath}/tmp/import.log`}>import.log</a>
+                {`${mountPath}/tmp/import.log`})
               </div>
               <br />
               {vertexesConfig.map(vertex => {
@@ -228,12 +226,7 @@ class Import extends React.Component<IProps, IState> {
                     </p>
                     <p>
                       {intl.get('import.vertexErrorFilePath')} ({mountPath}
-                      /tmp/err/${vertex.name}Fail.scv):
-                      <a
-                        href={`file://${mountPath}/tmp/err/${vertex.name}Fail.scv`}
-                      >
-                        {vertex.name}
-                      </a>
+                      /tmp/err/${vertex.name}Fail.scv)
                     </p>
                   </div>
                 );
@@ -249,12 +242,7 @@ class Import extends React.Component<IProps, IState> {
                     </p>
                     <p>
                       {intl.get('import.edgeErrorFilePath')} ({mountPath}
-                      /tmp/err/${edge.name}Fail.scv):
-                      <a
-                        href={`file://${mountPath}tmp/err/${edge.name}Fail.scv`}
-                      >
-                        {edge.name}
-                      </a>
+                      /tmp/err/${edge.name}Fail.scv)
                     </p>
                   </div>
                 );
