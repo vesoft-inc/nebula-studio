@@ -20,7 +20,8 @@
     "help": "help",
     "release": "New Version",
     "nebula": "Nebula Doc",
-    "setting": "setting"
+    "setting": "setting",
+    "feedback": "Feedback"
   },
   "NGQLOutput": {
     "success": "execute success!"

@@ -20,7 +20,8 @@
     "help": "帮助",
     "release": "新发布",
     "nebula": "Nebula 语法文档",
-    "setting":"设置"
+    "setting":"设置",
+    "feedback": "问题反馈"
   },
   "warning": {
     "configServer": "请先配置服务器"
