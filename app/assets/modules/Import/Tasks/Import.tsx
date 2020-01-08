@@ -173,7 +173,7 @@ class Import extends React.Component<IProps, IState> {
     const { activeKey } = this.state;
     return (
       <div className="import">
-        <div className="imprt-btn">
+        <div className="import-btn">
           <Button
             className="import-again"
             onClick={this.handleRunImport}
