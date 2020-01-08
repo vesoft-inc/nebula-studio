@@ -9,7 +9,7 @@ import merge from 'webpack-merge';
 import commonConfig from './webpack.base';
 
 const publicConfig = {
-  devtool: 'cheap-module-source-map',
+  // devtool: 'cheap-module-source-map',
   mode: 'production',
   output: {
     path: path.join(__dirname, '../app/public/'),
