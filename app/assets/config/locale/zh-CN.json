@@ -64,7 +64,7 @@
     "import":"导入",
     "init": "初始化",
     "selectFile": "选择文件",
-    "vertex": "配置Vertex",
+    "vertex": "配置 Vertex",
     "edge": "配置 Edge",
     "runImport": "导入",
     "next": "下一步",
