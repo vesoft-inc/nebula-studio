@@ -232,7 +232,7 @@ class Tag extends React.Component<IProps> {
       <div className="tag-config">
         {/* vertex id config need only once for each vertex file binding, we put it ahead */}
         {index === 0 && this.renderIdConfig()}
-        <h3>TAG{index}</h3>
+        <h3>TAG {index}</h3>
         <div className="tag-operation">
           <FormItem className="left" label="TAG">
             <Select

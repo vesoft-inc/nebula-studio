@@ -20,7 +20,8 @@
     "help": "help",
     "release": "New Version",
     "nebula": "Nebula Doc",
-    "setting": "setting"
+    "setting": "setting",
+    "feedback": "Feedback"
   },
   "NGQLOutput": {
     "success": "execute success!"
@@ -80,6 +81,7 @@
     "delete": "Delete",
     "addVertex": "Add Vertex",
     "addEdge": "Add Edge",
+    "confirm": "Confirm",
     "importResults": "Import Results",
     "newImport": "New Import",
     "endImport": "Stop Import",
