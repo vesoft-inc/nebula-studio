@@ -3,8 +3,8 @@ import * as d3 from 'd3';
 import _ from 'lodash';
 
 import service from '#assets/config/service';
-
-import { idToSrting, nebulaToData } from '../../utils/nebulaToData';
+import { fetchVertexId } from '#assets/utils/fetch';
+import { idToSrting, nebulaToData } from '#assets/utils/nebulaToData';
 
 interface INode extends d3.SimulationNodeDatum {
   name: string;
@@ -105,9 +105,19 @@ export const explore = createModel({
           idToSrting(data.tables),
           edgeType,
         );
-
+        const newVertexes = await Promise.all(
+          vertexes.map(async v => {
+            return {
+              ...v,
+              nodeProp: await fetchVertexId(
+                { space, host, username, password },
+                v.name,
+              ),
+            };
+          }),
+        );
         this.addNodesAndEdges({
-          vertexes,
+          vertexes: newVertexes,
           edges,
         });
       } else {
