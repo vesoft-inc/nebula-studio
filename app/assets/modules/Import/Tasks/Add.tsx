@@ -106,7 +106,9 @@ class Add extends React.PureComponent<IProps> {
                 </Select>,
               )}
             </FormItem>
-            <Button onClick={this.handleSubmit}>{addText}</Button>
+            <Button onClick={this.handleSubmit}>
+              {intl.get('import.confirm')}
+            </Button>
           </Form>
         </Modal>
       </div>
