@@ -7,7 +7,6 @@ import { connect } from 'react-redux';
 
 import { nodeIdRulesFn } from '#assets/config/rules';
 import { IDispatch, IRootState } from '#assets/store';
-import { fetchVertexId } from '#assets/utils/fetch';
 import readFileContent from '#assets/utils/file';
 
 import './ImportNode.less';
@@ -22,12 +21,7 @@ const mapState = (state: IRootState) => ({
   space: state.nebula.currentSpace,
 });
 const mapDispatch = (dispatch: IDispatch) => ({
-  updateNodes: vertexes => {
-    dispatch.explore.addNodesAndEdges({
-      vertexes,
-      edges: [],
-    });
-  },
+  updateNodes: dispatch.explore.asyncImportNodes,
 });
 
 interface IProps
@@ -55,21 +49,7 @@ class ImportNodes extends React.Component<IProps, IState> {
     this.props.form.validateFields(async (err, data) => {
       if (!err) {
         const { ids } = data;
-        this.props.updateNodes([
-          ...(await Promise.all(
-            ids
-              .trim()
-              .split('\n')
-              .map(async id => ({
-                name: id,
-                group: 0,
-                nodeProp: await fetchVertexId(
-                  { space, host, username, password },
-                  id,
-                ),
-              })),
-          )),
-        ]);
+        this.props.updateNodes({ space, host, username, password, ids });
       }
       this.props.handler.hide();
     });

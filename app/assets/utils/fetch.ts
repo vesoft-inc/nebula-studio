@@ -1,6 +1,6 @@
 import service from '#assets/config/service';
 
-export async function fetchVertexId(
+export async function fetchVertexProps(
   { space, host, username, password }: any,
   id: any,
 ) {

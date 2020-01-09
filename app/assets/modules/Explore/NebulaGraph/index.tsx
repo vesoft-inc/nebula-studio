@@ -81,17 +81,21 @@ class NebulaGraph extends React.Component<IProps, IState> {
   }
 
   handleMouseInNode = node => {
-    let nodeProp = '';
-    node.nodeProp.tables.map(v => {
-      Object.keys(v).map(index => {
-        nodeProp += `<p key=${index}>${index}: ${v[index]}</p>`;
-      });
-    });
     this.$tooltip
       .transition()
       .duration(200)
       .style('opacity', 0.95);
-    this.$tooltip.html(`<p>id: ${node.name}</p> ${nodeProp}`);
+    this.$tooltip.html(
+      `<p>id: ${node.name}</p> ${node.nodeProp.tables
+        .map(v => {
+          return Object.keys(v)
+            .map(index => {
+              return `<p key=${index}>${index}: ${v[index]}</p>`;
+            })
+            .join('');
+        })
+        .join('')}`,
+    );
   };
 
   handleMouseOutNode = () => {
