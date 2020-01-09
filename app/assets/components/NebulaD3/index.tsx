@@ -145,7 +145,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
     d3.select(this.nodeRef)
       .selectAll('circle')
       .data(nodes)
-      .attr('class', (d: any) => {
+      .attr('class', (d: INode) => {
         if (selectIdsMap[d.name]) {
           return 'node active';
         }
@@ -164,8 +164,8 @@ class NebulaD3 extends React.Component<IProps, {}> {
         }
       })
       .attr('class', 'node')
-      .attr('id', (d: any) => `node-${d.name}`)
-      .style('fill', (d: any) => colors[d.group % colorTotal]);
+      .attr('id', (d: INode) => `node-${d.name}`)
+      .style('fill', (d: INode) => colors[d.group % colorTotal]);
 
     d3.select(this.nodeRef)
       .selectAll('circle')
@@ -194,6 +194,11 @@ class NebulaD3 extends React.Component<IProps, {}> {
         .selectAll('.label')
         .on('click', (d: any) => {
           this.props.onSelectVertexes([d]);
+        })
+        .on('mouseover', (d: any) => {
+          if (this.props.onMouseInNode) {
+            this.props.onMouseInNode(d);
+          }
         })
         .call(
           d3

@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 
 import { nodeIdRulesFn } from '#assets/config/rules';
 import { IDispatch, IRootState } from '#assets/store';
+import { fetchVertexId } from '#assets/utils/fetch';
 import readFileContent from '#assets/utils/file';
 
 import './ImportNode.less';
@@ -15,6 +16,10 @@ const TextArea = Input.TextArea;
 
 const mapState = (state: IRootState) => ({
   vertexes: state.explore.vertexes,
+  host: state.nebula.host,
+  username: state.nebula.username,
+  password: state.nebula.password,
+  space: state.nebula.currentSpace,
 });
 const mapDispatch = (dispatch: IDispatch) => ({
   updateNodes: vertexes => {
@@ -46,17 +51,24 @@ class ImportNodes extends React.Component<IProps, IState> {
   }
 
   handleImport = () => {
-    this.props.form.validateFields((err, data) => {
+    const { space, host, username, password } = this.props;
+    this.props.form.validateFields(async (err, data) => {
       if (!err) {
         const { ids } = data;
         this.props.updateNodes([
-          ...ids
-            .trim()
-            .split('\n')
-            .map(id => ({
-              name: id,
-              group: 0,
-            })),
+          ...(await Promise.all(
+            ids
+              .trim()
+              .split('\n')
+              .map(async id => ({
+                name: id,
+                group: 0,
+                nodeProp: await fetchVertexId(
+                  { space, host, username, password },
+                  id,
+                ),
+              })),
+          )),
         ]);
       }
       this.props.handler.hide();
