@@ -206,6 +206,15 @@ class App extends React.Component<IProps, IState> {
                           {intl.get('common.nebula')}
                         </a>
                       </Menu.Item>
+                      <Menu.Item>
+                        <a
+                          href="https://github.com/vesoft-inc/nebula-web-docker/issues"
+                          target="_blank"
+                        >
+                          <Icon type="tags" />
+                          {intl.get('common.feedback')}
+                        </a>
+                      </Menu.Item>
                     </Menu>
                   }
                 >
