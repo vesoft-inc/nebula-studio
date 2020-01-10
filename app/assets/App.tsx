@@ -190,11 +190,11 @@ class App extends React.Component<IProps, IState> {
                     <Menu>
                       <Menu.Item>
                         <a
-                          href="https://github.com/vesoft-inc/nebula-web-console/blob/master/CHANGELOG.md"
+                          href="https://github.com/vesoft-inc/nebula-web-docker/blob/master/nebula-graph-studio-user-guide.md"
                           target="_blank"
                         >
                           <Icon type="tags" />
-                          {intl.get('common.release')}
+                          {intl.get('common.use')}
                         </a>
                       </Menu.Item>
                       <Menu.Item>
@@ -204,6 +204,15 @@ class App extends React.Component<IProps, IState> {
                         >
                           <Icon type="tags" />
                           {intl.get('common.nebula')}
+                        </a>
+                      </Menu.Item>
+                      <Menu.Item>
+                        <a
+                          href="https://github.com/vesoft-inc/nebula-web-console/blob/master/CHANGELOG.md"
+                          target="_blank"
+                        >
+                          <Icon type="tags" />
+                          {intl.get('common.release')}
                         </a>
                       </Menu.Item>
                       <Menu.Item>
