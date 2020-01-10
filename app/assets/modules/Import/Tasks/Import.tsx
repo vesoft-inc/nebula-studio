@@ -206,27 +206,36 @@ class Import extends React.Component<IProps, IState> {
             </Button>
             <div className="import-export">
               <div>
-                {intl.get('import.configFilePath')} (
-                {`${mountPath}/tmp/config.yaml`})
+                {intl.get('import.configFilePath')}
+                <a href={`${mountPath}/tmp/config.yaml`} target="__blank">
+                  config.yaml
+                </a>
               </div>
               <div>
-                {intl.get('import.logFilePath')} (
-                {`${mountPath}/tmp/import.log`})
+                {intl.get('import.logFilePath')}
+                <a href={`${mountPath}/tmp/import.log`} target="__blank">
+                  import.log
+                </a>
               </div>
               <br />
               {vertexesConfig.map(vertex => {
                 return (
                   <div key={vertex.name}>
                     <p>{intl.get('import.vertexesFilePath')}</p>
-                    <br />
                     <p>
-                      {`${intl.get('import.vertexFilePath')} ${
-                        vertex.file.path
-                      }`}
+                      {intl.get('import.vertexFilePath')}
+                      <a href={vertex.file.path} target="__blank">
+                        {vertex.name}
+                      </a>
                     </p>
                     <p>
-                      {intl.get('import.vertexErrorFilePath')} ({mountPath}
-                      /tmp/err/${vertex.name}Fail.scv)
+                      {intl.get('import.vertexErrorFilePath')}
+                      <a
+                        href={`${mountPath}/tmp/err/${vertex.name}Fail.scv`}
+                        target="__blank"
+                      >
+                        {vertex.name}Fail.csv
+                      </a>
                     </p>
                   </div>
                 );
@@ -236,13 +245,20 @@ class Import extends React.Component<IProps, IState> {
                 return (
                   <div key={edge.name}>
                     <p>{intl.get('import.edgesFilePath')}</p>
-                    <br />
                     <p>
-                      {`${intl.get('import.edgeFilePath')} ${edge.file.path}`}
+                      {intl.get('import.edgeFilePath')}
+                      <a href={edge.file.path} target="__blank">
+                        {edge.name}
+                      </a>
                     </p>
                     <p>
-                      {intl.get('import.edgeErrorFilePath')} ({mountPath}
-                      /tmp/err/${edge.name}Fail.scv)
+                      {intl.get('import.edgeErrorFilePath')}
+                      <a
+                        href={`${mountPath}/tmp/err/${edge.name}Fail.scv`}
+                        target="__blank"
+                      >
+                        {edge.name}Fail.csv
+                      </a>
                     </p>
                   </div>
                 );
