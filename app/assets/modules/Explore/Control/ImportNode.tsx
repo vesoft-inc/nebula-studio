@@ -21,7 +21,7 @@ const mapState = (state: IRootState) => ({
   space: state.nebula.currentSpace,
 });
 const mapDispatch = (dispatch: IDispatch) => ({
-  updateNodes: dispatch.explore.asyncImportNodes,
+  asyncImportNodes: dispatch.explore.asyncImportNodes,
 });
 
 interface IProps
@@ -49,7 +49,7 @@ class ImportNodes extends React.Component<IProps, IState> {
     this.props.form.validateFields(async (err, data) => {
       if (!err) {
         const { ids } = data;
-        this.props.updateNodes({ space, host, username, password, ids });
+        this.props.asyncImportNodes({ space, host, username, password, ids });
       }
       this.props.handler.hide();
     });

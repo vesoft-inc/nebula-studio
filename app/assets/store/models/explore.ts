@@ -86,8 +86,9 @@ export const explore = createModel({
             ),
           })),
       );
-      this.update({
+      this.addNodesAndEdges({
         vertexes: newVertexes,
+        edges: [],
       });
     },
 
