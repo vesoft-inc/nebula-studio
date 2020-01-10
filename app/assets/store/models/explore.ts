@@ -3,8 +3,8 @@ import * as d3 from 'd3';
 import _ from 'lodash';
 
 import service from '#assets/config/service';
-
-import { idToSrting, nebulaToData } from '../../utils/nebulaToData';
+import { fetchVertexProps } from '#assets/utils/fetch';
+import { idToSrting, nebulaToData } from '#assets/utils/nebulaToData';
 
 interface INode extends d3.SimulationNodeDatum {
   name: string;
@@ -65,6 +65,33 @@ export const explore = createModel({
     },
   },
   effects: {
+    async asyncImportNodes(payload: {
+      host: string;
+      username: string;
+      password: string;
+      space: string;
+      ids: string;
+    }) {
+      const { host, username, password, space, ids } = payload;
+      const newVertexes = await Promise.all(
+        ids
+          .trim()
+          .split('\n')
+          .map(async id => ({
+            name: id,
+            group: 0,
+            nodeProp: await fetchVertexProps(
+              { space, host, username, password },
+              id,
+            ),
+          })),
+      );
+      this.addNodesAndEdges({
+        vertexes: newVertexes,
+        edges: [],
+      });
+    },
+
     async asyncGetExpand(payload: {
       host: string;
       username: string;
@@ -105,9 +132,19 @@ export const explore = createModel({
           idToSrting(data.tables),
           edgeType,
         );
-
+        const newVertexes = await Promise.all(
+          vertexes.map(async v => {
+            return {
+              ...v,
+              nodeProp: await fetchVertexProps(
+                { space, host, username, password },
+                v.name,
+              ),
+            };
+          }),
+        );
         this.addNodesAndEdges({
-          vertexes,
+          vertexes: newVertexes,
           edges,
         });
       } else {
