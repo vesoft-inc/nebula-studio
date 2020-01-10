@@ -190,7 +190,7 @@ class App extends React.Component<IProps, IState> {
                     <Menu>
                       <Menu.Item>
                         <a
-                          href="https://github.com/vesoft-inc/nebula-web-docker/blob/master/nebula-graph-studio-user-guide.md"
+                          href="https://github.com/vesoft-inc/nebula-web-docker/blob/master/docs/nebula-graph-studio-user-guide.md"
                           target="_blank"
                         >
                           <Icon type="tags" />
@@ -208,7 +208,7 @@ class App extends React.Component<IProps, IState> {
                       </Menu.Item>
                       <Menu.Item>
                         <a
-                          href="https://github.com/vesoft-inc/nebula-web-console/blob/master/CHANGELOG.md"
+                          href="https://github.com/vesoft-inc/nebula-web-docker/blob/master/CHANGELOG.md"
                           target="_blank"
                         >
                           <Icon type="tags" />
