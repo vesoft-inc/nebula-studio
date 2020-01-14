@@ -19,6 +19,7 @@ WORKDIR /nebula-web-console
 COPY --from=builder ./nebula-web-console/package.json /nebula-web-console/
 COPY .npmrc /nebula-web-console/
 COPY --from=builder /nebula-web-console/app /nebula-web-console/app
+COPY --from=builder /nebula-web-console/favicon.ico /nebula-web-console/favicon.ico
 COPY --from=builder /nebula-web-console/config /nebula-web-console/config
 RUN npm install --production
 

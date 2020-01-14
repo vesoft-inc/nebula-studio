@@ -20,7 +20,7 @@ import { LanguageContext } from '#assets/context';
 import Console from '#assets/modules/Console';
 import Explore from '#assets/modules/Explore';
 import Import from '#assets/modules/Import';
-import { IDispatch } from '#assets/store';
+import { IDispatch, IRootState } from '#assets/store';
 import { updateQueryStringParameter } from '#assets/utils';
 
 import './App.less';
@@ -37,9 +37,12 @@ interface IState {
 
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncClearConfig: dispatch.nebula.asyncClearConfig,
+  asyncGetAppInfo: dispatch.app.asyncGetAppInfo,
 });
 
-const mapState = () => ({});
+const mapState = (state: IRootState) => ({
+  appVersion: state.app.version,
+});
 
 interface IProps
   extends RouteComponentProps,
@@ -105,6 +108,7 @@ class App extends React.Component<IProps, IState> {
 
   componentDidMount() {
     this.loadIntlLocale();
+    this.props.asyncGetAppInfo();
   }
 
   handleClear = () => {
@@ -112,6 +116,7 @@ class App extends React.Component<IProps, IState> {
   };
 
   render() {
+    const { appVersion } = this.props;
     const { loading, activeMenu } = this.state;
 
     return (
@@ -208,15 +213,6 @@ class App extends React.Component<IProps, IState> {
                       </Menu.Item>
                       <Menu.Item>
                         <a
-                          href="https://github.com/vesoft-inc/nebula-web-docker/blob/master/CHANGELOG.md"
-                          target="_blank"
-                        >
-                          <Icon type="tags" />
-                          {intl.get('common.release')}
-                        </a>
-                      </Menu.Item>
-                      <Menu.Item>
-                        <a
                           href="https://github.com/vesoft-inc/nebula-web-docker/issues"
                           target="_blank"
                         >
@@ -231,6 +227,28 @@ class App extends React.Component<IProps, IState> {
                     {intl.get('common.help')} <Icon type="down" />
                   </a>
                 </Dropdown>
+                {appVersion && (
+                  <Dropdown
+                    className="version"
+                    overlay={
+                      <Menu>
+                        <Menu.Item>
+                          <a
+                            href="https://github.com/vesoft-inc/nebula-web-docker/blob/master/CHANGELOG.md"
+                            target="_blank"
+                          >
+                            <Icon type="tags" />
+                            {intl.get('common.release')}
+                          </a>
+                        </Menu.Item>
+                      </Menu>
+                    }
+                  >
+                    <a>
+                      v{appVersion} <Icon type="down" />
+                    </a>
+                  </Dropdown>
+                )}
               </Header>
               <Content>
                 <Switch>

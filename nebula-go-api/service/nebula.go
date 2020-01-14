@@ -6,7 +6,7 @@ import (
 	common "nebula-go-api/utils"
 
 	nebula "github.com/vesoft-inc/nebula-go"
-	"github.com/vesoft-inc/nebula-go/graph"
+	"github.com/vesoft-inc/nebula-go/nebula/graph"
 )
 
 type ExecuteResult struct {
@@ -22,10 +22,6 @@ func connect(host, username, password string) (client *nebula.GraphClient, err e
 	}
 
 	err = client.Connect(username, password)
-	if err != nil {
-		log.Println(err)
-		return client, err
-	}
 
 	return client, err
 }
@@ -52,14 +48,14 @@ func getColumnValue(p *graph.ColumnValue) common.Any {
 }
 
 // Connect return if the nebula connect succeed
-func Connect(host, username, password string) bool {
+func Connect(host, username, password string) (ok bool, err error) {
 	client, err := connect(host, username, password)
 	if err != nil {
 		log.Println(err)
-		return false
+		return false, err
 	}
 	defer client.Disconnect()
-	return true
+	return true, err
 }
 
 func Execute(host, username, password, gql string) (result ExecuteResult, err error) {

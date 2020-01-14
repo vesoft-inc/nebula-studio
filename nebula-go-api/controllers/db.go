@@ -21,8 +21,8 @@ type Response struct {
 type Request struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Host string `json:"host"`
-	Gql string `json:"gql"`
+	Host     string `json:"host"`
+	Gql      string `json:"gql"`
 }
 
 type Data map[string]interface{}
@@ -31,11 +31,13 @@ func (this *DatabaseController) Connect() {
 	var res Response
 	var params Request
 	json.Unmarshal(this.Ctx.Input.RequestBody, &params)
-	ok := graphdb.Connect(params.Host, params.Username, params.Password)
+	ok, err := graphdb.Connect(params.Host, params.Username, params.Password)
+
 	if ok {
 		res.Code = "0"
 	} else {
 		res.Code = "-1"
+		res.Message = err.Error()
 	}
 	res.Data = make(map[string]common.Any)
 	this.Data["json"] = &res

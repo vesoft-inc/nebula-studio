@@ -18,6 +18,8 @@ const deleteProcess = _delete('/api/import/process');
 
 const getImportWokingDir = get('/api/import/working_dir');
 
+const getAppInfo = get('/api/app');
+
 export default {
   execNGQL,
   connectDB,
@@ -28,4 +30,5 @@ export default {
   getLog,
   deleteProcess,
   getImportWokingDir,
+  getAppInfo,
 };

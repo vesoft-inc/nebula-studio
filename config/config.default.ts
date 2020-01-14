@@ -1,5 +1,6 @@
 import { EggAppConfig, EggAppInfo, PowerPartial } from 'egg';
 import * as path from 'path';
+import fs from 'fs'
 
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>;
@@ -43,6 +44,10 @@ export default (appInfo: EggAppInfo) => {
   config.security = {
     csrf: false,
   };
+
+  config.siteFile = {
+    '/favicon.ico': fs.readFileSync(path.join(__dirname, '../favicon.ico'))
+  }
 
   // add your special config in here
   const bizConfig = {

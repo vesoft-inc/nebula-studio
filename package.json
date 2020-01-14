@@ -1,15 +1,15 @@
 {
-  "name": "egg-react-demo",
-  "version": "1.0.0",
-  "description": "egg+react全栈模板",
+  "name": "nebula-web-console",
+  "version": "1.0.0-beta",
+  "description": "nebula-web-console",
   "private": true,
   "egg": {
     "typescript": true
   },
   "scripts": {
-    "start": "egg-scripts start --daemon --title=egg-server-egg-react-demo",
-    "docker-start": "egg-scripts start --title=egg-server-egg-react-demo",
-    "stop": "egg-scripts stop --title=egg-server-egg-react-demo",
+    "start": "egg-scripts start --daemon --title=egg-server-nebula-web-console",
+    "docker-start": "egg-scripts start --title=egg-server-nebula-web-console",
+    "stop": "egg-scripts stop --title=egg-server-nebula-web-console",
     "dev": "egg-bin dev -r egg-ts-helper/register",
     "debug": "egg-bin debug -r egg-ts-helper/register",
     "test-local": "egg-bin test -r egg-ts-helper/register",

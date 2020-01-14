@@ -11,9 +11,9 @@ require (
 	github.com/pilu/fresh v0.0.0-20190826141211-0fa698148017 // indirect
 	github.com/rs/cors v1.7.0
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
-	github.com/vesoft-inc/nebula-go v0.0.0-20190929150249-5af3ab30c240
-	golang.org/x/crypto v0.0.0-20191010185427-af544f31c8ac // indirect
-	golang.org/x/net v0.0.0-20191009170851-d66e71096ffb // indirect
+	github.com/vesoft-inc/nebula-go v0.0.0-20191220020633-b7e8d5138552
+	golang.org/x/crypto v0.0.0-20200109152110-61a87790db17 // indirect
+	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553 // indirect
 	golang.org/x/text v0.3.2 // indirect
-	gopkg.in/yaml.v2 v2.2.4 // indirect
+	gopkg.in/yaml.v2 v2.2.7 // indirect
 )
