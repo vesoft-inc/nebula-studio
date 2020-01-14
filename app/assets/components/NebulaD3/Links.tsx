@@ -19,13 +19,14 @@ export default class Links extends React.Component<IProps, {}> {
 
   linkRender(links) {
     d3.select(this.ref)
-      .selectAll('line')
+      .selectAll('path')
       .data(links)
       .enter()
-      .append('line')
+      .append('svg:path')
       .attr('class', 'link')
       .style('stroke', '#999999')
       .style('stroke-opacity', 0.6)
+      .attr('id', (d: any) => 'text-path-' + d.id)
       .style('stroke-width', 2);
 
     d3.select(this.ref)
@@ -39,10 +40,7 @@ export default class Links extends React.Component<IProps, {}> {
       .data(links)
       .enter()
       .append('text')
-      .attr('class', 'text')
-      .text((d: any) => {
-        return d.type;
-      });
+      .attr('class', 'text');
 
     d3.select(this.ref)
       .selectAll('text')

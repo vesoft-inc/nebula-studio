@@ -3,9 +3,11 @@
 	overflow: hidden;
 	user-select: none;
 
-	.links line {
+	.links path {
 		stroke: #999;
 		stroke-opacity: 0.6;
+		cursor: default;
+		fill: none;
 	}
 
 	.nodes {
@@ -31,6 +33,12 @@
 		font-size: 12px;
 		cursor: pointer;
 		fill: #fff;
+	}
+
+	.text {
+		color: #333;
+		pointer-events: none;
+		text-anchor: middle;
 	}
 }
 

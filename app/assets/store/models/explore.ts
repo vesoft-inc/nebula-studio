@@ -41,12 +41,39 @@ export const explore = createModel({
         actionData,
       } = state;
       const { vertexes: addVertexes, edges: addEdges } = payload;
+
       const svg: any = d3.select('.output-graph');
       addVertexes.map(d => {
         d.x = _.meanBy(selectVertexes, 'x') || svg.style('width') / 2;
         d.y = _.meanBy(selectVertexes, 'y') || svg.style('heigth') / 2;
       });
       const edges = _.uniqBy([...originEdges, ...addEdges], e => e.id);
+      _.forEach(edges, link => {
+        // find other links with same target+source or source+target
+        const same = _.filter(edges, {
+          source: link.source,
+          target: link.target,
+        });
+        const sameAlt = _.filter(edges, {
+          source: link.target,
+          target: link.source,
+        });
+        const sameAll = same.concat(sameAlt);
+
+        _.forEach(sameAll, (s, i) => {
+          s.sameIndex = i + 1;
+          s.sameTotal = sameAll.length;
+          s.sameTotalHalf = s.sameTotal / 2;
+          s.sameUneven = s.sameTotal % 2 !== 0;
+          s.sameMiddleLink =
+            s.sameUneven === true && Math.ceil(s.sameTotalHalf) === s.sameIndex;
+          s.maxSameHalf = sameAll.length;
+          s.sameIndexCorrected = s.sameLowerHalf
+            ? s.sameIndex
+            : s.sameIndex - Math.ceil(s.sameTotalHalf);
+        });
+      });
+
       const vertexes = _.uniqBy(
         [...originVertexes, ...addVertexes],
         v => v.name,

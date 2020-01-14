@@ -11,16 +11,12 @@ interface INode extends d3.SimulationNodeDatum {
   group: number;
 }
 
-interface ILink extends d3.SimulationLinkDatum<INode> {
-  value: number;
-}
-
 interface IProps {
   width: number;
   height: number;
   data: {
     vertexes: INode[];
-    edges: ILink[];
+    edges: any[];
     selectIdsMap: Map<string, boolean>;
   };
   onSelectVertexes: (vertexes: INode[]) => void;
@@ -112,11 +108,34 @@ class NebulaD3 extends React.Component<IProps, {}> {
   };
 
   tick = () => {
-    this.link
-      .attr('x1', (d: any) => d.source.x)
-      .attr('y1', (d: any) => d.source.y)
-      .attr('x2', (d: any) => d.target.x)
-      .attr('y2', (d: any) => d.target.y);
+    this.link.attr('d', d => {
+      const dx = d.target.x - d.source.x;
+      const dy = d.target.y - d.source.y;
+      const dr = Math.sqrt(dx * dx + dy * dy);
+      const unevenCorrection = d.sameUneven ? 0 : 0.5;
+      let arc =
+        ((dr * d.maxSameHalf) / (d.sameIndexCorrected - unevenCorrection)) *
+        0.3;
+      if (d.sameMiddleLink) {
+        arc = 0;
+      }
+
+      return (
+        'M' +
+        d.source.x +
+        ',' +
+        d.source.y +
+        'A' +
+        arc +
+        ',' +
+        arc +
+        ' 0 0,1' +
+        ' ' +
+        d.target.x +
+        ',' +
+        d.target.y
+      );
+    });
 
     this.node.attr('cx', d => d.x).attr('cy', d => d.y);
 
@@ -213,7 +232,14 @@ class NebulaD3 extends React.Component<IProps, {}> {
   handleUpdataLinks = () => {
     if (this.force) {
       this.link = d3.selectAll('.link').attr('marker-end', 'url(#marker)');
-      this.linksText = d3.selectAll('.text');
+      this.linksText = d3
+        .selectAll('.text')
+        .append('textPath')
+        .attr('xlink:href', (d: any) => '#text-path-' + d.id)
+        .attr('startOffset', '50%')
+        .text((d: any) => {
+          return d.type;
+        });
     }
   };
 
@@ -239,7 +265,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
           'collide',
           d3
             .forceCollide()
-            .radius(80)
+            .radius(100)
             .iterations(2),
         );
     }
