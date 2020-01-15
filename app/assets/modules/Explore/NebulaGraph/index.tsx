@@ -81,7 +81,7 @@ class NebulaGraph extends React.Component<IProps, IState> {
   }
 
   handleMouseInNode = node => {
-    const nodeProp = node.nodeProp.tables
+    const nodeProp = node.nodeProp
       ? node.nodeProp.tables
           .map(v => {
             return Object.keys(v)
