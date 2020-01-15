@@ -288,7 +288,7 @@ export const importData = createModel({
         service.runImport();
         this.update({
           taskId,
-          isImporting: false,
+          isImporting: true,
         });
       } else {
         message.error(errMsg);
