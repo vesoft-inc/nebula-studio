@@ -4,7 +4,11 @@ import _ from 'lodash';
 
 import service from '#assets/config/service';
 import { fetchVertexProps } from '#assets/utils/fetch';
-import { idToSrting, nebulaToData } from '#assets/utils/nebulaToData';
+import {
+  idToSrting,
+  nebulaToData,
+  setLinkNumbers,
+} from '#assets/utils/nebulaToData';
 
 interface INode extends d3.SimulationNodeDatum {
   name: string;
@@ -41,12 +45,48 @@ export const explore = createModel({
         actionData,
       } = state;
       const { vertexes: addVertexes, edges: addEdges } = payload;
+
       const svg: any = d3.select('.output-graph');
       addVertexes.map(d => {
         d.x = _.meanBy(selectVertexes, 'x') || svg.style('width') / 2;
         d.y = _.meanBy(selectVertexes, 'y') || svg.style('heigth') / 2;
       });
       const edges = _.uniqBy([...originEdges, ...addEdges], e => e.id);
+
+      const linkmap = {};
+
+      const linkGroup = {};
+      edges.forEach(link => {
+        let key: string;
+        if (link.source.name) {
+          key =
+            link.source.name < link.target.name
+              ? link.source.name + ':' + link.target.name
+              : link.target.name + ':' + link.source.name;
+        } else {
+          key =
+            link.source < link.target
+              ? link.source + ':' + link.target
+              : link.target + ':' + link.source;
+        }
+        if (!linkmap.hasOwnProperty(key)) {
+          linkmap[key] = 0;
+        }
+        linkmap[key] += 1;
+        if (!linkGroup.hasOwnProperty(key)) {
+          linkGroup[key] = [];
+        }
+        linkGroup[key].push(link);
+        link.size = linkmap[key];
+        const group = linkGroup[key];
+        const keyPair = key.split(':');
+        let type = 'noself';
+        if (keyPair[0] === keyPair[1]) {
+          type = 'self';
+        }
+        setLinkNumbers(group, type);
+      });
+
       const vertexes = _.uniqBy(
         [...originVertexes, ...addVertexes],
         v => v.name,
