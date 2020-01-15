@@ -30,7 +30,7 @@ export default class Links extends React.Component<IProps, {}> {
       .style('stroke-width', 2);
 
     d3.select(this.ref)
-      .selectAll('line')
+      .selectAll('path')
       .data(links)
       .exit()
       .remove();
@@ -40,7 +40,9 @@ export default class Links extends React.Component<IProps, {}> {
       .data(links)
       .enter()
       .append('text')
-      .attr('class', 'text');
+      .attr('class', 'text')
+      .append('textPath')
+      .attr('class', 'textPath');
 
     d3.select(this.ref)
       .selectAll('text')

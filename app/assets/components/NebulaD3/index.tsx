@@ -108,29 +108,72 @@ class NebulaD3 extends React.Component<IProps, {}> {
   };
 
   tick = () => {
-    this.link.attr('d', d => {
+    this.link.attr('d', (d: any) => {
+      if (d.target.name === d.source.name) {
+        const dr = 30 / d.linknum;
+        return (
+          'M' +
+          d.source.x +
+          ',' +
+          d.source.y +
+          'A' +
+          dr +
+          ',' +
+          dr +
+          ' 0 1,1 ' +
+          d.target.x +
+          ',' +
+          (d.target.y + 1)
+        );
+      } else if (d.size % 2 !== 0 && d.linknum === 1) {
+        return (
+          'M ' +
+          d.source.x +
+          ' ' +
+          d.source.y +
+          ' L ' +
+          d.target.x +
+          ' ' +
+          d.target.y
+        );
+      }
+      const curve = 1.5;
+      const homogeneous = 1.2;
       const dx = d.target.x - d.source.x;
       const dy = d.target.y - d.source.y;
-      const dr = Math.sqrt(dx * dx + dy * dy);
-      const unevenCorrection = d.sameUneven ? 0 : 0.5;
-      let arc =
-        ((dr * d.maxSameHalf) / (d.sameIndexCorrected - unevenCorrection)) *
-        0.3;
-      if (d.sameMiddleLink) {
-        arc = 0;
-      }
+      const dr =
+        (Math.sqrt(dx * dx + dy * dy) * (d.linknum + homogeneous)) /
+        (curve * homogeneous);
 
+      if (d.linknum < 0) {
+        const dr =
+          (Math.sqrt(dx * dx + dy * dy) * (-1 * d.linknum + homogeneous)) /
+          (curve * homogeneous);
+        return (
+          'M' +
+          d.source.x +
+          ',' +
+          d.source.y +
+          'A' +
+          dr +
+          ',' +
+          dr +
+          ' 0 0,0 ' +
+          d.target.x +
+          ',' +
+          d.target.y
+        );
+      }
       return (
         'M' +
         d.source.x +
         ',' +
         d.source.y +
         'A' +
-        arc +
+        dr +
         ',' +
-        arc +
-        ' 0 0,1' +
-        ' ' +
+        dr +
+        ' 0 0,1 ' +
         d.target.x +
         ',' +
         d.target.y
@@ -233,8 +276,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
     if (this.force) {
       this.link = d3.selectAll('.link').attr('marker-end', 'url(#marker)');
       this.linksText = d3
-        .selectAll('.text')
-        .append('textPath')
+        .selectAll('.textPath')
         .attr('xlink:href', (d: any) => '#text-path-' + d.id)
         .attr('startOffset', '50%')
         .text((d: any) => {
