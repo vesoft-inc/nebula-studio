@@ -56,10 +56,18 @@ export function setLinkNumbers(group, type) {
   const linksB: any = [];
   for (let i = 0; i < len; i++) {
     const link = group[i];
-    if (link.source.name < link.target.name) {
-      linksA.push(link);
+    if (link.source.name) {
+      if (link.source.name < link.target.name) {
+        linksA.push(link);
+      } else {
+        linksB.push(link);
+      }
     } else {
-      linksB.push(link);
+      if (link.source < link.target) {
+        linksA.push(link);
+      } else {
+        linksB.push(link);
+      }
     }
   }
   let maxLinkNumber = 0;
@@ -90,14 +98,12 @@ export function setLinkNumbers(group, type) {
       biggerLinks = linksB;
       smallerLinks = linksA;
     }
-
     let startLinkNumber = maxLinkNumber;
     const smallerLinksLen = smallerLinks.length;
     for (let i = 0; i < smallerLinksLen; i++) {
       smallerLinks[i].linknum = startLinkNumber--;
     }
     const tmpNumber = startLinkNumber;
-
     startLinkNumber = 1;
     let p = 0;
     while (startLinkNumber <= maxLinkNumber) {

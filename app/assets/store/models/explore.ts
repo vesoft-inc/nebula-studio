@@ -57,10 +57,18 @@ export const explore = createModel({
 
       const linkGroup = {};
       edges.forEach(link => {
-        const key =
-          link.source.name < link.target.name
-            ? link.source.name + ':' + link.target.name
-            : link.target.name + ':' + link.source.name;
+        let key: string;
+        if (link.source.name) {
+          key =
+            link.source.name < link.target.name
+              ? link.source.name + ':' + link.target.name
+              : link.target.name + ':' + link.source.name;
+        } else {
+          key =
+            link.source < link.target
+              ? link.source + ':' + link.target
+              : link.target + ':' + link.source;
+        }
         if (!linkmap.hasOwnProperty(key)) {
           linkmap[key] = 0;
         }
@@ -69,12 +77,6 @@ export const explore = createModel({
           linkGroup[key] = [];
         }
         linkGroup[key].push(link);
-      });
-      edges.forEach(link => {
-        const key =
-          link.source.name < link.target.name
-            ? link.source.name + ':' + link.target.name
-            : link.target.name + ':' + link.source.name;
         link.size = linkmap[key];
         const group = linkGroup[key];
         const keyPair = key.split(':');
