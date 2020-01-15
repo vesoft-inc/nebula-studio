@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 
 import CSVPreviewLink from '#assets/components/CSVPreviewLink';
 import { IDispatch, IRootState } from '#assets/store';
+import { trackPageView } from '#assets/utils/stat';
 
 import Add, { AddType } from '../Add';
 import Next from '../Next';
@@ -37,6 +38,10 @@ class ConfigEdge extends React.Component<IProps> {
     const index = Number(key.split('#')[1]);
     this.props.updateActiveEdgeIndex(index);
   };
+
+  componentDidMount() {
+    trackPageView('/import/configEdge');
+  }
 
   render() {
     const { edgesConfig, activeEdgeIndex } = this.props;

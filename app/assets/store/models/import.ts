@@ -53,7 +53,7 @@ export const importData = createModel({
     activeEdgeIndex: -1,
     vertexAddCount: 0,
     edgeAddCount: 0,
-    isImporting: true,
+    isImporting: false,
     taskId: 'all',
   },
   reducers: {
@@ -276,7 +276,7 @@ export const importData = createModel({
         activeEdgeIndex: -1,
         vertexAddCount: 0,
         edgeAddCount: 0,
-        isImporting: true,
+        isImporting: false,
       });
     },
     async importData(payload) {
@@ -298,7 +298,7 @@ export const importData = createModel({
 
     async stopImport(payload) {
       this.update({
-        isImporting: true,
+        isImporting: false,
       });
       service.stopImport(payload);
     },

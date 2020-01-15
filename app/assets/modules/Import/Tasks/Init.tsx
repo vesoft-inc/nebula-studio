@@ -5,6 +5,7 @@ import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
 import { IDispatch, IRootState } from '#assets/store';
+import { trackPageView } from '#assets/utils/stat';
 
 import './Init.less';
 
@@ -48,6 +49,8 @@ class Init extends React.Component<IProps, {}> {
       username,
       password,
     });
+
+    trackPageView('/import/init');
   }
 
   handleNext = () => {

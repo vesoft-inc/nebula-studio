@@ -29,7 +29,7 @@ interface IProps
 class Progress extends React.Component<IProps, {}> {
   handleSwitchStep = step => {
     const { currentStep, isImporting } = this.props;
-    if (!isImporting) {
+    if (isImporting) {
       return;
     }
     if (step <= currentStep) {
@@ -39,7 +39,7 @@ class Progress extends React.Component<IProps, {}> {
 
   stepsStatus = index => {
     const { currentStep, isImporting } = this.props;
-    if (!isImporting) {
+    if (isImporting) {
       return 'wait';
     }
     return index <= currentStep ? 'finish' : 'wait';
@@ -79,7 +79,7 @@ class Progress extends React.Component<IProps, {}> {
             />
           ))}
         </Steps>
-        {isImporting && (
+        {!isImporting && (
           <Popconfirm
             placement="left"
             title={intl.get('import.clearAllConfigInfo')}

@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import service from '#assets/config/service';
 import { IDispatch } from '#assets/store';
 import { configToJson, getStringByteLength } from '#assets/utils/import';
+import { trackEvent, trackPageView } from '#assets/utils/stat';
 
 const { TabPane } = Tabs;
 const mapState = (state: any) => ({
@@ -81,6 +82,8 @@ class Import extends React.Component<IProps, IState> {
           message.error(intl.get('import.createConfigError'));
         }
       });
+
+    trackPageView('/import/data');
   }
 
   componentWillUnmount() {
@@ -111,6 +114,7 @@ class Import extends React.Component<IProps, IState> {
     if (errCode === 0) {
       this.logTimer = setTimeout(this.readlog, 2000);
     }
+    trackEvent('import', 'click');
   };
 
   readlog = async () => {
@@ -143,9 +147,10 @@ class Import extends React.Component<IProps, IState> {
           endByte: 1000000,
         });
         update({
-          isImporting: true,
+          isImporting: false,
         });
         clearTimeout(this.logTimer);
+        trackEvent('import', 'finish');
       }
     }
     this.ref.scrollTop = this.ref.scrollHeight;
@@ -177,14 +182,14 @@ class Import extends React.Component<IProps, IState> {
           <Button
             className="import-again"
             onClick={this.handleRunImport}
-            disabled={!isImporting}
+            disabled={isImporting}
           >
             {intl.get('import.runImport')}
           </Button>
           <Button
             className="import-again"
             onClick={() => this.props.stopImport({ taskId })}
-            disabled={isImporting}
+            disabled={!isImporting}
           >
             {intl.get('import.endImport')}
           </Button>
@@ -200,7 +205,7 @@ class Import extends React.Component<IProps, IState> {
             <Button
               className="import-again"
               onClick={this.props.resetAllConfig}
-              disabled={!isImporting}
+              disabled={isImporting}
             >
               {intl.get('import.newImport')}
             </Button>

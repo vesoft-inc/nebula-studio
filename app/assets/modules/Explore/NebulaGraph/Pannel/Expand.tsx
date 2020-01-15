@@ -5,6 +5,7 @@ import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
 import { IDispatch, IRootState } from '#assets/store';
+import { trackEvent } from '#assets/utils/stat';
 
 import './Expand.less';
 
@@ -115,6 +116,7 @@ class Expand extends React.Component<IProps, IState> {
     );
 
     this.props.close();
+    trackEvent('expand', 'click');
   };
 
   render() {

@@ -26,6 +26,7 @@ import { updateQueryStringParameter } from '#assets/utils';
 import './App.less';
 import ConfigServer from './modules/ConfigServer';
 import PrivateRoute from './PrivateRoute';
+import { trackPageView } from './utils/stat';
 
 const { Header, Content } = Layout;
 const { Option } = Select;
@@ -130,7 +131,7 @@ class App extends React.Component<IProps, IState> {
           {loading ? (
             <Spin />
           ) : (
-            <Layout className="nebula-web-console">
+            <Layout className="nebula-graph-studio">
               <Header>
                 <Menu
                   mode="horizontal"
@@ -193,21 +194,21 @@ class App extends React.Component<IProps, IState> {
                   className="help"
                   overlay={
                     <Menu>
-                      <Menu.Item>
+                      <Menu.Item onClick={() => trackPageView('/user-mannual')}>
                         <a
                           href="https://github.com/vesoft-inc/nebula-web-docker/blob/master/docs/nebula-graph-studio-user-guide.md"
                           target="_blank"
                         >
-                          <Icon type="tags" />
+                          <Icon type="compass" />
                           {intl.get('common.use')}
                         </a>
                       </Menu.Item>
-                      <Menu.Item>
+                      <Menu.Item onClick={() => trackPageView('/nebula-doc')}>
                         <a
                           href="https://github.com/vesoft-inc/nebula/blob/master/README.md"
                           target="_blank"
                         >
-                          <Icon type="tags" />
+                          <Icon type="star" />
                           {intl.get('common.nebula')}
                         </a>
                       </Menu.Item>
@@ -216,7 +217,7 @@ class App extends React.Component<IProps, IState> {
                           href="https://github.com/vesoft-inc/nebula-web-docker/issues"
                           target="_blank"
                         >
-                          <Icon type="tags" />
+                          <Icon type="bug" />
                           {intl.get('common.feedback')}
                         </a>
                       </Menu.Item>

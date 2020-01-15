@@ -1,15 +1,15 @@
 {
-  "name": "nebula-web-console",
-  "version": "1.0.0-beta",
-  "description": "nebula-web-console",
+  "name": "nebula-graph-studio",
+  "version": "1.0.0",
+  "description": "nebula-graph-studio",
   "private": true,
   "egg": {
     "typescript": true
   },
   "scripts": {
-    "start": "egg-scripts start --daemon --title=egg-server-nebula-web-console",
-    "docker-start": "egg-scripts start --title=egg-server-nebula-web-console",
-    "stop": "egg-scripts stop --title=egg-server-nebula-web-console",
+    "start": "egg-scripts start --daemon --title=egg-server-nebula-graph-studio",
+    "docker-start": "egg-scripts start --title=egg-server-nebula-graph-studio",
+    "stop": "egg-scripts stop --title=egg-server-nebula-graph-studio",
     "dev": "egg-bin dev -r egg-ts-helper/register",
     "debug": "egg-bin debug -r egg-ts-helper/register",
     "test-local": "egg-bin test -r egg-ts-helper/register",

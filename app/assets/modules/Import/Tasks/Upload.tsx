@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import CSVPreviewLink from '#assets/components/CSVPreviewLink';
 import { IDispatch, IRootState } from '#assets/store';
 import readFileContent from '#assets/utils/file';
+import { trackPageView } from '#assets/utils/stat';
 
 import './Upload.less';
 
@@ -34,6 +35,10 @@ class Import extends React.Component<IProps> {
   previewHandler;
   constructor(props) {
     super(props);
+  }
+
+  componentDidMount() {
+    trackPageView('/import/upload');
   }
 
   handleNext = () => {

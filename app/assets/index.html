@@ -5,7 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Nebula Web</title>
+		<title>Nebula Studio</title>
+    {% if Env == 'prod' %}
+			<script>
+				var _hmt = _hmt || [];
+				(function() {
+					var hm = document.createElement("script");
+					hm.src = "https://hm.baidu.com/hm.js?b9cb5b394fd669583c13f8975ca64ff0";
+					var s = document.getElementsByTagName("script")[0]; 
+					s.parentNode.insertBefore(hm, s);
+				})();
+			</script>
+		{% endif %}
     <style>
 		@-webkit-keyframes square-spin {
 			25% {
@@ -69,7 +80,7 @@
 			top: 200px;
 		}
 		</style>
-		{% if ENV != 'local' %}
+		{% if Env == 'prod' %}
         {{ helper.assets.getStyle('vendors.css') | safe }}
 		{% endif %}
 </head>
@@ -80,12 +91,12 @@
             <div></div>
         </div>
     </div>
-    {% if Env == 'local' %}
-        {{ helper.assets.getScript('app.js') | safe }}
-    {% else %}
+    {% if Env == 'prod' %}
         {{ helper.assets.getScript('app.js') | safe }}
         {{ helper.assets.getScript('vendors.js') | safe }}
         {{ helper.assets.getScript('manifest.js') | safe }}
+    {% else %}
+        {{ helper.assets.getScript('app.js') | safe }}
     {% endif %}
 </body>
 

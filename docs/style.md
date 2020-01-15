@@ -44,7 +44,7 @@ This is a full stack project including front and back end.
 
   // word upper case with '-'
   // case1 - constant config
-  const APP_NAME = 'nebula-web-console'
+  const APP_NAME = 'nebula-graph-studio'
   ```
 
 - Event Methods Naming

@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 
 import CSVPreviewLink from '#assets/components/CSVPreviewLink';
 import { IDispatch, IRootState } from '#assets/store';
+import { trackPageView } from '#assets/utils/stat';
 
 import Add, { AddType } from '../Add';
 import Next from '../Next';
@@ -41,6 +42,10 @@ class ConfigNode extends React.PureComponent<IProps> {
     const index = Number(key.split('#')[1]);
     this.props.updateActiveVertexIndex(index);
   };
+
+  componentDidMount() {
+    trackPageView('/import/configVertex');
+  }
 
   render() {
     const { vertexesConfig, activeVertexIndex } = this.props;

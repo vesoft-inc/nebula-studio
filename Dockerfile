@@ -1,26 +1,26 @@
 FROM node:10-alpine as builder
 # Set the working directory to /app
-WORKDIR /nebula-web-console
+WORKDIR /nebula-graph-studio
 # Copy the current directory contents into the container at /app
-COPY package.json /nebula-web-console/
-COPY .npmrc /nebula-web-console/
+COPY package.json /nebula-graph-studio/
+COPY .npmrc /nebula-graph-studio/
 # Install any needed packages
 RUN npm install
-COPY . /nebula-web-console/
+COPY . /nebula-graph-studio/
 
 # build and remove front source code
 RUN npm run build && npm run tsc && rm -rf app/assets/*
-COPY ./app/assets/index.html  /nebula-web-console/app/assets/
+COPY ./app/assets/index.html  /nebula-graph-studio/app/assets/
 
 FROM node:10-alpine
  # Make port available to the world outside this container
 
-WORKDIR /nebula-web-console
-COPY --from=builder ./nebula-web-console/package.json /nebula-web-console/
-COPY .npmrc /nebula-web-console/
-COPY --from=builder /nebula-web-console/app /nebula-web-console/app
-COPY --from=builder /nebula-web-console/favicon.ico /nebula-web-console/favicon.ico
-COPY --from=builder /nebula-web-console/config /nebula-web-console/config
+WORKDIR /nebula-graph-studio
+COPY --from=builder ./nebula-graph-studio/package.json /nebula-graph-studio/
+COPY .npmrc /nebula-graph-studio/
+COPY --from=builder /nebula-graph-studio/app /nebula-graph-studio/app
+COPY --from=builder /nebula-graph-studio/favicon.ico /nebula-graph-studio/favicon.ico
+COPY --from=builder /nebula-graph-studio/config /nebula-graph-studio/config
 RUN npm install --production
 
 EXPOSE 7001
