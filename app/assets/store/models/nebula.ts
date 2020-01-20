@@ -4,6 +4,7 @@ import cookies from 'js-cookie';
 import intl from 'react-intl-universal';
 
 import service from '#assets/config/service';
+import { trackEvent } from '#assets/utils/stat';
 
 interface IState {
   spaces: string[];
@@ -64,6 +65,7 @@ export const nebula = createModel({
         cookies.set('host', payload.host);
         cookies.set('username', username);
         cookies.set('password', password);
+        trackEvent('connect', 'success');
         this.update({
           host: payload.host,
           username,
@@ -72,6 +74,7 @@ export const nebula = createModel({
         message.success(intl.get('configServer.success'));
         return true;
       } else {
+        trackEvent('connect', 'fail');
         message.error(`${intl.get('configServer.fail')}: ${errorMessage}`);
         return false;
       }

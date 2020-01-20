@@ -2,6 +2,8 @@ import { Spin } from 'antd';
 import React from 'react';
 import { connect } from 'react-redux';
 
+import { trackPageView } from '#assets/utils/stat';
+
 import './index.less';
 import Progress from './Progress';
 import Tasks from './Tasks';
@@ -15,6 +17,10 @@ type IProps = ReturnType<typeof mapState>;
 class Import extends React.Component<IProps> {
   constructor(props: IProps) {
     super(props);
+  }
+
+  componentDidMount() {
+    trackPageView('/import');
   }
 
   render() {

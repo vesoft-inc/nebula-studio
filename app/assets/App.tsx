@@ -196,7 +196,7 @@ class App extends React.Component<IProps, IState> {
                     <Menu>
                       <Menu.Item onClick={() => trackPageView('/user-mannual')}>
                         <a
-                          href="https://github.com/vesoft-inc/nebula-web-docker/blob/master/docs/nebula-graph-studio-user-guide.md"
+                          href="https://github.com/vesoft-inc/nebula-web-docker"
                           target="_blank"
                         >
                           <Icon type="compass" />

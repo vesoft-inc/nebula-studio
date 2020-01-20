@@ -6,6 +6,7 @@ import { RouteComponentProps } from 'react-router-dom';
 
 import ConfigServerForm from '#assets/components/ConfigServerForm';
 import { IDispatch, IRootState } from '#assets/store';
+import { trackPageView } from '#assets/utils/stat';
 
 import './index.less';
 
@@ -34,6 +35,7 @@ class ConfigServer extends React.Component<IProps> {
 
   componentDidMount() {
     this.checkIsNeedConfig();
+    trackPageView('/config-server');
   }
 
   componentDidUpdate() {

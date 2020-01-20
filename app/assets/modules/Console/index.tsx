@@ -7,7 +7,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { CodeMirror, OutputBox } from '#assets/components';
 import { lineNum } from '#assets/config/nebulaQL';
 import service from '#assets/config/service';
-import { trackEvent } from '#assets/utils/stat';
+import { trackEvent, trackPageView } from '#assets/utils/stat';
 
 import Command from './Command';
 import './index.less';
@@ -41,6 +41,10 @@ export default class Console extends React.Component<IProps, IState> {
       history: false,
       outType: OutType.nGQL,
     };
+  }
+
+  componentDidMount() {
+    trackPageView('/console');
   }
 
   getLocalStorage = () => {
