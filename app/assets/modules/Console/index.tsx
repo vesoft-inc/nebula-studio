@@ -139,6 +139,13 @@ export default class Console extends React.Component<IProps, IState> {
     this.editor.setSize(undefined, line * 24 + 10 + 'px');
   };
 
+  historyListShow = (str: string) => {
+    if (str.length < 300) {
+      return str;
+    }
+    return str.substring(0, 300) + '...';
+  };
+
   render() {
     const { isUpDown, code, history, result, outType } = this.state;
     return (
@@ -204,9 +211,10 @@ export default class Console extends React.Component<IProps, IState> {
               renderItem={(item: string) => (
                 <List.Item
                   style={{ cursor: 'pointer' }}
+                  className="history-list"
                   onClick={() => this.handleHistoryItem(item)}
                 >
-                  {item}
+                  {this.historyListShow(item)}
                 </List.Item>
               )}
             />

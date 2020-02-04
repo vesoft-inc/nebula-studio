@@ -60,7 +60,8 @@
     "operator": "operator",
     "value": "value",
     "selectSpace": "Please select the space",
-    "selectReminder": "This will clear the existed graph data, are you sure?"
+    "selectReminder": "This will clear the existed graph data, are you sure?",
+    "zoom": "Zoom"
   },
   "import": {
     "import": "Import",

@@ -1,5 +1,7 @@
+import { Button } from 'antd';
 import * as d3 from 'd3';
 import * as React from 'react';
+import intl from 'react-intl-universal';
 
 import './index.less';
 import Links from './Links';
@@ -53,6 +55,7 @@ const colorTotal = colors.length;
 class NebulaD3 extends React.Component<IProps, {}> {
   ctrls: IRefs = {};
   nodeRef: SVGCircleElement;
+  circleRef: SVGCircleElement;
   force: any;
   svg: any;
   node: any;
@@ -60,6 +63,9 @@ class NebulaD3 extends React.Component<IProps, {}> {
   linksText: any;
   nodeText: any;
   selectNode: INode[];
+  state = {
+    isZoom: false,
+  };
 
   componentDidMount() {
     if (!this.ctrls.mountPoint) {
@@ -285,6 +291,28 @@ class NebulaD3 extends React.Component<IProps, {}> {
     }
   };
 
+  handleZoom = () => {
+    const { isZoom } = this.state;
+    if (isZoom) {
+      this.svg.on('.zoom', null);
+      this.setState({
+        isZoom: false,
+      });
+    } else {
+      this.svg.call(
+        d3
+          .zoom()
+          .scaleExtent([0.3, 1])
+          .on('zoom', () =>
+            d3.select(this.circleRef).attr('transform', d3.event.transform),
+          ),
+      );
+      this.setState({
+        isZoom: true,
+      });
+    }
+  };
+
   // compute to get (x,y ) of the nodes by d3-force: https://github.com/d3/d3-force/blob/v1.2.1/README.md#d3-force
   // it will change the data.edges and data.vertexes passed in
   computeDataByD3Force() {
@@ -300,14 +328,14 @@ class NebulaD3 extends React.Component<IProps, {}> {
     if (!this.force) {
       this.force = d3
         .forceSimulation()
-        .force('charge', d3.forceManyBody().strength(-100))
+        .force('charge', d3.forceManyBody().strength(-20))
         .force('x', d3.forceX())
         .force('y', d3.forceY())
         .force(
           'collide',
           d3
             .forceCollide()
-            .radius(100)
+            .radius(60)
             .iterations(2),
         );
     }
@@ -322,27 +350,41 @@ class NebulaD3 extends React.Component<IProps, {}> {
   render() {
     this.computeDataByD3Force();
     const { width, height, data } = this.props;
+    const { isZoom } = this.state;
     return (
-      <svg
-        className="output-graph"
-        ref={mountPoint => (this.ctrls.mountPoint = mountPoint)}
-        width={width}
-        height={height}
-      >
-        <Links links={data.edges} onUpdataLinks={this.handleUpdataLinks} />
-        <g
-          ref={(ref: SVGCircleElement) => (this.nodeRef = ref)}
-          className="nodes"
-        />
-        <Labels
-          nodes={data.vertexes}
-          onUpDataNodeTexts={this.handleUpdataNodeTexts}
-        />
-        <SelectIds
-          nodes={data.vertexes}
-          onSelectVertexes={this.props.onSelectVertexes}
-        />
-      </svg>
+      <div>
+        {data.vertexes.length !== 0 && (
+          <Button
+            type={isZoom ? 'primary' : 'default'}
+            className="graph-btn"
+            onClick={this.handleZoom}
+          >
+            {intl.get('explore.zoom')}
+          </Button>
+        )}
+        <svg
+          className="output-graph"
+          ref={mountPoint => (this.ctrls.mountPoint = mountPoint)}
+          width={width}
+          height={height}
+        >
+          <g ref={(ref: SVGCircleElement) => (this.circleRef = ref)}>
+            <Links links={data.edges} onUpdataLinks={this.handleUpdataLinks} />
+            <g
+              ref={(ref: SVGCircleElement) => (this.nodeRef = ref)}
+              className="nodes"
+            />
+            <Labels
+              nodes={data.vertexes}
+              onUpDataNodeTexts={this.handleUpdataNodeTexts}
+            />
+            <SelectIds
+              nodes={data.vertexes}
+              onSelectVertexes={this.props.onSelectVertexes}
+            />
+          </g>
+        </svg>
+      </div>
     );
   }
 }
