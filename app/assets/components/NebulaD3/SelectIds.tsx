@@ -8,6 +8,9 @@ interface INode extends d3.SimulationNodeDatum {
 
 interface IProps {
   nodes: INode[];
+  translateX: number;
+  translateY: number;
+  scale: number;
   onSelectVertexes: (vertexes: any[]) => void;
 }
 
@@ -27,6 +30,7 @@ export default class SelectIds extends React.Component<IProps, {}> {
   }
 
   rectRender(nodes) {
+    const { translateX, translateY, scale } = this.props;
     const startPoint = {
       x: 0,
       y: 0,
@@ -37,19 +41,31 @@ export default class SelectIds extends React.Component<IProps, {}> {
       .style('stroke-width', '0.6')
       .style('fill', 'transparent')
       .style('stroke-opacity', '0.6');
-
+    // fix: startPoint  is not correct
     d3.selectAll('svg')
       .on('mousedown', () => {
-        startPoint.x = d3.event.offsetX;
-        startPoint.y = d3.event.offsetY;
+        startPoint.x = d3.event.offsetX - translateX * scale;
+        startPoint.y = d3.event.offsetY - translateY * scale;
       })
       .on('mousemove', () => {
         if (startPoint.x !== 0) {
           rect
-            .attr('x', Math.min(d3.event.offsetX, startPoint.x))
-            .attr('y', Math.min(d3.event.offsetY, startPoint.y))
-            .attr('width', Math.abs(d3.event.offsetX - startPoint.x))
-            .attr('height', Math.abs(d3.event.offsetY - startPoint.y));
+            .attr(
+              'x',
+              Math.min(d3.event.offsetX - translateX * scale, startPoint.x),
+            )
+            .attr(
+              'y',
+              Math.min(d3.event.offsetY - translateY * scale, startPoint.y),
+            )
+            .attr(
+              'width',
+              Math.abs(d3.event.offsetX - translateX * scale - startPoint.x),
+            )
+            .attr(
+              'height',
+              Math.abs(d3.event.offsetY - translateY * scale - startPoint.y),
+            );
         }
       })
       .on('mouseup', () => {
@@ -63,11 +79,16 @@ export default class SelectIds extends React.Component<IProps, {}> {
   }
 
   isNotSelected(nodePoint, startPoint) {
+    const { translateX, translateY } = this.props;
     if (
-      (nodePoint.x > startPoint.x && nodePoint.x > d3.event.offsetX) ||
-      (nodePoint.x < startPoint.x && nodePoint.x < d3.event.offsetX) ||
-      (nodePoint.y > startPoint.y && nodePoint.y > d3.event.offsetY) ||
-      (nodePoint.y < startPoint.y && nodePoint.y < d3.event.offsetY)
+      (nodePoint.x > startPoint.x &&
+        nodePoint.x > d3.event.offsetX - translateX) ||
+      (nodePoint.x < startPoint.x &&
+        nodePoint.x < d3.event.offsetX - translateX) ||
+      (nodePoint.y > startPoint.y &&
+        nodePoint.y > d3.event.offsetY - translateY) ||
+      (nodePoint.y < startPoint.y &&
+        nodePoint.y < d3.event.offsetY - translateY)
     ) {
       return true;
     }

@@ -65,6 +65,9 @@ class NebulaD3 extends React.Component<IProps, {}> {
   selectNode: INode[];
   state = {
     isZoom: false,
+    translateX: 0,
+    translateY: 0,
+    scale: 1,
   };
 
   componentDidMount() {
@@ -305,6 +308,13 @@ class NebulaD3 extends React.Component<IProps, {}> {
           .scaleExtent([0.3, 1])
           .on('zoom', () =>
             d3.select(this.circleRef).attr('transform', d3.event.transform),
+          )
+          .on('end', () =>
+            this.setState({
+              scale: d3.event.transform.k,
+              translateX: d3.event.transform.x,
+              translateY: d3.event.transform.y,
+            }),
           ),
       );
       this.setState({
@@ -350,7 +360,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
   render() {
     this.computeDataByD3Force();
     const { width, height, data } = this.props;
-    const { isZoom } = this.state;
+    const { isZoom, translateX, translateY, scale } = this.state;
     return (
       <div>
         {data.vertexes.length !== 0 && (
@@ -380,6 +390,9 @@ class NebulaD3 extends React.Component<IProps, {}> {
             />
             <SelectIds
               nodes={data.vertexes}
+              translateX={translateX}
+              translateY={translateY}
+              scale={scale}
               onSelectVertexes={this.props.onSelectVertexes}
             />
           </g>
