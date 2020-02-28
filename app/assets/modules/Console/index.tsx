@@ -1,4 +1,4 @@
-import { Button, Icon, List, message, Modal, Tooltip } from 'antd';
+import { Button, Icon, Input, List, message, Modal, Tooltip } from 'antd';
 import cookies from 'js-cookie';
 import React from 'react';
 import intl from 'react-intl-universal';
@@ -21,6 +21,7 @@ interface IState {
   code: string;
   isUpDown: boolean;
   history: boolean;
+  space: string;
   result: any;
   outType: OutType;
 }
@@ -40,6 +41,7 @@ export default class Console extends React.Component<IProps, IState> {
       isUpDown: true,
       history: false,
       outType: OutType.nGQL,
+      space: '',
     };
   }
 
@@ -56,6 +58,8 @@ export default class Console extends React.Component<IProps, IState> {
   };
 
   handleRun = async () => {
+    const { space } = this.state;
+    const useSpace = space ? space + ';' : space;
     const code = this.editor.getValue();
     if (!code) {
       message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
@@ -63,7 +67,7 @@ export default class Console extends React.Component<IProps, IState> {
     }
     this.editor.execCommand('goDocEnd');
     const history = this.getLocalStorage();
-    history.push(code);
+    history.push(useSpace + code);
     localStorage.setItem('history', JSON.stringify(history));
 
     if (code.length && code.trim()[0] === ':') {
@@ -76,7 +80,7 @@ export default class Console extends React.Component<IProps, IState> {
         outType: OutType.nGQL,
         code,
       });
-      await this.runNGQL(code);
+      await this.runNGQL(useSpace + code);
     }
 
     trackEvent('console', 'run');
@@ -107,8 +111,15 @@ export default class Console extends React.Component<IProps, IState> {
   };
 
   handleHistoryItem = (value: string) => {
+    let code = value;
+    let space = '';
+    if (value.includes('use')) {
+      space = value.split(';', 1)[0];
+      code = value.substring(space.length + 1);
+    }
     this.setState({
-      code: value,
+      code,
+      space,
       outType: value[0] === ':' ? OutType.command : OutType.nGQL,
       history: false,
     });
@@ -134,8 +145,14 @@ export default class Console extends React.Component<IProps, IState> {
   };
 
   handleLineCount = () => {
-    const line =
-      this.editor.lineCount() > lineNum ? lineNum : this.editor.lineCount();
+    let line;
+    if (this.editor.lineCount() > lineNum) {
+      line = lineNum;
+    } else if (this.editor.lineCount() < 5) {
+      line = 5;
+    } else {
+      line = this.editor.lineCount();
+    }
     this.editor.setSize(undefined, line * 24 + 10 + 'px');
   };
 
@@ -146,17 +163,26 @@ export default class Console extends React.Component<IProps, IState> {
     return str.substring(0, 300) + '...';
   };
 
+  handleChangeSpace = e => {
+    this.setState({
+      space: e.target.value,
+    });
+  };
+
   render() {
-    const { isUpDown, code, history, result, outType } = this.state;
+    const { isUpDown, code, history, result, outType, space } = this.state;
     return (
       <div className="nebula-console">
         <div className="ngql-content">
           <div className="mirror-wrap">
+            <div className="mirror-nav">
+              Space: <Input onChange={this.handleChangeSpace} value={space} />
+            </div>
             <CodeMirror
               value={code}
-              onChangeLine={() => this.handleLineCount()}
+              onChangeLine={this.handleLineCount}
               ref={this.getInstance}
-              height={isUpDown ? '34px' : 24 * lineNum + 'px'}
+              height={isUpDown ? '120px' : 24 * lineNum + 'px'}
               options={{
                 keyMap: 'sublime',
                 fullScreen: true,
