@@ -13,10 +13,27 @@
 		> .mirror-wrap {
 			flex: 1;
 			display: flex;
+			flex-direction: column;
 			align-items: center;
 
 			> .CodeMirror {
 				width: 100%;
+			}
+
+			.mirror-nav {
+				text-align: left;
+				background: #f7f7f7;
+				padding: 10px 0 10px 30px;
+				width: 100%;
+
+				input {
+					width: 350px;
+					margin: 0 8px;
+				}
+
+				svg {
+					color: #999;
+				}
 			}
 
 			> .expand {

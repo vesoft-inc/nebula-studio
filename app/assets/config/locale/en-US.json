@@ -7,6 +7,7 @@
     "record": "record",
     "sorryNGQLCannotBeEmpty": "Sorry, NGQL cannot be empty",
     "NGQLHistoryList": "NGQL History List",
+    "spaceTip": "only required when you need to operate according to some space",
     "empty": "Empty",
     "run": "Run",
     "console": "console",

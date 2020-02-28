@@ -1,11 +1,11 @@
-import { Button, Icon, List, message, Modal, Tooltip } from 'antd';
+import { Button, Icon, Input, List, message, Modal, Tooltip } from 'antd';
 import cookies from 'js-cookie';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { CodeMirror, OutputBox } from '#assets/components';
-import { lineNum } from '#assets/config/nebulaQL';
+import { maxLineNum } from '#assets/config/nebulaQL';
 import service from '#assets/config/service';
 import { trackEvent, trackPageView } from '#assets/utils/stat';
 
@@ -21,6 +21,7 @@ interface IState {
   code: string;
   isUpDown: boolean;
   history: boolean;
+  space: string;
   result: any;
   outType: OutType;
 }
@@ -40,6 +41,7 @@ export default class Console extends React.Component<IProps, IState> {
       isUpDown: true,
       history: false,
       outType: OutType.nGQL,
+      space: '',
     };
   }
 
@@ -56,14 +58,16 @@ export default class Console extends React.Component<IProps, IState> {
   };
 
   handleRun = async () => {
+    const { space } = this.state;
     const code = this.editor.getValue();
+    const completeCode = space ? `use ${space};${code}` : code;
     if (!code) {
       message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
       return;
     }
     this.editor.execCommand('goDocEnd');
     const history = this.getLocalStorage();
-    history.push(code);
+    history.push(completeCode);
     localStorage.setItem('history', JSON.stringify(history));
 
     if (code.length && code.trim()[0] === ':') {
@@ -76,7 +80,7 @@ export default class Console extends React.Component<IProps, IState> {
         outType: OutType.nGQL,
         code,
       });
-      await this.runNGQL(code);
+      await this.runNGQL(completeCode);
     }
 
     trackEvent('console', 'run');
@@ -107,8 +111,16 @@ export default class Console extends React.Component<IProps, IState> {
   };
 
   handleHistoryItem = (value: string) => {
+    let code = value;
+    let space = '';
+    if (value.includes('use')) {
+      const str = value.split(';', 1)[0];
+      space = str.substring(4);
+      code = value.substring(str.length + 1);
+    }
     this.setState({
-      code: value,
+      code,
+      space,
       outType: value[0] === ':' ? OutType.command : OutType.nGQL,
       history: false,
     });
@@ -134,8 +146,14 @@ export default class Console extends React.Component<IProps, IState> {
   };
 
   handleLineCount = () => {
-    const line =
-      this.editor.lineCount() > lineNum ? lineNum : this.editor.lineCount();
+    let line;
+    if (this.editor.lineCount() > maxLineNum) {
+      line = maxLineNum;
+    } else if (this.editor.lineCount() < 5) {
+      line = 5;
+    } else {
+      line = this.editor.lineCount();
+    }
     this.editor.setSize(undefined, line * 24 + 10 + 'px');
   };
 
@@ -146,17 +164,34 @@ export default class Console extends React.Component<IProps, IState> {
     return str.substring(0, 300) + '...';
   };
 
+  handleChangeSpace = e => {
+    this.setState({
+      space: e.target.value,
+    });
+  };
+
   render() {
-    const { isUpDown, code, history, result, outType } = this.state;
+    const { isUpDown, code, history, result, outType, space } = this.state;
     return (
       <div className="nebula-console">
         <div className="ngql-content">
           <div className="mirror-wrap">
+            <div className="mirror-nav">
+              USE:
+              <Input
+                onChange={this.handleChangeSpace}
+                value={space}
+                placeholder="space name"
+              />
+              <Tooltip title={intl.get('common.spaceTip')} placement="right">
+                <Icon type="question-circle" theme="outlined" />
+              </Tooltip>
+            </div>
             <CodeMirror
               value={code}
-              onChangeLine={() => this.handleLineCount()}
+              onChangeLine={this.handleLineCount}
               ref={this.getInstance}
-              height={isUpDown ? '34px' : 24 * lineNum + 'px'}
+              height={isUpDown ? '120px' : 24 * maxLineNum + 'px'}
               options={{
                 keyMap: 'sublime',
                 fullScreen: true,
