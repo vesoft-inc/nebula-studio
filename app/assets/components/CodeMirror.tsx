@@ -10,7 +10,7 @@ import 'codemirror/mode/meta';
 import 'codemirror/theme/monokai.css';
 import React from 'react';
 
-import { keyWords, lineNum, operators } from '#assets/config/nebulaQL';
+import { keyWords, maxLineNum, operators } from '#assets/config/nebulaQL';
 
 interface IProps {
   options: object;
@@ -130,7 +130,9 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
     if (value !== this.editor.getValue()) {
       this.editor.setValue(value || '');
       const line =
-        this.editor.lineCount() > lineNum ? lineNum : this.editor.lineCount();
+        this.editor.lineCount() > maxLineNum
+          ? maxLineNum
+          : this.editor.lineCount();
       this.editor.setSize(undefined, line * 24 + 10 + 'px');
     }
   }

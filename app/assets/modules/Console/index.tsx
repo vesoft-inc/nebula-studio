@@ -5,7 +5,7 @@ import intl from 'react-intl-universal';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { CodeMirror, OutputBox } from '#assets/components';
-import { lineNum } from '#assets/config/nebulaQL';
+import { maxLineNum } from '#assets/config/nebulaQL';
 import service from '#assets/config/service';
 import { trackEvent, trackPageView } from '#assets/utils/stat';
 
@@ -59,15 +59,15 @@ export default class Console extends React.Component<IProps, IState> {
 
   handleRun = async () => {
     const { space } = this.state;
-    const useSpace = space ? space + ';' : space;
     const code = this.editor.getValue();
+    const completeCode = space ? `use ${space};${code}` : code;
     if (!code) {
       message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
       return;
     }
     this.editor.execCommand('goDocEnd');
     const history = this.getLocalStorage();
-    history.push(useSpace + code);
+    history.push(completeCode);
     localStorage.setItem('history', JSON.stringify(history));
 
     if (code.length && code.trim()[0] === ':') {
@@ -80,7 +80,7 @@ export default class Console extends React.Component<IProps, IState> {
         outType: OutType.nGQL,
         code,
       });
-      await this.runNGQL(useSpace + code);
+      await this.runNGQL(completeCode);
     }
 
     trackEvent('console', 'run');
@@ -114,8 +114,9 @@ export default class Console extends React.Component<IProps, IState> {
     let code = value;
     let space = '';
     if (value.includes('use')) {
-      space = value.split(';', 1)[0];
-      code = value.substring(space.length + 1);
+      const str = value.split(';', 1)[0];
+      space = str.substring(4);
+      code = value.substring(str.length + 1);
     }
     this.setState({
       code,
@@ -146,8 +147,8 @@ export default class Console extends React.Component<IProps, IState> {
 
   handleLineCount = () => {
     let line;
-    if (this.editor.lineCount() > lineNum) {
-      line = lineNum;
+    if (this.editor.lineCount() > maxLineNum) {
+      line = maxLineNum;
     } else if (this.editor.lineCount() < 5) {
       line = 5;
     } else {
@@ -176,13 +177,18 @@ export default class Console extends React.Component<IProps, IState> {
         <div className="ngql-content">
           <div className="mirror-wrap">
             <div className="mirror-nav">
-              Space: <Input onChange={this.handleChangeSpace} value={space} />
+              USE:
+              <Input
+                onChange={this.handleChangeSpace}
+                value={space}
+                placeholder="space name"
+              />
             </div>
             <CodeMirror
               value={code}
               onChangeLine={this.handleLineCount}
               ref={this.getInstance}
-              height={isUpDown ? '120px' : 24 * lineNum + 'px'}
+              height={isUpDown ? '120px' : 24 * maxLineNum + 'px'}
               options={{
                 keyMap: 'sublime',
                 fullScreen: true,
