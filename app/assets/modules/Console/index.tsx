@@ -183,6 +183,9 @@ export default class Console extends React.Component<IProps, IState> {
                 value={space}
                 placeholder="space name"
               />
+              <Tooltip title={intl.get('common.spaceTip')} placement="right">
+                <Icon type="question-circle" theme="outlined" />
+              </Tooltip>
             </div>
             <CodeMirror
               value={code}
