@@ -1,4 +1,4 @@
-import { Button, Icon, Input, List, message, Modal, Tooltip } from 'antd';
+import { Button, Icon, List, message, Modal, Tooltip } from 'antd';
 import cookies from 'js-cookie';
 import React from 'react';
 import intl from 'react-intl-universal';
@@ -11,6 +11,7 @@ import { trackEvent, trackPageView } from '#assets/utils/stat';
 
 import Command from './Command';
 import './index.less';
+import SpaceSearchInput from './SpaceSearchInput';
 
 enum OutType {
   nGQL = 'NGQL',
@@ -28,7 +29,7 @@ interface IState {
 
 type IProps = RouteComponentProps;
 
-export default class Console extends React.Component<IProps, IState> {
+class Console extends React.Component<IProps, IState> {
   codemirror;
   editor;
 
@@ -164,9 +165,9 @@ export default class Console extends React.Component<IProps, IState> {
     return str.substring(0, 300) + '...';
   };
 
-  handleChangeSpace = e => {
+  handleSpaceChange = value => {
     this.setState({
-      space: e.target.value,
+      space: value,
     });
   };
 
@@ -178,10 +179,9 @@ export default class Console extends React.Component<IProps, IState> {
           <div className="mirror-wrap">
             <div className="mirror-nav">
               USE:
-              <Input
-                onChange={this.handleChangeSpace}
+              <SpaceSearchInput
+                onSpaceChange={this.handleSpaceChange}
                 value={space}
-                placeholder="space name"
               />
               <Tooltip title={intl.get('common.spaceTip')} placement="right">
                 <Icon type="question-circle" theme="outlined" />
@@ -259,3 +259,5 @@ export default class Console extends React.Component<IProps, IState> {
     );
   }
 }
+
+export default Console;

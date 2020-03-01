@@ -10,14 +10,21 @@ import {
   setLinkNumbers,
 } from '#assets/utils/nebulaToData';
 
-interface INode extends d3.SimulationNodeDatum {
+export interface INode extends d3.SimulationNodeDatum {
   name: string;
-  group: number;
+  group?: number;
+}
+
+export interface IEdge extends d3.SimulationLinkDatum<INode> {
+  id: string;
+  source: INode;
+  target: INode;
+  size: number;
 }
 
 interface IState {
   vertexes: INode[];
-  edges: any[];
+  edges: IEdge[];
   selectVertexes: INode[];
   actionData: any[];
 }

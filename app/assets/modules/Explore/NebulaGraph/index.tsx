@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 
 import { NebulaD3 } from '#assets/components';
 import { IDispatch, IRootState } from '#assets/store';
+import { IEdge, INode } from '#assets/store/models';
 
 import './index.less';
 import Panel from './Pannel';
@@ -19,7 +20,7 @@ const mapState = (state: IRootState) => ({
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
-  updateSelectIds: (vertexes: any) => {
+  updateSelectIds: (vertexes: INode[]) => {
     dispatch.explore.update({
       selectVertexes: vertexes,
     });
@@ -120,11 +121,11 @@ class NebulaGraph extends React.Component<IProps, IState> {
 
   handleUndo = () => {
     const { actionData, vertexes, edges } = this.props;
-    const data = actionData.pop();
+    const data = actionData.pop() as any;
     this.props.updateActionData(
       actionData,
-      _.differenceBy(edges, data.edges, (e: any) => e.id),
-      _.differenceBy(vertexes, data.vertexes, (v: any) => v.name),
+      _.differenceBy(edges, data.edges, (e: IEdge) => e.id),
+      _.differenceBy(vertexes, data.vertexes, (v: INode) => v.name),
     );
   };
 
@@ -148,8 +149,8 @@ class NebulaGraph extends React.Component<IProps, IState> {
           data={{
             vertexes,
             edges,
-            selectIdsMap: selectVertexes.reduce((dict: any, vertexe) => {
-              dict[vertexe.name] = true;
+            selectIdsMap: selectVertexes.reduce((dict: any, vertex: INode) => {
+              dict[vertex.name] = true;
               return dict;
             }, {}),
           }}
