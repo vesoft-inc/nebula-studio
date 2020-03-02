@@ -48,6 +48,7 @@ class SpaceSearchInput extends React.Component<IProps> {
         onSearch={this.handleSpaceSearch}
         className="space-search-input"
         loading={!!loading}
+        allowClear={true}
       >
         {this.props.spaces.map(s => (
           <Option value={s} key={s}>
