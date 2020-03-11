@@ -21,6 +21,7 @@ interface IProps {
     edges: any[];
     selectIdsMap: Map<string, boolean>;
   };
+  checkedList: string[];
   onSelectVertexes: (vertexes: INode[]) => void;
   onMouseInNode: (node: INode) => void;
   onMouseOutNode: () => void;
@@ -196,7 +197,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
         return d.x;
       })
       .attr('y', (d: any) => {
-        return d.y + 5;
+        return d.y + 35;
       });
 
     this.linksText
@@ -206,6 +207,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .attr('y', (d: any) => {
         return (d.source.y + d.target.y) / 2;
       });
+    this.nodeRenderText();
   };
 
   handleUpdataNodes(nodes: INode[], selectIdsMap) {
@@ -229,7 +231,12 @@ class NebulaD3 extends React.Component<IProps, {}> {
           this.props.onMouseInNode(d);
         }
       })
-      .on('mouseleave', () => {
+      .on('mousedown', () => {
+        if (this.props.onMouseOutNode) {
+          this.props.onMouseOutNode();
+        }
+      })
+      .on('mouseout', () => {
         if (this.props.onMouseOutNode) {
           this.props.onMouseOutNode();
         }
@@ -266,9 +273,9 @@ class NebulaD3 extends React.Component<IProps, {}> {
         .on('click', (d: any) => {
           this.props.onSelectVertexes([d]);
         })
-        .on('mouseover', (d: any) => {
-          if (this.props.onMouseInNode) {
-            this.props.onMouseInNode(d);
+        .on('mouseover', () => {
+          if (this.props.onMouseOutNode) {
+            this.props.onMouseOutNode();
           }
         })
         .call(
@@ -357,6 +364,36 @@ class NebulaD3 extends React.Component<IProps, {}> {
     this.handleUpdataNodes(data.vertexes, data.selectIdsMap);
   }
 
+  nodeTexts = (node: any, name) => {
+    const nodeText = node.nodeProp
+      ? node.nodeProp.tables
+          .map(v => {
+            return Object.keys(v)
+              .map(index => {
+                if (index === name) {
+                  return `${index}: ${v[index]}`;
+                }
+              })
+              .join('');
+          })
+          .join('')
+      : '';
+    return nodeText;
+  };
+  nodeRenderText() {
+    const { checkedList, data } = this.props;
+    d3.selectAll('tspan').remove();
+    checkedList.map((item, index) => {
+      const line = index + 2;
+      d3.selectAll('.label')
+        .data(data.vertexes)
+        .append('tspan')
+        .attr('x', (d: any) => d.x)
+        .attr('y', (d: any) => d.y + 20 * line)
+        .attr('dy', '1em')
+        .text(d => this.nodeTexts(d, item));
+    });
+  }
   render() {
     this.computeDataByD3Force();
     const { width, height, data } = this.props;

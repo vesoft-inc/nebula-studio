@@ -1,6 +1,7 @@
 import { createModel } from '@rematch/core';
 import { message } from 'antd';
 import cookies from 'js-cookie';
+import _ from 'lodash';
 import intl from 'react-intl-universal';
 
 import service from '#assets/config/service';
@@ -13,6 +14,7 @@ interface IState {
   host: string;
   username: string;
   password: string;
+  tagsName: any[];
 }
 
 export const nebula = createModel({
@@ -24,12 +26,32 @@ export const nebula = createModel({
     currentSpace: '',
     edgeTypes: [],
     tags: [],
+    tagsName: [],
   },
   reducers: {
     update: (state: IState, payload: any) => {
       return {
         ...state,
         ...payload,
+      };
+    },
+
+    addTagsName: (state: IState, payload: any) => {
+      const { tagsName } = state;
+      const { tag, Names } = payload;
+      const index = _.findIndex(tagsName, tag);
+      if (index === -1) {
+        tagsName.push({
+          [tag]: Names,
+        });
+      } else {
+        tagsName[index] = {
+          [tag]: Names,
+        };
+      }
+      return {
+        ...state,
+        tagsName,
       };
     },
 
@@ -120,6 +142,43 @@ export const nebula = createModel({
         this.update({
           tags: data.tables.map(item => item.Name),
         });
+      }
+    },
+
+    async asyncGetTagsName(payload: {
+      host: string;
+      username: string;
+      password: string;
+      space: string;
+    }) {
+      const { host, username, password, space } = payload;
+      const { code, data } = (await service.execNGQL({
+        host,
+        username,
+        password,
+        gql: `
+          use ${space};
+          SHOW TAGS;
+        `,
+      })) as any;
+      if (code === '0') {
+        await Promise.all(
+          data.tables.map(async item => {
+            const { code, data } = (await service.execNGQL({
+              host,
+              username,
+              password,
+              gql: `
+            use ${space};
+            desc tag ${item.Name};
+          `,
+            })) as any;
+            if (code === '0') {
+              const Names = data.tables.map(item => item.Field);
+              this.addTagsName({ tag: item.Name, Names });
+            }
+          }),
+        );
       }
     },
 

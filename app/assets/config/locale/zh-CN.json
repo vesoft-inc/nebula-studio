@@ -62,7 +62,8 @@
     "value": "值",
     "selectSpace": "请选择 space",
     "selectReminder": "切换将会清除当前数据，确定？",
-    "zoom": "缩放"
+    "zoom": "缩放",
+    "setting": "设置"
   },
   "import": {
     "import":"导入",
