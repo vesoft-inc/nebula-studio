@@ -207,7 +207,6 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .attr('y', (d: any) => {
         return (d.source.y + d.target.y) / 2;
       });
-    this.nodeRenderText();
   };
 
   handleUpdataNodes(nodes: INode[], selectIdsMap) {
@@ -264,6 +263,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
           .on('end', d => this.dragEnded(d)) as any,
       );
     this.force.on('tick', () => this.tick());
+    this.nodeRenderText();
   }
 
   handleUpdataNodeTexts = () => {
@@ -364,34 +364,48 @@ class NebulaD3 extends React.Component<IProps, {}> {
     this.handleUpdataNodes(data.vertexes, data.selectIdsMap);
   }
 
-  nodeTexts = (node: any, name) => {
-    const nodeText = node.nodeProp
-      ? node.nodeProp.tables
-          .map(v => {
-            return Object.keys(v)
-              .map(index => {
-                if (index === name) {
-                  return `${index}: ${v[index]}`;
-                }
-              })
-              .join('');
-          })
-          .join('')
-      : '';
+  findField = (node, field) => {
+    let isInclude = false;
+    node.nodeProp.tables.map(v => {
+      Object.keys(v).map(index => {
+        if (index === field) {
+          isInclude = true;
+        }
+      });
+    });
+    return isInclude;
+  };
+
+  nodeTexts = (node, name) => {
+    let nodeText = '';
+    node.nodeProp.tables.map(v => {
+      Object.keys(v).map(index => {
+        if (index === name) {
+          nodeText = `${index}: ${v[index]}`;
+        }
+      });
+    });
     return nodeText;
   };
+
   nodeRenderText() {
     const { checkedList, data } = this.props;
     d3.selectAll('tspan').remove();
-    checkedList.map((item, index) => {
-      const line = index + 2;
-      d3.selectAll('.label')
-        .data(data.vertexes)
-        .append('tspan')
-        .attr('x', (d: any) => d.x)
-        .attr('y', (d: any) => d.y + 20 * line)
-        .attr('dy', '1em')
-        .text(d => this.nodeTexts(d, item));
+    data.vertexes.map((node: any) => {
+      let line = 1;
+      if (node.nodeProp) {
+        checkedList.map(item => {
+          if (this.findField(node, item)) {
+            line++;
+            d3.select('#name_' + node.name)
+              .append('tspan')
+              .attr('x', (d: any) => d.x)
+              .attr('y', (d: any) => d.y + 20 * line)
+              .attr('dy', '1em')
+              .text(d => this.nodeTexts(d, item));
+          }
+        });
+      }
     });
   }
   render() {

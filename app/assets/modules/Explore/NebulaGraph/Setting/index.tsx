@@ -42,7 +42,6 @@ class Setting extends React.Component<IProps, {}> {
 
   render() {
     const { checkedList, onTgasNameChange } = this.props;
-    console.log(checkedList);
     return (
       <>
         <Checkbox.Group onChange={onTgasNameChange} value={checkedList}>
