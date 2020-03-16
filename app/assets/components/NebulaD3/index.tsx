@@ -207,6 +207,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .attr('y', (d: any) => {
         return (d.source.y + d.target.y) / 2;
       });
+    this.nodeRenderText();
   };
 
   handleUpdataNodes(nodes: INode[], selectIdsMap) {
@@ -263,7 +264,6 @@ class NebulaD3 extends React.Component<IProps, {}> {
           .on('end', d => this.dragEnded(d)) as any,
       );
     this.force.on('tick', () => this.tick());
-    this.nodeRenderText();
   }
 
   handleUpdataNodeTexts = () => {
