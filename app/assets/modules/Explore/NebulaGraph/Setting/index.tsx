@@ -1,18 +1,12 @@
 import { Checkbox, Col, Row } from 'antd';
 import React from 'react';
-import { connect } from 'react-redux';
-
-import { IRootState } from '#assets/store';
 
 // import intl from 'react-intl-universal';
 
-const mapState = (state: IRootState) => ({
-  tagsName: state.nebula.tagsName,
-});
-
-interface IProps extends ReturnType<typeof mapState> {
-  checkedList: string[];
-  onTgasNameChange: () => void;
+interface IProps {
+  showFields: string[];
+  tagsFields: any[];
+  onTgasNameChange: (showFields) => void;
 }
 
 class Setting extends React.Component<IProps, {}> {
@@ -27,8 +21,8 @@ class Setting extends React.Component<IProps, {}> {
   };
 
   renderTagName() {
-    const { tagsName } = this.props;
-    return tagsName.map(itme => {
+    const { tagsFields } = this.props;
+    return tagsFields.map(itme => {
       const tag = Object.keys(itme)[0];
       const name = Object.values(itme)[0];
       return (
@@ -41,10 +35,10 @@ class Setting extends React.Component<IProps, {}> {
   }
 
   render() {
-    const { checkedList, onTgasNameChange } = this.props;
+    const { showFields, onTgasNameChange } = this.props;
     return (
       <>
-        <Checkbox.Group onChange={onTgasNameChange} value={checkedList}>
+        <Checkbox.Group onChange={onTgasNameChange} value={showFields}>
           {this.renderTagName()}
         </Checkbox.Group>
       </>
@@ -52,4 +46,4 @@ class Setting extends React.Component<IProps, {}> {
   }
 }
 
-export default connect(mapState)(Setting);
+export default Setting;

@@ -14,7 +14,7 @@ interface IState {
   host: string;
   username: string;
   password: string;
-  tagsName: any[];
+  tagsFields: any[];
 }
 
 export const nebula = createModel({
@@ -26,7 +26,7 @@ export const nebula = createModel({
     currentSpace: '',
     edgeTypes: [],
     tags: [],
-    tagsName: [],
+    tagsFields: [],
   },
   reducers: {
     update: (state: IState, payload: any) => {
@@ -37,21 +37,14 @@ export const nebula = createModel({
     },
 
     addTagsName: (state: IState, payload: any) => {
-      const { tagsName } = state;
+      const { tagsFields } = state;
       const { tag, Names } = payload;
-      const index = _.findIndex(tagsName, tag);
-      if (index === -1) {
-        tagsName.push({
-          [tag]: Names,
-        });
-      } else {
-        tagsName[index] = {
-          [tag]: Names,
-        };
-      }
+      tagsFields.push({
+        [tag]: Names,
+      });
       return {
         ...state,
-        tagsName,
+        tagsFields,
       };
     },
 
@@ -143,6 +136,7 @@ export const nebula = createModel({
           tags: data.tables.map(item => item.Name),
         });
       }
+      return { code, data };
     },
 
     async asyncGetTagsName(payload: {
@@ -150,36 +144,26 @@ export const nebula = createModel({
       username: string;
       password: string;
       space: string;
+      tags: any[];
     }) {
-      const { host, username, password, space } = payload;
-      const { code, data } = (await service.execNGQL({
-        host,
-        username,
-        password,
-        gql: `
+      const { host, username, password, space, tags } = payload;
+      await Promise.all(
+        tags.map(async item => {
+          const { code, data } = (await service.execNGQL({
+            host,
+            username,
+            password,
+            gql: `
           use ${space};
-          SHOW TAGS;
+          desc tag ${item};
         `,
-      })) as any;
-      if (code === '0') {
-        await Promise.all(
-          data.tables.map(async item => {
-            const { code, data } = (await service.execNGQL({
-              host,
-              username,
-              password,
-              gql: `
-            use ${space};
-            desc tag ${item.Name};
-          `,
-            })) as any;
-            if (code === '0') {
-              const Names = data.tables.map(item => item.Field);
-              this.addTagsName({ tag: item.Name, Names });
-            }
-          }),
-        );
-      }
+          })) as any;
+          if (code === '0') {
+            const Names = data.tables.map(item => item.Field);
+            this.addTagsName({ tag: item, Names });
+          }
+        }),
+      );
     },
 
     async asyncGetEdgeTypes(payload: {

@@ -12,6 +12,9 @@ const Option = Select.Option;
 const mapState = (state: IRootState) => ({
   currentSpace: state.nebula.currentSpace,
   spaces: state.nebula.spaces,
+  host: state.nebula.host,
+  username: state.nebula.username,
+  password: state.nebula.password,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -20,6 +23,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
       currentSpace: space,
     });
   },
+  asyncGetTags: dispatch.nebula.asyncGetTags,
 });
 
 interface IProps
@@ -39,6 +43,13 @@ class Init extends React.Component<IProps> {
 
   handleSelectChange = space => {
     this.props.updateSpace(space);
+    const { username, host, password } = this.props;
+    this.props.asyncGetTags({
+      username,
+      host,
+      password,
+      space,
+    });
     this.modalHandler.hide();
   };
 
