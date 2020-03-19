@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	common "nebula-go-api/utils"
+	"strconv"
 
 	nebula "github.com/vesoft-inc/nebula-go"
 	"github.com/vesoft-inc/nebula-go/nebula/graph"
@@ -30,9 +31,11 @@ func getColumnValue(p *graph.ColumnValue) common.Any {
 	if p.Str != nil {
 		return string(p.Str)
 	} else if p.Integer != nil {
-		return p.Integer
+		return strconv.FormatInt(*p.Integer, 10)
 	} else if p.Id != nil {
-		return p.Id
+		// return p.Id
+		var id = int64(*p.Id)
+		return strconv.FormatInt(id, 10)
 	} else if p.SinglePrecision != nil {
 		return p.SinglePrecision
 	} else if p.DoublePrecision != nil {
