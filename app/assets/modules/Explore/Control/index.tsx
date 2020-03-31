@@ -32,8 +32,10 @@ const mapDispatch = (dispatch: IDispatch) => ({
   updateSpace: space => {
     dispatch.nebula.update({
       currentSpace: space,
+      tagsName: [],
     });
   },
+  asyncGetTags: dispatch.nebula.asyncGetTags,
 });
 
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
@@ -55,6 +57,13 @@ class Control extends React.Component<IProps, {}> {
       cancelText: intl.get('common.cancel'),
       onOk: () => {
         this.props.updateSpace(space);
+        const { username, host, password } = this.props;
+        this.props.asyncGetTags({
+          username,
+          host,
+          password,
+          space,
+        });
         this.props.clear();
       },
     });

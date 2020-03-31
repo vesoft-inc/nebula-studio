@@ -5,18 +5,25 @@ import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
-import { NebulaD3 } from '#assets/components';
+import { Modal, NebulaD3 } from '#assets/components';
 import { IDispatch, IRootState } from '#assets/store';
 import { IEdge, INode } from '#assets/store/models';
 
 import './index.less';
 import Panel from './Pannel';
+import Setting from './Setting';
 
 const mapState = (state: IRootState) => ({
   vertexes: state.explore.vertexes,
   edges: state.explore.edges,
   selectVertexes: state.explore.selectVertexes,
   actionData: state.explore.actionData,
+  host: state.nebula.host,
+  username: state.nebula.username,
+  password: state.nebula.password,
+  space: state.nebula.currentSpace,
+  tagsFields: state.nebula.tagsFields,
+  tags: state.nebula.tags,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -33,16 +40,19 @@ const mapDispatch = (dispatch: IDispatch) => ({
       selectVertexes: [],
     });
   },
+  asyncGetTagsName: dispatch.nebula.asyncGetTagsName,
 });
 
 interface IState {
   width: number;
   height: number;
+  showFields: string[];
 }
 
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
 
 class NebulaGraph extends React.Component<IProps, IState> {
+  settingHandler;
   $tooltip;
   ref: HTMLDivElement;
 
@@ -51,6 +61,7 @@ class NebulaGraph extends React.Component<IProps, IState> {
     this.state = {
       width: 0,
       height: 0,
+      showFields: [],
     };
   }
 
@@ -70,11 +81,27 @@ class NebulaGraph extends React.Component<IProps, IState> {
       .select(this.ref)
       .append('div')
       .attr('class', 'tooltip')
-      .style('opacity', 0);
-
+      .style('max-height', clientHeight)
+      .style('overflow', 'auto');
+    this.$tooltip
+      .transition()
+      .duration(200)
+      .style('display', 'block')
+      .style('opacity', '0.85')
+      .style('top', 0)
+      .style('left', 0);
     window.addEventListener('resize', this.handleResize);
 
-    this.$tooltip.on('mouseout', this.hideTooltip);
+    this.$tooltip.on('mouseout', this.handleMouseOut);
+  }
+
+  componentDidUpdate(prevProps) {
+    const { space } = this.props;
+    if (prevProps.space !== space) {
+      this.setState({
+        showFields: [],
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -82,6 +109,7 @@ class NebulaGraph extends React.Component<IProps, IState> {
   }
 
   handleMouseInNode = node => {
+    // const e: any = event || window.event;
     const nodeProp = node.nodeProp
       ? node.nodeProp.tables
           .map(v => {
@@ -93,22 +121,32 @@ class NebulaGraph extends React.Component<IProps, IState> {
           })
           .join('')
       : '';
+
     this.$tooltip
-      .transition()
-      .duration(200)
-      .style('opacity', 0.95);
-    this.$tooltip.html(`<p>id: ${node.name}</p> ${nodeProp}`);
+      .html(
+        `<p style="font-weight:600">Vertex Details</p> <p>id: ${node.name}</p> ${nodeProp}`,
+      )
+      .style('display', 'block');
   };
 
-  handleMouseOutNode = () => {
+  handleMouseInLink = link => {
+    const linkText = Object.keys(link.edge)
+      .filter(field => {
+        return field !== 'id';
+      })
+      .map(key => {
+        return `<p key=${key}>${key}: ${link.edge[key]}</p>`;
+      })
+      .join('');
     this.$tooltip
-      .transition()
-      .duration(500)
-      .style('opacity', 0);
+      .html(
+        `<p style="font-weight:600">Edge Details</p> <p>id: ${link.id}</p> ${linkText}`,
+      )
+      .style('display', 'block');
   };
 
-  hideTooltip = () => {
-    this.$tooltip.style('opacity', 0);
+  handleMouseOut = () => {
+    this.$tooltip.style('display', 'none');
   };
 
   handleResize = () => {
@@ -129,23 +167,58 @@ class NebulaGraph extends React.Component<IProps, IState> {
     );
   };
 
+  handleSetting = async () => {
+    const {
+      username,
+      host,
+      password,
+      space,
+      asyncGetTagsName,
+      tags,
+    } = this.props;
+    await asyncGetTagsName({
+      username,
+      host,
+      password,
+      space,
+      tags,
+    });
+    this.settingHandler.show();
+  };
+
+  handleTgasNameChange = showFields => {
+    this.setState({
+      showFields,
+    });
+  };
+
   render() {
-    const { vertexes, edges, selectVertexes, actionData } = this.props;
-    const { width, height } = this.state;
+    const {
+      vertexes,
+      edges,
+      selectVertexes,
+      actionData,
+      tagsFields,
+    } = this.props;
+    const { width, height, showFields } = this.state;
     return (
       <div
         className="graph-wrap"
         ref={(ref: HTMLDivElement) => (this.ref = ref)}
       >
-        {selectVertexes.length !== 0 && <Panel />}
+        <Button className="history-show" onClick={this.handleSetting}>
+          {intl.get('explore.show')}
+        </Button>
         {actionData.length !== 0 && (
           <Button className="history-undo" onClick={this.handleUndo}>
             {intl.get('explore.undo')}
           </Button>
         )}
+        {selectVertexes.length !== 0 && <Panel />}
         <NebulaD3
           width={width}
           height={height}
+          showFields={showFields}
           data={{
             vertexes,
             edges,
@@ -154,10 +227,30 @@ class NebulaGraph extends React.Component<IProps, IState> {
               return dict;
             }, {}),
           }}
+          onMouseInLink={this.handleMouseInLink}
           onMouseInNode={this.handleMouseInNode}
-          onMouseOutNode={this.handleMouseOutNode}
+          onMouseOut={this.handleMouseOut}
           onSelectVertexes={this.handleSelectVertexes}
         />
+        <Modal
+          wrapClassName="graph-setting"
+          handlerRef={handler => (this.settingHandler = handler)}
+          footer={
+            <Button
+              key="confirm"
+              type="primary"
+              onClick={() => this.settingHandler.hide()}
+            >
+              {intl.get('explore.confirm')}
+            </Button>
+          }
+        >
+          <Setting
+            showFields={showFields}
+            tagsFields={tagsFields}
+            onTgasNameChange={this.handleTgasNameChange}
+          />
+        </Modal>
       </div>
     );
   }

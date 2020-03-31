@@ -59,12 +59,12 @@ export const explore = createModel({
         d.y = _.meanBy(selectVertexes, 'y') || svg.style('heigth') / 2;
       });
       const edges = _.uniqBy([...originEdges, ...addEdges], e => e.id);
-
       const linkmap = {};
 
       const linkGroup = {};
-      edges.forEach(link => {
+      edges.forEach((link: any) => {
         let key: string;
+        link.edge = { ...link };
         if (link.source.name) {
           key =
             link.source.name < link.target.name

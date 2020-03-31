@@ -21,9 +21,11 @@ interface IProps {
     edges: any[];
     selectIdsMap: Map<string, boolean>;
   };
+  showFields: string[];
   onSelectVertexes: (vertexes: INode[]) => void;
   onMouseInNode: (node: INode) => void;
-  onMouseOutNode: () => void;
+  onMouseOut: () => void;
+  onMouseInLink: (link: any) => void;
 }
 
 interface IRefs {
@@ -196,7 +198,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
         return d.x;
       })
       .attr('y', (d: any) => {
-        return d.y + 5;
+        return d.y + 35;
       });
 
     this.linksText
@@ -206,6 +208,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .attr('y', (d: any) => {
         return (d.source.y + d.target.y) / 2;
       });
+    this.nodeRenderText();
   };
 
   handleUpdataNodes(nodes: INode[], selectIdsMap) {
@@ -229,9 +232,10 @@ class NebulaD3 extends React.Component<IProps, {}> {
           this.props.onMouseInNode(d);
         }
       })
-      .on('mouseleave', () => {
-        if (this.props.onMouseOutNode) {
-          this.props.onMouseOutNode();
+
+      .on('mouseout', () => {
+        if (this.props.onMouseOut) {
+          this.props.onMouseOut();
         }
       })
       .attr('class', 'node')
@@ -266,9 +270,9 @@ class NebulaD3 extends React.Component<IProps, {}> {
         .on('click', (d: any) => {
           this.props.onSelectVertexes([d]);
         })
-        .on('mouseover', (d: any) => {
-          if (this.props.onMouseInNode) {
-            this.props.onMouseInNode(d);
+        .on('mouseover', () => {
+          if (this.props.onMouseOut) {
+            this.props.onMouseOut();
           }
         })
         .call(
@@ -285,6 +289,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
     if (this.force) {
       this.link = d3.selectAll('.link').attr('marker-end', 'url(#marker)');
       this.linksText = d3
+        .selectAll('.text')
         .selectAll('.textPath')
         .attr('xlink:href', (d: any) => '#text-path-' + d.id)
         .attr('startOffset', '50%')
@@ -357,9 +362,53 @@ class NebulaD3 extends React.Component<IProps, {}> {
     this.handleUpdataNodes(data.vertexes, data.selectIdsMap);
   }
 
+  isIncludeField = (node, field) => {
+    let isInclude = false;
+    node.nodeProp.tables.forEach(v => {
+      Object.keys(v).forEach(nodeField => {
+        if (nodeField === field) {
+          isInclude = true;
+        }
+      });
+    });
+    return isInclude;
+  };
+
+  targetName = (node, field) => {
+    let nodeText = '';
+    node.nodeProp.tables.forEach(v => {
+      Object.keys(v).forEach(nodeField => {
+        if (nodeField === field) {
+          nodeText = `${nodeField}: ${v[nodeField]}`;
+        }
+      });
+    });
+    return nodeText;
+  };
+
+  nodeRenderText() {
+    const { showFields, data } = this.props;
+    d3.selectAll('tspan').remove();
+    data.vertexes.forEach((node: any) => {
+      let line = 1;
+      if (node.nodeProp) {
+        showFields.forEach(field => {
+          if (this.isIncludeField(node, field)) {
+            line++;
+            d3.select('#name_' + node.name)
+              .append('tspan')
+              .attr('x', (d: any) => d.x)
+              .attr('y', (d: any) => d.y + 20 * line)
+              .attr('dy', '1em')
+              .text(d => this.targetName(d, field));
+          }
+        });
+      }
+    });
+  }
   render() {
     this.computeDataByD3Force();
-    const { width, height, data } = this.props;
+    const { width, height, data, onMouseInLink, onMouseOut } = this.props;
     const { isZoom, translateX, translateY, scale } = this.state;
     return (
       <div>
@@ -379,7 +428,12 @@ class NebulaD3 extends React.Component<IProps, {}> {
           height={height}
         >
           <g ref={(ref: SVGCircleElement) => (this.circleRef = ref)}>
-            <Links links={data.edges} onUpdataLinks={this.handleUpdataLinks} />
+            <Links
+              links={data.edges}
+              onUpdataLinks={this.handleUpdataLinks}
+              onMouseInLink={onMouseInLink}
+              onMouseOut={onMouseOut}
+            />
             <g
               ref={(ref: SVGCircleElement) => (this.nodeRef = ref)}
               className="nodes"

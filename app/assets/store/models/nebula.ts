@@ -1,6 +1,7 @@
 import { createModel } from '@rematch/core';
 import { message } from 'antd';
 import cookies from 'js-cookie';
+import _ from 'lodash';
 import intl from 'react-intl-universal';
 
 import service from '#assets/config/service';
@@ -13,6 +14,7 @@ interface IState {
   host: string;
   username: string;
   password: string;
+  tagsFields: any[];
 }
 
 export const nebula = createModel({
@@ -24,12 +26,25 @@ export const nebula = createModel({
     currentSpace: '',
     edgeTypes: [],
     tags: [],
+    tagsFields: [],
   },
   reducers: {
     update: (state: IState, payload: any) => {
       return {
         ...state,
         ...payload,
+      };
+    },
+
+    addTagsName: (state: IState, payload: any) => {
+      const { tagsFields } = state;
+      const { tag, Names } = payload;
+      tagsFields.push({
+        [tag]: Names,
+      });
+      return {
+        ...state,
+        tagsFields,
       };
     },
 
@@ -121,6 +136,34 @@ export const nebula = createModel({
           tags: data.tables.map(item => item.Name),
         });
       }
+      return { code, data };
+    },
+
+    async asyncGetTagsName(payload: {
+      host: string;
+      username: string;
+      password: string;
+      space: string;
+      tags: any[];
+    }) {
+      const { host, username, password, space, tags } = payload;
+      await Promise.all(
+        tags.map(async item => {
+          const { code, data } = (await service.execNGQL({
+            host,
+            username,
+            password,
+            gql: `
+          use ${space};
+          desc tag ${item};
+        `,
+          })) as any;
+          if (code === '0') {
+            const Names = data.tables.map(item => item.Field);
+            this.addTagsName({ tag: item, Names });
+          }
+        }),
+      );
     },
 
     async asyncGetEdgeTypes(payload: {

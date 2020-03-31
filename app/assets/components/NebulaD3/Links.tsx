@@ -4,6 +4,8 @@ import * as React from 'react';
 interface IProps {
   links: any[];
   onUpdataLinks: () => void;
+  onMouseInLink: (any) => void;
+  onMouseOut: () => void;
 }
 
 export default class Links extends React.Component<IProps, {}> {
@@ -23,6 +25,12 @@ export default class Links extends React.Component<IProps, {}> {
       .data(links)
       .enter()
       .append('svg:path')
+      .on('mouseover', (d: any) => {
+        this.props.onMouseInLink(d);
+      })
+      .on('mouseout', () => {
+        this.props.onMouseOut();
+      })
       .attr('class', 'link')
       .style('stroke', '#999999')
       .style('stroke-opacity', 0.6)
@@ -42,6 +50,7 @@ export default class Links extends React.Component<IProps, {}> {
       .append('text')
       .attr('class', 'text')
       .append('textPath')
+      .attr('id', (d: any) => 'text-marker' + d.id)
       .attr('class', 'textPath');
 
     d3.select(this.ref)
