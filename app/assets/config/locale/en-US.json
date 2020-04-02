@@ -29,7 +29,8 @@
     "success": "execute success!"
   },
   "warning": {
-    "configServer": "Please config server"
+    "configServer": "Please config server",
+    "connectError": "Connection refused，config again"
   },
   "configServer": {
     "connect": "Connect",

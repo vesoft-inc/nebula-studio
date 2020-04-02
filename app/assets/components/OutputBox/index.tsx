@@ -76,6 +76,7 @@ export default class OutputBox extends React.Component<IProps, {}> {
                   bordered={true}
                   columns={columns}
                   dataSource={dataSource}
+                  rowKey={(_, index) => index.toString()}
                 />
               </Tabs.TabPane>
             )}

@@ -48,7 +48,7 @@ export const nebula = createModel({
       };
     },
 
-    asyncClearConfig: (state: IState) => {
+    clearConfig: (state: IState) => {
       cookies.remove('host');
       cookies.remove('username');
       cookies.remove('password');

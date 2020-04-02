@@ -26,7 +26,8 @@
     "feedback": "问题反馈"
   },
   "warning": {
-    "configServer": "请先配置服务器"
+    "configServer": "请先配置服务器",
+    "connectError": "数据库连接有误，请重新配置"
   },
   "NGQLOutput": {
     "success": "执行成功"

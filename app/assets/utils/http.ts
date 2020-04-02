@@ -1,6 +1,8 @@
 import { notification } from 'antd';
 import axios from 'axios';
 
+import { store } from '#assets/store';
+
 const service = axios.create();
 
 service.interceptors.request.use(config => {
@@ -11,6 +13,13 @@ service.interceptors.request.use(config => {
 
 service.interceptors.response.use(
   (response: any) => {
+    const { code, message } = response.data;
+    // if connection refused, login again
+    if (code === '-1' && message && message.includes('connection refused')) {
+      store.dispatch({
+        type: 'nebula/clearConfig',
+      });
+    }
     return response.data;
   },
   (error: any) => {
