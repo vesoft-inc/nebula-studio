@@ -32,27 +32,44 @@ interface IRefs {
   mountPoint?: SVGSVGElement | null;
 }
 
-const colors = [
-  '#1e78b4',
-  '#b2df8a',
-  '#fb9a99',
-  '#e3181d',
-  '#fdbf6f',
-  '#ff7e01',
-  '#cab2d6',
-  '#6a3e9a',
-  '#ffff99',
-  '#b15828',
-  '#7fc97f',
-  '#beadd4',
-  '#fdc086',
-  '#ffff99',
-  '#a6cee3',
-  '#386cb0',
-  '#f0007f',
-  '#bf5a18',
-];
-const colorTotal = colors.length;
+const whichColor = (() => {
+  const colors = [
+    '#66C5CC',
+    '#F6CF71',
+    '#F89C74',
+    '#DCB0F2',
+    '#87C55F',
+    '#9EB9F3',
+    '#FE88B1',
+    '#C9DB74',
+    '#8BE0A4',
+    '#B497E7',
+    '#D3B484',
+    '#B3B3B3',
+    '#5F4690',
+    '#1D6996',
+    '#38A6A5',
+    '#0F8554',
+    '#73AF48',
+    '#EDAD08',
+    '#E17C05',
+    '#CC503E',
+    '#94346E',
+    '#6F4070',
+    '#994E95',
+    '#666666',
+  ];
+  const colorsTotal = colors.length;
+  let colorIndex = 0;
+  const colorsRecord = {};
+  return key => {
+    if (!colorsRecord[key]) {
+      colorsRecord[key] = colors[colorIndex];
+      colorIndex = (colorIndex + 1) % colorsTotal;
+    }
+    return colorsRecord[key];
+  };
+})();
 
 class NebulaD3 extends React.Component<IProps, {}> {
   ctrls: IRefs = {};
@@ -240,7 +257,10 @@ class NebulaD3 extends React.Component<IProps, {}> {
       })
       .attr('class', 'node')
       .attr('id', (d: INode) => `node-${d.name}`)
-      .style('fill', (d: INode) => colors[d.group % colorTotal]);
+      .style('fill', (d: INode) => {
+        const group = d.group;
+        return whichColor(group);
+      });
 
     d3.select(this.nodeRef)
       .selectAll('circle')

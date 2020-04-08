@@ -1,31 +1,36 @@
 import _ from 'lodash';
 
-const statNodeTypes = {};
-let nodeTypeNum = 0;
-
-export function nebulaToData(table: any[], edgeType: string) {
-  const nodeOut = `${edgeType}-out`;
-
-  if (!statNodeTypes[nodeOut]) {
-    nodeTypeNum++;
-    statNodeTypes[nodeOut] = nodeTypeNum;
-  }
-
-  const groupNum = statNodeTypes[nodeOut];
-
+export function nebulaToData(
+  table: any[],
+  edgeType: string,
+  direction: string,
+) {
   return table.reduce(
     (result, { sourceId, destId, rank }) => {
-      result.edges.push({
-        source: sourceId,
-        target: destId,
-        value: 6,
-        // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
-        id: `${sourceId}-${destId}-${edgeType}-${rank}`,
-        type: edgeType,
-      });
+      switch (direction) {
+        case 'incoming':
+          result.edges.push({
+            source: destId,
+            target: sourceId,
+            value: 6,
+            // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
+            id: `${destId}-${sourceId}-${edgeType}-${rank}`,
+            type: edgeType,
+          });
+          break;
+        default:
+          result.edges.push({
+            source: sourceId,
+            target: destId,
+            value: 6,
+            // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
+            id: `${sourceId}-${destId}-${edgeType}-${rank}`,
+            type: edgeType,
+          });
+      }
+
       result.vertexes.push({
         name: destId,
-        group: groupNum,
       });
 
       return result;

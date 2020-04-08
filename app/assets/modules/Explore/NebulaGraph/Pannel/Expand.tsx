@@ -18,10 +18,16 @@ const mapState = (state: IRootState) => ({
   password: state.nebula.password,
   currentSpace: state.nebula.currentSpace,
   selectVertexes: state.explore.selectVertexes,
+  exploreStep: state.explore.step,
+  exploreRules: state.explore.exploreRules,
 });
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetEdgeTypes: dispatch.nebula.asyncGetEdgeTypes,
   asyncGetExpand: dispatch.explore.asyncGetExpand,
+  updateExploreRules: rules =>
+    dispatch.explore.update({
+      exploreRules: rules,
+    }),
 });
 
 interface IProps
@@ -91,9 +97,13 @@ class Expand extends React.Component<IProps, IState> {
       password,
       currentSpace,
       selectVertexes,
+      exploreStep,
     } = this.props;
     const { getFieldValue } = this.props.form;
     const { filters } = this.state;
+    const edgeType = getFieldValue('edgeType');
+    const edgeDirection = getFieldValue('edgeDirection');
+    const vertexColor = getFieldValue('vertexColor');
     (this.props.asyncGetExpand({
       host,
       username,
@@ -101,7 +111,10 @@ class Expand extends React.Component<IProps, IState> {
       space: currentSpace,
       filters,
       selectVertexes,
-      edgeType: getFieldValue('edgeType'),
+      edgeType,
+      edgeDirection,
+      vertexColor,
+      exploreStep: exploreStep + 1,
     }) as any).then(
       () => {
         message.success(intl.get('common.success'));
@@ -115,12 +128,17 @@ class Expand extends React.Component<IProps, IState> {
       },
     );
 
+    this.props.updateExploreRules({
+      edgeType,
+      edgeDirection,
+      vertexColor,
+    });
     this.props.close();
     trackEvent('expand', 'click');
   };
 
   render() {
-    const { edgeTypes } = this.props;
+    const { edgeTypes, exploreRules: rules } = this.props;
     const { getFieldDecorator, getFieldValue } = this.props.form;
     const { filters } = this.state;
     const columns = [
@@ -182,13 +200,39 @@ class Expand extends React.Component<IProps, IState> {
       <div className="graph-expand">
         <Form>
           <Form.Item label="Edge Type:">
-            {getFieldDecorator('edgeType')(
+            {getFieldDecorator('edgeType', {
+              initialValue: rules.edgeType,
+            })(
               <Select>
                 {edgeTypes.map(e => (
                   <Option value={e} key={e}>
                     {e}
                   </Option>
                 ))}
+              </Select>,
+            )}
+          </Form.Item>
+          <Form.Item label="Edge Direction:">
+            {getFieldDecorator('edgeDirection', {
+              initialValue: rules.edgeDirection || 'outgoing',
+            })(
+              <Select>
+                <Option value="outgoing">{intl.get('explore.outgoing')}</Option>
+                <Option value="incoming">{intl.get('explore.incoming')}</Option>
+              </Select>,
+            )}
+          </Form.Item>
+          <Form.Item label={intl.get('explore.vertexColor')}>
+            {getFieldDecorator('vertexColor', {
+              initialValue: rules.vertexColor || 'groupByStep',
+            })(
+              <Select>
+                <Option value="groupByStep">
+                  {intl.get('explore.groupByStep')}
+                </Option>
+                <Option value="groupByTag">
+                  {intl.get('explore.groupByTag')}
+                </Option>
               </Select>,
             )}
           </Form.Item>

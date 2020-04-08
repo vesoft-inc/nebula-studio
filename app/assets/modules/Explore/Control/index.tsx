@@ -28,11 +28,15 @@ const mapDispatch = (dispatch: IDispatch) => ({
       edges: [],
       selectIds: [],
       actionData: [],
+      step: 0,
     }),
   updateSpace: space => {
     dispatch.nebula.update({
       currentSpace: space,
       tagsName: [],
+    });
+    dispatch.explore.update({
+      exploreRules: {},
     });
   },
   asyncGetTags: dispatch.nebula.asyncGetTags,

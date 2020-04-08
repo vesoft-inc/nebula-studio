@@ -27,6 +27,12 @@ interface IState {
   edges: IEdge[];
   selectVertexes: INode[];
   actionData: any[];
+  step: number;
+  exploreRules: {
+    edgeType?: string;
+    edgeDirection?: string;
+    vertexColor?: string;
+  };
 }
 
 export const explore = createModel({
@@ -35,6 +41,12 @@ export const explore = createModel({
     edges: [],
     selectVertexes: [],
     actionData: [],
+    step: 0,
+    exploreRules: {
+      edgeType: '',
+      edgeDirection: '',
+      vertexColor: '',
+    },
   },
   reducers: {
     update: (state: IState, payload: object): IState => {
@@ -124,14 +136,31 @@ export const explore = createModel({
         ids
           .trim()
           .split('\n')
-          .map(async id => ({
-            name: id,
-            group: 0,
-            nodeProp: await fetchVertexProps(
+          .map(async id => {
+            const nodeProp = await fetchVertexProps(
               { space, host, username, password },
               id,
-            ),
-          })),
+            );
+            const tags =
+              nodeProp && nodeProp.headers
+                ? _.sortedUniq(
+                    nodeProp.headers.map(field => {
+                      if (field === 'VertexID') {
+                        return 't';
+                      } else {
+                        return field.split('.')[0];
+                      }
+                    }),
+                  )
+                : [];
+
+            return {
+              name: id,
+              nodeProp,
+              step: 0,
+              group: tags.join('-'),
+            };
+          }),
       );
       this.addNodesAndEdges({
         vertexes: newVertexes,
@@ -146,7 +175,10 @@ export const explore = createModel({
       space: string;
       selectVertexes: any[];
       edgeType: string;
+      edgeDirection: string;
       filters: any[];
+      exploreStep: number;
+      vertexColor: string;
     }) {
       const {
         host,
@@ -155,15 +187,29 @@ export const explore = createModel({
         space,
         selectVertexes,
         edgeType,
+        edgeDirection,
         filters,
+        exploreStep,
+        vertexColor,
       } = payload;
       const wheres = filters
         .filter(filter => filter.field && filter.operator && filter.value)
         .map(filter => `${filter.field} ${filter.operator} ${filter.value}`)
         .join(' AND ');
+      let direction;
+      let group;
+      switch (edgeDirection) {
+        case 'incoming':
+          direction = 'REVERSELY';
+          break;
+        default:
+          direction = ''; // default outgoing
+      }
       const gql = `
         use ${space};
-        GO FROM ${selectVertexes.map(d => d.name)} OVER ${edgeType} ${
+        GO FROM ${selectVertexes.map(
+          d => d.name,
+        )} OVER ${edgeType} ${direction} ${
         wheres ? `WHERE ${wheres}` : ''
       } yield ${edgeType}._src as sourceId, ${edgeType}._dst as destId, ${edgeType}._rank as rank;
       `;
@@ -178,21 +224,45 @@ export const explore = createModel({
         const { edges, vertexes } = nebulaToData(
           idToSrting(data.tables),
           edgeType,
+          edgeDirection,
         );
         const newVertexes = await Promise.all(
           vertexes.map(async v => {
+            const nodeProp = await fetchVertexProps(
+              { space, host, username, password },
+              v.name,
+            );
+            if (vertexColor === 'groupByTag') {
+              const tags =
+                nodeProp && nodeProp.headers
+                  ? _.sortedUniq(
+                      nodeProp.headers.map(field => {
+                        if (field === 'VertexID') {
+                          return 't';
+                        } else {
+                          return field.split('.')[0];
+                        }
+                      }),
+                    )
+                  : [];
+              group = tags.join('-');
+            } else {
+              group = 'step-' + exploreStep;
+            }
+
             return {
               ...v,
-              nodeProp: await fetchVertexProps(
-                { space, host, username, password },
-                v.name,
-              ),
+              nodeProp,
+              group,
             };
           }),
         );
         this.addNodesAndEdges({
           vertexes: newVertexes,
           edges,
+        });
+        this.update({
+          step: exploreStep,
         });
       } else {
         throw new Error(message);

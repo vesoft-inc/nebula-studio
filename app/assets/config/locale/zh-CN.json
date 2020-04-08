@@ -57,7 +57,9 @@
     "expand": "拓展",
     "fileImport": "文件导入",
     "importPlaceholder": "id1\nid2\nid3\n每行1个节点id，以回车分开",
-    "fitler": "筛选",
+    "outgoing": "流出",
+    "incoming": "流入",
+    "filter": "筛选",
     "field": "字段",
     "operator": "操作符",
     "value": "值",
@@ -65,7 +67,10 @@
     "selectReminder": "切换将会清除当前数据，确定？",
     "zoom": "缩放",
     "show": "显示",
-    "confirm": "确定"
+    "confirm": "确定",
+    "vertexColor": "节点颜色",
+    "groupByStep": "按探索步骤分类",
+    "groupByTag": "按节点标签分类"
   },
   "import": {
     "import":"导入",

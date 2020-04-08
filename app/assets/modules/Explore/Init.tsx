@@ -22,6 +22,9 @@ const mapDispatch = (dispatch: IDispatch) => ({
     dispatch.nebula.update({
       currentSpace: space,
     });
+    dispatch.explore.update({
+      exploreRules: {},
+    });
   },
   asyncGetTags: dispatch.nebula.asyncGetTags,
 });

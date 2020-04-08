@@ -57,6 +57,8 @@
     "undo": "Undo",
     "fileImport": "File Import",
     "importPlaceholder": "id1\nid2\nid3\n1 node per line, split by \\n",
+    "outgoing": "Outgoing",
+    "incoming": "Incoming",
     "filter": "filter",
     "field": "field",
     "operator": "operator",
@@ -65,7 +67,10 @@
     "selectReminder": "This will clear the existed graph data, are you sure?",
     "zoom": "Zoom",
     "show": "Show",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "vertexColor": "Vertex Color",
+    "groupByStep": "Group by explore step",
+    "groupByTag": "Group by vertex tag"
   },
   "import": {
     "import": "Import",
