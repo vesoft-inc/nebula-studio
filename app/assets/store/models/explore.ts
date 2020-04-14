@@ -4,11 +4,7 @@ import _ from 'lodash';
 
 import service from '#assets/config/service';
 import { fetchVertexProps } from '#assets/utils/fetch';
-import {
-  idToSrting,
-  nebulaToData,
-  setLinkNumbers,
-} from '#assets/utils/nebulaToData';
+import { idToSrting, nebulaToData, setLink } from '#assets/utils/nebulaToData';
 
 export interface INode extends d3.SimulationNodeDatum {
   name: string;
@@ -49,7 +45,10 @@ export const explore = createModel({
     },
   },
   reducers: {
-    update: (state: IState, payload: object): IState => {
+    update: (state: IState, payload: any): IState => {
+      if (payload.edges) {
+        setLink(payload.edges);
+      }
       return {
         ...state,
         ...payload,
@@ -67,45 +66,15 @@ export const explore = createModel({
 
       const svg: any = d3.select('.output-graph');
       addVertexes.map(d => {
-        d.x = _.meanBy(selectVertexes, 'x') || svg.style('width') / 2;
-        d.y = _.meanBy(selectVertexes, 'y') || svg.style('heigth') / 2;
+        d.x =
+          _.meanBy(selectVertexes, 'x') ||
+          svg.node().getBoundingClientRect().width / 2;
+        d.y =
+          _.meanBy(selectVertexes, 'y') ||
+          svg.node().getBoundingClientRect().height / 2;
       });
       const edges = _.uniqBy([...originEdges, ...addEdges], e => e.id);
-      const linkmap = {};
-
-      const linkGroup = {};
-      edges.forEach((link: any) => {
-        let key: string;
-        link.edge = { ...link };
-        if (link.source.name) {
-          key =
-            link.source.name < link.target.name
-              ? link.source.name + ':' + link.target.name
-              : link.target.name + ':' + link.source.name;
-        } else {
-          key =
-            link.source < link.target
-              ? link.source + ':' + link.target
-              : link.target + ':' + link.source;
-        }
-        if (!linkmap.hasOwnProperty(key)) {
-          linkmap[key] = 0;
-        }
-        linkmap[key] += 1;
-        if (!linkGroup.hasOwnProperty(key)) {
-          linkGroup[key] = [];
-        }
-        linkGroup[key].push(link);
-        link.size = linkmap[key];
-        const group = linkGroup[key];
-        const keyPair = key.split(':');
-        let type = 'noself';
-        if (keyPair[0] === keyPair[1]) {
-          type = 'self';
-        }
-        setLinkNumbers(group, type);
-      });
-
+      setLink(edges);
       const vertexes = _.uniqBy(
         [...originVertexes, ...addVertexes],
         v => v.name,

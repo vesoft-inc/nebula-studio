@@ -268,7 +268,6 @@ export const importData = createModel({
       this.update({
         activeStep: 0,
         currentStep: 0,
-        mountPath: '',
         files: [] as any[],
         vertexesConfig: [] as IVertexConfig[],
         edgesConfig: [] as IEdgeConfig[],
@@ -285,7 +284,7 @@ export const importData = createModel({
         config,
       )) as any;
       if (errCode === 0) {
-        service.runImport();
+        service.runImport({ taskId });
         this.update({
           taskId,
           isImporting: true,

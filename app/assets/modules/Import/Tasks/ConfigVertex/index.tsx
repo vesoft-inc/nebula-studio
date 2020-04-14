@@ -16,6 +16,10 @@ const { TabPane } = Tabs;
 const mapState = (state: IRootState) => ({
   vertexesConfig: state.importData.vertexesConfig,
   activeVertexIndex: state.importData.activeVertexIndex,
+  host: state.nebula.host,
+  username: state.nebula.username,
+  password: state.nebula.password,
+  space: state.nebula.currentSpace,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -33,6 +37,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
       vertexName,
     });
   },
+  asyncGetTags: dispatch.nebula.asyncGetTags,
 });
 
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
@@ -44,6 +49,13 @@ class ConfigNode extends React.PureComponent<IProps> {
   };
 
   componentDidMount() {
+    const { username, host, password, space } = this.props;
+    this.props.asyncGetTags({
+      username,
+      host,
+      password,
+      space,
+    });
     trackPageView('/import/configVertex');
   }
 

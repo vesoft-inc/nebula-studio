@@ -1,13 +1,23 @@
 import { Controller } from 'egg';
 import fs from 'fs';
 
-const taskList = new Map();
+const taskIdDir =
+  __dirname
+    .split('/')
+    .slice(0, __dirname.split('/').length - 2)
+    .join('/') + '/tmp/taskId.json';
+
+if (!fs.existsSync(taskIdDir)) {
+  fs.writeFileSync(taskIdDir, JSON.stringify({}));
+}
 
 export default class ImportController extends Controller {
   async import() {
     const { ctx } = this;
-    const { taskId } = ctx.query;
-    taskList.set(taskId, false);
+    const { taskId } = ctx.request.body;
+    const taskIdJSON = require(taskIdDir);
+    taskIdJSON[taskId] = false;
+    fs.writeFileSync(taskIdDir, JSON.stringify(taskIdJSON));
     ctx.response.body = {
       data: [],
       code: '0',
@@ -38,7 +48,8 @@ export default class ImportController extends Controller {
     } catch (e) {
       data = 'read file error';
     }
-    if (!data && taskList.get(taskId)) {
+    const taskIdJSON = require(taskIdDir);
+    if (!data && taskIdJSON[taskId]) {
       code = '-1';
     }
     const log = data ? data.replace(/\n/g, '<br />') : '';
@@ -52,7 +63,9 @@ export default class ImportController extends Controller {
   async callback() {
     const { ctx } = this;
     const { taskId } = ctx.request.body;
-    taskList.set(taskId, true);
+    const taskIdJSON = require(taskIdDir);
+    taskIdJSON[taskId] = true;
+    fs.writeFileSync(taskIdDir, JSON.stringify(taskIdJSON));
     ctx.response.body = {
       message: '',
       data: '',
@@ -62,10 +75,11 @@ export default class ImportController extends Controller {
 
   async getWorkingDir() {
     const { ctx } = this;
+    const dir = process.env.UPLOAD_DIR || ctx.app.config.uploadPath;
     ctx.response.body = {
       code: '0',
       data: {
-        dir: (ctx.app.config.env as any).WORKING_DIR || process.env.WORKING_DIR,
+        dir,
       },
     };
   }

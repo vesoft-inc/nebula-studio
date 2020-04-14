@@ -1,14 +1,23 @@
 import { EggAppConfig, EggAppInfo, PowerPartial } from 'egg';
+import fs from 'fs';
 import * as path from 'path';
-import fs from 'fs'
 
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>;
 
+  // upload path
+  config.uploadPath =
+    __dirname
+      .split('/')
+      .slice(0, __dirname.split('/').length - 1)
+      .join('/') + '/tmp/upload';
+  if (!fs.existsSync(config.uploadPath)) {
+    fs.mkdirSync(config.uploadPath, { recursive: true });
+  }
   // override config from framework / plugin
   // use for cookie sign key, should change to your own and keep security
   config.keys = appInfo.name + '_1544867050896_3341';
-  
+
   // add your egg config in here
   config.middleware = [];
 
@@ -41,13 +50,20 @@ export default (appInfo: EggAppInfo) => {
     },
   };
 
+  config.multipart = {
+    fileSize: '100mb',
+    mode: 'stream',
+    fileModeMatch: /^\/upload_file$/,
+    whitelist: ['.csv'],
+  };
+
   config.security = {
     csrf: false,
   };
 
   config.siteFile = {
     '/favicon.ico': fs.readFileSync(path.join(__dirname, '../favicon.ico'))
-  }
+  };
 
   // add your special config in here
   const bizConfig = {

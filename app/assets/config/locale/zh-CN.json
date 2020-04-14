@@ -88,6 +88,7 @@
     "fileSize": "大小",
     "operation": "操作",
     "fileTitle": "选择文件列表",
+    "fileSizeErrorMsg": "文件必须小于100MB",
     "preview": "预览",
     "delete": "删除",
     "addVertex": "添加 Vertex",

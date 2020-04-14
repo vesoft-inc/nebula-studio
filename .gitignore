@@ -32,4 +32,4 @@ package-lock.json
 scripts/data/
 typings
 docker/data
-docker/tmp
+tmp

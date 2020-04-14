@@ -48,7 +48,7 @@ class SpaceSearchInput extends React.Component<IProps> {
         value={value}
         defaultActiveFirstOption={false}
         onChange={onSpaceChange}
-        onSearch={this.getSpaces}
+        onFocus={this.getSpaces}
         className="space-search-input"
         loading={!!loading}
         allowClear={true}
