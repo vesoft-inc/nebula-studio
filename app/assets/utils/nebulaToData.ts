@@ -1,31 +1,36 @@
 import _ from 'lodash';
 
-const statNodeTypes = {};
-let nodeTypeNum = 0;
-
-export function nebulaToData(table: any[], edgeType: string) {
-  const nodeOut = `${edgeType}-out`;
-
-  if (!statNodeTypes[nodeOut]) {
-    nodeTypeNum++;
-    statNodeTypes[nodeOut] = nodeTypeNum;
-  }
-
-  const groupNum = statNodeTypes[nodeOut];
-
+export function nebulaToData(
+  table: any[],
+  edgeType: string,
+  direction: string,
+) {
   return table.reduce(
     (result, { sourceId, destId, rank }) => {
-      result.edges.push({
-        source: sourceId,
-        target: destId,
-        value: 6,
-        // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
-        id: `${sourceId}-${destId}-${edgeType}-${rank}`,
-        type: edgeType,
-      });
+      switch (direction) {
+        case 'incoming':
+          result.edges.push({
+            source: destId,
+            target: sourceId,
+            value: 6,
+            // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
+            id: `${destId}-${sourceId}-${edgeType}-${rank}`,
+            type: edgeType,
+          });
+          break;
+        default:
+          result.edges.push({
+            source: sourceId,
+            target: destId,
+            value: 6,
+            // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
+            id: `${sourceId}-${destId}-${edgeType}-${rank}`,
+            type: edgeType,
+          });
+      }
+
       result.vertexes.push({
         name: destId,
-        group: groupNum,
       });
 
       return result;
@@ -78,7 +83,6 @@ export function setLinkNumbers(group, type) {
   }
   const linksALen = linksA.length;
   const linksBLen = linksB.length;
-
   if (linksALen === linksBLen) {
     let startLinkNumber = 1;
     for (let i = 0; i < linksALen; i++) {
@@ -114,4 +118,49 @@ export function setLinkNumbers(group, type) {
       biggerLinks[i].linknum = startLinkNumber++;
     }
   }
+}
+
+export function setLinkName(link) {
+  if (link.source.name) {
+    return link.source.name < link.target.name
+      ? link.source.name + ':' + link.target.name
+      : link.target.name + ':' + link.source.name;
+  } else {
+    return link.source < link.target
+      ? link.source + ':' + link.target
+      : link.target + ':' + link.source;
+  }
+}
+
+export function setLink(edges) {
+  const linkMap = {};
+
+  const linkGroup = {};
+  // statistical linkMap linkGroup
+  edges.forEach((link: any) => {
+    if (typeof link.source === 'string') {
+      link.edge = { ...link };
+    }
+    const key = setLinkName(link);
+    if (!linkMap.hasOwnProperty(key)) {
+      linkMap[key] = 0;
+    }
+    linkMap[key] += 1;
+    if (!linkGroup.hasOwnProperty(key)) {
+      linkGroup[key] = [];
+    }
+    linkGroup[key].push(link);
+  });
+  // assign linknum to each link
+  edges.forEach((link: any) => {
+    const key = setLinkName(link);
+    link.size = linkMap[key];
+    const group = linkGroup[key];
+    const keyPair = key.split(':');
+    let type = 'noself';
+    if (keyPair[0] === keyPair[1]) {
+      type = 'self';
+    }
+    setLinkNumbers(group, type);
+  });
 }

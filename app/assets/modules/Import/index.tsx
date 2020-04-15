@@ -2,6 +2,7 @@ import { Spin } from 'antd';
 import React from 'react';
 import { connect } from 'react-redux';
 
+import { IDispatch } from '#assets/store';
 import { trackPageView } from '#assets/utils/stat';
 
 import './index.less';
@@ -12,7 +13,13 @@ const mapState = (state: any) => ({
   loading: state.loading.effects.importData.testImport,
 });
 
-type IProps = ReturnType<typeof mapState>;
+const mapDispatch = (dispatch: IDispatch) => ({
+  asyncGetTags: dispatch.nebula.asyncGetTags,
+});
+
+interface IProps
+  extends ReturnType<typeof mapState>,
+    ReturnType<typeof mapDispatch> {}
 
 class Import extends React.Component<IProps> {
   constructor(props: IProps) {

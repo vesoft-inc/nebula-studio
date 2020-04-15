@@ -129,10 +129,14 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
     await this.setOptions(options);
     if (value !== this.editor.getValue()) {
       this.editor.setValue(value || '');
-      const line =
-        this.editor.lineCount() > maxLineNum
-          ? maxLineNum
-          : this.editor.lineCount();
+      let line;
+      if (this.editor.lineCount() > maxLineNum) {
+        line = maxLineNum;
+      } else if (this.editor.lineCount() < 5) {
+        line = 5;
+      } else {
+        line = this.editor.lineCount();
+      }
       this.editor.setSize(undefined, line * 24 + 10 + 'px');
     }
   }

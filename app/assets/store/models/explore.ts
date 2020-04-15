@@ -4,11 +4,7 @@ import _ from 'lodash';
 
 import service from '#assets/config/service';
 import { fetchVertexProps } from '#assets/utils/fetch';
-import {
-  idToSrting,
-  nebulaToData,
-  setLinkNumbers,
-} from '#assets/utils/nebulaToData';
+import { idToSrting, nebulaToData, setLink } from '#assets/utils/nebulaToData';
 
 export interface INode extends d3.SimulationNodeDatum {
   name: string;
@@ -27,6 +23,12 @@ interface IState {
   edges: IEdge[];
   selectVertexes: INode[];
   actionData: any[];
+  step: number;
+  exploreRules: {
+    edgeType?: string;
+    edgeDirection?: string;
+    vertexColor?: string;
+  };
 }
 
 export const explore = createModel({
@@ -35,9 +37,18 @@ export const explore = createModel({
     edges: [],
     selectVertexes: [],
     actionData: [],
+    step: 0,
+    exploreRules: {
+      edgeType: '',
+      edgeDirection: '',
+      vertexColor: '',
+    },
   },
   reducers: {
-    update: (state: IState, payload: object): IState => {
+    update: (state: IState, payload: any): IState => {
+      if (payload.edges) {
+        setLink(payload.edges);
+      }
       return {
         ...state,
         ...payload,
@@ -55,45 +66,15 @@ export const explore = createModel({
 
       const svg: any = d3.select('.output-graph');
       addVertexes.map(d => {
-        d.x = _.meanBy(selectVertexes, 'x') || svg.style('width') / 2;
-        d.y = _.meanBy(selectVertexes, 'y') || svg.style('heigth') / 2;
+        d.x =
+          _.meanBy(selectVertexes, 'x') ||
+          svg.node().getBoundingClientRect().width / 2;
+        d.y =
+          _.meanBy(selectVertexes, 'y') ||
+          svg.node().getBoundingClientRect().height / 2;
       });
       const edges = _.uniqBy([...originEdges, ...addEdges], e => e.id);
-      const linkmap = {};
-
-      const linkGroup = {};
-      edges.forEach((link: any) => {
-        let key: string;
-        link.edge = { ...link };
-        if (link.source.name) {
-          key =
-            link.source.name < link.target.name
-              ? link.source.name + ':' + link.target.name
-              : link.target.name + ':' + link.source.name;
-        } else {
-          key =
-            link.source < link.target
-              ? link.source + ':' + link.target
-              : link.target + ':' + link.source;
-        }
-        if (!linkmap.hasOwnProperty(key)) {
-          linkmap[key] = 0;
-        }
-        linkmap[key] += 1;
-        if (!linkGroup.hasOwnProperty(key)) {
-          linkGroup[key] = [];
-        }
-        linkGroup[key].push(link);
-        link.size = linkmap[key];
-        const group = linkGroup[key];
-        const keyPair = key.split(':');
-        let type = 'noself';
-        if (keyPair[0] === keyPair[1]) {
-          type = 'self';
-        }
-        setLinkNumbers(group, type);
-      });
-
+      setLink(edges);
       const vertexes = _.uniqBy(
         [...originVertexes, ...addVertexes],
         v => v.name,
@@ -124,14 +105,31 @@ export const explore = createModel({
         ids
           .trim()
           .split('\n')
-          .map(async id => ({
-            name: id,
-            group: 0,
-            nodeProp: await fetchVertexProps(
+          .map(async id => {
+            const nodeProp = await fetchVertexProps(
               { space, host, username, password },
               id,
-            ),
-          })),
+            );
+            const tags =
+              nodeProp && nodeProp.headers
+                ? _.sortedUniq(
+                    nodeProp.headers.map(field => {
+                      if (field === 'VertexID') {
+                        return 't';
+                      } else {
+                        return field.split('.')[0];
+                      }
+                    }),
+                  )
+                : [];
+
+            return {
+              name: id,
+              nodeProp,
+              step: 0,
+              group: tags.join('-'),
+            };
+          }),
       );
       this.addNodesAndEdges({
         vertexes: newVertexes,
@@ -146,7 +144,10 @@ export const explore = createModel({
       space: string;
       selectVertexes: any[];
       edgeType: string;
+      edgeDirection: string;
       filters: any[];
+      exploreStep: number;
+      vertexColor: string;
     }) {
       const {
         host,
@@ -155,15 +156,29 @@ export const explore = createModel({
         space,
         selectVertexes,
         edgeType,
+        edgeDirection,
         filters,
+        exploreStep,
+        vertexColor,
       } = payload;
       const wheres = filters
         .filter(filter => filter.field && filter.operator && filter.value)
         .map(filter => `${filter.field} ${filter.operator} ${filter.value}`)
         .join(' AND ');
+      let direction;
+      let group;
+      switch (edgeDirection) {
+        case 'incoming':
+          direction = 'REVERSELY';
+          break;
+        default:
+          direction = ''; // default outgoing
+      }
       const gql = `
         use ${space};
-        GO FROM ${selectVertexes.map(d => d.name)} OVER ${edgeType} ${
+        GO FROM ${selectVertexes.map(
+          d => d.name,
+        )} OVER ${edgeType} ${direction} ${
         wheres ? `WHERE ${wheres}` : ''
       } yield ${edgeType}._src as sourceId, ${edgeType}._dst as destId, ${edgeType}._rank as rank;
       `;
@@ -178,21 +193,45 @@ export const explore = createModel({
         const { edges, vertexes } = nebulaToData(
           idToSrting(data.tables),
           edgeType,
+          edgeDirection,
         );
         const newVertexes = await Promise.all(
           vertexes.map(async v => {
+            const nodeProp = await fetchVertexProps(
+              { space, host, username, password },
+              v.name,
+            );
+            if (vertexColor === 'groupByTag') {
+              const tags =
+                nodeProp && nodeProp.headers
+                  ? _.sortedUniq(
+                      nodeProp.headers.map(field => {
+                        if (field === 'VertexID') {
+                          return 't';
+                        } else {
+                          return field.split('.')[0];
+                        }
+                      }),
+                    )
+                  : [];
+              group = tags.join('-');
+            } else {
+              group = 'step-' + exploreStep;
+            }
+
             return {
               ...v,
-              nodeProp: await fetchVertexProps(
-                { space, host, username, password },
-                v.name,
-              ),
+              nodeProp,
+              group,
             };
           }),
         );
         this.addNodesAndEdges({
           vertexes: newVertexes,
           edges,
+        });
+        this.update({
+          step: exploreStep,
         });
       } else {
         throw new Error(message);

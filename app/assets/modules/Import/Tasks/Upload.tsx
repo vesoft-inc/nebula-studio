@@ -1,10 +1,11 @@
-import { Button, Checkbox, Select, Table, Upload } from 'antd';
+import { Button, Checkbox, message, Select, Table, Upload } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
 import CSVPreviewLink from '#assets/components/CSVPreviewLink';
+import service from '#assets/config/service';
 import { IDispatch, IRootState } from '#assets/store';
 import readFileContent from '#assets/utils/file';
 import { trackPageView } from '#assets/utils/stat';
@@ -38,6 +39,11 @@ class Import extends React.Component<IProps> {
   }
 
   componentDidMount() {
+    service.getFiles().then((data: any) => {
+      if (data.code === '0') {
+        this.props.updateFiles(data.data);
+      }
+    });
     trackPageView('/import/upload');
   }
 
@@ -59,7 +65,6 @@ class Import extends React.Component<IProps> {
     file.path = `${mountPath}/${file.name}`;
     file.withHeader = false;
     file.dataType = 'all';
-
     return file;
   };
 
@@ -71,14 +76,18 @@ class Import extends React.Component<IProps> {
     this.props.updateFiles([...files]);
   };
 
-  handleFileDelete = index => {
+  handleFileDelete = async index => {
     const { files } = this.props;
-    this.props.updateFiles(files.filter((_, i) => i !== index));
+    const data: any = await service.deteleFile({
+      filename: files[index].name,
+    });
+    if (data.code === '0') {
+      this.props.updateFiles(files.filter((_, i) => i !== index));
+    }
   };
 
   renderFileTable = () => {
     const { files } = this.props;
-
     const columns = [
       {
         title: intl.get('import.fileName'),
@@ -125,16 +134,23 @@ class Import extends React.Component<IProps> {
       {
         title: intl.get('import.operation'),
         key: 'operation',
-        render: (_1, file, index) => (
-          <div className="operation">
-            <CSVPreviewLink file={file}>
-              {intl.get('import.preview')}
-            </CSVPreviewLink>
-            <Button type="link" onClick={() => this.handleFileDelete(index)}>
-              {intl.get('import.delete')}
-            </Button>
-          </div>
-        ),
+        render: (_1, file, index) => {
+          if (file.content) {
+            return (
+              <div className="operation">
+                <CSVPreviewLink file={file}>
+                  {intl.get('import.preview')}
+                </CSVPreviewLink>
+                <Button
+                  type="link"
+                  onClick={() => this.handleFileDelete(index)}
+                >
+                  {intl.get('import.delete')}
+                </Button>
+              </div>
+            );
+          }
+        },
       },
     ];
 
@@ -153,7 +169,16 @@ class Import extends React.Component<IProps> {
   };
 
   handleUploadChange = ({ fileList }) => {
-    this.props.updateFiles(_.uniqBy(fileList, 'name'));
+    const files = fileList.filter(file => file.size / 1024 / 1024 < 100);
+    this.props.updateFiles(_.uniqBy(files, 'name'));
+  };
+
+  handleBeforeUpload = file => {
+    const isOverSize = file.size / 1024 / 1024 < 100;
+    if (!isOverSize) {
+      message.error(intl.get('import.fileSizeErrorMsg'));
+    }
+    return isOverSize;
   };
 
   render() {
@@ -168,11 +193,10 @@ class Import extends React.Component<IProps> {
             accept=".csv"
             showUploadList={false}
             fileList={files}
+            action={'/api/files/upload'}
             onChange={this.handleUploadChange}
+            beforeUpload={this.handleBeforeUpload}
             transformFile={this.transformFile as any}
-            customRequest={() => {
-              console.log('fake upload');
-            }}
           >
             <Button className="upload-btn" type="default">
               {intl.get('import.selectFile')}

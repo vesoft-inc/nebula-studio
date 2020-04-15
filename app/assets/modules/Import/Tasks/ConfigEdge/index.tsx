@@ -16,6 +16,10 @@ const { TabPane } = Tabs;
 const mapState = (state: IRootState) => ({
   edgesConfig: state.importData.edgesConfig,
   activeEdgeIndex: state.importData.activeEdgeIndex,
+  host: state.nebula.host,
+  username: state.nebula.username,
+  password: state.nebula.password,
+  space: state.nebula.currentSpace,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -27,6 +31,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
   deleteEdgeConfig: edgeName => {
     dispatch.importData.deleteEdgeConfig({ edgeName });
   },
+  asyncGetEdgeTypes: dispatch.nebula.asyncGetEdgeTypes,
 });
 
 interface IProps
@@ -40,6 +45,13 @@ class ConfigEdge extends React.Component<IProps> {
   };
 
   componentDidMount() {
+    const { username, host, password, space } = this.props;
+    this.props.asyncGetEdgeTypes({
+      username,
+      host,
+      password,
+      space,
+    });
     trackPageView('/import/configEdge');
   }
 

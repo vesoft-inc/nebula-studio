@@ -18,6 +18,11 @@ const deleteProcess = _delete('/api/import/process');
 
 const getImportWokingDir = get('/api/import/working_dir');
 
+const deteleFile = params => {
+  const { filename } = params;
+  return _delete(`/api/files/${filename}`)();
+};
+const getFiles = get('/api/files');
 const getAppInfo = get('/api/app');
 
 export default {
@@ -30,5 +35,7 @@ export default {
   getLog,
   deleteProcess,
   getImportWokingDir,
+  deteleFile,
+  getFiles,
   getAppInfo,
 };

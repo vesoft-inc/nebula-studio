@@ -32,27 +32,44 @@ interface IRefs {
   mountPoint?: SVGSVGElement | null;
 }
 
-const colors = [
-  '#1e78b4',
-  '#b2df8a',
-  '#fb9a99',
-  '#e3181d',
-  '#fdbf6f',
-  '#ff7e01',
-  '#cab2d6',
-  '#6a3e9a',
-  '#ffff99',
-  '#b15828',
-  '#7fc97f',
-  '#beadd4',
-  '#fdc086',
-  '#ffff99',
-  '#a6cee3',
-  '#386cb0',
-  '#f0007f',
-  '#bf5a18',
-];
-const colorTotal = colors.length;
+const whichColor = (() => {
+  const colors = [
+    '#66C5CC',
+    '#F6CF71',
+    '#F89C74',
+    '#DCB0F2',
+    '#87C55F',
+    '#9EB9F3',
+    '#FE88B1',
+    '#C9DB74',
+    '#8BE0A4',
+    '#B497E7',
+    '#D3B484',
+    '#B3B3B3',
+    '#5F4690',
+    '#1D6996',
+    '#38A6A5',
+    '#0F8554',
+    '#73AF48',
+    '#EDAD08',
+    '#E17C05',
+    '#CC503E',
+    '#94346E',
+    '#6F4070',
+    '#994E95',
+    '#666666',
+  ];
+  const colorsTotal = colors.length;
+  let colorIndex = 0;
+  const colorsRecord = {};
+  return key => {
+    if (!colorsRecord[key]) {
+      colorsRecord[key] = colors[colorIndex];
+      colorIndex = (colorIndex + 1) % colorsTotal;
+    }
+    return colorsRecord[key];
+  };
+})();
 
 class NebulaD3 extends React.Component<IProps, {}> {
   ctrls: IRefs = {};
@@ -82,15 +99,15 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .append('defs')
       .append('marker')
       .attr('id', 'marker')
-      .attr('viewBox', '1 -5 10 10')
-      .attr('refX', 30)
+      .attr('viewBox', '-10 -10 20 20')
+      .attr('refX', 21)
       .attr('refY', 0)
       .attr('orient', 'auto')
-      .attr('markerWidth', 6)
-      .attr('markerHeight', 6)
+      .attr('markerWidth', 10)
+      .attr('markerHeight', 12)
       .attr('xoverflow', 'visible')
       .append('path')
-      .attr('d', 'M 0,-5 L 12 ,0 L 0,5')
+      .attr('d', 'M-6.75,-6.75 L 0,0 L -6.75,6.75')
       .attr('fill', '#999')
       .attr('stroke', '#999');
   }
@@ -148,14 +165,13 @@ class NebulaD3 extends React.Component<IProps, {}> {
           d.target.y
         );
       }
-      const curve = 1.5;
-      const homogeneous = 1.2;
+      const curve = 3;
+      const homogeneous = 0.5;
       const dx = d.target.x - d.source.x;
       const dy = d.target.y - d.source.y;
       const dr =
         (Math.sqrt(dx * dx + dy * dy) * (d.linknum + homogeneous)) /
         (curve * homogeneous);
-
       if (d.linknum < 0) {
         const dr =
           (Math.sqrt(dx * dx + dy * dy) * (-1 * d.linknum + homogeneous)) /
@@ -184,7 +200,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
         dr +
         ',' +
         dr +
-        ' 0 0,1 ' +
+        ' 0 0, 1 ' +
         d.target.x +
         ',' +
         d.target.y
@@ -240,7 +256,10 @@ class NebulaD3 extends React.Component<IProps, {}> {
       })
       .attr('class', 'node')
       .attr('id', (d: INode) => `node-${d.name}`)
-      .style('fill', (d: INode) => colors[d.group % colorTotal]);
+      .style('fill', (d: INode) => {
+        const group = d.group;
+        return whichColor(group);
+      });
 
     d3.select(this.nodeRef)
       .selectAll('circle')
@@ -291,7 +310,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
       this.linksText = d3
         .selectAll('.text')
         .selectAll('.textPath')
-        .attr('xlink:href', (d: any) => '#text-path-' + d.id)
+        .attr(':href', (d: any) => '#text-path-' + d.id)
         .attr('startOffset', '50%')
         .text((d: any) => {
           return d.type;
@@ -344,8 +363,6 @@ class NebulaD3 extends React.Component<IProps, {}> {
       this.force = d3
         .forceSimulation()
         .force('charge', d3.forceManyBody().strength(-20))
-        .force('x', d3.forceX())
-        .force('y', d3.forceY())
         .force(
           'collide',
           d3

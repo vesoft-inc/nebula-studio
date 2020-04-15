@@ -39,16 +39,23 @@ export const nebula = createModel({
     addTagsName: (state: IState, payload: any) => {
       const { tagsFields } = state;
       const { tag, Names } = payload;
-      tagsFields.push({
-        [tag]: Names,
-      });
+      const index = _.findIndex(tagsFields, tag);
+      if (index === -1) {
+        tagsFields.push({
+          [tag]: Names,
+        });
+      } else {
+        tagsFields[index] = {
+          [tag]: Names,
+        };
+      }
       return {
         ...state,
         tagsFields,
       };
     },
 
-    asyncClearConfig: (state: IState) => {
+    clearConfig: (state: IState) => {
       cookies.remove('host');
       cookies.remove('username');
       cookies.remove('password');

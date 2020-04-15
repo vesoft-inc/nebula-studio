@@ -26,7 +26,8 @@
     "feedback": "问题反馈"
   },
   "warning": {
-    "configServer": "请先配置服务器"
+    "configServer": "请先配置服务器",
+    "connectError": "数据库连接有误，请重新配置"
   },
   "NGQLOutput": {
     "success": "执行成功"
@@ -56,7 +57,9 @@
     "expand": "拓展",
     "fileImport": "文件导入",
     "importPlaceholder": "id1\nid2\nid3\n每行1个节点id，以回车分开",
-    "fitler": "筛选",
+    "outgoing": "流出",
+    "incoming": "流入",
+    "filter": "筛选",
     "field": "字段",
     "operator": "操作符",
     "value": "值",
@@ -64,7 +67,10 @@
     "selectReminder": "切换将会清除当前数据，确定？",
     "zoom": "缩放",
     "show": "显示",
-    "confirm": "确定"
+    "confirm": "确定",
+    "vertexColor": "节点颜色",
+    "groupByStep": "按探索步骤分类",
+    "groupByTag": "按节点标签分类"
   },
   "import": {
     "import":"导入",
@@ -82,6 +88,7 @@
     "fileSize": "大小",
     "operation": "操作",
     "fileTitle": "选择文件列表",
+    "fileSizeErrorMsg": "文件必须小于100MB",
     "preview": "预览",
     "delete": "删除",
     "addVertex": "添加 Vertex",

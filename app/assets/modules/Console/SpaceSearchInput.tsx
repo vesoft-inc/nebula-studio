@@ -26,7 +26,10 @@ interface IProps
 }
 
 class SpaceSearchInput extends React.Component<IProps> {
-  handleSpaceSearch = () => {
+  componentDidMount() {
+    this.getSpaces();
+  }
+  getSpaces = () => {
     const { host, username, password } = this.props;
     this.props.asyncGetSpaces({
       host,
@@ -45,7 +48,7 @@ class SpaceSearchInput extends React.Component<IProps> {
         value={value}
         defaultActiveFirstOption={false}
         onChange={onSpaceChange}
-        onSearch={this.handleSpaceSearch}
+        onFocus={this.getSpaces}
         className="space-search-input"
         loading={!!loading}
         allowClear={true}

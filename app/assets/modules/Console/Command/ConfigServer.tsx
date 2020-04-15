@@ -14,7 +14,7 @@ interface IState {
 }
 
 const mapDispatch = (dispatch: IDispatch) => ({
-  asyncClearConfig: dispatch.nebula.asyncClearConfig,
+  clearConfig: dispatch.nebula.clearConfig,
   asyncConfigServer: dispatch.nebula.asyncConfigServer,
 });
 
@@ -42,7 +42,7 @@ class ConfigServer extends React.Component<IProps, IState> {
   };
 
   handleClear = () => {
-    this.props.asyncClearConfig();
+    this.props.clearConfig();
   };
 
   renderSuccess = () => {

@@ -9,5 +9,11 @@ export default (app: Application) => {
   router.post('/api/import/finish', controller.import.callback);
   router.get('/api/import/working_dir', controller.import.getWorkingDir);
   router.get('/api/app', controller.home.getAppInfo);
-  router.get(/^(?!^\/api\/)/, controller.home.index);
+
+  // file
+  router.resources('file', '/api/files', controller.files);
+  router.post('/api/files/upload', controller.files.upload);
+  if (1) {
+    router.get(/^(?!^\/api\/)/, controller.home.index);
+  }
 };
