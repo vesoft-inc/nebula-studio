@@ -160,11 +160,19 @@ class NebulaGraph extends React.Component<IProps, IState> {
   handleUndo = () => {
     const { actionData, vertexes, edges } = this.props;
     const data = actionData.pop() as any;
-    this.props.updateActionData(
-      actionData,
-      _.differenceBy(edges, data.edges, (e: IEdge) => e.id),
-      _.differenceBy(vertexes, data.vertexes, (v: INode) => v.name),
-    );
+    if (data.type === 'ADD') {
+      this.props.updateActionData(
+        actionData,
+        _.differenceBy(edges, data.edges, (e: IEdge) => e.id),
+        _.differenceBy(vertexes, data.vertexes, (v: INode) => v.name),
+      );
+    } else {
+      this.props.updateActionData(
+        actionData,
+        _.unionBy(edges, data.edges, (e: IEdge) => e.id),
+        _.unionBy(vertexes, data.vertexes, (v: INode) => v.name),
+      );
+    }
   };
 
   handleSetting = async () => {

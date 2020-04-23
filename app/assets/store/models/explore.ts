@@ -137,13 +137,52 @@ export const explore = createModel({
       });
     },
 
+    async deleteNodesAndEdges(payload: {
+      selectVertexes: any[];
+      vertexes: INode[];
+      edges: IEdge[];
+      actionData: any[];
+    }) {
+      const {
+        vertexes: originVertexes,
+        edges,
+        selectVertexes,
+        actionData,
+      } = payload;
+      const originEdges = [...edges];
+      selectVertexes.forEach(selectVertexe => {
+        _.remove(
+          originEdges,
+          v =>
+            v.source.name === selectVertexe.name ||
+            v.target.name === selectVertexe.name,
+        );
+      });
+      const vertexes = _.differenceBy(
+        originVertexes,
+        selectVertexes,
+        v => v.name,
+      );
+      actionData.push({
+        type: 'REMOVE',
+        vertexes: selectVertexes,
+        edges: _.differenceBy(edges, originEdges, v => v.id),
+      });
+      this.update({
+        vertexes,
+        edges: originEdges,
+        actionData,
+        selectVertexes: [],
+      });
+    },
+
     async asyncGetExpand(payload: {
       host: string;
       username: string;
       password: string;
       space: string;
       selectVertexes: any[];
-      edgeType: string;
+      edgeTypes: string[];
       edgeDirection: string;
       filters: any[];
       exploreStep: number;
@@ -155,7 +194,7 @@ export const explore = createModel({
         password,
         space,
         selectVertexes,
-        edgeType,
+        edgeTypes,
         edgeDirection,
         filters,
         exploreStep,
@@ -176,11 +215,14 @@ export const explore = createModel({
       }
       const gql = `
         use ${space};
-        GO FROM ${selectVertexes.map(
-          d => d.name,
-        )} OVER ${edgeType} ${direction} ${
-        wheres ? `WHERE ${wheres}` : ''
-      } yield ${edgeType}._src as sourceId, ${edgeType}._dst as destId, ${edgeType}._rank as rank;
+        GO FROM ${selectVertexes.map(d => d.name)} OVER ${edgeTypes.join(
+        ',',
+      )} ${direction} ${wheres ? `WHERE ${wheres}` : ''} yield ${edgeTypes
+        .map(
+          type =>
+            `${type}._src as ${type}SourceId, ${type}._dst as ${type}DestId, ${type}._rank as ${type}Rank`,
+        )
+        .join(',')};
       `;
       const { code, data, message } = (await service.execNGQL({
         host,
@@ -192,7 +234,7 @@ export const explore = createModel({
       if (code === '0' && data.tables.length !== 0) {
         const { edges, vertexes } = nebulaToData(
           idToSrting(data.tables),
-          edgeType,
+          edgeTypes,
           edgeDirection,
         );
         const newVertexes = await Promise.all(

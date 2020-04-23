@@ -234,6 +234,7 @@ class Console extends React.Component<IProps, IState> {
         <Modal
           title={intl.get('common.NGQLHistoryList')}
           visible={history}
+          className="historyList"
           footer={null}
           onCancel={() => {
             this.setState({ history: false });

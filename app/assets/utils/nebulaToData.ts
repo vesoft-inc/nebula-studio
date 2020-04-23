@@ -2,35 +2,46 @@ import _ from 'lodash';
 
 export function nebulaToData(
   table: any[],
-  edgeType: string,
+  edgeTypes: string[],
   direction: string,
 ) {
   return table.reduce(
-    (result, { sourceId, destId, rank }) => {
-      switch (direction) {
-        case 'incoming':
-          result.edges.push({
-            source: destId,
-            target: sourceId,
-            value: 6,
-            // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
-            id: `${destId}-${sourceId}-${edgeType}-${rank}`,
-            type: edgeType,
-          });
-          break;
-        default:
-          result.edges.push({
-            source: sourceId,
-            target: destId,
-            value: 6,
-            // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
-            id: `${sourceId}-${destId}-${edgeType}-${rank}`,
-            type: edgeType,
-          });
-      }
+    (result, data) => {
+      edgeTypes.forEach(type => {
+        // HACK: nebula1.0 return 0 if there is no dstid, it'll be fixed in nbula2.0
+        // Relative issue: https://github.com/vesoft-inc/nebula/issues/2080
+        if (data[`${type}DestId`] === '0') {
+          return;
+        }
+        switch (direction) {
+          case 'incoming':
+            result.edges.push({
+              source: data[`${type}DestId`],
+              target: data[`${type}SourceId`],
+              value: 6,
+              // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
+              id: `${data[`${type}DestId`]}-${
+                data[`${type}SourceId`]
+              }-${type}-${data[`${type}Rank`]}`,
+              type,
+            });
+            break;
+          default:
+            result.edges.push({
+              source: data[`${type}SourceId`],
+              target: data[`${type}DestId`],
+              value: 6,
+              // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
+              id: `${data[`${type}SourceId`]}-${
+                data[`${type}DestId`]
+              }-${type}-${data[`${type}Rank`]}`,
+              type,
+            });
+        }
 
-      result.vertexes.push({
-        name: destId,
+        result.vertexes.push({
+          name: data[`${type}DestId`],
+        });
       });
 
       return result;

@@ -101,7 +101,7 @@ class Expand extends React.Component<IProps, IState> {
     } = this.props;
     const { getFieldValue } = this.props.form;
     const { filters } = this.state;
-    const edgeType = getFieldValue('edgeType');
+    const edgeTypes = getFieldValue('edgeTypes');
     const edgeDirection = getFieldValue('edgeDirection');
     const vertexColor = getFieldValue('vertexColor');
     (this.props.asyncGetExpand({
@@ -111,7 +111,7 @@ class Expand extends React.Component<IProps, IState> {
       space: currentSpace,
       filters,
       selectVertexes,
-      edgeType,
+      edgeTypes,
       edgeDirection,
       vertexColor,
       exploreStep: exploreStep + 1,
@@ -129,7 +129,7 @@ class Expand extends React.Component<IProps, IState> {
     );
 
     this.props.updateExploreRules({
-      edgeType,
+      edgeTypes,
       edgeDirection,
       vertexColor,
     });
@@ -141,6 +141,7 @@ class Expand extends React.Component<IProps, IState> {
     const { edgeTypes, exploreRules: rules } = this.props;
     const { getFieldDecorator, getFieldValue } = this.props.form;
     const { filters } = this.state;
+    const selectEdgeTypes = getFieldValue('edgeTypes');
     const columns = [
       {
         title: intl.get('explore.field'),
@@ -200,10 +201,10 @@ class Expand extends React.Component<IProps, IState> {
       <div className="graph-expand">
         <Form>
           <Form.Item label="Edge Type:">
-            {getFieldDecorator('edgeType', {
+            {getFieldDecorator('edgeTypes', {
               initialValue: rules.edgeType,
             })(
-              <Select>
+              <Select mode="multiple">
                 {edgeTypes.map(e => (
                   <Option value={e} key={e}>
                     {e}
@@ -247,7 +248,7 @@ class Expand extends React.Component<IProps, IState> {
         </Form>
         <Button
           onClick={this.handleExpand}
-          disabled={!getFieldValue('edgeType')}
+          disabled={!selectEdgeTypes || !selectEdgeTypes.length}
         >
           {intl.get('explore.expand')}
         </Button>

@@ -1,6 +1,7 @@
 import { Controller } from 'egg';
 import fs from 'fs';
 import pump from 'mz-modules/pump';
+import readline from 'readline';
 import sendToWormhole from 'stream-wormhole';
 
 export default class FilesController extends Controller {
@@ -22,25 +23,23 @@ export default class FilesController extends Controller {
     const dir = process.env.UPLOAD_DIR || ctx.app.config.uploadPath;
     const files = fs.readdirSync(dir);
     const data: any = [];
-    files.forEach(file => {
-      const fileStat: any = fs.statSync(dir + '/' + file);
-      if (fileStat.isFile()) {
-        fileStat.name = file;
-        const MAX_FILE_SIZE = 50;
-        const content = fs
-          .readFileSync(dir + '/' + file)
-          .slice(0, MAX_FILE_SIZE)
-          .toString();
-        fileStat.content = content
-          .split('\n')
-          .slice(0, 3)
-          .join('\n');
-        fileStat.path = dir + '/' + file;
-        fileStat.withHeader = false;
-        fileStat.dataType = 'all';
-        data.push(fileStat);
-      }
-    });
+    await Promise.all(
+      files.map(async file => {
+        const fileStat: any = fs.statSync(dir + '/' + file);
+        if (fileStat.isFile()) {
+          fileStat.name = file;
+          const content = await this._readFileByLine(`${dir}/${file}`, 3);
+          fileStat.content = content
+            .split('\n')
+            .slice(0, 3)
+            .join('\n');
+          fileStat.path = dir + '/' + file;
+          fileStat.withHeader = false;
+          fileStat.dataType = 'all';
+          data.push(fileStat);
+        }
+      }),
+    );
     ctx.response.body = {
       code: '0',
       data,
@@ -74,5 +73,25 @@ export default class FilesController extends Controller {
     ctx.response.body = {
       code: '0',
     };
+  }
+
+  async _readFileByLine(path, lines) {
+    const fileStream = fs.createReadStream(path);
+    const rl = readline.createInterface({
+      input: fileStream,
+      crlfDelay: Infinity,
+    });
+
+    const content = [] as string[];
+    for await (const line of rl) {
+      content.push(line);
+      lines--;
+      if (lines === 0) {
+        break;
+      }
+    }
+    rl.close();
+
+    return content.join('\n');
   }
 }

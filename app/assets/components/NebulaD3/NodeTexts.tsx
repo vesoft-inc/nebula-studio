@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import _ from 'lodash';
 import * as React from 'react';
 
 interface INode extends d3.SimulationNodeDatum {
@@ -17,13 +18,25 @@ export default class NodeTexts extends React.Component<IProps, {}> {
     this.labelRender(this.props.nodes);
   }
 
-  componentDidUpdate() {
-    this.labelRender(this.props.nodes);
+  componentDidUpdate(prevProps) {
+    const { nodes } = this.props;
+    if (nodes.length < prevProps.nodes.length) {
+      const removeNodes = _.differenceBy(
+        prevProps.nodes,
+        nodes,
+        (v: any) => v.name,
+      );
+      removeNodes.forEach(removeNode => {
+        d3.select('#name_' + removeNode.name).remove();
+      });
+    } else {
+      this.labelRender(this.props.nodes);
+    }
   }
 
   labelRender(nodes) {
     d3.select(this.ref)
-      .selectAll('text')
+      .selectAll('.label')
       .data<INode>(nodes)
       .enter()
       .append('text')
@@ -31,12 +44,6 @@ export default class NodeTexts extends React.Component<IProps, {}> {
       .attr('id', d => 'name_' + d.name)
       .attr('text-anchor', 'middle')
       .text((d: INode) => d.name);
-
-    d3.select(this.ref)
-      .selectAll('text')
-      .data<INode>(nodes)
-      .exit()
-      .remove();
 
     if (this.ref) {
       this.props.onUpDataNodeTexts();

@@ -73,6 +73,17 @@ class Control extends React.Component<IProps, {}> {
     });
   };
 
+  handleClear = () => {
+    AntdModal.confirm({
+      content: intl.get('explore.clearTip'),
+      okText: intl.get('common.ok'),
+      cancelText: intl.get('common.cancel'),
+      onOk: () => {
+        this.props.clear();
+      },
+    });
+  };
+
   render() {
     const { spaces, currentSpace } = this.props;
 
@@ -88,7 +99,7 @@ class Control extends React.Component<IProps, {}> {
           </Select>
         </FormItem>
         <FormItem className="right">
-          <Button type="default" onClick={this.props.clear}>
+          <Button type="default" onClick={this.handleClear}>
             {intl.get('explore.clear')}
           </Button>
           <Button

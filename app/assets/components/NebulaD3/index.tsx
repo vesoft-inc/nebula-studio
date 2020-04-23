@@ -81,12 +81,35 @@ class NebulaD3 extends React.Component<IProps, {}> {
   link: any;
   linksText: any;
   nodeText: any;
-  selectNode: INode[];
+  selectedNodes: INode[] = [];
   state = {
     isZoom: false,
     translateX: 0,
     translateY: 0,
     scale: 1,
+    isMultiSelect: false,
+  };
+
+  handleCmdPress = event => {
+    if (event.keyCode === 91 || event.keyCode === 93) {
+      this.setState({
+        isMultiSelect: true,
+      });
+    }
+  };
+
+  handleCmdUp = event => {
+    if (event.keyCode === 91 || event.keyCode === 93) {
+      this.setState({
+        isMultiSelect: false,
+      });
+    }
+  };
+
+  handleWinBlur = () => {
+    this.setState({
+      isMultiSelect: false,
+    });
   };
 
   componentDidMount() {
@@ -110,7 +133,38 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .attr('d', 'M-6.75,-6.75 L 0,0 L -6.75,6.75')
       .attr('fill', '#999')
       .attr('stroke', '#999');
+
+    d3.select('.output-graph').on('click', () => {
+      const tagName = d3.event.target.tagName;
+      if (tagName !== 'text' && tagName !== 'circle') {
+        // clear already select
+        this.selectedNodes = [];
+      }
+    });
+    window.addEventListener('keydown', this.handleCmdPress);
+    window.addEventListener('blur', this.handleWinBlur);
+    window.addEventListener('keyup', this.handleCmdUp);
   }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.handleCmdPress);
+    window.removeEventListener('blur', this.handleWinBlur);
+    window.removeEventListener('keyup', this.handleCmdUp);
+  }
+
+  handleNodeClick = (d: any) => {
+    if (this.state.isMultiSelect) {
+      if (this.selectedNodes.find(n => n.name === d.name)) {
+        this.selectedNodes = this.selectedNodes.filter(n => n.name !== d.name);
+      } else {
+        this.selectedNodes = [...this.selectedNodes, d];
+      }
+      this.props.onSelectVertexes(this.selectedNodes);
+    } else {
+      this.selectedNodes = [];
+      this.props.onSelectVertexes([d]);
+    }
+  };
 
   dragged = d => {
     d.fx = d3.event.x;
@@ -216,13 +270,32 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .attr('y', (d: any) => {
         return d.y + 35;
       });
-
+    d3.selectAll('.text')
+      .attr('transform-origin', (d: any) => {
+        return `${(d.source.x + d.target.x) / 2} ${(d.source.y + d.target.y) /
+          2}`;
+      })
+      .attr('rotate', (d: any) => {
+        if (d.source.x - d.target.x > 0) {
+          return '180deg';
+        }
+        return '0deg';
+      });
     this.linksText
       .attr('x', (d: any) => {
         return (d.source.x + d.target.x) / 2;
       })
       .attr('y', (d: any) => {
         return (d.source.y + d.target.y) / 2;
+      })
+      .text((d: any) => {
+        if (d.source.x - d.target.x > 0) {
+          return d.type
+            .split('')
+            .reverse()
+            .join('');
+        }
+        return d.type;
       });
     this.nodeRenderText();
   };
@@ -269,9 +342,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
 
     this.node = d3
       .selectAll('.node')
-      .on('click', (d: any) => {
-        this.props.onSelectVertexes([d]);
-      })
+      .on('click', this.handleNodeClick)
       .call(
         d3
           .drag()
@@ -286,9 +357,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
     if (this.force) {
       this.nodeText = d3
         .selectAll('.label')
-        .on('click', (d: any) => {
-          this.props.onSelectVertexes([d]);
-        })
+        .on('click', this.handleNodeClick)
         .on('mouseover', () => {
           if (this.props.onMouseOut) {
             this.props.onMouseOut();

@@ -80,12 +80,27 @@
 	}
 }
 
-.ant-modal {
+.historyList {
 	height: 80%;
 	overflow: hidden;
+	position: relative;
 
 	.ant-modal-content {
+		position: relative;
+		height: 100%;
+	}
+
+	.ant-modal-body {
 		max-height: 100%;
 		overflow: auto;
+		padding-top: 55px;
+	}
+
+	.ant-modal-header {
+		position: absolute;
+		top: 0;
+		z-index: 9;
+		width: 100%;
 	}
 }
+

@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import _ from 'lodash';
 import * as React from 'react';
 
 interface IProps {
@@ -15,8 +16,22 @@ export default class Links extends React.Component<IProps, {}> {
     this.linkRender(this.props.links);
   }
 
-  componentDidUpdate() {
-    this.linkRender(this.props.links);
+  componentDidUpdate(prevProps) {
+    const { links } = this.props;
+    if (links.length < prevProps.links.length) {
+      const removeLinks = _.differenceBy(
+        prevProps.links,
+        links,
+        (v: any) => v.id,
+      );
+      removeLinks.forEach(removeLink => {
+        d3.select('#text-path-' + removeLink.id).remove();
+        d3.select('#text-marker' + removeLink.id).remove();
+        d3.select('#text-marker-id' + removeLink.id).remove();
+      });
+    } else {
+      this.linkRender(this.props.links);
+    }
   }
 
   linkRender(links) {
@@ -38,26 +53,15 @@ export default class Links extends React.Component<IProps, {}> {
       .style('stroke-width', 2);
 
     d3.select(this.ref)
-      .selectAll('path')
-      .data(links)
-      .exit()
-      .remove();
-
-    d3.select(this.ref)
       .selectAll('text')
       .data(links)
       .enter()
       .append('text')
       .attr('class', 'text')
+      .attr('id', (d: any) => 'text-marker-id' + d.id)
       .append('textPath')
       .attr('id', (d: any) => 'text-marker' + d.id)
       .attr('class', 'textPath');
-
-    d3.select(this.ref)
-      .selectAll('text')
-      .data(links)
-      .exit()
-      .remove();
 
     if (this.ref) {
       this.props.onUpdataLinks();
