@@ -277,9 +277,9 @@ class NebulaD3 extends React.Component<IProps, {}> {
       })
       .attr('rotate', (d: any) => {
         if (d.source.x - d.target.x > 0) {
-          return '180deg';
+          return 180;
         }
-        return '0deg';
+        return 0;
       });
     this.linksText
       .attr('x', (d: any) => {
