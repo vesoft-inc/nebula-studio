@@ -84,9 +84,6 @@ export const nebula = createModel({
         payload,
       )) as any;
       if (code === '0') {
-        cookies.set('host', payload.host);
-        cookies.set('username', username);
-        cookies.set('password', password);
         trackEvent('connect', 'success');
         this.update({
           host: payload.host,

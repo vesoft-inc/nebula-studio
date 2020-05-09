@@ -1,30 +1,18 @@
-package graphdb
+package dao
 
 import (
 	"errors"
 	"log"
+	pool "nebula-go-api/service/pool"
 	common "nebula-go-api/utils"
 	"strconv"
 
-	nebula "github.com/vesoft-inc/nebula-go"
-	"github.com/vesoft-inc/nebula-go/nebula/graph"
+	graph "github.com/vesoft-inc/nebula-go/nebula/graph"
 )
 
 type ExecuteResult struct {
 	Headers []string                `json:"headers"`
 	Tables  []map[string]common.Any `json:"tables"`
-}
-
-func connect(host, username, password string) (client *nebula.GraphClient, err error) {
-	client, err = nebula.NewClient(host)
-	if err != nil {
-		log.Println(err)
-		return client, err
-	}
-
-	err = client.Connect(username, password)
-
-	return client, err
 }
 
 func getColumnValue(p *graph.ColumnValue) common.Any {
@@ -51,23 +39,21 @@ func getColumnValue(p *graph.ColumnValue) common.Any {
 }
 
 // Connect return if the nebula connect succeed
-func Connect(host, username, password string) (ok bool, err error) {
-	client, err := connect(host, username, password)
+func Connect(host, username, password string) (sessionID int64, err error) {
+	sessionID, err = pool.NewConnection(host, username, password)
 	if err != nil {
 		log.Println(err)
-		return false, err
+		return sessionID, err
 	}
-	defer client.Disconnect()
-	return true, err
+	return sessionID, nil
 }
 
-func Execute(host, username, password, gql string) (result ExecuteResult, err error) {
+func Execute(sessionID int64, gql string) (result ExecuteResult, err error) {
 	result = ExecuteResult{
 		Headers: make([]string, 0),
 		Tables:  make([]map[string]common.Any, 0),
 	}
-	client, err := connect(host, username, password)
-	defer client.Disconnect()
+	client, err := pool.GetConnection(sessionID)
 	if err != nil {
 		log.Println(err)
 		return result, err

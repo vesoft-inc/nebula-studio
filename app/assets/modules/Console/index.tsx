@@ -1,5 +1,4 @@
 import { Button, Icon, List, message, Modal, Tooltip } from 'antd';
-import cookies from 'js-cookie';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { RouteComponentProps } from 'react-router-dom';
@@ -88,21 +87,7 @@ class Console extends React.Component<IProps, IState> {
   };
 
   runNGQL = async (code: string) => {
-    const username = cookies.get('username');
-    const password = cookies.get('password');
-    const host = cookies.get('host');
-    if (!username || !password || !host) {
-      message.warning(intl.get('warning.configServer'));
-      this.setState({
-        code: ':config server',
-        outType: OutType.command,
-      });
-      return;
-    }
     const result = await service.execNGQL({
-      username,
-      password,
-      host,
       gql: code,
     });
     this.setState({
