@@ -23,9 +23,6 @@ const mapState = (state: IRootState) => {
       state.nebula.edgeTypes,
       edgesConfig.map(e => e.type),
     ),
-    host: state.nebula.host,
-    username: state.nebula.username,
-    password: state.nebula.password,
     loading: state.loading.effects.importData.asyncUpdateEdgeConfig,
     space: state.nebula.currentSpace,
   };
@@ -42,12 +39,7 @@ interface IProps
 
 class Edge extends React.Component<IProps> {
   handleEdgeTypeChange = async edgeType => {
-    const { host, username, password, space } = this.props;
     await this.props.asyncUpdateEdgeConfig({
-      host,
-      username,
-      password,
-      space,
       edgeType,
     });
   };

@@ -8,9 +8,6 @@ const { Option } = Select;
 
 const mapState = (state: IRootState) => ({
   spaces: state.nebula.spaces,
-  host: state.nebula.host,
-  username: state.nebula.username,
-  password: state.nebula.password,
   loading: state.loading.effects.nebula.asyncGetSpaces,
 });
 
@@ -30,12 +27,7 @@ class SpaceSearchInput extends React.Component<IProps> {
     this.getSpaces();
   }
   getSpaces = () => {
-    const { host, username, password } = this.props;
-    this.props.asyncGetSpaces({
-      host,
-      username,
-      password,
-    });
+    this.props.asyncGetSpaces();
   };
 
   render() {

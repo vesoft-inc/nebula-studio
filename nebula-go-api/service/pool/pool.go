@@ -3,25 +3,47 @@ package pool
 import (
 	"errors"
 	"log"
+	"sync"
 	"time"
 
 	nebula "github.com/vesoft-inc/nebula-go"
+	"github.com/vesoft-inc/nebula-go/nebula/graph"
 )
 
-type Connection struct {
-	updateTime int64
-	client     *nebula.GraphClient
+type ChannelResponse struct {
+	Result *graph.ExecutionResponse
+	Error  error
 }
 
-var connectionPool = make(map[int64]Connection)
-var maxConnectionNum = 200
+type ChannelRequest struct {
+	Gql             string
+	ResponseChannel chan ChannelResponse
+}
+
+type Connection struct {
+	RequestChannel chan ChannelRequest
+	CloseChannel   chan bool
+	updateTime     int64
+	client         *nebula.GraphClient
+}
+
+const (
+	maxConnectionNum  = 200
+	secondsOfHalfHour = int64(30 * 60)
+)
+
+var connectionPool = make(map[int64]*Connection)
 var currentConnectionNum = 0
+var connectLock sync.Mutex
 
 func NewConnection(host, username, password string) (sessionID int64, err error) {
-	RecoverConnections()
+	connectLock.Lock()
+	defer connectLock.Unlock()
+	recoverConnections()
 	if currentConnectionNum >= maxConnectionNum {
 		return -1, errors.New("Too many connections to nebula db")
 	}
+
 	client, err := nebula.NewClient(host)
 	if err != nil {
 		log.Println(err)
@@ -31,40 +53,59 @@ func NewConnection(host, username, password string) (sessionID int64, err error)
 	if err != nil {
 		return 0, err
 	}
-	currentConnectionNum++
 	sessionID = client.GetSessionID()
-	connectionPool[sessionID] = Connection{
-		updateTime: time.Now().Unix(),
-		client:     client,
+	currentConnectionNum++
+	connectionPool[sessionID] = &Connection{
+		updateTime:     time.Now().Unix(),
+		client:         client,
+		RequestChannel: make(chan ChannelRequest),
+		CloseChannel:   make(chan bool),
 	}
+
+	// Make a goroutine to deal with concurrent requests from each connection
+	go func() {
+		connection := connectionPool[sessionID]
+		for {
+			select {
+			case request := <-connection.RequestChannel:
+				response, err := connection.client.Execute(request.Gql)
+				request.ResponseChannel <- ChannelResponse{
+					Result: response,
+					Error:  err,
+				}
+			case <-connection.CloseChannel:
+				connection.client.Disconnect()
+				connectLock.Lock()
+				delete(connectionPool, sessionID)
+				currentConnectionNum--
+				connectLock.Unlock()
+				// Exit loop
+				return
+			}
+		}
+	}()
 
 	return sessionID, nil
 }
 
-func GetConnection(sessionID int64) (client *nebula.GraphClient, err error) {
+func GetConnection(sessionID int64) (connection *Connection, err error) {
+	connectLock.Lock()
+	defer connectLock.Unlock()
+
 	connection, ok := connectionPool[sessionID]
 	if ok {
 		connection.updateTime = time.Now().Unix()
-		return connection.client, nil
+		return connection, nil
 	}
 	return nil, errors.New("connection refused for being released")
 }
 
-func RecoverConnections() {
+func recoverConnections() {
 	nowTimeStamps := time.Now().Unix()
-	secondsOfHalfHour := int64(30 * 60)
-	for sessionID, connection := range connectionPool {
+	for _, connection := range connectionPool {
 		// release connection if not use over 30minutes
 		if nowTimeStamps-connection.updateTime > secondsOfHalfHour {
-			defer DisConnect(sessionID)
+			connection.CloseChannel <- true
 		}
-	}
-}
-
-func DisConnect(sessionID int64) {
-	if connection, ok := connectionPool[sessionID]; ok {
-		defer connection.client.Disconnect()
-		delete(connectionPool, sessionID)
-		currentConnectionNum--
 	}
 }

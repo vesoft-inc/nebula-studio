@@ -18,9 +18,6 @@ const mapState = (state: IRootState) => ({
   edges: state.explore.edges,
   selectVertexes: state.explore.selectVertexes,
   actionData: state.explore.actionData,
-  host: state.nebula.host,
-  username: state.nebula.username,
-  password: state.nebula.password,
   space: state.nebula.currentSpace,
   tagsFields: state.nebula.tagsFields,
   tags: state.nebula.tags,
@@ -176,19 +173,8 @@ class NebulaGraph extends React.Component<IProps, IState> {
   };
 
   handleSetting = async () => {
-    const {
-      username,
-      host,
-      password,
-      space,
-      asyncGetTagsName,
-      tags,
-    } = this.props;
+    const { asyncGetTagsName, tags } = this.props;
     await asyncGetTagsName({
-      username,
-      host,
-      password,
-      space,
       tags,
     });
     this.settingHandler.show();

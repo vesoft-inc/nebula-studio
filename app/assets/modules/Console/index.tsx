@@ -1,32 +1,41 @@
 import { Button, Icon, List, message, Modal, Tooltip } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
+import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { CodeMirror, OutputBox } from '#assets/components';
 import { maxLineNum } from '#assets/config/nebulaQL';
-import service from '#assets/config/service';
+import { IDispatch, IRootState } from '#assets/store';
 import { trackEvent, trackPageView } from '#assets/utils/stat';
 
-import Command from './Command';
 import './index.less';
 import SpaceSearchInput from './SpaceSearchInput';
 
-enum OutType {
-  nGQL = 'NGQL',
-  command = 'command',
-}
-
 interface IState {
-  code: string;
   isUpDown: boolean;
   history: boolean;
-  space: string;
-  result: any;
-  outType: OutType;
 }
 
-type IProps = RouteComponentProps;
+const mapState = (state: IRootState) => ({
+  result: state.console.result,
+  currentGQL: state.console.currentGQL,
+  currentSpace: state.nebula.currentSpace,
+});
+
+const mapDispatch = (dispatch: IDispatch) => ({
+  asyncRunGQL: dispatch.console.asyncRunGQL,
+  updateCurrentGQL: gql =>
+    dispatch.console.update({
+      currentGQL: gql,
+    }),
+  asyncSwitchSpace: dispatch.nebula.asyncSwitchSpace,
+});
+
+interface IProps
+  extends ReturnType<typeof mapState>,
+    ReturnType<typeof mapDispatch>,
+    RouteComponentProps {}
 
 class Console extends React.Component<IProps, IState> {
   codemirror;
@@ -36,12 +45,8 @@ class Console extends React.Component<IProps, IState> {
     super(props);
 
     this.state = {
-      result: {},
-      code: 'SHOW SPACES;',
       isUpDown: true,
       history: false,
-      outType: OutType.nGQL,
-      space: '',
     };
   }
 
@@ -58,64 +63,32 @@ class Console extends React.Component<IProps, IState> {
   };
 
   handleRun = async () => {
-    const { space } = this.state;
-    const code = this.editor.getValue();
-    const completeCode = space ? `use ${space};${code}` : code;
-    if (!code) {
+    const gql = this.editor.getValue();
+    if (!gql) {
       message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
       return;
     }
     this.editor.execCommand('goDocEnd');
     const history = this.getLocalStorage();
-    history.push(completeCode);
+    history.push(gql);
     localStorage.setItem('history', JSON.stringify(history));
 
-    if (code.length && code.trim()[0] === ':') {
-      this.setState({
-        outType: OutType.command,
-        code,
-      });
-    } else {
-      this.setState({
-        outType: OutType.nGQL,
-        code,
-      });
-      await this.runNGQL(completeCode);
-    }
-
+    await this.props.asyncRunGQL(gql);
+    this.setState({
+      isUpDown: true,
+    });
     trackEvent('console', 'run');
   };
 
-  runNGQL = async (code: string) => {
-    const result = await service.execNGQL({
-      gql: code,
-    });
-    this.setState({
-      result,
-      isUpDown: true,
-    });
-  };
-
   handleHistoryItem = (value: string) => {
-    let code = value;
-    let space = '';
-    if (value.includes('use')) {
-      const str = value.split(';', 1)[0];
-      space = str.substring(4);
-      code = value.substring(str.length + 1);
-    }
+    this.props.updateCurrentGQL(value);
     this.setState({
-      code,
-      space,
-      outType: value[0] === ':' ? OutType.command : OutType.nGQL,
       history: false,
     });
   };
 
   handleEmptyNgql = () => {
-    this.setState({
-      code: '',
-    });
+    this.props.updateCurrentGQL('');
   };
 
   getInstance = instance => {
@@ -150,14 +123,9 @@ class Console extends React.Component<IProps, IState> {
     return str.substring(0, 300) + '...';
   };
 
-  handleSpaceChange = value => {
-    this.setState({
-      space: value,
-    });
-  };
-
   render() {
-    const { isUpDown, code, history, result, outType, space } = this.state;
+    const { isUpDown, history } = this.state;
+    const { currentSpace, currentGQL, result } = this.props;
     return (
       <div className="nebula-console">
         <div className="ngql-content">
@@ -165,15 +133,15 @@ class Console extends React.Component<IProps, IState> {
             <div className="mirror-nav">
               USE:
               <SpaceSearchInput
-                onSpaceChange={this.handleSpaceChange}
-                value={space}
+                onSpaceChange={this.props.asyncSwitchSpace}
+                value={currentSpace}
               />
               <Tooltip title={intl.get('common.spaceTip')} placement="right">
                 <Icon type="question-circle" theme="outlined" />
               </Tooltip>
             </div>
             <CodeMirror
-              value={code}
+              value={currentGQL}
               onChangeLine={this.handleLineCount}
               ref={this.getInstance}
               height={isUpDown ? '120px' : 24 * maxLineNum + 'px'}
@@ -183,11 +151,6 @@ class Console extends React.Component<IProps, IState> {
                 mode: 'nebula',
               }}
             />
-            {/*<div className="expand" onClick={this.handleUpDown}>
-                {
-                  isUpDown ? <Icon type="down" /> : <Icon type="up" />
-                }
-              </div>*/}
           </div>
           <Tooltip title={intl.get('common.empty')} placement="bottom">
             <Icon type="edit" onClick={() => this.handleEmptyNgql()} />
@@ -206,15 +169,11 @@ class Console extends React.Component<IProps, IState> {
           >
             {intl.get('common.seeTheHistory')}
           </Button>
-          {outType === OutType.nGQL ? (
-            <OutputBox
-              result={result}
-              value={this.getLocalStorage().pop()}
-              onHistoryItem={e => this.handleHistoryItem(e)}
-            />
-          ) : (
-            <Command command={code.substr(1)} />
-          )}
+          <OutputBox
+            result={result}
+            value={this.getLocalStorage().pop()}
+            onHistoryItem={e => this.handleHistoryItem(e)}
+          />
         </div>
         <Modal
           title={intl.get('common.NGQLHistoryList')}
@@ -246,4 +205,4 @@ class Console extends React.Component<IProps, IState> {
   }
 }
 
-export default Console;
+export default connect(mapState, mapDispatch)(Console);

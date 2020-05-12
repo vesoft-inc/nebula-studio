@@ -53,20 +53,28 @@ func Execute(sessionID int64, gql string) (result ExecuteResult, err error) {
 		Headers: make([]string, 0),
 		Tables:  make([]map[string]common.Any, 0),
 	}
-	client, err := pool.GetConnection(sessionID)
+	connection, err := pool.GetConnection(sessionID)
 	if err != nil {
 		log.Println(err)
 		return result, err
 	}
-	resp, err := client.Execute(gql)
-	if err != nil {
-		log.Println(err)
-		return result, err
+	responseChannel := make(chan pool.ChannelResponse)
+	connection.RequestChannel <- pool.ChannelRequest{
+		Gql:             gql,
+		ResponseChannel: responseChannel,
+	}
+	response := <-responseChannel
+
+	var resp *graph.ExecutionResponse
+	if response.Error != nil {
+		log.Println(response.Error)
+		return result, response.Error
 	} else {
-		if resp.GetErrorCode() != graph.ErrorCode_SUCCEEDED {
-			log.Printf("ErrorCode: %v, ErrorMsg: %s", resp.GetErrorCode(), resp.GetErrorMsg)
+		if response.Result.GetErrorCode() != graph.ErrorCode_SUCCEEDED {
+			log.Printf("ErrorCode: %v, ErrorMsg: %s", response.Result.GetErrorCode(), response.Result.GetErrorMsg)
 			return result, errors.New(resp.GetErrorMsg())
 		}
+		resp = response.Result
 	}
 
 	columns := resp.GetColumnNames()

@@ -93,23 +93,14 @@ export const explore = createModel({
     },
   },
   effects: {
-    async asyncImportNodes(payload: {
-      host: string;
-      username: string;
-      password: string;
-      space: string;
-      ids: string;
-    }) {
-      const { host, username, password, space, ids } = payload;
+    async asyncImportNodes(payload: { ids: string }) {
+      const { ids } = payload;
       const newVertexes = await Promise.all(
         ids
           .trim()
           .split('\n')
           .map(async id => {
-            const nodeProp = await fetchVertexProps(
-              { space, host, username, password },
-              id,
-            );
+            const nodeProp = await fetchVertexProps(id);
             const tags =
               nodeProp && nodeProp.headers
                 ? _.sortedUniq(
@@ -177,10 +168,6 @@ export const explore = createModel({
     },
 
     async asyncGetExpand(payload: {
-      host: string;
-      username: string;
-      password: string;
-      space: string;
       selectVertexes: any[];
       edgeTypes: string[];
       edgeDirection: string;
@@ -189,10 +176,6 @@ export const explore = createModel({
       vertexColor: string;
     }) {
       const {
-        host,
-        username,
-        password,
-        space,
         selectVertexes,
         edgeTypes,
         edgeDirection,
@@ -214,7 +197,6 @@ export const explore = createModel({
           direction = ''; // default outgoing
       }
       const gql = `
-        use ${space};
         GO FROM ${selectVertexes.map(d => d.name)} OVER ${edgeTypes.join(
         ',',
       )} ${direction} ${wheres ? `WHERE ${wheres}` : ''} yield ${edgeTypes
@@ -225,9 +207,6 @@ export const explore = createModel({
         .join(',')};
       `;
       const { code, data, message } = (await service.execNGQL({
-        host,
-        username,
-        password,
         gql,
       })) as any;
 
@@ -239,10 +218,7 @@ export const explore = createModel({
         );
         const newVertexes = await Promise.all(
           vertexes.map(async v => {
-            const nodeProp = await fetchVertexProps(
-              { space, host, username, password },
-              v.name,
-            );
+            const nodeProp = await fetchVertexProps(v.name);
             if (vertexColor === 'groupByTag') {
               const tags =
                 nodeProp && nodeProp.headers

@@ -4,12 +4,12 @@ import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
 import service from '#assets/config/service';
-import { IDispatch } from '#assets/store';
+import { IDispatch, IRootState } from '#assets/store';
 import { configToJson, getStringByteLength } from '#assets/utils/import';
 import { trackEvent, trackPageView } from '#assets/utils/stat';
 
 const { TabPane } = Tabs;
-const mapState = (state: any) => ({
+const mapState = (state: IRootState) => ({
   activeStep: state.importData.activeStep,
   importLoading: state.loading.effects.importData.importData,
   mountPath: state.importData.mountPath,

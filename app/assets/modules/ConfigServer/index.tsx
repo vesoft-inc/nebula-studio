@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 
 import ConfigServerForm from '#assets/components/ConfigServerForm';
-import { IDispatch, IRootState } from '#assets/store';
+import { IDispatch } from '#assets/store';
 import { trackPageView } from '#assets/utils/stat';
 
 import './index.less';
@@ -14,11 +14,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
   asyncConfigServer: dispatch.nebula.asyncConfigServer,
 });
 
-const mapState = (state: IRootState) => ({
-  host: state.nebula.host,
-  username: state.nebula.username,
-  password: state.nebula.password,
-});
+const mapState = () => ({});
 
 interface IProps
   extends ReturnType<typeof mapState>,
@@ -26,26 +22,17 @@ interface IProps
     RouteComponentProps {}
 
 class ConfigServer extends React.Component<IProps> {
-  checkIsNeedConfig = () => {
-    const { username, host, password } = this.props;
-    if (username && host && password) {
-      this.props.history.push('/');
-    }
-  };
-
   componentDidMount() {
-    this.checkIsNeedConfig();
     trackPageView('/config-server');
-  }
-
-  componentDidUpdate() {
-    this.checkIsNeedConfig();
   }
 
   handleConfigServer = (form: WrappedFormUtils) => {
     form.validateFields(async (err, data) => {
       if (!err) {
-        await this.props.asyncConfigServer(data);
+        const ok = await this.props.asyncConfigServer(data);
+        if (ok) {
+          this.props.history.push('/');
+        }
       }
     });
   };

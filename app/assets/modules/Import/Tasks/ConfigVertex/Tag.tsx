@@ -20,9 +20,6 @@ const mapState = (state: IRootState) => {
       state.nebula.tags,
       vertex.tags.map(tag => tag.name),
     ),
-    host: state.nebula.host,
-    username: state.nebula.username,
-    password: state.nebula.password,
     currentSpace: state.nebula.currentSpace,
     vertex,
   };
@@ -49,18 +46,8 @@ const Option = Select.Option;
 
 class Tag extends React.Component<IProps> {
   handleTagChange = async tag => {
-    const {
-      host,
-      username,
-      password,
-      currentSpace: space,
-      index: tagIndex,
-    } = this.props;
+    const { index: tagIndex } = this.props;
     await this.props.asyncUpdateTagConfig({
-      host,
-      username,
-      password,
-      space,
       tagIndex,
       tag,
     });

@@ -1,14 +1,8 @@
 import service from '#assets/config/service';
 
-export async function fetchVertexProps(
-  { space, host, username, password }: any,
-  id: any,
-) {
-  const gql = `use ${space}; fetch prop on * ${id}`;
+export async function fetchVertexProps(id: any) {
+  const gql = `fetch prop on * ${id}`;
   const { data } = (await service.execNGQL({
-    host,
-    username,
-    password,
     gql,
   })) as any;
   return data;

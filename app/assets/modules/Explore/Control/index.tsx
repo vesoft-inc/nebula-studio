@@ -13,9 +13,6 @@ const Option = Select.Option;
 const FormItem = Form.Item;
 
 const mapState = (state: IRootState) => ({
-  host: state.nebula.host,
-  username: state.nebula.username,
-  password: state.nebula.password,
   spaces: state.nebula.spaces,
   currentSpace: state.nebula.currentSpace,
 });
@@ -30,28 +27,20 @@ const mapDispatch = (dispatch: IDispatch) => ({
       actionData: [],
       step: 0,
     }),
-  updateSpace: space => {
-    dispatch.nebula.update({
-      currentSpace: space,
-      tagsName: [],
-    });
+  asyncSwitchSpace: async space => {
+    await dispatch.nebula.asyncSwitchSpace(space);
+    await dispatch.nebula.asyncGetTags();
     dispatch.explore.update({
       exploreRules: {},
     });
   },
-  asyncGetTags: dispatch.nebula.asyncGetTags,
 });
 
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
 class Control extends React.Component<IProps, {}> {
   importNodesHandler;
   componentDidMount() {
-    const { host, username, password } = this.props;
-    this.props.asyncGetSpaces({
-      host,
-      username,
-      password,
-    });
+    this.props.asyncGetSpaces();
   }
 
   handleSelect = space => {
@@ -60,14 +49,7 @@ class Control extends React.Component<IProps, {}> {
       okText: intl.get('common.ok'),
       cancelText: intl.get('common.cancel'),
       onOk: () => {
-        this.props.updateSpace(space);
-        const { username, host, password } = this.props;
-        this.props.asyncGetTags({
-          username,
-          host,
-          password,
-          space,
-        });
+        this.props.asyncSwitchSpace(space);
         this.props.clear();
       },
     });

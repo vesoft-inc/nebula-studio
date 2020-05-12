@@ -13,10 +13,6 @@ const Option = Select.Option;
 
 const mapState = (state: IRootState) => ({
   edgeTypes: state.nebula.edgeTypes,
-  host: state.nebula.host,
-  username: state.nebula.username,
-  password: state.nebula.password,
-  currentSpace: state.nebula.currentSpace,
   selectVertexes: state.explore.selectVertexes,
   exploreStep: state.explore.step,
   exploreRules: state.explore.exploreRules,
@@ -57,13 +53,7 @@ class Expand extends React.Component<IProps, IState> {
   }
 
   componentDidMount() {
-    const { host, username, password, currentSpace } = this.props;
-    this.props.asyncGetEdgeTypes({
-      host,
-      username,
-      password,
-      space: currentSpace,
-    });
+    this.props.asyncGetEdgeTypes();
   }
 
   handleFilterInputChange = e => {
@@ -91,24 +81,13 @@ class Expand extends React.Component<IProps, IState> {
   };
 
   handleExpand = () => {
-    const {
-      host,
-      username,
-      password,
-      currentSpace,
-      selectVertexes,
-      exploreStep,
-    } = this.props;
+    const { selectVertexes, exploreStep } = this.props;
     const { getFieldValue } = this.props.form;
     const { filters } = this.state;
     const edgeTypes = getFieldValue('edgeTypes');
     const edgeDirection = getFieldValue('edgeDirection');
     const vertexColor = getFieldValue('vertexColor');
     (this.props.asyncGetExpand({
-      host,
-      username,
-      password,
-      space: currentSpace,
       filters,
       selectVertexes,
       edgeTypes,

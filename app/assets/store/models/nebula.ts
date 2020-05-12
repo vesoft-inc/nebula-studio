@@ -19,10 +19,10 @@ interface IState {
 
 export const nebula = createModel({
   state: {
+    username: cookies.get('nu'),
+    host: cookies.get('nh'),
+    password: cookies.get('np'),
     spaces: [],
-    host: cookies.get('host'),
-    username: cookies.get('username'),
-    password: cookies.get('password'),
     currentSpace: '',
     edgeTypes: [],
     tags: [],
@@ -55,16 +55,13 @@ export const nebula = createModel({
       };
     },
 
-    clearConfig: (state: IState) => {
-      cookies.remove('host');
-      cookies.remove('username');
-      cookies.remove('password');
-      return {
-        ...state,
-        host: '',
-        username: '',
-        password: '',
-      };
+    clearConfig: () => {
+      cookies.remove('nh');
+      cookies.remove('nu');
+      cookies.remove('np');
+      setTimeout(() => {
+        window.location.href = '/config-server';
+      });
     },
   },
   effects: {
@@ -80,35 +77,40 @@ export const nebula = createModel({
       if (host.startsWith('https://')) {
         payload.host = host.substr(8);
       }
-      const { code, message: errorMessage } = (await service.connectDB(
-        payload,
-      )) as any;
+      const { code, message: errorMessage } = (await service.connectDB({
+        host,
+        username,
+        password,
+      })) as any;
       if (code === '0') {
         trackEvent('connect', 'success');
+        message.success(intl.get('configServer.success'));
+        cookies.set('nh', host);
+        cookies.set('nu', username);
+        cookies.set('np', password);
         this.update({
-          host: payload.host,
+          host,
           username,
           password,
         });
-        message.success(intl.get('configServer.success'));
         return true;
       } else {
         trackEvent('connect', 'fail');
         message.error(`${intl.get('configServer.fail')}: ${errorMessage}`);
+        this.update({
+          host: '',
+          username: '',
+          password: '',
+        });
+        cookies.remove('nh');
+        cookies.remove('nu');
+        cookies.remove('np');
         return false;
       }
     },
 
-    async asyncGetSpaces(payload: {
-      host: string;
-      username: string;
-      password: string;
-    }) {
-      const { host, username, password } = payload;
+    async asyncGetSpaces() {
       const { code, data } = (await service.execNGQL({
-        host,
-        username,
-        password,
         gql: 'show spaces;',
       })) as any;
       if (code === '0') {
@@ -118,19 +120,9 @@ export const nebula = createModel({
       }
     },
 
-    async asyncGetTags(payload: {
-      host: string;
-      username: string;
-      password: string;
-      space: string;
-    }) {
-      const { host, username, password, space } = payload;
+    async asyncGetTags() {
       const { code, data } = (await service.execNGQL({
-        host,
-        username,
-        password,
         gql: `
-          use ${space};
           SHOW TAGS;
         `,
       })) as any;
@@ -143,24 +135,12 @@ export const nebula = createModel({
       return { code, data };
     },
 
-    async asyncGetTagsName(payload: {
-      host: string;
-      username: string;
-      password: string;
-      space: string;
-      tags: any[];
-    }) {
-      const { host, username, password, space, tags } = payload;
+    async asyncGetTagsName(payload: { tags: any[] }) {
+      const { tags } = payload;
       await Promise.all(
         tags.map(async item => {
           const { code, data } = (await service.execNGQL({
-            host,
-            username,
-            password,
-            gql: `
-          use ${space};
-          desc tag ${item};
-        `,
+            gql: `desc tag ${item};`,
           })) as any;
           if (code === '0') {
             const Names = data.tables.map(item => item.Field);
@@ -170,25 +150,27 @@ export const nebula = createModel({
       );
     },
 
-    async asyncGetEdgeTypes(payload: {
-      host: string;
-      username: string;
-      password: string;
-      space: string;
-    }) {
-      const { host, username, password, space } = payload;
+    async asyncGetEdgeTypes() {
       const { code, data } = (await service.execNGQL({
-        host,
-        username,
-        password,
         gql: `
-          use ${space};
           show edges;
         `,
       })) as any;
       if (code === '0') {
         this.update({
           edgeTypes: data.tables.map(item => item.Name),
+        });
+      }
+    },
+
+    async asyncSwitchSpace(space: string) {
+      const { code } = (await service.execNGQL({
+        gql: `use ${space};`,
+      })) as any;
+
+      if (code === '0') {
+        this.update({
+          currentSpace: space,
         });
       }
     },

@@ -311,22 +311,10 @@ export const importData = createModel({
       return errCode;
     },
 
-    async asyncUpdateEdgeConfig(payload: {
-      host: string;
-      username: string;
-      password: string;
-      space: string;
-      edgeType: string;
-    }) {
-      const { host, username, password, edgeType, space } = payload;
+    async asyncUpdateEdgeConfig(payload: { edgeType: string }) {
+      const { edgeType } = payload;
       const { code, data } = (await service.execNGQL({
-        host,
-        username,
-        password,
-        gql: `
-          use ${space};
-          DESCRIBE EDGE ${edgeType};
-        `,
+        gql: `DESCRIBE EDGE ${edgeType};`,
       })) as any;
       if (code === '0') {
         const props = data.tables.map(item => ({
@@ -362,23 +350,10 @@ export const importData = createModel({
       }
     },
 
-    async asyncUpdateTagConfig(payload: {
-      host: string;
-      username: string;
-      password: string;
-      space: string;
-      tag: string;
-      tagIndex: number;
-    }) {
-      const { host, username, password, space, tag, tagIndex } = payload;
+    async asyncUpdateTagConfig(payload: { tag: string; tagIndex: number }) {
+      const { tag, tagIndex } = payload;
       const { code, data } = (await service.execNGQL({
-        host,
-        username,
-        password,
-        gql: `
-          use ${space};
-          DESCRIBE TAG ${tag}
-        `,
+        gql: `DESCRIBE TAG ${tag}`,
       })) as any;
       if (code === '0') {
         const props = data.tables.map(attr => ({

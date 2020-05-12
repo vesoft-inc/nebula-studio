@@ -10,9 +10,6 @@ import { trackPageView } from '#assets/utils/stat';
 import './Init.less';
 
 const mapState = (state: IRootState) => ({
-  host: state.nebula.host,
-  username: state.nebula.username,
-  password: state.nebula.password,
   spaces: state.nebula.spaces,
   currentSpace: state.nebula.currentSpace,
   currentStep: state.importData.currentStep,
@@ -21,10 +18,10 @@ const mapState = (state: IRootState) => ({
 
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetSpaces: dispatch.nebula.asyncGetSpaces,
-  updateCurrentSpace: space => {
-    dispatch.nebula.update({
-      currentSpace: space,
-    });
+  asyncSwitchSpace: async space => {
+    await dispatch.nebula.asyncSwitchSpace(space);
+    await dispatch.nebula.asyncGetTags();
+    await dispatch.nebula.asyncGetEdgeTypes();
   },
   asyncGetTags: dispatch.nebula.asyncGetTags,
   asyncGetImportWorkingDir: dispatch.importData.asyncGetImportWorkingDir,
@@ -42,13 +39,8 @@ interface IProps
 
 class Init extends React.Component<IProps, {}> {
   componentDidMount() {
-    const { host, username, password } = this.props;
     this.props.asyncGetImportWorkingDir();
-    this.props.asyncGetSpaces({
-      host,
-      username,
-      password,
-    });
+    this.props.asyncGetSpaces();
 
     trackPageView('/import/init');
   }
@@ -56,21 +48,8 @@ class Init extends React.Component<IProps, {}> {
   handleNext = () => {
     this.props.form.validateFields((err, values: any) => {
       const { space } = values;
-      const { username, host, password } = this.props;
       if (!err && space) {
-        this.props.updateCurrentSpace(space);
-        this.props.asyncGetTags({
-          username,
-          host,
-          password,
-          space,
-        });
-        this.props.asyncGetEdgeTypes({
-          username,
-          host,
-          password,
-          space,
-        });
+        this.props.asyncSwitchSpace(space);
         this.props.nextStep();
       }
     });
@@ -105,16 +84,6 @@ class Init extends React.Component<IProps, {}> {
               </Select>,
             )}
           </FormItem>
-          {/* <FormItem label={intl.get('import.mountPath')}>
-            {getFieldDecorator('mountPath', {
-              initialValue: mountPath,
-              rules: [
-                {
-                  required: true,
-                },
-              ],
-            })(<Input placeholder={intl.get('import.mountPathPlaceholder')} />)}
-          </FormItem> */}
         </Form>
         <Button
           type="primary"

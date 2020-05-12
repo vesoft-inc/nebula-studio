@@ -34,23 +34,23 @@ class Next extends React.Component<IProps> {
   handleNext = async () => {
     const {
       currentSpace,
-      username,
-      password,
-      host,
       vertexesConfig,
       edgesConfig,
       mountPath,
       activeStep,
+      host,
+      username,
+      password,
     } = this.props;
     const errCode: any = await this.props.testImport({
       currentSpace,
-      username,
-      password,
-      host,
       vertexesConfig,
       edgesConfig,
       mountPath,
       activeStep,
+      host,
+      username,
+      password,
     });
     if (!vertexesConfig.length && !edgesConfig.length) {
       this.props.nextStep();
