@@ -10,6 +10,11 @@ import (
 	"github.com/vesoft-inc/nebula-go/nebula/graph"
 )
 
+type Account struct {
+	username string
+	password string
+}
+
 type ChannelResponse struct {
 	Result *graph.ExecutionResponse
 	Error  error
@@ -25,6 +30,7 @@ type Connection struct {
 	CloseChannel   chan bool
 	updateTime     int64
 	client         *nebula.GraphClient
+	account        *Account
 }
 
 const (
@@ -56,10 +62,14 @@ func NewConnection(host, username, password string) (sessionID int64, err error)
 	sessionID = client.GetSessionID()
 	currentConnectionNum++
 	connectionPool[sessionID] = &Connection{
-		updateTime:     time.Now().Unix(),
-		client:         client,
 		RequestChannel: make(chan ChannelRequest),
 		CloseChannel:   make(chan bool),
+		updateTime:     time.Now().Unix(),
+		client:         client,
+		account: &Account{
+			username: username,
+			password: password,
+		},
 	}
 
 	// Make a goroutine to deal with concurrent requests from each connection
@@ -98,6 +108,13 @@ func GetConnection(sessionID int64) (connection *Connection, err error) {
 		return connection, nil
 	}
 	return nil, errors.New("connection refused for being released")
+}
+
+func ReConnect(connection *Connection) (err error) {
+	connection.client.Disconnect()
+	err = connection.client.Connect(connection.account.username, connection.account.password)
+
+	return err
 }
 
 func recoverConnections() {

@@ -6,6 +6,7 @@ import (
 	pool "nebula-go-api/service/pool"
 	common "nebula-go-api/utils"
 	"strconv"
+	"strings"
 
 	graph "github.com/vesoft-inc/nebula-go/nebula/graph"
 )
@@ -68,6 +69,17 @@ func Execute(sessionID int64, gql string) (result ExecuteResult, err error) {
 	var resp *graph.ExecutionResponse
 	if response.Error != nil {
 		log.Println(response.Error)
+		// the connection may be failed for broken pipe
+		if strings.Contains(response.Error.Error(), "write: broken pipe") {
+			// try reconnect
+			err := pool.ReConnect(connection)
+			if err == nil {
+				return Execute(sessionID, gql)
+			} else {
+				return result, errors.New("connect refused for network")
+			}
+		}
+
 		return result, response.Error
 	} else {
 		if response.Result.GetErrorCode() != graph.ErrorCode_SUCCEEDED {
