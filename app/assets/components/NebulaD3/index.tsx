@@ -90,26 +90,20 @@ class NebulaD3 extends React.Component<IProps, {}> {
     isMultiSelect: false,
   };
 
-  handleCmdPress = event => {
-    if (event.keyCode === 91 || event.keyCode === 93) {
+  handleShiftPress = event => {
+    if (event.keyCode === 16) {
       this.setState({
         isMultiSelect: true,
       });
     }
   };
 
-  handleCmdUp = event => {
-    if (event.keyCode === 91 || event.keyCode === 93) {
+  handleShiftUp = event => {
+    if (event.keyCode === 16) {
       this.setState({
         isMultiSelect: false,
       });
     }
-  };
-
-  handleWinBlur = () => {
-    this.setState({
-      isMultiSelect: false,
-    });
   };
 
   componentDidMount() {
@@ -141,15 +135,13 @@ class NebulaD3 extends React.Component<IProps, {}> {
         this.selectedNodes = [];
       }
     });
-    window.addEventListener('keydown', this.handleCmdPress);
-    window.addEventListener('blur', this.handleWinBlur);
-    window.addEventListener('keyup', this.handleCmdUp);
+    window.addEventListener('keydown', this.handleShiftPress);
+    window.addEventListener('keyup', this.handleShiftUp);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleCmdPress);
-    window.removeEventListener('blur', this.handleWinBlur);
-    window.removeEventListener('keyup', this.handleCmdUp);
+    window.removeEventListener('keydown', this.handleShiftPress);
+    window.removeEventListener('keyup', this.handleShiftUp);
   }
 
   handleNodeClick = (d: any) => {
