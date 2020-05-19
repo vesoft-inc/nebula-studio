@@ -12,6 +12,39 @@ interface IProps {
   prop?: string;
 }
 
+// TODO: move it into a npm package in future
+function csvToArray(content, delimiter) {
+  return content.split('\n').map((row: string) => {
+    const cols = [] as string[];
+    let isQuoteOpen = false;
+    let isQuoteClose = false;
+    for (let i = 0, j = 0, len = row.length; j < len; j++) {
+      switch (row[j]) {
+        case '"':
+          if (!isQuoteOpen) {
+            isQuoteOpen = true;
+          } else {
+            isQuoteClose = true;
+          }
+          break;
+        case delimiter:
+          if (!isQuoteOpen) {
+            cols.push(row.substring(i, j));
+            i = j + 1;
+          } else if (isQuoteClose) {
+            // value by quote
+            cols.push(row.substring(i + 1, j - 1));
+            i = j + 1;
+            isQuoteClose = false;
+            isQuoteOpen = false;
+          }
+          break;
+      }
+    }
+    return cols;
+  });
+}
+
 class CSVPreviewLink extends React.PureComponent<IProps> {
   modalHandler;
   handleLinkClick = () => {
@@ -29,7 +62,7 @@ class CSVPreviewLink extends React.PureComponent<IProps> {
   render() {
     const { onMapping, prop } = this.props;
     const { content } = this.props.file;
-    const csvData = content.split('\n').map(row => row.split(','));
+    const csvData = csvToArray(content, ',');
     const columns = csvData.length
       ? csvData[0].map((_, index) => {
           const textIndex = index;
