@@ -15,7 +15,7 @@ import { keyWords, maxLineNum, operators } from '#assets/config/nebulaQL';
 interface IProps {
   options: object;
   value: string;
-  ref: any;
+  ref?: any;
   width?: string;
   height?: string;
   onChange?: (value: string) => void;

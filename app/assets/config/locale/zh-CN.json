@@ -72,7 +72,8 @@
     "confirm": "确定",
     "vertexColor": "节点颜色",
     "groupByStep": "按探索步骤分类",
-    "groupByTag": "按节点标签分类"
+    "groupByTag": "按节点标签分类",
+    "mappingNGQL": "对应的 nGQL 语句"
   },
   "import": {
     "import":"导入",

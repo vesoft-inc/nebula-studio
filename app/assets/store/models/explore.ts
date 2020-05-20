@@ -4,6 +4,7 @@ import _ from 'lodash';
 
 import service from '#assets/config/service';
 import { fetchVertexProps } from '#assets/utils/fetch';
+import { getExploreGQL } from '#assets/utils/gql';
 import { idToSrting, nebulaToData, setLink } from '#assets/utils/nebulaToData';
 
 export interface INode extends d3.SimulationNodeDatum {
@@ -25,7 +26,7 @@ interface IState {
   actionData: any[];
   step: number;
   exploreRules: {
-    edgeType?: string;
+    edgeTypes?: string[];
     edgeDirection?: string;
     vertexColor?: string;
   };
@@ -39,7 +40,7 @@ export const explore = createModel({
     actionData: [],
     step: 0,
     exploreRules: {
-      edgeType: '',
+      edgeTypes: [],
       edgeDirection: '',
       vertexColor: '',
     },
@@ -183,29 +184,13 @@ export const explore = createModel({
         exploreStep,
         vertexColor,
       } = payload;
-      const wheres = filters
-        .filter(filter => filter.field && filter.operator && filter.value)
-        .map(filter => `${filter.field} ${filter.operator} ${filter.value}`)
-        .join(' AND ');
-      let direction;
       let group;
-      switch (edgeDirection) {
-        case 'incoming':
-          direction = 'REVERSELY';
-          break;
-        default:
-          direction = ''; // default outgoing
-      }
-      const gql = `
-        GO FROM ${selectVertexes.map(d => d.name)} OVER ${edgeTypes.join(
-        ',',
-      )} ${direction} ${wheres ? `WHERE ${wheres}` : ''} yield ${edgeTypes
-        .map(
-          type =>
-            `${type}._src as ${type}SourceId, ${type}._dst as ${type}DestId, ${type}._rank as ${type}Rank`,
-        )
-        .join(',')};
-      `;
+      const gql = getExploreGQL({
+        selectVertexes,
+        edgeTypes,
+        edgeDirection,
+        filters,
+      });
       const { code, data, message } = (await service.execNGQL({
         gql,
       })) as any;

@@ -83,8 +83,8 @@ func Execute(sessionID int64, gql string) (result ExecuteResult, err error) {
 		return result, response.Error
 	} else {
 		if response.Result.GetErrorCode() != graph.ErrorCode_SUCCEEDED {
-			log.Printf("ErrorCode: %v, ErrorMsg: %s", response.Result.GetErrorCode(), response.Result.GetErrorMsg)
-			return result, errors.New(resp.GetErrorMsg())
+			log.Printf("ErrorCode: %v, ErrorMsg: %s", response.Result.GetErrorCode(), response.Result.GetErrorMsg())
+			return result, errors.New(response.Result.GetErrorMsg())
 		}
 		resp = response.Result
 	}

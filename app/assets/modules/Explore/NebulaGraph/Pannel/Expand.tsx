@@ -1,15 +1,27 @@
-import { Button, Form, Icon, Input, message, Select, Table } from 'antd';
+import {
+  Button,
+  Collapse,
+  Form,
+  Icon,
+  Input,
+  message,
+  Select,
+  Table,
+} from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
+import { CodeMirror } from '#assets/components';
 import { IDispatch, IRootState } from '#assets/store';
+import { getExploreGQL } from '#assets/utils/gql';
 import { trackEvent } from '#assets/utils/stat';
 
 import './Expand.less';
 
 const Option = Select.Option;
+const Panel = Collapse.Panel;
 
 const mapState = (state: IRootState) => ({
   edgeTypes: state.nebula.edgeTypes,
@@ -117,10 +129,20 @@ class Expand extends React.Component<IProps, IState> {
   };
 
   render() {
-    const { edgeTypes, exploreRules: rules } = this.props;
+    const { edgeTypes, exploreRules: rules, selectVertexes } = this.props;
     const { getFieldDecorator, getFieldValue } = this.props.form;
     const { filters } = this.state;
     const selectEdgeTypes = getFieldValue('edgeTypes');
+    const edgeDirection = getFieldValue('edgeDirection');
+    const currentGQL =
+      selectEdgeTypes && selectEdgeTypes.length
+        ? getExploreGQL({
+            selectVertexes,
+            edgeTypes: selectEdgeTypes,
+            filters,
+            edgeDirection,
+          })
+        : '';
     const columns = [
       {
         title: intl.get('explore.field'),
@@ -181,7 +203,7 @@ class Expand extends React.Component<IProps, IState> {
         <Form>
           <Form.Item label="Edge Type:">
             {getFieldDecorator('edgeTypes', {
-              initialValue: rules.edgeType,
+              initialValue: rules.edgeTypes,
             })(
               <Select mode="multiple">
                 {edgeTypes.map(e => (
@@ -216,15 +238,33 @@ class Expand extends React.Component<IProps, IState> {
               </Select>,
             )}
           </Form.Item>
-          <h3>{intl.get('explore.filter')}</h3>
-          <Table
-            columns={columns}
-            dataSource={filters}
-            rowKey={(_, index) => index.toString()}
-            pagination={false}
-            footer={() => <Icon onClick={this.handleFilterAdd} type="plus" />}
-          />
+          <Collapse className="filters">
+            <Panel header={intl.get('explore.filter')} key="filter">
+              <Table
+                columns={columns}
+                dataSource={filters}
+                rowKey={(_, index) => index.toString()}
+                pagination={false}
+                footer={() => (
+                  <Icon onClick={this.handleFilterAdd} type="plus" />
+                )}
+              />
+            </Panel>
+          </Collapse>
         </Form>
+        <Collapse className="explore-gql">
+          <Panel header={intl.get('explore.mappingNGQL')} key="ngql">
+            <CodeMirror
+              value={currentGQL}
+              options={{
+                keyMap: 'sublime',
+                fullScreen: true,
+                mode: 'nebula',
+                readOnly: true,
+              }}
+            />
+          </Panel>
+        </Collapse>
         <Button
           onClick={this.handleExpand}
           disabled={!selectEdgeTypes || !selectEdgeTypes.length}

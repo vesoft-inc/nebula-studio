@@ -25,6 +25,7 @@ const nebulaWordsUppercase = [
   'WHERE',
   'FIND',
   'DELETE',
+  'REVERSELY',
 ];
 
 export const operators = [
