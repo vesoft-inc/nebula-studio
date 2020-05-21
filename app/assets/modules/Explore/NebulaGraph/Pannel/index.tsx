@@ -53,6 +53,7 @@ class Panel extends React.Component<IProps, {}> {
         <Modal
           handlerRef={handler => (this.modalHandler = handler)}
           width={800}
+          maskClosable={false}
           footer={null}
         >
           <Expand close={this.handleClose} />

@@ -80,27 +80,23 @@ class NebulaD3 extends React.Component<IProps, {}> {
   link: any;
   linksText: any;
   nodeText: any;
+  isMultiSelect: boolean;
   selectedNodes: INode[] = [];
   state = {
     offsetX: 0,
     offsetY: 0,
     scale: 0,
-    isMultiSelect: false,
   };
 
   handleShiftPress = event => {
     if (event.keyCode === 16) {
-      this.setState({
-        isMultiSelect: true,
-      });
+      this.isMultiSelect = true;
     }
   };
 
   handleShiftUp = event => {
     if (event.keyCode === 16) {
-      this.setState({
-        isMultiSelect: false,
-      });
+      this.isMultiSelect = false;
     }
   };
 
@@ -143,7 +139,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
   }
 
   handleNodeClick = (d: any) => {
-    if (this.state.isMultiSelect) {
+    if (this.isMultiSelect) {
       if (this.selectedNodes.find(n => n.name === d.name)) {
         this.selectedNodes = this.selectedNodes.filter(n => n.name !== d.name);
       } else {
