@@ -19,15 +19,16 @@
 			flex-direction: column;
 
 			> .ant-tabs-content {
-				flex: 1;
-				margin-bottom: 80px;
-				// Hack: make this to make the tab content with height
-				height: 85%;
+				position: absolute;
+				top: 72px;
+				right: 0;
+				left: 0;
+				bottom: 80px;
 
 				> .ant-tabs-tabpane {
 					display: flex;
 					flex-direction: column;
-					overflow: hidden;
+					overflow: auto;
 					background: #f5fbff;
 					padding: 16px;
 

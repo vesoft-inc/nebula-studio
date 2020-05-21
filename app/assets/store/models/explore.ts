@@ -1,6 +1,8 @@
 import { createModel } from '@rematch/core';
+import { message } from 'antd';
 import * as d3 from 'd3';
 import _ from 'lodash';
+import intl from 'react-intl-universal';
 
 import service from '#assets/config/service';
 import { fetchVertexProps } from '#assets/utils/fetch';
@@ -102,29 +104,33 @@ export const explore = createModel({
           .split('\n')
           .map(async id => {
             const nodeProp = await fetchVertexProps(id);
-            const tags =
-              nodeProp && nodeProp.headers
-                ? _.sortedUniq(
-                    nodeProp.headers.map(field => {
-                      if (field === 'VertexID') {
-                        return 't';
-                      } else {
-                        return field.split('.')[0];
-                      }
-                    }),
-                  )
-                : [];
+            if (nodeProp.headers.length) {
+              const tags =
+                nodeProp && nodeProp.headers
+                  ? _.sortedUniq(
+                      nodeProp.headers.map(field => {
+                        if (field === 'VertexID') {
+                          return 't';
+                        } else {
+                          return field.split('.')[0];
+                        }
+                      }),
+                    )
+                  : [];
 
-            return {
-              name: id,
-              nodeProp,
-              step: 0,
-              group: tags.join('-'),
-            };
+              return {
+                name: id,
+                nodeProp,
+                step: 0,
+                group: tags.join('-'),
+              };
+            } else {
+              message.warning(`${id}${intl.get('import.notExist')}`);
+            }
           }),
       );
       this.addNodesAndEdges({
-        vertexes: newVertexes,
+        vertexes: newVertexes.filter(v => v !== undefined),
         edges: [],
       });
     },

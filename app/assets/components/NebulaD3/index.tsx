@@ -1,7 +1,6 @@
-import { Button } from 'antd';
+import { Slider } from 'antd';
 import * as d3 from 'd3';
 import * as React from 'react';
-import intl from 'react-intl-universal';
 
 import './index.less';
 import Links from './Links';
@@ -83,10 +82,9 @@ class NebulaD3 extends React.Component<IProps, {}> {
   nodeText: any;
   selectedNodes: INode[] = [];
   state = {
-    isZoom: false,
-    translateX: 0,
-    translateY: 0,
-    scale: 1,
+    offsetX: 0,
+    offsetY: 0,
+    scale: 0,
     isMultiSelect: false,
   };
 
@@ -379,33 +377,20 @@ class NebulaD3 extends React.Component<IProps, {}> {
     }
   };
 
-  handleZoom = () => {
-    const { isZoom } = this.state;
-    if (isZoom) {
-      this.svg.on('.zoom', null);
-      this.setState({
-        isZoom: false,
-      });
-    } else {
-      this.svg.call(
-        d3
-          .zoom()
-          .scaleExtent([0.3, 1])
-          .on('zoom', () =>
-            d3.select(this.circleRef).attr('transform', d3.event.transform),
-          )
-          .on('end', () =>
-            this.setState({
-              scale: d3.event.transform.k,
-              translateX: d3.event.transform.x,
-              translateY: d3.event.transform.y,
-            }),
-          ),
-      );
-      this.setState({
-        isZoom: true,
-      });
-    }
+  handleZoom = zoomSize => {
+    const { width, height } = this.props;
+    const scale = (100 - zoomSize) / 100;
+    const offsetX = width * (scale / 2);
+    const offsetY = height * (scale / 2);
+    this.setState({
+      scale,
+      offsetX,
+      offsetY,
+    });
+    d3.select(this.circleRef).attr(
+      'transform',
+      `translate(${offsetX} ${offsetY})`,
+    );
   };
 
   // compute to get (x,y ) of the nodes by d3-force: https://github.com/d3/d3-force/blob/v1.2.1/README.md#d3-force
@@ -487,22 +472,35 @@ class NebulaD3 extends React.Component<IProps, {}> {
   render() {
     this.computeDataByD3Force();
     const { width, height, data, onMouseInLink, onMouseOut } = this.props;
-    const { isZoom, translateX, translateY, scale } = this.state;
+    const { offsetX, offsetY, scale } = this.state;
+    const marks = {
+      0: {
+        style: {
+          fontSize: '20px',
+        },
+        label: <strong>-</strong>,
+      },
+      100: {
+        style: {
+          fontSize: '20px',
+        },
+        label: <strong>+</strong>,
+      },
+    };
     return (
       <div>
-        {data.vertexes.length !== 0 && (
-          <Button
-            type={isZoom ? 'primary' : 'default'}
-            className="graph-btn"
-            onClick={this.handleZoom}
-          >
-            {intl.get('explore.zoom')}
-          </Button>
-        )}
+        <Slider
+          defaultValue={100}
+          className="slider"
+          marks={marks}
+          vertical={true}
+          onAfterChange={this.handleZoom}
+        />
         <svg
           className="output-graph"
           ref={mountPoint => (this.ctrls.mountPoint = mountPoint)}
           width={width}
+          viewBox={`0 0 ${width * (1 + scale)}  ${height * (1 + scale)}`}
           height={height}
         >
           <g ref={(ref: SVGCircleElement) => (this.circleRef = ref)}>
@@ -520,14 +518,14 @@ class NebulaD3 extends React.Component<IProps, {}> {
               nodes={data.vertexes}
               onUpDataNodeTexts={this.handleUpdataNodeTexts}
             />
-            <SelectIds
-              nodes={data.vertexes}
-              translateX={translateX}
-              translateY={translateY}
-              scale={scale}
-              onSelectVertexes={this.props.onSelectVertexes}
-            />
           </g>
+          <SelectIds
+            nodes={data.vertexes}
+            offsetX={offsetX}
+            offsetY={offsetY}
+            scale={scale}
+            onSelectVertexes={this.props.onSelectVertexes}
+          />
         </svg>
       </div>
     );

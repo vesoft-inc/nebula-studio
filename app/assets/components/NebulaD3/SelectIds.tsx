@@ -8,8 +8,8 @@ interface INode extends d3.SimulationNodeDatum {
 
 interface IProps {
   nodes: INode[];
-  translateX: number;
-  translateY: number;
+  offsetX: number;
+  offsetY: number;
   scale: number;
   onSelectVertexes: (vertexes: any[]) => void;
 }
@@ -30,8 +30,8 @@ export default class SelectIds extends React.Component<IProps, {}> {
   }
 
   rectRender(nodes) {
-    const { translateX, translateY, scale } = this.props;
-    const startPoint = {
+    const { scale } = this.props;
+    const selectStartPosition = {
       x: 0,
       y: 0,
     };
@@ -41,54 +41,54 @@ export default class SelectIds extends React.Component<IProps, {}> {
       .style('stroke-width', '0.6')
       .style('fill', 'transparent')
       .style('stroke-opacity', '0.6');
-    // fix: startPoint  is not correct
+
     d3.selectAll('svg')
       .on('mousedown', () => {
-        startPoint.x = d3.event.offsetX - translateX * scale;
-        startPoint.y = d3.event.offsetY - translateY * scale;
+        selectStartPosition.x = d3.event.offsetX * (1 + scale);
+        selectStartPosition.y = d3.event.offsetY * (1 + scale);
       })
       .on('mousemove', () => {
-        if (startPoint.x !== 0) {
+        if (selectStartPosition.x !== 0) {
           rect
             .attr(
               'x',
-              Math.min(d3.event.offsetX - translateX * scale, startPoint.x),
+              Math.min(d3.event.offsetX * (1 + scale), selectStartPosition.x),
             )
             .attr(
               'y',
-              Math.min(d3.event.offsetY - translateY * scale, startPoint.y),
+              Math.min(d3.event.offsetY * (1 + scale), selectStartPosition.y),
             )
             .attr(
               'width',
-              Math.abs(d3.event.offsetX - translateX * scale - startPoint.x),
+              Math.abs(d3.event.offsetX * (1 + scale) - selectStartPosition.x),
             )
             .attr(
               'height',
-              Math.abs(d3.event.offsetY - translateY * scale - startPoint.y),
+              Math.abs(d3.event.offsetY * (1 + scale) - selectStartPosition.y),
             );
         }
       })
       .on('mouseup', () => {
         this.props.onSelectVertexes(
-          nodes.filter(node => !this.isNotSelected(node, startPoint)),
+          nodes.filter(node => !this.isNotSelected(node, selectStartPosition)),
         );
-        startPoint.x = 0;
-        startPoint.y = 0;
+        selectStartPosition.x = 0;
+        selectStartPosition.y = 0;
         rect.attr('width', 0).attr('height', 0);
       });
   }
 
-  isNotSelected(nodePoint, startPoint) {
-    const { translateX, translateY } = this.props;
+  isNotSelected(nodePoint, selectStartPosition) {
+    const { scale, offsetX, offsetY } = this.props;
+    const x = nodePoint.x + offsetX;
+    const y = nodePoint.y + offsetY;
+    const selectEndPositionX = d3.event.offsetX * (1 + scale);
+    const selectEndPositionY = d3.event.offsetY * (1 + scale);
     if (
-      (nodePoint.x > startPoint.x &&
-        nodePoint.x > d3.event.offsetX - translateX) ||
-      (nodePoint.x < startPoint.x &&
-        nodePoint.x < d3.event.offsetX - translateX) ||
-      (nodePoint.y > startPoint.y &&
-        nodePoint.y > d3.event.offsetY - translateY) ||
-      (nodePoint.y < startPoint.y &&
-        nodePoint.y < d3.event.offsetY - translateY)
+      (x > selectStartPosition.x && x > selectEndPositionX) ||
+      (x < selectStartPosition.x && x < selectEndPositionX) ||
+      (y > selectStartPosition.y && y > selectEndPositionY) ||
+      (y < selectStartPosition.y && y < selectEndPositionY)
     ) {
       return true;
     }

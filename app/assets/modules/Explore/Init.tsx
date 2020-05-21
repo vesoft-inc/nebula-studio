@@ -22,6 +22,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
       exploreRules: {},
     });
   },
+  asyncGetTags: dispatch.nebula.asyncGetTags,
 });
 
 interface IProps
@@ -32,10 +33,12 @@ interface IProps
 class Init extends React.Component<IProps> {
   modalHandler;
 
-  componentDidMount() {
+  async componentDidMount() {
     // if no currentSpace opne the modal to select
     if (!this.props.currentSpace) {
       this.modalHandler.show();
+    } else {
+      await this.props.asyncGetTags();
     }
   }
 

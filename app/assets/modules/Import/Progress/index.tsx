@@ -14,11 +14,6 @@ const mapState = (state: IRootState) => ({
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
-  updateActiveStep: step => {
-    dispatch.importData.update({
-      activeStep: step,
-    });
-  },
   resetAllConfig: dispatch.importData.resetAllConfig,
 });
 
@@ -27,16 +22,6 @@ interface IProps
     ReturnType<typeof mapDispatch> {}
 
 class Progress extends React.Component<IProps, {}> {
-  handleSwitchStep = step => {
-    const { currentStep, isImporting } = this.props;
-    if (isImporting) {
-      return;
-    }
-    if (step <= currentStep) {
-      this.props.updateActiveStep(step);
-    }
-  };
-
   stepsStatus = index => {
     const { currentStep, isImporting } = this.props;
     if (isImporting) {
@@ -66,11 +51,7 @@ class Progress extends React.Component<IProps, {}> {
     const { activeStep, isImporting } = this.props;
     return (
       <div className="nav-import">
-        <Steps
-          type="navigation"
-          onChange={this.handleSwitchStep}
-          current={activeStep}
-        >
+        <Steps type="navigation" current={activeStep}>
           {steps.map((step, index) => (
             <Step
               title={step.title}

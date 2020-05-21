@@ -193,6 +193,7 @@ class NebulaGraph extends React.Component<IProps, IState> {
       selectVertexes,
       actionData,
       tagsFields,
+      tags,
     } = this.props;
     const { width, height, showFields } = this.state;
     return (
@@ -200,9 +201,11 @@ class NebulaGraph extends React.Component<IProps, IState> {
         className="graph-wrap"
         ref={(ref: HTMLDivElement) => (this.ref = ref)}
       >
-        <Button className="history-show" onClick={this.handleSetting}>
-          {intl.get('explore.show')}
-        </Button>
+        {tags.length !== 0 && (
+          <Button className="history-show" onClick={this.handleSetting}>
+            {intl.get('explore.show')}
+          </Button>
+        )}
         {actionData.length !== 0 && (
           <Button className="history-undo" onClick={this.handleUndo}>
             {intl.get('explore.undo')}

@@ -42,20 +42,24 @@ class Next extends React.Component<IProps> {
       username,
       password,
     } = this.props;
+    if (!vertexesConfig.length && activeStep === 2) {
+      this.props.nextStep();
+      return;
+    }
+    if (!edgesConfig.length && activeStep === 3) {
+      this.props.nextStep();
+      return;
+    }
     const errCode: any = await this.props.testImport({
       currentSpace,
-      vertexesConfig,
-      edgesConfig,
+      vertexesConfig: activeStep === 2 ? vertexesConfig : [], // Step 3 validates only the current configuration
+      edgesConfig: activeStep === 3 ? edgesConfig : [], // Step 4 validates only the current configuration
       mountPath,
       activeStep,
       host,
       username,
       password,
     });
-    if (!vertexesConfig.length && !edgesConfig.length) {
-      this.props.nextStep();
-      return;
-    }
     if (errCode === 0) {
       this.props.nextStep();
     } else {

@@ -10,6 +10,7 @@ import { IDispatch, IRootState } from '#assets/store';
 import readFileContent from '#assets/utils/file';
 import { trackPageView } from '#assets/utils/stat';
 
+import Prev from './Prev';
 import './Upload.less';
 
 const { Option } = Select;
@@ -203,6 +204,7 @@ class Import extends React.Component<IProps> {
             </Button>
           </Upload>
         </div>
+        <Prev />
         <Button
           type="primary"
           className="next"

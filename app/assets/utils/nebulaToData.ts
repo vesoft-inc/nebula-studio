@@ -144,8 +144,6 @@ export function setLinkName(link) {
 }
 
 export function setLink(edges) {
-  const linkMap = {};
-
   const linkGroup = {};
   // statistical linkMap linkGroup
   edges.forEach((link: any) => {
@@ -153,10 +151,6 @@ export function setLink(edges) {
       link.edge = { ...link };
     }
     const key = setLinkName(link);
-    if (!linkMap.hasOwnProperty(key)) {
-      linkMap[key] = 0;
-    }
-    linkMap[key] += 1;
     if (!linkGroup.hasOwnProperty(key)) {
       linkGroup[key] = [];
     }
@@ -165,13 +159,15 @@ export function setLink(edges) {
   // assign linknum to each link
   edges.forEach((link: any) => {
     const key = setLinkName(link);
-    link.size = linkMap[key];
+    link.size = linkGroup[key].length;
     const group = linkGroup[key];
     const keyPair = key.split(':');
     let type = 'noself';
     if (keyPair[0] === keyPair[1]) {
       type = 'self';
     }
-    setLinkNumbers(group, type);
+    if (group[group.length - 1] === link) {
+      setLinkNumbers(group, type);
+    }
   });
 }

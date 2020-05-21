@@ -78,11 +78,12 @@
   "import": {
     "import": "Import",
     "init": "Init",
-    "selectFile": "Select Files                                 ",
+    "selectFile": "Select Files",
     "vertex": "Config Vertices",
     "edge": "Config Edges",
     "runImport": "Start Import",
     "next": "Next",
+    "goback": "GoBack",
     "mountPath": "Mount Path",
     "mountPathPlaceholder": "Please input the docker data mount path",
     "fileName": "Name",
@@ -138,6 +139,7 @@
     "edgeErrorFilePath": "Error Edge File Path:",
     "clearoAllConfigInfo": "Confirm to clear all config？",
     "all": "All",
-    "mountPathWarning": "Import data need to config the WORKING_DIR env variable before starting."
+    "mountPathWarning": "Import data need to config the WORKING_DIR env variable before starting.",
+    "notExist": "Not exist"
   }
 }

@@ -8,6 +8,7 @@ import { trackPageView } from '#assets/utils/stat';
 
 import Add, { AddType } from '../Add';
 import Next from '../Next';
+import Prev from '../Prev';
 import Edge from './Edge';
 import './index.less';
 
@@ -90,6 +91,7 @@ class ConfigEdge extends React.Component<IProps> {
             ))}
           </Tabs>
         </div>
+        <Prev />
         <Next />
       </div>
     );

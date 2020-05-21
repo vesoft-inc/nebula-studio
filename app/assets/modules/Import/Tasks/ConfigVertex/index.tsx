@@ -8,6 +8,7 @@ import { trackPageView } from '#assets/utils/stat';
 
 import Add, { AddType } from '../Add';
 import Next from '../Next';
+import Prev from '../Prev';
 import './index.less';
 import TagList from './TagList';
 
@@ -93,6 +94,7 @@ class ConfigNode extends React.PureComponent<IProps> {
             ))}
           </Tabs>
         </div>
+        <Prev />
         <Next />
       </div>
     );
