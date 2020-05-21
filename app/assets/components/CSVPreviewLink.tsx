@@ -18,8 +18,9 @@ function csvToArray(content, delimiter) {
     const cols = [] as string[];
     let isQuoteOpen = false;
     let isQuoteClose = false;
-    for (let i = 0, j = 0, len = row.length; j < len; j++) {
-      switch (row[j]) {
+    const paddingRow = row + ',';
+    for (let i = 0, j = 0, len = paddingRow.length; j < len; j++) {
+      switch (paddingRow[j]) {
         case '"':
           if (!isQuoteOpen) {
             isQuoteOpen = true;
@@ -29,11 +30,11 @@ function csvToArray(content, delimiter) {
           break;
         case delimiter:
           if (!isQuoteOpen) {
-            cols.push(row.substring(i, j));
+            cols.push(paddingRow.substring(i, j));
             i = j + 1;
           } else if (isQuoteClose) {
             // value by quote
-            cols.push(row.substring(i + 1, j - 1));
+            cols.push(paddingRow.substring(i + 1, j - 1));
             i = j + 1;
             isQuoteClose = false;
             isQuoteOpen = false;

@@ -109,6 +109,12 @@ class Expand extends React.Component<IProps, IState> {
     }) as any).then(
       () => {
         message.success(intl.get('common.success'));
+        this.props.updateExploreRules({
+          edgeTypes,
+          edgeDirection,
+          vertexColor,
+        });
+        this.props.close();
       },
       (e: any) => {
         if (e.message) {
@@ -119,12 +125,6 @@ class Expand extends React.Component<IProps, IState> {
       },
     );
 
-    this.props.updateExploreRules({
-      edgeTypes,
-      edgeDirection,
-      vertexColor,
-    });
-    this.props.close();
     trackEvent('expand', 'click');
   };
 

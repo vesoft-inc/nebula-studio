@@ -17,6 +17,7 @@ const nebulaWordsUppercase = [
   'FETCH',
   'PROP',
   'YIELD',
+  'AND',
   'TAG',
   'ALTER',
   'INSERT',

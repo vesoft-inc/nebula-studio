@@ -9,7 +9,7 @@ export const getExploreGQL = (params: {
   const wheres = filters
     .filter(filter => filter.field && filter.operator && filter.value)
     .map(filter => `${filter.field} ${filter.operator} ${filter.value}`)
-    .join(' AND ');
+    .join(`\n  AND `);
   let direction;
   switch (edgeDirection) {
     case 'incoming':
@@ -19,9 +19,9 @@ export const getExploreGQL = (params: {
       direction = ''; // default outgoing
   }
   const gql = `GO FROM 
-    ${selectVertexes.map(d => d.name)}
+  ${selectVertexes.map(d => d.name)}
 OVER 
-    ${edgeTypes.join(',')} ${direction}${wheres ? `WHERE ${wheres}` : ''}
+  ${edgeTypes.join(',')} ${direction} ${wheres ? `\nWHERE ${wheres}` : ''}
 YIELD 
 ${edgeTypes
   .map(
