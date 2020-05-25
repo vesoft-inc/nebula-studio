@@ -5,6 +5,7 @@ import (
 	"log"
 	pool "nebula-go-api/service/pool"
 	common "nebula-go-api/utils"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -15,6 +16,8 @@ type ExecuteResult struct {
 	Headers []string                `json:"headers"`
 	Tables  []map[string]common.Any `json:"tables"`
 }
+
+var spaceRegex = regexp.MustCompile(`use ([0-9A-Za-z_]+);`)
 
 func getColumnValue(p *graph.ColumnValue) common.Any {
 	if p.Str != nil {
@@ -74,6 +77,9 @@ func Execute(sessionID int64, gql string) (result ExecuteResult, err error) {
 			// try reconnect
 			err := pool.ReConnect(connection)
 			if err == nil {
+				if connection.CurrentSpace != "" {
+					Execute(sessionID, "use "+connection.CurrentSpace+";")
+				}
 				return Execute(sessionID, gql)
 			} else {
 				return result, errors.New("connect refused for network")
@@ -88,6 +94,14 @@ func Execute(sessionID int64, gql string) (result ExecuteResult, err error) {
 		}
 		resp = response.Result
 	}
+
+	go func() {
+		// check if need to record space
+		matches := spaceRegex.FindStringSubmatch(gql)
+		if len(matches) > 0 {
+			connection.CurrentSpace = matches[1]
+		}
+	}()
 
 	columns := resp.GetColumnNames()
 	for i := 0; i < len(columns); i++ {

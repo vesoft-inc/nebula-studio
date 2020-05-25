@@ -28,6 +28,7 @@ type ChannelRequest struct {
 type Connection struct {
 	RequestChannel chan ChannelRequest
 	CloseChannel   chan bool
+	CurrentSpace   string
 	updateTime     int64
 	client         *nebula.GraphClient
 	account        *Account
