@@ -51,10 +51,10 @@ export const importData = createModel({
     edgesConfig: [] as IEdgeConfig[],
     activeVertexIndex: -1,
     activeEdgeIndex: -1,
-    vertexAddCount: 0,
-    edgeAddCount: 0,
     isImporting: false,
     taskId: 'all',
+    vertexAddCount: 1,
+    edgeAddCount: 1,
   },
   reducers: {
     update: (state: IState, payload: any) => {
@@ -66,7 +66,7 @@ export const importData = createModel({
     newVertexConfig: (state: IState, payload: any) => {
       const { file } = payload;
       const { vertexesConfig, vertexAddCount } = state;
-      const vertexName = `Vertex ${vertexAddCount}`;
+      const vertexName = `${intl.get('import.datasource')} ${vertexAddCount}`;
       vertexesConfig.push({
         name: vertexName,
         file,

@@ -8,6 +8,8 @@ import { IDispatch, IRootState } from '#assets/store';
 import { configToJson, getStringByteLength } from '#assets/utils/import';
 import { trackEvent, trackPageView } from '#assets/utils/stat';
 
+import Prev from './Prev';
+
 const { TabPane } = Tabs;
 const mapState = (state: IRootState) => ({
   activeStep: state.importData.activeStep,
@@ -193,6 +195,7 @@ class Import extends React.Component<IProps, IState> {
           >
             {intl.get('import.endImport')}
           </Button>
+          <Prev />
         </div>
         <Tabs activeKey={activeKey} size="large" onChange={this.handleTab}>
           <TabPane tab="log" key="log">

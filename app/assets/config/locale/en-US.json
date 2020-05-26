@@ -1,5 +1,6 @@
 {
   "common": {
+    "currentSpace": "Current Space",
     "languageSelect": "Language",
     "seeTheHistory": "History List",
     "table": "Table",
@@ -23,7 +24,8 @@
     "release": "New Version",
     "nebula": "Nebula",
     "setting": "Setting",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "ask": "Sure to do this?"
   },
   "NGQLOutput": {
     "success": "Execute Success!"
@@ -58,7 +60,7 @@
     "undo": "Undo",
     "deleteSelectNodes": "Remove Select",
     "fileImport": "File Import",
-    "importPlaceholder": "id1\nid2\nid3\n1 node per line, split by \\n",
+    "importPlaceholder": "1 node per line, split by \\n, format below:\nid1\nid2\nid3",
     "outgoing": "Outgoing",
     "incoming": "Incoming",
     "filter": "Filter",
@@ -77,8 +79,8 @@
   },
   "import": {
     "import": "Import",
-    "init": "Init",
-    "selectFile": "Select Files",
+    "selectSpace": "Select Space",
+    "uploadFile": "Upload Files",
     "vertex": "Config Vertices",
     "edge": "Config Edges",
     "runImport": "Start Import",
@@ -95,9 +97,10 @@
     "fileSizeErrorMsg": "File must smaller than 100 MB",
     "preview": "Preview",
     "delete": "Delete",
-    "addVertex": "Add Vertex",
-    "addEdge": "Add Edge",
-    "confirm": "Ok",
+    "bindDatasource": "Bind Datasource",
+    "confirm": "Confirm",
+    "stopImportFailed": "Stop Import Failed",
+    "uploadFailed": "Upload Failed",
     "importResults": "Import Information",
     "newImport": "New Import",
     "endImport": "Stop Import",
@@ -122,8 +125,9 @@
     "setDstTip": "Set field's value as edge destination id",
     "setRank": "Set Rank",
     "setRankTip": "Set field's value as edge rank",
-    "ignore": "Ignore",
     "edgeText": "Edge",
+    "choose": "Mapping",
+    "ignore": "Ignore",
     "vertexText": "Vertex",
     "createConfigError": "Create config file error",
     "importErrorInfo": "Error importing data. Please check the configuration or data file",
@@ -140,6 +144,14 @@
     "clearoAllConfigInfo": "Confirm to clear all config？",
     "all": "All",
     "mountPathWarning": "Import data need to config the WORKING_DIR env variable before starting.",
-    "notExist": "Not exist"
+    "notExist": "Not exist",
+    "importError": "Import Error",
+    "importMappingError": "The data file configuration map import failed",
+    "importFormatError": "Data file format is not uniform",
+    "importFileConfigError": "Data file configuration related error",
+    "importFileDownloadError": "Data file download failed",
+    "importFileError": "File related error",
+    "importNebulaError": "Error associated with instance interaction",
+    "datasource": "DataSource"
   }
 }

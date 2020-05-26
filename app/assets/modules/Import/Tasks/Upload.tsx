@@ -1,4 +1,4 @@
-import { Button, Checkbox, message, Select, Table, Upload } from 'antd';
+import { Button, Checkbox, message, Popconfirm, Table, Upload } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
@@ -12,8 +12,6 @@ import { trackPageView } from '#assets/utils/stat';
 
 import Prev from './Prev';
 import './Upload.less';
-
-const { Option } = Select;
 
 const mapState = (state: IRootState) => ({
   files: state.importData.files,
@@ -65,16 +63,7 @@ class Import extends React.Component<IProps> {
       .join('\n');
     file.path = `${mountPath}/${file.name}`;
     file.withHeader = false;
-    file.dataType = 'all';
     return file;
-  };
-
-  handleTypeChange = (type, file, index) => {
-    const { files } = this.props;
-    file.dataType = type;
-    files[index] = file;
-
-    this.props.updateFiles([...files]);
   };
 
   handleFileDelete = async index => {
@@ -100,23 +89,6 @@ class Import extends React.Component<IProps> {
         render: () => <Checkbox disabled={true} />,
       },
       {
-        title: intl.get('import.fileType'),
-        key: 'fileType',
-        render: (_, file, index) => {
-          return (
-            <Select
-              className="file-type-select"
-              value={file.dataType}
-              onChange={type => this.handleTypeChange(type, file, index)}
-            >
-              <Option value="all">{intl.get('import.all')}</Option>
-              <Option value="vertex">{intl.get('import.vertexText')}</Option>
-              <Option value="edge">{intl.get('import.edgeText')}</Option>
-            </Select>
-          );
-        },
-      },
-      {
         title: intl.get('import.fileSize'),
         key: 'size',
         dataIndex: 'size',
@@ -139,15 +111,19 @@ class Import extends React.Component<IProps> {
           if (file.content) {
             return (
               <div className="operation">
-                <CSVPreviewLink file={file}>
-                  {intl.get('import.preview')}
-                </CSVPreviewLink>
-                <Button
-                  type="link"
-                  onClick={() => this.handleFileDelete(index)}
-                >
-                  {intl.get('import.delete')}
-                </Button>
+                <div>
+                  <CSVPreviewLink file={file}>
+                    {intl.get('import.preview')}
+                  </CSVPreviewLink>
+                  <Popconfirm
+                    onConfirm={() => this.handleFileDelete(index)}
+                    title={intl.get('common.ask')}
+                    okText={intl.get('common.ok')}
+                    cancelText={intl.get('common.cancel')}
+                  >
+                    <Button type="link">{intl.get('import.delete')}</Button>
+                  </Popconfirm>
+                </div>
               </div>
             );
           }
@@ -200,7 +176,7 @@ class Import extends React.Component<IProps> {
             transformFile={this.transformFile as any}
           >
             <Button className="upload-btn" type="default">
-              {intl.get('import.selectFile')}
+              {intl.get('import.uploadFile')}
             </Button>
           </Upload>
         </div>

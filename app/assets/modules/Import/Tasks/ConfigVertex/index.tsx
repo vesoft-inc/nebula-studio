@@ -1,5 +1,6 @@
-import { Button, Icon, Tabs } from 'antd';
+import { Button, Icon, Popconfirm, Tabs } from 'antd';
 import React from 'react';
+import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
 import CSVPreviewLink from '#assets/components/CSVPreviewLink';
@@ -55,7 +56,6 @@ class ConfigNode extends React.PureComponent<IProps> {
     return (
       <div className="vertex-config task">
         <div className="vertexes">
-          <h3>Vertices</h3>
           <div className="operation">
             <Add type={AddType.vertex} />
           </div>
@@ -70,15 +70,23 @@ class ConfigNode extends React.PureComponent<IProps> {
                 tab={
                   <p className="tab-content">
                     {vertex.name}
-                    <Button
-                      type="link"
-                      onClick={e => {
-                        e.stopPropagation();
+                    <Popconfirm
+                      title={intl.get('common.ask')}
+                      onConfirm={() => {
                         this.props.deleteVertexConfig(vertex.name);
                       }}
+                      okText={intl.get('common.ok')}
+                      cancelText={intl.get('common.cancel')}
                     >
-                      <Icon type="close" />
-                    </Button>
+                      <Button
+                        type="link"
+                        onClick={e => {
+                          e.stopPropagation();
+                        }}
+                      >
+                        <Icon type="close" />
+                      </Button>
+                    </Popconfirm>
                   </p>
                 }
                 key={`${vertex.name}#${index}`}

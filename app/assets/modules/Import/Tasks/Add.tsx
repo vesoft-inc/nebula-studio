@@ -40,18 +40,12 @@ const FormItem = Form.Item;
 class Add extends React.PureComponent<IProps> {
   modalHandle;
 
-  getRelativeFiles = files => {
-    const { type } = this.props;
-
-    return files.filter(f => f.dataType === type || f.dataType === 'all');
-  };
-
   handleSubmit = () => {
     const { type, files } = this.props;
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const { fileIndex } = values;
-        const file = this.getRelativeFiles(files)[fileIndex];
+        const file = files[fileIndex];
         if (type === AddType.vertex) {
           this.props.newVertexConfig(file);
           this.modalHandle.hide();
@@ -75,14 +69,12 @@ class Add extends React.PureComponent<IProps> {
       files,
       form: { getFieldDecorator },
     } = this.props;
-    const addText =
-      type === AddType.vertex
-        ? intl.get('import.addVertex')
-        : intl.get('import.addEdge');
 
     return (
       <div className={`add-${type}`}>
-        <Button onClick={this.handleAdd}>{addText}</Button>
+        <Button onClick={this.handleAdd}>
+          + {intl.get('import.bindDatasource')}
+        </Button>
         <Modal
           className="add-file-select"
           handlerRef={handle => (this.modalHandle = handle)}
@@ -98,7 +90,7 @@ class Add extends React.PureComponent<IProps> {
                 ],
               })(
                 <Select>
-                  {this.getRelativeFiles(files).map((file, index) => (
+                  {files.map((file, index) => (
                     <Option value={index} key={file.name}>
                       {file.name}
                     </Option>

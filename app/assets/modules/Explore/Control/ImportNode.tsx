@@ -46,8 +46,8 @@ class ImportNodes extends React.Component<IProps, IState> {
       if (!err) {
         const { ids } = data;
         this.props.asyncImportNodes({ ids });
+        this.props.handler.hide();
       }
-      this.props.handler.hide();
     });
   };
 

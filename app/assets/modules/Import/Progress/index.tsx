@@ -33,10 +33,10 @@ class Progress extends React.Component<IProps, {}> {
   render() {
     const steps = [
       {
-        title: intl.get('import.init'),
+        title: intl.get('import.selectSpace'),
       },
       {
-        title: intl.get('import.selectFile'),
+        title: intl.get('import.uploadFile'),
       },
       {
         title: intl.get('import.vertex'),

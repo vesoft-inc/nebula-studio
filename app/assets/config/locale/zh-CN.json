@@ -1,5 +1,6 @@
 {
   "common": {
+    "currentSpace": "当前 Space",
     "languageSelect": "语言" ,
     "seeTheHistory":"查看历史",
     "table": "表格",
@@ -23,7 +24,8 @@
     "release": "新发布",
     "nebula": "Nebula",
     "setting":"设置",
-    "feedback": "问题反馈"
+    "feedback": "问题反馈",
+    "ask": "确定进行当前操作？"
   },
   "warning": {
     "configServer": "请先配置服务器",
@@ -58,7 +60,7 @@
     "deleteSelectNodes": "删除选中",
     "expand": "拓展",
     "fileImport": "文件导入",
-    "importPlaceholder": "id1\nid2\nid3\n每行1个节点id，以回车分开",
+    "importPlaceholder": "每行1个节点id，以回车分开，格式如下：\nid1\nid2\nid3",
     "outgoing": "流出",
     "incoming": "流入",
     "filter": "筛选",
@@ -77,8 +79,8 @@
   },
   "import": {
     "import":"导入",
-    "init": "初始化",
-    "selectFile": "选择文件",
+    "selectSpace": "选择 Space",
+    "uploadFile": "上传文件",
     "vertex": "配置 Vertex",
     "edge": "配置 Edge",
     "runImport": "导入",
@@ -91,12 +93,11 @@
     "fileType": "类型",
     "fileSize": "大小",
     "operation": "操作",
-    "fileTitle": "选择文件列表",
+    "fileTitle": "文件列表",
     "fileSizeErrorMsg": "文件必须小于100MB",
     "preview": "预览",
     "delete": "删除",
-    "addVertex": "添加 Vertex",
-    "addEdge": "添加 Edge",
+    "bindDatasource": "绑定数据源",
     "confirm": "确认",
     "importResults": "导入信息",
     "newImport": "新建导入",
@@ -122,8 +123,9 @@
     "setDstTip": "将当前字段值作为终点",
     "setRank": "设为Rank",
     "setRankTip": "将当前字段值作为rank",
-    "ignore": "忽略",
     "edgeText": "边",
+    "choose": "选择",
+    "ignore": "忽略",
     "vertexText": "点",
     "createConfigError": "创建配置文件错误",
     "importErrorInfo": "导入数据错误，请检查配置或数据文件",
@@ -138,6 +140,14 @@
     "edgeErrorFilePath": "该边错误数据文件路径：",
     "all": "全部",
     "mountPathWarning": "导入数据需在应用启动时配置 WORKING_DIR 环境变量，否则无法进行。",
-    "notExist": "不存在"
+    "notExist": "不存在",
+    "importError": "未知错误",
+    "importMappingError": "数据文件配置映射导入失败",
+    "importFormatError": "数据文件格式不统一",
+    "importFileConfigError": "数据文件配置相关错误",
+    "importFileDownloadError": "数据文件下载失败",
+    "importFileError": "文件相关错误",
+    "importNebulaError": "与实例交互相关错误",
+    "datasource": "数据源"
   }
 }

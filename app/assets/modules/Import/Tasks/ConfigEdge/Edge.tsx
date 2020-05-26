@@ -94,7 +94,7 @@ class Edge extends React.Component<IProps> {
                 this.handlePropChange(propIndex, 'mapping', columnIndex)
               }
             >
-              {mappingIndex === null ? intl.get('import.ignore') : mappingIndex}
+              {mappingIndex === null ? intl.get('import.choose') : mappingIndex}
             </CSVPreviewLink>
           </div>
         ),
@@ -140,6 +140,7 @@ class Edge extends React.Component<IProps> {
         loading={!!loading}
         dataSource={props}
         columns={columns}
+        pagination={false}
         rowKey="name"
       />
     );

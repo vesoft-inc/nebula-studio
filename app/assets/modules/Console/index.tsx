@@ -131,7 +131,7 @@ class Console extends React.Component<IProps, IState> {
         <div className="ngql-content">
           <div className="mirror-wrap">
             <div className="mirror-nav">
-              USE:
+              {intl.get('common.currentSpace')}:
               <SpaceSearchInput
                 onSpaceChange={this.props.asyncSwitchSpace}
                 value={currentSpace}

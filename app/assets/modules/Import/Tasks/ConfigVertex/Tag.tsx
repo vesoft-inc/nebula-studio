@@ -1,4 +1,4 @@
-import { Button, Form, Icon, Select, Table, Tooltip } from 'antd';
+import { Button, Form, Icon, Popconfirm, Select, Table, Tooltip } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
@@ -111,7 +111,7 @@ class Tag extends React.Component<IProps> {
               file={file}
               prop={prop.name}
             >
-              {mappingIndex === null ? intl.get('import.ignore') : mappingIndex}
+              {mappingIndex === null ? intl.get('import.choose') : mappingIndex}
             </CSVPreviewLink>
           </div>
         ),
@@ -120,7 +120,7 @@ class Tag extends React.Component<IProps> {
         title: render(intl.get('import.type'), intl.get('import.typeTip')),
         dataIndex: 'type',
         render: value => (
-          <Select value={value} disabled={true}>
+          <Select value={value} disabled={true} showArrow={false}>
             <Option value={value}>{value}</Option>
           </Select>
         ),
@@ -143,10 +143,7 @@ class Tag extends React.Component<IProps> {
     const { vertex } = this.props;
     const columns = [
       {
-        title: render(
-          intl.get('import.prop'),
-          intl.get('import.propTip', { name: 'vertex' }),
-        ),
+        title: '',
         dataIndex: 'name',
       },
       {
@@ -165,7 +162,7 @@ class Tag extends React.Component<IProps> {
               file={vertex.file}
               prop={prop.name}
             >
-              {mappingIndex === null ? intl.get('import.ignore') : mappingIndex}
+              {mappingIndex === null ? intl.get('import.choose') : mappingIndex}
             </CSVPreviewLink>
           </div>
         ),
@@ -219,7 +216,7 @@ class Tag extends React.Component<IProps> {
       <div className="tag-config">
         {/* vertex id config need only once for each vertex file binding, we put it ahead */}
         {index === 0 && this.renderIdConfig()}
-        <h3>TAG {index}</h3>
+        <h3>TAG {index + 1}</h3>
         <div className="tag-operation">
           <FormItem className="left" label="TAG">
             <Select
@@ -235,9 +232,14 @@ class Tag extends React.Component<IProps> {
             </Select>
           </FormItem>
           <FormItem className="right">
-            <Button type="danger" onClick={this.handleTagDelete}>
-              {intl.get('import.delete')}
-            </Button>
+            <Popconfirm
+              title={intl.get('common.ask')}
+              onConfirm={this.handleTagDelete}
+              okText={intl.get('common.ok')}
+              cancelText={intl.get('common.cancel')}
+            >
+              <Button type="danger">{intl.get('import.delete')}</Button>
+            </Popconfirm>
           </FormItem>
         </div>
         {this.renderPropsTable(data.props, data.name)}

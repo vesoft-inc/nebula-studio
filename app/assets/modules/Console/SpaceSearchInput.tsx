@@ -36,14 +36,12 @@ class SpaceSearchInput extends React.Component<IProps> {
       <Select
         showSearch={true}
         placeholder="space name"
-        showArrow={false}
         value={value}
         defaultActiveFirstOption={false}
         onChange={onSpaceChange}
         onFocus={this.getSpaces}
         className="space-search-input"
         loading={!!loading}
-        allowClear={true}
       >
         {this.props.spaces.map(s => (
           <Option value={s} key={s}>

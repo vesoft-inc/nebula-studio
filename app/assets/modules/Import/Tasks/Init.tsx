@@ -66,7 +66,7 @@ class Init extends React.Component<IProps, {}> {
     return (
       <div className="init task">
         <Form layout="inline">
-          <FormItem label="Spaces: ">
+          <FormItem label={intl.get('common.currentSpace')}>
             {getFieldDecorator('space', {
               initialValue: currentSpace,
               rules: [

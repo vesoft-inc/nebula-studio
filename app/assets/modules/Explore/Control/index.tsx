@@ -71,7 +71,7 @@ class Control extends React.Component<IProps, {}> {
 
     return (
       <div className="control">
-        <FormItem className="left" label="Spaces: ">
+        <FormItem className="left" label={intl.get('common.currentSpace')}>
           <Select onChange={this.handleSelect} value={currentSpace}>
             {spaces.map(space => (
               <Option value={space} key={space}>

@@ -20,7 +20,9 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {}
+    ReturnType<typeof mapDispatch> {
+  disabled?: boolean;
+}
 
 class Prev extends React.Component<IProps> {
   constructor(props) {
@@ -33,8 +35,10 @@ class Prev extends React.Component<IProps> {
   };
 
   render() {
+    const { disabled = false } = this.props;
+
     return (
-      <Button className="prev" onClick={this.handleGoBack}>
+      <Button className="prev" onClick={this.handleGoBack} disabled={disabled}>
         {intl.get('import.goback')}
       </Button>
     );

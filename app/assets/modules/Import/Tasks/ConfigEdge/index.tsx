@@ -1,5 +1,6 @@
-import { Button, Icon, Tabs } from 'antd';
+import { Button, Icon, Popconfirm, Tabs } from 'antd';
 import React from 'react';
+import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
 import CSVPreviewLink from '#assets/components/CSVPreviewLink';
@@ -52,7 +53,6 @@ class ConfigEdge extends React.Component<IProps> {
     return (
       <div className="edge-config-task task">
         <div className="edges">
-          <h3>Edge Types</h3>
           <div className="operation">
             <Add type={AddType.edge} />
           </div>
@@ -67,15 +67,21 @@ class ConfigEdge extends React.Component<IProps> {
                 tab={
                   <p className="tab-content">
                     {edge.name}
-                    <Button
-                      type="link"
-                      onClick={e => {
-                        e.stopPropagation();
-                        this.props.deleteEdgeConfig(edge.name);
-                      }}
+                    <Popconfirm
+                      title={intl.get('common.ask')}
+                      onConfirm={() => this.props.deleteEdgeConfig(edge.name)}
+                      okText={intl.get('common.ok')}
+                      cancelText={intl.get('common.cancel')}
                     >
-                      <Icon type="close" />
-                    </Button>
+                      <Button
+                        type="link"
+                        onClick={e => {
+                          e.stopPropagation();
+                        }}
+                      >
+                        <Icon type="close" />
+                      </Button>
+                    </Popconfirm>
                   </p>
                 }
                 key={`${edge.name}#${index}`}
