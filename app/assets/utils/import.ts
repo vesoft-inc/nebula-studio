@@ -77,7 +77,7 @@ export function edgeDataToJSON(
     });
     const edgeConfig = {
       path: edge.file.path,
-      failDataPath: `${mountPath}/tmp//err/${edge.name}Fail.scv`,
+      failDataPath: `${mountPath}/tmp//err/${edge.name}Fail.csv`,
       batchSize: 10,
       limit,
       type: 'csv',
@@ -127,7 +127,7 @@ export function vertexDataToJSON(
     });
     const vertexConfig: any = {
       path: vertex.file.path,
-      failDataPath: `${mountPath}/tmp/err/${vertex.name}Fail.scv`,
+      failDataPath: `${mountPath}/tmp/err/${vertex.name}Fail.csv`,
       batchSize: 10,
       limit,
       type: 'csv',

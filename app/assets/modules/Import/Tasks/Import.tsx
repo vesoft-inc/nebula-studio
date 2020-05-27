@@ -214,13 +214,13 @@ class Import extends React.Component<IProps, IState> {
             </Button>
             <div className="import-export">
               <div>
-                {intl.get('import.configFilePath')}
+                {intl.get('import.configFile')}
                 <a href={`${mountPath}/tmp/config.yaml`} target="__blank">
                   config.yaml
                 </a>
               </div>
               <div>
-                {intl.get('import.logFilePath')}
+                {intl.get('import.logFile')}
                 <a href={`${mountPath}/tmp/import.log`} target="__blank">
                   import.log
                 </a>
@@ -229,17 +229,17 @@ class Import extends React.Component<IProps, IState> {
               {vertexesConfig.map(vertex => {
                 return (
                   <div key={vertex.name}>
-                    <p>{intl.get('import.vertexesFilePath')}</p>
+                    <p>{intl.get('import.vertexesFile')}</p>
                     <p>
-                      {intl.get('import.vertexFilePath')}
+                      {intl.get('import.vertexFile')}
                       <a href={vertex.file.path} target="__blank">
                         {vertex.name}
                       </a>
                     </p>
                     <p>
-                      {intl.get('import.vertexErrorFilePath')}
+                      {intl.get('import.vertexErrorFile')}
                       <a
-                        href={`${mountPath}/tmp/err/${vertex.name}Fail.scv`}
+                        href={`${mountPath}/tmp/err/${vertex.name}Fail.csv`}
                         target="__blank"
                       >
                         {vertex.name}Fail.csv
@@ -262,7 +262,7 @@ class Import extends React.Component<IProps, IState> {
                     <p>
                       {intl.get('import.edgeErrorFilePath')}
                       <a
-                        href={`${mountPath}/tmp/err/${edge.name}Fail.scv`}
+                        href={`${mountPath}/tmp/err/${edge.name}Fail.csv`}
                         target="__blank"
                       >
                         {edge.name}Fail.csv
