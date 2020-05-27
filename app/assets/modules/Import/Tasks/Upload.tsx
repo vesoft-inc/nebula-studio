@@ -96,11 +96,11 @@ class Import extends React.Component<IProps> {
           if (size < 1000) {
             return `${size} B`;
           } else if (size < 1000000) {
-            return `${Math.round(size / 1000)} KB`;
+            return `${(size / 1000).toFixed(1)} KB`;
           } else if (size < 1000000000) {
-            return `${size / 1000000} MB`;
+            return `${(size / 1000000).toFixed(1)} MB`;
           } else {
-            return `${size / 1000000000} GB`;
+            return `${(size / 1000000000).toFixed(1)} GB`;
           }
         },
       },
