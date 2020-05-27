@@ -1,5 +1,6 @@
-import { notification } from 'antd';
+import { message } from 'antd';
 import _ from 'lodash';
+import intl from 'react-intl-universal';
 
 export function configToJson(payload) {
   const {
@@ -152,11 +153,8 @@ export function vertexDataToJSON(
 
 export function indexJudge(index: number | null, name: string) {
   if (index === null) {
-    notification.error({
-      message: `${name} Index cannot be null`,
-      description: `config error`,
-    });
-    return false;
+    message.error(`${name} ${intl.get('import.indexNotEmpty')}`);
+    throw new Error();
   }
   return index;
 }

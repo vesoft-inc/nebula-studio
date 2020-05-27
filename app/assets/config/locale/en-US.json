@@ -1,5 +1,6 @@
 {
   "common": {
+    "requestError": "Request Error",
     "currentSpace": "Current Space",
     "languageSelect": "Language",
     "seeTheHistory": "History List",
@@ -152,6 +153,7 @@
     "importFileDownloadError": "Data file download failed",
     "importFileError": "File related error",
     "importNebulaError": "Error associated with instance interaction",
-    "datasource": "DataSource"
+    "datasource": "DataSource",
+    "indexNotEmpty": "column index can't be null."
   }
 }

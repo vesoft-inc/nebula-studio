@@ -1,5 +1,6 @@
 {
   "common": {
+    "requestError": "请求错误",
     "currentSpace": "当前 Space",
     "languageSelect": "语言" ,
     "seeTheHistory":"查看历史",
@@ -148,6 +149,7 @@
     "importFileDownloadError": "数据文件下载失败",
     "importFileError": "文件相关错误",
     "importNebulaError": "与实例交互相关错误",
-    "datasource": "数据源"
+    "datasource": "数据源",
+    "indexNotEmpty": "对应列标不能为空"
   }
 }

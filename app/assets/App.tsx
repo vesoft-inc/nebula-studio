@@ -119,7 +119,10 @@ class App extends React.Component<IProps, IState> {
   render() {
     const { appVersion } = this.props;
     const { loading, activeMenu } = this.state;
-
+    const nGQLHref =
+      cookies.get('locale') === 'ZH_CN'
+        ? 'https://github.com/vesoft-inc/nebula-docs-cn/blob/master/docs/manual-CN/README.md'
+        : 'https://github.com/vesoft-inc/nebula-docs/blob/master/docs/manual-EN/README.md';
     return (
       <Router>
         <LanguageContext.Provider
@@ -204,12 +207,9 @@ class App extends React.Component<IProps, IState> {
                         </a>
                       </Menu.Item>
                       <Menu.Item onClick={() => trackPageView('/nebula-doc')}>
-                        <a
-                          href="https://github.com/vesoft-inc/nebula/blob/master/README.md"
-                          target="_blank"
-                        >
+                        <a href={nGQLHref} target="_blank">
                           <Icon type="star" />
-                          {intl.get('common.nebula')}
+                          nGQL
                         </a>
                       </Menu.Item>
                       <Menu.Item>

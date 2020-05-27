@@ -1,4 +1,4 @@
-import { message as AntMessage, notification } from 'antd';
+import { message, message as AntMessage } from 'antd';
 import axios from 'axios';
 import intl from 'react-intl-universal';
 
@@ -25,11 +25,11 @@ service.interceptors.response.use(
     return response.data;
   },
   (error: any) => {
-    console.log(error);
-    notification.error({
-      message: `Request error status: ${error.response.status}`,
-      description: error.response.statusText,
-    });
+    message.error(
+      `${intl.get('common.requestError')}: ${error.response.status} ${
+        error.response.statusText
+      }`,
+    );
     return error.response;
   },
 );
