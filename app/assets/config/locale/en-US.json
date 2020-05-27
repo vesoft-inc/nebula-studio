@@ -42,7 +42,7 @@
     "password": "Password",
     "success": "succeed",
     "fail": "Failed",
-    "clear": "Clear Config",
+    "clear": "Clear Connect",
     "title": "Config Server"
   },
   "formRules": {
@@ -82,8 +82,8 @@
     "import": "Import",
     "selectSpace": "Select Space",
     "uploadFile": "Upload Files",
-    "vertex": "Config Vertices",
-    "edge": "Config Edges",
+    "vertex": "Map Vertices",
+    "edge": "Map Edges",
     "runImport": "Start Import",
     "next": "Next",
     "goback": "GoBack",

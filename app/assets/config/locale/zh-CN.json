@@ -42,7 +42,7 @@
     "password": "密码",
     "success": "配置成功",
     "fail": "配置失败",
-    "clear": "清除配置",
+    "clear": "清除连接",
     "title": "配置数据库"
   },
   "formRules": {
@@ -82,8 +82,8 @@
     "import":"导入",
     "selectSpace": "选择 Space",
     "uploadFile": "上传文件",
-    "vertex": "配置 Vertex",
-    "edge": "配置 Edge",
+    "vertex": "关联点",
+    "edge": "关联边",
     "runImport": "导入",
     "next": "下一步",
     "goback":"上一步",
