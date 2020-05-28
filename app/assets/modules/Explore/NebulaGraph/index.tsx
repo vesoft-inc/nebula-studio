@@ -10,7 +10,7 @@ import { IDispatch, IRootState } from '#assets/store';
 import { IEdge, INode } from '#assets/store/models';
 
 import './index.less';
-import Panel from './Pannel';
+import Panel from './Panel';
 import Setting from './Setting';
 
 const mapState = (state: IRootState) => ({
@@ -201,17 +201,22 @@ class NebulaGraph extends React.Component<IProps, IState> {
         className="graph-wrap"
         ref={(ref: HTMLDivElement) => (this.ref = ref)}
       >
-        {tags.length !== 0 && (
-          <Button className="history-show" onClick={this.handleSetting}>
-            {intl.get('explore.show')}
-          </Button>
-        )}
-        {actionData.length !== 0 && (
-          <Button className="history-undo" onClick={this.handleUndo}>
-            {intl.get('explore.undo')}
-          </Button>
-        )}
-        {selectVertexes.length !== 0 && <Panel />}
+        {/* // TODO: move into <Panel/> */}
+        <Button
+          className="history-show"
+          onClick={this.handleSetting}
+          disabled={tags.length === 0 || vertexes.length === 0}
+        >
+          {intl.get('explore.show')}
+        </Button>
+        <Button
+          className="history-undo"
+          onClick={this.handleUndo}
+          disabled={actionData.length === 0}
+        >
+          {intl.get('explore.undo')}
+        </Button>
+        <Panel />
         <NebulaD3
           width={width}
           height={height}

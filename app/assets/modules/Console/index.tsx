@@ -1,4 +1,4 @@
-import { Button, Icon, List, message, Modal, Tooltip } from 'antd';
+import { Icon, List, message, Modal, Tooltip } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
@@ -139,6 +139,29 @@ class Console extends React.Component<IProps, IState> {
               <Tooltip title={intl.get('common.spaceTip')} placement="right">
                 <Icon type="question-circle" theme="outlined" />
               </Tooltip>
+              <div className="operation">
+                <Tooltip
+                  title={intl.get('common.seeTheHistory')}
+                  placement="bottom"
+                >
+                  <Icon
+                    type="history"
+                    onClick={() => {
+                      this.setState({ history: true });
+                    }}
+                  />
+                </Tooltip>
+                <Tooltip title={intl.get('common.empty')} placement="bottom">
+                  <Icon type="delete" onClick={() => this.handleEmptyNgql()} />
+                </Tooltip>
+                <Tooltip title={intl.get('common.run')} placement="bottom">
+                  <Icon
+                    type="play-circle"
+                    theme="twoTone"
+                    onClick={() => this.handleRun()}
+                  />
+                </Tooltip>
+              </div>
             </div>
             <CodeMirror
               value={currentGQL}
@@ -152,23 +175,8 @@ class Console extends React.Component<IProps, IState> {
               }}
             />
           </div>
-          <Tooltip title={intl.get('common.empty')} placement="bottom">
-            <Icon type="edit" onClick={() => this.handleEmptyNgql()} />
-          </Tooltip>
-          <Tooltip title={intl.get('common.run')} placement="bottom">
-            <Icon type="play-circle" onClick={() => this.handleRun()} />
-          </Tooltip>
         </div>
         <div className="result-wrap">
-          <Button
-            className="ngql-history"
-            type="primary"
-            onClick={() => {
-              this.setState({ history: true });
-            }}
-          >
-            {intl.get('common.seeTheHistory')}
-          </Button>
           <OutputBox
             result={result}
             value={this.getLocalStorage().pop()}

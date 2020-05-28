@@ -155,7 +155,7 @@ class App extends React.Component<IProps, IState> {
                   </Menu.Item>
                   <Menu.Item key="explore">
                     <Link to="explore">
-                      <Icon type="eye" />
+                      <Icon type="branches" />
                       {intl.get('common.explore')}
                     </Link>
                   </Menu.Item>

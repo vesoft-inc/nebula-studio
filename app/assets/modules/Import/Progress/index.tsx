@@ -1,4 +1,4 @@
-import { Icon, Popconfirm, Steps } from 'antd';
+import { Button, Popconfirm, Steps } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
@@ -23,11 +23,15 @@ interface IProps
 
 class Progress extends React.Component<IProps, {}> {
   stepsStatus = index => {
-    const { currentStep, isImporting } = this.props;
+    const { currentStep, isImporting, activeStep } = this.props;
     if (isImporting) {
       return 'wait';
     }
-    return index <= currentStep ? 'finish' : 'wait';
+
+    if (index === activeStep) {
+      return 'process';
+    }
+    return index < currentStep ? 'finish' : 'wait';
   };
 
   render() {
@@ -51,7 +55,7 @@ class Progress extends React.Component<IProps, {}> {
     const { activeStep, isImporting } = this.props;
     return (
       <div className="nav-import">
-        <Steps type="navigation" current={activeStep}>
+        <Steps size="small" current={activeStep}>
           {steps.map((step, index) => (
             <Step
               title={step.title}
@@ -68,7 +72,9 @@ class Progress extends React.Component<IProps, {}> {
             okText="Yes"
             cancelText="No"
           >
-            <Icon type="delete" className="rest-import" />
+            <Button size="small" type="default" className="rest-import">
+              {intl.get('import.reset')}
+            </Button>
           </Popconfirm>
         )}
       </div>

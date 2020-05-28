@@ -184,7 +184,7 @@ class Import extends React.Component<IProps, IState> {
           <Button
             className="import-again"
             onClick={this.handleRunImport}
-            disabled={isImporting}
+            loading={isImporting}
           >
             {intl.get('import.runImport')}
           </Button>
@@ -195,7 +195,7 @@ class Import extends React.Component<IProps, IState> {
           >
             {intl.get('import.endImport')}
           </Button>
-          <Prev />
+          <Prev disabled={isImporting} />
         </div>
         <Tabs activeKey={activeKey} size="large" onChange={this.handleTab}>
           <TabPane tab="log" key="log">

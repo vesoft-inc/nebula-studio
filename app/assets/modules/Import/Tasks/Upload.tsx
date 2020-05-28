@@ -136,11 +136,7 @@ class Import extends React.Component<IProps> {
         dataSource={files}
         columns={columns}
         rowKey="name"
-        pagination={{
-          pageSize: 12,
-          hideOnSinglePage: true,
-          total: files.length,
-        }}
+        pagination={false}
       />
     );
   };
@@ -163,7 +159,12 @@ class Import extends React.Component<IProps> {
     return (
       <div className="upload task">
         <div className="files">
-          <h3>{intl.get('import.fileTitle')}</h3>
+          <div className="title">
+            <h3>{intl.get('import.fileTitle')}</h3>
+            <Button className="upload-btn" type="default">
+              {intl.get('import.uploadFile')}
+            </Button>
+          </div>
           {this.renderFileTable()}
           <Upload
             multiple={true}
@@ -174,11 +175,7 @@ class Import extends React.Component<IProps> {
             onChange={this.handleUploadChange}
             beforeUpload={this.handleBeforeUpload}
             transformFile={this.transformFile as any}
-          >
-            <Button className="upload-btn" type="default">
-              {intl.get('import.uploadFile')}
-            </Button>
-          </Upload>
+          />
         </div>
         <Prev />
         <Button

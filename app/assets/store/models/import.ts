@@ -67,17 +67,19 @@ export const importData = createModel({
       const { file } = payload;
       const { vertexesConfig, vertexAddCount } = state;
       const vertexName = `${intl.get('import.datasource')} ${vertexAddCount}`;
-      vertexesConfig.push({
-        name: vertexName,
-        file,
-        tags: [],
-        idMapping: null,
-        useHash: 'unset',
-      });
       return {
         ...state,
-        vertexesConfig,
-        activeVertexIndex: vertexesConfig.length - 1,
+        vertexesConfig: [
+          ...vertexesConfig,
+          {
+            name: vertexName,
+            file,
+            tags: [],
+            idMapping: null,
+            useHash: 'unset',
+          },
+        ],
+        activeVertexIndex: vertexesConfig.length,
         vertexAddCount: vertexAddCount + 1,
       };
     },
@@ -165,17 +167,19 @@ export const importData = createModel({
       const { file } = payload;
       const { edgesConfig, edgeAddCount } = state;
       const edgeName = `Edge ${edgeAddCount}`;
-      edgesConfig.push({
-        file,
-        name: edgeName,
-        props: [],
-        type: '',
-      });
 
       return {
         ...state,
-        edgesConfig,
-        activeEdgeIndex: edgesConfig.length - 1,
+        edgesConfig: [
+          ...edgesConfig,
+          {
+            file,
+            name: edgeName,
+            props: [],
+            type: '',
+          },
+        ],
+        activeEdgeIndex: edgesConfig.length,
         edgeAddCount: edgeAddCount + 1,
       };
     },

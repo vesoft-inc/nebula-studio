@@ -150,6 +150,7 @@
     "importFileError": "文件相关错误",
     "importNebulaError": "与实例交互相关错误",
     "datasource": "数据源",
-    "indexNotEmpty": "对应列标不能为空"
+    "indexNotEmpty": "对应列标不能为空",
+    "reset": "重置"
   }
 }

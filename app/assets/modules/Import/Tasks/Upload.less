@@ -1,6 +1,13 @@
 .data-import .upload {
 	.files {
+		overflow: hidden;
+		height: 100%;
 		text-align: center;
+
+		.ant-table-wrapper {
+			overflow: auto;
+			height: 100%;
+		}
 
 		> .ant-btn {
 			margin-top: 24px;
@@ -10,10 +17,20 @@
 			width: 100px;
 		}
 
-		> h3 {
-			margin-top: 32px;
-			margin-bottom: 16px;
-			font-size: 24px;
+		.title {
+			position: relative;
+
+			> h3 {
+				margin-top: 32px;
+				margin-bottom: 16px;
+				font-size: 24px;
+			}
+
+			> .ant-btn {
+				position: absolute;
+				right: 0;
+				top: 0;
+			}
 		}
 
 		table {
@@ -21,10 +38,6 @@
 			td {
 				text-align: center;
 			}
-		}
-
-		.upload-btn {
-			margin-top: 24px;
 		}
 	}
 }

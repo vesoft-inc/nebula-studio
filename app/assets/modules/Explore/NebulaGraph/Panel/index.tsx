@@ -42,12 +42,20 @@ class Panel extends React.Component<IProps, {}> {
   };
 
   render() {
+    const { selectVertexes } = this.props;
     return (
       <div className="panel">
-        <Button onClick={this.handleExpand}>
+        <Button
+          onClick={this.handleExpand}
+          disabled={selectVertexes.length === 0}
+        >
           {intl.get('explore.expand')}
         </Button>
-        <Button onClick={this.handleDelete} className="panel-delete">
+        <Button
+          onClick={this.handleDelete}
+          className="panel-delete"
+          disabled={selectVertexes.length === 0}
+        >
           {intl.get('explore.deleteSelectNodes')}
         </Button>
         <Modal

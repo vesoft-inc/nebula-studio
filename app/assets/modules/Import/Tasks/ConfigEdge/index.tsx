@@ -15,10 +15,12 @@ import './index.less';
 
 const { TabPane } = Tabs;
 
-const mapState = (state: IRootState) => ({
-  edgesConfig: state.importData.edgesConfig,
-  activeEdgeIndex: state.importData.activeEdgeIndex,
-});
+const mapState = (state: IRootState) => {
+  return {
+    edgesConfig: state.importData.edgesConfig,
+    activeEdgeIndex: state.importData.activeEdgeIndex,
+  };
+};
 
 const mapDispatch = (dispatch: IDispatch) => ({
   updateActiveEdgeIndex: edgeIndex => {
@@ -69,7 +71,10 @@ class ConfigEdge extends React.Component<IProps> {
                     {edge.name}
                     <Popconfirm
                       title={intl.get('common.ask')}
-                      onConfirm={() => this.props.deleteEdgeConfig(edge.name)}
+                      onConfirm={(e: any) => {
+                        e.stopPropagation();
+                        this.props.deleteEdgeConfig(edge.name);
+                      }}
                       okText={intl.get('common.ok')}
                       cancelText={intl.get('common.cancel')}
                     >

@@ -86,7 +86,7 @@
     "edge": "Map Edges",
     "runImport": "Start Import",
     "next": "Next",
-    "goback": "GoBack",
+    "goback": "Prev",
     "mountPath": "Mount Path",
     "mountPathPlaceholder": "Please input the docker data mount path",
     "fileName": "Name",
@@ -154,6 +154,7 @@
     "importFileError": "File related error",
     "importNebulaError": "Error associated with instance interaction",
     "datasource": "DataSource",
-    "indexNotEmpty": "column index can't be null."
+    "indexNotEmpty": "column index can't be null.",
+    "reset": "Reset"
   }
 }
