@@ -23,11 +23,7 @@ interface IProps
 
 class Progress extends React.Component<IProps, {}> {
   stepsStatus = index => {
-    const { currentStep, isImporting, activeStep } = this.props;
-    if (isImporting) {
-      return 'wait';
-    }
-
+    const { currentStep, activeStep } = this.props;
     if (index === activeStep) {
       return 'process';
     }

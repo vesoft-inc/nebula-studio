@@ -161,21 +161,22 @@ class Import extends React.Component<IProps> {
         <div className="files">
           <div className="title">
             <h3>{intl.get('import.fileTitle')}</h3>
-            <Button className="upload-btn" type="default">
-              {intl.get('import.uploadFile')}
-            </Button>
+            <Upload
+              multiple={true}
+              accept=".csv"
+              showUploadList={false}
+              fileList={files}
+              action={'/api/files/upload'}
+              onChange={this.handleUploadChange}
+              beforeUpload={this.handleBeforeUpload}
+              transformFile={this.transformFile as any}
+            >
+              <Button className="upload-btn" type="default">
+                {intl.get('import.uploadFile')}
+              </Button>
+            </Upload>
           </div>
           {this.renderFileTable()}
-          <Upload
-            multiple={true}
-            accept=".csv"
-            showUploadList={false}
-            fileList={files}
-            action={'/api/files/upload'}
-            onChange={this.handleUploadChange}
-            beforeUpload={this.handleBeforeUpload}
-            transformFile={this.transformFile as any}
-          />
         </div>
         <Prev />
         <Button
