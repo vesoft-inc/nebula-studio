@@ -181,6 +181,7 @@ export const explore = createModel({
       filters: any[];
       exploreStep: number;
       vertexColor: string;
+      originVertexes: any[];
     }) {
       const {
         selectVertexes,
@@ -189,6 +190,7 @@ export const explore = createModel({
         filters,
         exploreStep,
         vertexColor,
+        originVertexes,
       } = payload;
       let group;
       const gql = getExploreGQL({
@@ -208,32 +210,34 @@ export const explore = createModel({
           edgeDirection,
         );
         const newVertexes = await Promise.all(
-          vertexes.map(async v => {
-            const nodeProp = await fetchVertexProps(v.name);
-            if (vertexColor === 'groupByTag') {
-              const tags =
-                nodeProp && nodeProp.headers
-                  ? _.sortedUniq(
-                      nodeProp.headers.map(field => {
-                        if (field === 'VertexID') {
-                          return 't';
-                        } else {
-                          return field.split('.')[0];
-                        }
-                      }),
-                    )
-                  : [];
-              group = tags.join('-');
-            } else {
-              group = 'step-' + exploreStep;
-            }
+          _.differenceBy(vertexes, originVertexes, vertexe => vertexe.name).map(
+            async (v: any) => {
+              const nodeProp = await fetchVertexProps(v.name);
+              if (vertexColor === 'groupByTag') {
+                const tags =
+                  nodeProp && nodeProp.headers
+                    ? _.sortedUniq(
+                        nodeProp.headers.map(field => {
+                          if (field === 'VertexID') {
+                            return 't';
+                          } else {
+                            return field.split('.')[0];
+                          }
+                        }),
+                      )
+                    : [];
+                group = tags.join('-');
+              } else {
+                group = 'step-' + exploreStep;
+              }
 
-            return {
-              ...v,
-              nodeProp,
-              group,
-            };
-          }),
+              return {
+                ...v,
+                nodeProp,
+                group,
+              };
+            },
+          ),
         );
         this.addNodesAndEdges({
           vertexes: newVertexes,

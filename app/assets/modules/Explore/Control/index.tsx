@@ -23,9 +23,14 @@ const mapDispatch = (dispatch: IDispatch) => ({
     dispatch.explore.update({
       vertexes: [],
       edges: [],
-      selectIds: [],
+      selectVertexes: [],
       actionData: [],
       step: 0,
+      exploreRules: {
+        edgeTypes: [],
+        edgeDirection: '',
+        vertexColor: '',
+      },
     }),
   asyncSwitchSpace: async space => {
     await dispatch.nebula.asyncSwitchSpace(space);

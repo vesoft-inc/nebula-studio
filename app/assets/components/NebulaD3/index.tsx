@@ -33,30 +33,18 @@ interface IRefs {
 
 const whichColor = (() => {
   const colors = [
-    '#66C5CC',
-    '#F6CF71',
-    '#F89C74',
-    '#DCB0F2',
-    '#87C55F',
-    '#9EB9F3',
-    '#FE88B1',
-    '#C9DB74',
-    '#8BE0A4',
-    '#B497E7',
-    '#D3B484',
-    '#B3B3B3',
-    '#5F4690',
-    '#1D6996',
-    '#38A6A5',
-    '#0F8554',
-    '#73AF48',
-    '#EDAD08',
-    '#E17C05',
-    '#CC503E',
-    '#94346E',
-    '#6F4070',
-    '#994E95',
-    '#666666',
+    '#69C0FF',
+    '#5CDBD3',
+    '#95DE64',
+    '#FF7875',
+    '#FF9C6E',
+    '#85A5FF',
+    '#FFC069',
+    '#FFD666',
+    '#B37FEB',
+    '#FFF566',
+    '#FF85C0',
+    '#D3F261',
   ];
   const colorsTotal = colors.length;
   let colorIndex = 0;
@@ -111,11 +99,11 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .append('marker')
       .attr('id', 'marker')
       .attr('viewBox', '-10 -10 20 20')
-      .attr('refX', 21)
+      .attr('refX', 23)
       .attr('refY', 0)
       .attr('orient', 'auto')
       .attr('markerWidth', 10)
-      .attr('markerHeight', 12)
+      .attr('markerHeight', 9)
       .attr('xoverflow', 'visible')
       .append('path')
       .attr('d', 'M-6.75,-6.75 L 0,0 L -6.75,6.75')
@@ -249,13 +237,6 @@ class NebulaD3 extends React.Component<IProps, {}> {
 
     this.node.attr('cx', d => d.x).attr('cy', d => d.y);
 
-    this.nodeText
-      .attr('x', (d: any) => {
-        return d.x;
-      })
-      .attr('y', (d: any) => {
-        return d.y + 35;
-      });
     d3.selectAll('.text')
       .attr('transform-origin', (d: any) => {
         return `${(d.source.x + d.target.x) / 2} ${(d.source.y + d.target.y) /
@@ -299,6 +280,10 @@ class NebulaD3 extends React.Component<IProps, {}> {
           return 'node active';
         }
         return 'node';
+      })
+      .style('fill', (d: INode) => {
+        const group = d.group;
+        return whichColor(group);
       })
       .enter()
       .append<SVGCircleElement>('circle')
@@ -399,7 +384,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
         return d.name;
       })
       .distance((d: any) => {
-        return d.value * 30;
+        return d.value * 35;
       });
     if (!this.force) {
       this.force = d3
@@ -438,7 +423,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
     node.nodeProp.tables.forEach(v => {
       Object.keys(v).forEach(nodeField => {
         if (nodeField === field) {
-          nodeText = `${nodeField}: ${v[nodeField]}`;
+          nodeText = `${v[nodeField]}`;
         }
       });
     });
@@ -457,7 +442,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
             d3.select('#name_' + node.name)
               .append('tspan')
               .attr('x', (d: any) => d.x)
-              .attr('y', (d: any) => d.y + 20 * line)
+              .attr('y', (d: any) => d.y - 20 + 20 * line)
               .attr('dy', '1em')
               .text(d => this.targetName(d, field));
           }

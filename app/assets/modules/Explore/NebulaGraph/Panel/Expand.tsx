@@ -28,6 +28,7 @@ const mapState = (state: IRootState) => ({
   selectVertexes: state.explore.selectVertexes,
   exploreStep: state.explore.step,
   exploreRules: state.explore.exploreRules,
+  vertexes: state.explore.vertexes,
 });
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetEdgeTypes: dispatch.nebula.asyncGetEdgeTypes,
@@ -93,7 +94,7 @@ class Expand extends React.Component<IProps, IState> {
   };
 
   handleExpand = () => {
-    const { selectVertexes, exploreStep } = this.props;
+    const { selectVertexes, exploreStep, vertexes } = this.props;
     const { getFieldValue } = this.props.form;
     const { filters } = this.state;
     const edgeTypes = getFieldValue('edgeTypes');
@@ -106,6 +107,7 @@ class Expand extends React.Component<IProps, IState> {
       edgeDirection,
       vertexColor,
       exploreStep: exploreStep + 1,
+      originVertexes: vertexes,
     }) as any).then(
       () => {
         message.success(intl.get('common.success'));

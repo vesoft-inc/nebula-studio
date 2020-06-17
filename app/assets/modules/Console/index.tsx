@@ -89,6 +89,7 @@ class Console extends React.Component<IProps, IState> {
 
   handleEmptyNgql = () => {
     this.props.updateCurrentGQL('');
+    this.forceUpdate();
   };
 
   getInstance = instance => {
