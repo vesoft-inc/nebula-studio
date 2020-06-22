@@ -20,7 +20,7 @@ export default class ImportController extends Controller {
     fs.writeFileSync(taskIdDir, JSON.stringify(taskIdJSON));
     ctx.response.body = {
       data: [],
-      code: '0',
+      code: 0,
     };
   }
 
@@ -29,7 +29,7 @@ export default class ImportController extends Controller {
     const { startByte, endByte, dir, taskId } = ctx.query;
     let data: any;
     let readStream: any;
-    let code: string = '0';
+    let code: number = 0;
     try {
       readStream = fs.createReadStream(dir + '/tmp/import.log', {
         start: Number(startByte),
@@ -50,7 +50,7 @@ export default class ImportController extends Controller {
     }
     const taskIdJSON = require(taskIdDir);
     if (!data && taskIdJSON[taskId]) {
-      code = '-1';
+      code = -1;
     }
     const log = data ? data.replace(/\n/g, '<br />') : '';
     ctx.response.body = {
@@ -69,7 +69,7 @@ export default class ImportController extends Controller {
     ctx.response.body = {
       message: '',
       data: '',
-      code: '0',
+      code: 0,
     };
   }
 
@@ -77,7 +77,7 @@ export default class ImportController extends Controller {
     const { ctx } = this;
     const dir = process.env.UPLOAD_DIR || ctx.app.config.uploadPath;
     ctx.response.body = {
-      code: '0',
+      code: 0,
       data: {
         dir,
       },

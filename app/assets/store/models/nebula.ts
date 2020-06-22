@@ -82,7 +82,7 @@ export const nebula = createModel({
         username,
         password,
       })) as any;
-      if (code === '0') {
+      if (code === 0) {
         trackEvent('connect', 'success');
         message.success(intl.get('configServer.success'));
         cookies.set('nh', host);
@@ -113,7 +113,7 @@ export const nebula = createModel({
       const { code, data } = (await service.execNGQL({
         gql: 'show spaces;',
       })) as any;
-      if (code === '0') {
+      if (code === 0) {
         this.update({
           spaces: data.tables.map(item => item.Name).sort(),
         });
@@ -127,7 +127,7 @@ export const nebula = createModel({
         `,
       })) as any;
 
-      if (code === '0') {
+      if (code === 0) {
         this.update({
           tags: data.tables.map(item => item.Name),
         });
@@ -142,7 +142,7 @@ export const nebula = createModel({
           const { code, data } = (await service.execNGQL({
             gql: `desc tag ${item};`,
           })) as any;
-          if (code === '0') {
+          if (code === 0) {
             const Names = data.tables.map(item => item.Field);
             this.addTagsName({ tag: item, Names });
           }
@@ -156,7 +156,7 @@ export const nebula = createModel({
           show edges;
         `,
       })) as any;
-      if (code === '0') {
+      if (code === 0) {
         this.update({
           edgeTypes: data.tables.map(item => item.Name),
         });
@@ -168,7 +168,7 @@ export const nebula = createModel({
         gql: `use ${space};`,
       })) as any;
 
-      if (code === '0') {
+      if (code === 0) {
         this.update({
           currentSpace: space,
         });

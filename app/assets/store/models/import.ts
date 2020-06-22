@@ -3,7 +3,7 @@ import { message } from 'antd';
 import intl from 'react-intl-universal';
 
 import service from '#assets/config/service';
-import { configToJson } from '#assets/utils/import';
+import { configToJson, getGQLByConfig } from '#assets/utils/import';
 
 interface ITag {
   props: any[];
@@ -315,12 +315,36 @@ export const importData = createModel({
       return errCode;
     },
 
+    async asyncTestDataMapping(payload: {
+      vertexesConfig: any[];
+      edgesConfig: any[];
+      activeStep: number;
+    }) {
+      const { vertexesConfig, edgesConfig, activeStep } = payload;
+      const configInfo = {
+        vertexesConfig: activeStep === 2 ? vertexesConfig : [],
+        edgesConfig: activeStep === 3 ? edgesConfig : [],
+      };
+      try {
+        const gql: string = getGQLByConfig(configInfo).join(';');
+        const { code, message: msg } = (await service.execNGQL({
+          gql,
+        })) as any;
+        if (code !== 0) {
+          message.error(`${msg}`);
+        }
+        return code;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
     async asyncUpdateEdgeConfig(payload: { edgeType: string }) {
       const { edgeType } = payload;
       const { code, data } = (await service.execNGQL({
         gql: `DESCRIBE EDGE ${edgeType};`,
       })) as any;
-      if (code === '0') {
+      if (code === 0) {
         const props = data.tables.map(item => ({
           name: item.Field,
           type: item.Type,
@@ -359,7 +383,7 @@ export const importData = createModel({
       const { code, data } = (await service.execNGQL({
         gql: `DESCRIBE TAG ${tag}`,
       })) as any;
-      if (code === '0') {
+      if (code === 0) {
         const props = data.tables.map(attr => ({
           name: attr.Field,
           type: attr.Type,
@@ -377,7 +401,7 @@ export const importData = createModel({
     async asyncGetImportWorkingDir() {
       const { code, data } = (await service.getImportWokingDir()) as any;
       const { dir } = data;
-      if (code === '0' && dir) {
+      if (code === 0 && dir) {
         this.update({
           mountPath: dir.endsWith('/') ? dir.substring(0, dir.length - 1) : dir,
         });

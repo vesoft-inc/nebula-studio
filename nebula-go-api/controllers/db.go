@@ -13,7 +13,7 @@ type DatabaseController struct {
 }
 
 type Response struct {
-	Code    string     `json:"code"`
+	Code    int     `json:"code"`
 	Data    common.Any `json:"data"`
 	Message string     `json:"message"`
 }
@@ -38,13 +38,13 @@ func (this *DatabaseController) Connect() {
 	sessionID, err := dao.Connect(params.Host, params.Username, params.Password)
 
 	if err == nil {
-		res.Code = "0"
+		res.Code = 0
 		m := make(map[string]common.Any)
 		m["sessionID"] = sessionID
 		res.Data = m
 		this.SetSession("nsid", sessionID)
 	} else {
-		res.Code = "-1"
+		res.Code = -1
 		res.Message = err.Error()
 	}
 
@@ -57,16 +57,16 @@ func (this *DatabaseController) Execute() {
 	var params ExecuteRequest
 	sessionID := this.GetSession("nsid")
 	if sessionID == nil {
-		res.Code = "-1"
+		res.Code = -1
 		res.Message = "connection refused for lack of session"
 	} else {
 		json.Unmarshal(this.Ctx.Input.RequestBody, &params)
 		result, err := dao.Execute(sessionID.(int64), params.Gql)
 		if err == nil {
-			res.Code = "0"
+			res.Code = 0
 			res.Data = &result
 		} else {
-			res.Code = "-1"
+			res.Code = -1
 			res.Message = err.Error()
 		}
 	}

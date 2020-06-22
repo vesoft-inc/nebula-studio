@@ -211,7 +211,6 @@ class Tag extends React.Component<IProps> {
 
   render() {
     const { index, tags, data } = this.props;
-
     return (
       <div className="tag-config">
         {/* vertex id config need only once for each vertex file binding, we put it ahead */}

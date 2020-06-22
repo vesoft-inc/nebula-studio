@@ -20,6 +20,7 @@ const mapState = (state: IRootState) => ({
 const mapDispatch = (dispatch: IDispatch) => ({
   nextStep: dispatch.importData.nextStep,
   testImport: dispatch.importData.testImport,
+  asyncTestDataMapping: dispatch.importData.asyncTestDataMapping,
 });
 
 interface IProps
@@ -33,15 +34,16 @@ class Next extends React.Component<IProps> {
 
   handleNext = async () => {
     const {
-      currentSpace,
       vertexesConfig,
       edgesConfig,
-      mountPath,
       activeStep,
-      host,
-      username,
-      password,
+      asyncTestDataMapping,
     } = this.props;
+    const configInfo = {
+      vertexesConfig,
+      edgesConfig,
+      activeStep,
+    };
     if (!vertexesConfig.length && activeStep === 2) {
       this.props.nextStep();
       return;
@@ -50,17 +52,9 @@ class Next extends React.Component<IProps> {
       this.props.nextStep();
       return;
     }
-    const errCode: any = await this.props.testImport({
-      currentSpace,
-      vertexesConfig: activeStep === 2 ? vertexesConfig : [], // Step 3 validates only the current configuration
-      edgesConfig: activeStep === 3 ? edgesConfig : [], // Step 4 validates only the current configuration
-      mountPath,
-      activeStep,
-      host,
-      username,
-      password,
-    });
-    if (errCode === 0) {
+    const code: any = await asyncTestDataMapping(configInfo);
+    if (code === 0) {
+      message.success(intl.get('import.importConfigValidationSuccess'));
       this.props.nextStep();
     } else {
       message.error(intl.get('import.importErrorInfo'));

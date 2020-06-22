@@ -39,7 +39,7 @@ class Import extends React.Component<IProps> {
 
   componentDidMount() {
     service.getFiles().then((data: any) => {
-      if (data.code === '0') {
+      if (data.code === 0) {
         this.props.updateFiles(data.data);
       }
     });
@@ -71,7 +71,7 @@ class Import extends React.Component<IProps> {
     const data: any = await service.deteleFile({
       filename: files[index].name,
     });
-    if (data.code === '0') {
+    if (data.code === 0) {
       this.props.updateFiles(files.filter((_, i) => i !== index));
     }
   };

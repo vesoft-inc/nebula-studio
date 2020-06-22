@@ -17,7 +17,7 @@ export default class OutputBox extends React.Component<IProps, {}> {
 
   outputClass = (code: any) => {
     if (code !== undefined) {
-      if (code === '0') {
+      if (code === 0) {
         return 'success';
       }
       return 'error';
@@ -29,7 +29,7 @@ export default class OutputBox extends React.Component<IProps, {}> {
     const { value, result = {} } = this.props;
     let columns = [];
     let dataSource = [];
-    if (result.code === '0') {
+    if (result.code === 0) {
       if (result.data && result.data.headers) {
         columns = result.data.headers.map(column => {
           return {
@@ -62,7 +62,7 @@ export default class OutputBox extends React.Component<IProps, {}> {
         />
         <div className="tab-container">
           <Tabs defaultActiveKey={'log'} size={'large'} tabPosition={'left'}>
-            {result.code === '0' && (
+            {result.code === 0 && (
               <Tabs.TabPane
                 tab={
                   <>
@@ -80,7 +80,7 @@ export default class OutputBox extends React.Component<IProps, {}> {
                 />
               </Tabs.TabPane>
             )}
-            {result.code !== '0' && (
+            {result.code !== 0 && (
               <Tabs.TabPane
                 tab={
                   <>

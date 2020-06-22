@@ -80,7 +80,7 @@ class Import extends React.Component<IProps, IState> {
         mountPath,
       })
       .then((result: any) => {
-        if (result.code !== '0') {
+        if (result.code !== 0) {
           message.error(intl.get('import.createConfigError'));
         }
       });
@@ -129,7 +129,7 @@ class Import extends React.Component<IProps, IState> {
       taskId,
     });
     const byteLength = getStringByteLength(result.data);
-    if (result.data && result.code === '0') {
+    if (result.data && result.code === 0) {
       this.setState(
         {
           startByte: startByte + byteLength,
@@ -141,7 +141,7 @@ class Import extends React.Component<IProps, IState> {
       );
       this.ref.innerHTML += result.data;
     } else {
-      if (result.code === '0') {
+      if (result.code === 0) {
         this.logTimer = setTimeout(this.readlog, 2000);
       } else {
         this.setState({

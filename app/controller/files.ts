@@ -14,7 +14,7 @@ export default class FilesController extends Controller {
       fs.unlinkSync(target);
     }
     ctx.response.body = {
-      code: '0',
+      code: 0,
     };
   }
 
@@ -41,7 +41,7 @@ export default class FilesController extends Controller {
       }),
     );
     ctx.response.body = {
-      code: '0',
+      code: 0,
       data,
     };
   }
@@ -71,7 +71,7 @@ export default class FilesController extends Controller {
 
     ctx.status = 200;
     ctx.response.body = {
-      code: '0',
+      code: 0,
     };
   }
 

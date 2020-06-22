@@ -25,7 +25,7 @@ export const nodeIdRulesFn = intl => [
     message: intl.get('formRules.idRequired'),
   },
   {
-    pattern: /^([a-zA-Z\d]+)*(\n[a-zA-Z\d]+)*(\n)*$/,
+    pattern: /^([-\d\d]+)*(\n[-\d\d]+)*(\n)*$/,
     message: intl.get('formRules.nodeIdError'),
   },
 ];

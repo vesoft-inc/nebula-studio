@@ -11,7 +11,7 @@ import (
 )
 
 type Response struct {
-	Code    string     `json:"code"`
+	Code    int     `json:"code"`
 	Data    common.Any `json:"data"`
 	Message string     `json:"message"`
 }
@@ -55,7 +55,7 @@ func Test_DB_Connect(t *testing.T) {
 		 
 		json.Unmarshal([]byte(body), &Response)
 		
-		if Response.Code != "-1" && Response.Code != "0" {
+		if Response.Code != -1 && Response.Code != 0 {
 			t.Fail()
 		}
 	}
@@ -96,7 +96,7 @@ func Test_DB_Execute(t *testing.T) {
 		body, _ := ioutil.ReadAll(resp.Body)
 
 		json.Unmarshal([]byte(body), &Response)
-		if Response.Code != "-1" && Response.Code != "0" {
+		if Response.Code != -1 && Response.Code != 0 {
 			t.Fail()
 		}
 	}
