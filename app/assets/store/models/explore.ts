@@ -203,7 +203,7 @@ export const explore = createModel({
         gql,
       })) as any;
 
-      if (code === '0' && data.tables.length !== 0) {
+      if (code === 0 && data.tables.length !== 0) {
         const { edges, vertexes } = nebulaToData(
           idToSrting(data.tables),
           edgeTypes,
