@@ -147,11 +147,12 @@ class Import extends React.Component<IProps> {
   };
 
   handleBeforeUpload = file => {
-    const isOverSize = file.size / 1024 / 1024 < 100;
+    const isOverSize = file.size / 1000 / 1000 < 100;
     if (!isOverSize) {
       message.error(intl.get('import.fileSizeErrorMsg'));
+      return Promise.reject(false);
     }
-    return isOverSize;
+    return Promise.resolve(file);
   };
 
   render() {
