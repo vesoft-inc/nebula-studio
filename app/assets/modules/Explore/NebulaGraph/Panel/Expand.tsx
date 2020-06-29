@@ -29,6 +29,7 @@ const mapState = (state: IRootState) => ({
   exploreStep: state.explore.step,
   exploreRules: state.explore.exploreRules,
   vertexes: state.explore.vertexes,
+  getExpandLoading: state.loading.effects.explore.asyncGetExpand,
 });
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetEdgeTypes: dispatch.nebula.asyncGetEdgeTypes,
@@ -131,7 +132,12 @@ class Expand extends React.Component<IProps, IState> {
   };
 
   render() {
-    const { edgeTypes, exploreRules: rules, selectVertexes } = this.props;
+    const {
+      edgeTypes,
+      exploreRules: rules,
+      selectVertexes,
+      getExpandLoading,
+    } = this.props;
     const { getFieldDecorator, getFieldValue } = this.props.form;
     const { filters } = this.state;
     const selectEdgeTypes = getFieldValue('edgeTypes');
@@ -199,7 +205,6 @@ class Expand extends React.Component<IProps, IState> {
         ),
       },
     ];
-
     return (
       <div className="graph-expand">
         <Form>
@@ -269,7 +274,9 @@ class Expand extends React.Component<IProps, IState> {
         </Collapse>
         <Button
           onClick={this.handleExpand}
-          disabled={!selectEdgeTypes || !selectEdgeTypes.length}
+          disabled={
+            !selectEdgeTypes || !selectEdgeTypes.length || !!getExpandLoading
+          }
         >
           {intl.get('explore.expand')}
         </Button>

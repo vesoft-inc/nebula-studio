@@ -8,6 +8,7 @@
     "log":"日志",
     "record": "记录",
     "sorryNGQLCannotBeEmpty": "对不起， NGQL语句不能为空",
+    "disablesUseToSwitchSpace": "禁止使用命令切换space",
     "NGQLHistoryList": "NGQL 历史列表",
     "spaceTip": "仅对某个space进行操作时需要",
     "empty": "清空",

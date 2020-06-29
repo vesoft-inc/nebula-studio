@@ -68,6 +68,10 @@ class Console extends React.Component<IProps, IState> {
       message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
       return;
     }
+    if (gql.includes('use ') || gql.includes('USE ')) {
+      message.error(intl.get('common.disablesUseToSwitchSpace'));
+      return;
+    }
     this.editor.execCommand('goDocEnd');
     const history = this.getLocalStorage();
     history.push(gql);

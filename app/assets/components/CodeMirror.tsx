@@ -10,7 +10,7 @@ import 'codemirror/mode/meta';
 import 'codemirror/theme/monokai.css';
 import React from 'react';
 
-import { keyWords, maxLineNum, operators } from '#assets/config/nebulaQL';
+import { ban, keyWords, maxLineNum, operators } from '#assets/config/nebulaQL';
 
 interface IProps {
   options: object;
@@ -42,6 +42,8 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
             return 'keyword';
           } else if (operators.some(item => item === cur)) {
             return 'def';
+          } else if (ban.some(item => item === cur)) {
+            return 'error';
           }
           stream.next();
         },

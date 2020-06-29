@@ -31,6 +31,8 @@ const nebulaWordsUppercase = [
   'YIELD',
 ];
 
+export const ban = ['use', 'USE'];
+
 export const operators = [
   // Bitwise Operator
   '&',

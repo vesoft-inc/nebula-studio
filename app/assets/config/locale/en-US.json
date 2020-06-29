@@ -8,6 +8,7 @@
     "log": "Log",
     "record": "Record",
     "sorryNGQLCannotBeEmpty": "Sorry, NGQL cannot be empty",
+    "disablesUseToSwitchSpace": "Disables the use of commands to switch Space",
     "NGQLHistoryList": "NGQL History List",
     "spaceTip": "Only required when you need to execute queries in a specified space.",
     "empty": "Clear",
