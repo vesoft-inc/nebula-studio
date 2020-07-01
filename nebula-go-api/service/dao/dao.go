@@ -2,6 +2,7 @@ package dao
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	pool "nebula-go-api/service/pool"
 	common "nebula-go-api/utils"
@@ -18,6 +19,28 @@ type ExecuteResult struct {
 }
 
 var spaceRegex = regexp.MustCompile(`use ([0-9A-Za-z_]+);`)
+
+func parsePath(path *graph.Path) string {
+	entryList := path.GetEntryList()
+	pathStr := ""
+	for _, entry := range entryList {
+		if entry.IsSetEdge() {
+			e := entry.GetEdge()
+			t := e.GetType()
+			r := e.GetRanking()
+			s := fmt.Sprintf(" <%s,%d> ", t, r)
+			pathStr = pathStr + s
+		}
+		if entry.IsSetVertex() {
+			v := entry.GetVertex()
+			id := v.GetId()
+			s := fmt.Sprintf("%d", id)
+			pathStr = pathStr + s
+		}
+	}
+
+	return pathStr
+}
 
 func getColumnValue(p *graph.ColumnValue) common.Any {
 	if p.Str != nil {
@@ -38,6 +61,8 @@ func getColumnValue(p *graph.ColumnValue) common.Any {
 		return p.Timestamp
 	} else if p.Date != nil {
 		return p.Date
+	} else if p.Path != nil {
+		return parsePath(p.Path)
 	}
 	return nil
 }
