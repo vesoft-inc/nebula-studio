@@ -65,7 +65,7 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
         return;
       }
 
-      const list = [...keyWords, ...operators].filter(item => {
+      const list = [...keyWords, ...operators, ...ban].filter(item => {
         return item.indexOf(str) === 0;
       });
 

@@ -29,6 +29,9 @@ const nebulaWordsUppercase = [
   'WHERE',
   'YIELD',
   'YIELD',
+  'FIND',
+  'PATH',
+  'SHORTEST',
 ];
 
 export const ban = ['use', 'USE'];
