@@ -80,6 +80,19 @@ export default class OutputBox extends React.Component<IProps, {}> {
                 />
               </Tabs.TabPane>
             )}
+            {result.code === 0 && result.data.costTime && (
+              <Tabs.TabPane
+                tab={
+                  <>
+                    <Icon type="clock-circle" />
+                    {intl.get('console.cost')}
+                  </>
+                }
+                key="cost"
+              >
+                {`${intl.get('console.execTime')} ${result.data.costTime} (μs)`}
+              </Tabs.TabPane>
+            )}
             {result.code !== 0 && (
               <Tabs.TabPane
                 tab={

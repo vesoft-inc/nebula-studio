@@ -14,8 +14,9 @@ import (
 )
 
 type ExecuteResult struct {
-	Headers []string                `json:"headers"`
-	Tables  []map[string]common.Any `json:"tables"`
+	Headers  []string                `json:"headers"`
+	Tables   []map[string]common.Any `json:"tables"`
+	TimeCost int32                   `json:"timeCost"`
 }
 
 var spaceRegex = regexp.MustCompile(`use ([0-9A-Za-z_]+);`)
@@ -141,6 +142,8 @@ func Execute(sessionID int64, gql string) (result ExecuteResult, err error) {
 		}
 		result.Tables = append(result.Tables, rowValue)
 	}
+
+	result.CostTime = resp.LatencyInUs
 
 	return result, nil
 }

@@ -221,6 +221,12 @@ class App extends React.Component<IProps, IState> {
                           {intl.get('common.feedback')}
                         </a>
                       </Menu.Item>
+                      <Menu.Item>
+                        <a href={intl.get('common.forumLink')} target="_blank">
+                          <Icon type="question" />
+                          {intl.get('common.forum')}
+                        </a>
+                      </Menu.Item>
                     </Menu>
                   }
                 >

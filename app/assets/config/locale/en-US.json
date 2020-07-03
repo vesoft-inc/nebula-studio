@@ -27,6 +27,8 @@
     "nebula": "Nebula",
     "setting": "Setting",
     "feedback": "Feedback",
+    "forum": "Help Forum",
+    "forumLink": "https://discuss.nebula-graph.io/",
     "ask": "Sure to do this?"
   },
   "NGQLOutput": {
@@ -52,6 +54,10 @@
     "passwordRequired": "Password Required",
     "nodeIdError": "The format is not right, id1\nid2\nid3\n1 node per line, split by \\n",
     "idRequired": "The ids is required"
+  },
+  "console": {
+    "cost": "Cost",
+    "execTime": "Execution Time"
   },
   "explore": {
     "clear": "Clear",

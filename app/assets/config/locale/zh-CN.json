@@ -27,6 +27,8 @@
     "nebula": "Nebula",
     "setting":"设置",
     "feedback": "问题反馈",
+    "forum": "求助论坛",
+    "forumLink": "https://discuss.nebula-graph.com.cn/",
     "ask": "确定进行当前操作？"
   },
   "warning": {
@@ -52,6 +54,10 @@
     "passwordRequired": "请填写密码",
     "nodeIdError": "格式不正确，id1 id2 id3每行1个节点id，以回车分开",
     "idRequired": "请输入导入的节点id"
+  },
+  "console": {
+    "cost": "开销",
+    "execTime": "执行时间消耗"
   },
   "explore": {
     "clear": "清除",
