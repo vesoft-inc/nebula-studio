@@ -143,7 +143,7 @@ func Execute(sessionID int64, gql string) (result ExecuteResult, err error) {
 		result.Tables = append(result.Tables, rowValue)
 	}
 
-	result.CostTime = resp.LatencyInUs
+	result.TimeCost = resp.LatencyInUs
 
 	return result, nil
 }

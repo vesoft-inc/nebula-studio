@@ -80,7 +80,7 @@ export default class OutputBox extends React.Component<IProps, {}> {
                 />
               </Tabs.TabPane>
             )}
-            {result.code === 0 && result.data.costTime && (
+            {result.code === 0 && result.data.timeCost && (
               <Tabs.TabPane
                 tab={
                   <>
@@ -90,7 +90,8 @@ export default class OutputBox extends React.Component<IProps, {}> {
                 }
                 key="cost"
               >
-                {`${intl.get('console.execTime')} ${result.data.costTime} (μs)`}
+                {`${intl.get('console.execTime')} ${result.data.timeCost /
+                  1000000} (s)`}
               </Tabs.TabPane>
             )}
             {result.code !== 0 && (
