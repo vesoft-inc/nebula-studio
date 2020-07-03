@@ -35,6 +35,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
   asyncSwitchSpace: async space => {
     await dispatch.nebula.asyncSwitchSpace(space);
     await dispatch.nebula.asyncGetTags();
+    await dispatch.nebula.asyncGetEdgeTypes();
     dispatch.explore.update({
       exploreRules: {},
     });

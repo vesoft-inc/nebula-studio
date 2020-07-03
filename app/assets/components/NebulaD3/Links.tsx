@@ -25,13 +25,25 @@ export default class Links extends React.Component<IProps, {}> {
         (v: any) => v.id,
       );
       removeLinks.forEach(removeLink => {
-        d3.select('#text-path-' + removeLink.id).remove();
-        d3.select('#text-marker' + removeLink.id).remove();
-        d3.select('#text-marker-id' + removeLink.id).remove();
+        const id = this.generateId(removeLink);
+        d3.select('#text-path-' + id).remove();
+        d3.select('#text-marker' + id).remove();
+        d3.select('#text-marker-id' + id).remove();
       });
     } else {
       this.linkRender(this.props.links);
     }
+  }
+
+  generateId(link) {
+    const source = link.source.name || link.source;
+    const target = link.target.name || link.target;
+    return (
+      source +
+      link.type +
+      target +
+      link.edgeProp.tables[0][`${link.type}._rank`]
+    );
   }
 
   linkRender(links) {
@@ -49,7 +61,7 @@ export default class Links extends React.Component<IProps, {}> {
       .attr('class', 'link')
       .style('stroke', '#999999')
       .style('stroke-opacity', 0.6)
-      .attr('id', (d: any) => 'text-path-' + d.id)
+      .attr('id', (d: any) => 'text-path-' + this.generateId(d))
       .style('stroke-width', 2);
 
     d3.select(this.ref)
@@ -58,9 +70,9 @@ export default class Links extends React.Component<IProps, {}> {
       .enter()
       .append('text')
       .attr('class', 'text')
-      .attr('id', (d: any) => 'text-marker-id' + d.id)
+      .attr('id', (d: any) => 'text-marker-id' + this.generateId(d))
       .append('textPath')
-      .attr('id', (d: any) => 'text-marker' + d.id)
+      .attr('id', (d: any) => 'text-marker' + this.generateId(d))
       .attr('class', 'textPath');
 
     if (this.ref) {

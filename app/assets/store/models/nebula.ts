@@ -15,6 +15,7 @@ interface IState {
   username: string;
   password: string;
   tagsFields: any[];
+  edgesFields: any[];
 }
 
 export const nebula = createModel({
@@ -27,6 +28,7 @@ export const nebula = createModel({
     edgeTypes: [],
     tags: [],
     tagsFields: [],
+    edgesFields: [],
   },
   reducers: {
     update: (state: IState, payload: any) => {
@@ -36,17 +38,36 @@ export const nebula = createModel({
       };
     },
 
+    addEdgesName: (state: IState, payload: any) => {
+      const { edgesFields } = state;
+      const { edgeType, edgeFields } = payload;
+      const index = _.findIndex(edgesFields, edgeType);
+      if (index === -1) {
+        edgesFields.push({
+          [edgeType]: edgeFields,
+        });
+      } else {
+        edgesFields[index] = {
+          [edgeType]: edgeFields,
+        };
+      }
+      return {
+        ...state,
+        edgesFields,
+      };
+    },
+
     addTagsName: (state: IState, payload: any) => {
       const { tagsFields } = state;
-      const { tag, Names } = payload;
+      const { tag, tagFields } = payload;
       const index = _.findIndex(tagsFields, tag);
       if (index === -1) {
         tagsFields.push({
-          [tag]: Names,
+          [tag]: tagFields,
         });
       } else {
         tagsFields[index] = {
-          [tag]: Names,
+          [tag]: tagFields,
         };
       }
       return {
@@ -135,7 +156,7 @@ export const nebula = createModel({
       return { code, data };
     },
 
-    async asyncGetTagsName(payload: { tags: any[] }) {
+    async asyncGetTagsFields(payload: { tags: any[] }) {
       const { tags } = payload;
       await Promise.all(
         tags.map(async item => {
@@ -143,8 +164,26 @@ export const nebula = createModel({
             gql: `desc tag ${item};`,
           })) as any;
           if (code === 0) {
-            const Names = data.tables.map(item => item.Field);
-            this.addTagsName({ tag: item, Names });
+            const tagFields = data.tables.map(item => item.Field);
+            this.addTagsName({ tag: item, tagFields });
+          }
+        }),
+      );
+    },
+
+    async asyncGetEdgeTypesFields(payload: { edgeTypes: any[] }) {
+      const { edgeTypes } = payload;
+      await Promise.all(
+        edgeTypes.map(async item => {
+          const { code, data } = (await service.execNGQL({
+            gql: `desc edge ${item};`,
+          })) as any;
+          if (code === 0) {
+            const edgeFields = data.tables.map(item => item.Field);
+            this.addEdgesName({
+              edgeType: item,
+              edgeFields: ['type', '_rank', ...edgeFields],
+            });
           }
         }),
       );

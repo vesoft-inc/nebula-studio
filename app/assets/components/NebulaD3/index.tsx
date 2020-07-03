@@ -20,7 +20,8 @@ interface IProps {
     edges: any[];
     selectIdsMap: Map<string, boolean>;
   };
-  showFields: string[];
+  showTagFields: string[];
+  showEdgeFields: string[];
   onSelectVertexes: (vertexes: INode[]) => void;
   onMouseInNode: (node: INode) => void;
   onMouseOut: () => void;
@@ -257,12 +258,19 @@ class NebulaD3 extends React.Component<IProps, {}> {
       })
       .text((d: any) => {
         if (d.source.x - d.target.x > 0) {
-          return d.type
-            .split('')
-            .reverse()
-            .join('');
+          return (
+            this.edgeName(d)
+              .join(' & ')
+              .split('')
+              .reverse()
+              .join('') ||
+            d.type
+              .split('')
+              .reverse()
+              .join('')
+          );
         }
-        return d.type;
+        return this.edgeName(d).join(' & ') || d.type;
       });
     this.nodeRenderText();
   };
@@ -344,17 +352,25 @@ class NebulaD3 extends React.Component<IProps, {}> {
     }
   };
 
+  generateId(link) {
+    const source = link.source.name || link.source;
+    const target = link.target.name || link.target;
+    return (
+      source +
+      link.type +
+      target +
+      link.edgeProp.tables[0][`${link.type}._rank`]
+    );
+  }
+
   handleUpdataLinks = () => {
     if (this.force) {
       this.link = d3.selectAll('.link').attr('marker-end', 'url(#marker)');
       this.linksText = d3
         .selectAll('.text')
         .selectAll('.textPath')
-        .attr(':href', (d: any) => '#text-path-' + d.id)
-        .attr('startOffset', '50%')
-        .text((d: any) => {
-          return d.type;
-        });
+        .attr(':href', (d: any) => '#text-path-' + this.generateId(d))
+        .attr('startOffset', '50%');
     }
   };
 
@@ -383,9 +399,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .id((d: any) => {
         return d.name;
       })
-      .distance((d: any) => {
-        return d.value * 35;
-      });
+      .distance(210);
     if (!this.force) {
       this.force = d3
         .forceSimulation()
@@ -408,7 +422,8 @@ class NebulaD3 extends React.Component<IProps, {}> {
 
   isIncludeField = (node, field) => {
     let isInclude = false;
-    node.nodeProp.tables.forEach(v => {
+    const props = node.nodeProp || node.edgeProp;
+    props.tables.forEach(v => {
       Object.keys(v).forEach(nodeField => {
         if (nodeField === field) {
           isInclude = true;
@@ -416,6 +431,31 @@ class NebulaD3 extends React.Component<IProps, {}> {
       });
     });
     return isInclude;
+  };
+
+  edgeName = edge => {
+    const { showEdgeFields } = this.props;
+    const edgeText: any = [];
+    if (showEdgeFields.includes(`${edge.type}.type`)) {
+      if (showEdgeFields.includes(`${edge.type}._rank`)) {
+        edgeText.push(
+          `${edge.type}@${edge.edgeProp.tables[0][`${edge.type}._rank`]}`,
+        );
+      } else {
+        edgeText.push(edge.type);
+      }
+    }
+
+    showEdgeFields.forEach(field => {
+      edge.edgeProp.tables.forEach(e => {
+        Object.keys(e).forEach(edgeField => {
+          if (edgeField === field && field !== `${edge.type}._rank`) {
+            edgeText.push(`${e[edgeField]}`);
+          }
+        });
+      });
+    });
+    return edgeText;
   };
 
   targetName = (node, field) => {
@@ -431,12 +471,12 @@ class NebulaD3 extends React.Component<IProps, {}> {
   };
 
   nodeRenderText() {
-    const { showFields, data } = this.props;
+    const { showTagFields, data } = this.props;
     d3.selectAll('tspan').remove();
     data.vertexes.forEach((node: any) => {
       let line = 1;
       if (node.nodeProp) {
-        showFields.forEach(field => {
+        showTagFields.forEach(field => {
           if (this.isIncludeField(node, field)) {
             line++;
             d3.select('#name_' + node.name)

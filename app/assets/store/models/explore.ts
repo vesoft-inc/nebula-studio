@@ -5,7 +5,7 @@ import _ from 'lodash';
 import intl from 'react-intl-universal';
 
 import service from '#assets/config/service';
-import { fetchVertexProps } from '#assets/utils/fetch';
+import { fetchEdgeProps, fetchVertexProps } from '#assets/utils/fetch';
 import { getExploreGQL } from '#assets/utils/gql';
 import { idToSrting, nebulaToData, setLink } from '#assets/utils/nebulaToData';
 
@@ -182,6 +182,7 @@ export const explore = createModel({
       exploreStep: number;
       vertexColor: string;
       originVertexes: any[];
+      originEdges: any[];
     }) {
       const {
         selectVertexes,
@@ -191,6 +192,7 @@ export const explore = createModel({
         exploreStep,
         vertexColor,
         originVertexes,
+        originEdges,
       } = payload;
       let group;
       const gql = getExploreGQL({
@@ -209,6 +211,7 @@ export const explore = createModel({
           edgeTypes,
           edgeDirection,
         );
+        // fetch vertexes
         const newVertexes = await Promise.all(
           _.differenceBy(vertexes, originVertexes, vertexe => vertexe.name).map(
             async (v: any) => {
@@ -239,9 +242,21 @@ export const explore = createModel({
             },
           ),
         );
+        // fetch edges
+        const newEdges = await Promise.all(
+          _.differenceBy(edges, originEdges, edge => edge.id).map(
+            async (e: any) => {
+              const edgeProp = await fetchEdgeProps(e.id);
+              return {
+                ...e,
+                edgeProp,
+              };
+            },
+          ),
+        );
         this.addNodesAndEdges({
           vertexes: newVertexes,
-          edges,
+          edges: newEdges,
         });
         this.update({
           step: exploreStep,

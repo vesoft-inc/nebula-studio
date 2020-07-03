@@ -20,7 +20,9 @@ const mapState = (state: IRootState) => ({
   actionData: state.explore.actionData,
   space: state.nebula.currentSpace,
   tagsFields: state.nebula.tagsFields,
+  edgesFields: state.nebula.edgesFields,
   tags: state.nebula.tags,
+  edgeTypes: state.nebula.edgeTypes,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -37,13 +39,16 @@ const mapDispatch = (dispatch: IDispatch) => ({
       selectVertexes: [],
     });
   },
-  asyncGetTagsName: dispatch.nebula.asyncGetTagsName,
+  asyncGetTagsFields: dispatch.nebula.asyncGetTagsFields,
+  asyncGetEdgeTypesFields: dispatch.nebula.asyncGetEdgeTypesFields,
 });
 
 interface IState {
   width: number;
   height: number;
-  showFields: string[];
+  showTagFields: string[];
+  showEdgeFields: string[];
+  isTags: boolean;
 }
 
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
@@ -58,7 +63,9 @@ class NebulaGraph extends React.Component<IProps, IState> {
     this.state = {
       width: 0,
       height: 0,
-      showFields: [],
+      showTagFields: [],
+      showEdgeFields: [],
+      isTags: true,
     };
   }
 
@@ -96,7 +103,8 @@ class NebulaGraph extends React.Component<IProps, IState> {
     const { space } = this.props;
     if (prevProps.space !== space) {
       this.setState({
-        showFields: [],
+        showTagFields: [],
+        showEdgeFields: [],
       });
     }
   }
@@ -107,12 +115,12 @@ class NebulaGraph extends React.Component<IProps, IState> {
 
   handleMouseInNode = node => {
     // const e: any = event || window.event;
-    const nodeProp = node.nodeProp
+    const nodeFieldsValuePairStr = node.nodeProp
       ? node.nodeProp.tables
-          .map(v => {
-            return Object.keys(v)
-              .map(index => {
-                return `<p key=${index}>${index}: ${v[index]}</p>`;
+          .map(node => {
+            return Object.keys(node)
+              .map(fields => {
+                return `<p key=${fields}>${fields}: ${node[fields]}</p>`;
               })
               .join('');
           })
@@ -121,23 +129,26 @@ class NebulaGraph extends React.Component<IProps, IState> {
 
     this.$tooltip
       .html(
-        `<p style="font-weight:600">Vertex Details</p> <p>id: ${node.name}</p> ${nodeProp}`,
+        `<p style="font-weight:600">Vertex Details</p> <p>id: ${node.name}</p> ${nodeFieldsValuePairStr}`,
       )
       .style('display', 'block');
   };
 
   handleMouseInLink = link => {
-    const linkText = Object.keys(link.edge)
-      .filter(field => {
-        return field !== 'id';
-      })
-      .map(key => {
-        return `<p key=${key}>${key}: ${link.edge[key]}</p>`;
-      })
-      .join('');
+    const edgeFieldsValuePairStr = link.edgeProp
+      ? link.edgeProp.tables
+          .map(link => {
+            return Object.keys(link)
+              .map(attribute => {
+                return `<p key=${attribute}>${attribute}: ${link[attribute]}</p>`;
+              })
+              .join('');
+          })
+          .join('')
+      : '';
     this.$tooltip
       .html(
-        `<p style="font-weight:600">Edge Details</p> <p>id: ${link.id}</p> ${linkText}`,
+        `<p style="font-weight:600">Edge Details</p> <p>id: ${link.id}</p> ${edgeFieldsValuePairStr}`,
       )
       .style('display', 'block');
   };
@@ -172,17 +183,58 @@ class NebulaGraph extends React.Component<IProps, IState> {
     }
   };
 
-  handleSetting = async () => {
-    const { asyncGetTagsName, tags } = this.props;
-    await asyncGetTagsName({
+  handleShowTags = async () => {
+    const { asyncGetTagsFields, tags } = this.props;
+    await asyncGetTagsFields({
       tags,
     });
     this.settingHandler.show();
   };
 
-  handleTgasNameChange = showFields => {
+  handleShowEdges = async () => {
+    const { asyncGetEdgeTypesFields, edgeTypes } = this.props;
+    await asyncGetEdgeTypesFields({
+      edgeTypes,
+    });
+    this.settingHandler.show();
+  };
+
+  handleSetting = (type: string) => {
+    if (type === 'tags') {
+      this.setState(
+        {
+          isTags: true,
+        },
+        this.handleShowTags,
+      );
+    } else {
+      this.setState(
+        {
+          isTags: false,
+        },
+        this.handleShowEdges,
+      );
+    }
+  };
+
+  handleEdgesNameChange = showEdgeFields => {
+    const { edges } = this.props;
+    edges.forEach((edge: any) => {
+      if (
+        !showEdgeFields.includes(`${edge.type}.type`) &&
+        showEdgeFields.includes(`${edge.type}._rank`)
+      ) {
+        showEdgeFields.splice(showEdgeFields.indexOf(`${edge.type}._rank`), 1);
+      }
+    });
     this.setState({
-      showFields,
+      showEdgeFields,
+    });
+  };
+
+  handleTgasNameChange = showTagFields => {
+    this.setState({
+      showTagFields,
     });
   };
 
@@ -194,8 +246,10 @@ class NebulaGraph extends React.Component<IProps, IState> {
       actionData,
       tagsFields,
       tags,
+      edgeTypes,
+      edgesFields,
     } = this.props;
-    const { width, height, showFields } = this.state;
+    const { width, height, showTagFields, showEdgeFields, isTags } = this.state;
     return (
       <div
         className="graph-wrap"
@@ -203,11 +257,18 @@ class NebulaGraph extends React.Component<IProps, IState> {
       >
         {/* // TODO: move into <Panel/> */}
         <Button
-          className="history-show"
-          onClick={this.handleSetting}
+          className="show-btn"
+          onClick={() => this.handleSetting('tags')}
           disabled={tags.length === 0 || vertexes.length === 0}
         >
-          {intl.get('explore.show')}
+          {intl.get('explore.showTags')}
+        </Button>
+        <Button
+          className="show-btn show-edges"
+          onClick={() => this.handleSetting('edges')}
+          disabled={edgeTypes.length === 0 || edges.length === 0}
+        >
+          {intl.get('explore.showEdges')}
         </Button>
         <Button
           className="history-undo"
@@ -220,7 +281,8 @@ class NebulaGraph extends React.Component<IProps, IState> {
         <NebulaD3
           width={width}
           height={height}
-          showFields={showFields}
+          showTagFields={showTagFields}
+          showEdgeFields={showEdgeFields}
           data={{
             vertexes,
             edges,
@@ -248,9 +310,11 @@ class NebulaGraph extends React.Component<IProps, IState> {
           }
         >
           <Setting
-            showFields={showFields}
-            tagsFields={tagsFields}
-            onTgasNameChange={this.handleTgasNameChange}
+            showFields={isTags ? showTagFields : showEdgeFields}
+            fields={isTags ? tagsFields : edgesFields}
+            onNameChange={
+              isTags ? this.handleTgasNameChange : this.handleEdgesNameChange
+            }
           />
         </Modal>
       </div>

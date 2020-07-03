@@ -29,6 +29,7 @@ const mapState = (state: IRootState) => ({
   exploreStep: state.explore.step,
   exploreRules: state.explore.exploreRules,
   vertexes: state.explore.vertexes,
+  edges: state.explore.edges,
   getExpandLoading: state.loading.effects.explore.asyncGetExpand,
 });
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -95,7 +96,7 @@ class Expand extends React.Component<IProps, IState> {
   };
 
   handleExpand = () => {
-    const { selectVertexes, exploreStep, vertexes } = this.props;
+    const { selectVertexes, exploreStep, vertexes, edges } = this.props;
     const { getFieldValue } = this.props.form;
     const { filters } = this.state;
     const edgeTypes = getFieldValue('edgeTypes');
@@ -109,6 +110,7 @@ class Expand extends React.Component<IProps, IState> {
       vertexColor,
       exploreStep: exploreStep + 1,
       originVertexes: vertexes,
+      originEdges: edges,
     }) as any).then(
       () => {
         message.success(intl.get('common.success'));
