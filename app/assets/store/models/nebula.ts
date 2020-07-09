@@ -161,7 +161,8 @@ export const nebula = createModel({
       await Promise.all(
         tags.map(async item => {
           const { code, data } = (await service.execNGQL({
-            gql: `desc tag ${item};`,
+            // HACK: Processing keyword
+            gql: 'desc tag' + '`' + item + '`;',
           })) as any;
           if (code === 0) {
             const tagFields = data.tables.map(item => item.Field);
@@ -176,7 +177,8 @@ export const nebula = createModel({
       await Promise.all(
         edgeTypes.map(async item => {
           const { code, data } = (await service.execNGQL({
-            gql: `desc edge ${item};`,
+            // HACK: Processing keyword
+            gql: 'desc edge' + '`' + item + '`;',
           })) as any;
           if (code === 0) {
             const edgeFields = data.tables.map(item => item.Field);
@@ -204,7 +206,8 @@ export const nebula = createModel({
 
     async asyncSwitchSpace(space: string) {
       const { code } = (await service.execNGQL({
-        gql: `use ${space};`,
+        // HACK: Processing keyword
+        gql: 'use' + '`' + space + '`;',
       })) as any;
 
       if (code === 0) {

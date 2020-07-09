@@ -22,6 +22,8 @@ const mapState = (state: IRootState) => {
     ),
     currentSpace: state.nebula.currentSpace,
     vertex,
+    vertexesConfig: state.importData.vertexesConfig,
+    activeVertexIndex: state.importData.activeVertexIndex,
   };
 };
 
@@ -31,6 +33,7 @@ const mapDispatch = (dispatch: IDispatch) => {
     refresh: dispatch.importData.refresh,
     deleteTag: dispatch.importData.deleteTag,
     updateVertex: dispatch.importData.updateVertexConfig,
+    changeTagType: dispatch.importData.changeTagType,
   };
 };
 
@@ -84,6 +87,17 @@ class Tag extends React.Component<IProps> {
     );
   };
 
+  handleChangeTagType = async (record, tag, type) => {
+    const { activeVertexIndex, vertexesConfig, changeTagType } = this.props;
+    await changeTagType({
+      activeVertexIndex,
+      vertexesConfig,
+      record,
+      tagName: tag,
+      type,
+    });
+  };
+
   renderPropsTable = (props, tag) => {
     const render = this.renderTableTitle;
     const { file } = this.props.vertex;
@@ -119,9 +133,14 @@ class Tag extends React.Component<IProps> {
       {
         title: render(intl.get('import.type'), intl.get('import.typeTip')),
         dataIndex: 'type',
-        render: value => (
-          <Select value={value} disabled={true} showArrow={false}>
-            <Option value={value}>{value}</Option>
+        render: (value, record) => (
+          <Select
+            value={value}
+            onChange={type => this.handleChangeTagType(record, tag, type)}
+          >
+            <Option value={'int'}>{'int'}</Option>
+            <Option value={'string'}>{'string'}</Option>
+            <Option value={'bool'}>{'bool'}</Option>
           </Select>
         ),
       },

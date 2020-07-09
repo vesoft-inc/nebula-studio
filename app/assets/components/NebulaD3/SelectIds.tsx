@@ -42,7 +42,7 @@ export default class SelectIds extends React.Component<IProps, {}> {
       .style('fill', 'transparent')
       .style('stroke-opacity', '0.6');
 
-    d3.selectAll('svg')
+    d3.select('#output-graph')
       .on('mousedown', () => {
         selectStartPosition.x = d3.event.offsetX * (1 + scale);
         selectStartPosition.y = d3.event.offsetY * (1 + scale);

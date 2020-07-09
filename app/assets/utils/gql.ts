@@ -5,7 +5,6 @@ export const getExploreGQL = (params: {
   filters: any[];
 }) => {
   const { selectVertexes, edgeTypes, edgeDirection, filters } = params;
-
   const wheres = filters
     .filter(filter => filter.field && filter.operator && filter.value)
     .map(filter => `${filter.field} ${filter.operator} ${filter.value}`)
@@ -18,16 +17,21 @@ export const getExploreGQL = (params: {
     default:
       direction = ''; // default outgoing
   }
-  const gql = `GO FROM 
+  const gql =
+    `GO FROM 
   ${selectVertexes.map(d => d.name)}
-OVER 
-  ${edgeTypes.join(',')} ${direction} ${wheres ? `\nWHERE ${wheres}` : ''}
+OVER
+  ` +
+    '`' +
+    edgeTypes.join('`,`') +
+    '` ' +
+    `${direction} ${wheres ? `\nWHERE ${wheres}` : ''}
 YIELD 
 ${edgeTypes
-  .map(
-    type =>
-      `  ${type}._src as ${type}SourceId,\n  ${type}._dst as ${type}DestId,\n  ${type}._rank as ${type}Rank`,
-  )
+  .map(type => {
+    const typeName = '`' + type + '`';
+    return `${typeName}._src as ${type}SourceId,\n  ${typeName}._dst as ${type}DestId,\n  ${typeName}._rank as ${type}Rank`;
+  })
   .join(',\n')};
 `;
 

@@ -199,7 +199,8 @@ export function getGQLByConfig(payload) {
             message.error(`${prop.name} ${intl.get('import.indexNotEmpty')}`);
             throw new Error();
           }
-          tagField.push(prop.name);
+          // HACK: Processing keyword
+          tagField.push('`' + prop.name + '`');
           const value =
             prop.type === 'string'
               ? `"${columns[prop.mapping]}"`
@@ -207,11 +208,17 @@ export function getGQLByConfig(payload) {
           values.push(value);
         });
         NGQL.push(
-          `INSERT VERTEX ${tag.name}(${tagField}) VALUES ${
-            vertexConfig.useHash === 'unset'
-              ? columns[vertexConfig.idMapping]
-              : `${vertexConfig.useHash}("${columns[vertexConfig.idMapping]}")`
-          }:(${values})`,
+          'INSERT VERTEX' +
+            '`' +
+            tag.name +
+            '`' +
+            `(${tagField}) VALUES ${
+              vertexConfig.useHash === 'unset'
+                ? columns[vertexConfig.idMapping]
+                : `${vertexConfig.useHash}("${
+                    columns[vertexConfig.idMapping]
+                  }")`
+            }:(${values})`,
         );
       });
     });
@@ -235,7 +242,8 @@ export function getGQLByConfig(payload) {
           prop.name !== 'dstId' &&
           prop.name !== 'rank'
         ) {
-          edgeField.push(prop.name);
+          // HACK: Processing keyword
+          edgeField.push('`' + prop.name + '`');
           const value =
             prop.type === 'string'
               ? `"${columns[prop.mapping]}"`
@@ -248,19 +256,23 @@ export function getGQLByConfig(payload) {
           ? ''
           : `@${columns[edgeConfig.props[2].mapping]}`;
       NGQL.push(
-        `INSERT EDGE ${edgeConfig.type}(${edgeField.join(',')}) VALUES ${
-          edgeConfig.props[0].useHash === 'unset'
-            ? columns[edgeConfig.props[0].mapping]
-            : `${edgeConfig.props[0].useHash}("${
-                columns[edgeConfig.props[0].mapping]
-              }")`
-        } -> ${
-          edgeConfig.props[1].useHash === 'unset'
-            ? columns[edgeConfig.props[1].mapping]
-            : `${edgeConfig.props[1].useHash}("${
-                columns[edgeConfig.props[1].mapping]
-              }")`
-        } ${rank}:(${values})`,
+        'INSERT EDGE' +
+          '`' +
+          edgeConfig.type +
+          '`' +
+          `(${edgeField.join(',')}) VALUES ${
+            edgeConfig.props[0].useHash === 'unset'
+              ? columns[edgeConfig.props[0].mapping]
+              : `${edgeConfig.props[0].useHash}("${
+                  columns[edgeConfig.props[0].mapping]
+                }")`
+          } -> ${
+            edgeConfig.props[1].useHash === 'unset'
+              ? columns[edgeConfig.props[1].mapping]
+              : `${edgeConfig.props[1].useHash}("${
+                  columns[edgeConfig.props[1].mapping]
+                }")`
+          } ${rank}:(${values})`,
       );
     });
   });

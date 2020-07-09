@@ -306,6 +306,50 @@ export const importData = createModel({
       service.stopImport(payload);
     },
 
+    async changeTagType(payload: {
+      activeVertexIndex: number;
+      vertexesConfig: IVertexConfig[];
+      record: any;
+      tagName: string;
+      type: string;
+    }) {
+      const {
+        activeVertexIndex,
+        vertexesConfig,
+        record,
+        tagName,
+        type,
+      } = payload;
+      vertexesConfig[activeVertexIndex].tags.forEach(tag => {
+        if (tag.name === tagName) {
+          tag.props.forEach(prop => {
+            if (prop.name === record.name) {
+              prop.type = type;
+            }
+          });
+        }
+      });
+      this.update({
+        vertexesConfig,
+      });
+    },
+
+    async changeEdgeFieldType(payload: {
+      edge: IEdgeConfig;
+      propName: string;
+      type: string;
+    }) {
+      const { edge, propName, type } = payload;
+      edge.props.forEach(prop => {
+        if (prop.name === propName) {
+          prop.type = type;
+        }
+      });
+      this.update({
+        edge,
+      });
+    },
+
     async testImport(payload) {
       const config: any = configToJson(payload);
       const { taskId, errCode } = (await service.importData(config)) as any;
@@ -342,7 +386,7 @@ export const importData = createModel({
     async asyncUpdateEdgeConfig(payload: { edgeType: string }) {
       const { edgeType } = payload;
       const { code, data } = (await service.execNGQL({
-        gql: `DESCRIBE EDGE ${edgeType};`,
+        gql: 'DESCRIBE EDGE' + '`' + edgeType + '`;',
       })) as any;
       if (code === 0) {
         const props = data.tables.map(item => ({
@@ -381,7 +425,8 @@ export const importData = createModel({
     async asyncUpdateTagConfig(payload: { tag: string; tagIndex: number }) {
       const { tag, tagIndex } = payload;
       const { code, data } = (await service.execNGQL({
-        gql: `DESCRIBE TAG ${tag}`,
+        // HACK: Processing keyword
+        gql: 'DESCRIBE TAG' + '`' + tag + '`;',
       })) as any;
       if (code === 0) {
         const props = data.tables.map(attr => ({

@@ -44,8 +44,13 @@ class Add extends React.PureComponent<IProps> {
     const { type, files } = this.props;
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        const { fileIndex } = values;
-        const file = files[fileIndex];
+        const { fileName } = values;
+        let file;
+        files.forEach(_file => {
+          if (_file.name === fileName) {
+            file = _file;
+          }
+        });
         if (type === AddType.vertex) {
           this.props.newVertexConfig(file);
           this.modalHandle.hide();
@@ -69,7 +74,6 @@ class Add extends React.PureComponent<IProps> {
       files,
       form: { getFieldDecorator },
     } = this.props;
-
     return (
       <div className={`add-${type}`}>
         <Button onClick={this.handleAdd}>
@@ -82,16 +86,16 @@ class Add extends React.PureComponent<IProps> {
         >
           <Form>
             <FormItem label={intl.get('import.fileName')}>
-              {getFieldDecorator('fileIndex', {
+              {getFieldDecorator('fileName', {
                 rules: [
                   {
                     required: true,
                   },
                 ],
               })(
-                <Select>
-                  {files.map((file, index) => (
-                    <Option value={index} key={file.name}>
+                <Select showSearch={true}>
+                  {files.map((file: any) => (
+                    <Option value={file.name} key={file.name}>
                       {file.name}
                     </Option>
                   ))}

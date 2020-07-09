@@ -518,6 +518,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
           onAfterChange={this.handleZoom}
         />
         <svg
+          id="output-graph"
           className="output-graph"
           ref={mountPoint => (this.ctrls.mountPoint = mountPoint)}
           width={width}

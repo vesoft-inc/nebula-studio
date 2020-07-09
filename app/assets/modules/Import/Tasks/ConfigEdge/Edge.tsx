@@ -30,6 +30,7 @@ const mapState = (state: IRootState) => {
 
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncUpdateEdgeConfig: dispatch.importData.asyncUpdateEdgeConfig,
+  changeEdgeFieldType: dispatch.importData.changeEdgeFieldType,
   refresh: dispatch.importData.refresh,
 });
 
@@ -60,6 +61,11 @@ class Edge extends React.Component<IProps> {
         </Tooltip>
       </p>
     );
+  };
+
+  handleChangeEdgeType = async (record, type) => {
+    const { edge, changeEdgeFieldType } = this.props;
+    await changeEdgeFieldType({ edge, propName: record.name, type });
   };
 
   renderPropsTable = () => {
@@ -102,9 +108,14 @@ class Edge extends React.Component<IProps> {
       {
         title: render(intl.get('import.type'), intl.get('import.typeTip')),
         dataIndex: 'type',
-        render: value => (
-          <Select value={value} disabled={true}>
-            <Option value={value}>{value}</Option>
+        render: (value, record) => (
+          <Select
+            value={value}
+            onChange={type => this.handleChangeEdgeType(record, type)}
+          >
+            <Option value={'int'}>{'int'}</Option>
+            <Option value={'string'}>{'string'}</Option>
+            <Option value={'bool'}>{'bool'}</Option>
           </Select>
         ),
       },
