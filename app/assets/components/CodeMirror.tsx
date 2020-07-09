@@ -12,6 +12,8 @@ import React from 'react';
 
 import { ban, keyWords, maxLineNum, operators } from '#assets/config/nebulaQL';
 
+import './Codemirror.less';
+
 interface IProps {
   options: object;
   value: string;
