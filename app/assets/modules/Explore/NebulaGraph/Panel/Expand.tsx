@@ -102,12 +102,14 @@ class Expand extends React.Component<IProps, IState> {
     const edgeTypes = getFieldValue('edgeTypes');
     const edgeDirection = getFieldValue('edgeDirection');
     const vertexColor = getFieldValue('vertexColor');
+    const quantityLimit = getFieldValue('quantityLimit') || null;
     (this.props.asyncGetExpand({
       filters,
       selectVertexes,
       edgeTypes,
       edgeDirection,
       vertexColor,
+      quantityLimit,
       exploreStep: exploreStep + 1,
       originVertexes: vertexes,
       originEdges: edges,
@@ -144,6 +146,7 @@ class Expand extends React.Component<IProps, IState> {
     const { filters } = this.state;
     const selectEdgeTypes = getFieldValue('edgeTypes');
     const edgeDirection = getFieldValue('edgeDirection');
+    const quantityLimit = getFieldValue('quantityLimit') || null;
     const currentGQL =
       selectEdgeTypes && selectEdgeTypes.length
         ? getExploreGQL({
@@ -151,6 +154,7 @@ class Expand extends React.Component<IProps, IState> {
             edgeTypes: selectEdgeTypes,
             filters,
             edgeDirection,
+            quantityLimit,
           })
         : '';
     const columns = [
@@ -213,6 +217,12 @@ class Expand extends React.Component<IProps, IState> {
           <Form.Item label="Edge Type:">
             {getFieldDecorator('edgeTypes', {
               initialValue: rules.edgeTypes,
+              rules: [
+                {
+                  required: true,
+                  message: 'Edge Type is required',
+                },
+              ],
             })(
               <Select mode="multiple">
                 {edgeTypes.map(e => (
@@ -226,6 +236,11 @@ class Expand extends React.Component<IProps, IState> {
           <Form.Item label="Edge Direction:">
             {getFieldDecorator('edgeDirection', {
               initialValue: rules.edgeDirection || 'outgoing',
+              rules: [
+                {
+                  required: true,
+                },
+              ],
             })(
               <Select>
                 <Option value="outgoing">{intl.get('explore.outgoing')}</Option>
@@ -236,6 +251,11 @@ class Expand extends React.Component<IProps, IState> {
           <Form.Item label={intl.get('explore.vertexColor')}>
             {getFieldDecorator('vertexColor', {
               initialValue: rules.vertexColor || 'groupByStep',
+              rules: [
+                {
+                  required: true,
+                },
+              ],
             })(
               <Select>
                 <Option value="groupByStep">
@@ -246,6 +266,22 @@ class Expand extends React.Component<IProps, IState> {
                 </Option>
               </Select>,
             )}
+          </Form.Item>
+          <Form.Item label={intl.get('explore.quantityLimit')}>
+            {getFieldDecorator('quantityLimit', {
+              initialValue: rules.quantityLimit,
+              rules: [
+                {
+                  message: intl.get('formRules.positiveIntegerRequired'),
+                  pattern: /^\d+$/,
+                  transform(value) {
+                    if (value) {
+                      return Number(value);
+                    }
+                  },
+                },
+              ],
+            })(<Input type="number" />)}
           </Form.Item>
           <Collapse className="filters">
             <Panel header={intl.get('explore.filter')} key="filter">
@@ -277,7 +313,10 @@ class Expand extends React.Component<IProps, IState> {
         <Button
           onClick={this.handleExpand}
           disabled={
-            !selectEdgeTypes || !selectEdgeTypes.length || !!getExpandLoading
+            !selectEdgeTypes ||
+            !selectEdgeTypes.length ||
+            !!getExpandLoading ||
+            quantityLimit < 0
           }
         >
           {intl.get('explore.expand')}

@@ -3,8 +3,15 @@ export const getExploreGQL = (params: {
   edgeTypes: string[];
   edgeDirection: string;
   filters: any[];
+  quantityLimit: number | null;
 }) => {
-  const { selectVertexes, edgeTypes, edgeDirection, filters } = params;
+  const {
+    selectVertexes,
+    edgeTypes,
+    edgeDirection,
+    filters,
+    quantityLimit,
+  } = params;
   const wheres = filters
     .filter(filter => filter.field && filter.operator && filter.value)
     .map(filter => `${filter.field} ${filter.operator} ${filter.value}`)
@@ -32,8 +39,14 @@ ${edgeTypes
     const typeName = '`' + type + '`';
     return `${typeName}._src as ${type}SourceId,\n  ${typeName}._dst as ${type}DestId,\n  ${typeName}._rank as ${type}Rank`;
   })
-  .join(',\n')};
-`;
+  .join(',\n')}
+` +
+    `${
+      quantityLimit
+        ? `| LIMIT
+  ${quantityLimit};`
+        : `;`
+    }`;
 
   return gql;
 };

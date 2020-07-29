@@ -31,6 +31,7 @@ interface IState {
     edgeTypes?: string[];
     edgeDirection?: string;
     vertexColor?: string;
+    quantityLimit?: number;
   };
 }
 
@@ -45,6 +46,7 @@ export const explore = createModel({
       edgeTypes: [],
       edgeDirection: '',
       vertexColor: '',
+      quantityLimit: null,
     },
   },
   reducers: {
@@ -181,6 +183,7 @@ export const explore = createModel({
       filters: any[];
       exploreStep: number;
       vertexColor: string;
+      quantityLimit: number | null;
       originVertexes: any[];
       originEdges: any[];
     }) {
@@ -191,6 +194,7 @@ export const explore = createModel({
         filters,
         exploreStep,
         vertexColor,
+        quantityLimit,
         originVertexes,
         originEdges,
       } = payload;
@@ -200,6 +204,7 @@ export const explore = createModel({
         edgeTypes,
         edgeDirection,
         filters,
+        quantityLimit,
       });
       const { code, data, message } = (await service.execNGQL({
         gql,

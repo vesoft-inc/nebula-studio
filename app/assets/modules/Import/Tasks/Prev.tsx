@@ -14,6 +14,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
   updateActiveStep: step => {
     dispatch.importData.update({
       activeStep: step,
+      currentStep: step,
     });
   },
 });

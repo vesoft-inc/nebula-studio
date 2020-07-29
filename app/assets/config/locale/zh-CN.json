@@ -53,7 +53,8 @@
     "usernameRequired": "请填写用户名",
     "passwordRequired": "请填写密码",
     "nodeIdError": "格式不正确，id1 id2 id3每行1个节点id，以回车分开",
-    "idRequired": "请输入导入的节点id"
+    "idRequired": "请输入导入的节点id",
+    "positiveIntegerRequired": "请输入一个非负整数"
   },
   "console": {
     "cost": "开销",
@@ -82,6 +83,7 @@
     "showEdges": "显示边",
     "confirm": "确定",
     "vertexColor": "节点颜色",
+    "quantityLimit": "结果数量限制",
     "groupByStep": "按探索步骤分类",
     "groupByTag": "按节点标签分类",
     "mappingNGQL": "对应的 nGQL 语句"
