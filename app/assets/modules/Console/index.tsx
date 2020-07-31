@@ -21,6 +21,7 @@ const mapState = (state: IRootState) => ({
   result: state.console.result,
   currentGQL: state.console.currentGQL,
   currentSpace: state.nebula.currentSpace,
+  runGQLLoading: state.loading.effects.console.asyncRunGQL,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -130,7 +131,7 @@ class Console extends React.Component<IProps, IState> {
 
   render() {
     const { isUpDown, history } = this.state;
-    const { currentSpace, currentGQL, result } = this.props;
+    const { currentSpace, currentGQL, result, runGQLLoading } = this.props;
     return (
       <div className="nebula-console">
         <div className="ngql-content">
@@ -160,11 +161,15 @@ class Console extends React.Component<IProps, IState> {
                   <Icon type="delete" onClick={() => this.handleEmptyNgql()} />
                 </Tooltip>
                 <Tooltip title={intl.get('common.run')} placement="bottom">
-                  <Icon
-                    type="play-circle"
-                    theme="twoTone"
-                    onClick={() => this.handleRun()}
-                  />
+                  {!!runGQLLoading ? (
+                    <Icon type="loading" />
+                  ) : (
+                    <Icon
+                      type="play-circle"
+                      theme="twoTone"
+                      onClick={() => this.handleRun()}
+                    />
+                  )}
                 </Tooltip>
               </div>
             </div>
@@ -173,6 +178,7 @@ class Console extends React.Component<IProps, IState> {
               onChangeLine={this.handleLineCount}
               ref={this.getInstance}
               height={isUpDown ? '120px' : 24 * maxLineNum + 'px'}
+              onShiftEnter={this.handleRun}
               options={{
                 keyMap: 'sublime',
                 fullScreen: true,

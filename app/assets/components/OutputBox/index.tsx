@@ -2,6 +2,8 @@ import { Alert, Icon, Table, Tabs } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 
+import { OutputCsv } from '#assets/components';
+
 import './index.less';
 
 interface IProps {
@@ -45,12 +47,6 @@ export default class OutputBox extends React.Component<IProps, {}> {
     }
     return (
       <div className="output-box">
-        {/* <p
-          className={`output-value ${this.outputClass(result.code)}`}
-          onClick={() => this.props.onHistoryItem(value)}
-        >
-          $ {value}
-        </p> */}
         <Alert
           message={
             <p className="gql" onClick={() => this.props.onHistoryItem(value)}>
@@ -72,6 +68,9 @@ export default class OutputBox extends React.Component<IProps, {}> {
                 }
                 key="table"
               >
+                <div className="operation">
+                  <OutputCsv tableData={result.data} />
+                </div>
                 <Table
                   bordered={true}
                   columns={columns}

@@ -29,7 +29,9 @@
     "feedback": "Feedback",
     "forum": "Help Forum",
     "forumLink": "https://discuss.nebula-graph.io/",
-    "ask": "Sure to do this?"
+    "ask": "Sure to do this?",
+    "output": "Export CSV file"
+
   },
   "NGQLOutput": {
     "success": "Execute Success!"

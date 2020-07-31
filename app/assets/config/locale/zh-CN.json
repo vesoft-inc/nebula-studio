@@ -29,7 +29,8 @@
     "feedback": "问题反馈",
     "forum": "求助论坛",
     "forumLink": "https://discuss.nebula-graph.com.cn/",
-    "ask": "确定进行当前操作？"
+    "ask": "确定进行当前操作？",
+    "output":"导出CSV文件"
   },
   "warning": {
     "configServer": "请先配置服务器",

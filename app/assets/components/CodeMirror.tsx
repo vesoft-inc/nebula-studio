@@ -20,6 +20,7 @@ interface IProps {
   ref?: any;
   width?: string;
   height?: string;
+  onShiftEnter?: () => void;
   onChange?: (value: string) => void;
   onChangeLine?: () => void;
 }
@@ -101,6 +102,7 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
     this.codemirror = CodeMirror;
     // event
     this.editor.on('change', this.codemirrorValueChange);
+    this.editor.on('keydown', this.keydown);
     const { value, width, height } = this.props;
     this.editor.setValue(value || '');
     if (width || height) {
@@ -108,7 +110,14 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
       this.editor.setSize(width, height);
     }
   }
-
+  keydown = (_, change) => {
+    if (change.shiftKey === true && change.keyCode === 13) {
+      if (this.props.onShiftEnter) {
+        this.props.onShiftEnter();
+      }
+      change.preventDefault();
+    }
+  };
   codemirrorValueChange = (doc, change) => {
     if (change.origin !== 'setValue') {
       if (this.props.onChange) {
