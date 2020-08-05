@@ -15,7 +15,10 @@ export default class OutputCsv extends React.PureComponent<IProps> {
       return '';
     }
     const { headers = [], tables = [] } = tableData;
-    const csv = [headers, ...tables.map(item => Object.values(item))]
+    const csv = [
+      headers,
+      ...tables.map(values => headers.map(field => values[field])),
+    ]
       .map(row => row.join(','))
       .join('\n');
 

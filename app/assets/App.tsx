@@ -252,7 +252,8 @@ class App extends React.Component<IProps, IState> {
                     }
                   >
                     <a>
-                      v{appVersion} <Icon type="down" />
+                      v{appVersion}
+                      <Icon type="down" />
                     </a>
                   </Dropdown>
                 )}
