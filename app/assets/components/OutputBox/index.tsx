@@ -12,10 +12,24 @@ interface IProps {
   onHistoryItem: (value: string) => void;
 }
 
-export default class OutputBox extends React.Component<IProps, {}> {
+interface IState {
+  sorter: any;
+}
+
+export default class OutputBox extends React.Component<IProps, IState> {
   constructor(props) {
     super(props);
+
+    this.state = {
+      sorter: null,
+    };
   }
+
+  handleTableChange = (_1, _2, sorter) => {
+    this.setState({
+      sorter,
+    });
+  };
 
   outputClass = (code: any) => {
     if (code !== undefined) {
@@ -29,6 +43,7 @@ export default class OutputBox extends React.Component<IProps, {}> {
 
   render() {
     const { value, result = {} } = this.props;
+    const { sorter } = this.state;
     let columns = [];
     let dataSource = [];
     if (result.code === 0) {
@@ -37,12 +52,34 @@ export default class OutputBox extends React.Component<IProps, {}> {
           return {
             title: column,
             dataIndex: column,
+            sorter: true,
+            sortDirections: ['descend', 'ascend'],
           };
         });
       }
 
       if (result.data && result.data.tables) {
         dataSource = result.data.tables;
+        if (sorter) {
+          switch (sorter.order) {
+            case 'descend':
+              dataSource = result.data.tables.sort((r1, r2) => {
+                const field = sorter.field;
+                const v1 = r1[field];
+                const v2 = r2[field];
+                return v1 === v2 ? 0 : v1 < v2 ? 1 : -1;
+              });
+              break;
+            case 'ascend':
+              dataSource = result.data.tables.sort((r1, r2) => {
+                const field = sorter.field;
+                const v1 = r1[field];
+                const v2 = r2[field];
+                return v1 === v2 ? 0 : v1 > v2 ? 1 : -1;
+              });
+              break;
+          }
+        }
       }
     }
     return (
@@ -69,13 +106,19 @@ export default class OutputBox extends React.Component<IProps, {}> {
                 key="table"
               >
                 <div className="operation">
-                  <OutputCsv tableData={result.data} />
+                  <OutputCsv
+                    tableData={{
+                      headers: result.data && result.data.headers,
+                      tables: dataSource,
+                    }}
+                  />
                 </div>
                 <Table
                   bordered={true}
                   columns={columns}
                   dataSource={dataSource}
                   rowKey={(_, index) => index.toString()}
+                  onChange={this.handleTableChange}
                 />
               </Tabs.TabPane>
             )}
