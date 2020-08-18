@@ -95,6 +95,12 @@ class OutputBox extends React.Component<IProps, IState> {
             dataIndex: column,
             sorter: true,
             sortDirections: ['descend', 'ascend'],
+            render: value => {
+              if (typeof value === 'boolean') {
+                return value.toString();
+              }
+              return value;
+            },
           };
         });
       }

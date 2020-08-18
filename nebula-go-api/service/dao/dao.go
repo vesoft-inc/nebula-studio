@@ -64,6 +64,8 @@ func getColumnValue(p *graph.ColumnValue) common.Any {
 		return p.Date
 	} else if p.Path != nil {
 		return parsePath(p.Path)
+	} else if p.BoolVal != nil {
+		return p.BoolVal
 	}
 	return nil
 }
