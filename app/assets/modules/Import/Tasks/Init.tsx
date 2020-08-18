@@ -22,6 +22,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
     await dispatch.nebula.asyncSwitchSpace(space);
     await dispatch.nebula.asyncGetTags();
     await dispatch.nebula.asyncGetEdgeTypes();
+    await dispatch.explore.clear();
   },
   asyncGetTags: dispatch.nebula.asyncGetTags,
   asyncGetImportWorkingDir: dispatch.importData.asyncGetImportWorkingDir,

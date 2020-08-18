@@ -50,3 +50,39 @@ ${edgeTypes
 
   return gql;
 };
+
+export const getExploreGQLWithIndex = (params: {
+  tag: string;
+  filters: any[];
+  quantityLimit: number | null;
+}) => {
+  const { tag, filters, quantityLimit } = params;
+  const tagName = '`' + tag + '`';
+  const wheres = filters
+    .filter(
+      filter =>
+        filter.field &&
+        filter.operator &&
+        !['', undefined, null].includes(filter.value),
+    )
+    .map(filter => {
+      const value =
+        filter.type === 'string' ? `'${filter.value}'` : filter.value;
+      return `${filter.relation ? filter.relation : ''} ${tagName}.${
+        filter.field
+      } ${filter.operator} ${value}`;
+    })
+    .join(`\n`);
+  const gql =
+    `LOOKUP ON
+  ${tag} ${wheres ? `\nWHERE ${wheres}` : ''}
+    ` +
+    `${
+      quantityLimit
+        ? `| LIMIT
+  ${quantityLimit};`
+        : `;`
+    }`;
+
+  return gql;
+};

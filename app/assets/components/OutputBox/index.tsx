@@ -1,27 +1,32 @@
-import { Alert, Icon, Table, Tabs } from 'antd';
+import { Alert, Button, Icon, Table, Tabs } from 'antd';
+import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { OutputCsv } from '#assets/components';
 
 import './index.less';
 
-interface IProps {
+interface IProps extends RouteComponentProps {
   value: string;
   result: any;
   onHistoryItem: (value: string) => void;
+  onVertexesPreload: (value: string[]) => void;
 }
 
 interface IState {
   sorter: any;
+  ids: string[];
 }
 
-export default class OutputBox extends React.Component<IProps, IState> {
+class OutputBox extends React.Component<IProps, IState> {
   constructor(props) {
     super(props);
 
     this.state = {
       sorter: null,
+      ids: [],
     };
   }
 
@@ -40,10 +45,46 @@ export default class OutputBox extends React.Component<IProps, IState> {
     }
     return 'info';
   };
+  componentDidMount() {
+    if (this.props.result && this.props.result.code === 0) {
+      this.fetchIds(this.props.result.data);
+    }
+  }
+  componentDidUpdate(prevProps) {
+    if (
+      !_.isEqual(prevProps.result, this.props.result) &&
+      this.props.result.code === 0
+    ) {
+      this.fetchIds(this.props.result.data);
+    }
+  }
+
+  fetchIds(data) {
+    // TODO support alias
+    const reg = /^\w+._(dst|src)$/;
+    let ids = [];
+    if (data.headers.includes('VertexID')) {
+      ids = data.tables.map(i => i.VertexID).filter(i => i !== undefined);
+    } else {
+      data.headers.forEach(i => {
+        // HACK: nebula1.0 return 0 if there is no dstid, it'll be fixed in nbula2.0
+        if (reg.test(i)) {
+          const newIds = data.tables
+            .map(el => el[i])
+            .filter(i => i !== undefined && i !== '0');
+          ids = ids.concat(newIds);
+        }
+      });
+    }
+    ids = _.uniq(ids);
+    this.setState({
+      ids,
+    });
+  }
 
   render() {
     const { value, result = {} } = this.props;
-    const { sorter } = this.state;
+    const { sorter, ids } = this.state;
     let columns = [];
     let dataSource = [];
     if (result.code === 0) {
@@ -112,6 +153,17 @@ export default class OutputBox extends React.Component<IProps, IState> {
                       tables: dataSource,
                     }}
                   />
+                  {ids.length > 0 && (
+                    <Button
+                      type="primary"
+                      style={{ marginLeft: '10px' }}
+                      onClick={() => this.props.onVertexesPreload(ids)}
+                    >
+                      <Link to="/explore" className="btn-link">
+                        {intl.get('common.openInExplore')}
+                      </Link>
+                    </Button>
+                  )}
                 </div>
                 <Table
                   bordered={true}
@@ -120,20 +172,6 @@ export default class OutputBox extends React.Component<IProps, IState> {
                   rowKey={(_, index) => index.toString()}
                   onChange={this.handleTableChange}
                 />
-              </Tabs.TabPane>
-            )}
-            {result.code === 0 && result.data.timeCost && (
-              <Tabs.TabPane
-                tab={
-                  <>
-                    <Icon type="clock-circle" />
-                    {intl.get('console.cost')}
-                  </>
-                }
-                key="cost"
-              >
-                {`${intl.get('console.execTime')} ${result.data.timeCost /
-                  1000000} (s)`}
               </Tabs.TabPane>
             )}
             {result.code !== 0 && (
@@ -151,7 +189,17 @@ export default class OutputBox extends React.Component<IProps, IState> {
             )}
           </Tabs>
         </div>
+        {result.code === 0 && result.data.timeCost && (
+          <div className="output-footer">
+            <span>
+              {`${intl.get('console.execTime')} ${result.data.timeCost /
+                1000000} (s)`}
+            </span>
+          </div>
+        )}
       </div>
     );
   }
 }
+
+export default withRouter(OutputBox);

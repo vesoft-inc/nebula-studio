@@ -16,6 +16,22 @@ interface IState {
   password: string;
   tagsFields: any[];
   edgesFields: any[];
+  indexes: any[];
+  tagsWithIndexInfo: ITag[];
+}
+
+interface IIndex {
+  indexName: string;
+  props: IField[];
+}
+interface ITag {
+  tagName: string;
+  indexes: IIndex[];
+}
+
+interface IField {
+  Field: string;
+  Type: string;
 }
 
 export const nebula = createModel({
@@ -29,6 +45,8 @@ export const nebula = createModel({
     tags: [],
     tagsFields: [],
     edgesFields: [],
+    indexes: [],
+    tagsWithIndexInfo: [] as ITag[],
   },
   reducers: {
     update: (state: IState, payload: any) => {
@@ -85,7 +103,8 @@ export const nebula = createModel({
       });
     },
   },
-  effects: {
+  // TODO dispatch type interface
+  effects: (dispatch: any) => ({
     async asyncConfigServer(payload: {
       host: string;
       username: string;
@@ -216,5 +235,99 @@ export const nebula = createModel({
         });
       }
     },
-  },
+
+    async asyncGetTagIndexes() {
+      const { code, data } = (await service.execNGQL({
+        gql: `
+          SHOW TAG INDEXES
+        `,
+      })) as any;
+      if (code === 0) {
+        const indexes = data.tables.map(item => {
+          return {
+            id: item['Index ID'],
+            name: item['Index Name'],
+          };
+        });
+        this.update({
+          indexes,
+        });
+        return { code, indexes };
+      }
+      return { code, data };
+    },
+
+    async asyncGetTagWithIndex(name) {
+      const { code, data } = (await service.execNGQL({
+        gql: `
+          SHOW CREATE TAG index ${name}
+        `,
+      })) as any;
+      if (code === 0) {
+        const res = (data.tables && data.tables[0]['Create Tag Index']) || '';
+        const re = /.+\s+ON\s+`?(\w+)`?\((.+)\)/g;
+        const tag = re.exec(res);
+        return tag ? tag[1] : null;
+      } else {
+        return null;
+      }
+    },
+
+    async asyncGetIndexFields(name) {
+      const { code, data } = (await service.execNGQL({
+        gql: `
+          DESCRIBE TAG INDEX ${name}
+        `,
+      })) as any;
+      return { code, data };
+    },
+
+    async asyncCombineTagList() {
+      const { code, indexes } = await dispatch.nebula.asyncGetTagIndexes();
+      if (code === 0) {
+        const _indexes = await Promise.all(
+          indexes.map(async (item: any) => {
+            const { code, data } = await dispatch.nebula.asyncGetIndexFields(
+              item.name,
+            );
+            return {
+              indexName: item.name,
+              props: code === 0 ? data.tables : [],
+            };
+          }),
+        );
+        const tags = [] as ITag[];
+        await Promise.all(
+          _indexes.map(async (item: any) => {
+            const data = await dispatch.nebula.asyncGetTagWithIndex(
+              item.indexName,
+            );
+            const tag = tags.filter(i => i.tagName === data);
+            if (tag.length > 0) {
+              tag[0].indexes.push(item);
+            } else {
+              tags.push({
+                tagName: data,
+                indexes: [item],
+              });
+            }
+            return tags;
+          }),
+        );
+        // Explain: tags format:
+        /* [{  tagName: 'xxx',
+             indexes: [{
+               indexName: 'xxx',
+               props: [{
+                 Field: 'name',
+                 Type: 'string'
+               }]
+             }]
+          }] */
+        this.update({
+          tagsWithIndexInfo: tags,
+        });
+      }
+    },
+  }),
 });

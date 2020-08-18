@@ -5,7 +5,6 @@ import { hot } from 'react-hot-loader/root';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 import {
-  BrowserRouter as Router,
   Link,
   Redirect,
   Route,
@@ -112,6 +111,14 @@ class App extends React.Component<IProps, IState> {
     this.props.asyncGetAppInfo();
   }
 
+  componentDidUpdate(prevProps: IProps) {
+    if (prevProps.location.pathname !== this.props.location.pathname) {
+      this.setState({
+        activeMenu: this.props.location.pathname.split('/').pop() || '',
+      });
+    }
+  }
+
   handleClear = () => {
     this.props.clearConfig();
   };
@@ -124,7 +131,7 @@ class App extends React.Component<IProps, IState> {
         ? 'https://github.com/vesoft-inc/nebula-docs-cn/blob/master/docs/manual-CN/README.md'
         : 'https://github.com/vesoft-inc/nebula-docs/blob/master/docs/manual-EN/README.md';
     return (
-      <Router>
+      <>
         <LanguageContext.Provider
           value={{
             currentLocale: this.currentLocale,
@@ -142,7 +149,7 @@ class App extends React.Component<IProps, IState> {
                   onClick={this.handleMenuClick as any}
                 >
                   <Menu.Item key="console">
-                    <Link to="/console">
+                    <Link to="console">
                       <Icon type="code" />
                       {intl.get('common.console')}
                     </Link>
@@ -270,9 +277,9 @@ class App extends React.Component<IProps, IState> {
             </Layout>
           )}
         </LanguageContext.Provider>
-      </Router>
+      </>
     );
   }
 }
 
-export default connect(mapState, mapDispatch)(withRouter(hot(App)));
+export default withRouter(connect(mapState, mapDispatch)(hot(App)));

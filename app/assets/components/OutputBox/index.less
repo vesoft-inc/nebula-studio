@@ -2,6 +2,7 @@
 	flex: 1;
 	overflow: hidden;
 	background: #fff;
+	position: relative;
 
 	.output-value {
 		padding: 0 12px;
@@ -44,10 +45,12 @@
 
 			a {
 				color: #fff;
-				display: inline-block;
-				background: #1890ff;
-				padding: 6px;
-				border-radius: 2px;
+				background-color: #1890ff;
+				border-color: #1890ff;
+			}
+
+			.btn-link {
+				background: transparent;
 			}
 		}
 
@@ -63,5 +66,17 @@
 				background: #fff;
 			}
 		}
+	}
+
+	.output-footer {
+		position: absolute;
+		bottom: 0;
+		padding: 17px 15px;
+		width: 100%;
+		border-top: 1px solid #d9d9d9;
+		font-family: PingFangSC-Regular, serif;
+		font-size: 16px;
+		color: #595959;
+		letter-spacing: 1.48px;
 	}
 }

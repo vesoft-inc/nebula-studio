@@ -43,7 +43,7 @@ export default class OutputCsv extends React.PureComponent<IProps> {
 
     return (
       url && (
-        <a className="csv-export" href={url} download="result">
+        <a className="csv-export ant-btn" href={url} download="result">
           {intl.get('common.output')}
         </a>
       )

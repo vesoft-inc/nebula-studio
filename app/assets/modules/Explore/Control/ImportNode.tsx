@@ -1,30 +1,14 @@
-import { Button, Form, Input, Spin, Upload } from 'antd';
+import { Form, Tabs } from 'antd';
 import { FormComponentProps } from 'antd/lib/form/Form';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
-import { connect } from 'react-redux';
 
-import { nodeIdRulesFn } from '#assets/config/rules';
-import { IDispatch, IRootState } from '#assets/store';
-import readFileContent from '#assets/utils/file';
+import CustomQuery from './CustomQuery';
+import IdQuery from './IdQuery';
+import IndexQuery from './IndexQuery';
 
-import './ImportNode.less';
-
-const TextArea = Input.TextArea;
-
-const mapState = (state: IRootState) => ({
-  vertexes: state.explore.vertexes,
-  space: state.nebula.currentSpace,
-});
-const mapDispatch = (dispatch: IDispatch) => ({
-  asyncImportNodes: dispatch.explore.asyncImportNodes,
-});
-
-interface IProps
-  extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    FormComponentProps {
+interface IProps extends FormComponentProps {
   handler: any;
 }
 
@@ -41,69 +25,21 @@ class ImportNodes extends React.Component<IProps, IState> {
     };
   }
 
-  handleImport = () => {
-    this.props.form.validateFields(async (err, data) => {
-      if (!err) {
-        const { ids } = data;
-        this.props.asyncImportNodes({ ids });
-        this.props.handler.hide();
-      }
-    });
-  };
-
-  handleFileImport = async ({ file }) => {
-    this.setState({
-      loading: true,
-    });
-    const ids = await readFileContent(file);
-    this.setState({
-      loading: false,
-    });
-    this.props.form.setFieldsValue({
-      ids,
-    });
-  };
-
   render() {
-    const { getFieldDecorator } = this.props.form;
-    const { loading } = this.state;
-
     return (
-      <Spin spinning={loading}>
-        <div className="import-node">
-          <h3>{intl.get('explore.importNode')}</h3>
-          <Form>
-            <Form.Item>
-              {getFieldDecorator('ids', {
-                rules: nodeIdRulesFn(intl),
-              })(
-                <TextArea
-                  placeholder={intl.get('explore.importPlaceholder')}
-                  rows={20}
-                />,
-              )}
-            </Form.Item>
-            <Form.Item className="btn-wrap">
-              {/* <Input type="file" onChange={this.handleFileImport} id="ids-file"></Input> */}
-              <Upload
-                beforeUpload={() => false}
-                onChange={this.handleFileImport}
-                showUploadList={false}
-              >
-                <Button>{intl.get('explore.fileImport')}</Button>
-              </Upload>
-              <Button type="primary" onClick={this.handleImport}>
-                {intl.get('explore.addConfirm')}
-              </Button>
-            </Form.Item>
-          </Form>
-        </div>
-      </Spin>
+      <Tabs defaultActiveKey={'id'}>
+        <Tabs.TabPane tab={intl.get('explore.queryById')} key="id">
+          <IdQuery closeHandler={this.props.handler.hide} />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab={intl.get('explore.queryByIndex')} key="index">
+          <IndexQuery closeHandler={this.props.handler.hide} />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab={intl.get('explore.queryByCustom')} key="custom">
+          <CustomQuery />
+        </Tabs.TabPane>
+      </Tabs>
     );
   }
 }
 
-export default connect(
-  mapState,
-  mapDispatch,
-)(Form.create<IProps>()(ImportNodes));
+export default Form.create<IProps>()(ImportNodes);

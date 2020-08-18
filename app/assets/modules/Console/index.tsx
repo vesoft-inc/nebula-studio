@@ -30,7 +30,14 @@ const mapDispatch = (dispatch: IDispatch) => ({
     dispatch.console.update({
       currentGQL: gql,
     }),
-  asyncSwitchSpace: dispatch.nebula.asyncSwitchSpace,
+  asyncSwitchSpace: async space => {
+    await dispatch.nebula.asyncSwitchSpace(space);
+    await dispatch.explore.clear();
+  },
+  updatePreloadVertexes: ids =>
+    dispatch.explore.update({
+      preloadVertexes: ids,
+    }),
 });
 
 interface IProps
@@ -92,6 +99,10 @@ class Console extends React.Component<IProps, IState> {
     });
   };
 
+  handleVertexesPreload = ids => {
+    this.props.updatePreloadVertexes(ids);
+  };
+
   handleEmptyNgql = () => {
     this.props.updateCurrentGQL('');
     this.forceUpdate();
@@ -146,6 +157,9 @@ class Console extends React.Component<IProps, IState> {
                 <Icon type="question-circle" theme="outlined" />
               </Tooltip>
               <div className="operation">
+                <Tooltip title={intl.get('common.empty')} placement="bottom">
+                  <Icon type="delete" onClick={this.handleEmptyNgql} />
+                </Tooltip>
                 <Tooltip
                   title={intl.get('common.seeTheHistory')}
                   placement="bottom"
@@ -156,9 +170,6 @@ class Console extends React.Component<IProps, IState> {
                       this.setState({ history: true });
                     }}
                   />
-                </Tooltip>
-                <Tooltip title={intl.get('common.empty')} placement="bottom">
-                  <Icon type="delete" onClick={() => this.handleEmptyNgql()} />
                 </Tooltip>
                 <Tooltip title={intl.get('common.run')} placement="bottom">
                   {!!runGQLLoading ? (
@@ -192,6 +203,7 @@ class Console extends React.Component<IProps, IState> {
             result={result}
             value={this.getLocalStorage().pop()}
             onHistoryItem={e => this.handleHistoryItem(e)}
+            onVertexesPreload={ids => this.handleVertexesPreload(ids)}
           />
         </div>
         <Modal

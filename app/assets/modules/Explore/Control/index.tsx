@@ -1,4 +1,5 @@
 import { Button, Form, Modal as AntdModal, Select } from 'antd';
+import { FormComponentProps } from 'antd/lib/form/Form';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
@@ -15,23 +16,12 @@ const FormItem = Form.Item;
 const mapState = (state: IRootState) => ({
   spaces: state.nebula.spaces,
   currentSpace: state.nebula.currentSpace,
+  vertexes: state.explore.vertexes,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetSpaces: dispatch.nebula.asyncGetSpaces,
-  clear: () =>
-    dispatch.explore.update({
-      vertexes: [],
-      edges: [],
-      selectVertexes: [],
-      actionData: [],
-      step: 0,
-      exploreRules: {
-        edgeTypes: [],
-        edgeDirection: '',
-        vertexColor: '',
-      },
-    }),
+  clear: dispatch.explore.clear,
   asyncSwitchSpace: async space => {
     await dispatch.nebula.asyncSwitchSpace(space);
     await dispatch.nebula.asyncGetTags();
@@ -42,11 +32,18 @@ const mapDispatch = (dispatch: IDispatch) => ({
   },
 });
 
-type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
+interface IProps
+  extends ReturnType<typeof mapState>,
+    ReturnType<typeof mapDispatch>,
+    FormComponentProps {
+  onRef: any;
+}
+
 class Control extends React.Component<IProps, {}> {
   importNodesHandler;
   componentDidMount() {
     this.props.asyncGetSpaces();
+    this.props.onRef(this);
   }
 
   handleSelect = space => {
@@ -72,8 +69,14 @@ class Control extends React.Component<IProps, {}> {
     });
   };
 
+  handleSearch = () => {
+    if (this.importNodesHandler) {
+      this.importNodesHandler.show();
+    }
+  };
+
   render() {
-    const { spaces, currentSpace } = this.props;
+    const { spaces, currentSpace, vertexes } = this.props;
 
     return (
       <div className="control">
@@ -87,22 +90,26 @@ class Control extends React.Component<IProps, {}> {
           </Select>
         </FormItem>
         <FormItem className="right">
-          <Button type="default" onClick={this.handleClear}>
+          <Button
+            type="default"
+            disabled={vertexes.length === 0}
+            onClick={this.handleClear}
+          >
             {intl.get('explore.clear')}
           </Button>
           <Button
-            type="primary"
             onClick={() => {
               if (this.importNodesHandler) {
                 this.importNodesHandler.show();
               }
             }}
           >
-            {intl.get('explore.importNode')}
+            {intl.get('explore.startWithVertices')}
           </Button>
           <Modal
             handlerRef={handler => (this.importNodesHandler = handler)}
             footer={null}
+            width="650px"
           >
             <ImportNodes handler={this.importNodesHandler} />
           </Modal>

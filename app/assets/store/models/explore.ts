@@ -5,7 +5,11 @@ import _ from 'lodash';
 import intl from 'react-intl-universal';
 
 import service from '#assets/config/service';
-import { fetchEdgeProps, fetchVertexProps } from '#assets/utils/fetch';
+import {
+  fetchEdgeProps,
+  fetchVertexProps,
+  fetchVertexPropsWithIndex,
+} from '#assets/utils/fetch';
 import { getExploreGQL } from '#assets/utils/gql';
 import { idToSrting, nebulaToData, setLink } from '#assets/utils/nebulaToData';
 
@@ -33,6 +37,7 @@ interface IState {
     vertexColor?: string;
     quantityLimit?: number;
   };
+  preloadVertexes: string[];
 }
 
 export const explore = createModel({
@@ -48,6 +53,7 @@ export const explore = createModel({
       vertexColor: '',
       quantityLimit: null,
     },
+    preloadVertexes: [],
   },
   reducers: {
     update: (state: IState, payload: any): IState => {
@@ -96,17 +102,33 @@ export const explore = createModel({
         actionData,
       };
     },
+
+    clear: () => {
+      return {
+        vertexes: [],
+        edges: [],
+        selectVertexes: [],
+        actionData: [],
+        step: 0,
+        exploreRules: {
+          edgeTypes: [],
+          edgeDirection: '',
+          vertexColor: '',
+        },
+        preloadVertexes: [],
+      };
+    },
   },
   effects: {
-    async asyncImportNodes(payload: { ids: string }) {
-      const { ids } = payload;
+    async asyncImportNodes(payload: { ids: string; useHash?: string }) {
+      const { ids, useHash } = payload;
       const newVertexes = await Promise.all(
         ids
           .trim()
           .split('\n')
           .map(async id => {
-            const nodeProp = await fetchVertexProps(id);
-            if (nodeProp.headers.length) {
+            const nodeProp = await fetchVertexProps(id, useHash);
+            if (nodeProp.headers.length && nodeProp.tables.length) {
               const tags =
                 nodeProp && nodeProp.headers
                   ? _.sortedUniq(
@@ -266,6 +288,19 @@ export const explore = createModel({
         this.update({
           step: exploreStep,
         });
+      } else {
+        throw new Error(message);
+      }
+    },
+    async asyncImportNodesWithIndex(payload: {
+      tag: string;
+      filters: any[];
+      quantityLimit: number | null;
+    }) {
+      const { code, data, message } = await fetchVertexPropsWithIndex(payload);
+      if (code === 0 && data.tables.length !== 0) {
+        const ids = data.tables && data.tables.map(i => i.VertexID).join('\n');
+        this.asyncImportNodes({ ids });
       } else {
         throw new Error(message);
       }
