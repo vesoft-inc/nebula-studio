@@ -401,7 +401,7 @@ export const importData = createModel({
         const fields = res.split(/\n|\r\n/);
         fields.forEach(field => {
           const fieldArr = field.trim().split(/\s|\s+/);
-          if (field.includes('default')) {
+          if (field.includes('default') || fieldArr.includes('DEFAULT')) {
             let defaultField = fieldArr[0];
             if (defaultField.includes('`')) {
               defaultField = defaultField.replace(/`/g, '');
@@ -465,7 +465,7 @@ export const importData = createModel({
         const fields = res.split(/\n|\r\n/);
         fields.forEach(field => {
           const fieldArr = field.trim().split(/\s|\s+/);
-          if (fieldArr.includes('default')) {
+          if (fieldArr.includes('default') || fieldArr.includes('DEFAULT')) {
             let defaultField = fieldArr[0];
             if (defaultField.includes('`')) {
               defaultField = defaultField.replace(/`/g, '');
