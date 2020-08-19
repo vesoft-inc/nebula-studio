@@ -31,7 +31,7 @@ class ConfigServer extends React.Component<IProps> {
       if (!err) {
         const ok = await this.props.asyncConfigServer(data);
         if (ok) {
-          this.props.history.push('/');
+          this.props.history.replace('/');
         }
       }
     });

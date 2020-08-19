@@ -388,12 +388,37 @@ export const importData = createModel({
       const { code, data } = (await service.execNGQL({
         gql: 'DESCRIBE EDGE' + '`' + edgeType + '`;',
       })) as any;
+      const createTag = (await service.execNGQL({
+        // HACK: Process the default value fields
+        gql: 'show create EDGE' + ' `' + edgeType + '`;',
+      })) as any;
+      const defaultValueFields: any[] = [];
+      if (!!createTag) {
+        const res =
+          (createTag.data.tables && createTag.data.tables[0]['Create Edge']) ||
+          '';
+        // HACK: createTag split to ↵
+        const fields = res.split(/\n|\r\n/);
+        fields.forEach(field => {
+          const fieldArr = field.trim().split(/\s|\s+/);
+          if (field.includes('default')) {
+            let defaultField = fieldArr[0];
+            if (defaultField.includes('`')) {
+              defaultField = defaultField.replace(/`/g, '');
+            }
+            defaultValueFields.push(defaultField);
+          }
+        });
+      }
       if (code === 0) {
-        const props = data.tables.map(item => ({
-          name: item.Field,
-          type: item.Type,
-          mapping: null,
-        }));
+        const props = data.tables.map(item => {
+          return {
+            name: item.Field,
+            type: item.Type,
+            isDefault: defaultValueFields.includes(item.Field),
+            mapping: null,
+          };
+        });
 
         this.updateEdgeConfig({
           props: [
@@ -426,15 +451,39 @@ export const importData = createModel({
       const { tag, tagIndex } = payload;
       const { code, data } = (await service.execNGQL({
         // HACK: Processing keyword
-        gql: 'DESCRIBE TAG' + '`' + tag + '`;',
+        gql: 'DESCRIBE TAG' + ' `' + tag + '`;',
       })) as any;
+      const createTag = (await service.execNGQL({
+        // HACK: Process the default value fields
+        gql: 'show create tag' + ' `' + tag + '`;',
+      })) as any;
+      const defaultValueFields: any[] = [];
+      if (!!createTag) {
+        const res =
+          (createTag.data.tables && createTag.data.tables[0]['Create Tag']) ||
+          '';
+        const fields = res.split(/\n|\r\n/);
+        fields.forEach(field => {
+          const fieldArr = field.trim().split(/\s|\s+/);
+          if (fieldArr.includes('default')) {
+            let defaultField = fieldArr[0];
+            if (defaultField.includes('`')) {
+              defaultField = defaultField.replace(/`/g, '');
+            }
+            defaultValueFields.push(defaultField);
+          }
+        });
+      }
       if (code === 0) {
-        const props = data.tables.map(attr => ({
-          name: attr.Field,
-          type: attr.Type,
-          mapping: null,
-          useHash: 'unset',
-        }));
+        const props = data.tables.map(attr => {
+          return {
+            name: attr.Field,
+            type: attr.Type,
+            isDefault: defaultValueFields.includes(attr.Field),
+            mapping: null,
+            useHash: 'unset',
+          };
+        });
         this.updateTagConfig({
           props,
           tagIndex,

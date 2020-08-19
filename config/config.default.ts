@@ -12,7 +12,7 @@ export default (appInfo: EggAppInfo) => {
       .slice(0, __dirname.split('/').length - 1)
       .join('/') + '/tmp/upload';
   if (!fs.existsSync(config.uploadPath)) {
-    fs.mkdirSync(config.uploadPath, { recursive: true });
+    fs.mkdirSync(config.uploadPath + '/tmp', { recursive: true });
   }
   // override config from framework / plugin
   // use for cookie sign key, should change to your own and keep security

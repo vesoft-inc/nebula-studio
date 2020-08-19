@@ -117,7 +117,7 @@ class Tag extends React.Component<IProps> {
         dataIndex: 'mapping',
         render: (mappingIndex, prop, propIndex) => (
           <div>
-            {prop && <span className="csv-index-mark">*</span>}
+            {!prop.isDefault && <span className="csv-index-mark">*</span>}
             <CSVPreviewLink
               onMapping={columnIndex =>
                 this.handlePropChange(propIndex, 'mapping', columnIndex)

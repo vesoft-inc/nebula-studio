@@ -67,6 +67,9 @@ export function edgeDataToJSON(
           };
           break;
         default:
+          if (prop.mapping === null && prop.isDefault) {
+            break;
+          }
           const _prop = {
             name: prop.name,
             type: prop.type,
@@ -114,14 +117,19 @@ export function vertexDataToJSON(
         .sort((p1, p2) => {
           return p1.mapping - p2.mapping;
         })
-        .map(prop => ({
-          name: prop.name,
-          type: prop.type,
-          index: indexJudge(prop.mapping, prop.name),
-        }));
+        .map(prop => {
+          if (prop.mapping === null && prop.isDefault) {
+            return null;
+          }
+          return {
+            name: prop.name,
+            type: prop.type,
+            index: indexJudge(prop.mapping, prop.name),
+          };
+        });
       const _tag = {
         name: tag.name,
-        props,
+        props: props.filter(prop => prop),
       };
       return _tag;
     });
@@ -195,17 +203,19 @@ export function getGQLByConfig(payload) {
           throw new Error();
         }
         tag.props.forEach(prop => {
-          if (prop.mapping === null) {
+          if (prop.mapping === null && !prop.isDefault) {
             message.error(`${prop.name} ${intl.get('import.indexNotEmpty')}`);
             throw new Error();
           }
-          // HACK: Processing keyword
-          tagField.push('`' + prop.name + '`');
-          const value =
-            prop.type === 'string'
-              ? `"${columns[prop.mapping]}"`
-              : columns[prop.mapping];
-          values.push(value);
+          if (prop.mapping !== null) {
+            // HACK: Processing keyword
+            tagField.push('`' + prop.name + '`');
+            const value =
+              prop.type === 'string'
+                ? `"${columns[prop.mapping]}"`
+                : columns[prop.mapping];
+            values.push(value);
+          }
         });
         NGQL.push(
           'INSERT VERTEX' +
@@ -233,14 +243,15 @@ export function getGQLByConfig(payload) {
         throw new Error();
       }
       edgeConfig.props.forEach(prop => {
-        if (prop.mapping === null && prop.name !== 'rank') {
+        if (prop.mapping === null && prop.name !== 'rank' && !prop.isDefault) {
           message.error(`${prop.name} ${intl.get('import.indexNotEmpty')}`);
           throw new Error();
         }
         if (
           prop.name !== 'srcId' &&
           prop.name !== 'dstId' &&
-          prop.name !== 'rank'
+          prop.name !== 'rank' &&
+          prop.mapping !== null
         ) {
           // HACK: Processing keyword
           edgeField.push('`' + prop.name + '`');

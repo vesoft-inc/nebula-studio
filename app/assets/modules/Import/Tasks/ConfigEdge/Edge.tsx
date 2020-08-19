@@ -90,7 +90,7 @@ class Edge extends React.Component<IProps> {
         dataIndex: 'mapping',
         render: (mappingIndex, prop, propIndex) => (
           <div>
-            {prop && prop.name !== 'rank' && (
+            {!prop.isDefault && prop.name !== 'rank' && (
               <span className="csv-index-mark">*</span>
             )}
             <CSVPreviewLink
