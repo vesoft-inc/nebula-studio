@@ -53,9 +53,9 @@ func getColumnValue(p *graph.ColumnValue) common.Any {
 		var id = int64(*p.Id)
 		return strconv.FormatInt(id, 10)
 	} else if p.SinglePrecision != nil {
-		return p.SinglePrecision
+		return fmt.Sprintf("%.7f", *p.SinglePrecision)
 	} else if p.DoublePrecision != nil {
-		return p.DoublePrecision
+		return fmt.Sprintf("%.15F", *p.DoublePrecision)
 	} else if p.Datetime != nil {
 		return p.Datetime
 	} else if p.Timestamp != nil {
