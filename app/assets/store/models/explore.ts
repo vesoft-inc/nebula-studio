@@ -127,34 +127,41 @@ export const explore = createModel({
           .trim()
           .split('\n')
           .map(async id => {
-            const nodeProp = await fetchVertexProps(id, useHash);
-            if (nodeProp.headers.length && nodeProp.tables.length) {
-              const tags =
-                nodeProp && nodeProp.headers
-                  ? _.sortedUniq(
-                      nodeProp.headers.map(field => {
-                        if (field === 'VertexID') {
-                          return 't';
-                        } else {
-                          return field.split('.')[0];
-                        }
-                      }),
-                    )
-                  : [];
-
-              return {
-                name: id,
-                nodeProp,
-                step: 0,
-                group: tags.join('-'),
-              };
+            const res = await fetchVertexProps(id, useHash);
+            if (res.code === 0) {
+              const nodeProp = res.data;
+              if (nodeProp.headers.length && nodeProp.tables.length) {
+                const tags =
+                  nodeProp && nodeProp.headers
+                    ? _.sortedUniq(
+                        nodeProp.headers.map(field => {
+                          if (field === 'VertexID') {
+                            return 't';
+                          } else {
+                            return field.split('.')[0];
+                          }
+                        }),
+                      )
+                    : [];
+                const vertexID =
+                  nodeProp.tables.map(i => i.VertexID)[0] || null;
+                return {
+                  name: vertexID,
+                  nodeProp,
+                  step: 0,
+                  group: tags.join('-'),
+                };
+              } else {
+                message.warning(`${id}${intl.get('import.notExist')}`);
+              }
             } else {
-              message.warning(`${id}${intl.get('import.notExist')}`);
+              message.warning(res.message);
             }
           }),
       );
+      const uniqVertexes = _.uniqBy(newVertexes, 'name');
       this.addNodesAndEdges({
-        vertexes: newVertexes.filter(v => v !== undefined),
+        vertexes: uniqVertexes.filter(v => v !== undefined),
         edges: [],
       });
     },
@@ -242,7 +249,8 @@ export const explore = createModel({
         const newVertexes = await Promise.all(
           _.differenceBy(vertexes, originVertexes, vertexe => vertexe.name).map(
             async (v: any) => {
-              const nodeProp = await fetchVertexProps(v.name);
+              const res = await fetchVertexProps(v.name);
+              const nodeProp = res.data;
               if (vertexColor === 'groupByTag') {
                 const tags =
                   nodeProp && nodeProp.headers

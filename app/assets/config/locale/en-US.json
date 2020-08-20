@@ -71,7 +71,7 @@
     "undo": "Undo",
     "deleteSelectNodes": "Remove Select",
     "fileImport": "File Import",
-    "importPlaceholder": "Enter Vertex IDs (VIDs) and split them by pressing the Enter key, one VID per line. Here is an example:\nVID1\nVID2\nVID3",
+    "importPlaceholder": "Enter VIDs or enter other data for VID generation, one data per line, and split them by pressing the Enter key. \n\nIf you want to enter VIDs or other data of bool, double, or int type for Hash pre-processing, enter them directly.\n\nIf you want to use Hash or UUID to pre-process any strings to generate VIDs, enter them by enclosing each string with single or double quotes. Here is an example:\n'string1'\n'string2'\n'string3'",
     "outgoing": "Outgoing",
     "incoming": "Incoming",
     "filter": "Filter",
@@ -116,7 +116,8 @@
     "indexConditionDescription": "To use a multiple-field index for a query, use all the fields or only the first several fields in sequence. Do not skip any field from left to right and the first field is required.",
     "timestampInput": "Only numbers are supported for the timestamp field",
     "documentIntroductionUrl": "https://docs.nebula-graph.io/manual-EN/2.query-language/4.statement-syntax/1.data-definition-statements/",
-    "customQueryUrl": "https://cloud-cdn.nebula-graph.com.cn/studio-resource/go-to-explore_en.png"
+    "customQueryUrl": "https://cloud-cdn.nebula-graph.com.cn/studio-resource/go-to-explore_en.png",
+    "pretreatmentExplaination": "Hash can pre-process data of the bool, double, int, or string type to generate VIDs, but UUID can pre-process data of the string type only. To generate VIDs by pre-processing strings, enclose each string with single or double quotes."
   },
   "import": {
     "import": "Import",

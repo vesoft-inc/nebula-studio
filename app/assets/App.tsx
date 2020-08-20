@@ -25,7 +25,7 @@ import { updateQueryStringParameter } from '#assets/utils';
 import './App.less';
 import ConfigServer from './modules/ConfigServer';
 import PrivateRoute from './PrivateRoute';
-import { trackPageView } from './utils/stat';
+import { trackEvent, trackPageView } from './utils/stat';
 
 const { Header, Content } = Layout;
 const { Option } = Select;
@@ -241,6 +241,20 @@ class App extends React.Component<IProps, IState> {
                     {intl.get('common.help')} <Icon type="down" />
                   </a>
                 </Dropdown>
+                <div
+                  className="github-star"
+                  onClick={() => trackEvent('navStar', 'linkClick')}
+                >
+                  <a
+                    className="github-button"
+                    href="https://github.com/vesoft-inc/nebula"
+                    data-size="large"
+                    data-show-count="true"
+                    aria-label="Star vesoft-inc/nebula on GitHub"
+                  >
+                    Star
+                  </a>
+                </div>
                 {appVersion && (
                   <Dropdown
                     className="version"

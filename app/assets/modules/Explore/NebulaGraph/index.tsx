@@ -129,7 +129,7 @@ class NebulaGraph extends React.Component<IProps, IState> {
 
     this.$tooltip
       .html(
-        `<p style="font-weight:600">Vertex Details</p> <p>id: ${node.name}</p> ${nodeFieldsValuePairStr}`,
+        `<p style="font-weight:600">Vertex Details</p> ${nodeFieldsValuePairStr}`,
       )
       .style('display', 'block');
   };

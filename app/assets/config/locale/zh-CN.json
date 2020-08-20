@@ -71,7 +71,7 @@
     "deleteSelectNodes": "删除选中",
     "expand": "拓展",
     "fileImport": "文件导入",
-    "importPlaceholder": "每行1个节点id，以回车分开，格式如下：\nid1\nid2\nid3",
+    "importPlaceholder": "输入VID或者用于生成VID的数据，一行一个数据，按回车键断开。\n\n如果输入VID或者其他需要Hash预处理的bool、double、int类型数据，直接输入数据值。\n\n如果要使用Hash或UUID预处理string类型的数据生成VID，使用单引号或双引号标示每个string，格式示例如下：\n'string1'\n'string2'\n'string3'",
     "outgoing": "流出",
     "incoming": "流入",
     "filter": "筛选",
@@ -116,7 +116,8 @@
     "indexConditionDescription": "匹配字段时，必须以索引中左边第一个字段开始，如果需要匹配多个字段，不得跳过字段，但是可以省略后续字段。",
     "timestampInput": "时间戳字段只支持输入数字",
     "documentIntroductionUrl": "https://docs.nebula-graph.com.cn/manual-CN/2.query-language/4.statement-syntax/1.data-definition-statements/",
-    "customQueryUrl": "https://cloud-cdn.nebula-graph.com.cn/studio-resource/go-to-explore_zh.png"
+    "customQueryUrl": "https://cloud-cdn.nebula-graph.com.cn/studio-resource/go-to-explore_zh.png",
+    "pretreatmentExplaination": "Hash能预处理bool、double、int、string类型的数据生成VID，但是UUID仅支持预处理string类型的数据。如果您需要使用Hash或UUID预处理string生成VID，则使用单引号或双引号标示每个string。"
   },
   "import": {
     "import":"导入",

@@ -5,12 +5,12 @@ export async function fetchVertexProps(id: any, useHash?: string) {
   const _id =
     useHash === 'unset' || useHash === undefined
       ? `${id}`
-      : `${useHash}("${id}")`;
+      : `${useHash}(${id})`;
   const gql = `fetch prop on * ${_id}`;
-  const { data } = (await service.execNGQL({
+  const { data, code, message } = (await service.execNGQL({
     gql,
   })) as any;
-  return data;
+  return { data, code, message };
 }
 
 export async function fetchEdgeProps(id: any) {
