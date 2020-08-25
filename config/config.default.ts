@@ -14,6 +14,10 @@ export default (appInfo: EggAppInfo) => {
   if (!fs.existsSync(config.uploadPath)) {
     fs.mkdirSync(config.uploadPath + '/tmp', { recursive: true });
   }
+  // production environment use
+  if (process.env.UPLOAD_DIR) {
+    fs.mkdirSync(process.env.UPLOAD_DIR + '/tmp', { recursive: true });
+  }
   // override config from framework / plugin
   // use for cookie sign key, should change to your own and keep security
   config.keys = appInfo.name + '_1544867050896_3341';
