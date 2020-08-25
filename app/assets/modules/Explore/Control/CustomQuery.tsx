@@ -3,6 +3,8 @@ import React from 'react';
 import intl from 'react-intl-universal';
 import { Link, withRouter } from 'react-router-dom';
 
+import { trackEvent } from '#assets/utils/stat';
+
 import './CustomQuery.less';
 
 function CustomQuery(): JSX.Element {
@@ -11,7 +13,7 @@ function CustomQuery(): JSX.Element {
       <img className="logo" src={intl.get('explore.customQueryUrl')} />
       <p>{intl.get('explore.customQueryDescription')}</p>
       <div className="btn">
-        <Button>
+        <Button onClick={() => trackEvent('explore', 'queryByCustom')}>
           <Link to="/console">{intl.get('explore.openInConsole')}</Link>
         </Button>
       </div>

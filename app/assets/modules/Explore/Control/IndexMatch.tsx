@@ -23,6 +23,7 @@ import { CodeMirror } from '#assets/components';
 import { IDispatch, IRootState } from '#assets/store';
 import { enumOfCompare } from '#assets/utils/constant';
 import { getExploreGQLWithIndex } from '#assets/utils/gql';
+import { trackEvent } from '#assets/utils/stat';
 
 import './IndexMatch.less';
 const Option = Select.Option;
@@ -232,6 +233,7 @@ class IndexMatch extends React.Component<IProps, IState> {
     const { filters } = this.state;
     const tag = getFieldValue('tag');
     const quantityLimit = getFieldValue('quantityLimit') || null;
+    trackEvent('explore', 'queryByIndex');
     (this.props.asyncImportNodesWithIndex({
       filters,
       tag,

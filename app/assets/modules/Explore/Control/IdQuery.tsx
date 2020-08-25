@@ -9,6 +9,7 @@ import { nodeIdRulesFn } from '#assets/config/rules';
 import { LanguageContext } from '#assets/context';
 import { IDispatch } from '#assets/store';
 import readFileContent from '#assets/utils/file';
+import { trackEvent } from '#assets/utils/stat';
 
 import './IdQuery.less';
 
@@ -40,6 +41,7 @@ class IdQuery extends React.Component<IProps, IState> {
     };
   }
   handleImport = () => {
+    trackEvent('explore', 'queryById');
     this.props.form.validateFields(async (err, data) => {
       if (!err) {
         const { ids, useHash } = data;
