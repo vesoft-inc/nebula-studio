@@ -208,6 +208,7 @@ export const explore = createModel({
     async asyncGetExpand(payload: {
       selectVertexes: any[];
       edgeTypes: string[];
+      edgesFields: any[];
       edgeDirection: string;
       filters: any[];
       exploreStep: number;
@@ -219,6 +220,7 @@ export const explore = createModel({
       const {
         selectVertexes,
         edgeTypes,
+        edgesFields,
         edgeDirection,
         filters,
         exploreStep,
@@ -281,7 +283,12 @@ export const explore = createModel({
         const newEdges = await Promise.all(
           _.differenceBy(edges, originEdges, edge => edge.id).map(
             async (e: any) => {
-              const edgeProp = await fetchEdgeProps(e.id);
+              const edgeFields = _.find(edgesFields, e.type);
+              const edgeProp = await fetchEdgeProps({
+                id: e.id,
+                type: e.type,
+                edgeFields,
+              });
               return {
                 ...e,
                 edgeProp,

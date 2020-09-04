@@ -217,9 +217,11 @@ export const nebula = createModel({
         `,
       })) as any;
       if (code === 0) {
+        const edgeTypes = data.tables.map(item => item.Name);
         this.update({
-          edgeTypes: data.tables.map(item => item.Name),
+          edgeTypes,
         });
+        this.asyncGetEdgeTypesFields({ edgeTypes });
       }
     },
 

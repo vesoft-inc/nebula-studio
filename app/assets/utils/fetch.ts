@@ -13,8 +13,19 @@ export async function fetchVertexProps(id: any, useHash?: string) {
   return { data, code, message };
 }
 
-export async function fetchEdgeProps(id: any) {
-  const gql = `fetch prop on ${id}`;
+export async function fetchEdgeProps(payload: {
+  id: any;
+  type: string;
+  edgeFields: any;
+}) {
+  const { id, edgeFields, type } = payload;
+  const edgeType = '`' + type + '`';
+  let gql = `fetch prop on ${id} yield ${edgeType}._src, ${edgeType}._dst `;
+  edgeFields[type].forEach(edgeField => {
+    if (edgeField !== 'type') {
+      gql += `,${edgeType}.${edgeField}`;
+    }
+  });
   const { data } = (await service.execNGQL({
     gql,
   })) as any;
