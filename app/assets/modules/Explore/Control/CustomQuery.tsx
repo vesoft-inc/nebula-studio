@@ -13,8 +13,15 @@ function CustomQuery(): JSX.Element {
       <img className="logo" src={intl.get('explore.customQueryUrl')} />
       <p>{intl.get('explore.customQueryDescription')}</p>
       <div className="btn">
-        <Button onClick={() => trackEvent('explore', 'queryByCustom')}>
-          <Link to="/console">{intl.get('explore.openInConsole')}</Link>
+        <Button onClick={() => trackEvent('explore', 'query_by_custom')}>
+          <Link
+            to="/console"
+            onClick={() => {
+              trackEvent('navigation', 'view_console', 'from_explore_btn');
+            }}
+          >
+            {intl.get('explore.openInConsole')}
+          </Link>
         </Button>
       </div>
     </div>

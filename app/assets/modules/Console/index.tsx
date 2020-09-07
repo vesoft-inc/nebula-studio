@@ -89,7 +89,7 @@ class Console extends React.Component<IProps, IState> {
     this.setState({
       isUpDown: true,
     });
-    trackEvent('console', 'run');
+    trackEvent('console', 'run_code');
   };
 
   handleHistoryItem = (value: string) => {
@@ -100,6 +100,7 @@ class Console extends React.Component<IProps, IState> {
   };
 
   handleVertexesPreload = ids => {
+    trackEvent('navigation', 'view_explore', 'from_console_btn');
     this.props.updatePreloadVertexes(ids);
   };
 

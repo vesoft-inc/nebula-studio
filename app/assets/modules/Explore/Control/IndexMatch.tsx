@@ -233,7 +233,7 @@ class IndexMatch extends React.Component<IProps, IState> {
     const { filters } = this.state;
     const tag = getFieldValue('tag');
     const quantityLimit = getFieldValue('quantityLimit') || null;
-    trackEvent('explore', 'queryByIndex');
+    trackEvent('explore', 'query_by_index');
     (this.props.asyncImportNodesWithIndex({
       filters,
       tag,

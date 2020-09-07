@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
+
+import { trackEvent } from '#assets/utils/stat';
 interface IProps {
   tableData?: {
     headers: any[];
@@ -43,7 +45,14 @@ export default class OutputCsv extends React.PureComponent<IProps> {
 
     return (
       url && (
-        <a className="csv-export ant-btn" href={url} download="result">
+        <a
+          className="csv-export ant-btn"
+          href={url}
+          download="result"
+          onClick={() => {
+            trackEvent('console', 'export_csv_file');
+          }}
+        >
           {intl.get('common.output')}
         </a>
       )

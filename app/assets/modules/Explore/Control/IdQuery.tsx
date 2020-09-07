@@ -41,7 +41,7 @@ class IdQuery extends React.Component<IProps, IState> {
     };
   }
   handleImport = () => {
-    trackEvent('explore', 'queryById');
+    trackEvent('explore', 'query_by_id');
     this.props.form.validateFields(async (err, data) => {
       if (!err) {
         const { ids, useHash } = data;

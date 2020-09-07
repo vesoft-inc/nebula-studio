@@ -20,20 +20,31 @@ export const trackPageView = (url: string) => {
   }
 };
 
-export const trackEvent = (category: string, action: string) => {
-  if (win._hmt) {
-    try {
-      (window as any)._hmt.push(['_trackEvent', category, action]);
-    } catch (e) {
-      console.log(e);
-    }
-  }
+interface IGtag {
+  event_category: string;
+  event_label?: string;
+  value?: number;
+}
 
+export const trackEvent = (
+  category: string,
+  action: string,
+  label?: string,
+  value?: number,
+) => {
+  // google analytics
   if (win.gtag) {
     try {
-      win.gtag('event', action, {
+      const params: IGtag = {
         event_category: category,
-      });
+      };
+      if (label) {
+        params.event_label = label;
+      }
+      if (value) {
+        params.value = value;
+      }
+      win.gtag('event', action, params);
     } catch (e) {
       console.log(e);
     }
