@@ -72,6 +72,7 @@ class App extends React.Component<IProps, IState> {
 
   toggleLanguage = (locale: string) => {
     cookies.set('locale', locale);
+    trackEvent('navigation', 'change_language', locale);
     window.location.href = updateQueryStringParameter(
       window.location.href,
       'lang',
@@ -120,8 +121,13 @@ class App extends React.Component<IProps, IState> {
   }
 
   handleClear = () => {
+    trackEvent('user', 'sign_out');
     this.props.clearConfig();
   };
+
+  trackRoute(action: string) {
+    trackEvent('navigation', action, 'from_navigation');
+  }
 
   render() {
     const { appVersion } = this.props;
@@ -149,19 +155,28 @@ class App extends React.Component<IProps, IState> {
                   onClick={this.handleMenuClick as any}
                 >
                   <Menu.Item key="console">
-                    <Link to="console">
+                    <Link
+                      to="console"
+                      onClick={() => this.trackRoute('view_console')}
+                    >
                       <Icon type="code" />
                       {intl.get('common.console')}
                     </Link>
                   </Menu.Item>
                   <Menu.Item key="import">
-                    <Link to="import">
+                    <Link
+                      to="import"
+                      onClick={() => this.trackRoute('view_import')}
+                    >
                       <Icon type="import" />
                       {intl.get('common.import')}
                     </Link>
                   </Menu.Item>
                   <Menu.Item key="explore">
-                    <Link to="explore">
+                    <Link
+                      to="explore"
+                      onClick={() => this.trackRoute('view_explore')}
+                    >
                       <Icon type="branches" />
                       {intl.get('common.explore')}
                     </Link>
@@ -243,7 +258,7 @@ class App extends React.Component<IProps, IState> {
                 </Dropdown>
                 <div
                   className="github-star"
-                  onClick={() => trackEvent('navStar', 'linkClick')}
+                  onClick={() => trackEvent('navigation', 'star_github')}
                 >
                   <a
                     className="github-button"

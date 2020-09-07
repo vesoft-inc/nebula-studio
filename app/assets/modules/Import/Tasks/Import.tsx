@@ -116,7 +116,7 @@ class Import extends React.Component<IProps, IState> {
     if (errCode === 0) {
       this.logTimer = setTimeout(this.readlog, 2000);
     }
-    trackEvent('import', 'click');
+    trackEvent('import', 'import_files', 'start');
   };
 
   readlog = async () => {
@@ -152,7 +152,7 @@ class Import extends React.Component<IProps, IState> {
           isImporting: false,
         });
         clearTimeout(this.logTimer);
-        trackEvent('import', 'finish');
+        trackEvent('import', 'import_files', 'finish');
       }
     }
     this.ref.scrollTop = this.ref.scrollHeight;

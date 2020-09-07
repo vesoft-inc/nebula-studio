@@ -124,6 +124,7 @@ class Expand extends React.Component<IProps, IState> {
     }) as any).then(
       () => {
         message.success(intl.get('common.success'));
+        trackEvent('explore', 'expand', 'ajax success');
         this.props.updateExploreRules({
           edgeTypes,
           edgeDirection,
@@ -132,6 +133,7 @@ class Expand extends React.Component<IProps, IState> {
         this.props.close();
       },
       (e: any) => {
+        trackEvent('explore', 'expand', 'ajax fail');
         if (e.message) {
           message.error(e.message);
         } else {
@@ -139,8 +141,6 @@ class Expand extends React.Component<IProps, IState> {
         }
       },
     );
-
-    trackEvent('expand', 'click');
   };
 
   render() {

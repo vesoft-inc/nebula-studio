@@ -122,8 +122,8 @@ export const nebula = createModel({
         username,
         password,
       })) as any;
+      trackEvent('user', 'sign_in', code === 0 ? 'ajax_success' : 'ajax_fail');
       if (code === 0) {
-        trackEvent('connect', 'success');
         message.success(intl.get('configServer.success'));
         cookies.set('nh', host);
         cookies.set('nu', username);
@@ -135,7 +135,6 @@ export const nebula = createModel({
         });
         return true;
       } else {
-        trackEvent('connect', 'fail');
         message.error(`${intl.get('configServer.fail')}: ${errorMessage}`);
         this.update({
           host: '',
