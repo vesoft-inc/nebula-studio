@@ -423,11 +423,13 @@ export const nebula = createModel({
       const { edgeTypes } = payload;
       await Promise.all(
         edgeTypes.map(async item => {
-          const { code, data } = await dispatch.nebula.asyncGetEdgeInfo(item);
+          const { code, data } = await dispatch.nebula.asyncGetEdgeInfo(
+            item.Name,
+          );
           if (code === 0) {
             const edgeFields = data.tables.map(item => item.Field);
             this.addEdgesName({
-              edgeType: item,
+              edgeType: item.Name,
               edgeFields: ['type', '_rank', ...edgeFields],
             });
           }
@@ -436,7 +438,7 @@ export const nebula = createModel({
     },
 
     async asyncGetEdgesAndFields() {
-      const res = await dispatch.nebula.asyncGetEdgeTypes();
+      const res = await dispatch.nebula.asyncGetEdges();
       if (res.data) {
         this.asyncGetEdgeTypesFields({ edgeTypes: res.data });
       }
