@@ -90,3 +90,28 @@ export const enumOfCompare = {
     },
   ],
 };
+
+export const dataType = [
+  {
+    value: 'double',
+    label: 'double',
+  },
+  {
+    value: 'int',
+    label: 'int',
+  },
+  {
+    value: 'bool',
+    label: 'bool',
+  },
+  {
+    value: 'string',
+    label: 'string',
+  },
+  {
+    value: 'timestamp',
+    label: 'timestamp',
+  },
+];
+
+export const nameReg = /^[a-zA-Z][a-zA-Z0-9_]*$/;

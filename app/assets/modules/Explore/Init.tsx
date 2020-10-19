@@ -18,13 +18,13 @@ const mapDispatch = (dispatch: IDispatch) => ({
   asyncSwitchSpace: async space => {
     await dispatch.nebula.asyncSwitchSpace(space);
     await dispatch.nebula.asyncGetTags();
-    await dispatch.nebula.asyncGetEdgeTypes();
+    await dispatch.nebula.asyncGetEdges();
     dispatch.explore.update({
       exploreRules: {},
     });
   },
   asyncGetTags: dispatch.nebula.asyncGetTags,
-  asyncGetEdgeTypes: dispatch.nebula.asyncGetTags,
+  asyncGetEdges: dispatch.nebula.asyncGetEdges,
 });
 
 interface IProps
@@ -41,7 +41,7 @@ class Init extends React.Component<IProps> {
       this.modalHandler.show();
     } else {
       await this.props.asyncGetTags();
-      await this.props.asyncGetEdgeTypes();
+      await this.props.asyncGetEdges();
     }
   }
 

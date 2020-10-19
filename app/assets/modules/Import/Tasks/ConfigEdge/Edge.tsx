@@ -106,7 +106,7 @@ class Edge extends React.Component<IProps> {
         ),
       },
       {
-        title: render(intl.get('import.type'), intl.get('import.typeTip')),
+        title: render(intl.get('common.type'), intl.get('import.typeTip')),
         dataIndex: 'type',
         render: (value, record) => (
           <Select
@@ -163,7 +163,7 @@ class Edge extends React.Component<IProps> {
     return (
       <div className="edge-config">
         <div className="operation">
-          <FormItem label={intl.get('import.type')}>
+          <FormItem label={intl.get('common.type')}>
             <Select
               className="edge-select"
               onChange={this.handleEdgeTypeChange}

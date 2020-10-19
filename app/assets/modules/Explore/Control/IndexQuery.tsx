@@ -13,7 +13,7 @@ const mapState = (state: IRootState) => ({
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
-  asyncCombineTagList: dispatch.nebula.asyncCombineTagList,
+  asyncGetIndexTree: dispatch.nebula.asyncGetIndexTree,
 });
 
 interface IProps
@@ -33,7 +33,7 @@ class IndexQuery extends React.Component<IProps> {
   }
 
   async fetchInfo() {
-    this.props.asyncCombineTagList();
+    this.props.asyncGetIndexTree('TAG');
   }
 
   render() {

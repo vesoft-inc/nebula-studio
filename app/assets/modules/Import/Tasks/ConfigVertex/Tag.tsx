@@ -131,7 +131,7 @@ class Tag extends React.Component<IProps> {
         ),
       },
       {
-        title: render(intl.get('import.type'), intl.get('import.typeTip')),
+        title: render(intl.get('common.type'), intl.get('import.typeTip')),
         dataIndex: 'type',
         render: (value, record) => (
           <Select
@@ -256,7 +256,7 @@ class Tag extends React.Component<IProps> {
               okText={intl.get('common.ok')}
               cancelText={intl.get('common.cancel')}
             >
-              <Button type="danger">{intl.get('import.delete')}</Button>
+              <Button type="danger">{intl.get('common.delete')}</Button>
             </Popconfirm>
           </FormItem>
         </div>

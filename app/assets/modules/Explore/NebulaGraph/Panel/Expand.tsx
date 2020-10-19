@@ -13,7 +13,7 @@ import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
-import { CodeMirror } from '#assets/components';
+import GQLCodeMirror from '#assets/components/GQLCodeMirror';
 import { IDispatch, IRootState } from '#assets/store';
 import { getExploreGQL } from '#assets/utils/gql';
 import { trackEvent } from '#assets/utils/stat';
@@ -34,7 +34,7 @@ const mapState = (state: IRootState) => ({
   getExpandLoading: state.loading.effects.explore.asyncGetExpand,
 });
 const mapDispatch = (dispatch: IDispatch) => ({
-  asyncGetEdgeTypes: dispatch.nebula.asyncGetEdgeTypes,
+  asyncGetEdgesAndFields: dispatch.nebula.asyncGetEdgesAndFields,
   asyncGetExpand: dispatch.explore.asyncGetExpand,
   updateExploreRules: rules =>
     dispatch.explore.update({
@@ -69,7 +69,7 @@ class Expand extends React.Component<IProps, IState> {
   }
 
   componentDidMount() {
-    this.props.asyncGetEdgeTypes();
+    this.props.asyncGetEdgesAndFields();
   }
 
   handleFilterInputChange = e => {
@@ -167,7 +167,7 @@ class Expand extends React.Component<IProps, IState> {
         : '';
     const columns = [
       {
-        title: intl.get('explore.field'),
+        title: intl.get('common.field'),
         key: 'field',
         render: (record, _, index) => (
           <Input
@@ -305,19 +305,7 @@ class Expand extends React.Component<IProps, IState> {
             </Panel>
           </Collapse>
         </Form>
-        <Collapse className="explore-gql">
-          <Panel header={intl.get('explore.mappingNGQL')} key="ngql">
-            <CodeMirror
-              value={currentGQL}
-              options={{
-                keyMap: 'sublime',
-                fullScreen: true,
-                mode: 'nebula',
-                readOnly: true,
-              }}
-            />
-          </Panel>
-        </Collapse>
+        <GQLCodeMirror currentGQL={currentGQL} />
         <Button
           onClick={this.handleExpand}
           disabled={

@@ -31,7 +31,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
   deleteEdgeConfig: edgeName => {
     dispatch.importData.deleteEdgeConfig({ edgeName });
   },
-  asyncGetEdgeTypes: dispatch.nebula.asyncGetEdgeTypes,
+  asyncGetEdges: dispatch.nebula.asyncGetEdges,
 });
 
 interface IProps
@@ -45,7 +45,7 @@ class ConfigEdge extends React.Component<IProps> {
   };
 
   componentDidMount() {
-    this.props.asyncGetEdgeTypes();
+    this.props.asyncGetEdges();
     trackPageView('/import/configEdge');
   }
 

@@ -19,6 +19,9 @@ import { LanguageContext } from '#assets/context';
 import Console from '#assets/modules/Console';
 import Explore from '#assets/modules/Explore';
 import Import from '#assets/modules/Import';
+import Schema from '#assets/modules/Schema';
+import CreateSpace from '#assets/modules/Schema/CreateSpace';
+import SpaceConfig from '#assets/modules/Schema/SpaceConfig';
 import { IDispatch, IRootState } from '#assets/store';
 import { updateQueryStringParameter } from '#assets/utils';
 
@@ -66,7 +69,7 @@ class App extends React.Component<IProps, IState> {
     this.currentLocale = cookies.get('locale');
     this.state = {
       loading: true,
-      activeMenu: props.location.pathname.split('/').pop() || '',
+      activeMenu: '',
     };
   }
 
@@ -109,16 +112,22 @@ class App extends React.Component<IProps, IState> {
 
   componentDidMount() {
     this.loadIntlLocale();
+    this.renderMenu();
     this.props.asyncGetAppInfo();
   }
 
   componentDidUpdate(prevProps: IProps) {
     if (prevProps.location.pathname !== this.props.location.pathname) {
-      this.setState({
-        activeMenu: this.props.location.pathname.split('/').pop() || '',
-      });
+      this.renderMenu();
     }
   }
+
+  renderMenu = () => {
+    const path = this.props.location.pathname.split('/')[1] || '';
+    this.setState({
+      activeMenu: path === 'space' ? 'schema' : path,
+    });
+  };
 
   handleClear = () => {
     trackEvent('user', 'sign_out');
@@ -154,18 +163,20 @@ class App extends React.Component<IProps, IState> {
                   selectedKeys={[activeMenu]}
                   onClick={this.handleMenuClick as any}
                 >
-                  <Menu.Item key="console">
+                  <Menu.Item key="schema">
                     <Link
-                      to="console"
-                      onClick={() => this.trackRoute('view_console')}
+                      to="/schema"
+                      onClick={() => this.trackRoute('view_schema')}
                     >
-                      <Icon type="code" />
-                      {intl.get('common.console')}
+                      <svg className="icon" aria-hidden="true">
+                        <use xlinkHref="#iconnav-model" />
+                      </svg>
+                      {intl.get('common.schema')}
                     </Link>
                   </Menu.Item>
                   <Menu.Item key="import">
                     <Link
-                      to="import"
+                      to="/import"
                       onClick={() => this.trackRoute('view_import')}
                     >
                       <Icon type="import" />
@@ -174,11 +185,20 @@ class App extends React.Component<IProps, IState> {
                   </Menu.Item>
                   <Menu.Item key="explore">
                     <Link
-                      to="explore"
+                      to="/explore"
                       onClick={() => this.trackRoute('view_explore')}
                     >
                       <Icon type="branches" />
                       {intl.get('common.explore')}
+                    </Link>
+                  </Menu.Item>
+                  <Menu.Item key="console">
+                    <Link
+                      to="/console"
+                      onClick={() => this.trackRoute('view_console')}
+                    >
+                      <Icon type="code" />
+                      {intl.get('common.console')}
                     </Link>
                   </Menu.Item>
                 </Menu>
@@ -204,7 +224,7 @@ class App extends React.Component<IProps, IState> {
                     <Menu>
                       <Menu.Item>
                         <a onClick={this.handleClear}>
-                          <Icon type="setting" />
+                          <Icon type="logout" />
                           {intl.get('configServer.clear')}
                         </a>
                       </Menu.Item>
@@ -296,10 +316,40 @@ class App extends React.Component<IProps, IState> {
               </Header>
               <Content>
                 <Switch>
-                  <PrivateRoute path="/console" component={Console} />
-                  <PrivateRoute path="/explore" component={Explore} />
-                  <PrivateRoute path="/import" component={Import} />
-                  <Route path="/config-server" component={ConfigServer} />
+                  <PrivateRoute
+                    path="/schema"
+                    exact={true}
+                    component={Schema}
+                  />
+                  <PrivateRoute
+                    path="/space/create"
+                    exact={true}
+                    component={CreateSpace}
+                  />
+                  <PrivateRoute
+                    path="/space/:space/:type?/:action?"
+                    component={SpaceConfig}
+                  />
+                  <PrivateRoute
+                    path="/import"
+                    exact={true}
+                    component={Import}
+                  />
+                  <PrivateRoute
+                    path="/explore"
+                    exact={true}
+                    component={Explore}
+                  />
+                  <PrivateRoute
+                    path="/console"
+                    exact={true}
+                    component={Console}
+                  />
+                  <Route
+                    path="/config-server"
+                    exact={true}
+                    component={ConfigServer}
+                  />
                   <Redirect to="/console" />
                 </Switch>
               </Content>

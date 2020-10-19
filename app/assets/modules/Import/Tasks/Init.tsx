@@ -21,12 +21,12 @@ const mapDispatch = (dispatch: IDispatch) => ({
   asyncSwitchSpace: async space => {
     await dispatch.nebula.asyncSwitchSpace(space);
     await dispatch.nebula.asyncGetTags();
-    await dispatch.nebula.asyncGetEdgeTypes();
+    await dispatch.nebula.asyncGetEdges();
     await dispatch.explore.clear();
   },
   asyncGetTags: dispatch.nebula.asyncGetTags,
   asyncGetImportWorkingDir: dispatch.importData.asyncGetImportWorkingDir,
-  asyncGetEdgeTypes: dispatch.nebula.asyncGetEdgeTypes,
+  asyncGetEdges: dispatch.nebula.asyncGetEdges,
   nextStep: dispatch.importData.nextStep,
 });
 

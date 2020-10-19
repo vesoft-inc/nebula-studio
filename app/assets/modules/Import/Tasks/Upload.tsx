@@ -105,7 +105,7 @@ class Import extends React.Component<IProps> {
         },
       },
       {
-        title: intl.get('import.operation'),
+        title: intl.get('common.operation'),
         key: 'operation',
         render: (_1, file, index) => {
           if (file.content) {
@@ -121,7 +121,7 @@ class Import extends React.Component<IProps> {
                     okText={intl.get('common.ok')}
                     cancelText={intl.get('common.cancel')}
                   >
-                    <Button type="link">{intl.get('import.delete')}</Button>
+                    <Button type="link">{intl.get('common.delete')}</Button>
                   </Popconfirm>
                 </div>
               </div>

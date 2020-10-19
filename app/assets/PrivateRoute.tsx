@@ -14,19 +14,16 @@ const mapState = (state: IRootState) => ({
 
 const mapDispatch = () => ({});
 
-const PrivateRoute = ({ component: Component, ...rest }) => {
-  return (
-    <Route
-      {...rest}
-      render={props =>
-        rest.host && rest.username && rest.password ? (
-          <Component {...props} />
-        ) : (
-          <ConfigServer />
-        )
-      }
-    />
-  );
+const PrivateRoute = ({ component: Component, render, ...rest }) => {
+  if (rest.host && rest.username && rest.password) {
+    return Component ? (
+      <Route {...rest} render={props => <Component {...props} />} />
+    ) : (
+      <Route render={render} {...rest} />
+    );
+  } else {
+    return <Route {...rest} render={_ => <ConfigServer />} />;
+  }
 };
 
 export default connect(mapState, mapDispatch)(PrivateRoute);

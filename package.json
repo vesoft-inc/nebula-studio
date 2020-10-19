@@ -1,6 +1,6 @@
 {
   "name": "nebula-graph-studio",
-  "version": "1.1.1-beta",
+  "version": "1.2.0-beta",
   "description": "nebula-graph-studio",
   "private": true,
   "egg": {
@@ -42,6 +42,7 @@
     "lodash": "^4.17.15",
     "mz-modules": "^2.1.0",
     "react": "^16.11.0",
+    "react-beautiful-dnd": "^13.0.0",
     "react-dom": "^16.11.0",
     "react-hot-loader": "^4.12.16",
     "react-intl-universal": "^1.16.2",

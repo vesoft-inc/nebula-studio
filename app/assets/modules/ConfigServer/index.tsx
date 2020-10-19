@@ -39,8 +39,10 @@ class ConfigServer extends React.Component<IProps> {
   render() {
     return (
       <div className="config-server">
-        <h3>{intl.get('configServer.title')}</h3>
-        <ConfigServerForm onConfig={this.handleConfigServer} />
+        <div className="nebula-authorization">
+          <h3>{intl.get('configServer.title')}</h3>
+          <ConfigServerForm onConfig={this.handleConfigServer} />
+        </div>
       </div>
     );
   }

@@ -9,6 +9,15 @@ p {
 	padding: 0;
 }
 
+.icon {
+	width: 16px;
+	height: 16px;
+	vertical-align: -0.15em;
+	overflow: hidden;
+	fill: #fff;
+	margin-right: 10px;
+}
+
 .ant-dropdown-menu-item i {
 	margin-right: 4px;
 }
@@ -19,8 +28,18 @@ p {
 	line-height: 40px;
 }
 
+.btns {
+	text-align: center;
+	margin-bottom: 20px;
+
+	button > a > i {
+		margin-right: 8px;
+	}
+}
+
 #app {
 	height: 100%;
+	min-width: 1440px;
 
 	> .ant-spin-nested-loading {
 		height: 100%;
@@ -121,6 +140,10 @@ p {
 					i {
 						color: #00152a;
 					}
+
+					.icon {
+						fill: #00152a;
+					}
 				}
 			}
 		}
@@ -128,6 +151,18 @@ p {
 
 	.ant-layout-content {
 		padding: 12px 4% 24px 4%;
+		height: 100%;
 		overflow: auto;
 	}
 }
+
+.header-title {
+	font-family: PingFangSC-Medium, serif;
+	font-size: 20px;
+	line-height: 18px;
+	color: #333;
+	letter-spacing: 1.85px;
+	border-left: 4px solid #1d9bf6;
+	padding-left: 12px;
+}
+

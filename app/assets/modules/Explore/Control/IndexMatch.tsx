@@ -1,6 +1,5 @@
 import {
   Button,
-  Collapse,
   Divider,
   Form,
   Icon,
@@ -11,15 +10,14 @@ import {
   Radio,
   Select,
   Table,
-  Tooltip,
 } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
-import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
-import { CodeMirror } from '#assets/components';
+import { Instruction } from '#assets/components';
+import GQLCodeMirror from '#assets/components/GQLCodeMirror';
 import { IDispatch, IRootState } from '#assets/store';
 import { enumOfCompare } from '#assets/utils/constant';
 import { getExploreGQLWithIndex } from '#assets/utils/gql';
@@ -27,13 +25,12 @@ import { trackEvent } from '#assets/utils/stat';
 
 import './IndexMatch.less';
 const Option = Select.Option;
-const Panel = Collapse.Panel;
 const { confirm } = Modal;
 
 const mapState = (state: IRootState) => ({
   indexes: state.nebula.indexes,
   getQueryLoading: state.loading.effects.explore.asyncImportNodesWithIndex,
-  tags: state.nebula.tagsWithIndexInfo,
+  tags: state.nebula.tagIndexTree,
 });
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncImportNodesWithIndex: dispatch.explore.asyncImportNodesWithIndex,
@@ -55,7 +52,7 @@ interface IIndex {
   props: IField[];
 }
 interface ITag {
-  tagName: string;
+  name: string;
   indexes: IIndex[];
 }
 
@@ -91,7 +88,7 @@ class IndexMatch extends React.Component<IProps, IState> {
   handleSelectTag = value => {
     const { tags } = this.props;
     const { setFieldsValue } = this.props.form;
-    const selectedTag = tags.filter(item => item.tagName === value)[0] || {};
+    const selectedTag = tags.filter(item => item.name === value)[0] || {};
     this.setState({
       selectedTag,
       filterProps: [],
@@ -208,24 +205,26 @@ class IndexMatch extends React.Component<IProps, IState> {
 
   handleFilterAdd = () => {
     const { filters, filterProps } = this.state;
-    const lastField = filters[filters.length - 1].field;
-    const index = filterProps.findIndex(i => i.Field === lastField);
-    const newField =
-      index === filterProps.length - 1
-        ? filterProps[index]
-        : filterProps[index + 1];
-    this.setState({
-      filters: [
-        ...filters,
-        {
-          relation: 'AND',
-          field: newField.Field,
-          operator: '==',
-          value: '',
-          type: newField.Type,
-        },
-      ],
-    });
+    if (filters && filters.length > 0) {
+      const lastField = filters[filters.length - 1].field;
+      const index = filterProps.findIndex(i => i.Field === lastField);
+      const newField =
+        index === filterProps.length - 1
+          ? filterProps[index]
+          : filterProps[index + 1];
+      this.setState({
+        filters: [
+          ...filters,
+          {
+            relation: 'AND',
+            field: newField.Field,
+            operator: '==',
+            value: '',
+            type: newField.Type,
+          },
+        ],
+      });
+    }
   };
 
   handleInquiry = () => {
@@ -292,7 +291,7 @@ class IndexMatch extends React.Component<IProps, IState> {
           ),
       },
       {
-        title: intl.get('explore.field'),
+        title: intl.get('common.field'),
         key: 'field',
         render: (record, _, index) => {
           let pre;
@@ -415,8 +414,8 @@ class IndexMatch extends React.Component<IProps, IState> {
             })(
               <Select onChange={this.handleSelectTag}>
                 {tags.map(e => (
-                  <Option value={e.tagName} key={e.tagName}>
-                    {e.tagName}
+                  <Option value={e.name} key={e.name}>
+                    {e.name}
                   </Option>
                 ))}
               </Select>,
@@ -461,12 +460,9 @@ class IndexMatch extends React.Component<IProps, IState> {
             header={
               <Divider orientation="center">
                 {intl.get('explore.paramFilter')}
-                <Tooltip
-                  title={intl.get('explore.indexConditionDescription')}
-                  placement="right"
-                >
-                  <Icon type="question-circle" />
-                </Tooltip>
+                <Instruction
+                  description={intl.get('explore.indexConditionDescription')}
+                />
               </Divider>
             }
             itemLayout="horizontal"
@@ -484,19 +480,7 @@ class IndexMatch extends React.Component<IProps, IState> {
             </li>
           </List>
         </Form>
-        <Collapse className="explore-gql">
-          <Panel header={intl.get('explore.mappingNGQL')} key="ngql">
-            <CodeMirror
-              value={currentGQL}
-              options={{
-                keyMap: 'sublime',
-                fullScreen: true,
-                mode: 'nebula',
-                readOnly: true,
-              }}
-            />
-          </Panel>
-        </Collapse>
+        <GQLCodeMirror currentGQL={currentGQL} />
         <Button
           type="primary"
           onClick={this.handleInquiry}
