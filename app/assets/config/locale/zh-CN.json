@@ -121,7 +121,7 @@
     "vertexColor": "点的颜色",
     "quantityLimit": "结果数量限制",
     "groupByStep": "按探索步骤分类",
-    "groupByTag": "按标签分类",
+    "groupByTag": "按标签类型分类",
     "noVertexPrompt": "当前画板没有点数据，请",
     "search": "查询",
     "queryById": "按VID查询",

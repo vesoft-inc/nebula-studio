@@ -102,7 +102,7 @@ class CSVPreviewLink extends React.PureComponent<IProps> {
             this.modalHandler = handler;
           }}
           footer={false}
-          width={800}
+          width={1000}
         >
           <div className="csv-preview">
             <Table

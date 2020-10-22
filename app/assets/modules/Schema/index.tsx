@@ -13,12 +13,17 @@ import './index.less';
 const mapState = (state: IRootState) => ({
   loading: state.loading.effects.nebula.asyncGetSpacesList,
   spaceList: state.nebula.spaceList,
+  currentSpace: state.nebula.currentSpace,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetSpacesList: dispatch.nebula.asyncGetSpacesList,
   asyncDeleteSpace: dispatch.nebula.asyncDeleteSpace,
   asyncSwitchSpace: dispatch.nebula.asyncSwitchSpace,
+  clearCurrentSpace: () =>
+    dispatch.nebula.update({
+      currentSpace: '',
+    }),
 });
 
 interface IProps
@@ -43,8 +48,12 @@ class Schema extends React.Component<IProps> {
   handleDeleteSpace = async (name: string) => {
     const res = await this.props.asyncDeleteSpace(name);
     if (res.code === 0) {
+      const { currentSpace } = this.props;
       message.success(intl.get('common.deleteSuccess'));
       await this.getSpaces();
+      if (currentSpace === name) {
+        this.props.clearCurrentSpace();
+      }
     }
     trackEvent(
       'schema',

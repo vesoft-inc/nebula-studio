@@ -23,6 +23,7 @@ export interface IEdge extends d3.SimulationLinkDatum<INode> {
   source: INode;
   target: INode;
   size: number;
+  type: string;
 }
 
 interface IState {
@@ -38,6 +39,51 @@ interface IState {
     quantityLimit?: number;
   };
   preloadVertexes: string[];
+}
+function getTagData(nodeProps, expand) {
+  if (nodeProps.headers.length && nodeProps.tables.length) {
+    let group;
+    if (expand && expand.vertexColor !== 'groupByTag') {
+      group = 'step-' + expand.exploreStep;
+    } else {
+      const tags =
+        nodeProps && nodeProps.headers
+          ? _.sortedUniq(
+              nodeProps.headers.map(field => {
+                if (field === 'VertexID') {
+                  return 't';
+                } else {
+                  return field.split('.')[0];
+                }
+              }),
+            )
+          : [];
+      group = tags.join('-');
+    }
+    const vertexes = nodeProps.tables.map(item => {
+      const nodeProp = {
+        headers: nodeProps.headers,
+        tables: [item],
+      };
+      if (expand) {
+        return {
+          name: item.VertexID,
+          nodeProp,
+          group,
+        };
+      } else {
+        return {
+          name: item.VertexID,
+          step: 0,
+          group,
+          nodeProp,
+        };
+      }
+    });
+    return vertexes;
+  } else {
+    return [];
+  }
 }
 
 export const explore = createModel({
@@ -93,7 +139,11 @@ export const explore = createModel({
       actionData.push({
         type: 'ADD',
         vertexes: _.differenceBy(addVertexes, originVertexes, v => v.name),
-        edges: _.differenceBy(addEdges, originEdges, v => v.id),
+        edges: _.differenceBy(
+          addEdges,
+          originEdges,
+          v => '`' + v.type + '`' + v.id,
+        ),
       });
       return {
         ...state,
@@ -119,46 +169,73 @@ export const explore = createModel({
       };
     },
   },
-  effects: {
-    async asyncImportNodes(payload: { ids: string; useHash?: string }) {
-      const { ids, useHash } = payload;
-      const newVertexes = await Promise.all(
-        ids
-          .trim()
-          .split('\n')
-          .map(async id => {
-            const res = await fetchVertexProps(id, useHash);
-            if (res.code === 0) {
-              const nodeProp = res.data;
-              if (nodeProp.headers.length && nodeProp.tables.length) {
-                const tags =
-                  nodeProp && nodeProp.headers
-                    ? _.sortedUniq(
-                        nodeProp.headers.map(field => {
-                          if (field === 'VertexID') {
-                            return 't';
-                          } else {
-                            return field.split('.')[0];
-                          }
-                        }),
-                      )
-                    : [];
-                const vertexID =
-                  nodeProp.tables.map(i => i.VertexID)[0] || null;
-                return {
-                  name: vertexID,
-                  nodeProp,
-                  step: 0,
-                  group: tags.join('-'),
-                };
-              } else {
-                message.warning(`${id}${intl.get('import.notExist')}`);
-              }
-            } else {
-              message.warning(res.message);
-            }
+  effects: (dispatch: any) => ({
+    async asyncGetVertexes(payload: {
+      ids: string[];
+      useHash?: string;
+      expand?: {
+        vertexColor: string;
+        exploreStep;
+      };
+    }) {
+      const { ids, useHash, expand } = payload;
+      let newVertexes: any = [];
+      if (ids.length === 1) {
+        const nodeData = await fetchVertexProps({ ids, useHash });
+        if (nodeData.code === 0) {
+          newVertexes = getTagData(nodeData.data, expand);
+        }
+      } else if (ids.length > 1) {
+        const tagData = await dispatch.nebula.asyncGetTags();
+        const tags = tagData.code === 0 ? tagData.data.map(i => i.Name) : [];
+        const tagNodes = await Promise.all(
+          tags.map(async tag => {
+            const nodesData = await fetchVertexProps({ ids, useHash, tag });
+            return nodesData.code === 0
+              ? getTagData(nodesData.data, expand)
+              : undefined;
           }),
-      );
+        );
+        const flattenVertexes = _.flatten(tagNodes).filter(
+          i => i !== undefined,
+        );
+        const vertexTags: any = {};
+        flattenVertexes.forEach((item: any) => {
+          const id = item.name;
+          if (vertexTags[id]) {
+            const { headers, tables } = vertexTags[id].nodeProp;
+            const data = tables[0];
+            const nodeProp = {
+              headers: _.union(headers, item.nodeProp.headers),
+              tables: [_.assign(data, item.nodeProp.tables[0])],
+            };
+            vertexTags[id].nodeProp = nodeProp;
+          } else {
+            vertexTags[id] = item;
+          }
+        });
+        newVertexes = Object.values(vertexTags);
+      }
+      return newVertexes;
+    },
+
+    async asyncImportNodes(payload: { idsText: string; useHash?: string }) {
+      const { idsText, useHash } = payload;
+      const ids = idsText.trim().split('\n');
+      const newVertexes: any =
+        ids.length > 0
+          ? await this.asyncGetVertexes({
+              ids,
+              useHash,
+            })
+          : [];
+      const newIds = newVertexes.map(i => i.name);
+      if (newIds.length !== ids.length) {
+        const notExistIds = _.xor(newIds, ids);
+        message.warning(
+          `${notExistIds.join(', ')}${intl.get('import.notExist')}`,
+        );
+      }
       const uniqVertexes = _.uniqBy(newVertexes, 'name');
       this.addNodesAndEdges({
         vertexes: uniqVertexes.filter(v => v !== undefined),
@@ -195,7 +272,11 @@ export const explore = createModel({
       actionData.push({
         type: 'REMOVE',
         vertexes: selectVertexes,
-        edges: _.differenceBy(edges, originEdges, v => v.id),
+        edges: _.differenceBy(
+          edges,
+          originEdges,
+          v => '`' + v.type + '`' + v.id,
+        ),
       });
       this.update({
         vertexes,
@@ -229,7 +310,6 @@ export const explore = createModel({
         originVertexes,
         originEdges,
       } = payload;
-      let group;
       const gql = getExploreGQL({
         selectVertexes,
         edgeTypes,
@@ -248,54 +328,57 @@ export const explore = createModel({
           edgeDirection,
         );
         // fetch vertexes
-        const newVertexes = await Promise.all(
-          _.differenceBy(vertexes, originVertexes, vertexe => vertexe.name).map(
-            async (v: any) => {
-              const res = await fetchVertexProps(v.name);
-              const nodeProp = res.data;
-              if (vertexColor === 'groupByTag') {
-                const tags =
-                  nodeProp && nodeProp.headers
-                    ? _.sortedUniq(
-                        nodeProp.headers.map(field => {
-                          if (field === 'VertexID') {
-                            return 't';
-                          } else {
-                            return field.split('.')[0];
-                          }
-                        }),
-                      )
-                    : [];
-                group = tags.join('-');
-              } else {
-                group = 'step-' + exploreStep;
-              }
-
-              return {
-                ...v,
-                nodeProp,
-                group,
-              };
-            },
-          ),
+        const uniqVertexes = _.differenceBy(
+          vertexes,
+          originVertexes,
+          vertex => vertex.name,
         );
+        const uniqIds = uniqVertexes.map((i: any) => i.name);
+        const newVertexes =
+          uniqIds.length > 0
+            ? await this.asyncGetVertexes({
+                ids: uniqIds,
+                expand: {
+                  vertexColor,
+                  exploreStep,
+                },
+              })
+            : [];
         // fetch edges
-        const newEdges = await Promise.all(
-          _.differenceBy(edges, originEdges, edge => edge.id).map(
-            async (e: any) => {
-              const edgeFields = _.find(edgesFields, e.type);
-              const edgeProp = await fetchEdgeProps({
-                id: e.id,
-                type: e.type,
-                edgeFields,
-              });
+        const uniqEdges = _.differenceBy(
+          edges,
+          originEdges,
+          edge => '`' + edge.type + '`' + edge.id,
+        );
+        const edgeTypeGroup = _.groupBy(uniqEdges, (edge: any) => edge.type);
+        const edgeList = await Promise.all(
+          Object.keys(edgeTypeGroup).map(async type => {
+            const idRoutes = edgeTypeGroup[type].map((i: any) => i.id);
+            const edgeFields = _.find(edgesFields, type);
+            const res = await fetchEdgeProps({
+              idRoutes,
+              type,
+              edgeFields,
+            });
+            const _edges = res.tables.map(item => {
+              const edgeProp = {
+                headers: res.headers,
+                tables: [item],
+              };
               return {
-                ...e,
+                source: item[`${type}._src`],
+                target: item[`${type}._dst`],
+                id: `${item[`${type}._src`]}->${item[`${type}._dst`]}@${
+                  item[`${type}._rank`]
+                }`,
+                type,
                 edgeProp,
               };
-            },
-          ),
+            });
+            return _edges;
+          }),
         );
+        const newEdges = _.flatten(edgeList);
         this.addNodesAndEdges({
           vertexes: newVertexes,
           edges: newEdges,
@@ -314,11 +397,12 @@ export const explore = createModel({
     }) {
       const { code, data, message } = await fetchVertexPropsWithIndex(payload);
       if (code === 0 && data.tables.length !== 0) {
-        const ids = data.tables && data.tables.map(i => i.VertexID).join('\n');
-        this.asyncImportNodes({ ids });
+        const idsText =
+          data.tables && data.tables.map(i => i.VertexID).join('\n');
+        this.asyncImportNodes({ idsText });
       } else {
         throw new Error(message);
       }
     },
-  },
+  }),
 });

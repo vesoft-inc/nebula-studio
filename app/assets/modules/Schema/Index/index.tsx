@@ -91,7 +91,13 @@ class IndexList extends React.Component<IProps, IState> {
 
   componentDidMount() {
     trackPageView('/space/config/index/list');
-    this.props.asyncGetIndexList('TAG');
+    const { indexType } = this.state;
+    const { history } = this.props;
+    const {
+      location: { state },
+    }: any = history;
+    const type = state && state.indexType ? state.indexType : indexType;
+    this.props.asyncGetIndexList(type);
   }
 
   componentDidUpdate(prevProps) {

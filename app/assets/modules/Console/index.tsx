@@ -187,6 +187,7 @@ class Console extends React.Component<IProps, IState> {
             </div>
             <CodeMirror
               value={currentGQL}
+              onBlur={value => this.props.updateCurrentGQL(value)}
               onChangeLine={this.handleLineCount}
               ref={this.getInstance}
               height={isUpDown ? '120px' : 24 * maxLineNum + 'px'}

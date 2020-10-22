@@ -19,13 +19,9 @@ export function nebulaToData(
               source: data[`${type}DestId`],
               target: data[`${type}SourceId`],
               // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
-              id:
-                '`' +
-                type +
-                '`' +
-                `${data[`${type}DestId`]}->${data[`${type}SourceId`]}@${
-                  data[`${type}Rank`]
-                }`,
+              id: `${data[`${type}DestId`]}->${data[`${type}SourceId`]}@${
+                data[`${type}Rank`]
+              }`,
               type,
             });
             break;
@@ -34,13 +30,9 @@ export function nebulaToData(
               source: data[`${type}SourceId`],
               target: data[`${type}DestId`],
               // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
-              id:
-                '`' +
-                type +
-                '`' +
-                `${data[`${type}SourceId`]}->${data[`${type}DestId`]}@${
-                  data[`${type}Rank`]
-                }`,
+              id: `${data[`${type}SourceId`]}->${data[`${type}DestId`]}@${
+                data[`${type}Rank`]
+              }`,
               type,
             });
         }

@@ -22,6 +22,7 @@ interface IProps {
   height?: string;
   onShiftEnter?: () => void;
   onChange?: (value: string) => void;
+  onBlur?: (value: string) => void;
   onChangeLine?: () => void;
 }
 
@@ -103,6 +104,7 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
     // event
     this.editor.on('change', this.codemirrorValueChange);
     this.editor.on('keydown', this.keydown);
+    this.editor.on('blur', this.blur);
     const { value, width, height } = this.props;
     this.editor.setValue(value || '');
     if (width || height) {
@@ -110,6 +112,13 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
       this.editor.setSize(width, height);
     }
   }
+
+  blur = instance => {
+    if (this.props.onBlur) {
+      this.props.onBlur(instance.doc.getValue());
+    }
+  };
+
   keydown = (_, change) => {
     if (change.shiftKey === true && change.keyCode === 13) {
       if (this.props.onShiftEnter) {

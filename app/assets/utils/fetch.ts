@@ -1,12 +1,18 @@
 import service from '#assets/config/service';
 import { getExploreGQLWithIndex } from '#assets/utils/gql';
 
-export async function fetchVertexProps(id: any, useHash?: string) {
-  const _id =
+export async function fetchVertexProps(payload: {
+  ids: string[];
+  useHash?: string;
+  tag?: string;
+}) {
+  const { ids, useHash, tag } = payload;
+  const _ids =
     useHash === 'unset' || useHash === undefined
-      ? `${id}`
-      : `${useHash}(${id})`;
-  const gql = `fetch prop on * ${_id}`;
+      ? `${ids.join(', ')}`
+      : ids.map(i => `${useHash}(${i})`).join(', ');
+  const _tag = tag ? tag : '*';
+  const gql = `fetch prop on ${_tag} ${_ids}`;
   const { data, code, message } = (await service.execNGQL({
     gql,
   })) as any;
@@ -14,13 +20,15 @@ export async function fetchVertexProps(id: any, useHash?: string) {
 }
 
 export async function fetchEdgeProps(payload: {
-  id: any;
+  idRoutes: string[];
   type: string;
   edgeFields: any;
 }) {
-  const { id, edgeFields, type } = payload;
+  const { idRoutes, edgeFields, type } = payload;
   const edgeType = '`' + type + '`';
-  let gql = `fetch prop on ${id} yield ${edgeType}._src, ${edgeType}._dst `;
+  let gql = `fetch prop on ${edgeType} ${idRoutes.join(
+    ', ',
+  )} yield ${edgeType}._src, ${edgeType}._dst `;
   edgeFields[type].forEach(edgeField => {
     if (edgeField !== 'type') {
       gql += `,${edgeType}.${edgeField}`;

@@ -5,6 +5,7 @@ import {
   Icon,
   Input,
   message,
+  Radio,
   Select,
   Table,
 } from 'antd';
@@ -265,14 +266,14 @@ class Expand extends React.Component<IProps, IState> {
                 },
               ],
             })(
-              <Select>
-                <Option value="groupByStep">
+              <Radio.Group className="select-color">
+                <Radio.Button value="groupByStep">
                   {intl.get('explore.groupByStep')}
-                </Option>
-                <Option value="groupByTag">
+                </Radio.Button>
+                <Radio.Button value="groupByTag">
                   {intl.get('explore.groupByTag')}
-                </Option>
-              </Select>,
+                </Radio.Button>
+              </Radio.Group>,
             )}
           </Form.Item>
           <Form.Item label={intl.get('explore.quantityLimit')}>
@@ -308,11 +309,9 @@ class Expand extends React.Component<IProps, IState> {
         <GQLCodeMirror currentGQL={currentGQL} />
         <Button
           onClick={this.handleExpand}
+          loading={!!getExpandLoading}
           disabled={
-            !selectEdgeTypes ||
-            !selectEdgeTypes.length ||
-            !!getExpandLoading ||
-            quantityLimit < 0
+            !selectEdgeTypes || !selectEdgeTypes.length || quantityLimit < 0
           }
         >
           {intl.get('explore.expand')}

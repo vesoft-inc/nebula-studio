@@ -49,11 +49,11 @@ class InitVertexes extends React.Component<IProps> {
   }
 
   handleInsert = async (type?) => {
-    const ids = this.props.preloadVertexes.join('\n');
+    const idsText = this.props.preloadVertexes.join('\n');
     if (type === 'clear') {
       await this.props.clearExplore();
     }
-    await this.props.asyncImportNodes({ ids });
+    await this.props.asyncImportNodes({ idsText });
     await this.props.clearPreload();
     this.modalHandler.hide();
   };
