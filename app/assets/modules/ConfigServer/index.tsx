@@ -23,7 +23,7 @@ interface IProps
 
 class ConfigServer extends React.Component<IProps> {
   componentDidMount() {
-    trackPageView('/config-server');
+    trackPageView('/connect-server');
   }
 
   handleConfigServer = (form: WrappedFormUtils) => {

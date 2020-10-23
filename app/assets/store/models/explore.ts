@@ -40,25 +40,29 @@ interface IState {
   };
   preloadVertexes: string[];
 }
+function getGroup(headers) {
+  const tags = headers
+    ? _.sortedUniq(
+        headers
+          .map(field => {
+            if (field === 'VertexID') {
+              return '';
+            } else {
+              return field.split('.')[0];
+            }
+          })
+          .filter(i => i !== ''),
+      )
+    : [];
+  return 't' + tags.sort().join('-');
+}
 function getTagData(nodeProps, expand) {
   if (nodeProps.headers.length && nodeProps.tables.length) {
     let group;
     if (expand && expand.vertexColor !== 'groupByTag') {
       group = 'step-' + expand.exploreStep;
     } else {
-      const tags =
-        nodeProps && nodeProps.headers
-          ? _.sortedUniq(
-              nodeProps.headers.map(field => {
-                if (field === 'VertexID') {
-                  return 't';
-                } else {
-                  return field.split('.')[0];
-                }
-              }),
-            )
-          : [];
-      group = tags.join('-');
+      group = getGroup(nodeProps.headers);
     }
     const vertexes = nodeProps.tables.map(item => {
       const nodeProp = {
@@ -205,11 +209,13 @@ export const explore = createModel({
           if (vertexTags[id]) {
             const { headers, tables } = vertexTags[id].nodeProp;
             const data = tables[0];
+            const newHeaders = _.union(headers, item.nodeProp.headers);
             const nodeProp = {
-              headers: _.union(headers, item.nodeProp.headers),
+              headers: newHeaders,
               tables: [_.assign(data, item.nodeProp.tables[0])],
             };
             vertexTags[id].nodeProp = nodeProp;
+            vertexTags[id].group = getGroup(newHeaders);
           } else {
             vertexTags[id] = item;
           }

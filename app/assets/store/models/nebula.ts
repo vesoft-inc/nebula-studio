@@ -167,7 +167,7 @@ export const nebula = createModel({
       cookies.remove('nu');
       cookies.remove('np');
       setTimeout(() => {
-        window.location.href = '/config-server';
+        window.location.href = '/connect-server';
       });
     },
   },

@@ -346,7 +346,7 @@ class App extends React.Component<IProps, IState> {
                     component={Console}
                   />
                   <Route
-                    path="/config-server"
+                    path="/connect-server"
                     exact={true}
                     component={ConfigServer}
                   />
