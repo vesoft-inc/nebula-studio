@@ -1,4 +1,13 @@
-import { Button, Checkbox, message, Popconfirm, Table, Upload } from 'antd';
+import {
+  Button,
+  Checkbox,
+  Icon,
+  message,
+  Modal,
+  Popconfirm,
+  Table,
+  Upload,
+} from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
@@ -12,7 +21,7 @@ import { trackPageView } from '#assets/utils/stat';
 
 import Prev from './Prev';
 import './Upload.less';
-
+const confirm = Modal.confirm;
 const mapState = (state: IRootState) => ({
   files: state.importData.files,
   mountPath: state.importData.mountPath,
@@ -47,7 +56,20 @@ class Import extends React.Component<IProps> {
   }
 
   handleNext = () => {
-    this.props.nextStep();
+    const self = this;
+    const { files } = self.props;
+    const uploading =
+      files.filter(i => i.status && i.status === 'uploading').length > 0;
+    if (uploading) {
+      confirm({
+        title: intl.get('import.fileUploading'),
+        onOk() {
+          self.props.nextStep();
+        },
+      });
+    } else {
+      self.props.nextStep();
+    }
   };
 
   transformFile = async file => {
@@ -82,6 +104,18 @@ class Import extends React.Component<IProps> {
       {
         title: intl.get('import.fileName'),
         dataIndex: 'name',
+        render: (record, row) => {
+          if (row.status && row.status === 'uploading') {
+            return (
+              <>
+                <Icon type="loading" className="loading-upload" />
+                {record}
+              </>
+            );
+          } else {
+            return <span>{record}</span>;
+          }
+        },
       },
       {
         title: intl.get('import.withHeader'),

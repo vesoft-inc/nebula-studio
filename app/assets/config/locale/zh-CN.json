@@ -223,7 +223,8 @@
     "importNebulaError": "与实例交互相关错误",
     "datasource": "数据源",
     "indexNotEmpty": "对应列标不能为空",
-    "reset": "重置"
+    "reset": "重置",
+    "fileUploading": "正在上传CSV文件，请等待。如果您离开当前页面，只有已上传的部分数据会被保留。"
   },
   "schema": {
     "spaceList": "图空间列表",

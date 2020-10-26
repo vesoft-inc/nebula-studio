@@ -227,7 +227,8 @@
     "importNebulaError": "Error associated with instance interaction",
     "datasource": "DataSource",
     "indexNotEmpty": "column index can't be null.",
-    "reset": "Reset"
+    "reset": "Reset",
+    "fileUploading": "Upload in progress. If you leave this page now, only the uploaded data are stored."
   },
   "schema": {
     "spaceList": "Graph Space List",
