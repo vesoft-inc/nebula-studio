@@ -6,7 +6,6 @@ import './index.less';
 import Links from './Links';
 import Labels from './NodeTexts';
 import SelectIds from './SelectIds';
-
 interface INode extends d3.SimulationNodeDatum {
   name: string;
   group: number;
@@ -18,7 +17,6 @@ interface IProps {
   data: {
     vertexes: INode[];
     edges: any[];
-    selectIdsMap: Map<string, boolean>;
   };
   showTagFields: string[];
   showEdgeFields: string[];
@@ -59,7 +57,13 @@ const whichColor = (() => {
   };
 })();
 
-class NebulaD3 extends React.Component<IProps, {}> {
+interface IState {
+  offsetX: number;
+  offsetY: number;
+  scale: number;
+  selectedNodes: INode[];
+}
+class NebulaD3 extends React.Component<IProps, IState> {
   ctrls: IRefs = {};
   nodeRef: SVGCircleElement;
   circleRef: SVGCircleElement;
@@ -69,25 +73,15 @@ class NebulaD3 extends React.Component<IProps, {}> {
   link: any;
   linksText: any;
   nodeText: any;
-  isMultiSelect: boolean;
-  selectedNodes: INode[] = [];
-  state = {
-    offsetX: 0,
-    offsetY: 0,
-    scale: 0,
-  };
-
-  handleShiftPress = event => {
-    if (event.keyCode === 16) {
-      this.isMultiSelect = true;
-    }
-  };
-
-  handleShiftUp = event => {
-    if (event.keyCode === 16) {
-      this.isMultiSelect = false;
-    }
-  };
+  constructor(props: IProps) {
+    super(props);
+    this.state = {
+      offsetX: 0,
+      offsetY: 0,
+      scale: 0,
+      selectedNodes: [],
+    };
+  }
 
   componentDidMount() {
     if (!this.ctrls.mountPoint) {
@@ -110,34 +104,25 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .attr('d', 'M-6.75,-6.75 L 0,0 L -6.75,6.75')
       .attr('fill', '#999')
       .attr('stroke', '#999');
-
-    d3.select('.output-graph').on('click', () => {
-      const tagName = d3.event.target.tagName;
-      if (tagName !== 'text' && tagName !== 'circle') {
-        // clear already select
-        this.selectedNodes = [];
-      }
-    });
-    window.addEventListener('keydown', this.handleShiftPress);
-    window.addEventListener('keyup', this.handleShiftUp);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleShiftPress);
-    window.removeEventListener('keyup', this.handleShiftUp);
   }
 
   handleNodeClick = (d: any) => {
-    if (this.isMultiSelect) {
-      if (this.selectedNodes.find(n => n.name === d.name)) {
-        this.selectedNodes = this.selectedNodes.filter(n => n.name !== d.name);
+    const event = d3.event;
+    const { selectedNodes } = this.state;
+    if (event.shiftKey) {
+      if (selectedNodes.find(n => n.name === d.name)) {
+        this.setState({
+          selectedNodes: selectedNodes.filter(n => n.name !== d.name),
+        });
       } else {
-        this.selectedNodes = [...this.selectedNodes, d];
+        this.setState({
+          selectedNodes: [...selectedNodes, d],
+        });
       }
-      this.props.onSelectVertexes(this.selectedNodes);
+      this.onSelectVertexes(selectedNodes);
     } else {
-      this.selectedNodes = [];
-      this.props.onSelectVertexes([d]);
+      this.setState({ selectedNodes: [d] });
+      this.onSelectVertexes([d]);
     }
   };
 
@@ -275,7 +260,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
     this.nodeRenderText();
   };
 
-  handleUpdataNodes(nodes: INode[], selectIdsMap) {
+  handleUpdataNodes(nodes: INode[], selectIds) {
     if (nodes.length === 0) {
       d3.selectAll('.node').remove();
       return;
@@ -283,41 +268,32 @@ class NebulaD3 extends React.Component<IProps, {}> {
     d3.select(this.nodeRef)
       .selectAll('circle')
       .data(nodes)
-      .attr('class', (d: INode) => {
-        if (selectIdsMap[d.name]) {
-          return 'node active';
+      .classed('active', (d: INode) => {
+        if (selectIds.includes(d.name)) {
+          return true;
+        } else {
+          return false;
         }
-        return 'node';
       })
+      .enter()
+      .append<SVGCircleElement>('circle')
+      .attr('class', 'node')
+      .attr('r', 20)
       .style('fill', (d: INode) => {
         const group = d.group;
         return whichColor(group);
       })
-      .enter()
-      .append<SVGCircleElement>('circle')
+      .attr('id', (d: INode) => `node-${d.name}`)
       .on('mouseover', (d: INode) => {
         if (this.props.onMouseInNode) {
           this.props.onMouseInNode(d);
         }
       })
-
       .on('mouseout', () => {
         if (this.props.onMouseOut) {
           this.props.onMouseOut();
         }
-      })
-      .attr('class', 'node')
-      .attr('id', (d: INode) => `node-${d.name}`)
-      .style('fill', (d: INode) => {
-        const group = d.group;
-        return whichColor(group);
       });
-
-    d3.select(this.nodeRef)
-      .selectAll('circle')
-      .data(nodes)
-      .exit()
-      .remove();
 
     this.node = d3
       .selectAll('.node')
@@ -394,6 +370,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
   // it will change the data.edges and data.vertexes passed in
   computeDataByD3Force() {
     const { width, height, data } = this.props;
+    const { selectedNodes } = this.state;
     const linkForce = d3
       .forceLink(data.edges)
       .id((d: any) => {
@@ -417,7 +394,10 @@ class NebulaD3 extends React.Component<IProps, {}> {
       .force('link', linkForce)
       .force('center', d3.forceCenter(width / 2, height / 2))
       .restart();
-    this.handleUpdataNodes(data.vertexes, data.selectIdsMap);
+    this.handleUpdataNodes(
+      data.vertexes,
+      selectedNodes.map(i => i.name),
+    );
   }
 
   isIncludeField = (node, field) => {
@@ -490,6 +470,16 @@ class NebulaD3 extends React.Component<IProps, {}> {
       }
     });
   }
+
+  onSelectVertexes = nodes => {
+    if (d3.event.target.tagName !== 'circle') {
+      this.setState({
+        selectedNodes: nodes,
+      });
+    }
+    this.props.onSelectVertexes(nodes);
+  };
+
   render() {
     this.computeDataByD3Force();
     const { width, height, data, onMouseInLink, onMouseOut } = this.props;
@@ -546,7 +536,7 @@ class NebulaD3 extends React.Component<IProps, {}> {
             offsetX={offsetX}
             offsetY={offsetY}
             scale={scale}
-            onSelectVertexes={this.props.onSelectVertexes}
+            onSelectVertexes={this.onSelectVertexes}
           />
         </svg>
       </div>

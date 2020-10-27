@@ -339,7 +339,7 @@ export const explore = createModel({
           originVertexes,
           vertex => vertex.name,
         );
-        const uniqIds = uniqVertexes.map((i: any) => i.name);
+        const uniqIds = _.uniq(uniqVertexes.map((i: any) => i.name));
         const newVertexes =
           uniqIds.length > 0
             ? await this.asyncGetVertexes({

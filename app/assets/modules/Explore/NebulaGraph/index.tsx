@@ -242,7 +242,6 @@ class NebulaGraph extends React.Component<IProps, IState> {
     const {
       vertexes,
       edges,
-      selectVertexes,
       actionData,
       tagsFields,
       tags,
@@ -286,10 +285,6 @@ class NebulaGraph extends React.Component<IProps, IState> {
           data={{
             vertexes,
             edges,
-            selectIdsMap: selectVertexes.reduce((dict: any, vertex: INode) => {
-              dict[vertex.name] = true;
-              return dict;
-            }, {}),
           }}
           onMouseInLink={this.handleMouseInLink}
           onMouseInNode={this.handleMouseInNode}
