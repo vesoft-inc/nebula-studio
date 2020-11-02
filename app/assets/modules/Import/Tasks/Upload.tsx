@@ -1,13 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  Icon,
-  message,
-  Modal,
-  Popconfirm,
-  Table,
-  Upload,
-} from 'antd';
+import { Button, Checkbox, Icon, Modal, Popconfirm, Table, Upload } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
@@ -176,17 +167,7 @@ class Import extends React.Component<IProps> {
   };
 
   handleUploadChange = ({ fileList }) => {
-    const files = fileList.filter(file => file.size / 1024 / 1024 < 100);
-    this.props.updateFiles(_.uniqBy(files, 'name'));
-  };
-
-  handleBeforeUpload = file => {
-    const isOverSize = file.size / 1000 / 1000 < 100;
-    if (!isOverSize) {
-      message.error(intl.get('import.fileSizeErrorMsg'));
-      return Promise.reject(false);
-    }
-    return Promise.resolve(file);
+    this.props.updateFiles(_.uniqBy(fileList, 'name'));
   };
 
   render() {
@@ -203,7 +184,6 @@ class Import extends React.Component<IProps> {
               fileList={files}
               action={'/api/files/upload'}
               onChange={this.handleUploadChange}
-              beforeUpload={this.handleBeforeUpload}
               transformFile={this.transformFile as any}
             >
               <Button className="upload-btn" type="default">
