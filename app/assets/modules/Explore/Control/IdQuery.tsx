@@ -45,7 +45,8 @@ class IdQuery extends React.Component<IProps, IState> {
     this.props.form.validateFields(async (err, data) => {
       if (!err) {
         const { ids, useHash } = data;
-        this.props.asyncImportNodes({ idsText: ids, useHash });
+        const _ids = ids.trim().split('\n');
+        this.props.asyncImportNodes({ ids: _ids, useHash });
         this.props.closeHandler();
       }
     });

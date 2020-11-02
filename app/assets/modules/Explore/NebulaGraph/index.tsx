@@ -193,8 +193,11 @@ class NebulaGraph extends React.Component<IProps, IState> {
 
   handleShowEdges = async () => {
     const { asyncGetEdgeTypesFields, edgeTypes } = this.props;
+    const _edgeTypes = edgeTypes.map(i => ({
+      Name: i,
+    }));
     await asyncGetEdgeTypesFields({
-      edgeTypes,
+      edgeTypes: _edgeTypes,
     });
     this.settingHandler.show();
   };

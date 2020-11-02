@@ -34,10 +34,6 @@ const mapDispatch = (dispatch: IDispatch) => ({
     await dispatch.nebula.asyncSwitchSpace(space);
     await dispatch.explore.clear();
   },
-  updatePreloadVertexes: ids =>
-    dispatch.explore.update({
-      preloadVertexes: ids,
-    }),
 });
 
 interface IProps
@@ -97,11 +93,6 @@ class Console extends React.Component<IProps, IState> {
     this.setState({
       history: false,
     });
-  };
-
-  handleVertexesPreload = ids => {
-    trackEvent('navigation', 'view_explore', 'from_console_btn');
-    this.props.updatePreloadVertexes(ids);
   };
 
   handleEmptyNgql = () => {
@@ -205,7 +196,6 @@ class Console extends React.Component<IProps, IState> {
             result={result}
             value={this.getLocalStorage().pop()}
             onHistoryItem={e => this.handleHistoryItem(e)}
-            onVertexesPreload={ids => this.handleVertexesPreload(ids)}
           />
         </div>
         <Modal

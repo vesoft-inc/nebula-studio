@@ -26,6 +26,17 @@ export interface IEdge extends d3.SimulationLinkDatum<INode> {
   type: string;
 }
 
+interface IExportEdge {
+  srcId: string;
+  dstId: string;
+  rank: string;
+  edgeType: string;
+}
+
+interface IExportData {
+  vertexes: string[];
+  edges: IExportEdge[];
+}
 interface IState {
   vertexes: INode[];
   edges: IEdge[];
@@ -38,7 +49,7 @@ interface IState {
     vertexColor?: string;
     quantityLimit?: number;
   };
-  preloadVertexes: string[];
+  preloadData: IExportData;
 }
 function getGroup(headers) {
   const tags = headers
@@ -103,7 +114,10 @@ export const explore = createModel({
       vertexColor: '',
       quantityLimit: null,
     },
-    preloadVertexes: [],
+    preloadData: {
+      vertexes: [],
+      edges: [],
+    },
   },
   reducers: {
     update: (state: IState, payload: any): IState => {
@@ -169,7 +183,10 @@ export const explore = createModel({
           edgeDirection: '',
           vertexColor: '',
         },
-        preloadVertexes: [],
+        preloadData: {
+          vertexes: [],
+          edges: [],
+        },
       };
     },
   },
@@ -225,26 +242,11 @@ export const explore = createModel({
       return newVertexes;
     },
 
-    async asyncImportNodes(payload: { idsText: string; useHash?: string }) {
-      const { idsText, useHash } = payload;
-      const ids = idsText.trim().split('\n');
-      const newVertexes: any =
-        ids.length > 0
-          ? await this.asyncGetVertexes({
-              ids,
-              useHash,
-            })
-          : [];
-      const newIds = newVertexes.map(i => i.name);
-      if (newIds.length !== ids.length) {
-        const notExistIds = _.xor(newIds, ids);
-        message.warning(
-          `${notExistIds.join(', ')}${intl.get('import.notExist')}`,
-        );
-      }
-      const uniqVertexes = _.uniqBy(newVertexes, 'name');
+    async asyncImportNodes(payload: { ids: string[]; useHash?: string }) {
+      const { ids, useHash } = payload;
+      const vertexes = await this.asyncGetExploreVertex({ ids, useHash });
       this.addNodesAndEdges({
-        vertexes: uniqVertexes.filter(v => v !== undefined),
+        vertexes,
         edges: [],
       });
     },
@@ -403,12 +405,72 @@ export const explore = createModel({
     }) {
       const { code, data, message } = await fetchVertexPropsWithIndex(payload);
       if (code === 0 && data.tables.length !== 0) {
-        const idsText =
-          data.tables && data.tables.map(i => i.VertexID).join('\n');
-        this.asyncImportNodes({ idsText });
+        const ids = data.tables && data.tables.map(i => i.VertexID);
+        this.asyncImportNodes({ ids });
       } else {
         throw new Error(message);
       }
+    },
+    async asyncGetExploreVertex(payload: { ids: string[]; useHash?: string }) {
+      const { ids, useHash } = payload;
+      const _ids = _.uniq(ids);
+      const vertexes: any =
+        _ids.length > 0
+          ? await this.asyncGetVertexes({
+              ids: _ids,
+              useHash,
+            })
+          : [];
+      const newIds = vertexes.map(i => i.name);
+      if (newIds.length !== _ids.length) {
+        const notExistIds = _.xor(newIds, _ids);
+        message.warning(
+          `${notExistIds.join(', ')}${intl.get('import.notExist')}`,
+        );
+      }
+      return _.uniqBy(vertexes, 'name').filter(i => i !== undefined);
+    },
+
+    async asyncGetExploreEdge(edgeList: IExportEdge[]) {
+      let _edges = [];
+      if (edgeList.length > 0) {
+        const type = edgeList[0].edgeType;
+        const res = await fetchEdgeProps({
+          idRoutes: edgeList.map(i => `${i.srcId}->${i.dstId}@${i.rank}`),
+          type,
+        });
+        _edges = res.tables.map(item => {
+          const edgeProp = {
+            headers: res.headers,
+            tables: [item],
+          };
+          return {
+            source: item[`${type}._src`],
+            target: item[`${type}._dst`],
+            id: `${item[`${type}._src`]}->${item[`${type}._dst`]}@${
+              item[`${type}._rank`]
+            }`,
+            type,
+            edgeProp,
+          };
+        });
+      }
+      return _edges;
+    },
+
+    async asyncGetExploreInfo(data: IExportData) {
+      const { vertexes, edges } = data;
+      const _vertexes = await this.asyncGetExploreVertex({ ids: vertexes });
+      let _edges: any = _.groupBy(edges, e => e.edgeType);
+      _edges = await Promise.all(
+        Object.values(_edges).map(async item => {
+          return this.asyncGetExploreEdge(item);
+        }),
+      );
+      this.addNodesAndEdges({
+        vertexes: _vertexes,
+        edges: _edges.flat(),
+      });
     },
   }),
 });

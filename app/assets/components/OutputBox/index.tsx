@@ -2,31 +2,40 @@ import { Alert, Button, Icon, Table, Tabs } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
-import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-import { OutputCsv } from '#assets/components';
+import { Modal, OutputCsv } from '#assets/components';
+import { IDispatch } from '#assets/store';
 
+import Export from './Export';
 import './index.less';
 
-interface IProps extends RouteComponentProps {
+interface IProps extends ReturnType<typeof mapDispatch>, RouteComponentProps {
   value: string;
   result: any;
   onHistoryItem: (value: string) => void;
-  onVertexesPreload: (value: string[]) => void;
 }
 
 interface IState {
   sorter: any;
-  ids: string[];
 }
 
+const mapState = () => ({});
+
+const mapDispatch = (dispatch: IDispatch) => ({
+  updatePreloadData: data =>
+    dispatch.explore.update({
+      preloadData: data,
+    }),
+});
 class OutputBox extends React.Component<IProps, IState> {
+  importNodesHandler;
   constructor(props) {
     super(props);
 
     this.state = {
       sorter: null,
-      ids: [],
     };
   }
 
@@ -45,46 +54,57 @@ class OutputBox extends React.Component<IProps, IState> {
     }
     return 'info';
   };
-  componentDidMount() {
-    if (this.props.result && this.props.result.code === 0) {
-      this.fetchIds(this.props.result.data);
-    }
-  }
-  componentDidUpdate(prevProps) {
-    if (
-      !_.isEqual(prevProps.result, this.props.result) &&
-      this.props.result.code === 0
-    ) {
-      this.fetchIds(this.props.result.data);
-    }
-  }
 
-  fetchIds(data) {
-    // TODO support alias
-    const reg = /^\w+._(dst|src)$/;
-    let ids = [];
-    if (data.headers.includes('VertexID')) {
-      ids = data.tables.map(i => i.VertexID).filter(i => i !== undefined);
+  handleExplore = () => {
+    const { result = {} } = this.props;
+    if (result.data && result.data.headers.includes('_path_')) {
+      this.parsePathToGraph();
     } else {
-      data.headers.forEach(i => {
-        // HACK: nebula1.0 return 0 if there is no dstid, it'll be fixed in nbula2.0
-        if (reg.test(i)) {
-          const newIds = data.tables
-            .map(el => el[i])
-            .filter(i => i !== undefined && i !== '0');
-          ids = ids.concat(newIds);
+      if (this.importNodesHandler) {
+        this.importNodesHandler.show();
+      }
+    }
+  };
+
+  parsePathToGraph = () => {
+    const { result } = this.props;
+    const edgeReg = /^\<[a-zA-Z0-9_]+,\d+\>$/;
+    const pathes = result.data.tables.map(i => i._path_);
+    const exportData = pathes.map(path => {
+      const list = path.split(' ');
+      const vertexes: any = [];
+      const edges: any = [];
+      list.forEach((item, index) => {
+        if (edgeReg.test(item)) {
+          const [edgeType, rank] = item.replace(/[\<|\>|\s*]/g, '').split(',');
+          edges.push({
+            srcId: list[index - 1],
+            dstId: list[index + 1],
+            edgeType,
+            rank,
+            id: `${edgeType} ${list[index - 1]}->${list[index + 1]}@${rank}}`,
+          });
+        } else {
+          vertexes.push(item);
         }
       });
-    }
-    ids = _.uniq(ids);
-    this.setState({
-      ids,
+      return {
+        vertexes,
+        edges,
+      };
     });
-  }
+    const vertexes = exportData.map(i => i.vertexes).flat();
+    const edges = exportData.map(i => i.edges).flat();
+    this.props.updatePreloadData({
+      vertexes,
+      edges: _.uniqBy(edges, (e: any) => e.id),
+    });
+    this.props.history.push('/explore');
+  };
 
   render() {
     const { value, result = {} } = this.props;
-    const { sorter, ids } = this.state;
+    const { sorter } = this.state;
     let columns = [];
     let dataSource = [];
     if (result.code === 0) {
@@ -159,17 +179,15 @@ class OutputBox extends React.Component<IProps, IState> {
                       tables: dataSource,
                     }}
                   />
-                  {ids.length > 0 && (
-                    <Button
-                      type="primary"
-                      style={{ marginLeft: '10px' }}
-                      onClick={() => this.props.onVertexesPreload(ids)}
-                    >
-                      <Link to="/explore" className="btn-link">
-                        {intl.get('common.openInExplore')}
-                      </Link>
-                    </Button>
-                  )}
+                  <Button
+                    type="primary"
+                    style={{ marginLeft: '10px' }}
+                    onClick={this.handleExplore}
+                  >
+                    {result.data.headers.includes('_path_')
+                      ? intl.get('console.showSubgraphs')
+                      : intl.get('common.openInExplore')}
+                  </Button>
                 </div>
                 <Table
                   bordered={true}
@@ -203,9 +221,17 @@ class OutputBox extends React.Component<IProps, IState> {
             </span>
           </div>
         )}
+        <Modal
+          className="export-node-modal"
+          handlerRef={handler => (this.importNodesHandler = handler)}
+          footer={null}
+          width="650px"
+        >
+          <Export data={result.data} />
+        </Modal>
       </div>
     );
   }
 }
 
-export default withRouter(OutputBox);
+export default connect(mapState, mapDispatch)(withRouter(OutputBox));

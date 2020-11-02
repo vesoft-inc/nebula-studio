@@ -9,7 +9,7 @@ import { IDispatch, IRootState } from '#assets/store';
 import './InitVertexes.less';
 const mapState = (state: IRootState) => ({
   currentSpace: state.nebula.currentSpace,
-  preloadVertexes: state.explore.preloadVertexes,
+  preloadData: state.explore.preloadData,
   vertexes: state.explore.vertexes,
 });
 
@@ -29,9 +29,12 @@ const mapDispatch = (dispatch: IDispatch) => ({
     }),
   clearPreload: () =>
     dispatch.explore.update({
-      preloadVertexes: [],
+      preloadData: {
+        vertexes: [],
+        edges: [],
+      },
     }),
-  asyncImportNodes: dispatch.explore.asyncImportNodes,
+  asyncGetExploreInfo: dispatch.explore.asyncGetExploreInfo,
 });
 
 interface IProps
@@ -42,18 +45,18 @@ class InitVertexes extends React.Component<IProps> {
   modalHandler;
 
   componentDidMount() {
-    const { currentSpace, preloadVertexes, vertexes } = this.props;
-    if (currentSpace && preloadVertexes.length > 0) {
+    const { currentSpace, preloadData, vertexes } = this.props;
+    if (currentSpace && preloadData.vertexes.length > 0) {
       vertexes.length > 0 ? this.modalHandler.show() : this.handleInsert();
     }
   }
 
   handleInsert = async (type?) => {
-    const idsText = this.props.preloadVertexes.join('\n');
     if (type === 'clear') {
       await this.props.clearExplore();
     }
-    await this.props.asyncImportNodes({ idsText });
+    const { preloadData } = this.props;
+    await this.props.asyncGetExploreInfo(preloadData);
     await this.props.clearPreload();
     this.modalHandler.hide();
   };

@@ -95,7 +95,10 @@
   },
   "console": {
     "cost": "开销",
-    "execTime": "执行时间消耗"
+    "execTime": "执行时间消耗",
+    "exportVertex": "请选择表中代表点VID的列",
+    "exportEdge": "请选择结果中分别代表边的起点（src_vid）、终点（dst_vid）和权重（rank）的列",
+    "showSubgraphs": "查看子图"
   },
   "explore": {
     "clear": "清除",

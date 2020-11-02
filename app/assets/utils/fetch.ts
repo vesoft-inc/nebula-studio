@@ -22,18 +22,20 @@ export async function fetchVertexProps(payload: {
 export async function fetchEdgeProps(payload: {
   idRoutes: string[];
   type: string;
-  edgeFields: any;
+  edgeFields?: any;
 }) {
   const { idRoutes, edgeFields, type } = payload;
   const edgeType = '`' + type + '`';
-  let gql = `fetch prop on ${edgeType} ${idRoutes.join(
-    ', ',
-  )} yield ${edgeType}._src, ${edgeType}._dst `;
-  edgeFields[type].forEach(edgeField => {
-    if (edgeField !== 'type') {
-      gql += `,${edgeType}.${edgeField}`;
-    }
-  });
+  let gql = `fetch prop on ${edgeType} ${idRoutes.join(', ')}`;
+  if (edgeFields) {
+    gql += ` yield ${edgeType}._src, ${edgeType}._dst `;
+    edgeFields[type].forEach(edgeField => {
+      if (edgeField !== 'type') {
+        gql += `,${edgeType}.${edgeField}`;
+      }
+    });
+  }
+
   const { data } = (await service.execNGQL({
     gql,
   })) as any;
