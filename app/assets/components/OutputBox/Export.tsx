@@ -89,7 +89,7 @@ class Export extends React.Component<IProps> {
           {type === 'vertex' && (
             <>
               <p>{intl.get('console.exportVertex')}</p>
-              <Form.Item className="select-component" label="Vertex Id">
+              <Form.Item className="select-component" label="Vertex ID">
                 {getFieldDecorator('vertexId', {
                   rules: [
                     {
@@ -120,7 +120,7 @@ class Export extends React.Component<IProps> {
                   ],
                 })(<Input />)}
               </Form.Item>
-              <Form.Item className="select-component" label="Src Id">
+              <Form.Item className="select-component" label="Src ID">
                 {getFieldDecorator('srcId', {
                   rules: [
                     {
@@ -137,7 +137,7 @@ class Export extends React.Component<IProps> {
                   </Select>,
                 )}
               </Form.Item>
-              <Form.Item className="select-component" label="Dst Id">
+              <Form.Item className="select-component" label="Dst ID">
                 {getFieldDecorator('dstId', {
                   rules: [
                     {
