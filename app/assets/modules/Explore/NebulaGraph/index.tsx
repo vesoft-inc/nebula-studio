@@ -171,14 +171,14 @@ class NebulaGraph extends React.Component<IProps, IState> {
     if (data.type === 'ADD') {
       this.props.updateActionData(
         actionData,
-        _.differenceBy(edges, data.edges, (e: IEdge) => e.id),
-        _.differenceBy(vertexes, data.vertexes, (v: INode) => v.name),
+        _.differenceBy(edges, data.edges, (e: IEdge) => e.uuid),
+        _.differenceBy(vertexes, data.vertexes, (v: INode) => v.uuid),
       );
     } else {
       this.props.updateActionData(
         actionData,
-        _.unionBy(edges, data.edges, (e: IEdge) => e.id),
-        _.unionBy(vertexes, data.vertexes, (v: INode) => v.name),
+        _.unionBy(edges, data.edges, (e: IEdge) => e.uuid),
+        _.unionBy(vertexes, data.vertexes, (v: INode) => v.uuid),
       );
     }
   };

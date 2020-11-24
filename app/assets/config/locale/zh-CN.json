@@ -109,7 +109,7 @@
     "deleteSelectNodes": "删除选中",
     "expand": "拓展",
     "fileImport": "文件导入",
-    "importPlaceholder": "输入VID或者用于生成VID的数据，一行一个数据，按回车键断开。\n\n如果输入VID或者其他需要Hash预处理的bool、double、int类型数据，直接输入数据值。\n\n如果要使用Hash或UUID预处理string类型的数据生成VID，使用单引号或双引号标示每个string，格式示例如下：\n'string1'\n'string2'\n'string3'",
+    "importPlaceholder": "输入VID或者用于生成VID的数据，一行一个数据，按回车键断开。格式示例如下：\nstring1\nstring2\nstring3",
     "outgoing": "流出",
     "incoming": "流入",
     "filter": "筛选",

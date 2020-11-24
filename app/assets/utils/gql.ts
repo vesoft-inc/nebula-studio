@@ -1,4 +1,4 @@
-import { handleKeyword } from '#assets/utils/function';
+import { handleKeyword, handleVidStringName } from '#assets/utils/function';
 interface IField {
   name: string;
   type: string;
@@ -43,7 +43,7 @@ export const getExploreGQL = (params: {
   }
   const gql =
     `GO FROM 
-  ${selectVertexes.map(d => d.name)}
+  ${selectVertexes.map(i => handleVidStringName(i.name))}
 OVER
   ` +
     '`' +
@@ -84,7 +84,9 @@ export const getExploreGQLWithIndex = (params: {
     )
     .map(filter => {
       const value =
-        filter.type === 'string' ? `'${filter.value}'` : filter.value;
+        filter.type === 'string' || filter.type.startsWith('fixed_string')
+          ? handleVidStringName(filter.value)
+          : filter.value;
       return `${filter.relation ? filter.relation : ''} ${tagName}.${
         filter.field
       } ${filter.operator} ${value}`;

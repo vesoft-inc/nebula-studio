@@ -1,6 +1,6 @@
 {
   "name": "nebula-graph-studio",
-  "version": "1.2.1-beta",
+  "version": "2.0.0-beta",
   "description": "nebula-graph-studio",
   "private": true,
   "egg": {
@@ -50,7 +50,8 @@
     "react-redux": "^7.1.1",
     "react-router-dom": "^5.1.2",
     "stream-wormhole": "^1.1.0",
-    "tslib": "^1.9.0"
+    "tslib": "^1.9.0",
+    "uuid": "^8.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",

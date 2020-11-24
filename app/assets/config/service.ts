@@ -4,6 +4,8 @@ const execNGQL = post('/api-nebula/db/exec');
 
 const connectDB = post('/api-nebula/db/connect');
 
+const disconnectDB = post('/api-nebula/db/disconnect');
+
 const importData = post('/api-import/submit');
 
 const runImport = post('/api/import/import');
@@ -28,6 +30,7 @@ const getAppInfo = get('/api/app');
 export default {
   execNGQL,
   connectDB,
+  disconnectDB,
   importData,
   runImport,
   stopImport,

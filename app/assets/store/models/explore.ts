@@ -3,6 +3,7 @@ import { message } from 'antd';
 import * as d3 from 'd3';
 import _ from 'lodash';
 import intl from 'react-intl-universal';
+import { v4 as uuidv4 } from 'uuid';
 
 import service from '#assets/config/service';
 import {
@@ -10,12 +11,14 @@ import {
   fetchVertexProps,
   fetchVertexPropsWithIndex,
 } from '#assets/utils/fetch';
+import { handleVidStringName } from '#assets/utils/function';
 import { getExploreGQL } from '#assets/utils/gql';
-import { idToSrting, nebulaToData, setLink } from '#assets/utils/nebulaToData';
+import { nebulaToData, setLink } from '#assets/utils/nebulaToData';
 
 export interface INode extends d3.SimulationNodeDatum {
   name: string;
   group?: number;
+  uuid: string;
 }
 
 export interface IEdge extends d3.SimulationLinkDatum<INode> {
@@ -24,6 +27,7 @@ export interface IEdge extends d3.SimulationLinkDatum<INode> {
   target: INode;
   size: number;
   type: string;
+  uuid: string;
 }
 
 interface IExportEdge {
@@ -51,40 +55,41 @@ interface IState {
   };
   preloadData: IExportData;
 }
-function getGroup(headers) {
-  const tags = headers
-    ? _.sortedUniq(
-        headers
-          .map(field => {
-            if (field === 'VertexID') {
-              return '';
-            } else {
-              return field.split('.')[0];
-            }
-          })
-          .filter(i => i !== ''),
-      )
-    : [];
-  return 't' + tags.sort().join('-');
+function getGroup(headers, expand) {
+  if (expand && expand.vertexColor !== 'groupByTag') {
+    return 'step-' + expand.exploreStep;
+  } else {
+    const tags = headers
+      ? _.sortedUniq(
+          headers
+            .map(field => {
+              if (field === 'VertexID') {
+                return '';
+              } else {
+                return field.split('.')[0];
+              }
+            })
+            .filter(i => i !== ''),
+        )
+      : [];
+    return 't' + tags.sort().join('-');
+  }
 }
 function getTagData(nodeProps, expand) {
   if (nodeProps.headers.length && nodeProps.tables.length) {
-    let group;
-    if (expand && expand.vertexColor !== 'groupByTag') {
-      group = 'step-' + expand.exploreStep;
-    } else {
-      group = getGroup(nodeProps.headers);
-    }
+    const group = getGroup(nodeProps.headers, expand);
     const vertexes = nodeProps.tables.map(item => {
       const nodeProp = {
         headers: nodeProps.headers,
         tables: [item],
       };
+      const uuid = uuidv4();
       if (expand) {
         return {
           name: item.VertexID,
           nodeProp,
           group,
+          uuid,
         };
       } else {
         return {
@@ -92,6 +97,7 @@ function getTagData(nodeProps, expand) {
           step: 0,
           group,
           nodeProp,
+          uuid,
         };
       }
     });
@@ -232,7 +238,7 @@ export const explore = createModel({
               tables: [_.assign(data, item.nodeProp.tables[0])],
             };
             vertexTags[id].nodeProp = nodeProp;
-            vertexTags[id].group = getGroup(newHeaders);
+            vertexTags[id].group = getGroup(newHeaders, expand);
           } else {
             vertexTags[id] = item;
           }
@@ -268,14 +274,14 @@ export const explore = createModel({
         _.remove(
           originEdges,
           v =>
-            v.source.name === selectVertexe.name ||
-            v.target.name === selectVertexe.name,
+            v.source.uuid === selectVertexe.uuid ||
+            v.target.uuid === selectVertexe.uuid,
         );
       });
       const vertexes = _.differenceBy(
         originVertexes,
         selectVertexes,
-        v => v.name,
+        v => v.uuid,
       );
       actionData.push({
         type: 'REMOVE',
@@ -331,7 +337,9 @@ export const explore = createModel({
 
       if (code === 0 && data.tables.length !== 0) {
         const { edges, vertexes } = nebulaToData(
-          idToSrting(data.tables),
+          // nebula 2.0 alpha support string vid only now
+          // idToSrting(data.tables),
+          data.tables,
           edgeTypes,
           edgeDirection,
         );
@@ -381,6 +389,7 @@ export const explore = createModel({
                 }`,
                 type,
                 edgeProp,
+                uuid: uuidv4(),
               };
             });
             return _edges;
@@ -405,7 +414,7 @@ export const explore = createModel({
     }) {
       const { code, data, message } = await fetchVertexPropsWithIndex(payload);
       if (code === 0 && data.tables.length !== 0) {
-        const ids = data.tables && data.tables.map(i => i.VertexID);
+        const ids = data.tables && data.tables.map(i => i.VertexID || i._vid);
         this.asyncImportNodes({ ids });
       } else {
         throw new Error(message);
@@ -436,7 +445,12 @@ export const explore = createModel({
       if (edgeList.length > 0) {
         const type = edgeList[0].edgeType;
         const res = await fetchEdgeProps({
-          idRoutes: edgeList.map(i => `${i.srcId}->${i.dstId}@${i.rank}`),
+          idRoutes: edgeList.map(
+            i =>
+              `${handleVidStringName(i.srcId)}->${handleVidStringName(
+                i.dstId,
+              )}@${i.rank}`,
+          ),
           type,
         });
         _edges = res.tables.map(item => {
@@ -452,6 +466,7 @@ export const explore = createModel({
             }`,
             type,
             edgeProp,
+            uuid: uuidv4(),
           };
         });
       }

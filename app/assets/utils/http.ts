@@ -1,4 +1,4 @@
-import { message, message as AntMessage } from 'antd';
+import { message } from 'antd';
 import axios from 'axios';
 import intl from 'react-intl-universal';
 
@@ -14,23 +14,32 @@ service.interceptors.request.use(config => {
 
 service.interceptors.response.use(
   (response: any) => {
-    const { code, message } = response.data;
+    const { code, message: errMsg } = response.data;
     // if connection refused, login again
-    if (code === -1 && message && message.includes('connection refused')) {
-      AntMessage.warning(intl.get('warning.connectError'));
+    if (
+      code === -1 &&
+      errMsg &&
+      (errMsg.includes('connection refused') || errMsg.includes('broken pipe'))
+    ) {
+      message.warning(intl.get('warning.connectError'));
       store.dispatch({
-        type: 'nebula/clearConfig',
+        type: 'nebula/asyncClearConfigServer',
       });
     }
     return response.data;
   },
   (error: any) => {
-    message.error(
-      `${intl.get('common.requestError')}: ${error.response.status} ${
-        error.response.statusText
-      }`,
-    );
-    return error.response;
+    if (error.response && error.response.status) {
+      message.error(
+        `${intl.get('common.requestError')}: ${error.response.status} ${
+          error.response.statusText
+        }`,
+      );
+      return error.response;
+    } else {
+      message.error(`${intl.get('common.requestError')}: ${error}`);
+      return error;
+    }
   },
 );
 

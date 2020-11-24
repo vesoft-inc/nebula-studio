@@ -1,4 +1,5 @@
 import service from '#assets/config/service';
+import { handleVidStringName } from '#assets/utils/function';
 import { getExploreGQLWithIndex } from '#assets/utils/gql';
 
 export async function fetchVertexProps(payload: {
@@ -9,7 +10,7 @@ export async function fetchVertexProps(payload: {
   const { ids, useHash, tag } = payload;
   const _ids =
     useHash === 'unset' || useHash === undefined
-      ? `${ids.join(', ')}`
+      ? ids.map(i => handleVidStringName(i)).join(', ')
       : ids.map(i => `${useHash}(${i})`).join(', ');
   const _tag = tag ? tag : '*';
   const gql = `fetch prop on ${_tag} ${_ids}`;

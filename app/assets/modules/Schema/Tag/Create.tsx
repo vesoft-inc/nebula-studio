@@ -240,7 +240,7 @@ class CreateTag extends React.Component<IProps, IState> {
     };
     const fields = getFieldsValue().fields ? getFieldsValue().fields : [];
     const ttlOptions = fields.filter(i =>
-      ['int', 'timestamp'].includes(i.type),
+      ['int', 'int64', 'timestamp'].includes(i.type),
     );
     if (ttlRequired) {
       return (

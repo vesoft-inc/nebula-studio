@@ -1,5 +1,7 @@
 import _ from 'lodash';
 
+import { handleVidStringName } from '#assets/utils/function';
+
 export function nebulaToData(
   table: any[],
   edgeTypes: string[],
@@ -8,20 +10,19 @@ export function nebulaToData(
   return table.reduce(
     (result, data) => {
       edgeTypes.forEach(type => {
-        // HACK: nebula1.0 return 0 if there is no dstid, it'll be fixed in nbula2.0
-        // Relative issue: https://github.com/vesoft-inc/nebula/issues/2080
-        if (data[`${type}DestId`] === '0') {
+        // HACK: nebula 2.0 alpha return '' if there is no dstid
+        if (data[`${type}DestId`] === '') {
           return;
         }
+        const destId = handleVidStringName(data[`${type}DestId`]);
+        const sourceId = handleVidStringName(data[`${type}SourceId`]);
         switch (direction) {
           case 'incoming':
             result.edges.push({
               source: data[`${type}DestId`],
               target: data[`${type}SourceId`],
               // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
-              id: `${data[`${type}DestId`]}->${data[`${type}SourceId`]}@${
-                data[`${type}Rank`]
-              }`,
+              id: `${destId}->${sourceId}@${data[`${type}Rank`]}`,
               type,
             });
             break;
@@ -30,9 +31,7 @@ export function nebulaToData(
               source: data[`${type}SourceId`],
               target: data[`${type}DestId`],
               // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
-              id: `${data[`${type}SourceId`]}->${data[`${type}DestId`]}@${
-                data[`${type}Rank`]
-              }`,
+              id: `${sourceId}->${destId}@${data[`${type}Rank`]}`,
               type,
             });
         }

@@ -2,12 +2,12 @@ package pool
 
 import (
 	"errors"
-	"log"
 	"sync"
 	"time"
 
-	nebula "github.com/vesoft-inc/nebula-go"
-	"github.com/vesoft-inc/nebula-go/nebula/graph"
+	uuid "github.com/satori/go.uuid"
+	nebula "github.com/vesoft-inc/nebula-clients/go"
+	graph "github.com/vesoft-inc/nebula-clients/go/nebula/graph"
 )
 
 type Account struct {
@@ -28,10 +28,9 @@ type ChannelRequest struct {
 type Connection struct {
 	RequestChannel chan ChannelRequest
 	CloseChannel   chan bool
-	CurrentSpace   string
 	updateTime     int64
-	client         *nebula.GraphClient
 	account        *Account
+	session        *nebula.Session
 }
 
 const (
@@ -39,83 +38,90 @@ const (
 	secondsOfHalfHour = int64(30 * 60)
 )
 
-var connectionPool = make(map[int64]*Connection)
+var connectionPool = make(map[string]*Connection)
 var currentConnectionNum = 0
 var connectLock sync.Mutex
 
-func NewConnection(host, username, password string) (sessionID int64, err error) {
+func NewConnection(address string, port int, username string, password string) (nsid string, err error) {
 	connectLock.Lock()
 	defer connectLock.Unlock()
-	recoverConnections()
-	if currentConnectionNum >= maxConnectionNum {
-		return -1, errors.New("Too many connections to nebula db")
+	// Initialize logger
+	var nebulaLog = nebula.DefaultLogger{}
+	hostAddress := nebula.HostAddress{Host: address, Port: port}
+	hostList := []nebula.HostAddress{hostAddress}
+	poolConfig := nebula.GetDefaultConf()
+	// Initialize connectin pool
+	pool, err := nebula.NewConnectionPool(hostList, poolConfig, nebulaLog)
+	if err != nil {
+		return "", errors.New("Fail to initialize the connection pool")
+	}
+	err = pool.Ping(hostList[0], 5000*time.Millisecond)
+	if err != nil {
+		return "", err
 	}
 
-	client, err := nebula.NewClient(host)
-	if err != nil {
-		log.Println(err)
-		return client.GetSessionID(), err
-	}
-	err = client.Connect(username, password)
-	if err != nil {
-		return 0, err
-	}
-	sessionID = client.GetSessionID()
-	currentConnectionNum++
-	connectionPool[sessionID] = &Connection{
-		RequestChannel: make(chan ChannelRequest),
-		CloseChannel:   make(chan bool),
-		updateTime:     time.Now().Unix(),
-		client:         client,
-		account: &Account{
-			username: username,
-			password: password,
-		},
-	}
-
-	// Make a goroutine to deal with concurrent requests from each connection
-	go func() {
-		connection := connectionPool[sessionID]
-		for {
-			select {
-			case request := <-connection.RequestChannel:
-				response, err := connection.client.Execute(request.Gql)
-				request.ResponseChannel <- ChannelResponse{
-					Result: response,
-					Error:  err,
-				}
-			case <-connection.CloseChannel:
-				connection.client.Disconnect()
-				connectLock.Lock()
-				delete(connectionPool, sessionID)
-				currentConnectionNum--
-				connectLock.Unlock()
-				// Exit loop
-				return
-			}
+	// Create session
+	session, err := pool.GetSession(username, password)
+	if err == nil {
+		nsid = uuid.NewV4().String()
+		connectionPool[nsid] = &Connection{
+			RequestChannel: make(chan ChannelRequest),
+			CloseChannel:   make(chan bool),
+			updateTime:     time.Now().Unix(),
+			session:        session,
+			account: &Account{
+				username: username,
+				password: password,
+			},
 		}
-	}()
+		currentConnectionNum++
 
-	return sessionID, nil
+		// Make a goroutine to deal with concurrent requests from each connection
+		go func() {
+			connection := connectionPool[nsid]
+			for {
+				select {
+				case request := <-connection.RequestChannel:
+					response, err := connection.session.Execute(request.Gql)
+					request.ResponseChannel <- ChannelResponse{
+						Result: response,
+						Error:  err,
+					}
+				case <-connection.CloseChannel:
+					connection.session.Release()
+					connectLock.Lock()
+					delete(connectionPool, nsid)
+					currentConnectionNum--
+					connectLock.Unlock()
+					// Exit loop
+					return
+				}
+			}
+		}()
+		return nsid, err
+	}
+	return "", err
 }
 
-func GetConnection(sessionID int64) (connection *Connection, err error) {
+func Disconnect(nsid string) {
+	connection := connectionPool[nsid]
+	if connection != nil {
+		connection.session.Release()
+		delete(connectionPool, nsid)
+	}
+	return
+}
+
+func GetConnection(nsid string) (connection *Connection, err error) {
 	connectLock.Lock()
 	defer connectLock.Unlock()
 
-	connection, ok := connectionPool[sessionID]
+	connection, ok := connectionPool[nsid]
 	if ok {
 		connection.updateTime = time.Now().Unix()
 		return connection, nil
 	}
 	return nil, errors.New("connection refused for being released")
-}
-
-func ReConnect(connection *Connection) (err error) {
-	connection.client.Disconnect()
-	err = connection.client.Connect(connection.account.username, connection.account.password)
-
-	return err
 }
 
 func recoverConnections() {

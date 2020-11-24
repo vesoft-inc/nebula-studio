@@ -1,8 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Route } from 'react-router-dom';
-
-import ConfigServer from '#assets/modules/ConfigServer';
+import { Redirect, Route } from 'react-router-dom';
 
 import { IRootState } from './store';
 
@@ -22,7 +20,7 @@ const PrivateRoute = ({ component: Component, render, ...rest }) => {
       <Route render={render} {...rest} />
     );
   } else {
-    return <Route {...rest} render={_ => <ConfigServer />} />;
+    return <Redirect to="/connect-server" {...rest} />;
   }
 };
 

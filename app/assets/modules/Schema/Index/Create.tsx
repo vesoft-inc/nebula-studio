@@ -283,8 +283,8 @@ class CreateIndex extends React.Component<IProps, IState> {
                 ],
               })(
                 <Select onChange={this.getFieldList}>
-                  {typeList.map(item => (
-                    <Option value={item.Name} key={item.ID}>
+                  {typeList.map((item, index) => (
+                    <Option value={item.Name} key={`${index}_${item.Name}`}>
                       {item.Name}
                     </Option>
                   ))}

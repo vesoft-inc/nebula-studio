@@ -116,8 +116,9 @@ class EditEdge extends React.Component<IProps, IState> {
   };
 
   handleData = (data: string) => {
-    const reg = /CREATE EDGE.+(\([^\)]+\))\s+(ttl_duration = \d+),\s+(ttl_col\s+=\s+"?\w*"?)/gm;
-    const infoList = reg.exec(data) || [];
+    const reg = /CREATE EDGE\s`\w+`\s(?<!string)\((.*)(?<!\d)\)\s+(ttl_duration = \d+),\s+(ttl_col\s+=\s+"?\w*"?)/gm;
+    const str = data.replaceAll(/[\r\n]/g, ' ');
+    const infoList = reg.exec(str) || [];
     const fieldStr =
       infoList &&
       infoList[1].slice(1, infoList[1].length - 1).replace(/[\r\n]/g, '');
@@ -126,14 +127,16 @@ class EditEdge extends React.Component<IProps, IState> {
     const ttlCol =
       (infoList && infoList[3].split(' = ')[1].replace(/"/g, '')) || '';
     const fieldList: IField[] = fields.map(i => {
-      const item = i
-        .replace(/^\s*/g, '')
-        .replace(/`/g, '')
-        .split(' ');
+      const fieldReg = /`(.+)`\s+([0-9a-zA-Z\_\(\)]+)\s+(NOT NULL|NULL)(?:\sDEFAULT\s+(.+))?/g;
+      const result = fieldReg.exec(i) || [];
       return {
-        name: item[0],
-        type: item[1],
-        value: item[3] || '',
+        name: result[1],
+        type: result[2],
+        null: result[3] === 'NULL',
+        value:
+          result[4] === undefined
+            ? ''
+            : result[4].replace(/^"/, '').replace(/"$/, ''),
       };
     });
     const fieldRequired = fieldList.length > 0;
@@ -576,7 +579,7 @@ class EditEdge extends React.Component<IProps, IState> {
     };
     const fields = this.state.fieldList;
     const ttlOptions = fields.filter(i =>
-      ['int', 'timestamp'].includes(i.type),
+      ['int', 'int64', 'timestamp'].includes(i.type),
     );
     const { editTtl, ttlConfig, editTtlConfig } = this.state;
     return (

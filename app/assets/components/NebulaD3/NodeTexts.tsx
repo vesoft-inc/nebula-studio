@@ -5,6 +5,7 @@ import * as React from 'react';
 interface INode extends d3.SimulationNodeDatum {
   name: string;
   group: number;
+  uuid: string;
 }
 interface IProps {
   nodes: INode[];
@@ -27,7 +28,7 @@ export default class NodeTexts extends React.Component<IProps, {}> {
         (v: any) => v.name,
       );
       removeNodes.forEach(removeNode => {
-        d3.select('#name_' + removeNode.name).remove();
+        d3.select('#name_' + removeNode.uuid).remove();
       });
     } else {
       this.labelRender(this.props.nodes);
@@ -41,7 +42,7 @@ export default class NodeTexts extends React.Component<IProps, {}> {
       .enter()
       .append('text')
       .attr('class', 'label')
-      .attr('id', d => 'name_' + d.name)
+      .attr('id', d => 'name_' + d.uuid)
       .attr('text-anchor', 'middle');
 
     if (this.ref) {

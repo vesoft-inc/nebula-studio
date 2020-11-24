@@ -12,8 +12,8 @@ import SpaceSearchInput from '../../Console/SpaceSearchInput';
 import EdgeList from '../Edge';
 import CreateEdge from '../Edge/Create';
 import EditEdge from '../Edge/Edit';
-import CreateIndex from '../Index/Create';
-import IndexList from '../Index/index';
+// import CreateIndex from '../Index/Create';
+// import IndexList from '../Index/index';
 import TagList from '../Tag';
 import CreateTag from '../Tag/Create';
 import EditTag from '../Tag/Edit';
@@ -158,7 +158,7 @@ class SpaceConfig extends React.Component<IProps, IState> {
           >
             <TabPane tab={intl.get('common.tag')} key="tag" />
             <TabPane tab={intl.get('common.edge')} key="edge" />
-            <TabPane tab={intl.get('common.index')} key="index" />
+            {/* <TabPane tab={intl.get('common.index')} key="index" /> */}
           </Tabs>
           <div className="space-content">
             <PrivateRoute
@@ -201,7 +201,8 @@ class SpaceConfig extends React.Component<IProps, IState> {
                 />
               )}
             />
-            <PrivateRoute
+            {/* TODO: hide index page in studio v2 */}
+            {/* <PrivateRoute
               path="/space/:space/index/list"
               exact={true}
               component={IndexList}
@@ -210,7 +211,7 @@ class SpaceConfig extends React.Component<IProps, IState> {
               path={`/space/:space/index/create`}
               exact={true}
               component={CreateIndex}
-            />
+            /> */}
             {/* TODO: 子路由里重定向问题 */}
             {/* <Redirect to={`/space/${space}/tag/list`} /> */}
           </div>

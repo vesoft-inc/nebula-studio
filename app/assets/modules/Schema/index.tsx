@@ -102,7 +102,7 @@ class Schema extends React.Component<IProps> {
             />
           </>
         ),
-        dataIndex: 'Partition number',
+        dataIndex: 'Partition Number',
         align: 'center' as const,
       },
       {

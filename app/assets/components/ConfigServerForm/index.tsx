@@ -3,12 +3,14 @@ import { FormComponentProps } from 'antd/lib/form';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import React from 'react';
 import intl from 'react-intl-universal';
+import { connect } from 'react-redux';
 
 import {
   hostRulesFn,
   passwordRulesFn,
   usernameRulesFn,
 } from '#assets/config/rules';
+import { IRootState } from '#assets/store';
 
 import './index.less';
 
@@ -18,13 +20,15 @@ const fomrItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 14 },
 };
-
-interface IProps extends FormComponentProps {
+const mapState = (state: IRootState) => ({
+  loading: state.loading.effects.nebula.asyncConfigServer,
+});
+interface IProps extends ReturnType<typeof mapState>, FormComponentProps {
   onConfig: (form: WrappedFormUtils) => void;
 }
 
 const ConfigServerForm = Form.create<IProps>()((props: IProps) => {
-  const { onConfig } = props;
+  const { onConfig, loading } = props;
   const { getFieldDecorator } = props.form;
   return (
     <Form
@@ -47,11 +51,15 @@ const ConfigServerForm = Form.create<IProps>()((props: IProps) => {
           rules: passwordRulesFn(intl),
         })(<Input />)}
       </FormItem>
-      <Button type="primary" onClick={() => onConfig(props.form)}>
+      <Button
+        type="primary"
+        onClick={() => onConfig(props.form)}
+        loading={!!loading}
+      >
         {intl.get('configServer.connect')}
       </Button>
     </Form>
   );
 });
 
-export default ConfigServerForm;
+export default connect(mapState)(ConfigServerForm);

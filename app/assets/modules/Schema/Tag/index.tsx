@@ -27,7 +27,6 @@ interface IProps
 }
 
 interface ITag {
-  id: string;
   name: string;
   fields: IField[];
 }
@@ -92,6 +91,8 @@ class TagList extends React.Component<IProps, IState> {
     if (res.code === 0) {
       message.success(intl.get('common.deleteSuccess'));
       await this.props.asyncGetTagList();
+    } else {
+      message.warning(res.message);
     }
     trackEvent(
       'schema',
@@ -101,7 +102,7 @@ class TagList extends React.Component<IProps, IState> {
   };
 
   handleRowClick = async record => {
-    const { id: key } = record;
+    const { name: key } = record;
     const { expandedRowKeys } = this.state;
     this.setState({
       expandedRowKeys: expandedRowKeys.includes(key) ? [] : [key],
@@ -184,7 +185,7 @@ class TagList extends React.Component<IProps, IState> {
         }}
         expandedRowKeys={expandedRowKeys}
         loading={!!loading}
-        rowKey="id"
+        rowKey="name"
       />
     );
   };

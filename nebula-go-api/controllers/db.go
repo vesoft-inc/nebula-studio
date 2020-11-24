@@ -13,7 +13,7 @@ type DatabaseController struct {
 }
 
 type Response struct {
-	Code    int     `json:"code"`
+	Code    int        `json:"code"`
 	Data    common.Any `json:"data"`
 	Message string     `json:"message"`
 }
@@ -21,7 +21,8 @@ type Response struct {
 type Request struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Host     string `json:"host"`
+	Address  string `json:"address"`
+	Port     int    `json:"port"`
 }
 
 type ExecuteRequest struct {
@@ -35,19 +36,27 @@ func (this *DatabaseController) Connect() {
 	var res Response
 	var params Request
 	json.Unmarshal(this.Ctx.Input.RequestBody, &params)
-	sessionID, err := dao.Connect(params.Host, params.Username, params.Password)
-
+	nsid, err := dao.Connect(params.Address, params.Port, params.Username, params.Password)
 	if err == nil {
 		res.Code = 0
-		m := make(map[string]common.Any)
-		m["sessionID"] = sessionID
-		res.Data = m
-		this.SetSession("nsid", sessionID)
+		this.SetSession("nsid", nsid)
+		res.Message = "Login successfully"
 	} else {
 		res.Code = -1
 		res.Message = err.Error()
 	}
+	this.Data["json"] = &res
+	this.ServeJSON()
+}
 
+func (this *DatabaseController) Disconnect() {
+	var res Response
+	nsid := this.GetSession("nsid")
+	if nsid != nil {
+		dao.Disconnect(nsid.(string))
+	}
+	res.Code = 0
+	res.Message = "Disconnect successfully"
 	this.Data["json"] = &res
 	this.ServeJSON()
 }
@@ -55,13 +64,13 @@ func (this *DatabaseController) Connect() {
 func (this *DatabaseController) Execute() {
 	var res Response
 	var params ExecuteRequest
-	sessionID := this.GetSession("nsid")
-	if sessionID == nil {
+	nsid := this.GetSession("nsid")
+	if nsid == nil {
 		res.Code = -1
 		res.Message = "connection refused for lack of session"
 	} else {
 		json.Unmarshal(this.Ctx.Input.RequestBody, &params)
-		result, err := dao.Execute(sessionID.(int64), params.Gql)
+		result, err := dao.Execute(nsid.(string), params.Gql)
 		if err == nil {
 			res.Code = 0
 			res.Data = &result

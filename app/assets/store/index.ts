@@ -11,6 +11,10 @@ const loading = createLoadingPlugin({});
 export const store = init({
   models,
   plugins: [loading],
+  redux: {
+    devtoolOptions: {},
+    rootReducers: { RESET_APP: () => undefined },
+  },
 });
 
 export type IStore = typeof store;

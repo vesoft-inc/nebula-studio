@@ -43,7 +43,6 @@ interface IState {
 type IndexType = 'TAG' | 'EDGE';
 
 interface IIndexList {
-  id: string;
   name: string;
   fields: IField[];
 }
@@ -131,7 +130,7 @@ class IndexList extends React.Component<IProps, IState> {
   };
 
   handleRowClick = async record => {
-    const { id: key } = record;
+    const { name: key } = record;
     const { expandedRowKeys } = this.state;
     this.setState({
       expandedRowKeys: expandedRowKeys.includes(key) ? [] : [key],
@@ -203,7 +202,7 @@ class IndexList extends React.Component<IProps, IState> {
           };
         }}
         loading={!!loading}
-        rowKey="id"
+        rowKey="name"
       />
     );
   };

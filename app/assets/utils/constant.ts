@@ -1,5 +1,5 @@
 export const enumOfCompare = {
-  int: [
+  int64: [
     {
       label: '==',
       value: '==',

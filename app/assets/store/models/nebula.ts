@@ -56,22 +56,19 @@ interface ISpace {
   ID: number;
   Charset: string;
   Collate: string;
-  'Partition number': string;
+  'Partition Number': string;
   'Replica Factor': string;
 }
 
 interface ITag {
-  id: string;
   name: string;
   fields: IField[];
 }
 interface IEdge {
-  id: string;
   name: string;
   fields: IField[];
 }
 interface IIndexList {
-  id: string;
   name: string;
   owner: string;
   fields: IField[];
@@ -161,15 +158,6 @@ export const nebula = createModel({
         tagsFields,
       };
     },
-
-    clearConfig: () => {
-      cookies.remove('nh');
-      cookies.remove('nu');
-      cookies.remove('np');
-      setTimeout(() => {
-        window.location.href = '/connect-server';
-      });
-    },
   },
   // TODO dispatch type interface
   effects: (dispatch: any) => ({
@@ -185,8 +173,11 @@ export const nebula = createModel({
       if (host.startsWith('https://')) {
         payload.host = host.substr(8);
       }
+      const [address, _port] = host.split(':');
+      const port = Number(_port);
       const { code, message: errorMessage } = (await service.connectDB({
-        host,
+        address,
+        port,
         username,
         password,
       })) as any;
@@ -214,6 +205,20 @@ export const nebula = createModel({
         cookies.remove('np');
         return false;
       }
+    },
+    async asyncClearConfigServer() {
+      await service.disconnectDB();
+      this.update({
+        host: '',
+        username: '',
+        password: '',
+        spaces: [],
+        currentSpace: '',
+      });
+      cookies.remove('nh');
+      cookies.remove('nu');
+      cookies.remove('np');
+      dispatch({ type: 'RESET_APP' });
     },
     // spaces
     async asyncGetSpaces() {
@@ -308,7 +313,7 @@ export const nebula = createModel({
 
     async asyncGetTagInfo(tag: string) {
       const { code, data } = (await service.execNGQL({
-        gql: 'desc tag' + '`' + tag + '`;',
+        gql: 'desc tag ' + '`' + tag + '`;',
       })) as any;
       return { code, data };
     },
@@ -333,7 +338,6 @@ export const nebula = createModel({
         await Promise.all(
           res.data.map(async item => {
             const tag: ITag = {
-              id: item.ID,
               name: item.Name,
               fields: [],
             };
@@ -351,12 +355,12 @@ export const nebula = createModel({
     },
 
     async asyncDeleteTag(name: string) {
-      const { code, data } = (await service.execNGQL({
+      const { code, data, message } = (await service.execNGQL({
         gql: `
           DROP TAG ${name}
         `,
       })) as any;
-      return { code, data };
+      return { code, data, message };
     },
 
     async asyncCreateTag(payload: {
@@ -451,7 +455,6 @@ export const nebula = createModel({
         await Promise.all(
           res.data.map(async item => {
             const edge: IEdge = {
-              id: item.ID,
               name: item.Name,
               fields: [],
             };
@@ -469,12 +472,12 @@ export const nebula = createModel({
     },
 
     async asyncDeleteEdge(name: string) {
-      const { code, data } = (await service.execNGQL({
+      const { code, data, message } = (await service.execNGQL({
         gql: `
           DROP EDGE ${name}
         `,
       })) as any;
-      return { code, data };
+      return { code, data, message };
     },
 
     async asyncCreateEdge(payload: {
@@ -510,8 +513,7 @@ export const nebula = createModel({
       if (code === 0) {
         const indexes = data.tables.map(item => {
           return {
-            id: item['Index ID'],
-            name: item['Index Name'],
+            name: item.Names,
           };
         });
         this.update({
@@ -533,7 +535,7 @@ export const nebula = createModel({
         const _type = type === 'TAG' ? 'Tag' : 'Edge';
         const res =
           (data.tables && data.tables[0][`Create ${_type} Index`]) || '';
-        const reg = /.+\s+ON\s+`?(\w+)`?\((.+)\)/g;
+        const reg = /.+\s+ON\s+`?(\w+)`?\s.+/g;
         const owner = reg.exec(res);
         return owner ? owner[1] : null;
       } else {
@@ -614,7 +616,6 @@ export const nebula = createModel({
               name: item.name,
             });
             const index: IIndexList = {
-              id: item.id,
               owner,
               name: item.name,
               fields: [],

@@ -25,7 +25,7 @@ export default class Links extends React.Component<IProps, {}> {
         (v: any) => v.id,
       );
       removeLinks.forEach(removeLink => {
-        const id = this.generateId(removeLink);
+        const id = removeLink.uuid;
         d3.select('#text-path-' + id).remove();
         d3.select('#text-marker' + id).remove();
         d3.select('#text-marker-id' + id).remove();
@@ -61,7 +61,7 @@ export default class Links extends React.Component<IProps, {}> {
       .attr('class', 'link')
       .style('stroke', '#999999')
       .style('stroke-opacity', 0.6)
-      .attr('id', (d: any) => 'text-path-' + this.generateId(d))
+      .attr('id', (d: any) => 'text-path-' + d.uuid)
       .style('stroke-width', 2);
 
     d3.select(this.ref)
@@ -70,9 +70,9 @@ export default class Links extends React.Component<IProps, {}> {
       .enter()
       .append('text')
       .attr('class', 'text')
-      .attr('id', (d: any) => 'text-marker-id' + this.generateId(d))
+      .attr('id', (d: any) => 'text-marker-id' + d.uuid)
       .append('textPath')
-      .attr('id', (d: any) => 'text-marker' + this.generateId(d))
+      .attr('id', (d: any) => 'text-marker' + d.uuid)
       .attr('class', 'textPath');
 
     if (this.ref) {

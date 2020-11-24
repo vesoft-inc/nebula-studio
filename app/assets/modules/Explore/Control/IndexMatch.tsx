@@ -333,18 +333,23 @@ class IndexMatch extends React.Component<IProps, IState> {
         title: intl.get('explore.operator'),
         key: 'operator',
         width: 120,
-        render: (record, _, index) => (
-          <Select
-            value={record.operator}
-            onChange={value => this.handleSelect(value, 'operator', index)}
-          >
-            {enumOfCompare[record.type].map(i => (
-              <Option value={i.value} key={i.value}>
-                {i.label}
-              </Option>
-            ))}
-          </Select>
-        ),
+        render: (record, _, index) => {
+          const type = record.type.startsWith('fixed_string')
+            ? 'string'
+            : record.type;
+          return (
+            <Select
+              value={record.operator}
+              onChange={value => this.handleSelect(value, 'operator', index)}
+            >
+              {enumOfCompare[type].map(i => (
+                <Option value={i.value} key={i.value}>
+                  {i.label}
+                </Option>
+              ))}
+            </Select>
+          );
+        },
       },
       {
         title: intl.get('explore.value'),

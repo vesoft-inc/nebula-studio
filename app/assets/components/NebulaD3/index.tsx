@@ -9,6 +9,7 @@ import SelectIds from './SelectIds';
 interface INode extends d3.SimulationNodeDatum {
   name: string;
   group: number;
+  uuid: string;
 }
 
 interface IProps {
@@ -260,16 +261,23 @@ class NebulaD3 extends React.Component<IProps, IState> {
     this.nodeRenderText();
   };
 
-  handleUpdataNodes(nodes: INode[], selectIds) {
+  handleUpdataNodes(nodes: INode[], selectNodes: INode[]) {
     if (nodes.length === 0) {
       d3.selectAll('.node').remove();
       return;
     }
+    const names = nodes.map(i => i.name);
+    const selectNames = selectNodes.map(i => i.name);
+    selectNodes.forEach(i => {
+      if (!names.includes(i.name)) {
+        d3.select(`#node-${i.uuid}`).remove();
+      }
+    });
     d3.select(this.nodeRef)
       .selectAll('circle')
       .data(nodes)
       .classed('active', (d: INode) => {
-        if (selectIds.includes(d.name)) {
+        if (selectNames.includes(d.name)) {
           return true;
         } else {
           return false;
@@ -283,7 +291,7 @@ class NebulaD3 extends React.Component<IProps, IState> {
         const group = d.group;
         return whichColor(group);
       })
-      .attr('id', (d: INode) => `node-${d.name}`)
+      .attr('id', (d: INode) => `node-${d.uuid}`)
       .on('mouseover', (d: INode) => {
         if (this.props.onMouseInNode) {
           this.props.onMouseInNode(d);
@@ -345,7 +353,7 @@ class NebulaD3 extends React.Component<IProps, IState> {
       this.linksText = d3
         .selectAll('.text')
         .selectAll('.textPath')
-        .attr(':href', (d: any) => '#text-path-' + this.generateId(d))
+        .attr(':href', (d: any) => '#text-path-' + d.uuid)
         .attr('startOffset', '50%');
     }
   };
@@ -394,10 +402,7 @@ class NebulaD3 extends React.Component<IProps, IState> {
       .force('link', linkForce)
       .force('center', d3.forceCenter(width / 2, height / 2))
       .restart();
-    this.handleUpdataNodes(
-      data.vertexes,
-      selectedNodes.map(i => i.name),
-    );
+    this.handleUpdataNodes(data.vertexes, selectedNodes);
   }
 
   isIncludeField = (node, field) => {
@@ -459,7 +464,7 @@ class NebulaD3 extends React.Component<IProps, IState> {
         showTagFields.forEach(field => {
           if (this.isIncludeField(node, field)) {
             line++;
-            d3.select('#name_' + node.name)
+            d3.select('#name_' + node.uuid)
               .append('tspan')
               .attr('x', (d: any) => d.x)
               .attr('y', (d: any) => d.y - 20 + 20 * line)

@@ -1,4 +1,4 @@
-import { Button, Form, Icon, Input, Select, Spin, Tooltip, Upload } from 'antd';
+import { Button, Form, Input, Spin, Upload } from 'antd';
 import { FormComponentProps } from 'antd/lib/form/Form';
 import _ from 'lodash';
 import React from 'react';
@@ -14,7 +14,6 @@ import { trackEvent } from '#assets/utils/stat';
 import './IdQuery.less';
 
 const { TextArea } = Input;
-const Option = Select.Option;
 const mapState = () => ({});
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncImportNodes: dispatch.explore.asyncImportNodes,
@@ -72,15 +71,8 @@ class IdQuery extends React.Component<IProps, IState> {
   };
 
   render() {
-    const { getFieldDecorator, getFieldValue } = this.props.form;
+    const { getFieldDecorator } = this.props.form;
     const { loading } = this.state;
-    const itemLayout = {
-      labelCol: {
-        span: this.context && this.context.currentLocale === 'EN_US' ? 8 : 4,
-      },
-      wrapperCol: { span: 6 },
-    };
-    const useHash = getFieldValue('useHash');
     return (
       <Spin spinning={loading}>
         <div className="import-node">
@@ -99,45 +91,12 @@ class IdQuery extends React.Component<IProps, IState> {
           <Form layout="horizontal">
             <Form.Item>
               {getFieldDecorator('ids', {
-                rules:
-                  useHash === 'unset'
-                    ? nodeIdRulesFn(intl)
-                    : [
-                        {
-                          required: true,
-                          message: intl.get('formRules.idRequired'),
-                        },
-                      ],
+                rules: nodeIdRulesFn(intl),
               })(
                 <TextArea
                   placeholder={intl.get('explore.importPlaceholder')}
                   rows={12}
                 />,
-              )}
-            </Form.Item>
-            <Form.Item
-              label={
-                <>
-                  {intl.get('explore.idPretreatment')}
-                  <Tooltip
-                    title={intl.get('explore.pretreatmentExplaination')}
-                    placement="right"
-                  >
-                    <Icon type="question-circle" />
-                  </Tooltip>
-                </>
-              }
-              labelAlign="left"
-              {...itemLayout}
-            >
-              {getFieldDecorator('useHash', {
-                initialValue: 'unset',
-              })(
-                <Select onChange={this.resetValidator}>
-                  <Option value="unset">{intl.get('import.unset')}</Option>
-                  <Option value="uuid">{intl.get('import.uuid')}</Option>
-                  <Option value="hash">{intl.get('import.hash')}</Option>
-                </Select>,
               )}
             </Form.Item>
             <Form.Item className="btn-wrap">
