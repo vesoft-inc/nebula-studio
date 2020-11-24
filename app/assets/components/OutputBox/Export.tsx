@@ -35,21 +35,23 @@ class Export extends React.Component<IProps> {
     const { tables } = this.props.data;
     const vertexes =
       type === 'vertex'
-        ? tables.map(i => i[vertexId]).filter(i => i !== '')
+        ? tables
+            .map(vertex => vertex[vertexId])
+            .filter(vertexId => vertexId !== '')
         : tables
-            .map(i => [i[srcId], i[dstId]])
+            .map(edge => [edge[srcId], edge[dstId]])
             .flat()
-            .filter(i => i !== '');
+            .filter(id => id !== '');
     const edges =
       type === 'edge'
         ? tables
-            .map(i => ({
-              srcId: i[srcId],
-              dstId: i[dstId],
-              rank: rank !== '' && rank !== undefined ? i[rank] : 0,
+            .map(edge => ({
+              srcId: edge[srcId],
+              dstId: edge[dstId],
+              rank: rank !== '' && rank !== undefined ? edge[rank] : 0,
               edgeType,
             }))
-            .filter(i => i.srcId !== '' && i.dstId !== '')
+            .filter(edge => edge.srcId !== '' && edge.dstId !== '')
         : [];
     this.props.updatePreloadData({
       vertexes,

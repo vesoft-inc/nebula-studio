@@ -266,8 +266,8 @@ class NebulaD3 extends React.Component<IProps, IState> {
       d3.selectAll('.node').remove();
       return;
     }
-    const names = nodes.map(i => i.name);
-    const selectNames = selectNodes.map(i => i.name);
+    const names = nodes.map(node => node.name);
+    const selectNodeNames = selectNodes.map(node => node.name);
     selectNodes.forEach(i => {
       if (!names.includes(i.name)) {
         d3.select(`#node-${i.uuid}`).remove();
@@ -277,7 +277,7 @@ class NebulaD3 extends React.Component<IProps, IState> {
       .selectAll('circle')
       .data(nodes)
       .classed('active', (d: INode) => {
-        if (selectNames.includes(d.name)) {
+        if (selectNodeNames.includes(d.name)) {
           return true;
         } else {
           return false;

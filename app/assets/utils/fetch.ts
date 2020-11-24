@@ -10,8 +10,8 @@ export async function fetchVertexProps(payload: {
   const { ids, useHash, tag } = payload;
   const _ids =
     useHash === 'unset' || useHash === undefined
-      ? ids.map(i => handleVidStringName(i)).join(', ')
-      : ids.map(i => `${useHash}(${i})`).join(', ');
+      ? ids.map(id => handleVidStringName(id)).join(', ')
+      : ids.map(id => `${useHash}(${id})`).join(', ');
   const _tag = tag ? tag : '*';
   const gql = `fetch prop on ${_tag} ${_ids}`;
   const { data, code, message } = (await service.execNGQL({
