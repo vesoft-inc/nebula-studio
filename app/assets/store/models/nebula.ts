@@ -357,7 +357,7 @@ export const nebula = createModel({
     async asyncDeleteTag(name: string) {
       const { code, data, message } = (await service.execNGQL({
         gql: `
-          DROP TAG ${name}
+          DROP TAG ${handleKeyword(name)}
         `,
       })) as any;
       return { code, data, message };
@@ -379,7 +379,7 @@ export const nebula = createModel({
     },
 
     async asyncGetTagDetail(name: string) {
-      const gql = `SHOW CREATE TAG ${name}`;
+      const gql = `SHOW CREATE TAG ${handleKeyword(name)}`;
       const { code, data, message } = (await service.execNGQL({
         gql,
       })) as any;
@@ -474,7 +474,7 @@ export const nebula = createModel({
     async asyncDeleteEdge(name: string) {
       const { code, data, message } = (await service.execNGQL({
         gql: `
-          DROP EDGE ${name}
+          DROP EDGE ${handleKeyword(name)}
         `,
       })) as any;
       return { code, data, message };
@@ -496,7 +496,7 @@ export const nebula = createModel({
     },
 
     async asyncGetEdgeDetail(name: string) {
-      const gql = `SHOW CREATE EDGE ${name}`;
+      const gql = `SHOW CREATE EDGE ${handleKeyword(name)}`;
       const { code, data, message } = (await service.execNGQL({
         gql,
       })) as any;
@@ -528,7 +528,7 @@ export const nebula = createModel({
       const { type, name } = payload;
       const { code, data } = (await service.execNGQL({
         gql: `
-          SHOW CREATE ${type} index ${name}
+          SHOW CREATE ${type} index ${handleKeyword(name)}
         `,
       })) as any;
       if (code === 0) {
@@ -547,7 +547,7 @@ export const nebula = createModel({
       const { type, name } = payload;
       const { code, data } = (await service.execNGQL({
         gql: `
-          DESCRIBE ${type} INDEX ${name}
+          DESCRIBE ${type} INDEX ${handleKeyword(name)}
         `,
       })) as any;
       return { code, data };
@@ -639,7 +639,7 @@ export const nebula = createModel({
       const { type, name } = payload;
       const { code, data } = (await service.execNGQL({
         gql: `
-          DROP ${type} INDEX ${name}
+          DROP ${type} INDEX ${handleKeyword(name)}
         `,
       })) as any;
       return { code, data };

@@ -94,7 +94,7 @@ export const getExploreGQLWithIndex = (params: {
     .join(`\n`);
   const gql =
     `LOOKUP ON
-  ${tag} ${wheres ? `\nWHERE ${wheres}` : ''}
+  ${handleKeyword(tag)} ${wheres ? `\nWHERE ${wheres}` : ''}
     ` +
     `${
       quantityLimit
@@ -223,7 +223,9 @@ export const getIndexCreateGQL = (params: {
   fields: string[];
 }) => {
   const { type, name, associate, fields } = params;
-  const combine = associate ? `on ${associate}(${fields.join(', ')})` : '';
-  const gql = `CREATE ${type} INDEX ${name} ${combine}`;
+  const combine = associate
+    ? `on ${handleKeyword(associate)}(${fields.join(', ')})`
+    : '';
+  const gql = `CREATE ${type} INDEX ${handleKeyword(name)} ${combine}`;
   return gql;
 };
