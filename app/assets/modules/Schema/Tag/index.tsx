@@ -92,6 +92,8 @@ class TagList extends React.Component<IProps, IState> {
     if (res.code === 0) {
       message.success(intl.get('common.deleteSuccess'));
       await this.props.asyncGetTagList();
+    } else {
+      message.warning(res.message);
     }
     trackEvent(
       'schema',
