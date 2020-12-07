@@ -50,7 +50,7 @@ func getColumnValue(p *graph.ColumnValue) common.Any {
 	} else if p.Id != nil {
 		return p.GetId()
 	} else if p.SinglePrecision != nil {
-		// TODO: Fix decimal precision problem
+		// TODO: Fix decimal precision problem like fix yield 1.0 => 1
 		return p.GetSinglePrecision()
 	} else if p.DoublePrecision != nil {
 		return p.GetDoublePrecision()
