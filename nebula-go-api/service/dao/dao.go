@@ -7,7 +7,6 @@ import (
 	pool "nebula-go-api/service/pool"
 	common "nebula-go-api/utils"
 	"regexp"
-	"strconv"
 	"strings"
 
 	graph "github.com/vesoft-inc/nebula-go/nebula/graph"
@@ -47,15 +46,14 @@ func getColumnValue(p *graph.ColumnValue) common.Any {
 	if p.Str != nil {
 		return string(p.Str)
 	} else if p.Integer != nil {
-		return strconv.FormatInt(*p.Integer, 10)
+		return p.GetInteger()
 	} else if p.Id != nil {
-		// return p.Id
-		var id = int64(*p.Id)
-		return strconv.FormatInt(id, 10)
+		return p.GetId()
 	} else if p.SinglePrecision != nil {
-		return fmt.Sprintf("%.7f", *p.SinglePrecision)
+		// TODO: Fix decimal precision problem like fix yield 1.0 => 1
+		return p.GetSinglePrecision()
 	} else if p.DoublePrecision != nil {
-		return fmt.Sprintf("%.15F", *p.DoublePrecision)
+		return p.GetDoublePrecision()
 	} else if p.Datetime != nil {
 		return p.Datetime
 	} else if p.Timestamp != nil {

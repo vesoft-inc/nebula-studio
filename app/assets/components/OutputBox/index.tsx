@@ -17,10 +17,6 @@ interface IProps extends ReturnType<typeof mapDispatch>, RouteComponentProps {
   onHistoryItem: (value: string) => void;
 }
 
-interface IState {
-  sorter: any;
-}
-
 const mapState = () => ({});
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -29,21 +25,8 @@ const mapDispatch = (dispatch: IDispatch) => ({
       preloadData: data,
     }),
 });
-class OutputBox extends React.Component<IProps, IState> {
+class OutputBox extends React.Component<IProps> {
   importNodesHandler;
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      sorter: null,
-    };
-  }
-
-  handleTableChange = (_1, _2, sorter) => {
-    this.setState({
-      sorter,
-    });
-  };
 
   outputClass = (code: any) => {
     if (code !== undefined) {
@@ -104,49 +87,34 @@ class OutputBox extends React.Component<IProps, IState> {
 
   render() {
     const { value, result = {} } = this.props;
-    const { sorter } = this.state;
     let columns = [];
-    let dataSource = [];
+    const dataSource =
+      result.data && result.data.tables ? result.data.tables : [];
     if (result.code === 0) {
       if (result.data && result.data.headers) {
         columns = result.data.headers.map(column => {
           return {
             title: column,
             dataIndex: column,
-            sorter: true,
+            sorter: (r1, r2) => {
+              const v1 = r1[column];
+              const v2 = r2[column];
+              return v1 === v2 ? 0 : v1 < v2 ? 1 : -1;
+            },
             sortDirections: ['descend', 'ascend'],
             render: value => {
               if (typeof value === 'boolean') {
+                return value.toString();
+              } else if (
+                typeof value === 'number' ||
+                typeof value === 'bigint'
+              ) {
                 return value.toString();
               }
               return value;
             },
           };
         });
-      }
-
-      if (result.data && result.data.tables) {
-        dataSource = result.data.tables;
-        if (sorter) {
-          switch (sorter.order) {
-            case 'descend':
-              dataSource = result.data.tables.sort((r1, r2) => {
-                const field = sorter.field;
-                const v1 = r1[field];
-                const v2 = r2[field];
-                return v1 === v2 ? 0 : v1 < v2 ? 1 : -1;
-              });
-              break;
-            case 'ascend':
-              dataSource = result.data.tables.sort((r1, r2) => {
-                const field = sorter.field;
-                const v1 = r1[field];
-                const v2 = r2[field];
-                return v1 === v2 ? 0 : v1 > v2 ? 1 : -1;
-              });
-              break;
-          }
-        }
       }
     }
     return (
@@ -194,7 +162,6 @@ class OutputBox extends React.Component<IProps, IState> {
                   columns={columns}
                   dataSource={dataSource}
                   rowKey={(_, index) => index.toString()}
-                  onChange={this.handleTableChange}
                 />
               </Tabs.TabPane>
             )}
