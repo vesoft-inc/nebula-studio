@@ -1,14 +1,10 @@
 package dao
 
 import (
-	"bytes"
 	"errors"
-	"fmt"
 	"log"
 	pool "nebula-go-api/service/pool"
 	common "nebula-go-api/utils"
-	"strconv"
-	"strings"
 
 	nebula "github.com/vesoft-inc/nebula-clients/go"
 	nebulaType "github.com/vesoft-inc/nebula-clients/go/nebula"
@@ -20,140 +16,215 @@ type ExecuteResult struct {
 	TimeCost int32                   `json:"timeCost"`
 }
 
-func getValue(value *nebulaType.Value) string {
-	if value.IsSetNVal() { // null
-		switch value.GetNVal() {
-		case nebulaType.NullType___NULL__:
-			return "NULL"
-		case nebulaType.NullType_NaN:
-			return "NaN"
-		case nebulaType.NullType_BAD_DATA:
-			return "BAD_DATA"
-		case nebulaType.NullType_BAD_TYPE:
-			return "BAD_TYPE"
-		}
-		return "NULL"
-	} else if value.IsSetBVal() { // bool
-		return strconv.FormatBool(value.GetBVal())
-	} else if value.IsSetIVal() { // int64
-		return strconv.FormatInt(value.GetIVal(), 10)
-	} else if value.IsSetFVal() { // float64
-		val := strconv.FormatFloat(value.GetFVal(), 'g', -1, 64)
-		if !strings.Contains(val, ".") {
-			idx := strings.LastIndex(val, "e")
-			if idx == -1 {
-				val += ".0"
-			} else {
-				val = val[0:idx] + ".0" + val[idx:]
-			}
-		}
-		return val
-	} else if value.IsSetSVal() { // string
-		return string(value.GetSVal())
-	} else if value.IsSetDVal() { // yyyy-mm-dd
-		date := value.GetDVal()
-		str := fmt.Sprintf("%d-%d-%d", date.GetYear(), date.GetMonth(), date.GetDay())
-		return str
-	} else if value.IsSetTVal() {
-		time := value.GetTVal()
-		str := fmt.Sprintf("%d:%d:%d:%d",
-			time.GetHour(), time.GetMinute(), time.GetSec(), time.GetMicrosec())
-		return str
-	} else if value.IsSetDtVal() {
-		datetime := value.GetDtVal()
-		str := fmt.Sprintf("%d-%d-%d %d:%d:%d:%d",
-			datetime.GetYear(), datetime.GetMonth(), datetime.GetDay(),
-			datetime.GetHour(), datetime.GetMinute(), datetime.GetSec(), datetime.GetMicrosec())
-		return str
-	} else if value.IsSetVVal() { // Vertex
-		var buffer bytes.Buffer
-		vertex := value.GetVVal()
-		buffer.WriteString(`("`)
-		buffer.WriteString(string(vertex.GetVid()))
-		buffer.WriteString(`")`)
-		var tags []string
-		for _, tag := range vertex.GetTags() {
-			var props []string
-			for k, v := range tag.GetProps() {
-				props = append(props, fmt.Sprintf("%s: %s", k, getValue(v)))
-			}
-			tagName := string(tag.GetName())
-			tagString := fmt.Sprintf(" :%s{%s}", tagName, strings.Join(props, ", "))
-			tags = append(tags, tagString)
-		}
-		buffer.WriteString(strings.Join(tags, ","))
-		return buffer.String()
-	} else if value.IsSetEVal() { // Edge
-		// (src)-[edge]->(dst)@ranking {props}
-		edge := value.GetEVal()
-		var buffer bytes.Buffer
-		src := string(edge.GetSrc())
-		dst := string(edge.GetDst())
-		if edge.GetType() < 0 {
-			src, dst = dst, src
-		}
-		var props []string
-		for k, v := range edge.GetProps() {
-			props = append(props, fmt.Sprintf("%s: %s", k, getValue(v)))
-		}
-		propsString := strings.Join(props, ", ")
-		buffer.WriteString(fmt.Sprintf(`("%s")-[%s]->("%s")@%d{%s}`,
-			src, edge.GetName(), dst, edge.GetRanking(), propsString))
-		return buffer.String()
-	} else if value.IsSetPVal() { // Path
-		// (src)-[TypeName@ranking]->(dst)-[TypeName@ranking]->(dst) ...
-		var buffer bytes.Buffer
-		p := value.GetPVal()
-		srcVid := string(p.GetSrc().GetVid())
-		buffer.WriteString(fmt.Sprintf("(%q)", srcVid))
-		for _, step := range p.GetSteps() {
-			dstVid := string(step.GetDst().GetVid())
-			buffer.WriteString(fmt.Sprintf("-[%s@%d]->(%q)", step.GetName(), step.GetRanking(), dstVid))
-		}
-		return buffer.String()
-	} else if value.IsSetLVal() { // List
-		l := value.GetLVal()
-		var buffer bytes.Buffer
-		buffer.WriteString("[")
-		for _, v := range l.GetValues() {
-			buffer.WriteString(getValue(v))
-			buffer.WriteString(", ")
-		}
-		if buffer.Len() > 1 {
-			buffer.Truncate(buffer.Len() - 2)
-		}
-		buffer.WriteString("]")
-		return buffer.String()
-	} else if value.IsSetMVal() { // Map
-		m := value.GetMVal()
-		var buffer bytes.Buffer
-		buffer.WriteString("{")
-		for k, v := range m.GetKvs() {
-			buffer.WriteString("\"" + k + "\"")
-			buffer.WriteString(":")
-			buffer.WriteString(getValue(v))
-			buffer.WriteString(", ")
-		}
-		if buffer.Len() > 1 {
-			buffer.Truncate(buffer.Len() - 2)
-		}
-		buffer.WriteString("}")
-		return buffer.String()
-	} else if value.IsSetUVal() { // Set
-		s := value.GetUVal()
-		var buffer bytes.Buffer
-		buffer.WriteString("{")
-		for _, v := range s.GetValues() {
-			buffer.WriteString(getValue(v))
-			buffer.WriteString(", ")
-		}
-		if buffer.Len() > 1 {
-			buffer.Truncate(buffer.Len() - 2)
-		}
-		buffer.WriteString("}")
-		return buffer.String()
+func getValue(valWarp *nebula.ValueWrapper) (common.Any, error) {
+	var valType = valWarp.GetType()
+	if valType == "vertex" {
+		return valWarp.String(), nil
+	} else if valType == "edge" {
+		return valWarp.String(), nil
+	} else if valType == "path" {
+		return valWarp.String(), nil
+	} else if valType == "list" {
+		return valWarp.String(), nil
+	} else if valType == "map" {
+		return valWarp.String(), nil
+	} else if valType == "set" {
+		return valWarp.String(), nil
+	} else {
+		return getBasicValue(valWarp)
 	}
-	return ""
+}
+
+func getBasicValue(valWarp *nebula.ValueWrapper) (common.Any, error) {
+	var valType = valWarp.GetType()
+	if valType == "null" {
+		value, err := valWarp.AsNull()
+		switch value {
+		case nebulaType.NullType___NULL__:
+			return "NULL", err
+		case nebulaType.NullType_NaN:
+			return "NaN", err
+		case nebulaType.NullType_BAD_DATA:
+			return "BAD_DATA", err
+		case nebulaType.NullType_BAD_TYPE:
+			return "BAD_TYPE", err
+		}
+		return "NULL", err
+	} else if valType == "bool" {
+		return valWarp.AsBool()
+	} else if valType == "int" {
+		return valWarp.AsInt()
+	} else if valType == "float" {
+		return valWarp.AsFloat()
+	} else if valType == "string" {
+		return valWarp.AsString()
+	} else if valType == "date" {
+		return valWarp.AsDate()
+	} else if valType == "time" {
+		return valWarp.AsTime()
+	} else if valType == "datetime" {
+		return valWarp.AsDateTime()
+	}
+	return "", nil
+}
+
+func getVertexInfo(valWarp *nebula.ValueWrapper, data map[string]common.Any) (map[string]common.Any, error) {
+	node, err := valWarp.AsNode()
+	if err != nil {
+		return nil, err
+	}
+	id := node.GetID()
+	data["vid"] = id
+	tags := node.GetTags()
+	data["tags"] = tags
+	properties := make(map[string]map[string]common.Any)
+	for _, tagName := range tags {
+		props, err := node.Properties(tagName)
+		if err != nil {
+			return nil, err
+		}
+		_props := make(map[string]common.Any)
+		for k, v := range props {
+			value, err := getValue(v)
+			if err != nil {
+				return nil, err
+			}
+			_props[k] = value
+		}
+		properties[tagName] = _props
+	}
+	data["properties"] = properties
+	return data, nil
+}
+
+func getEdgeInfo(valWarp *nebula.ValueWrapper, data map[string]common.Any) (map[string]common.Any, error) {
+	relationship, err := valWarp.AsRelationship()
+	if err != nil {
+		return nil, err
+	}
+	srcID := relationship.GetSrcVertexID()
+	data["srcID"] = srcID
+	dstID := relationship.GetDstVertexID()
+	data["dstID"] = dstID
+	edgeName := relationship.GetEdgeName()
+	data["edgeName"] = edgeName
+	rank := relationship.GetRanking()
+	data["rank"] = rank
+	properties := make(map[string]common.Any)
+	props := relationship.Properties()
+	for k, v := range props {
+		value, err := getValue(v)
+		if err != nil {
+			return nil, err
+		}
+		properties[k] = value
+	}
+	data["properties"] = properties
+	return data, nil
+}
+
+func getPathInfo(valWarp *nebula.ValueWrapper, data map[string]common.Any) (map[string]common.Any, error) {
+	path, err := valWarp.AsPath()
+	if err != nil {
+		return nil, err
+	}
+	relationships := path.GetRelationships()
+	var _relationships []common.Any
+	for _, relation := range relationships {
+		_relation := make(map[string]common.Any)
+		srcID := relation.GetSrcVertexID()
+		_relation["srcID"] = srcID
+		dstID := relation.GetDstVertexID()
+		_relation["dstID"] = dstID
+		edgeName := relation.GetEdgeName()
+		_relation["edgeName"] = edgeName
+		rank := relation.GetRanking()
+		_relation["rank"] = rank
+		_relationships = append(_relationships, _relation)
+	}
+	data["relationships"] = _relationships
+	return data, nil
+}
+
+func getListInfo(valWarp *nebula.ValueWrapper, data []common.Any, listType string) ([]common.Any, error) {
+	var valueList []nebula.ValueWrapper
+	var err error
+	if listType == "list" {
+		valueList, err = valWarp.AsList()
+	} else if listType == "set" {
+		valueList, err = valWarp.AsDedupList()
+	}
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range valueList {
+		var props = make(map[string]common.Any)
+		vType := v.GetType()
+		props["type"] = vType
+		if vType == "vertex" {
+			props, err = getVertexInfo(&v, props)
+		} else if vType == "edge" {
+			props, err = getEdgeInfo(&v, props)
+		} else if vType == "list" {
+			var items = make([]common.Any, 0)
+			items, err = getListInfo(&v, items, "list")
+			props["items"] = items
+		} else if vType == "map" {
+			var items = make(map[string]common.Any)
+			items, err = getMapInfo(&v, items)
+			props["items"] = items
+		} else if vType == "set" {
+			var items = make([]common.Any, 0)
+			items, err = getListInfo(&v, items, "set")
+			props["items"] = items
+		} else {
+			basicVal, err := getBasicValue(&v)
+			if err != nil {
+				return data, err
+			}
+			props["value"] = basicVal
+		}
+		data = append(data, props)
+	}
+	return data, nil
+}
+
+func getMapInfo(valWarp *nebula.ValueWrapper, data map[string]common.Any) (map[string]common.Any, error) {
+	valueMap, err := valWarp.AsMap()
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range valueMap {
+		vType := v.GetType()
+		if vType == "vertex" {
+			var _props map[string]common.Any
+			_props, err = getVertexInfo(&v, _props)
+			data[k] = _props
+		} else if vType == "edge" {
+			var _props map[string]common.Any
+			_props, err = getEdgeInfo(&v, _props)
+			data[k] = _props
+		} else if vType == "list" {
+			var items = make([]common.Any, 0)
+			items, err = getListInfo(&v, items, "list")
+			data[k] = items
+		} else if vType == "map" {
+			var items = make(map[string]common.Any)
+			items, err = getMapInfo(&v, items)
+			data[k] = items
+		} else if vType == "set" {
+			var items = make([]common.Any, 0)
+			items, err = getListInfo(&v, items, "set")
+			data[k] = items
+		} else {
+			basicVal, err := getBasicValue(&v)
+			if err != nil {
+				return data, err
+			}
+			data[k] = basicVal
+		}
+	}
+	return data, nil
 }
 
 // Connect return if the nebula connect succeed
@@ -190,26 +261,64 @@ func Execute(nsid string, gql string) (result ExecuteResult, err error) {
 		return result, response.Error
 	}
 	resp := response.Result
-	if nebula.IsError(response.Result) {
+	if !resp.IsSucceed() {
 		log.Printf("ErrorCode: %v, ErrorMsg: %s", resp.GetErrorCode(), resp.GetErrorMsg())
 		return result, errors.New(string(resp.GetErrorMsg()))
 	}
-	if resp.GetData() != nil {
-		columns := resp.GetData().GetColumnNames()
-		for i := 0; i < len(columns); i++ {
-			result.Headers = append(result.Headers, string(columns[i]))
+	if !resp.IsEmpty() {
+		rowSize, rowErr := resp.GetRowSize()
+		colSize, colErr := resp.GetColSize()
+		if rowErr != nil {
+			return result, err
 		}
-
-		rows := resp.GetData().GetRows()
-		for _, row := range rows {
+		if colErr != nil {
+			return result, err
+		}
+		colNames := resp.GetColNames()
+		result.Headers = colNames
+		for i := 0; i < rowSize; i++ {
 			var rowValue = make(map[string]common.Any)
-			for index, column := range row.GetValues() {
-				rowValue[result.Headers[index]] = getValue(column)
+			record, err := resp.GetRowValuesByIndex(i)
+			if err != nil {
+				return result, err
+			}
+			for j := 0; j < colSize; j++ {
+				rowData, err := record.GetValueByIndex(j)
+				if err != nil {
+					return result, err
+				}
+				value, err := getValue(rowData)
+				if err != nil {
+					return result, err
+				}
+				rowValue[result.Headers[j]] = value
+				valueType := rowData.GetType()
+				if valueType == "vertex" {
+					rowValue, err = getVertexInfo(rowData, rowValue)
+				} else if valueType == "edge" {
+					rowValue, err = getEdgeInfo(rowData, rowValue)
+				} else if valueType == "path" {
+					rowValue, err = getPathInfo(rowData, rowValue)
+				} else if valueType == "list" {
+					var info []common.Any
+					info, err = getListInfo(rowData, info, "list")
+					rowValue[result.Headers[j]+"_info"] = info
+				} else if valueType == "set" {
+					var info []common.Any
+					info, err = getListInfo(rowData, info, "set")
+					rowValue[result.Headers[j]+"_info"] = info
+				} else if valueType == "map" {
+					var info = make(map[string]common.Any)
+					info, err = getMapInfo(rowData, info)
+					rowValue[result.Headers[j]+"_info"] = info
+				}
+				if err != nil {
+					return result, err
+				}
 			}
 			result.Tables = append(result.Tables, rowValue)
 		}
 	}
-	result.TimeCost = resp.LatencyInUs
-
+	result.TimeCost = resp.GetLatency()
 	return result, nil
 }

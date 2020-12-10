@@ -7,7 +7,6 @@ import (
 
 	uuid "github.com/satori/go.uuid"
 	nebula "github.com/vesoft-inc/nebula-clients/go"
-	graph "github.com/vesoft-inc/nebula-clients/go/nebula/graph"
 )
 
 type Account struct {
@@ -16,7 +15,7 @@ type Account struct {
 }
 
 type ChannelResponse struct {
-	Result *graph.ExecutionResponse
+	Result *nebula.ResultSet
 	Error  error
 }
 

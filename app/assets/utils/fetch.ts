@@ -2,22 +2,10 @@ import service from '#assets/config/service';
 import { handleVidStringName } from '#assets/utils/function';
 import { getExploreGQLWithIndex } from '#assets/utils/gql';
 
-export async function fetchVertexProps(payload: {
-  ids: string[];
-  useHash?: string;
-  tag?: string;
-}) {
-  const { ids, useHash, tag } = payload;
-  const _ids =
-    useHash === 'unset' || useHash === undefined
-      ? ids.map(id => handleVidStringName(id)).join(', ')
-      : ids.map(id => `${useHash}(${id})`).join(', ');
-  const _tag = tag ? tag : '*';
-  const gql = `fetch prop on ${_tag} ${_ids}`;
-  const { data, code, message } = (await service.execNGQL({
-    gql,
-  })) as any;
-  return { data, code, message };
+interface IMatchVertex {
+  vid?: string;
+  tags?: string[];
+  properties?: {};
 }
 
 export async function fetchEdgeProps(payload: {
@@ -53,4 +41,24 @@ export async function fetchVertexPropsWithIndex(payload: {
     gql,
   })) as any;
   return { code, data, message };
+}
+
+export async function fetchVertexProps(payload: { ids: string[] }) {
+  const { ids } = payload;
+  const _ids = ids.map(id => handleVidStringName(id)).join(', ');
+  const gql = `MATCH (n) WHERE id(n) IN [${_ids}] RETURN n`;
+  const { data, code, message } = (await service.execNGQL({
+    gql,
+  })) as any;
+  if (code === 0) {
+    const vertexes = data.tables.map(vertex => {
+      const _vertex: IMatchVertex = {};
+      _vertex.vid = vertex.vid || '';
+      _vertex.tags = vertex.tags || [];
+      _vertex.properties = vertex.properties || {};
+      return _vertex;
+    });
+    return { data: vertexes, code, message };
+  }
+  return { data, code, message };
 }

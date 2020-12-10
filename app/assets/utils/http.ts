@@ -1,10 +1,27 @@
 import { message } from 'antd';
 import axios from 'axios';
+import JSONBigint from 'json-bigint';
 import intl from 'react-intl-universal';
 
 import { store } from '#assets/store';
 
-const service = axios.create();
+const service = axios.create({
+  transformResponse: [
+    data => {
+      try {
+        // transform big int to string in js
+        const _data = JSONBigint({ useNativeBigInt: true }).parse(data);
+        return _data;
+      } catch (err) {
+        try {
+          return JSON.parse(data);
+        } catch (e) {
+          return data;
+        }
+      }
+    },
+  ],
+});
 
 service.interceptors.request.use(config => {
   config.headers['Content-Type'] = 'application/json';

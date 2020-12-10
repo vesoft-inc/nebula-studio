@@ -55,56 +55,32 @@ interface IState {
   };
   preloadData: IExportData;
 }
-function getGroup(headers, expand) {
+
+function getGroup(tags, expand) {
   if (expand && expand.vertexColor !== 'groupByTag') {
     return 'step-' + expand.exploreStep;
   } else {
-    const tags = headers
-      ? _.sortedUniq(
-          headers
-            .map(field => {
-              if (field === 'VertexID') {
-                return '';
-              } else {
-                return field.split('.')[0];
-              }
-            })
-            .filter(i => i !== ''),
-        )
-      : [];
-    return 't' + tags.sort().join('-');
+    return 't-' + tags.sort().join('-');
   }
 }
-function getTagData(nodeProps, expand) {
-  if (nodeProps.headers.length && nodeProps.tables.length) {
-    const group = getGroup(nodeProps.headers, expand);
-    const vertexes = nodeProps.tables.map(item => {
-      const nodeProp = {
-        headers: nodeProps.headers,
-        tables: [item],
-      };
-      const uuid = uuidv4();
-      if (expand) {
-        return {
-          name: item.VertexID,
-          nodeProp,
-          group,
-          uuid,
-        };
-      } else {
-        return {
-          name: item.VertexID,
-          step: 0,
-          group,
-          nodeProp,
-          uuid,
-        };
-      }
-    });
-    return vertexes;
-  } else {
-    return [];
-  }
+
+function getTagData(nodes, expand) {
+  const data = nodes.map(node => {
+    const { vid, tags, properties } = node;
+    const group = getGroup(tags, expand);
+    const nodeProp = {
+      tags,
+      properties,
+    };
+    const uuid = uuidv4();
+    return {
+      name: vid,
+      nodeProp,
+      group,
+      uuid,
+    };
+  });
+  return data;
 }
 
 export const explore = createModel({
@@ -196,61 +172,23 @@ export const explore = createModel({
       };
     },
   },
-  effects: (dispatch: any) => ({
+  effects: () => ({
     async asyncGetVertexes(payload: {
       ids: string[];
-      useHash?: string;
       expand?: {
         vertexColor: string;
         exploreStep;
       };
     }) {
-      const { ids, useHash, expand } = payload;
-      let newVertexes: any = [];
-      if (ids.length === 1) {
-        const nodeData = await fetchVertexProps({ ids, useHash });
-        if (nodeData.code === 0) {
-          newVertexes = getTagData(nodeData.data, expand);
-        }
-      } else if (ids.length > 1) {
-        const tagData = await dispatch.nebula.asyncGetTags();
-        const tags = tagData.code === 0 ? tagData.data.map(i => i.Name) : [];
-        const tagNodes = await Promise.all(
-          tags.map(async tag => {
-            const nodesData = await fetchVertexProps({ ids, useHash, tag });
-            return nodesData.code === 0
-              ? getTagData(nodesData.data, expand)
-              : undefined;
-          }),
-        );
-        const flattenVertexes = _.flatten(tagNodes).filter(
-          i => i !== undefined,
-        );
-        const vertexTags: any = {};
-        flattenVertexes.forEach((item: any) => {
-          const id = item.name;
-          if (vertexTags[id]) {
-            const { headers, tables } = vertexTags[id].nodeProp;
-            const data = tables[0];
-            const newHeaders = _.union(headers, item.nodeProp.headers);
-            const nodeProp = {
-              headers: newHeaders,
-              tables: [_.assign(data, item.nodeProp.tables[0])],
-            };
-            vertexTags[id].nodeProp = nodeProp;
-            vertexTags[id].group = getGroup(newHeaders, expand);
-          } else {
-            vertexTags[id] = item;
-          }
-        });
-        newVertexes = Object.values(vertexTags);
-      }
+      const { ids, expand } = payload;
+      const res = await fetchVertexProps({ ids });
+      const newVertexes = res.code === 0 ? getTagData(res.data, expand) : [];
       return newVertexes;
     },
 
-    async asyncImportNodes(payload: { ids: string[]; useHash?: string }) {
-      const { ids, useHash } = payload;
-      const vertexes = await this.asyncGetExploreVertex({ ids, useHash });
+    async asyncImportNodes(payload: { ids: string[] }) {
+      const { ids } = payload;
+      const vertexes = await this.asyncGetExploreVertex({ ids });
       this.addNodesAndEdges({
         vertexes,
         edges: [],
@@ -337,8 +275,6 @@ export const explore = createModel({
 
       if (code === 0 && data.tables.length !== 0) {
         const { edges, vertexes } = nebulaToData(
-          // nebula 2.0 alpha support string vid only now
-          // idToSrting(data.tables),
           data.tables,
           edgeTypes,
           edgeDirection,
@@ -420,14 +356,14 @@ export const explore = createModel({
         throw new Error(message);
       }
     },
-    async asyncGetExploreVertex(payload: { ids: string[]; useHash?: string }) {
-      const { ids, useHash } = payload;
+
+    async asyncGetExploreVertex(payload: { ids: string[] }) {
+      const { ids } = payload;
       const _ids = _.uniq(ids);
       const vertexes: any =
         _ids.length > 0
           ? await this.asyncGetVertexes({
               ids: _ids,
-              useHash,
             })
           : [];
       const newIds = vertexes.map(i => i.name);

@@ -407,14 +407,21 @@ class NebulaD3 extends React.Component<IProps, IState> {
 
   isIncludeField = (node, field) => {
     let isInclude = false;
-    const props = node.nodeProp || node.edgeProp;
-    props.tables.forEach(v => {
-      Object.keys(v).forEach(nodeField => {
-        if (nodeField === field) {
-          isInclude = true;
-        }
+    // TODO keep the structure of match vertex and edge api consisitent
+    if (node.nodeProp && node.nodeProp.properties) {
+      const properties = node.nodeProp.properties;
+      isInclude = Object.keys(properties).some(v => {
+        const valueObj = properties[v];
+        return Object.keys(valueObj).some(
+          nodeField => field === v + '.' + nodeField,
+        );
       });
-    });
+    } else {
+      const props = node.nodeProp || node.edgeProp;
+      isInclude = props.tables.some(v => {
+        return Object.keys(v).some(nodeField => nodeField === field);
+      });
+    }
     return isInclude;
   };
 
@@ -445,10 +452,14 @@ class NebulaD3 extends React.Component<IProps, IState> {
 
   targetName = (node, field) => {
     let nodeText = '';
-    node.nodeProp.tables.forEach(v => {
-      Object.keys(v).forEach(nodeField => {
-        if (nodeField === field) {
-          nodeText = `${v[nodeField]}`;
+    const properties = node.nodeProp.properties;
+    Object.keys(properties).some(property => {
+      const value = properties[property];
+      return Object.keys(value).some(nodeField => {
+        const fieldStr = property + '.' + nodeField;
+        if (fieldStr === field) {
+          nodeText = `${value[nodeField]}`;
+          return true;
         }
       });
     });

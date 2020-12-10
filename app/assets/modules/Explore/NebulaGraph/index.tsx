@@ -114,19 +114,17 @@ class NebulaGraph extends React.Component<IProps, IState> {
   }
 
   handleMouseInNode = node => {
-    // const e: any = event || window.event;
-    const nodeFieldsValuePairStr = node.nodeProp
-      ? node.nodeProp.tables
-          .map(node => {
-            return Object.keys(node)
-              .map(fields => {
-                return `<p key=${fields}>${fields}: ${node[fields]}</p>`;
-              })
-              .join('');
+    const properties = node.nodeProp ? node.nodeProp.properties : {};
+    const nodeFieldsValuePairStr = Object.keys(properties)
+      .map(property => {
+        const valueObj = properties[property];
+        return Object.keys(valueObj)
+          .map(fields => {
+            return `<p key=${fields}>${property}.${fields}: ${valueObj[fields]}</p>`;
           })
-          .join('')
-      : '';
-
+          .join('');
+      })
+      .join('');
     this.$tooltip
       .html(
         `<p style="font-weight:600">Vertex Details</p> ${nodeFieldsValuePairStr}`,
