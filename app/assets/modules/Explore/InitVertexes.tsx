@@ -55,10 +55,10 @@ class InitVertexes extends React.Component<IProps> {
     if (type === 'clear') {
       await this.props.clearExplore();
     }
+    this.modalHandler.hide();
     const { preloadData } = this.props;
     await this.props.asyncGetExploreInfo(preloadData);
     await this.props.clearPreload();
-    this.modalHandler.hide();
   };
 
   render() {

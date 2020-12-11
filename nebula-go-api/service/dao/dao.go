@@ -295,10 +295,13 @@ func Execute(nsid string, gql string) (result ExecuteResult, err error) {
 				valueType := rowData.GetType()
 				if valueType == "vertex" {
 					rowValue, err = getVertexInfo(rowData, rowValue)
+					rowValue["type"] = "vertex"
 				} else if valueType == "edge" {
 					rowValue, err = getEdgeInfo(rowData, rowValue)
+					rowValue["type"] = "edge"
 				} else if valueType == "path" {
 					rowValue, err = getPathInfo(rowData, rowValue)
+					rowValue["type"] = "path"
 				} else if valueType == "list" {
 					var info []common.Any
 					info, err = getListInfo(rowData, info, "list")

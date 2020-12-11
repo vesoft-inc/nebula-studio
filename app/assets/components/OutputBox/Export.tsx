@@ -36,7 +36,13 @@ class Export extends React.Component<IProps> {
     const vertexes =
       type === 'vertex'
         ? tables
-            .map(vertex => vertex[vertexId])
+            .map(vertex => {
+              if (vertex.type === 'vertex') {
+                return vertex.vid;
+              } else {
+                return vertex[vertexId].toString();
+              }
+            })
             .filter(vertexId => vertexId !== '')
         : tables
             .map(edge => [edge[srcId], edge[dstId]])
