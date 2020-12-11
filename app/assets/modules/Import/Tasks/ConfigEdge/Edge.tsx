@@ -116,32 +116,11 @@ class Edge extends React.Component<IProps> {
             <Option value={'int'}>{'int'}</Option>
             <Option value={'string'}>{'string'}</Option>
             <Option value={'bool'}>{'bool'}</Option>
+            <Option value={'float'}>{'float'}</Option>
+            <Option value={'double'}>{'double'}</Option>
+            <Option value={'timestamp'}>{'timestamp'}</Option>
           </Select>
         ),
-      },
-      {
-        title: render(
-          intl.get('import.useHash'),
-          intl.get('import.useHashTip'),
-        ),
-        dataIndex: 'useHash',
-        render: (value, record, index) => {
-          const { name } = record;
-          if (name === 'srcId' || name === 'dstId') {
-            return (
-              <Select
-                value={value}
-                onChange={v => this.handlePropChange(index, 'useHash', v)}
-              >
-                <Option value="unset">{intl.get('import.unset')}</Option>
-                <Option value="hash">{intl.get('import.hash')}</Option>
-                <Option value="uuid">{intl.get('import.uuid')}</Option>
-              </Select>
-            );
-          } else {
-            return '-';
-          }
-        },
       },
     ];
 

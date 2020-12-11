@@ -14,11 +14,11 @@ import {
 } from 'react-router-dom';
 
 import { INTL_LOCALE_SELECT, INTL_LOCALES } from '#assets/config';
-// import service from '#assets/config/service';
+import service from '#assets/config/service';
 import { LanguageContext } from '#assets/context';
 import Console from '#assets/modules/Console';
 import Explore from '#assets/modules/Explore';
-// import Import from '#assets/modules/Import';
+import Import from '#assets/modules/Import';
 import Schema from '#assets/modules/Schema';
 import CreateSpace from '#assets/modules/Schema/CreateSpace';
 import SpaceConfig from '#assets/modules/Schema/SpaceConfig';
@@ -106,9 +106,8 @@ class App extends React.Component<IProps, IState> {
   };
 
   componentWillMount() {
-    // TODO: hide import page and wait go-importer 2.0
     // Initialize the import task
-    // service.stopImport({ taskId: 'all' });
+    service.stopImport({ taskId: 'all' });
   }
 
   componentDidMount() {
@@ -175,7 +174,7 @@ class App extends React.Component<IProps, IState> {
                       {intl.get('common.schema')}
                     </Link>
                   </Menu.Item>
-                  {/* <Menu.Item key="import">
+                  <Menu.Item key="import">
                     <Link
                       to="/import"
                       onClick={() => this.trackRoute('view_import')}
@@ -183,7 +182,7 @@ class App extends React.Component<IProps, IState> {
                       <Icon type="import" />
                       {intl.get('common.import')}
                     </Link>
-                  </Menu.Item> */}
+                  </Menu.Item>
                   <Menu.Item key="explore">
                     <Link
                       to="/explore"
@@ -331,11 +330,11 @@ class App extends React.Component<IProps, IState> {
                     path="/space/:space/:type?/:action?"
                     component={SpaceConfig}
                   />
-                  {/* <PrivateRoute
+                  <PrivateRoute
                     path="/import"
                     exact={true}
                     component={Import}
-                  /> */}
+                  />
                   <PrivateRoute
                     path="/explore"
                     exact={true}

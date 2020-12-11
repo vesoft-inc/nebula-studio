@@ -15,7 +15,6 @@ interface IVertexConfig {
   file: any;
   tags: ITag[];
   idMapping: any;
-  useHash: string;
 }
 
 interface IEdgeConfig {
@@ -76,7 +75,6 @@ export const importData = createModel({
             file,
             tags: [],
             idMapping: null,
-            useHash: 'unset',
           },
         ],
         activeVertexIndex: vertexesConfig.length,
@@ -414,7 +412,7 @@ export const importData = createModel({
         const props = data.tables.map(item => {
           return {
             name: item.Field,
-            type: item.Type,
+            type: item.Type === 'int64' ? 'int' : item.Type,
             isDefault: defaultValueFields.includes(item.Field),
             mapping: null,
           };
@@ -425,15 +423,13 @@ export const importData = createModel({
             // each edge must have the three special prop srcId, dstId, rank，put them ahead
             {
               name: 'srcId',
-              type: 'int',
+              type: 'string',
               mapping: null,
-              useHash: 'unset',
             },
             {
               name: 'dstId',
-              type: 'int',
+              type: 'string',
               mapping: null,
-              useHash: 'unset',
             },
             {
               name: 'rank',
@@ -478,10 +474,9 @@ export const importData = createModel({
         const props = data.tables.map(attr => {
           return {
             name: attr.Field,
-            type: attr.Type,
+            type: attr.Type === 'int64' ? 'int' : attr.Type, // HACK: exec return int64 but importer only use int
             isDefault: defaultValueFields.includes(attr.Field),
             mapping: null,
-            useHash: 'unset',
           };
         });
         this.updateTagConfig({

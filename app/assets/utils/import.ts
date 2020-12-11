@@ -2,6 +2,7 @@ import { message } from 'antd';
 import _ from 'lodash';
 import intl from 'react-intl-universal';
 
+import { handleVidStringName } from './function';
 export function configToJson(payload) {
   const {
     currentSpace,
@@ -57,13 +58,11 @@ export function edgeDataToJSON(
         case 'srcId':
           edge.srcVID = {
             index: indexJudge(prop.mapping, prop.name),
-            function: prop.useHash === 'unset' ? undefined : prop.useHash,
           };
           break;
         case 'dstId':
           edge.dstVID = {
             index: indexJudge(prop.mapping, prop.name),
-            function: prop.useHash === 'unset' ? undefined : prop.useHash,
           };
           break;
         default:
@@ -148,7 +147,6 @@ export function vertexDataToJSON(
         vertex: {
           vid: {
             index: indexJudge(vertex.idMapping, 'vertexId'),
-            function: vertex.useHash === 'unset' ? undefined : vertex.useHash,
           },
           tags,
         },
@@ -218,17 +216,13 @@ export function getGQLByConfig(payload) {
           }
         });
         NGQL.push(
-          'INSERT VERTEX' +
+          'INSERT VERTEX ' +
             '`' +
             tag.name +
             '`' +
-            `(${tagField}) VALUES ${
-              vertexConfig.useHash === 'unset'
-                ? columns[vertexConfig.idMapping]
-                : `${vertexConfig.useHash}("${
-                    columns[vertexConfig.idMapping]
-                  }")`
-            }:(${values})`,
+            `(${tagField}) VALUES ${handleVidStringName(
+              columns[vertexConfig.idMapping],
+            )}:(${values})`,
         );
       });
     });
@@ -267,23 +261,15 @@ export function getGQLByConfig(payload) {
           ? ''
           : `@${columns[edgeConfig.props[2].mapping]}`;
       NGQL.push(
-        'INSERT EDGE' +
+        'INSERT EDGE ' +
           '`' +
           edgeConfig.type +
           '`' +
-          `(${edgeField.join(',')}) VALUES ${
-            edgeConfig.props[0].useHash === 'unset'
-              ? columns[edgeConfig.props[0].mapping]
-              : `${edgeConfig.props[0].useHash}("${
-                  columns[edgeConfig.props[0].mapping]
-                }")`
-          } -> ${
-            edgeConfig.props[1].useHash === 'unset'
-              ? columns[edgeConfig.props[1].mapping]
-              : `${edgeConfig.props[1].useHash}("${
-                  columns[edgeConfig.props[1].mapping]
-                }")`
-          } ${rank}:(${values})`,
+          `(${edgeField.join(',')}) VALUES ${handleVidStringName(
+            columns[edgeConfig.props[0].mapping],
+          )} -> ${handleVidStringName(
+            columns[edgeConfig.props[1].mapping],
+          )} ${rank}:(${values})`,
       );
     });
   });

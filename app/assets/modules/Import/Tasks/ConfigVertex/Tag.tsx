@@ -141,6 +141,9 @@ class Tag extends React.Component<IProps> {
             <Option value={'int'}>{'int'}</Option>
             <Option value={'string'}>{'string'}</Option>
             <Option value={'bool'}>{'bool'}</Option>
+            <Option value={'float'}>{'float'}</Option>
+            <Option value={'double'}>{'double'}</Option>
+            <Option value={'timestamp'}>{'timestamp'}</Option>
           </Select>
         ),
       },
@@ -186,25 +189,6 @@ class Tag extends React.Component<IProps> {
           </div>
         ),
       },
-      {
-        title: render(
-          intl.get('import.useHash'),
-          intl.get('import.useHashTip'),
-        ),
-        dataIndex: 'useHash',
-        render: value => {
-          return (
-            <Select
-              value={value}
-              onChange={v => this.handleVertexChange('useHash', v)}
-            >
-              <Option value="unset">{intl.get('import.unset')}</Option>
-              <Option value="uuid">{intl.get('import.uuid')}</Option>
-              <Option value="hash">{intl.get('import.hash')}</Option>
-            </Select>
-          );
-        },
-      },
     ];
 
     return (
@@ -216,9 +200,8 @@ class Tag extends React.Component<IProps> {
           dataSource={[
             {
               name: 'vertexId',
-              type: 'int',
+              type: 'string',
               idMapping: vertex.idMapping,
-              useHash: vertex.useHash,
             },
           ]}
           pagination={false}
