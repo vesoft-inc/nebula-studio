@@ -99,7 +99,7 @@ class OutputBox extends React.Component<IProps> {
             sorter: (r1, r2) => {
               const v1 = r1[column];
               const v2 = r2[column];
-              return v1 === v2 ? 0 : v1 < v2 ? 1 : -1;
+              return v1 === v2 ? 0 : v1 > v2 ? 1 : -1;
             },
             sortDirections: ['descend', 'ascend'],
             render: value => {

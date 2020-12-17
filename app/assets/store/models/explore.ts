@@ -6,12 +6,13 @@ import intl from 'react-intl-universal';
 
 import service from '#assets/config/service';
 import {
+  fetchBidirectVertexes,
   fetchEdgeProps,
   fetchVertexProps,
   fetchVertexPropsWithIndex,
 } from '#assets/utils/fetch';
 import { getExploreGQL } from '#assets/utils/gql';
-import { idToSrting, nebulaToData, setLink } from '#assets/utils/nebulaToData';
+import { idToString, nebulaToData, setLink } from '#assets/utils/nebulaToData';
 
 export interface INode extends d3.SimulationNodeDatum {
   name: string;
@@ -99,6 +100,20 @@ function getTagData(nodeProps, expand) {
   } else {
     return [];
   }
+}
+
+function getBidrectVertexIds(data) {
+  const { tables } = data;
+  const ids = _.uniq(
+    tables
+      .map(row => {
+        return Object.values(row);
+      })
+      .flat(),
+  )
+    .filter(id => id !== 0)
+    .map(id => String(id));
+  return ids;
 }
 
 export const explore = createModel({
@@ -239,6 +254,11 @@ export const explore = createModel({
         });
         newVertexes = Object.values(vertexTags);
       }
+      newVertexes = await this.asyncCheckVertexesExist({
+        preAddVertexes: newVertexes,
+        inputIds: ids.map(id => String(id)),
+        expand,
+      });
       return newVertexes;
     },
 
@@ -331,7 +351,7 @@ export const explore = createModel({
 
       if (code === 0 && data.tables.length !== 0) {
         const { edges, vertexes } = nebulaToData(
-          idToSrting(data.tables),
+          idToString(data.tables),
           edgeTypes,
           edgeDirection,
         );
@@ -341,7 +361,7 @@ export const explore = createModel({
           originVertexes,
           vertex => vertex.name,
         );
-        const uniqIds = _.uniq(uniqVertexes.map((i: any) => i.name));
+        const uniqIds = _.uniq(uniqVertexes.map((i: any) => String(i.name)));
         const newVertexes =
           uniqIds.length > 0
             ? await this.asyncGetVertexes({
@@ -411,6 +431,7 @@ export const explore = createModel({
         throw new Error(message);
       }
     },
+
     async asyncGetExploreVertex(payload: { ids: string[]; useHash?: string }) {
       const { ids, useHash } = payload;
       const _ids = _.uniq(ids);
@@ -421,14 +442,61 @@ export const explore = createModel({
               useHash,
             })
           : [];
-      const newIds = vertexes.map(i => i.name);
-      if (newIds.length !== _ids.length) {
-        const notExistIds = _.xor(newIds, _ids);
-        message.warning(
-          `${notExistIds.join(', ')}${intl.get('import.notExist')}`,
-        );
-      }
       return _.uniqBy(vertexes, 'name').filter(i => i !== undefined);
+    },
+
+    // check if vertex exist
+    async asyncCheckVertexesExist(payload: {
+      preAddVertexes;
+      inputIds: string[];
+      expand;
+    }) {
+      const { preAddVertexes, inputIds, expand } = payload;
+      const preAddIds = preAddVertexes.map(i => String(i.name));
+      if (preAddIds.length !== inputIds.length) {
+        const notIncludedIds = _.xor(preAddIds, inputIds);
+        const existedIds = (await this.asyncGetVertexesOnHaningEdge({
+          ids: notIncludedIds,
+        })) as any;
+        const notExistIds = notIncludedIds.filter(
+          id => !existedIds.includes(id),
+        );
+        const addIds = notIncludedIds.filter(id => existedIds.includes(id));
+        if (notExistIds.length > 0) {
+          message.warning(
+            `${notExistIds.join(', ')}${intl.get('import.notExist')}`,
+          );
+        }
+        addIds.forEach(id => {
+          const vertex: any = {
+            name: Number(id),
+            nodeProp: {
+              headers: ['VertexID'],
+              tables: [{ VertexID: Number(id) }],
+            },
+          };
+          if (expand && expand.vertexColor !== 'groupByTag') {
+            vertex.group = 'step-' + expand.exploreStep;
+          } else if (expand) {
+            vertex.group = 't';
+          } else {
+            vertex.step = 0;
+          }
+          preAddVertexes.push(vertex);
+        });
+      }
+      return preAddVertexes;
+    },
+
+    async asyncGetVertexesOnHaningEdge(payload: { ids: string[] }) {
+      const { ids } = payload;
+      let bidirectRes = await fetchBidirectVertexes({ ids });
+      let _ids =
+        bidirectRes.code === 0 ? getBidrectVertexIds(bidirectRes.data) : [];
+      bidirectRes = await fetchBidirectVertexes({ ids: _ids });
+      _ids =
+        bidirectRes.code === 0 ? getBidrectVertexIds(bidirectRes.data) : [];
+      return _ids;
     },
 
     async asyncGetExploreEdge(edgeList: IExportEdge[]) {

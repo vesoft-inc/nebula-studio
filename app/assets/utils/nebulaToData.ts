@@ -10,7 +10,7 @@ export function nebulaToData(
       edgeTypes.forEach(type => {
         // HACK: nebula1.0 return 0 if there is no dstid, it'll be fixed in nbula2.0
         // Relative issue: https://github.com/vesoft-inc/nebula/issues/2080
-        if (data[`${type}DestId`] === '0') {
+        if (data[`${type}DestId`] === 0) {
           return;
         }
         switch (direction) {
@@ -52,7 +52,7 @@ export function nebulaToData(
 }
 
 // translate nebula data id type from int to string
-export function idToSrting(data: any) {
+export function idToString(data: any) {
   return data.map((item: { destId: string; sourceId: string }) => {
     item.destId = String(item.destId);
     item.sourceId = String(item.sourceId);

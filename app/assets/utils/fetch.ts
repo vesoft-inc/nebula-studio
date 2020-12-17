@@ -53,3 +53,12 @@ export async function fetchVertexPropsWithIndex(payload: {
   })) as any;
   return { code, data, message };
 }
+
+export async function fetchBidirectVertexes(payload: { ids: string[] }) {
+  const { ids } = payload;
+  const gql = `GO FROM ${ids.join(', ')} OVER * BIDIRECT`;
+  const { code, data, message } = (await service.execNGQL({
+    gql,
+  })) as any;
+  return { code, data, message };
+}
