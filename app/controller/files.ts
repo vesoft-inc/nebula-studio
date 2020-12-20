@@ -1,3 +1,4 @@
+import csv from 'csvtojson';
 import { Controller } from 'egg';
 import fs from 'fs';
 import pump from 'mz-modules/pump';
@@ -28,11 +29,20 @@ export default class FilesController extends Controller {
         const fileStat: any = fs.statSync(dir + '/' + file);
         if (fileStat.isFile()) {
           fileStat.name = file;
-          const content = await this._readFileByLine(`${dir}/${file}`, 3);
-          fileStat.content = content
-            .split('\n')
-            .slice(0, 3)
-            .join('\n');
+          const str = await this._readFileByLine(`${dir}/${file}`, 100);
+          const content = await csv({
+            noheader: true,
+            output: 'csv',
+            ignoreEmpty: true,
+          })
+            .preFileLine((fileLineString, lineIdx) => {
+              if (lineIdx < 3) {
+                return fileLineString;
+              }
+              return '';
+            })
+            .fromString(str);
+          fileStat.content = content;
           fileStat.path = dir + '/' + file;
           fileStat.withHeader = false;
           fileStat.dataType = 'all';

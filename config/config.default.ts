@@ -55,7 +55,7 @@ export default (appInfo: EggAppInfo) => {
   };
 
   config.multipart = {
-    fileSize: '100mb',
+    fileSize: '5GB',
     mode: 'stream',
     fileModeMatch: /^\/upload_file$/,
     whitelist: ['.csv'],

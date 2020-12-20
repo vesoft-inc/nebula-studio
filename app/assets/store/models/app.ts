@@ -26,5 +26,10 @@ export const app = createModel({
         ...appInfo,
       });
     },
+
+    async asyncGetImportFiles() {
+      const { code, data } = (await service.getFiles()) as any;
+      return { code, data };
+    },
   },
 });
