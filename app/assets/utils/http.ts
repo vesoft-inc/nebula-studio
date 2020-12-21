@@ -42,6 +42,8 @@ service.interceptors.response.use(
       store.dispatch({
         type: 'nebula/asyncClearConfigServer',
       });
+    } else if (code === -1 && errMsg) {
+      message.warning(errMsg);
     }
     return response.data;
   },

@@ -297,7 +297,7 @@ class App extends React.Component<IProps, IState> {
                       <Menu>
                         <Menu.Item>
                           <a
-                            href="https://github.com/vesoft-inc/nebula-web-docker/blob/master/CHANGELOG.md"
+                            href="https://github.com/vesoft-inc/nebula-web-docker/blob/master/v2/CHANGELOG.md"
                             target="_blank"
                           >
                             <Icon type="tags" />
