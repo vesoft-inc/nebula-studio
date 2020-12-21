@@ -193,7 +193,7 @@ export function getGQLByConfig(payload) {
       message.error(`vertexId ${intl.get('import.indexNotEmpty')}`);
       throw new Error();
     }
-    const csvTable = csvToArray(vertexConfig.file.content, ',');
+    const csvTable = vertexConfig.file.content;
     vertexConfig.tags.forEach(tag => {
       csvTable.forEach(columns => {
         const tagField: string[] = [];
@@ -234,7 +234,7 @@ export function getGQLByConfig(payload) {
     });
   });
   edgesConfig.forEach(edgeConfig => {
-    const csvTable = csvToArray(edgeConfig.file.content, ',');
+    const csvTable = edgeConfig.file.content;
     csvTable.forEach(columns => {
       const edgeField: string[] = [];
       const values: any[] = [];
@@ -288,38 +288,4 @@ export function getGQLByConfig(payload) {
     });
   });
   return NGQL;
-}
-
-// TODO: move it into a npm package in future
-export function csvToArray(content, delimiter) {
-  return content.split('\n').map((row: string) => {
-    const cols = [] as string[];
-    let isQuoteOpen = false;
-    let isQuoteClose = false;
-    const paddingRow = row + ',';
-    for (let i = 0, j = 0, len = paddingRow.length; j < len; j++) {
-      switch (paddingRow[j]) {
-        case '"':
-          if (!isQuoteOpen) {
-            isQuoteOpen = true;
-          } else {
-            isQuoteClose = true;
-          }
-          break;
-        case delimiter:
-          if (!isQuoteOpen) {
-            cols.push(paddingRow.substring(i, j));
-            i = j + 1;
-          } else if (isQuoteClose) {
-            // value by quote
-            cols.push(paddingRow.substring(i + 1, j - 1));
-            i = j + 1;
-            isQuoteClose = false;
-            isQuoteOpen = false;
-          }
-          break;
-      }
-    }
-    return cols;
-  });
 }

@@ -12,40 +12,6 @@ interface IProps {
   prop?: string;
 }
 
-// TODO: move it into a npm package in future
-function csvToArray(content, delimiter) {
-  return content.split('\n').map((row: string) => {
-    const cols = [] as string[];
-    let isQuoteOpen = false;
-    let isQuoteClose = false;
-    const paddingRow = row + ',';
-    for (let i = 0, j = 0, len = paddingRow.length; j < len; j++) {
-      switch (paddingRow[j]) {
-        case '"':
-          if (!isQuoteOpen) {
-            isQuoteOpen = true;
-          } else {
-            isQuoteClose = true;
-          }
-          break;
-        case delimiter:
-          if (!isQuoteOpen) {
-            cols.push(paddingRow.substring(i, j));
-            i = j + 1;
-          } else if (isQuoteClose) {
-            // value by quote
-            cols.push(paddingRow.substring(i + 1, j - 1));
-            i = j + 1;
-            isQuoteClose = false;
-            isQuoteOpen = false;
-          }
-          break;
-      }
-    }
-    return cols;
-  });
-}
-
 class CSVPreviewLink extends React.PureComponent<IProps> {
   modalHandler;
   handleLinkClick = () => {
@@ -63,9 +29,8 @@ class CSVPreviewLink extends React.PureComponent<IProps> {
   render() {
     const { onMapping, prop } = this.props;
     const { content } = this.props.file;
-    const csvData = csvToArray(content, ',');
-    const columns = csvData.length
-      ? csvData[0].map((_, index) => {
+    const columns = content.length
+      ? content[0].map((_, index) => {
           const textIndex = index;
           return {
             title: onMapping ? (
@@ -107,7 +72,7 @@ class CSVPreviewLink extends React.PureComponent<IProps> {
           <div className="csv-preview">
             <Table
               bordered={true}
-              dataSource={csvData}
+              dataSource={content}
               columns={columns}
               pagination={false}
               rowKey={(_, index) => index.toString()}
