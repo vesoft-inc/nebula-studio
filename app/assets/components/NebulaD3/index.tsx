@@ -1,11 +1,16 @@
-import { Slider } from 'antd';
+import { message, Slider } from 'antd';
 import * as d3 from 'd3';
+import { saveAs } from 'file-saver';
 import * as React from 'react';
+import intl from 'react-intl-universal';
+
+import { trackEvent } from '#assets/utils/stat';
 
 import './index.less';
 import Links from './Links';
 import Labels from './NodeTexts';
 import SelectIds from './SelectIds';
+
 interface INode extends d3.SimulationNodeDatum {
   name: string;
   group: number;
@@ -25,6 +30,48 @@ interface IProps {
   onMouseInNode: (node: INode) => void;
   onMouseOut: () => void;
   onMouseInLink: (link: any) => void;
+  onDblClickNode: () => void;
+  onD3Ref: any;
+}
+
+function save(dataBlob, _filesize) {
+  saveAs(dataBlob, 'Graph.png');
+}
+
+function svgString2Image(svgString, size, callback) {
+  const imgsrc =
+    'data:image/svg+xml;base64,' +
+    btoa(unescape(encodeURIComponent(svgString))); // Convert SVG string to data URL
+
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d') as any;
+  const { width, height } = size;
+  canvas.width = width;
+  canvas.height = height;
+
+  const image = new Image();
+  image.onload = () => {
+    context.clearRect(0, 0, width, height);
+    context.drawImage(image, 0, 0, width, height);
+    // fill white backgroud color
+    context.globalCompositeOperation = 'destination-over';
+    context.fillStyle = '#fff';
+    context.fillRect(0, 0, width, height);
+
+    canvas.toBlob((blob: any) => {
+      if (!blob) {
+        // TODO: toBlob return null when size of canvas is to large,like 20000 * 20000
+        return message.warning(intl.get('explore.toBlobError'));
+      }
+      const filesize = Math.round(blob.length / 1024) + ' KB';
+      if (callback) {
+        trackEvent('explore', 'export_graph_png');
+        callback(blob, filesize);
+      }
+    });
+  };
+
+  image.src = imgsrc;
 }
 
 interface IRefs {
@@ -34,8 +81,8 @@ interface IRefs {
 const whichColor = (() => {
   const colors = [
     '#69C0FF',
-    '#5CDBD3',
     '#95DE64',
+    '#5CDBD3',
     '#FF7875',
     '#FF9C6E',
     '#85A5FF',
@@ -89,7 +136,7 @@ class NebulaD3 extends React.Component<IProps, IState> {
       return;
     }
     this.svg = d3.select(this.ctrls.mountPoint);
-
+    this.props.onD3Ref(this);
     this.svg
       .append('defs')
       .append('marker')
@@ -306,6 +353,7 @@ class NebulaD3 extends React.Component<IProps, IState> {
     this.node = d3
       .selectAll('.node')
       .on('click', this.handleNodeClick)
+      .on('dblclick', this.props.onDblClickNode)
       .call(
         d3
           .drag()
@@ -494,6 +542,20 @@ class NebulaD3 extends React.Component<IProps, IState> {
       });
     }
     this.props.onSelectVertexes(nodes);
+  };
+
+  handleExportImg = () => {
+    const _svgNode = this.svg.node().cloneNode(true);
+    const size = this.svg.node().getBBox();
+    _svgNode.setAttribute(
+      'viewBox',
+      size.x + ' ' + size.y + ' ' + size.width + ' ' + size.height,
+    );
+    _svgNode.setAttribute('width', size.width);
+    _svgNode.setAttribute('height', size.height);
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(_svgNode);
+    svgString2Image(svgString, size, save);
   };
 
   render() {

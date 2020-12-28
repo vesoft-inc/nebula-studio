@@ -41,6 +41,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
   },
   asyncGetTagsFields: dispatch.nebula.asyncGetTagsFields,
   asyncGetEdgeTypesFields: dispatch.nebula.asyncGetEdgeTypesFields,
+  asyncBidirectExpand: dispatch.explore.asyncBidirectExpand,
 });
 
 interface IState {
@@ -51,8 +52,11 @@ interface IState {
   isTags: boolean;
 }
 
-type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
-
+interface IProps
+  extends ReturnType<typeof mapState>,
+    ReturnType<typeof mapDispatch> {
+  onD3Ref: any;
+}
 class NebulaGraph extends React.Component<IProps, IState> {
   settingHandler;
   $tooltip;
@@ -291,6 +295,8 @@ class NebulaGraph extends React.Component<IProps, IState> {
           onMouseInNode={this.handleMouseInNode}
           onMouseOut={this.handleMouseOut}
           onSelectVertexes={this.handleSelectVertexes}
+          onDblClickNode={this.props.asyncBidirectExpand}
+          onD3Ref={this.props.onD3Ref}
         />
         <Modal
           wrapClassName="graph-setting"

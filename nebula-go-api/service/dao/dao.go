@@ -303,11 +303,11 @@ func Execute(nsid string, gql string) (result ExecuteResult, err error) {
 					rowValue, err = getPathInfo(rowData, rowValue)
 					rowValue["type"] = "path"
 				} else if valueType == "list" {
-					var info []common.Any
+					var info = make([]common.Any, 0)
 					info, err = getListInfo(rowData, info, "list")
 					rowValue[result.Headers[j]+"_info"] = info
 				} else if valueType == "set" {
-					var info []common.Any
+					var info = make([]common.Any, 0)
 					info, err = getListInfo(rowData, info, "set")
 					rowValue[result.Headers[j]+"_info"] = info
 				} else if valueType == "map" {

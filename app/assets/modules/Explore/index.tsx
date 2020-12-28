@@ -19,20 +19,34 @@ type IProps = ReturnType<typeof mapState>;
 
 class Explore extends React.Component<IProps, {}> {
   controlComponent;
+  d3Component;
   componentDidMount() {
     trackPageView('/explore');
   }
   onRef = ref => {
     this.controlComponent = ref;
   };
-  handleSearch = () => {
-    this.controlComponent.handleSearch();
+
+  onD3Ref = ref => {
+    this.d3Component = ref;
   };
+
+  handleSearch = () => {
+    if (this.controlComponent) {
+      this.controlComponent.handleSearch();
+    }
+  };
+  handleExportImg = () => {
+    if (this.d3Component) {
+      this.d3Component.handleExportImg();
+    }
+  };
+
   render() {
     return (
       <div className="nebula-explore">
-        <Control onRef={this.onRef} />
-        <NebulaGraph />
+        <Control onRef={this.onRef} handleExportImg={this.handleExportImg} />
+        <NebulaGraph onD3Ref={this.onD3Ref} />
         <Init />
         <InitVertexes />
         {this.props.vertexes.length === 0 && (

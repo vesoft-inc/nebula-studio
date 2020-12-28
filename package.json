@@ -1,6 +1,6 @@
 {
   "name": "nebula-graph-studio",
-  "version": "2.1.1-beta",
+  "version": "2.1.2-beta",
   "description": "nebula-graph-studio",
   "private": true,
   "egg": {
@@ -29,6 +29,7 @@
     "@rematch/loading": "^1.2.1",
     "antd": "^3.25.0",
     "axios": "^0.19.0",
+    "blueimp-canvas-to-blob": "^3.28.0",
     "child_process": "^1.0.2",
     "codemirror": "^5.49.0",
     "csvtojson": "^2.0.10",
@@ -37,6 +38,7 @@
     "egg-scripts": "^2.6.0",
     "egg-view-assets": "^1.4.0",
     "egg-view-nunjucks": "^2.2.0",
+    "file-saver": "^2.0.5",
     "http-proxy-middleware": "^0.20.0",
     "js-cookie": "^2.2.1",
     "json-bigint": "^1.0.0",

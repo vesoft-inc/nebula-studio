@@ -247,102 +247,22 @@ export const explore = createModel({
       exploreStep: number;
       vertexColor: string;
       quantityLimit: number | null;
-      originVertexes: any[];
-      originEdges: any[];
     }) {
-      const {
-        selectVertexes,
-        edgeTypes,
-        edgesFields,
-        edgeDirection,
-        filters,
-        exploreStep,
-        vertexColor,
-        quantityLimit,
-        originVertexes,
-        originEdges,
-      } = payload;
-      const gql = getExploreGQL({
-        selectVertexes,
-        edgeTypes,
-        edgeDirection,
-        filters,
-        quantityLimit,
+      const { edgesFields, exploreStep, vertexColor } = payload;
+      const { vertexes, edges } = (await this.asyncGetExpandData(
+        payload,
+      )) as any;
+      await this.asyncAddGraph({
+        edges,
+        vertexes,
+        expand: {
+          vertexColor,
+          exploreStep,
+          edgesFields,
+        },
       });
-      const { code, data, message } = (await service.execNGQL({
-        gql,
-      })) as any;
-
-      if (code === 0 && data.tables.length !== 0) {
-        const { edges, vertexes } = nebulaToData(
-          data.tables,
-          edgeTypes,
-          edgeDirection,
-        );
-        // fetch vertexes
-        const uniqVertexes = _.differenceBy(
-          vertexes,
-          originVertexes,
-          vertex => vertex.name,
-        );
-        const uniqIds = _.uniq(uniqVertexes.map((i: any) => i.name));
-        const newVertexes =
-          uniqIds.length > 0
-            ? await this.asyncGetVertexes({
-                ids: uniqIds,
-                expand: {
-                  vertexColor,
-                  exploreStep,
-                },
-              })
-            : [];
-        // fetch edges
-        const uniqEdges = _.differenceBy(
-          edges,
-          originEdges,
-          edge => '`' + edge.type + '`' + edge.id,
-        );
-        const edgeTypeGroup = _.groupBy(uniqEdges, (edge: any) => edge.type);
-        const edgeList = await Promise.all(
-          Object.keys(edgeTypeGroup).map(async type => {
-            const idRoutes = edgeTypeGroup[type].map((i: any) => i.id);
-            const edgeFields = _.find(edgesFields, type);
-            const res = await fetchEdgeProps({
-              idRoutes,
-              type,
-              edgeFields,
-            });
-            const _edges = res.tables.map(item => {
-              const edgeProp = {
-                headers: res.headers,
-                tables: [item],
-              };
-              return {
-                source: item[`${type}._src`],
-                target: item[`${type}._dst`],
-                id: `${item[`${type}._src`]}->${item[`${type}._dst`]}@${
-                  item[`${type}._rank`]
-                }`,
-                type,
-                edgeProp,
-                uuid: uuidv4(),
-              };
-            });
-            return _edges;
-          }),
-        );
-        const newEdges = _.flatten(edgeList);
-        this.addNodesAndEdges({
-          vertexes: newVertexes,
-          edges: newEdges,
-        });
-        this.update({
-          step: exploreStep,
-        });
-      } else {
-        throw new Error(message);
-      }
     },
+
     async asyncImportNodesWithIndex(payload: {
       tag: string;
       filters: any[];
@@ -422,6 +342,159 @@ export const explore = createModel({
         vertexes: _vertexes,
         edges: _edges.flat(),
       });
+    },
+
+    async asyncBidirectExpand(_payload, rootState) {
+      const {
+        nebula: { edgeTypes },
+        explore: { selectVertexes },
+      } = rootState;
+      let vertexes = [] as any;
+      let edges = [] as any;
+      const {
+        vertexes: incomingV,
+        edges: incomingE,
+      } = (await this.asyncGetExpandData({
+        selectVertexes,
+        edgeTypes,
+        edgeDirection: 'incoming',
+      })) as any;
+      const {
+        vertexes: outgoingV,
+        edges: outgoingE,
+      } = (await this.asyncGetExpandData({
+        selectVertexes,
+        edgeTypes,
+        edgeDirection: 'outgoing',
+      })) as any;
+      vertexes = [...vertexes, ...incomingV, ...outgoingV];
+      edges = [...edges, ...incomingE, ...outgoingE];
+      await this.asyncAddGraph({
+        vertexes,
+        edges,
+      });
+    },
+
+    async asyncGetExpandData(payload: {
+      selectVertexes: any[];
+      edgeTypes: string[];
+      edgesFields?: any[];
+      edgeDirection: string;
+      filters?: any[];
+      exploreStep?: number;
+      vertexColor?: string;
+      quantityLimit?: number | null;
+    }) {
+      const {
+        selectVertexes,
+        edgeTypes,
+        edgeDirection,
+        filters,
+        quantityLimit,
+      } = payload;
+      const gql = getExploreGQL({
+        selectVertexes,
+        edgeTypes,
+        edgeDirection,
+        filters,
+        quantityLimit,
+      });
+      const { code, data, message: errMsg } = (await service.execNGQL({
+        gql,
+      })) as any;
+      if (code === 0) {
+        const { vertexes, edges } = nebulaToData(
+          data.tables,
+          edgeTypes,
+          edgeDirection,
+        );
+        return {
+          vertexes,
+          edges,
+        };
+      } else {
+        message.warning(errMsg);
+        return {
+          vertexes: [],
+          edges: [],
+        };
+      }
+    },
+
+    async asyncAddGraph(
+      payload: {
+        vertexes;
+        edges;
+        expand;
+      },
+      rootState,
+    ) {
+      const {
+        explore: { vertexes: originVertexes, edges: originEdges },
+      } = rootState;
+      const { vertexes, edges, expand } = payload;
+      // fetch vertexes
+      const newVertexes = _.differenceBy(
+        vertexes,
+        originVertexes,
+        (vertex: any) => vertex.name,
+      );
+      const newIds = _.uniq(newVertexes.map((i: any) => i.name));
+      const _newVertexes =
+        newIds.length > 0
+          ? await this.asyncGetVertexes({
+              ids: newIds,
+              expand,
+            })
+          : [];
+      // fetch edges
+      const newEdges = _.differenceBy(
+        edges,
+        originEdges,
+        (edge: any) => '`' + edge.type + '`' + edge.id,
+      );
+      const edgeTypeGroup = _.groupBy(newEdges, (edge: any) => edge.type);
+      const edgeList = await Promise.all(
+        Object.keys(edgeTypeGroup).map(async type => {
+          const idRoutes = edgeTypeGroup[type].map((i: any) => i.id);
+          const edgeFields =
+            expand && expand.edgeFields
+              ? _.find(expand.edgesFields, type)
+              : null;
+          const res = await fetchEdgeProps({
+            idRoutes,
+            type,
+            edgeFields,
+          });
+          const _edges = res.tables.map(item => {
+            const edgeProp = {
+              headers: res.headers,
+              tables: [item],
+            };
+            return {
+              source: item[`${type}._src`],
+              target: item[`${type}._dst`],
+              id: `${item[`${type}._src`]}->${item[`${type}._dst`]}@${
+                item[`${type}._rank`]
+              }`,
+              type,
+              edgeProp,
+              uuid: uuidv4(),
+            };
+          });
+          return _edges;
+        }),
+      );
+      const _newEdges = _.flatten(edgeList);
+      this.addNodesAndEdges({
+        vertexes: _newVertexes,
+        edges: _newEdges,
+      });
+      if (expand && expand.exploreStep) {
+        this.update({
+          step: expand.exploreStep,
+        });
+      }
     },
   }),
 });

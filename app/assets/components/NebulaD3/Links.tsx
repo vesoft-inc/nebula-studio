@@ -59,6 +59,7 @@ export default class Links extends React.Component<IProps, {}> {
         this.props.onMouseOut();
       })
       .attr('class', 'link')
+      .style('fill', 'none')
       .style('stroke', '#999999')
       .style('stroke-opacity', 0.6)
       .attr('id', (d: any) => 'text-path-' + d.uuid)

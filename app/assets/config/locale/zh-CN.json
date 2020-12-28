@@ -153,7 +153,10 @@
     "timestampInput": "时间戳字段只支持输入数字",
     "documentIntroductionUrl": "https://docs.nebula-graph.com.cn/manual-CN/2.query-language/4.statement-syntax/1.data-definition-statements/",
     "customQueryUrl": "https://cloud-cdn.nebula-graph.com.cn/studio-resource/go-to-explore_zh.png",
-    "pretreatmentExplaination": "Hash能预处理bool、double、int、string类型的数据生成VID，但是UUID仅支持预处理string类型的数据。如果您需要使用Hash或UUID预处理string生成VID，则使用单引号或双引号标示每个string。"
+    "pretreatmentExplaination": "Hash能预处理bool、double、int、string类型的数据生成VID，但是UUID仅支持预处理string类型的数据。如果您需要使用Hash或UUID预处理string生成VID，则使用单引号或双引号标示每个string。",
+    "exportToImg": "导出图形",
+    "toBlobError": "导出失败。当前画布尺寸过大，请缩放画布尺寸后重试。",
+    "expandTip": "双击任意点也可实现该点的拓展。"
   },
   "import": {
     "import":"导入",
