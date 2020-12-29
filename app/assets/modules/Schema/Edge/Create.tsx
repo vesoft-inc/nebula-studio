@@ -374,7 +374,7 @@ class CreateEdge extends React.Component<IProps, IState> {
     };
     const currentGQL = edgeName
       ? getTagOrEdgeCreateGQL({
-          type: 'TAG',
+          type: 'EDGE',
           name: edgeName,
           fields,
           ttlConfig,
