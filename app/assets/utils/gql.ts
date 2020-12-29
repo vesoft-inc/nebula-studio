@@ -18,9 +18,9 @@ interface IAlterConfig {
 export const getExploreGQL = (params: {
   selectVertexes: any[];
   edgeTypes: string[];
-  edgeDirection: string;
-  filters: any[];
-  quantityLimit: number | null;
+  edgeDirection?: string;
+  filters?: any[];
+  quantityLimit?: number | null;
 }) => {
   const {
     selectVertexes,
@@ -30,9 +30,11 @@ export const getExploreGQL = (params: {
     quantityLimit,
   } = params;
   const wheres = filters
-    .filter(filter => filter.field && filter.operator && filter.value)
-    .map(filter => `${filter.field} ${filter.operator} ${filter.value}`)
-    .join(`\n  AND `);
+    ? filters
+        .filter(filter => filter.field && filter.operator && filter.value)
+        .map(filter => `${filter.field} ${filter.operator} ${filter.value}`)
+        .join(`\n  AND `)
+    : '';
   let direction;
   switch (edgeDirection) {
     case 'incoming':

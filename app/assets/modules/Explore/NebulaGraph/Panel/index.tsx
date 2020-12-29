@@ -1,4 +1,4 @@
-import { Button } from 'antd';
+import { Button, Tooltip } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
@@ -45,12 +45,15 @@ class Panel extends React.Component<IProps, {}> {
     const { selectVertexes } = this.props;
     return (
       <div className="panel">
-        <Button
-          onClick={this.handleExpand}
-          disabled={selectVertexes.length === 0}
-        >
-          {intl.get('explore.expand')}
-        </Button>
+        <Tooltip placement="topLeft" title={intl.get('explore.expandTip')}>
+          <Button
+            onClick={this.handleExpand}
+            disabled={selectVertexes.length === 0}
+          >
+            {intl.get('explore.expand')}
+          </Button>
+        </Tooltip>
+
         <Button
           onClick={this.handleDelete}
           className="panel-delete"

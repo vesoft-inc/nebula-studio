@@ -153,7 +153,10 @@
     "timestampInput": "Only numbers are supported for the timestamp field",
     "documentIntroductionUrl": "https://docs.nebula-graph.io/manual-EN/2.query-language/4.statement-syntax/1.data-definition-statements/",
     "customQueryUrl": "https://cloud-cdn.nebula-graph.com.cn/studio-resource/go-to-explore_en.png",
-    "pretreatmentExplaination": "Hash can pre-process data of the bool, double, int, or string type to generate VIDs, but UUID can pre-process data of the string type only. To generate VIDs by pre-processing strings, enclose each string with single or double quotes."
+    "pretreatmentExplaination": "Hash can pre-process data of the bool, double, int, or string type to generate VIDs, but UUID can pre-process data of the string type only. To generate VIDs by pre-processing strings, enclose each string with single or double quotes.",
+    "exportToImg": "Export Graph",
+    "toBlobError": "Export failed. The current canvas size is too large. Please zoom out to retry.",
+    "expandTip": "Double-click any vertex to explore its related vertices and edges."
   },
   "import": {
     "import": "Import",

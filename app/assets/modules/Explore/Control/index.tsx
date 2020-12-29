@@ -37,6 +37,7 @@ interface IProps
     ReturnType<typeof mapDispatch>,
     FormComponentProps {
   onRef: any;
+  handleExportImg: () => void;
 }
 
 class Control extends React.Component<IProps, {}> {
@@ -75,6 +76,10 @@ class Control extends React.Component<IProps, {}> {
     }
   };
 
+  handleExportImg = () => {
+    this.props.handleExportImg();
+  };
+
   render() {
     const { spaces, currentSpace, vertexes } = this.props;
 
@@ -105,6 +110,12 @@ class Control extends React.Component<IProps, {}> {
             }}
           >
             {intl.get('explore.startWithVertices')}
+          </Button>
+          <Button
+            disabled={vertexes.length === 0}
+            onClick={this.handleExportImg}
+          >
+            {intl.get('explore.exportToImg')}
           </Button>
           <Modal
             handlerRef={handler => (this.importNodesHandler = handler)}
