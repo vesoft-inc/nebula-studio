@@ -3,10 +3,6 @@ on:
   push:
     branches:
       - master
-    tags:
-      - both-release-*
-      - studio-release-*
-
 jobs:
   release-image:
     runs-on: ubuntu-latest
@@ -34,4 +30,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: vesoft/nebula-graph-studio-v2:latest
+        tags: vesoft/nebula-graph-studio:v2

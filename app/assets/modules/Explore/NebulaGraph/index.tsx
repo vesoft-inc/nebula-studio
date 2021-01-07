@@ -119,6 +119,7 @@ class NebulaGraph extends React.Component<IProps, IState> {
 
   handleMouseInNode = node => {
     const properties = node.nodeProp ? node.nodeProp.properties : {};
+    const vertexIDStr = `<p key='id'>Vertex ID: ${node.name}</p>`;
     const nodeFieldsValuePairStr = Object.keys(properties)
       .map(property => {
         const valueObj = properties[property];
@@ -131,7 +132,7 @@ class NebulaGraph extends React.Component<IProps, IState> {
       .join('');
     this.$tooltip
       .html(
-        `<p style="font-weight:600">Vertex Details</p> ${nodeFieldsValuePairStr}`,
+        `<p style="font-weight:600">Vertex Details</p> ${vertexIDStr} ${nodeFieldsValuePairStr}`,
       )
       .style('display', 'block');
   };
