@@ -60,12 +60,7 @@ ${edgeTypes
   })
   .join(',\n')}
 ` +
-    `${
-      quantityLimit
-        ? `| LIMIT
-  ${quantityLimit};`
-        : `;`
-    }`;
+    `| LIMIT ${quantityLimit ? quantityLimit : 100}`;
 
   return gql;
 };
@@ -97,13 +92,7 @@ export const getExploreGQLWithIndex = (params: {
   const gql =
     `LOOKUP ON
   ${handleKeyword(tag)} ${wheres ? `\nWHERE ${wheres}` : ''}
-    ` +
-    `${
-      quantityLimit
-        ? `| LIMIT
-  ${quantityLimit};`
-        : `;`
-    }`;
+    ` + `| LIMIT ${quantityLimit ? quantityLimit : 100}`;
 
   return gql;
 };

@@ -309,17 +309,19 @@ class NebulaD3 extends React.Component<IProps, IState> {
   };
 
   handleUpdataNodes(nodes: INode[], selectNodes: INode[]) {
+    const currentNodes = d3.selectAll('.node');
     if (nodes.length === 0) {
-      d3.selectAll('.node').remove();
+      currentNodes.remove();
+      return;
+    } else if (currentNodes.size() > nodes.length) {
+      const ids = nodes.map(i => i.name);
+      const deleteNodes = currentNodes.filter((data: any) => {
+        return !ids.includes(data.name);
+      });
+      deleteNodes.remove();
       return;
     }
-    const names = nodes.map(node => node.name);
     const selectNodeNames = selectNodes.map(node => node.name);
-    selectNodes.forEach(i => {
-      if (!names.includes(i.name)) {
-        d3.select(`#node-${i.uuid}`).remove();
-      }
-    });
     d3.select(this.nodeRef)
       .selectAll('circle')
       .data(nodes)
