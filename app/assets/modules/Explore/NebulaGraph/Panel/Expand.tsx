@@ -120,6 +120,7 @@ class Expand extends React.Component<IProps, IState> {
           edgeTypes,
           edgeDirection,
           vertexColor,
+          quantityLimit,
         });
         this.props.close();
       },
@@ -268,7 +269,7 @@ class Expand extends React.Component<IProps, IState> {
           </Form.Item>
           <Form.Item label={intl.get('explore.quantityLimit')}>
             {getFieldDecorator('quantityLimit', {
-              initialValue: rules.quantityLimit,
+              initialValue: rules.quantityLimit || 100,
               rules: [
                 {
                   message: intl.get('formRules.positiveIntegerRequired'),
