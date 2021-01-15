@@ -78,6 +78,8 @@ interface IProperty {
   name: string;
   type: string;
   value?: string;
+  allowNull?: boolean;
+  fixedLength?: string;
 }
 
 type IndexType = 'TAG' | 'EDGE';

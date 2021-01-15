@@ -3,6 +3,8 @@ interface IField {
   name: string;
   type: string;
   value?: string;
+  allowNull?: boolean;
+  fixedLength?: string;
 }
 
 type IndexType = 'TAG' | 'EDGE';
@@ -104,6 +106,7 @@ export const getSpaceCreateGQL = (params: {
     replica_factor: string | undefined;
     charset: string | undefined;
     collate: string | undefined;
+    vid_type: string | undefined;
   };
 }) => {
   const { name, options } = params;
@@ -136,6 +139,7 @@ export const getTagOrEdgeCreateGQL = (params: {
           if (item.value) {
             switch (item.type) {
               case 'string':
+              case 'fixed_string':
                 valueStr = `DEFAULT "${item.value}"`;
                 break;
               case 'timestamp':
@@ -148,7 +152,12 @@ export const getTagOrEdgeCreateGQL = (params: {
                 valueStr = `DEFAULT ${item.value}`;
             }
           }
-          const conbine = [handleKeyword(item.name), item.type, valueStr];
+          const _type =
+            item.type !== 'fixed_string'
+              ? item.type
+              : item.type + `(${item.fixedLength ? item.fixedLength : ''})`;
+          const _null = item.allowNull ? 'NULL' : 'NOT NULL';
+          const conbine = [handleKeyword(item.name), _type, _null, valueStr];
           return conbine.join(' ');
         })
         .join(', ')
@@ -177,14 +186,19 @@ export const getAlterGQL = (params: {
   } else if (action !== 'TTL' && config.fields) {
     const date = config.fields
       .map(item => {
-        const { name, type, value } = item;
+        const { name, type, value, fixedLength, allowNull } = item;
         if (action === 'DROP') {
           return name;
         } else {
-          let str = `${name} ${type}`;
+          let str = `${name} ${
+            type !== 'fixed_string'
+              ? type
+              : type + `(${fixedLength ? item.fixedLength : ''})`
+          } ${allowNull ? 'NULL' : 'NOT NULL'}`;
           if (value) {
             switch (type) {
               case 'string':
+              case 'fixed_string':
                 str += ` DEFAULT "${value}"`;
                 break;
               case 'timestamp':

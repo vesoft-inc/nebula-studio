@@ -10,8 +10,7 @@ export function nebulaToData(
   return table.reduce(
     (result, data) => {
       edgeTypes.forEach(type => {
-        // HACK: nebula 2.0 alpha return '' if there is no dstid
-        if (data[`${type}DestId`] === '') {
+        if (data[`${type}DestId`] === '_EMPTY_') {
           return;
         }
         const destId = handleVidStringName(data[`${type}DestId`]);

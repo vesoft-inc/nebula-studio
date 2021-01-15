@@ -112,6 +112,11 @@ export const dataType = [
     value: 'timestamp',
     label: 'timestamp',
   },
+  {
+    value: 'fixed_string',
+    label: 'fixed_string',
+  },
 ];
 
 export const nameReg = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+export const positiveIntegerReg = /^[1-9]\d*$/g;

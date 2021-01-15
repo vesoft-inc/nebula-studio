@@ -6,10 +6,11 @@ import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 import { match, RouteComponentProps, withRouter } from 'react-router-dom';
 
-import { Modal as ModalComponent } from '#assets/components';
+import { Instruction, Modal as ModalComponent } from '#assets/components';
 import GQLCodeMirror from '#assets/components/GQLCodeMirror';
 import { nameRulesFn } from '#assets/config/rules';
 import { IDispatch, IRootState } from '#assets/store';
+import { positiveIntegerReg } from '#assets/utils/constant';
 import { getIndexCreateGQL } from '#assets/utils/gql';
 import { trackEvent, trackPageView } from '#assets/utils/stat';
 
@@ -53,6 +54,8 @@ interface IState {
   typeList: IType[];
   fieldList: IField[];
   selectedField: string;
+  selectedFieldType: string;
+  indexLength: string;
 }
 
 const itemLayout = {
@@ -80,6 +83,8 @@ class CreateIndex extends React.Component<IProps, IState> {
       typeList: [],
       fieldList: [],
       selectedField: '',
+      selectedFieldType: '',
+      indexLength: '',
     };
   }
 
@@ -156,8 +161,22 @@ class CreateIndex extends React.Component<IProps, IState> {
   };
 
   handleSelectField = (value: string) => {
+    const { fieldList } = this.state;
+    const selectedFieldType = fieldList.filter(
+      field => field.Field === value,
+    )[0].Type;
     this.setState({
       selectedField: value,
+      selectedFieldType,
+      indexLength: selectedFieldType.startsWith('fixed_string')
+        ? selectedFieldType.replace(/[fixed_string(|)]/g, '')
+        : '',
+    });
+  };
+
+  addIndexLength = e => {
+    this.setState({
+      indexLength: e.target.value,
     });
   };
 
@@ -194,14 +213,26 @@ class CreateIndex extends React.Component<IProps, IState> {
   };
 
   handleAddField = () => {
-    const { selectedField } = this.state;
+    const { selectedField, indexLength, selectedFieldType } = this.state;
     const { setFieldsValue, getFieldValue } = this.props.form;
+    if (
+      selectedFieldType === 'string' &&
+      !indexLength.match(positiveIntegerReg)
+    ) {
+      return message.warning(intl.get('schema.indexedLengthRequired'));
+    }
+    const newField =
+      selectedFieldType === 'string'
+        ? selectedField + `(${indexLength})`
+        : selectedField;
     const fields = getFieldValue('fields');
     setFieldsValue({
-      fields: [...fields, selectedField],
+      fields: [...fields, newField],
     });
     this.setState({
       selectedField: '',
+      indexLength: '',
+      selectedFieldType: '',
     });
     this.handleClose();
   };
@@ -231,8 +262,16 @@ class CreateIndex extends React.Component<IProps, IState> {
     const name = getFieldValue('name') || '';
     const type = getFieldValue('type');
     const associate = getFieldValue('associate') || '';
-    const { typeList, fieldList, selectedField } = this.state;
-    const filterList = fieldList.filter(item => !fields.includes(item.Field));
+    const {
+      typeList,
+      fieldList,
+      selectedField,
+      selectedFieldType,
+      indexLength,
+    } = this.state;
+    const filterList = fieldList.filter(
+      item => !fields.some(field => field.startsWith(item.Field)),
+    );
     const currentGQL = getIndexCreateGQL({
       type,
       name,
@@ -365,14 +404,34 @@ class CreateIndex extends React.Component<IProps, IState> {
               </>
             }
           >
-            <span>{intl.get('schema.selectFields')}:</span>
-            <Select onChange={this.handleSelectField} className="select-field">
-              {filterList.map(item => (
-                <Option value={item.Field} key={item.Field}>
-                  {item.Field}
-                </Option>
-              ))}
-            </Select>
+            <div className="modal-item">
+              <span>{intl.get('schema.selectFields')}:</span>
+              <Select
+                onChange={this.handleSelectField}
+                className="select-field"
+              >
+                {filterList.map(item => (
+                  <Option value={item.Field} key={item.Field}>
+                    {item.Field}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+            {/* string & fixed string should supply length parameter */}
+            {selectedFieldType && selectedFieldType.includes('string') && (
+              <div className="modal-item">
+                <span>{intl.get('schema.indexedLength')}:</span>
+                <Input
+                  disabled={selectedFieldType.startsWith('fixed_string')}
+                  placeholder={indexLength}
+                  className="input-index-length"
+                  onChange={this.addIndexLength}
+                />
+                <Instruction
+                  description={intl.get('schema.indexedLengthDescription')}
+                />
+              </div>
+            )}
           </ModalComponent>
         </div>
       </div>

@@ -20,7 +20,7 @@ import { connect } from 'react-redux';
 import { match, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import GQLCodeMirror from '#assets/components/GQLCodeMirror';
-import { nameRulesFn } from '#assets/config/rules';
+import { nameRulesFn, numberRulesFn } from '#assets/config/rules';
 import { IDispatch, IRootState } from '#assets/store';
 import { dataType } from '#assets/utils/constant';
 import { getTagOrEdgeCreateGQL } from '#assets/utils/gql';
@@ -148,7 +148,7 @@ class CreateEdge extends React.Component<IProps, IState> {
     if (fieldRequired) {
       const formItems = keys.map((_, k: number) => (
         <div key={k} className="form-item">
-          <Col span={7}>
+          <Col span={5}>
             <Form.Item {...itemLayout}>
               {getFieldDecorator(`fields[${k}].name`, {
                 rules: nameRulesFn(intl),
@@ -158,8 +158,8 @@ class CreateEdge extends React.Component<IProps, IState> {
               )}
             </Form.Item>
           </Col>
-          <Col span={7}>
-            <Form.Item {...itemLayout}>
+          <Col span={6}>
+            <Form.Item {...itemLayout} wrapperCol={{ span: 18 }}>
               {getFieldDecorator(`fields[${k}].type`, {
                 initialValue: '',
                 rules: [
@@ -169,7 +169,7 @@ class CreateEdge extends React.Component<IProps, IState> {
                   },
                 ],
               })(
-                <Select>
+                <Select className="select-type">
                   {dataType.map(item => {
                     return (
                       <Option value={item.value} key={item.value}>
@@ -179,9 +179,30 @@ class CreateEdge extends React.Component<IProps, IState> {
                   })}
                 </Select>,
               )}
+              {fields && fields[k] && fields[k].type === 'fixed_string' && (
+                <Form.Item className="item-string-length">
+                  {getFieldDecorator(`fields[${k}].fixedLength`, {
+                    rules: [
+                      ...numberRulesFn(intl),
+                      {
+                        required: true,
+                        message: intl.get('formRules.numberRequired'),
+                      },
+                    ],
+                  })(<Input className="input-string-length" />)}
+                </Form.Item>
+              )}
             </Form.Item>
           </Col>
-          <Col span={7}>
+          <Col span={4}>
+            <Form.Item {...itemLayout}>
+              {getFieldDecorator(`fields[${k}].allowNull`, {
+                valuePropName: 'checked',
+                initialValue: true,
+              })(<Checkbox />)}
+            </Form.Item>
+          </Col>
+          <Col span={6}>
             <Form.Item {...itemLayout}>
               {fields && fields[k] && fields[k].type === 'timestamp' ? (
                 <Popover
@@ -210,7 +231,7 @@ class CreateEdge extends React.Component<IProps, IState> {
               )}
             </Form.Item>
           </Col>
-          <Col span={3}>
+          <Col span={2}>
             {keys.length > 1 && (
               <Icon
                 className="delete-button"
@@ -416,9 +437,10 @@ class CreateEdge extends React.Component<IProps, IState> {
             >
               <Panel header={intl.get('schema.defineFields')} key="field">
                 <Row className="form-header">
-                  <Col span={7}>{intl.get('common.propertyName')}</Col>
-                  <Col span={7}>{intl.get('common.dataType')}</Col>
-                  <Col span={7}>{intl.get('common.defaults')}</Col>
+                  <Col span={5}>{intl.get('common.propertyName')}</Col>
+                  <Col span={5}>{intl.get('common.dataType')}</Col>
+                  <Col span={5}>{intl.get('common.allowNull')}</Col>
+                  <Col span={5}>{intl.get('common.defaults')}</Col>
                 </Row>
                 {fieldTable}
                 <Row className="form-footer">

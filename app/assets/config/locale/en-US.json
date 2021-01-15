@@ -48,6 +48,7 @@
     "deleteSuccess": "Delete Successfully",
     "propertyName": "Property Name",
     "dataType": "Data Type",
+    "allowNull": "Allow Null",
     "defaults": "Defaults",
     "addProperty": "Add Property",
     "updateSuccess": "Update Successfully",
@@ -91,7 +92,8 @@
     "defaultRequired": "Please enter the default value",
     "ttlRequired": "Please select the corresponding property, and the data type of the property must be integer or timestamp",
     "ttlDurationRequired": "Please enter the time (in seconds)",
-    "dataTypeRequired": "Please select the data type"
+    "dataTypeRequired": "Please select the data type",
+    "fixedStringLength": "Fixed String length must be a positive integer"
   },
   "console": {
     "cost": "Cost",
@@ -243,6 +245,7 @@
     "replicaFactorDescription": "replica_factor specifies the number of replicas in the cluster. The default replica factor is 1. The suggested number is 3 in cluster. It is usually 3 in production. Due to the majority voting principle, it must set to be odd.",
     "charsetDescription": "charset is short for character set. A character set is a set of symbols and encodings. The default value is utf8.",
     "collateDescription": "A collation is a set of rules for comparing characters in a character set. The default value is utf8_bin.",
+    "vidTypeDescription": "Specifies the data type of vertex IDs (VIDs) in a graph space. The default value is FIXED_STRING(8). ",
     "createSuccess": "Create Successfully",
     "defineFields": "Define Properties",
     "setTTL": "Set TTL",
@@ -259,6 +262,9 @@
     "indexFields": "Indexed Properties",
     "dragSorting": "(Drag to Sort)",
     "selectFields": "Choose Property",
+    "indexedLength": "Indexed length",
+    "indexedLengthDescription": "Set the indexed string length. If you are indexing fixed strings, you must not set this option.",
+    "indexedLengthRequired": "Indexed length must be a positive integer",
     "backToTagList": "Back to Tag List",
     "backToEdgeList": "Back to Edge Type List",
     "backToIndexList": "Back to Index List",

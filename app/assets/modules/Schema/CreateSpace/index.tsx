@@ -49,6 +49,17 @@ interface IProps
     FormComponentProps,
     RouteComponentProps {}
 
+function getVidType(type: string, length?: string) {
+  let result: string | undefined;
+  if (type === 'INT64') {
+    result = type;
+  } else if (length) {
+    result = type + '(' + length + ')';
+  } else if (!length) {
+    result = type + '(8)';
+  }
+  return result;
+}
 class CreateSpace extends React.Component<IProps> {
   componentDidMount() {
     trackPageView('/space/create');
@@ -64,12 +75,16 @@ class CreateSpace extends React.Component<IProps> {
           replicaFactor,
           charset,
           collate,
+          vidType,
+          stringLength,
         } = this.props.form.getFieldsValue();
+        const _vidType = getVidType(vidType, stringLength);
         const options = {
           partition_num: partitionNum,
           replica_factor: replicaFactor,
           charset,
           collate,
+          vid_type: _vidType,
         };
         const { code, message: errorMsg } = await this.props.asyncCreateSpace({
           name,
@@ -114,6 +129,8 @@ class CreateSpace extends React.Component<IProps> {
       replicaFactor,
       charset,
       collate,
+      vidType,
+      stringLength,
     } = getFieldsValue();
     const innerItemLayout = {
       labelCol: {
@@ -131,11 +148,13 @@ class CreateSpace extends React.Component<IProps> {
         span: 6,
       },
     };
+    const _vidType = getVidType(vidType, stringLength);
     const options = {
       partition_num: partitionNum,
       replica_factor: replicaFactor,
       charset,
       collate,
+      vid_type: _vidType,
     };
     const currentGQL = name
       ? getSpaceCreateGQL({
@@ -229,6 +248,38 @@ class CreateSpace extends React.Component<IProps> {
                     <Select placeholder="utf8_bin">
                       <Option value="utf8_bin">utf8_bin</Option>
                     </Select>,
+                  )}
+                </Form.Item>
+                <Form.Item
+                  label={
+                    <>
+                      <span>vid type</span>
+                      <Instruction
+                        description={intl.get('schema.vidTypeDescription')}
+                      />
+                    </>
+                  }
+                >
+                  {getFieldDecorator('vidType')(
+                    <Select
+                      placeholder="FIXED_STRING"
+                      className="select-vid-type"
+                    >
+                      <Option value="FIXED_STRING">FIXED_STRING</Option>
+                      <Option value="INT64">INT64</Option>
+                    </Select>,
+                  )}
+                  {vidType === 'FIXED_STRING' && (
+                    <Form.Item className="item-string-length">
+                      {getFieldDecorator('stringLength', {
+                        rules: numberRulesFn(intl),
+                      })(
+                        <Input
+                          className="input-string-length"
+                          placeholder="8"
+                        />,
+                      )}
+                    </Form.Item>
                   )}
                 </Form.Item>
               </Panel>

@@ -22,7 +22,7 @@ import { match, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import GQLCodeMirror from '#assets/components/GQLCodeMirror';
 import { IDispatch, IRootState } from '#assets/store';
-import { dataType, nameReg } from '#assets/utils/constant';
+import { dataType, nameReg, positiveIntegerReg } from '#assets/utils/constant';
 import { getAlterGQL } from '#assets/utils/gql';
 import { trackEvent, trackPageView } from '#assets/utils/stat';
 
@@ -77,6 +77,8 @@ interface IField {
   name: string;
   type: string;
   value: string;
+  allowNull: boolean;
+  fixedLength?: string;
 }
 
 interface IEditField extends IField {
@@ -131,12 +133,16 @@ class EditEdge extends React.Component<IProps, IState> {
       const result = fieldReg.exec(i) || [];
       return {
         name: result[1],
-        type: result[2],
-        null: result[3] === 'NULL',
+        showType: result[2],
+        type: result[2].startsWith('fixed_string') ? 'fixed_string' : result[2],
+        allowNull: result[3] === 'NULL',
         value:
           result[4] === undefined
             ? ''
             : result[4].replace(/^"/, '').replace(/"$/, ''),
+        fixedLength: result[2].startsWith('fixed_string')
+          ? result[2].replace(/[fixed_string(|)]/g, '')
+          : '',
       };
     });
     const fieldRequired = fieldList.length > 0;
@@ -159,6 +165,8 @@ class EditEdge extends React.Component<IProps, IState> {
       name: '',
       type: '',
       value: '',
+      allowNull: true,
+      fixedLength: '',
       alterType: 'ADD',
     };
     const newList = [...fieldList, editField];
@@ -244,7 +252,7 @@ class EditEdge extends React.Component<IProps, IState> {
     this.props.asyncUpdateEditStatus(false);
   };
 
-  handleChangeValue = (key: string, value: string) => {
+  handleChangeValue = (key: string, value: string | boolean) => {
     const editField = this.state.editField;
     const newField = editField!;
     newField[key] = value;
@@ -274,12 +282,15 @@ class EditEdge extends React.Component<IProps, IState> {
     } = match;
     const { editField } = this.state;
     if (editField) {
-      const { name, type, alterType } = editField;
+      const { name, type, alterType, fixedLength } = editField;
       if (name === '' || type === '') {
         return message.warning(intl.get('schema.fieldRequired'));
       }
       if (name !== '' && !nameReg.test(name)) {
         return message.warning(intl.get('formRules.nameValidate'));
+      }
+      if (type === 'fixed_string' && !fixedLength?.match(positiveIntegerReg)) {
+        return message.warning(intl.get('formRules.fixedStringLength'));
       }
       const res = await this.props.asyncAlterField({
         type: 'EDGE',
@@ -439,7 +450,7 @@ class EditEdge extends React.Component<IProps, IState> {
               <Input
                 value={editField!.name}
                 onChange={e => this.handleChangeValue('name', e.target.value)}
-                placeholder={intl.get('formRules.defaultRequired')}
+                placeholder={intl.get('formRules.propertyRequired')}
               />
             );
           } else {
@@ -451,24 +462,55 @@ class EditEdge extends React.Component<IProps, IState> {
         title: intl.get('common.dataType'),
         dataIndex: 'type',
         align: 'center' as const,
+        render: (_, row, index) => {
+          if (editRow === index) {
+            return (
+              <>
+                <Select
+                  className="select-type"
+                  value={editField!.type}
+                  onChange={value => this.handleChangeValue('type', value)}
+                >
+                  {dataType.map(item => {
+                    return (
+                      <Option value={item.value} key={item.value}>
+                        {item.label}
+                      </Option>
+                    );
+                  })}
+                </Select>
+                {editField!.type === 'fixed_string' && (
+                  <Input
+                    className="input-string-length"
+                    value={editField!.fixedLength}
+                    onChange={e =>
+                      this.handleChangeValue('fixedLength', e.target.value)
+                    }
+                  />
+                )}
+              </>
+            );
+          } else {
+            return <span>{row.showType}</span>;
+          }
+        },
+      },
+      {
+        title: intl.get('common.allowNull'),
+        dataIndex: 'allowNull',
+        align: 'center' as const,
         render: (record, _, index) => {
           if (editRow === index) {
             return (
-              <Select
-                value={editField!.type}
-                onChange={value => this.handleChangeValue('type', value)}
-              >
-                {dataType.map(item => {
-                  return (
-                    <Option value={item.value} key={item.value}>
-                      {item.label}
-                    </Option>
-                  );
-                })}
-              </Select>
+              <Checkbox
+                value={editField!.allowNull}
+                onChange={e =>
+                  this.handleChangeValue('allowNull', e.target.checked)
+                }
+              />
             );
           } else {
-            return <span>{record}</span>;
+            return <Checkbox checked={record} disabled={true} />;
           }
         },
       },

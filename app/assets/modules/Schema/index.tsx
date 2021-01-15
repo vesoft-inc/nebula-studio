@@ -138,6 +138,16 @@ class Schema extends React.Component<IProps> {
         align: 'center' as const,
       },
       {
+        title: (
+          <>
+            <span>Vid Type</span>
+            <Instruction description={intl.get('schema.vidTypeDescription')} />
+          </>
+        ),
+        dataIndex: 'Vid Type',
+        align: 'center' as const,
+      },
+      {
         title: intl.get('common.operation'),
         dataIndex: 'operation',
         align: 'center' as const,

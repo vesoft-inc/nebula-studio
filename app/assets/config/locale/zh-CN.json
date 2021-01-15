@@ -48,6 +48,7 @@
     "deleteSuccess": "删除成功",
     "propertyName": "属性名称",
     "dataType": "数据类型",
+    "allowNull": "允许空值",
     "defaults": "默认值",
     "addProperty": "添加属性",
     "updateSuccess": "更新成功",
@@ -91,7 +92,8 @@
     "defaultRequired": "请输入默认值",
     "ttlRequired": "请选择TTL指定的属性, 且属性的数据类型需为integer或timestamp",
     "ttlDurationRequired": "请输入时间(s)",
-    "dataTypeRequired": "请选择数据类型"
+    "dataTypeRequired": "请选择数据类型",
+    "fixedStringLength": "Fixed String 长度需为正整数"
   },
   "console": {
     "cost": "开销",
@@ -239,6 +241,7 @@
     "replicaFactorDescription": "replica_factor 表示副本数量。默认值是 1，生产集群建议为 3。由于采用多数表决原理，因此需为奇数。",
     "charsetDescription": "charset 表示字符集，定义了字符以及字符的编码，默认为 utf8。",
     "collateDescription": "collate 表示字符序，定义了字符的比较规则，默认为 utf8_bin。",
+    "vidTypeDescription": "vid type 指定图空间中点 ID（VID）的数据类型。默认值为 FIXED_STRING(8)",
     "createSuccess": "创建成功",
     "defineFields": "定义属性",
     "setTTL": "设置TTL",
@@ -255,6 +258,9 @@
     "indexFields": "索引属性",
     "dragSorting": "(可拖拽排序)",
     "selectFields": "选择关联的属性",
+    "indexedLength": "索引长度",
+    "indexedLengthDescription": "设置索引字符串的长度。如果索引定长字符串，则索引长度无法修改。",
+    "indexedLengthRequired": "索引长度应为正整数",
     "backToTagList": "返回标签列表",
     "backToEdgeList": "返回边类型列表",
     "backToIndexList": "返回索引列表",

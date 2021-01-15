@@ -1,30 +1,30 @@
 version: '3.4'
 services:
   metad0:
-    image: vesoft/nebula-metad:v2-preview-nightly
+    image: vesoft/nebula-metad:v2-nightly
     environment:
       USER: root
       TZ:   "${TZ}"
     command:
-      - --meta_server_addrs=metad0:45500
+      - --meta_server_addrs=metad0:9559
       - --local_ip=metad0
       - --ws_ip=metad0
-      - --port=45500
-      - --ws_http_port=11000
+      - --port=9559
+      - --ws_http_port=19559
       - --data_path=/data/meta
       - --log_dir=/logs
       - --v=0
       - --minloglevel=0
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://metad0:11000/status"]
+      test: ["CMD", "curl", "-sf", "http://metad0:19559/status"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 20s
     ports:
-      - 45500
-      - 11000
-      - 11002
+      - 9559
+      - 19559
+      - 19560
     volumes:
       - ./data/meta0:/data/meta
       - ./logs/meta0:/logs
@@ -35,16 +35,16 @@ services:
       - SYS_PTRACE
 
   storaged0:
-    image: vesoft/nebula-storaged:v2-preview-nightly
+    image: vesoft/nebula-storaged:v2-nightly
     environment:
       USER: root
       TZ:   "${TZ}"
     command:
-      - --meta_server_addrs=metad0:45500
+      - --meta_server_addrs=metad0:9559
       - --local_ip=storaged0
       - --ws_ip=storaged0
-      - --port=44500
-      - --ws_http_port=12000
+      - --port=9779
+      - --ws_http_port=19779
       - --data_path=/data/storage
       - --log_dir=/logs
       - --v=0
@@ -52,15 +52,15 @@ services:
     depends_on:
       - metad0
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://storaged0:12000/status"]
+      test: ["CMD", "curl", "-sf", "http://storaged0:19779/status"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 20s
     ports:
-      - 44500
-      - 12000
-      - 12002
+      - 9779
+      - 19779
+      - 19780
     volumes:
       - ./data/storage0:/data/storage
       - ./logs/storage0:/logs
@@ -71,30 +71,30 @@ services:
       - SYS_PTRACE
 
   graphd:
-    image: vesoft/nebula-graphd:v2-preview-nightly
+    image: vesoft/nebula-graphd:v2-nightly
     environment:
       USER: root
       TZ:   "${TZ}"
     command:
-      - --meta_server_addrs=metad0:45500
-      - --port=3699
+      - --meta_server_addrs=metad0:9559
+      - --port=9669
       - --ws_ip=graphd
-      - --ws_http_port=13000
+      - --ws_http_port=19669
       - --log_dir=/logs
       - --v=0
       - --minloglevel=0
     depends_on:
       - metad0
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://graphd:13000/status"]
+      test: ["CMD", "curl", "-sf", "http://graphd:19669/status"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 20s
     ports:
-      - 3699:3699
-      - 13000
-      - 13002
+      - "9669:9669"
+      - 19669
+      - 19670
     volumes:
       - ./logs/graph:/logs
     networks:
@@ -105,7 +105,3 @@ services:
 
 networks:
   nebula-net:
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.28.0.0/16
