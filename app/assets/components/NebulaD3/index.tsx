@@ -31,6 +31,8 @@ interface IProps {
   onMouseOut: () => void;
   onMouseInLink: (link: any) => void;
   onDblClickNode: () => void;
+  onClickNode: () => void;
+  onClickEmptySvg: () => void;
   onD3Ref: any;
 }
 
@@ -152,11 +154,20 @@ class NebulaD3 extends React.Component<IProps, IState> {
       .attr('d', 'M-6.75,-6.75 L 0,0 L -6.75,6.75')
       .attr('fill', '#999')
       .attr('stroke', '#999');
+
+    this.svg.on('click', () => {
+      if (d3.event.target.tagName !== 'circle' && this.props.onClickEmptySvg) {
+        this.props.onClickEmptySvg();
+      }
+    });
   }
 
   handleNodeClick = (d: any) => {
     const event = d3.event;
     const { selectedNodes } = this.state;
+    if (this.props.onClickNode) {
+      this.props.onClickNode();
+    }
     if (event.shiftKey) {
       if (selectedNodes.find(n => n.name === d.name)) {
         this.setState({

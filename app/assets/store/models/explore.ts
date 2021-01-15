@@ -54,6 +54,8 @@ interface IState {
     quantityLimit?: number;
   };
   preloadData: IExportData;
+  showTagFields: string[];
+  showEdgeFields: string[];
 }
 
 function getGroup(tags, expand) {
@@ -100,6 +102,8 @@ export const explore = createModel({
       vertexes: [],
       edges: [],
     },
+    showTagFields: [],
+    showEdgeFields: [],
   },
   reducers: {
     update: (state: IState, payload: any): IState => {

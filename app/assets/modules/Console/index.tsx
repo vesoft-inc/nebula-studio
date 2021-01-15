@@ -72,9 +72,11 @@ class Console extends React.Component<IProps, IState> {
       message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
       return;
     }
-    if (gql.includes('use ') || gql.includes('USE ')) {
-      message.error(intl.get('common.disablesUseToSwitchSpace'));
-      return;
+    const reg = /(?<=[;?\s*]?)(?<![0-9a-zA-Z])USE `?[0-9a-zA-Z_]+`?(?=[\s*;?]?)/gm;
+    const _gql = gql.replace(/[\r\n]/g, '').toUpperCase();
+    // TODO this reg cannot avoid all situations like string vid fetch prop on * 'Fuse s'
+    if (_gql.match(reg)) {
+      return message.error(intl.get('common.disablesUseToSwitchSpace'));
     }
     this.editor.execCommand('goDocEnd');
     const history = this.getLocalStorage();
