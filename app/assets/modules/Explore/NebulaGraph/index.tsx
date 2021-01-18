@@ -18,6 +18,8 @@ const mapState = (state: IRootState) => ({
   edges: state.explore.edges,
   selectVertexes: state.explore.selectVertexes,
   actionData: state.explore.actionData,
+  showTagFields: state.explore.showTagFields,
+  showEdgeFields: state.explore.showEdgeFields,
   space: state.nebula.currentSpace,
   tagsFields: state.nebula.tagsFields,
   edgesFields: state.nebula.edgesFields,
@@ -39,6 +41,9 @@ const mapDispatch = (dispatch: IDispatch) => ({
       selectVertexes: [],
     });
   },
+  updateShowingFields: fields => {
+    dispatch.explore.update(fields);
+  },
   asyncGetTagsFields: dispatch.nebula.asyncGetTagsFields,
   asyncGetEdgeTypesFields: dispatch.nebula.asyncGetEdgeTypesFields,
   asyncBidirectExpand: dispatch.explore.asyncBidirectExpand,
@@ -47,9 +52,8 @@ const mapDispatch = (dispatch: IDispatch) => ({
 interface IState {
   width: number;
   height: number;
-  showTagFields: string[];
-  showEdgeFields: string[];
   isTags: boolean;
+  isFixToolTip: boolean;
 }
 
 interface IProps
@@ -67,9 +71,8 @@ class NebulaGraph extends React.Component<IProps, IState> {
     this.state = {
       width: 0,
       height: 0,
-      showTagFields: [],
-      showEdgeFields: [],
       isTags: true,
+      isFixToolTip: false,
     };
   }
 
@@ -106,7 +109,7 @@ class NebulaGraph extends React.Component<IProps, IState> {
   componentDidUpdate(prevProps) {
     const { space } = this.props;
     if (prevProps.space !== space) {
-      this.setState({
+      this.props.updateShowingFields({
         showTagFields: [],
         showEdgeFields: [],
       });
@@ -118,24 +121,8 @@ class NebulaGraph extends React.Component<IProps, IState> {
   }
 
   handleMouseInNode = node => {
-    // const e: any = event || window.event;
-    const nodeFieldsValuePairStr = node.nodeProp
-      ? node.nodeProp.tables
-          .map(node => {
-            return Object.keys(node)
-              .map(fields => {
-                return `<p key=${fields}>${fields}: ${node[fields]}</p>`;
-              })
-              .join('');
-          })
-          .join('')
-      : '';
-
-    this.$tooltip
-      .html(
-        `<p style="font-weight:600">Vertex Details</p> ${nodeFieldsValuePairStr}`,
-      )
-      .style('display', 'block');
+    this.renderTooltip(node);
+    this.$tooltip.style('display', 'block');
   };
 
   handleMouseInLink = link => {
@@ -157,8 +144,46 @@ class NebulaGraph extends React.Component<IProps, IState> {
       .style('display', 'block');
   };
 
-  handleMouseOut = () => {
+  fixTooltip = () => {
+    this.$tooltip.style('display', 'block');
+    this.setState({
+      isFixToolTip: true,
+    });
+  };
+
+  hideTooltip = () => {
     this.$tooltip.style('display', 'none');
+    this.setState({
+      isFixToolTip: false,
+    });
+  };
+
+  handleMouseOut = () => {
+    const { isFixToolTip } = this.state;
+    const { selectVertexes } = this.props;
+    if (!isFixToolTip) {
+      this.$tooltip.style('display', 'none');
+    } else if (isFixToolTip && selectVertexes.length === 1) {
+      this.renderTooltip(selectVertexes[0]);
+    }
+  };
+
+  renderTooltip = node => {
+    const nodeFieldsValuePairStr = node.nodeProp
+      ? node.nodeProp.tables
+          .map(node => {
+            return Object.keys(node)
+              .map(fields => {
+                return `<p key=${fields}>${fields}: ${node[fields]}</p>`;
+              })
+              .join('');
+          })
+          .join('')
+      : '';
+
+    this.$tooltip.html(
+      `<p style="font-weight:600">Vertex Details</p> ${nodeFieldsValuePairStr}`,
+    );
   };
 
   handleResize = () => {
@@ -225,7 +250,7 @@ class NebulaGraph extends React.Component<IProps, IState> {
   };
 
   handleEdgesNameChange = showEdgeFields => {
-    const { edges } = this.props;
+    const { edges, updateShowingFields } = this.props;
     edges.forEach((edge: any) => {
       if (
         !showEdgeFields.includes(`${edge.type}.type`) &&
@@ -234,13 +259,13 @@ class NebulaGraph extends React.Component<IProps, IState> {
         showEdgeFields.splice(showEdgeFields.indexOf(`${edge.type}._rank`), 1);
       }
     });
-    this.setState({
+    updateShowingFields({
       showEdgeFields,
     });
   };
 
-  handleTgasNameChange = showTagFields => {
-    this.setState({
+  handleTagsNameChange = showTagFields => {
+    this.props.updateShowingFields({
       showTagFields,
     });
   };
@@ -254,8 +279,10 @@ class NebulaGraph extends React.Component<IProps, IState> {
       tags,
       edgeTypes,
       edgesFields,
+      showTagFields,
+      showEdgeFields,
     } = this.props;
-    const { width, height, showTagFields, showEdgeFields, isTags } = this.state;
+    const { width, height, isTags } = this.state;
     return (
       <div
         className="graph-wrap"
@@ -298,6 +325,8 @@ class NebulaGraph extends React.Component<IProps, IState> {
           onMouseOut={this.handleMouseOut}
           onSelectVertexes={this.handleSelectVertexes}
           onDblClickNode={this.props.asyncBidirectExpand}
+          onClickNode={this.fixTooltip}
+          onClickEmptySvg={this.hideTooltip}
           onD3Ref={this.props.onD3Ref}
         />
         <Modal
@@ -317,7 +346,7 @@ class NebulaGraph extends React.Component<IProps, IState> {
             showFields={isTags ? showTagFields : showEdgeFields}
             fields={isTags ? tagsFields : edgesFields}
             onNameChange={
-              isTags ? this.handleTgasNameChange : this.handleEdgesNameChange
+              isTags ? this.handleTagsNameChange : this.handleEdgesNameChange
             }
           />
         </Modal>
