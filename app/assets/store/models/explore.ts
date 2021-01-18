@@ -173,6 +173,8 @@ export const explore = createModel({
           vertexes: [],
           edges: [],
         },
+        showTagFields: [],
+        showEdgeFields: [],
       };
     },
   },

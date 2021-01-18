@@ -53,7 +53,7 @@ interface IState {
   width: number;
   height: number;
   isTags: boolean;
-  fixTooltip: boolean;
+  isFixToolTip: boolean;
 }
 
 interface IProps
@@ -72,7 +72,7 @@ class NebulaGraph extends React.Component<IProps, IState> {
       width: 0,
       height: 0,
       isTags: true,
-      fixTooltip: false,
+      isFixToolTip: false,
     };
   }
 
@@ -147,23 +147,23 @@ class NebulaGraph extends React.Component<IProps, IState> {
   fixTooltip = () => {
     this.$tooltip.style('display', 'block');
     this.setState({
-      fixTooltip: true,
+      isFixToolTip: true,
     });
   };
 
   hideTooltip = () => {
     this.$tooltip.style('display', 'none');
     this.setState({
-      fixTooltip: false,
+      isFixToolTip: false,
     });
   };
 
   handleMouseOut = () => {
-    const { fixTooltip } = this.state;
+    const { isFixToolTip } = this.state;
     const { selectVertexes } = this.props;
-    if (!fixTooltip) {
+    if (!isFixToolTip) {
       this.$tooltip.style('display', 'none');
-    } else if (fixTooltip && selectVertexes.length === 1) {
+    } else if (isFixToolTip && selectVertexes.length === 1) {
       this.renderTooltip(selectVertexes[0]);
     }
   };
