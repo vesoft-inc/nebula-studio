@@ -21,7 +21,10 @@ export default class OutputCsv extends React.PureComponent<IProps> {
       headers,
       ...tables.map(values => headers.map(field => values[field])),
     ]
-      .map(row => row.join(','))
+      .map(row =>
+        // HACK: waiting for use case if there need to check int or string
+        row.map(value => `"${value.toString().replace(/"/g, '""')}"`).join(','),
+      )
       .join('\n');
 
     if (!csv) {

@@ -503,7 +503,7 @@ class EditTag extends React.Component<IProps, IState> {
           if (editRow === index) {
             return (
               <Checkbox
-                value={editField!.allowNull}
+                checked={editField!.allowNull}
                 onChange={e =>
                   this.handleChangeValue('allowNull', e.target.checked)
                 }

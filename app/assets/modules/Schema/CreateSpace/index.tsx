@@ -53,10 +53,9 @@ function getVidType(type: string, length?: string) {
   let result: string | undefined;
   if (type === 'INT64') {
     result = type;
-  } else if (length) {
-    result = type + '(' + length + ')';
-  } else if (!length) {
-    result = type + '(8)';
+  } else if (type === 'FIXED_STRING') {
+    const _length = length || 8;
+    result = type + '(' + _length + ')';
   }
   return result;
 }
