@@ -442,7 +442,7 @@ export const explore = createModel({
           return {
             source: item[`${type}._src`],
             target: item[`${type}._dst`],
-            id: `${item[`${type}._src`]}->${item[`${type}._dst`]}@${
+            id: `${type} ${item[`${type}._src`]}->${item[`${type}._dst`]}@${
               item[`${type}._rank`]
             }`,
             type,
@@ -598,7 +598,7 @@ export const explore = createModel({
             return {
               source: item[`${type}._src`],
               target: item[`${type}._dst`],
-              id: `${item[`${type}._src`]}->${item[`${type}._dst`]}@${
+              id: `${type} ${item[`${type}._src`]}->${item[`${type}._dst`]}@${
                 item[`${type}._rank`]
               }`,
               type,
