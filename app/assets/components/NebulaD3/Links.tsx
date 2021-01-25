@@ -35,17 +35,6 @@ export default class Links extends React.Component<IProps, {}> {
     }
   }
 
-  generateId(link) {
-    const source = link.source.name || link.source;
-    const target = link.target.name || link.target;
-    return (
-      source +
-      link.type +
-      target +
-      link.edgeProp.tables[0][`${link.type}._rank`]
-    );
-  }
-
   linkRender(links) {
     d3.select(this.ref)
       .selectAll('path')

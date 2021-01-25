@@ -397,17 +397,6 @@ class NebulaD3 extends React.Component<IProps, IState> {
     }
   };
 
-  generateId(link) {
-    const source = link.source.name || link.source;
-    const target = link.target.name || link.target;
-    return (
-      source +
-      link.type +
-      target +
-      link.edgeProp.tables[0][`${link.type}._rank`]
-    );
-  }
-
   handleUpdataLinks = () => {
     if (this.force) {
       this.link = d3.selectAll('.link').attr('marker-end', 'url(#marker)');
@@ -468,7 +457,6 @@ class NebulaD3 extends React.Component<IProps, IState> {
 
   isIncludeField = (node, field) => {
     let isInclude = false;
-    // TODO keep the structure of match vertex and edge api consisitent
     if (node.nodeProp && node.nodeProp.properties) {
       const properties = node.nodeProp.properties;
       isInclude = Object.keys(properties).some(v => {
@@ -476,11 +464,6 @@ class NebulaD3 extends React.Component<IProps, IState> {
         return Object.keys(valueObj).some(
           nodeField => field === v + '.' + nodeField,
         );
-      });
-    } else {
-      const props = node.nodeProp || node.edgeProp;
-      isInclude = props.tables.some(v => {
-        return Object.keys(v).some(nodeField => nodeField === field);
       });
     }
     return isInclude;
@@ -491,21 +474,17 @@ class NebulaD3 extends React.Component<IProps, IState> {
     const edgeText: any = [];
     if (showEdgeFields.includes(`${edge.type}.type`)) {
       if (showEdgeFields.includes(`${edge.type}._rank`)) {
-        edgeText.push(
-          `${edge.type}@${edge.edgeProp.tables[0][`${edge.type}._rank`]}`,
-        );
+        edgeText.push(`${edge.type}@${edge.rank}`);
       } else {
         edgeText.push(edge.type);
       }
     }
 
     showEdgeFields.forEach(field => {
-      edge.edgeProp.tables.forEach(e => {
-        Object.keys(e).forEach(edgeField => {
-          if (edgeField === field && field !== `${edge.type}._rank`) {
-            edgeText.push(`${e[edgeField]}`);
-          }
-        });
+      Object.keys(edge.edgeProp.properties).forEach(property => {
+        if (field === `${edge.type}.${property}`) {
+          edgeText.push(edge.edgeProp.properties[property]);
+        }
       });
     });
     return edgeText;

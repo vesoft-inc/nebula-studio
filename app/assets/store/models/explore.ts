@@ -317,16 +317,14 @@ export const explore = createModel({
         });
         _edges = res.tables.map(item => {
           const edgeProp = {
-            headers: res.headers,
-            tables: [item],
+            properties: item.properties,
           };
           return {
-            source: item[`${type}._src`],
-            target: item[`${type}._dst`],
-            id: `${item[`${type}._src`]}->${item[`${type}._dst`]}@${
-              item[`${type}._rank`]
-            }`,
+            source: item.srcID,
+            target: item.dstID,
+            id: `${type} ${item.srcID}->${item.dstID} @${item.rank}`,
             type,
+            rank: item.rank,
             edgeProp,
             uuid: uuidv4(),
           };
@@ -474,16 +472,14 @@ export const explore = createModel({
           });
           const _edges = res.tables.map(item => {
             const edgeProp = {
-              headers: res.headers,
-              tables: [item],
+              properties: item.properties,
             };
             return {
-              source: item[`${type}._src`],
-              target: item[`${type}._dst`],
-              id: `${item[`${type}._src`]}->${item[`${type}._dst`]}@${
-                item[`${type}._rank`]
-              }`,
+              source: item.srcID,
+              target: item.dstID,
+              id: `${type} ${item.srcID}->${item.dstID} @${item.rank}`,
               type,
+              rank: item.rank,
               edgeProp,
               uuid: uuidv4(),
             };

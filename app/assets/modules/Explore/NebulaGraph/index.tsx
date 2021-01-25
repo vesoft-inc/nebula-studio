@@ -126,17 +126,13 @@ class NebulaGraph extends React.Component<IProps, IState> {
   };
 
   handleMouseInLink = link => {
-    const edgeFieldsValuePairStr = link.edgeProp
-      ? link.edgeProp.tables
-          .map(link => {
-            return Object.keys(link)
-              .map(attribute => {
-                return `<p key=${attribute}>${attribute}: ${link[attribute]}</p>`;
-              })
-              .join('');
-          })
-          .join('')
-      : '';
+    const properties = link.edgeProp ? link.edgeProp.properties : {};
+    const edgeFieldsValuePairStr = Object.keys(properties)
+      .map(property => {
+        const value = properties[property];
+        return `<p key=${property}>${link.type}.${property}: ${value}</p>`;
+      })
+      .join('');
     this.$tooltip
       .html(
         `<p style="font-weight:600">Edge Details</p> <p>id: ${link.id}</p> ${edgeFieldsValuePairStr}`,
