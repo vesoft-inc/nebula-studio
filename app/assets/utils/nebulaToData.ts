@@ -1,5 +1,7 @@
 import _ from 'lodash';
 
+import { convertBigNumberToString } from '#assets/utils/function';
+
 export function nebulaToData(
   table: any[],
   edgeTypes: string[],
@@ -16,8 +18,8 @@ export function nebulaToData(
         switch (direction) {
           case 'incoming':
             result.edges.push({
-              source: data[`${type}DestId`],
-              target: data[`${type}SourceId`],
+              source: convertBigNumberToString(data[`${type}DestId`]),
+              target: convertBigNumberToString(data[`${type}SourceId`]),
               // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
               id: `${data[`${type}DestId`]}->${data[`${type}SourceId`]}@${
                 data[`${type}Rank`]
@@ -27,8 +29,8 @@ export function nebulaToData(
             break;
           default:
             result.edges.push({
-              source: data[`${type}SourceId`],
-              target: data[`${type}DestId`],
+              source: convertBigNumberToString(data[`${type}SourceId`]),
+              target: convertBigNumberToString(data[`${type}DestId`]),
               // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
               id: `${data[`${type}SourceId`]}->${data[`${type}DestId`]}@${
                 data[`${type}Rank`]

@@ -1,4 +1,5 @@
 import { Alert, Button, Icon, Table, Tabs } from 'antd';
+import { BigNumber } from 'bignumber.js';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
@@ -107,7 +108,7 @@ class OutputBox extends React.Component<IProps> {
                 return value.toString();
               } else if (
                 typeof value === 'number' ||
-                typeof value === 'bigint'
+                BigNumber.isBigNumber(value)
               ) {
                 return value.toString();
               }

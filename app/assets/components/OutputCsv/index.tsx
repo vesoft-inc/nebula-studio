@@ -26,7 +26,6 @@ export default class OutputCsv extends React.PureComponent<IProps> {
         row.map(value => `"${value.toString().replace(/"/g, '""')}"`).join(','),
       )
       .join('\n');
-
     if (!csv) {
       return '';
     }

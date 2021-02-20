@@ -11,6 +11,7 @@ import {
   fetchVertexProps,
   fetchVertexPropsWithIndex,
 } from '#assets/utils/fetch';
+import { convertBigNumberToString } from '#assets/utils/function';
 import { getExploreGQL } from '#assets/utils/gql';
 import { idToString, nebulaToData, setLink } from '#assets/utils/nebulaToData';
 
@@ -169,13 +170,14 @@ export const explore = createModel({
       });
       const edges = _.uniqBy([...originEdges, ...addEdges], e => e.id);
       setLink(edges);
-      const vertexes = _.uniqBy(
-        [...originVertexes, ...addVertexes],
-        v => v.name,
+      const vertexes = _.uniqBy([...originVertexes, ...addVertexes], v =>
+        convertBigNumberToString(v.name),
       );
       actionData.push({
         type: 'ADD',
-        vertexes: _.differenceBy(addVertexes, originVertexes, v => v.name),
+        vertexes: _.differenceBy(addVertexes, originVertexes, v =>
+          convertBigNumberToString(v.name),
+        ),
         edges: _.differenceBy(
           addEdges,
           originEdges,
@@ -369,7 +371,9 @@ export const explore = createModel({
               useHash,
             })
           : [];
-      return _.uniqBy(vertexes, 'name').filter(i => i !== undefined);
+      return _.uniqBy(vertexes, (i: any) =>
+        convertBigNumberToString(i.name),
+      ).filter(i => i !== undefined);
     },
 
     // check if vertex exist
@@ -440,8 +444,8 @@ export const explore = createModel({
             tables: [item],
           };
           return {
-            source: item[`${type}._src`],
-            target: item[`${type}._dst`],
+            source: convertBigNumberToString(item[`${type}._src`]),
+            target: convertBigNumberToString(item[`${type}._dst`]),
             id: `${type} ${item[`${type}._src`]}->${item[`${type}._dst`]}@${
               item[`${type}._rank`]
             }`,
@@ -561,9 +565,11 @@ export const explore = createModel({
       const newVertexes = _.differenceBy(
         vertexes,
         originVertexes,
-        (vertex: any) => vertex.name,
+        (vertex: any) => convertBigNumberToString(vertex.name),
       );
-      const newIds = _.uniq(newVertexes.map((i: any) => i.name));
+      const newIds = _.uniq(
+        newVertexes.map((i: any) => convertBigNumberToString(i.name)),
+      );
       const _newVertexes =
         newIds.length > 0
           ? await this.asyncGetVertexes({
@@ -596,8 +602,8 @@ export const explore = createModel({
               tables: [item],
             };
             return {
-              source: item[`${type}._src`],
-              target: item[`${type}._dst`],
+              source: convertBigNumberToString(item[`${type}._src`]),
+              target: convertBigNumberToString(item[`${type}._dst`]),
               id: `${type} ${item[`${type}._src`]}->${item[`${type}._dst`]}@${
                 item[`${type}._rank`]
               }`,

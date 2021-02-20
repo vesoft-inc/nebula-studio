@@ -9,7 +9,7 @@ const service = axios.create({
   transformResponse: [
     data => {
       try {
-        const _data = JSONBigint({ useNativeBigInt: true }).parse(data);
+        const _data = JSONBigint.parse(data);
         return _data;
       } catch (err) {
         return JSON.parse(data);
