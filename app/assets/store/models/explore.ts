@@ -11,7 +11,10 @@ import {
   fetchVertexProps,
   fetchVertexPropsWithIndex,
 } from '#assets/utils/fetch';
-import { handleVidStringName } from '#assets/utils/function';
+import {
+  convertBigNumberToString,
+  handleVidStringName,
+} from '#assets/utils/function';
 import { getExploreGQL } from '#assets/utils/gql';
 import { nebulaToData, setLink } from '#assets/utils/nebulaToData';
 
@@ -136,13 +139,14 @@ export const explore = createModel({
       });
       const edges = _.uniqBy([...originEdges, ...addEdges], e => e.id);
       setLink(edges);
-      const vertexes = _.uniqBy(
-        [...originVertexes, ...addVertexes],
-        v => v.name,
+      const vertexes = _.uniqBy([...originVertexes, ...addVertexes], v =>
+        convertBigNumberToString(v.name),
       );
       actionData.push({
         type: 'ADD',
-        vertexes: _.differenceBy(addVertexes, originVertexes, v => v.name),
+        vertexes: _.differenceBy(addVertexes, originVertexes, v =>
+          convertBigNumberToString(v.name),
+        ),
         edges: _.differenceBy(
           addEdges,
           originEdges,
@@ -179,15 +183,21 @@ export const explore = createModel({
     },
   },
   effects: () => ({
-    async asyncGetVertexes(payload: {
-      ids: string[];
-      expand?: {
-        vertexColor: string;
-        exploreStep;
-      };
-    }) {
+    async asyncGetVertexes(
+      payload: {
+        ids: string[];
+        expand?: {
+          vertexColor: string;
+          exploreStep;
+        };
+      },
+      rootState,
+    ) {
       const { ids, expand } = payload;
-      const res = await fetchVertexProps({ ids });
+      const {
+        nebula: { spaceVidType },
+      } = rootState;
+      const res = await fetchVertexProps({ ids, spaceVidType });
       const newVertexes = res.code === 0 ? getTagData(res.data, expand) : [];
       return newVertexes;
     },
@@ -285,33 +295,40 @@ export const explore = createModel({
 
     async asyncGetExploreVertex(payload: { ids: string[] }) {
       const { ids } = payload;
-      const _ids = _.uniq(ids);
+      const _ids = _.uniqBy(ids, i => convertBigNumberToString(i));
       const vertexes: any =
         _ids.length > 0
           ? await this.asyncGetVertexes({
               ids: _ids,
             })
           : [];
-      const newIds = vertexes.map(i => i.name);
-      if (newIds.length !== _ids.length) {
-        const notExistIds = _.xor(newIds, _ids);
+      const newIds = vertexes.map(i => convertBigNumberToString(i.name));
+      const _convertIds = _ids.map(i => convertBigNumberToString(i));
+      if (newIds.length !== _convertIds.length) {
+        const notExistIds = _.xor(newIds, _convertIds);
         message.warning(
           `${notExistIds.join(', ')}${intl.get('import.notExist')}`,
         );
       }
-      return _.uniqBy(vertexes, 'name').filter(i => i !== undefined);
+      return _.uniqBy(vertexes, (i: any) =>
+        convertBigNumberToString(i.name),
+      ).filter(i => i !== undefined);
     },
 
-    async asyncGetExploreEdge(edgeList: IExportEdge[]) {
+    async asyncGetExploreEdge(edgeList: IExportEdge[], rootState) {
       let _edges = [];
       if (edgeList.length > 0) {
         const type = edgeList[0].edgeType;
+        const {
+          nebula: { spaceVidType },
+        } = rootState;
         const res = await fetchEdgeProps({
           idRoutes: edgeList.map(
             i =>
-              `${handleVidStringName(i.srcId)}->${handleVidStringName(
-                i.dstId,
-              )}@${i.rank}`,
+              `${handleVidStringName(
+                i.srcId,
+                spaceVidType,
+              )}->${handleVidStringName(i.dstId, spaceVidType)}@${i.rank}`,
           ),
           type,
         });
@@ -320,8 +337,8 @@ export const explore = createModel({
             properties: item.properties,
           };
           return {
-            source: item.srcID,
-            target: item.dstID,
+            source: convertBigNumberToString(item.srcID),
+            target: convertBigNumberToString(item.dstID),
             id: `${type} ${item.srcID}->${item.dstID} @${item.rank}`,
             type,
             rank: item.rank,
@@ -379,16 +396,19 @@ export const explore = createModel({
       });
     },
 
-    async asyncGetExpandData(payload: {
-      selectVertexes: any[];
-      edgeTypes: string[];
-      edgesFields?: any[];
-      edgeDirection: string;
-      filters?: any[];
-      exploreStep?: number;
-      vertexColor?: string;
-      quantityLimit?: number | null;
-    }) {
+    async asyncGetExpandData(
+      payload: {
+        selectVertexes: any[];
+        edgeTypes: string[];
+        edgesFields?: any[];
+        edgeDirection: string;
+        filters?: any[];
+        exploreStep?: number;
+        vertexColor?: string;
+        quantityLimit?: number | null;
+      },
+      rootState,
+    ) {
       const {
         selectVertexes,
         edgeTypes,
@@ -396,12 +416,16 @@ export const explore = createModel({
         filters,
         quantityLimit,
       } = payload;
+      const {
+        nebula: { spaceVidType },
+      } = rootState;
       const gql = getExploreGQL({
         selectVertexes,
         edgeTypes,
         edgeDirection,
         filters,
         quantityLimit,
+        spaceVidType,
       });
       const { code, data, message: errMsg } = (await service.execNGQL({
         gql,
@@ -411,6 +435,7 @@ export const explore = createModel({
           data.tables,
           edgeTypes,
           edgeDirection,
+          spaceVidType,
         );
         return {
           vertexes,
@@ -441,9 +466,11 @@ export const explore = createModel({
       const newVertexes = _.differenceBy(
         vertexes,
         originVertexes,
-        (vertex: any) => vertex.name,
+        (vertex: any) => convertBigNumberToString(vertex.name),
       );
-      const newIds = _.uniq(newVertexes.map((i: any) => i.name));
+      const newIds = _.uniq(
+        newVertexes.map((i: any) => convertBigNumberToString(i.name)),
+      );
       const _newVertexes =
         newIds.length > 0
           ? await this.asyncGetVertexes({
@@ -475,8 +502,8 @@ export const explore = createModel({
               properties: item.properties,
             };
             return {
-              source: item.srcID,
-              target: item.dstID,
+              source: convertBigNumberToString(item.srcID),
+              target: convertBigNumberToString(item.dstID),
               id: `${type} ${item.srcID}->${item.dstID} @${item.rank}`,
               type,
               rank: item.rank,

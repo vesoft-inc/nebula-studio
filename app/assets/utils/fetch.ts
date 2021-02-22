@@ -43,9 +43,12 @@ export async function fetchVertexPropsWithIndex(payload: {
   return { code, data, message };
 }
 
-export async function fetchVertexProps(payload: { ids: string[] }) {
-  const { ids } = payload;
-  const _ids = ids.map(id => handleVidStringName(id)).join(', ');
+export async function fetchVertexProps(payload: {
+  ids: string[];
+  spaceVidType: string;
+}) {
+  const { ids, spaceVidType } = payload;
+  const _ids = ids.map(id => handleVidStringName(id, spaceVidType)).join(', ');
   const gql = `MATCH (n) WHERE id(n) IN [${_ids}] RETURN n`;
   const { data, code, message } = (await service.execNGQL({
     gql,

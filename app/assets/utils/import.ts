@@ -184,7 +184,7 @@ export function createTaskID(instanceId: string) {
 }
 
 export function getGQLByConfig(payload) {
-  const { vertexesConfig, edgesConfig } = payload;
+  const { vertexesConfig, edgesConfig, spaceVidType } = payload;
   const NGQL: string[] = [];
   vertexesConfig.forEach(vertexConfig => {
     if (vertexConfig.idMapping === null) {
@@ -222,6 +222,7 @@ export function getGQLByConfig(payload) {
             '`' +
             `(${tagField}) VALUES ${handleVidStringName(
               columns[vertexConfig.idMapping],
+              spaceVidType,
             )}:(${values})`,
         );
       });
@@ -267,8 +268,10 @@ export function getGQLByConfig(payload) {
           '`' +
           `(${edgeField.join(',')}) VALUES ${handleVidStringName(
             columns[edgeConfig.props[0].mapping],
+            spaceVidType,
           )} -> ${handleVidStringName(
             columns[edgeConfig.props[1].mapping],
+            spaceVidType,
           )} ${rank}:(${values})`,
       );
     });

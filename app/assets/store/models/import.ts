@@ -357,15 +357,22 @@ export const importData = createModel({
       return errCode;
     },
 
-    async asyncTestDataMapping(payload: {
-      vertexesConfig: any[];
-      edgesConfig: any[];
-      activeStep: number;
-    }) {
+    async asyncTestDataMapping(
+      payload: {
+        vertexesConfig: any[];
+        edgesConfig: any[];
+        activeStep: number;
+      },
+      rootState,
+    ) {
       const { vertexesConfig, edgesConfig, activeStep } = payload;
+      const {
+        nebula: { spaceVidType },
+      } = rootState;
       const configInfo = {
         vertexesConfig: activeStep === 2 ? vertexesConfig : [],
         edgesConfig: activeStep === 3 ? edgesConfig : [],
+        spaceVidType,
       };
       try {
         const gql: string = getGQLByConfig(configInfo).join(';');

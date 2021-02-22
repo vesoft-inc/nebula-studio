@@ -1,4 +1,5 @@
 import { Alert, Button, Icon, Table, Tabs } from 'antd';
+import { BigNumber } from 'bignumber.js';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
@@ -6,19 +7,24 @@ import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { Modal, OutputCsv } from '#assets/components';
-import { IDispatch } from '#assets/store';
+import { IDispatch, IRootState } from '#assets/store';
 import { handleVidStringName } from '#assets/utils/function';
 
 import Export from './Export';
 import './index.less';
 
-interface IProps extends ReturnType<typeof mapDispatch>, RouteComponentProps {
+interface IProps
+  extends ReturnType<typeof mapState>,
+    ReturnType<typeof mapDispatch>,
+    RouteComponentProps {
   value: string;
   result: any;
   onHistoryItem: (value: string) => void;
 }
 
-const mapState = () => ({});
+const mapState = (state: IRootState) => ({
+  spaceVidType: state.nebula.spaceVidType,
+});
 
 const mapDispatch = (dispatch: IDispatch) => ({
   updatePreloadData: data =>
@@ -74,6 +80,7 @@ class OutputBox extends React.Component<IProps> {
   parseSubGraph = data => {
     const vertexes: any = [];
     const edges: any = [];
+    const { spaceVidType } = this.props;
     data.forEach(row => {
       const { _edges_info: edgeList, _vertices_info: vertexList } = row;
       vertexList.forEach(vertex => {
@@ -86,9 +93,10 @@ class OutputBox extends React.Component<IProps> {
           dstId,
           edgeType,
           rank,
-          id: `${edgeType} ${handleVidStringName(srcId)}->${handleVidStringName(
-            dstId,
-          )}@${rank}}`,
+          id: `${edgeType} ${handleVidStringName(
+            srcId,
+            spaceVidType,
+          )}->${handleVidStringName(dstId, spaceVidType)}@${rank}}`,
         });
       });
     });
@@ -96,6 +104,7 @@ class OutputBox extends React.Component<IProps> {
   };
 
   parsePathToGraph = data => {
+    const { spaceVidType } = this.props;
     const vertexes: any = [];
     const edges: any = [];
     const relationships = data.map(i => i.relationships).flat();
@@ -113,9 +122,10 @@ class OutputBox extends React.Component<IProps> {
         dstId,
         edgeType,
         rank,
-        id: `${edgeType} ${handleVidStringName(srcId)}->${handleVidStringName(
-          dstId,
-        )}@${rank}}`,
+        id: `${edgeType} ${handleVidStringName(
+          srcId,
+          spaceVidType,
+        )}->${handleVidStringName(dstId, spaceVidType)}@${rank}}`,
       });
     });
     return { vertexes, edges };
@@ -144,7 +154,7 @@ class OutputBox extends React.Component<IProps> {
                 return value.toString();
               } else if (
                 typeof value === 'number' ||
-                typeof value === 'bigint'
+                BigNumber.isBigNumber(value)
               ) {
                 return value.toString();
               }

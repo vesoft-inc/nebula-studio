@@ -23,6 +23,7 @@ export const getExploreGQL = (params: {
   edgeDirection?: string;
   filters?: any[];
   quantityLimit?: number | null;
+  spaceVidType: string;
 }) => {
   const {
     selectVertexes,
@@ -30,6 +31,7 @@ export const getExploreGQL = (params: {
     edgeDirection,
     filters,
     quantityLimit,
+    spaceVidType,
   } = params;
   const wheres = filters
     ? filters
@@ -47,7 +49,7 @@ export const getExploreGQL = (params: {
   }
   const gql =
     `GO FROM 
-  ${selectVertexes.map(i => handleVidStringName(i.name))}
+  ${selectVertexes.map(i => handleVidStringName(i.name, spaceVidType))}
 OVER
   ` +
     '`' +

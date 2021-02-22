@@ -27,6 +27,7 @@ const Panel = Collapse.Panel;
 const mapState = (state: IRootState) => ({
   edgeTypes: state.nebula.edgeTypes,
   edgesFields: state.nebula.edgesFields,
+  spaceVidType: state.nebula.spaceVidType,
   selectVertexes: state.explore.selectVertexes,
   exploreStep: state.explore.step,
   exploreRules: state.explore.exploreRules,
@@ -141,6 +142,7 @@ class Expand extends React.Component<IProps, IState> {
       exploreRules: rules,
       selectVertexes,
       getExpandLoading,
+      spaceVidType,
     } = this.props;
     const { getFieldDecorator, getFieldValue } = this.props.form;
     const { filters } = this.state;
@@ -155,6 +157,7 @@ class Expand extends React.Component<IProps, IState> {
             filters,
             edgeDirection,
             quantityLimit,
+            spaceVidType,
           })
         : '';
     const columns = [

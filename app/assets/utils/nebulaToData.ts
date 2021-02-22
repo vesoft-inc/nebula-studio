@@ -1,11 +1,15 @@
 import _ from 'lodash';
 
-import { handleVidStringName } from '#assets/utils/function';
+import {
+  convertBigNumberToString,
+  handleVidStringName,
+} from '#assets/utils/function';
 
 export function nebulaToData(
   table: any[],
   edgeTypes: string[],
   direction: string,
+  spaceVidType: string,
 ) {
   return table.reduce(
     (result, data) => {
@@ -13,13 +17,16 @@ export function nebulaToData(
         if (data[`${type}DestId`] === '_EMPTY_') {
           return;
         }
-        const destId = handleVidStringName(data[`${type}DestId`]);
-        const sourceId = handleVidStringName(data[`${type}SourceId`]);
+        const destId = handleVidStringName(data[`${type}DestId`], spaceVidType);
+        const sourceId = handleVidStringName(
+          data[`${type}SourceId`],
+          spaceVidType,
+        );
         switch (direction) {
           case 'incoming':
             result.edges.push({
-              source: data[`${type}DestId`],
-              target: data[`${type}SourceId`],
+              source: convertBigNumberToString(data[`${type}DestId`]),
+              target: convertBigNumberToString(data[`${type}SourceId`]),
               // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
               id: `${destId}->${sourceId}@${data[`${type}Rank`]}`,
               type,
@@ -27,8 +34,8 @@ export function nebulaToData(
             break;
           default:
             result.edges.push({
-              source: data[`${type}SourceId`],
-              target: data[`${type}DestId`],
+              source: convertBigNumberToString(data[`${type}SourceId`]),
+              target: convertBigNumberToString(data[`${type}DestId`]),
               // Each edge can be uniquely identified by a tuple <src_vid, dst_vid, edge_type, rank>
               id: `${sourceId}->${destId}@${data[`${type}Rank`]}`,
               type,

@@ -17,6 +17,7 @@ import { trackEvent } from '#assets/utils/stat';
 interface IState {
   spaces: string[];
   currentSpace: string;
+  spaceVidType: string;
   edgeTypes: string[];
   host: string;
   username: string;
@@ -99,6 +100,7 @@ export const nebula = createModel({
     password: cookies.get('np'),
     spaces: [],
     currentSpace: '',
+    spaceVidType: '',
     edgeTypes: [],
     tags: [],
     tagsFields: [],
@@ -288,8 +290,14 @@ export const nebula = createModel({
       })) as any;
 
       if (code === 0) {
+        const { data } = await dispatch.nebula.asyncGetSpaceInfo(space);
+        let spaceVidType = 'FIXED_STRING(8)';
+        if (data && data.tables && data.tables[0]) {
+          spaceVidType = data.tables[0]['Vid Type'];
+        }
         this.update({
           currentSpace: space,
+          spaceVidType,
         });
       }
     },
