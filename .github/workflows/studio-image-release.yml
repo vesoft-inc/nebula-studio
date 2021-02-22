@@ -2,7 +2,7 @@ name: Client-Image-Release
 on:
   push:
     branches:
-      - master-v1
+      - v1
 
 jobs:
   release-image:
