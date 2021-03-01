@@ -58,7 +58,8 @@
     "index": "Index",
     "list": "List",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "graph": "Graph"
   },
   "NGQLOutput": {
     "success": "Execution successful!"

@@ -58,7 +58,8 @@
     "index": "索引",
     "list": "列表",
     "yes": "确定",
-    "no": "取消"
+    "no": "取消",
+    "graph": "可视化"
   },
   "warning": {
     "configServer": "请先配置服务器",

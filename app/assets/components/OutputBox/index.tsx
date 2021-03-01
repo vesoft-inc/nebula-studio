@@ -9,8 +9,10 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { Modal, OutputCsv } from '#assets/components';
 import { IDispatch, IRootState } from '#assets/store';
 import { handleVidStringName } from '#assets/utils/function';
+import { trackEvent } from '#assets/utils/stat';
 
 import Export from './Export';
+import Graphviz from './Graphviz';
 import './index.less';
 
 interface IProps
@@ -131,6 +133,9 @@ class OutputBox extends React.Component<IProps> {
     return { vertexes, edges };
   };
 
+  handleTabChange = async key => {
+    trackEvent('console', `change_tab_${key}`);
+  };
   render() {
     const { value, result = {} } = this.props;
     let columns = [];
@@ -180,7 +185,12 @@ class OutputBox extends React.Component<IProps> {
           type={this.outputClass(result.code)}
         />
         <div className="tab-container">
-          <Tabs defaultActiveKey={'log'} size={'large'} tabPosition={'left'}>
+          <Tabs
+            defaultActiveKey={'log'}
+            size={'large'}
+            tabPosition={'left'}
+            onChange={this.handleTabChange}
+          >
             {result.code === 0 && (
               <Tabs.TabPane
                 tab={
@@ -214,6 +224,19 @@ class OutputBox extends React.Component<IProps> {
                   dataSource={dataSource}
                   rowKey={(_, index) => index.toString()}
                 />
+              </Tabs.TabPane>
+            )}
+            {result.code === 0 && result.data.headers[0] === 'format' && (
+              <Tabs.TabPane
+                tab={
+                  <>
+                    <Icon type="share-alt" />
+                    {intl.get('common.graph')}
+                  </>
+                }
+                key="graph"
+              >
+                {<Graphviz graph={dataSource[0].format} />}
               </Tabs.TabPane>
             )}
             {result.code !== 0 && (

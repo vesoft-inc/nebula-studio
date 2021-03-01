@@ -1,6 +1,6 @@
 {
   "name": "nebula-graph-studio",
-  "version": "2.1.6-beta",
+  "version": "2.1.7-beta",
   "description": "nebula-graph-studio",
   "private": true,
   "egg": {
@@ -35,6 +35,7 @@
     "codemirror": "^5.49.0",
     "csvtojson": "^2.0.10",
     "d3": "^5.12.0",
+    "d3-graphviz": "^2.6.1",
     "egg": "^2.6.1",
     "egg-scripts": "^2.6.0",
     "egg-view-assets": "^1.4.0",
