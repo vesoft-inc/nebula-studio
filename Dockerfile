@@ -1,9 +1,10 @@
-FROM node:10-alpine as builder
+FROM node:12-alpine as builder
 # Set the working directory to /app
 WORKDIR /nebula-graph-studio
 # Copy the current directory contents into the container at /app
 COPY package.json /nebula-graph-studio/
 COPY .npmrc /nebula-graph-studio/
+
 # Install any needed packages
 RUN npm install
 COPY . /nebula-graph-studio/
@@ -12,7 +13,7 @@ COPY . /nebula-graph-studio/
 RUN npm run build && npm run tsc && rm -rf app/assets/*
 COPY ./app/assets/index.html  /nebula-graph-studio/app/assets/
 
-FROM node:10-alpine
+FROM node:12-alpine
  # Make port available to the world outside this container
 
 WORKDIR /nebula-graph-studio
