@@ -11,6 +11,7 @@ export default (app: Application) => {
   router.get('/api/app', controller.home.getAppInfo);
 
   // file
+  router.resources('testFile', '/api/test/files', controller.testFiles);
   router.resources('file', '/api/files', controller.files);
   router.post('/api/files/upload', controller.files.upload);
   if (1) {

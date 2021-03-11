@@ -30,7 +30,6 @@ export default class SelectIds extends React.Component<IProps, {}> {
   }
 
   rectRender(nodes) {
-    const { scale } = this.props;
     const selectStartPosition = {
       x: 0,
       y: 0,
@@ -44,28 +43,16 @@ export default class SelectIds extends React.Component<IProps, {}> {
 
     d3.select('#output-graph')
       .on('mousedown', () => {
-        selectStartPosition.x = d3.event.offsetX * (1 + scale);
-        selectStartPosition.y = d3.event.offsetY * (1 + scale);
+        selectStartPosition.x = d3.event.offsetX;
+        selectStartPosition.y = d3.event.offsetY;
       })
       .on('mousemove', () => {
         if (selectStartPosition.x !== 0) {
           rect
-            .attr(
-              'x',
-              Math.min(d3.event.offsetX * (1 + scale), selectStartPosition.x),
-            )
-            .attr(
-              'y',
-              Math.min(d3.event.offsetY * (1 + scale), selectStartPosition.y),
-            )
-            .attr(
-              'width',
-              Math.abs(d3.event.offsetX * (1 + scale) - selectStartPosition.x),
-            )
-            .attr(
-              'height',
-              Math.abs(d3.event.offsetY * (1 + scale) - selectStartPosition.y),
-            );
+            .attr('x', Math.min(d3.event.offsetX, selectStartPosition.x))
+            .attr('y', Math.min(d3.event.offsetY, selectStartPosition.y))
+            .attr('width', Math.abs(d3.event.offsetX - selectStartPosition.x))
+            .attr('height', Math.abs(d3.event.offsetY - selectStartPosition.y));
         }
       })
       .on('mouseup', () => {
@@ -80,10 +67,10 @@ export default class SelectIds extends React.Component<IProps, {}> {
 
   isNotSelected(nodePoint, selectStartPosition) {
     const { scale, offsetX, offsetY } = this.props;
-    const x = nodePoint.x + offsetX;
-    const y = nodePoint.y + offsetY;
-    const selectEndPositionX = d3.event.offsetX * (1 + scale);
-    const selectEndPositionY = d3.event.offsetY * (1 + scale);
+    const x = nodePoint.x * scale + offsetX;
+    const y = nodePoint.y * scale + offsetY;
+    const selectEndPositionX = d3.event.offsetX;
+    const selectEndPositionY = d3.event.offsetY;
     if (
       (x > selectStartPosition.x && x > selectEndPositionX) ||
       (x < selectStartPosition.x && x < selectEndPositionX) ||

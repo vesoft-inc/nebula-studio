@@ -6,6 +6,7 @@ import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
 import { Modal, NebulaD3 } from '#assets/components';
+import { MAX_SCALE, MIN_SCALE } from '#assets/config/explore';
 import { IDispatch, IRootState } from '#assets/store';
 import { IEdge, INode } from '#assets/store/models';
 
@@ -277,6 +278,7 @@ class NebulaGraph extends React.Component<IProps, IState> {
       edgesFields,
       showTagFields,
       showEdgeFields,
+      selectVertexes,
     } = this.props;
     const { width, height, isTags } = this.state;
     return (
@@ -310,6 +312,7 @@ class NebulaGraph extends React.Component<IProps, IState> {
         <NebulaD3
           width={width}
           height={height}
+          selectedNodes={selectVertexes}
           showTagFields={showTagFields}
           showEdgeFields={showEdgeFields}
           data={{
@@ -324,6 +327,8 @@ class NebulaGraph extends React.Component<IProps, IState> {
           onClickNode={this.fixTooltip}
           onClickEmptySvg={this.hideTooltip}
           onD3Ref={this.props.onD3Ref}
+          minScale={MIN_SCALE}
+          maxScale={MAX_SCALE}
         />
         <Modal
           wrapClassName="graph-setting"

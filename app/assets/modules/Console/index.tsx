@@ -1,4 +1,4 @@
-import { Icon, List, message, Modal, Tooltip } from 'antd';
+import { Button, Icon, List, message, Modal, Tooltip } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
@@ -92,6 +92,13 @@ class Console extends React.Component<IProps, IState> {
 
   handleHistoryItem = (value: string) => {
     this.props.updateCurrentGQL(value);
+    this.setState({
+      history: false,
+    });
+  };
+
+  handleEmptyNgqlHistory = () => {
+    localStorage.setItem('history', 'null');
     this.setState({
       history: false,
     });
@@ -201,7 +208,16 @@ class Console extends React.Component<IProps, IState> {
           />
         </div>
         <Modal
-          title={intl.get('common.NGQLHistoryList')}
+          title={
+            <div>
+              <span className="history-title">
+                {intl.get('common.NGQLHistoryList')}
+              </span>
+              <Button type="link" onClick={this.handleEmptyNgqlHistory}>
+                {intl.get('console.deleteHistory')}
+              </Button>
+            </div>
+          }
           visible={history}
           className="historyList"
           footer={null}

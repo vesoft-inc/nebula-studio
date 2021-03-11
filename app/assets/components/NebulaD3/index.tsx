@@ -1,4 +1,4 @@
-import { message, Slider } from 'antd';
+import { Button, Icon, message } from 'antd';
 import * as d3 from 'd3';
 import { saveAs } from 'file-saver';
 import * as React from 'react';
@@ -26,6 +26,7 @@ interface IProps {
   };
   showTagFields: string[];
   showEdgeFields: string[];
+  selectedNodes: INode[];
   onSelectVertexes: (vertexes: INode[]) => void;
   onMouseInNode: (node: INode) => void;
   onMouseOut: () => void;
@@ -34,6 +35,8 @@ interface IProps {
   onClickNode: () => void;
   onClickEmptySvg: () => void;
   onD3Ref: any;
+  minScale: number;
+  maxScale: number;
 }
 
 function save(dataBlob, _filesize) {
@@ -111,12 +114,12 @@ interface IState {
   offsetX: number;
   offsetY: number;
   scale: number;
-  selectedNodes: INode[];
+  isZoom: boolean;
 }
 class NebulaD3 extends React.Component<IProps, IState> {
   ctrls: IRefs = {};
   nodeRef: SVGCircleElement;
-  circleRef: SVGCircleElement;
+  canvasBoardRef: SVGCircleElement;
   force: any;
   svg: any;
   node: any;
@@ -128,8 +131,8 @@ class NebulaD3 extends React.Component<IProps, IState> {
     this.state = {
       offsetX: 0,
       offsetY: 0,
-      scale: 0,
-      selectedNodes: [],
+      scale: 1,
+      isZoom: false,
     };
   }
 
@@ -162,25 +165,24 @@ class NebulaD3 extends React.Component<IProps, IState> {
     });
   }
 
+  componentDidUpdate() {
+    const { data, selectedNodes } = this.props;
+    this.handleUpdataNodes(data.vertexes, selectedNodes);
+  }
+
   handleNodeClick = (d: any) => {
     const event = d3.event;
-    const { selectedNodes } = this.state;
+    const { selectedNodes } = this.props;
     if (this.props.onClickNode) {
       this.props.onClickNode();
     }
     if (event.shiftKey) {
       if (selectedNodes.find(n => n.name === d.name)) {
-        this.setState({
-          selectedNodes: selectedNodes.filter(n => n.name !== d.name),
-        });
+        this.onSelectVertexes(selectedNodes.filter(n => n.name !== d.name));
       } else {
-        this.setState({
-          selectedNodes: [...selectedNodes, d],
-        });
+        this.onSelectVertexes([...selectedNodes, d]);
       }
-      this.onSelectVertexes(selectedNodes);
     } else {
-      this.setState({ selectedNodes: [d] });
       this.onSelectVertexes([d]);
     }
   };
@@ -204,8 +206,68 @@ class NebulaD3 extends React.Component<IProps, IState> {
     if (!d3.event.active) {
       this.force.alphaTarget(0);
     }
-    d.fx = null;
-    d.fy = null;
+    d.fx = d3.event.x;
+    d.fy = d3.event.y;
+  };
+
+  handleStartZoom = () => {
+    const { isZoom } = this.state;
+    const { minScale, maxScale } = this.props;
+    if (isZoom) {
+      this.svg.on('.zoom', null);
+      this.setState({
+        isZoom: false,
+      });
+    } else {
+      this.svg.call(
+        d3
+          .zoom()
+          .scaleExtent([minScale, maxScale])
+          .on('zoom', () =>
+            // TODO: scale cancel the fixed, supports scroll zoom
+            d3
+              .select(this.canvasBoardRef)
+              .attr(
+                'transform',
+                `translate(${d3.event.transform.x},${d3.event.transform.y}) scale(${this.state.scale})`,
+              ),
+          )
+          .on('end', () => {
+            this.setState({
+              offsetX: d3.event.transform.x,
+              offsetY: d3.event.transform.y,
+              // scale: d3.event.transform.k, // TODO: scale cancel the fixed, supports scroll zoom
+            });
+          }),
+      );
+      this.setState({
+        isZoom: true,
+      });
+    }
+  };
+
+  handleZoom = (type: string) => {
+    const { scale, offsetX, offsetY } = this.state;
+    const { minScale, maxScale } = this.props;
+    if (type === 'out' && scale > minScale) {
+      const number = scale * 0.9 < minScale ? minScale : scale * 0.9;
+      this.setState({
+        scale: number,
+      });
+      d3.select(this.canvasBoardRef).attr(
+        'transform',
+        `translate(${offsetX},${offsetY}) scale(${number})`,
+      );
+    } else if (type === 'in' && scale < 1) {
+      const number = scale * 1.1 > maxScale ? maxScale : scale * 1.1;
+      this.setState({
+        scale: number,
+      });
+      d3.select(this.canvasBoardRef).attr(
+        'transform',
+        `translate(${offsetX},${offsetY}) scale(${number})`,
+      );
+    }
   };
 
   tick = () => {
@@ -320,18 +382,6 @@ class NebulaD3 extends React.Component<IProps, IState> {
   };
 
   handleUpdataNodes(nodes: INode[], selectNodes: INode[]) {
-    const currentNodes = d3.selectAll('.node');
-    if (nodes.length === 0) {
-      currentNodes.remove();
-      return;
-    } else if (currentNodes.size() > nodes.length) {
-      const ids = nodes.map(i => i.name);
-      const deleteNodes = currentNodes.filter((data: any) => {
-        return !ids.includes(data.name);
-      });
-      deleteNodes.remove();
-      return;
-    }
     const selectNodeNames = selectNodes.map(node => node.name);
     d3.select(this.nodeRef)
       .selectAll('circle')
@@ -362,7 +412,19 @@ class NebulaD3 extends React.Component<IProps, IState> {
           this.props.onMouseOut();
         }
       });
+    const currentNodes = d3.selectAll('.node');
+    if (nodes.length === 0) {
+      currentNodes.remove();
+      return;
+    } else if (currentNodes.size() > nodes.length) {
+      const ids = nodes.map(i => i.name);
+      const deleteNodes = currentNodes.filter((data: any) => {
+        return !ids.includes(data.name);
+      });
+      deleteNodes.remove();
 
+      return;
+    }
     this.node = d3
       .selectAll('.node')
       .on('click', this.handleNodeClick)
@@ -408,27 +470,10 @@ class NebulaD3 extends React.Component<IProps, IState> {
     }
   };
 
-  handleZoom = zoomSize => {
-    const { width, height } = this.props;
-    const scale = (100 - zoomSize) / 100;
-    const offsetX = width * (scale / 2);
-    const offsetY = height * (scale / 2);
-    this.setState({
-      scale,
-      offsetX,
-      offsetY,
-    });
-    d3.select(this.circleRef).attr(
-      'transform',
-      `translate(${offsetX} ${offsetY})`,
-    );
-  };
-
   // compute to get (x,y ) of the nodes by d3-force: https://github.com/d3/d3-force/blob/v1.2.1/README.md#d3-force
   // it will change the data.edges and data.vertexes passed in
   computeDataByD3Force() {
-    const { width, height, data } = this.props;
-    const { selectedNodes } = this.state;
+    const { data } = this.props;
     const linkForce = d3
       .forceLink(data.edges)
       .id((d: any) => {
@@ -443,16 +488,15 @@ class NebulaD3 extends React.Component<IProps, IState> {
           'collide',
           d3
             .forceCollide()
-            .radius(60)
+            .radius(35)
             .iterations(2),
         );
     }
     this.force
       .nodes(data.vertexes)
       .force('link', linkForce)
-      .force('center', d3.forceCenter(width / 2, height / 2))
+      // .force('center', d3.forceCenter(width / 2, height / 2))
       .restart();
-    this.handleUpdataNodes(data.vertexes, selectedNodes);
   }
 
   isIncludeField = (node, field) => {
@@ -528,11 +572,6 @@ class NebulaD3 extends React.Component<IProps, IState> {
   }
 
   onSelectVertexes = nodes => {
-    if (d3.event.target.tagName !== 'circle') {
-      this.setState({
-        selectedNodes: nodes,
-      });
-    }
     this.props.onSelectVertexes(nodes);
   };
 
@@ -553,39 +592,39 @@ class NebulaD3 extends React.Component<IProps, IState> {
   render() {
     this.computeDataByD3Force();
     const { width, height, data, onMouseInLink, onMouseOut } = this.props;
-    const { offsetX, offsetY, scale } = this.state;
-    const marks = {
-      0: {
-        style: {
-          fontSize: '20px',
-        },
-        label: <strong>-</strong>,
-      },
-      100: {
-        style: {
-          fontSize: '20px',
-        },
-        label: <strong>+</strong>,
-      },
-    };
+    const { offsetX, offsetY, scale, isZoom } = this.state;
     return (
       <div>
-        <Slider
-          defaultValue={100}
-          className="slider"
-          marks={marks}
-          vertical={true}
-          onAfterChange={this.handleZoom}
-        />
+        <Button
+          type={isZoom ? 'primary' : 'default'}
+          className="graph-btn"
+          onClick={this.handleStartZoom}
+          disabled={data.vertexes.length === 0}
+        >
+          <Icon type="drag" />
+        </Button>
+        <Button.Group className="graph-btn">
+          <Button
+            onClick={() => this.handleZoom('out')}
+            disabled={data.vertexes.length === 0}
+          >
+            <Icon type="zoom-out" />
+          </Button>
+          <Button
+            onClick={() => this.handleZoom('in')}
+            disabled={data.vertexes.length === 0}
+          >
+            <Icon type="zoom-in" />
+          </Button>
+        </Button.Group>
         <svg
           id="output-graph"
           className="output-graph"
           ref={mountPoint => (this.ctrls.mountPoint = mountPoint)}
           width={width}
-          viewBox={`0 0 ${width * (1 + scale)}  ${height * (1 + scale)}`}
           height={height}
         >
-          <g ref={(ref: SVGCircleElement) => (this.circleRef = ref)}>
+          <g ref={(ref: SVGCircleElement) => (this.canvasBoardRef = ref)}>
             <Links
               links={data.edges}
               onUpdataLinks={this.handleUpdataLinks}

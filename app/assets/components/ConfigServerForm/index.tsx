@@ -49,7 +49,7 @@ const ConfigServerForm = Form.create<IProps>()((props: IProps) => {
       <FormItem label={intl.get('configServer.password')}>
         {getFieldDecorator('password', {
           rules: passwordRulesFn(intl),
-        })(<Input />)}
+        })(<Input.Password />)}
       </FormItem>
       <Button
         type="primary"

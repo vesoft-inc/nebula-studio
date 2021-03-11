@@ -20,14 +20,10 @@ export default class Graphviz extends React.Component<IProps> {
   }
 
   renderFlowChart(graph) {
-    const { clientWidth, clientHeight } = this.ref;
-    const scale = 0.5;
     const defaultOptions: GraphvizOptions = {
       fit: true,
-      height: 'auto',
       width: '100%',
       zoom: false,
-      viewBox: `0 0 ${clientWidth * scale}  ${clientHeight * scale}`,
     };
     graphviz('#graph')
       .options({
