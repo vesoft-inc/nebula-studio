@@ -111,6 +111,7 @@ class Edge extends React.Component<IProps> {
         render: (value, record) => (
           <Select
             value={value}
+            disabled={record.name === 'srcId' || record.name === 'dstId'}
             onChange={type => this.handleChangeEdgeType(record, type)}
           >
             <Option value={'int'}>{'int'}</Option>

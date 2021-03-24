@@ -13,12 +13,23 @@ export function configToJson(payload) {
     edgesConfig,
     mountPath,
     activeStep,
+    spaceVidType,
   } = payload;
-  const vertexToJSON = vertexDataToJSON(vertexesConfig, activeStep, mountPath);
-  const edgeToJSON = edgeDataToJSON(edgesConfig, activeStep, mountPath);
+  const vertexToJSON = vertexDataToJSON(
+    vertexesConfig,
+    activeStep,
+    mountPath,
+    spaceVidType,
+  );
+  const edgeToJSON = edgeDataToJSON(
+    edgesConfig,
+    activeStep,
+    mountPath,
+    spaceVidType,
+  );
   const files: any[] = [...vertexToJSON, ...edgeToJSON];
   const configJson = {
-    version: 'v1rc1',
+    version: 'v2',
     description: 'web console import',
     clientSettings: {
       concurrency: 10,
@@ -40,6 +51,7 @@ export function edgeDataToJSON(
   config: any,
   activeStep: number,
   mountPath: string,
+  spaceVidType: string,
 ) {
   const limit = activeStep === 2 || activeStep === 3 ? 10 : undefined;
   const files = config.map(edge => {
@@ -58,11 +70,13 @@ export function edgeDataToJSON(
         case 'srcId':
           edge.srcVID = {
             index: indexJudge(prop.mapping, prop.name),
+            type: spaceVidType === 'INT64' ? 'int' : 'string',
           };
           break;
         case 'dstId':
           edge.dstVID = {
             index: indexJudge(prop.mapping, prop.name),
+            type: spaceVidType === 'INT64' ? 'int' : 'string',
           };
           break;
         default:
@@ -108,6 +122,7 @@ export function vertexDataToJSON(
   config: any,
   activeStep: number,
   mountPath: string,
+  spaceVidType: string,
 ) {
   const limit = activeStep === 2 || activeStep === 3 ? 10 : undefined;
   const files = config.map(vertex => {
@@ -147,6 +162,7 @@ export function vertexDataToJSON(
         vertex: {
           vid: {
             index: indexJudge(vertex.idMapping, 'vertexId'),
+            type: spaceVidType === 'INT64' ? 'int' : 'string',
           },
           tags,
         },

@@ -280,8 +280,11 @@ export const importData = createModel({
         isImporting: false,
       });
     },
-    async importData(payload) {
-      const config: any = configToJson(payload);
+    async importData(payload, rootState) {
+      const {
+        nebula: { spaceVidType },
+      } = rootState;
+      const config: any = configToJson({ ...payload, spaceVidType });
       const { taskId, errCode, errMsg } = (await service.importData(
         config,
       )) as any;
@@ -348,8 +351,11 @@ export const importData = createModel({
       });
     },
 
-    async testImport(payload) {
-      const config: any = configToJson(payload);
+    async testImport(payload, rootState) {
+      const {
+        nebula: { spaceVidType },
+      } = rootState;
+      const config: any = configToJson({ ...payload, spaceVidType });
       const { taskId, errCode } = (await service.importData(config)) as any;
       this.update({
         taskId,
@@ -388,8 +394,11 @@ export const importData = createModel({
       }
     },
 
-    async asyncUpdateEdgeConfig(payload: { edgeType: string }) {
+    async asyncUpdateEdgeConfig(payload: { edgeType: string }, rootState) {
       const { edgeType } = payload;
+      const {
+        nebula: { spaceVidType },
+      } = rootState;
       const { code, data } = (await service.execNGQL({
         gql: 'DESCRIBE EDGE' + '`' + edgeType + '`;',
       })) as any;
@@ -430,12 +439,12 @@ export const importData = createModel({
             // each edge must have the three special prop srcId, dstId, rank，put them ahead
             {
               name: 'srcId',
-              type: 'string',
+              type: spaceVidType === 'INT64' ? 'int' : 'string',
               mapping: null,
             },
             {
               name: 'dstId',
-              type: 'string',
+              type: spaceVidType === 'INT64' ? 'int' : 'string',
               mapping: null,
             },
             {

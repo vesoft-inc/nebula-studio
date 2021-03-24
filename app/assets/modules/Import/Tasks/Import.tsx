@@ -23,6 +23,7 @@ const mapState = (state: IRootState) => ({
   username: state.nebula.username,
   password: state.nebula.password,
   host: state.nebula.host,
+  spaceVidType: state.nebula.spaceVidType,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -63,6 +64,7 @@ class Import extends React.Component<IProps, IState> {
       edgesConfig,
       mountPath,
       activeStep,
+      spaceVidType,
     } = this.props;
     const config: any = configToJson({
       currentSpace,
@@ -73,6 +75,7 @@ class Import extends React.Component<IProps, IState> {
       edgesConfig,
       mountPath,
       activeStep,
+      spaceVidType,
     });
     service
       .createConfigFile({
