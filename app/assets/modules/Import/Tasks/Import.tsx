@@ -154,6 +154,7 @@ class Import extends React.Component<IProps, IState> {
         update({
           isImporting: false,
         });
+        message.success(intl.get('import.importFinished'));
         clearTimeout(this.logTimer);
         trackEvent('import', 'import_data', 'finish');
       }

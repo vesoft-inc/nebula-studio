@@ -238,7 +238,8 @@
     "datasource": "DataSource",
     "indexNotEmpty": "column index can't be null.",
     "reset": "Reset",
-    "fileUploading": "Upload in progress. If you leave this page now, only the uploaded data are stored."
+    "fileUploading": "Upload in progress. If you leave this page now, only the uploaded data are stored.",
+    "importFinished": "Import task has ended."
   },
   "schema": {
     "spaceList": "Graph Space List",

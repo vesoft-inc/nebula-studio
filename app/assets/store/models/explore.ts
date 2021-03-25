@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import service from '#assets/config/service';
 import {
+  fetchBidirectVertexes,
   fetchEdgeProps,
   fetchVertexProps,
   fetchVertexPropsWithIndex,
@@ -17,6 +18,21 @@ import {
 } from '#assets/utils/function';
 import { getExploreGQL } from '#assets/utils/gql';
 import { nebulaToData, setLink } from '#assets/utils/nebulaToData';
+
+function getBidrectVertexIds(data) {
+  const { tables } = data;
+  // go from nqgl return [{*._dst: id}]
+  const ids = _.uniq(
+    tables
+      .map(row => {
+        return Object.values(row);
+      })
+      .flat(),
+  )
+    .filter(id => id !== 0)
+    .map(id => String(id));
+  return ids;
+}
 
 export interface INode extends d3.SimulationNodeDatum {
   name: string;
@@ -198,7 +214,12 @@ export const explore = createModel({
         nebula: { spaceVidType },
       } = rootState;
       const res = await fetchVertexProps({ ids, spaceVidType });
-      const newVertexes = res.code === 0 ? getTagData(res.data, expand) : [];
+      let newVertexes = res.code === 0 ? getTagData(res.data, expand) : [];
+      newVertexes = await this.asyncCheckVertexesExist({
+        preAddVertexes: newVertexes,
+        inputIds: ids.map(id => String(id)),
+        expand,
+      });
       return newVertexes;
     },
 
@@ -302,17 +323,80 @@ export const explore = createModel({
               ids: _ids,
             })
           : [];
-      const newIds = vertexes.map(i => convertBigNumberToString(i.name));
-      const _convertIds = _ids.map(i => convertBigNumberToString(i));
-      if (newIds.length !== _convertIds.length) {
-        const notExistIds = _.xor(newIds, _convertIds);
-        message.warning(
-          `${notExistIds.join(', ')}${intl.get('import.notExist')}`,
-        );
-      }
       return _.uniqBy(vertexes, (i: any) =>
         convertBigNumberToString(i.name),
       ).filter(i => i !== undefined);
+    },
+
+    // check if vertex exist
+    async asyncCheckVertexesExist(
+      payload: {
+        preAddVertexes;
+        inputIds: string[];
+        expand;
+      },
+      rootState,
+    ) {
+      const { preAddVertexes, inputIds, expand } = payload;
+      const preAddIds = preAddVertexes.map(i => String(i.name));
+      if (preAddIds.length !== inputIds.length) {
+        // Get the missing id in the returned result
+        const notIncludedIds = _.xor(preAddIds, inputIds);
+        // judge whether it is a vertex on the hanging edge
+        const existedIds = (await this.asyncGetVertexesOnHangingEdge({
+          ids: notIncludedIds,
+        })) as any;
+        // If the id in notIncludedIds exists in the existedIds, means that its a vertex on the hanging edge
+        // otherwise it really does not exist in nebula
+        const notExistIds = notIncludedIds.filter(
+          id => !existedIds.includes(id),
+        );
+        const addIds = notIncludedIds.filter(id => existedIds.includes(id));
+        if (notExistIds.length > 0) {
+          message.warning(
+            `${notExistIds.join(', ')}${intl.get('import.notExist')}`,
+          );
+        }
+        const {
+          nebula: { spaceVidType },
+        } = rootState;
+        addIds.forEach(id => {
+          const vertex: any = {
+            name: spaceVidType === 'INT64' ? Number(id) : String(id),
+            nodeProp: {
+              tags: [],
+              properties: {},
+            },
+            uuid: uuidv4(),
+          };
+          if (expand && expand.vertexColor !== 'groupByTag') {
+            vertex.group = 'step-' + expand.exploreStep;
+          } else if (expand) {
+            vertex.group = 't';
+          } else {
+            vertex.step = 0;
+          }
+          preAddVertexes.push(vertex);
+        });
+      }
+      return preAddVertexes;
+    },
+
+    async asyncGetVertexesOnHangingEdge(payload: { ids: string[] }) {
+      const { ids } = payload;
+      // If these ids have hanging edges, get the src/dst id of these input ids on the hanging edges
+      let bidirectRes = await fetchBidirectVertexes({ ids });
+      let _ids =
+        bidirectRes.code === 0 ? getBidrectVertexIds(bidirectRes.data) : [];
+      if (_ids.length > 0) {
+        // Batch query cannot accurately know which input ids have hanging edges
+        // So use the result ids to query the corresponding ids on all edges
+        // these ids must include vertex id of the haning edge
+        bidirectRes = await fetchBidirectVertexes({ ids: _ids });
+        _ids =
+          bidirectRes.code === 0 ? getBidrectVertexIds(bidirectRes.data) : [];
+      }
+      return _ids;
     },
 
     async asyncGetExploreEdge(edgeList: IExportEdge[], rootState) {
