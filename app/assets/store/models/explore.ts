@@ -382,17 +382,20 @@ export const explore = createModel({
       return preAddVertexes;
     },
 
-    async asyncGetVertexesOnHangingEdge(payload: { ids: string[] }) {
+    async asyncGetVertexesOnHangingEdge(payload: { ids: string[] }, rootState) {
       const { ids } = payload;
+      const {
+        nebula: { spaceVidType },
+      } = rootState;
       // If these ids have hanging edges, get the src/dst id of these input ids on the hanging edges
-      let bidirectRes = await fetchBidirectVertexes({ ids });
+      let bidirectRes = await fetchBidirectVertexes({ ids, spaceVidType });
       let _ids =
         bidirectRes.code === 0 ? getBidrectVertexIds(bidirectRes.data) : [];
       if (_ids.length > 0) {
         // Batch query cannot accurately know which input ids have hanging edges
         // So use the result ids to query the corresponding ids on all edges
         // these ids must include vertex id of the haning edge
-        bidirectRes = await fetchBidirectVertexes({ ids: _ids });
+        bidirectRes = await fetchBidirectVertexes({ ids: _ids, spaceVidType });
         _ids =
           bidirectRes.code === 0 ? getBidrectVertexIds(bidirectRes.data) : [];
       }

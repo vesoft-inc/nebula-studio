@@ -66,9 +66,13 @@ export async function fetchVertexProps(payload: {
   return { data, code, message };
 }
 
-export async function fetchBidirectVertexes(payload: { ids: string[] }) {
-  const { ids } = payload;
-  const gql = `GO FROM ${ids.join(', ')} OVER * BIDIRECT`;
+export async function fetchBidirectVertexes(payload: {
+  ids: string[];
+  spaceVidType: string;
+}) {
+  const { ids, spaceVidType } = payload;
+  const _ids = ids.map(id => handleVidStringName(id, spaceVidType)).join(', ');
+  const gql = `GO FROM ${_ids} OVER * BIDIRECT`;
   const { code, data, message } = (await service.execNGQL({
     gql,
   })) as any;
