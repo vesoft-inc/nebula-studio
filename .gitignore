@@ -11,6 +11,7 @@ logs/
 *.lock
 *.js
 *.map
+.github/workflows/nodejs.yml
 
 app/**/*.js
 test/**/*.js
