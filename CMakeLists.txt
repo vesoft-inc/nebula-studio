@@ -3,7 +3,7 @@ project("Nebula Graph Studio")
 # package name
 set(CPACK_PACKAGE_NAME "nebula graph studio")
 set(CPACK_RPM_PACKAGE_ARCHITECTURE "x86_64")
-set(CPACK_RPM_PACKAGE_RELEASE 1)
+set(CPACK_RPM_PACKAGE_RELEASE 2)
 # user define install dir ON
 # set(CPACK_SET_DESTDIR ON)
 set(CPACK_RPM_PACKAGE_RELOCATABLE ON)
