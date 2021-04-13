@@ -1,0 +1,38 @@
+use commercial_relations;
+INSERT VERTEX person(name, age) VALUES '1':('Liuqiangdong', 40);
+INSERT VERTEX person(name, age) VALUES '2':('Liyanghong', 50);
+INSERT VERTEX person(name, age) VALUES '3':('Wangxing', 45);
+INSERT VERTEX person(name, age) VALUES '4':('Huangzheng', 30);
+INSERT VERTEX person(name, age) VALUES '5':('Mayun', 40);
+INSERT VERTEX person(name, age) VALUES '6':('Tony', 60);
+INSERT VERTEX person(name, age) VALUES '7':('Zhangchaoyang', 50);
+INSERT VERTEX person(name, age) VALUES '8':('Liuchuanzhi', 60);
+INSERT VERTEX person(name, age) VALUES '9':('Wangjianlin', 50);
+
+INSERT VERTEX company(name, industry, value) VALUES '21':('Alibaba', 'all', 3000);
+INSERT VERTEX company(name, industry, value) VALUES '22':('Baidu', 'information', 600);
+INSERT VERTEX company(name, industry, value) VALUES '23':('Tecent', 'entertaiment', 2700);
+INSERT VERTEX company(name, industry, value) VALUES '24':('Bytedance', 'entertaiment', 1500);
+INSERT VERTEX company(name, industry, value) VALUES '25':('Meituan', 'retail', 1000);
+
+
+INSERT VERTEX investment(name, count) VALUES '31':('matrix', 2);
+INSERT VERTEX investment(name, count) VALUES '32':('Sequoia', 3);
+
+INSERT EDGE own(share) VALUES '1' -> '21':(100);
+INSERT EDGE own(share) VALUES '2' -> '22':(50);
+INSERT EDGE own(share) VALUES '3' -> '22':(50);
+INSERT EDGE own(share) VALUES '4' -> '23':(100);
+INSERT EDGE own(share) VALUES '5' -> '24':(40);
+INSERT EDGE own(share) VALUES '5' -> '25':(60);
+
+INSERT EDGE invested(money) VALUES '21' -> '6':(1000);
+INSERT EDGE invested(money) VALUES '22' -> '7':(100);
+INSERT EDGE invested(money) VALUES '22' -> '8':(800);
+INSERT EDGE invested(money) VALUES '24' -> '9':(500);
+INSERT EDGE invested(money) VALUES '25' -> '9':(500);
+
+INSERT EDGE employed(long) VALUES '6' -> '31':(3);
+INSERT EDGE employed(long) VALUES '7' -> '31':(2);
+INSERT EDGE employed(long) VALUES '8' -> '32':(3);
+INSERT EDGE employed(long) VALUES '9' -> '32':(4);

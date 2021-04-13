@@ -1,6 +1,0 @@
-CREATE SPACE infect_relationship(partition_num=1, replica_factor=1);
-use infect_relationship;
-CREATE TAG person(name string, age int, sex string);
-CREATE EDGE infect(level int);
-CREATE EDGE suspect(level int);
-CREATE EDGE touch(level int);

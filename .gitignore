@@ -33,3 +33,6 @@ scripts/data/
 typings
 docker/data
 tmp
+
+sample-data/data/
+.github/workflows/nodejs.yml
