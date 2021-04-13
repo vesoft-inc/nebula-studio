@@ -59,6 +59,7 @@ install(
 	PATTERN "docker/*" EXCLUDE
 	PATTERN "logs" EXCLUDE
 	PATTERN "logs/*" EXCLUDE
+	PATTERN "tmp/*" EXCLUDE
 	PATTERN "nebula-go-api" EXCLUDE
 	PATTERN "nebula-go-api/*" EXCLUDE
 	PATTERN ".github" EXCLUDE

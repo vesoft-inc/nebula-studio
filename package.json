@@ -1,6 +1,6 @@
 {
   "name": "nebula-graph-studio",
-  "version": "2.1.9-beta",
+  "version": "2.1.9",
   "description": "nebula-graph-studio",
   "private": true,
   "egg": {
@@ -21,7 +21,7 @@
     "lint": "tslint -c tslint.json 'app/**/*.{ts,tsx}' && stylelint **/*.{html,less}",
     "lint-fix": "tslint -c tslint.json 'app/**/*.{ts,tsx}' --fix && stylelint **/*.{html,less} --fix",
     "clean": "ets clean",
-    "build": "webpack --config config/webpack.prod.ts"
+    "build": "node --max-old-space-size=8192 node_modules/webpack/bin/webpack.js --config config/webpack.prod.ts"
   },
   "dependencies": {
     "@hot-loader/react-dom": "^16.11.0",

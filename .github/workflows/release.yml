@@ -1,4 +1,4 @@
-name: Client-Image-Release
+name: Studio Image Release
 on:
   push:
     branches:
@@ -15,7 +15,7 @@ jobs:
       name: Set up QEMU
       uses: docker/setup-qemu-action@v1
     -
-      name: Set up Docker Buildx
+      name: Set up Docker Build
       uses: docker/setup-buildx-action@v1
     -
       name: Login to DockerHub
