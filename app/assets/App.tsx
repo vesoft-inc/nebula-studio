@@ -13,6 +13,7 @@ import {
   withRouter,
 } from 'react-router-dom';
 
+import IconFont from '#assets/components/Icon';
 import { INTL_LOCALE_SELECT, INTL_LOCALES } from '#assets/config';
 import service from '#assets/config/service';
 import { LanguageContext } from '#assets/context';
@@ -22,6 +23,7 @@ import Import from '#assets/modules/Import';
 import Schema from '#assets/modules/Schema';
 import CreateSpace from '#assets/modules/Schema/CreateSpace';
 import SpaceConfig from '#assets/modules/Schema/SpaceConfig';
+import logo from '#assets/static/images/studio-logo.png';
 import { IDispatch, IRootState } from '#assets/store';
 import { updateQueryStringParameter } from '#assets/utils';
 
@@ -41,6 +43,7 @@ interface IState {
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncClearConfigServer: dispatch.nebula.asyncClearConfigServer,
   asyncGetAppInfo: dispatch.app.asyncGetAppInfo,
+  asyncSwitchSpace: dispatch.nebula.asyncSwitchSpace,
 });
 
 const mapState = (state: IRootState) => ({
@@ -114,6 +117,10 @@ class App extends React.Component<IProps, IState> {
     this.loadIntlLocale();
     this.renderMenu();
     this.props.asyncGetAppInfo();
+    const space = sessionStorage.getItem('currentSpace');
+    if (space) {
+      this.props.asyncSwitchSpace(space);
+    }
   }
 
   componentDidUpdate(prevProps: IProps) {
@@ -143,8 +150,8 @@ class App extends React.Component<IProps, IState> {
     const { loading, activeMenu } = this.state;
     const nGQLHref =
       cookies.get('locale') === 'ZH_CN'
-        ? 'https://github.com/vesoft-inc/nebula-docs-cn/blob/master/docs/manual-CN/README.md'
-        : 'https://github.com/vesoft-inc/nebula-docs/blob/master/docs/manual-EN/README.md';
+        ? 'https://docs.nebula-graph.com.cn/2.0/3.ngql-guide/1.nGQL-overview/1.overview/'
+        : 'https://docs.nebula-graph.io/2.0/3.ngql-guide/1.nGQL-overview/1.overview/';
     return (
       <>
         <LanguageContext.Provider
@@ -158,6 +165,9 @@ class App extends React.Component<IProps, IState> {
           ) : (
             <Layout className="nebula-graph-studio">
               <Header>
+                <div className="studio-logo">
+                  <img src={logo} />
+                </div>
                 <Menu
                   mode="horizontal"
                   selectedKeys={[activeMenu]}
@@ -168,9 +178,7 @@ class App extends React.Component<IProps, IState> {
                       to="/schema"
                       onClick={() => this.trackRoute('view_schema')}
                     >
-                      <svg className="icon" aria-hidden="true">
-                        <use xlinkHref="#iconnav-model" />
-                      </svg>
+                      <IconFont type="iconnav-model" />
                       {intl.get('common.schema')}
                     </Link>
                   </Menu.Item>
@@ -282,7 +290,7 @@ class App extends React.Component<IProps, IState> {
                 >
                   <a
                     className="github-button"
-                    href="https://github.com/vesoft-inc/nebula"
+                    href="https://github.com/vesoft-inc/nebula-graph"
                     data-size="large"
                     data-show-count="true"
                     aria-label="Star vesoft-inc/nebula on GitHub"
@@ -350,7 +358,7 @@ class App extends React.Component<IProps, IState> {
                     exact={true}
                     component={ConfigServer}
                   />
-                  <Redirect to="/console" />
+                  <Redirect to="/explore" />
                 </Switch>
               </Content>
             </Layout>

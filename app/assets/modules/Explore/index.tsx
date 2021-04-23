@@ -1,7 +1,9 @@
+import { Spin } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
+import emptyPng from '#assets/static/images/explore-empty.png';
 import { IRootState } from '#assets/store';
 import { trackPageView } from '#assets/utils/stat';
 
@@ -13,13 +15,13 @@ import NebulaGraph from './NebulaGraph';
 
 const mapState = (state: IRootState) => ({
   vertexes: state.explore.vertexes,
+  loading: state.loading.models.explore,
 });
 
 type IProps = ReturnType<typeof mapState>;
 
 class Explore extends React.Component<IProps, {}> {
   controlComponent;
-  d3Component;
   componentDidMount() {
     trackPageView('/explore');
   }
@@ -27,42 +29,33 @@ class Explore extends React.Component<IProps, {}> {
     this.controlComponent = ref;
   };
 
-  onD3Ref = ref => {
-    this.d3Component = ref;
-  };
-
   handleSearch = () => {
     if (this.controlComponent) {
       this.controlComponent.handleSearch();
     }
   };
-  handleExportImg = () => {
-    if (this.d3Component) {
-      this.d3Component.handleExportImg();
-    }
-  };
 
   render() {
+    const { loading } = this.props;
     return (
       <div className="nebula-explore">
-        <Control onRef={this.onRef} handleExportImg={this.handleExportImg} />
-        <NebulaGraph onD3Ref={this.onD3Ref} />
-        <Init />
-        <InitVertexes />
-        {this.props.vertexes.length === 0 && (
-          <div className="text-prompt">
-            <img
-              className="empty-board"
-              src="https://cloud-cdn.nebula-graph.com.cn/studio-resource/explore-empty.png"
-            />
-            <div>
-              <span>{intl.get('explore.noVertexPrompt')}</span>
-              <span className="btn" onClick={this.handleSearch}>
-                {intl.get('explore.search')}
-              </span>
+        <Spin spinning={!!loading} delay={300}>
+          <Control onRef={this.onRef} />
+          <NebulaGraph />
+          <Init />
+          <InitVertexes />
+          {this.props.vertexes.length === 0 && (
+            <div className="text-prompt">
+              <img className="empty-board" src={emptyPng} />
+              <div>
+                <span>{intl.get('explore.noVertexPrompt')}</span>
+                <span className="btn" onClick={this.handleSearch}>
+                  {intl.get('explore.search')}
+                </span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </Spin>
       </div>
     );
   }

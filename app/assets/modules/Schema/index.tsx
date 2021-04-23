@@ -19,7 +19,10 @@ const mapState = (state: IRootState) => ({
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetSpacesList: dispatch.nebula.asyncGetSpacesList,
   asyncDeleteSpace: dispatch.nebula.asyncDeleteSpace,
-  asyncSwitchSpace: dispatch.nebula.asyncSwitchSpace,
+  asyncSwitchSpace: async space => {
+    await dispatch.nebula.asyncSwitchSpace(space);
+    await dispatch.explore.clear();
+  },
   clearCurrentSpace: () =>
     dispatch.nebula.update({
       currentSpace: '',
@@ -184,7 +187,7 @@ class Schema extends React.Component<IProps> {
       },
     ];
     return (
-      <div className="nebula-schema">
+      <div className="nebula-schema padding-page">
         <div className="header">
           <span className="header-title">{intl.get('schema.spaceList')}</span>
         </div>

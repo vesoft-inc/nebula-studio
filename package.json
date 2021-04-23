@@ -1,6 +1,6 @@
 {
   "name": "nebula-graph-studio",
-  "version": "2.1.9",
+  "version": "2.2.0",
   "description": "nebula-graph-studio",
   "private": true,
   "egg": {
@@ -40,15 +40,19 @@
     "egg-scripts": "^2.6.0",
     "egg-view-assets": "^1.4.0",
     "egg-view-nunjucks": "^2.2.0",
+    "file-loader": "^6.2.0",
     "file-saver": "^2.0.5",
     "http-proxy-middleware": "^0.20.0",
     "js-cookie": "^2.2.1",
     "json-bigint": "^1.0.0",
+    "json2csv": "^5.0.6",
     "koa2-connect": "^1.0.2",
     "lodash": "^4.17.15",
     "mz-modules": "^2.1.0",
     "react": "^16.11.0",
     "react-beautiful-dnd": "^13.0.0",
+    "react-color": "^2.19.3",
+    "react-copy-to-clipboard": "^5.0.3",
     "react-dom": "^16.11.0",
     "react-hot-loader": "^4.12.16",
     "react-intl-universal": "^1.16.2",
@@ -57,6 +61,7 @@
     "react-router-dom": "^5.1.2",
     "stream-wormhole": "^1.1.0",
     "tslib": "^1.9.0",
+    "url-loader": "^4.1.1",
     "uuid": "^8.3.1"
   },
   "devDependencies": {

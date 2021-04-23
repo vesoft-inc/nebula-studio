@@ -4,6 +4,7 @@ import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
 import { Modal } from '#assets/components';
+import { DEFAULT_EXPLORE_RULES } from '#assets/config/explore';
 import { IDispatch, IRootState } from '#assets/store';
 
 import './InitVertexes.less';
@@ -19,13 +20,10 @@ const mapDispatch = (dispatch: IDispatch) => ({
       vertexes: [],
       edges: [],
       selectVertexes: [],
-      actionData: [],
+      selectEdges: [],
+      actionHistory: [],
       step: 0,
-      exploreRules: {
-        edgeTypes: [],
-        edgeDirection: '',
-        vertexColor: '',
-      },
+      exploreRules: DEFAULT_EXPLORE_RULES,
     }),
   clearPreload: () =>
     dispatch.explore.update({
@@ -57,7 +55,7 @@ class InitVertexes extends React.Component<IProps> {
     }
     this.modalHandler.hide();
     const { preloadData } = this.props;
-    await this.props.asyncGetExploreInfo(preloadData);
+    await this.props.asyncGetExploreInfo({ data: preloadData });
     await this.props.clearPreload();
   };
 

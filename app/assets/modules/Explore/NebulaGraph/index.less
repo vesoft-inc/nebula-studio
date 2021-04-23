@@ -1,26 +1,28 @@
 .graph-wrap {
-	padding-top: 15px;
-
 	.tooltip {
 		position: absolute;
-		text-align: center;
-		background: #c7eafb;
-		padding: 0 6px;
+		background: #e6f7ff;
 		min-width: 200px;
 		max-width: 300px;
 		max-height: 100%;
-		top: 0;
-		left: 50px;
 		font-size: 12px;
 		line-height: 14px;
+		padding: 0 19px;
+		text-align: left;
+		z-index: 100;
 
-		p {
-			border-top: 1px solid #100;
-			line-height: 30px;
+		div {
+			padding: 12px 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+
+			span:nth-child(2) {
+				font-weight: bold;
+			}
 		}
 
-		p:first-child {
-			border-top: 0;
+		div:first-child {
+			font-weight: 600;
 		}
 	}
 

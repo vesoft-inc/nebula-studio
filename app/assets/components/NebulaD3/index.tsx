@@ -1,123 +1,43 @@
-import { Button, Icon, message } from 'antd';
 import * as d3 from 'd3';
-import { saveAs } from 'file-saver';
 import * as React from 'react';
-import intl from 'react-intl-universal';
+import { connect } from 'react-redux';
 
-import { trackEvent } from '#assets/utils/stat';
+import Menu from '#assets/modules/Explore/NebulaGraph/Menu';
+import { IRootState } from '#assets/store';
+import { INode, IPath } from '#assets/utils/interface';
 
 import './index.less';
 import Links from './Links';
 import Labels from './NodeTexts';
 import SelectIds from './SelectIds';
 
-interface INode extends d3.SimulationNodeDatum {
-  name: string;
-  group: number;
-  uuid: string;
-}
+const mapState = (state: IRootState) => ({
+  offsetX: state.d3Graph.canvasOffsetX,
+  offsetY: state.d3Graph.canvasOffsetY,
+  isZoom: state.d3Graph.isZoom,
+  scale: state.d3Graph.canvasScale,
+});
 
-interface IProps {
+interface IProps extends ReturnType<typeof mapState> {
   width: number;
   height: number;
   data: {
     vertexes: INode[];
-    edges: any[];
+    edges: IPath[];
   };
   showTagFields: string[];
   showEdgeFields: string[];
   selectedNodes: INode[];
+  selectedPaths: IPath[];
   onSelectVertexes: (vertexes: INode[]) => void;
-  onMouseInNode: (node: INode) => void;
+  onSelectEdges: (edges: IPath[]) => void;
+  onMouseInNode: (node: INode, event: MouseEvent) => void;
   onMouseOut: () => void;
-  onMouseInLink: (link: any) => void;
+  onMouseInLink: (link: IPath, event: MouseEvent) => void;
   onDblClickNode: () => void;
-  onClickNode: () => void;
-  onClickEmptySvg: () => void;
-  onD3Ref: any;
-  minScale: number;
-  maxScale: number;
 }
 
-function save(dataBlob, _filesize) {
-  saveAs(dataBlob, 'Graph.png');
-}
-
-function svgString2Image(svgString, size, callback) {
-  const imgsrc =
-    'data:image/svg+xml;base64,' +
-    btoa(unescape(encodeURIComponent(svgString))); // Convert SVG string to data URL
-
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d') as any;
-  const { width, height } = size;
-  canvas.width = width;
-  canvas.height = height;
-
-  const image = new Image();
-  image.onload = () => {
-    context.clearRect(0, 0, width, height);
-    context.drawImage(image, 0, 0, width, height);
-    // fill white backgroud color
-    context.globalCompositeOperation = 'destination-over';
-    context.fillStyle = '#fff';
-    context.fillRect(0, 0, width, height);
-
-    canvas.toBlob((blob: any) => {
-      if (!blob) {
-        // TODO: toBlob return null when size of canvas is to large,like 20000 * 20000
-        return message.warning(intl.get('explore.toBlobError'));
-      }
-      const filesize = Math.round(blob.length / 1024) + ' KB';
-      if (callback) {
-        trackEvent('explore', 'export_graph_png');
-        callback(blob, filesize);
-      }
-    });
-  };
-
-  image.src = imgsrc;
-}
-
-interface IRefs {
-  mountPoint?: SVGSVGElement | null;
-}
-
-const whichColor = (() => {
-  const colors = [
-    '#69C0FF',
-    '#95DE64',
-    '#5CDBD3',
-    '#FF7875',
-    '#FF9C6E',
-    '#85A5FF',
-    '#FFC069',
-    '#FFD666',
-    '#B37FEB',
-    '#FFF566',
-    '#FF85C0',
-    '#D3F261',
-  ];
-  const colorsTotal = colors.length;
-  let colorIndex = 0;
-  const colorsRecord = {};
-  return key => {
-    if (!colorsRecord[key]) {
-      colorsRecord[key] = colors[colorIndex];
-      colorIndex = (colorIndex + 1) % colorsTotal;
-    }
-    return colorsRecord[key];
-  };
-})();
-
-interface IState {
-  offsetX: number;
-  offsetY: number;
-  scale: number;
-  isZoom: boolean;
-}
-class NebulaD3 extends React.Component<IProps, IState> {
-  ctrls: IRefs = {};
+class NebulaD3 extends React.Component<IProps> {
   nodeRef: SVGCircleElement;
   canvasBoardRef: SVGCircleElement;
   force: any;
@@ -126,44 +46,52 @@ class NebulaD3 extends React.Component<IProps, IState> {
   link: any;
   linksText: any;
   nodeText: any;
-  constructor(props: IProps) {
-    super(props);
-    this.state = {
-      offsetX: 0,
-      offsetY: 0,
-      scale: 1,
-      isZoom: false,
-    };
-  }
 
   componentDidMount() {
-    if (!this.ctrls.mountPoint) {
-      return;
-    }
-    this.svg = d3.select(this.ctrls.mountPoint);
-    this.props.onD3Ref(this);
-    this.svg
-      .append('defs')
+    this.svg = d3.select('#output-graph');
+    const { offsetX, offsetY, scale } = this.props;
+    this.initMarker();
+    d3.select('.nebula-d3-canvas').attr(
+      'transform',
+      `translate(${offsetX},${offsetY}) scale(${scale})`,
+    );
+  }
+
+  initMarker = () => {
+    const defs = this.svg.append('defs');
+    defs
       .append('marker')
       .attr('id', 'marker')
-      .attr('viewBox', '-10 -10 20 20')
-      .attr('refX', 23)
+      .attr('markerUnits', 'userSpaceOnUse')
+      .attr('viewBox', '-20 -10 20 20')
+      .attr('refX', 20)
       .attr('refY', 0)
       .attr('orient', 'auto')
-      .attr('markerWidth', 10)
-      .attr('markerHeight', 9)
+      .attr('markerWidth', 20)
+      .attr('markerHeight', 20)
       .attr('xoverflow', 'visible')
       .append('path')
-      .attr('d', 'M-6.75,-6.75 L 0,0 L -6.75,6.75')
-      .attr('fill', '#999')
-      .attr('stroke', '#999');
-
-    this.svg.on('click', () => {
-      if (d3.event.target.tagName !== 'circle' && this.props.onClickEmptySvg) {
-        this.props.onClickEmptySvg();
-      }
-    });
-  }
+      .attr('d', 'M-10, -5 L 0,0 L -10, 5')
+      .attr('fill', '#595959')
+      .attr('stroke', '#595959');
+    defs
+      .append('marker')
+      .attr('id', 'marker-actived')
+      .attr('markerUnits', 'userSpaceOnUse')
+      .attr('viewBox', '-20 -10 20 20')
+      .attr('refX', 25.5)
+      .attr('refY', 0)
+      .attr('orient', 'auto')
+      .attr('markerWidth', 16)
+      .attr('markerHeight', 16)
+      .attr('xoverflow', 'visible')
+      .append('path')
+      .attr('d', 'M-16, -8 L 0,0 L -16, 8')
+      .attr('fill', '#0091FF')
+      .attr('stroke', '#0091FF')
+      .attr('stroke-opacity', '0.6')
+      .attr('fill-opacity', '0.9');
+  };
 
   componentDidUpdate() {
     const { data, selectedNodes } = this.props;
@@ -172,101 +100,46 @@ class NebulaD3 extends React.Component<IProps, IState> {
 
   handleNodeClick = (d: any) => {
     const event = d3.event;
-    const { selectedNodes } = this.props;
-    if (this.props.onClickNode) {
-      this.props.onClickNode();
-    }
+    const { selectedNodes, onSelectVertexes } = this.props;
     if (event.shiftKey) {
-      if (selectedNodes.find(n => n.name === d.name)) {
-        this.onSelectVertexes(selectedNodes.filter(n => n.name !== d.name));
-      } else {
-        this.onSelectVertexes([...selectedNodes, d]);
-      }
+      const data = selectedNodes.find(n => n.name === d.name)
+        ? selectedNodes.filter(n => n.name !== d.name)
+        : [...selectedNodes, d];
+      onSelectVertexes(data);
     } else {
-      this.onSelectVertexes([d]);
+      onSelectVertexes([d]);
+    }
+  };
+
+  handleEdgeClick = (d: any) => {
+    const event = d3.event;
+    const { selectedPaths, onSelectEdges } = this.props;
+    if (event.shiftKey) {
+      const data = selectedPaths.find(n => n.id === d.id)
+        ? selectedPaths.filter(n => n.id !== d.id)
+        : [...selectedPaths, d];
+      onSelectEdges(data);
+    } else {
+      onSelectEdges([d]);
     }
   };
 
   dragged = d => {
     d.fx = d3.event.x;
     d.fy = d3.event.y;
+    d.isFixed = true;
   };
 
   dragstart = (d: any) => {
     if (!d3.event.active) {
       this.force.alphaTarget(0.6).restart();
     }
-    d.fx = d.x;
-    d.fy = d.y;
-
     return d;
   };
 
-  dragEnded = d => {
+  dragEnded = () => {
     if (!d3.event.active) {
       this.force.alphaTarget(0);
-    }
-    d.fx = d3.event.x;
-    d.fy = d3.event.y;
-  };
-
-  handleStartZoom = () => {
-    const { isZoom } = this.state;
-    const { minScale, maxScale } = this.props;
-    if (isZoom) {
-      this.svg.on('.zoom', null);
-      this.setState({
-        isZoom: false,
-      });
-    } else {
-      this.svg.call(
-        d3
-          .zoom()
-          .scaleExtent([minScale, maxScale])
-          .on('zoom', () =>
-            // TODO: scale cancel the fixed, supports scroll zoom
-            d3
-              .select(this.canvasBoardRef)
-              .attr(
-                'transform',
-                `translate(${d3.event.transform.x},${d3.event.transform.y}) scale(${this.state.scale})`,
-              ),
-          )
-          .on('end', () => {
-            this.setState({
-              offsetX: d3.event.transform.x,
-              offsetY: d3.event.transform.y,
-              // scale: d3.event.transform.k, // TODO: scale cancel the fixed, supports scroll zoom
-            });
-          }),
-      );
-      this.setState({
-        isZoom: true,
-      });
-    }
-  };
-
-  handleZoom = (type: string) => {
-    const { scale, offsetX, offsetY } = this.state;
-    const { minScale, maxScale } = this.props;
-    if (type === 'out' && scale > minScale) {
-      const number = scale * 0.9 < minScale ? minScale : scale * 0.9;
-      this.setState({
-        scale: number,
-      });
-      d3.select(this.canvasBoardRef).attr(
-        'transform',
-        `translate(${offsetX},${offsetY}) scale(${number})`,
-      );
-    } else if (type === 'in' && scale < 1) {
-      const number = scale * 1.1 > maxScale ? maxScale : scale * 1.1;
-      this.setState({
-        scale: number,
-      });
-      d3.select(this.canvasBoardRef).attr(
-        'transform',
-        `translate(${offsetX},${offsetY}) scale(${number})`,
-      );
     }
   };
 
@@ -386,25 +259,17 @@ class NebulaD3 extends React.Component<IProps, IState> {
     d3.select(this.nodeRef)
       .selectAll('circle')
       .data(nodes)
-      .classed('active', (d: INode) => {
-        if (selectNodeNames.includes(d.name)) {
-          return true;
-        } else {
-          return false;
-        }
-      })
+      .style('fill', (d: INode) => d.color)
+      .classed('active', (d: INode) => selectNodeNames.includes(d.name))
       .enter()
       .append<SVGCircleElement>('circle')
       .attr('class', 'node')
       .attr('r', 20)
-      .style('fill', (d: INode) => {
-        const group = d.group;
-        return whichColor(group);
-      })
+      .style('fill', (d: INode) => d.color) // HACK: Color distortion caused by delete node
       .attr('id', (d: INode) => `node-${d.uuid}`)
       .on('mouseover', (d: INode) => {
         if (this.props.onMouseInNode) {
-          this.props.onMouseInNode(d);
+          this.props.onMouseInNode(d, d3.event);
         }
       })
       .on('mouseout', () => {
@@ -434,7 +299,7 @@ class NebulaD3 extends React.Component<IProps, IState> {
           .drag()
           .on('start', d => this.dragstart(d))
           .on('drag', d => this.dragged(d))
-          .on('end', d => this.dragEnded(d)) as any,
+          .on('end', this.dragEnded) as any,
       );
     this.force.on('tick', () => this.tick());
   }
@@ -454,14 +319,22 @@ class NebulaD3 extends React.Component<IProps, IState> {
             .drag()
             .on('start', d => this.dragstart(d))
             .on('drag', d => this.dragged(d))
-            .on('end', d => this.dragEnded(d)) as any,
+            .on('end', this.dragEnded) as any,
         );
     }
   };
 
-  handleUpdataLinks = () => {
+  handleUpdateLinks = () => {
     if (this.force) {
-      this.link = d3.selectAll('.link').attr('marker-end', 'url(#marker)');
+      this.link = d3.selectAll('.link').on('click', this.handleEdgeClick);
+      d3.selectAll('.link:not(.hovered-link .active-link)')
+        .attr('marker-end', 'url(#marker)')
+        .style('stroke', '#595959')
+        .style('stroke-width', 2);
+      d3.selectAll('.link.active-link')
+        .attr('marker-end', 'url(#marker-actived)')
+        .style('stroke', '#0091ff')
+        .style('stroke-width', 3);
       this.linksText = d3
         .selectAll('.text')
         .selectAll('.textPath')
@@ -571,69 +444,44 @@ class NebulaD3 extends React.Component<IProps, IState> {
     });
   }
 
-  onSelectVertexes = nodes => {
-    this.props.onSelectVertexes(nodes);
-  };
-
-  handleExportImg = () => {
-    const _svgNode = this.svg.node().cloneNode(true);
-    const size = this.svg.node().getBBox();
-    _svgNode.setAttribute(
-      'viewBox',
-      size.x + ' ' + size.y + ' ' + size.width + ' ' + size.height,
-    );
-    _svgNode.setAttribute('width', size.width);
-    _svgNode.setAttribute('height', size.height);
-    const serializer = new XMLSerializer();
-    const svgString = serializer.serializeToString(_svgNode);
-    svgString2Image(svgString, size, save);
-  };
-
   render() {
     this.computeDataByD3Force();
-    const { width, height, data, onMouseInLink, onMouseOut } = this.props;
-    const { offsetX, offsetY, scale, isZoom } = this.state;
+    const {
+      width,
+      height,
+      data,
+      onMouseInLink,
+      onMouseOut,
+      offsetX,
+      offsetY,
+      scale,
+      selectedPaths,
+      onSelectVertexes,
+      onSelectEdges,
+      isZoom,
+    } = this.props;
     return (
-      <div>
-        <Button
-          type={isZoom ? 'primary' : 'default'}
-          className="graph-btn"
-          onClick={this.handleStartZoom}
-          disabled={data.vertexes.length === 0}
-        >
-          <Icon type="drag" />
-        </Button>
-        <Button.Group className="graph-btn">
-          <Button
-            onClick={() => this.handleZoom('out')}
-            disabled={data.vertexes.length === 0}
-          >
-            <Icon type="zoom-out" />
-          </Button>
-          <Button
-            onClick={() => this.handleZoom('in')}
-            disabled={data.vertexes.length === 0}
-          >
-            <Icon type="zoom-in" />
-          </Button>
-        </Button.Group>
+      <>
         <svg
           id="output-graph"
-          className="output-graph"
-          ref={mountPoint => (this.ctrls.mountPoint = mountPoint)}
+          className={isZoom ? 'cursor-move' : undefined}
           width={width}
           height={height}
         >
-          <g ref={(ref: SVGCircleElement) => (this.canvasBoardRef = ref)}>
+          <g
+            className="nebula-d3-canvas"
+            ref={(ref: SVGCircleElement) => (this.canvasBoardRef = ref)}
+          >
             <Links
               links={data.edges}
-              onUpdataLinks={this.handleUpdataLinks}
+              selectedPaths={selectedPaths}
+              onUpdateLinks={this.handleUpdateLinks}
               onMouseInLink={onMouseInLink}
               onMouseOut={onMouseOut}
             />
             <g
               ref={(ref: SVGCircleElement) => (this.nodeRef = ref)}
-              className="nodes"
+              className="nebula-d3-nodes"
             />
             <Labels
               nodes={data.vertexes}
@@ -642,15 +490,19 @@ class NebulaD3 extends React.Component<IProps, IState> {
           </g>
           <SelectIds
             nodes={data.vertexes}
+            links={data.edges}
             offsetX={offsetX}
             offsetY={offsetY}
             scale={scale}
-            onSelectVertexes={this.onSelectVertexes}
+            onSelectVertexes={onSelectVertexes}
+            onSelectEdges={onSelectEdges}
+            selectedPaths={selectedPaths}
           />
         </svg>
-      </div>
+        <Menu width={width} height={height} />
+      </>
     );
   }
 }
 
-export default NebulaD3;
+export default connect(mapState)(NebulaD3);

@@ -1,16 +1,13 @@
-.output-graph {
+#output-graph {
 	text-align: center;
 	overflow: hidden;
 	user-select: none;
 
 	.links path {
-		stroke: #999;
-		stroke-opacity: 0.6;
 		cursor: default;
-		fill: none;
 	}
 
-	.nodes {
+	.nebula-d3-nodes {
 		cursor: pointer;
 		stroke: #fff;
 		stroke-width: 2.5;
@@ -19,7 +16,7 @@
 
 		.node {
 			&.active {
-				stroke: rgba(140, 192, 234, 0.8);
+				stroke: rgba(0, 0, 0, 0.5);
 				stroke-width: 6;
 				r: 20;
 			}
@@ -51,3 +48,7 @@
 	}
 }
 
+
+.cursor-move {
+	cursor: move;
+}

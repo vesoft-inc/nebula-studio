@@ -118,5 +118,24 @@ export const dataType = [
   },
 ];
 
+export const RELATION_OPERATORS = [
+  {
+    label: 'NOT',
+    value: 'NOT',
+  },
+  {
+    label: 'AND',
+    value: 'AND',
+  },
+  {
+    label: 'OR',
+    value: 'OR',
+  },
+  {
+    label: 'XOR',
+    value: 'XOR',
+  },
+];
+
 export const nameReg = /^[a-zA-Z][a-zA-Z0-9_]*$/;
 export const positiveIntegerReg = /^[1-9]\d*$/g;

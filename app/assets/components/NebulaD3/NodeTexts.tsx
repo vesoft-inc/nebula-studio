@@ -2,11 +2,8 @@ import * as d3 from 'd3';
 import _ from 'lodash';
 import * as React from 'react';
 
-interface INode extends d3.SimulationNodeDatum {
-  name: string;
-  group: number;
-  uuid: string;
-}
+import { INode } from '#assets/utils/interface';
+
 interface IProps {
   nodes: INode[];
   onUpDataNodeTexts: () => void;

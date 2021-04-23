@@ -1,31 +1,29 @@
-import { Button } from 'antd';
 import * as d3 from 'd3';
 import _ from 'lodash';
 import React from 'react';
-import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
-import { Modal, NebulaD3 } from '#assets/components';
-import { MAX_SCALE, MIN_SCALE } from '#assets/config/explore';
+import { NebulaD3 } from '#assets/components';
+import DisplayPanel from '#assets/components/DisplayPanel';
+import ExpandComponent from '#assets/components/Expand';
 import { IDispatch, IRootState } from '#assets/store';
-import { IEdge, INode } from '#assets/store/models';
+import { INode, IPath } from '#assets/utils/interface';
 
 import './index.less';
 import Panel from './Panel';
-import Setting from './Setting';
 
 const mapState = (state: IRootState) => ({
   vertexes: state.explore.vertexes,
   edges: state.explore.edges,
   selectVertexes: state.explore.selectVertexes,
-  actionData: state.explore.actionData,
+  selectEdges: state.explore.selectEdges,
   showTagFields: state.explore.showTagFields,
   showEdgeFields: state.explore.showEdgeFields,
   space: state.nebula.currentSpace,
-  tagsFields: state.nebula.tagsFields,
   edgesFields: state.nebula.edgesFields,
-  tags: state.nebula.tags,
-  edgeTypes: state.nebula.edgeTypes,
+  canvasScale: state.d3Graph.canvasScale,
+  canvasOffsetX: state.d3Graph.canvasOffsetX,
+  canvasOffsetY: state.d3Graph.canvasOffsetY,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -34,51 +32,39 @@ const mapDispatch = (dispatch: IDispatch) => ({
       selectVertexes: vertexes,
     });
   },
-  updateActionData: (actionData, edges, vertexes) => {
+  updateSelectEdges: (edges: IPath[]) => {
     dispatch.explore.update({
-      actionData,
-      edges,
-      vertexes,
-      selectVertexes: [],
+      selectEdges: edges,
     });
   },
-  updateShowingFields: fields => {
-    dispatch.explore.update(fields);
-  },
-  asyncGetTagsFields: dispatch.nebula.asyncGetTagsFields,
-  asyncGetEdgeTypesFields: dispatch.nebula.asyncGetEdgeTypesFields,
-  asyncBidirectExpand: dispatch.explore.asyncBidirectExpand,
+  asyncAutoExpand: dispatch.explore.asyncAutoExpand,
 });
 
 interface IState {
   width: number;
   height: number;
-  isTags: boolean;
-  isFixToolTip: boolean;
 }
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {
-  onD3Ref: any;
-}
+    ReturnType<typeof mapDispatch> {}
 class NebulaGraph extends React.Component<IProps, IState> {
   settingHandler;
   $tooltip;
   ref: HTMLDivElement;
-
   constructor(props: IProps) {
     super(props);
     this.state = {
       width: 0,
       height: 0,
-      isTags: true,
-      isFixToolTip: false,
     };
   }
 
-  handleSelectVertexes = (nodes: any[]) => {
+  handleSelectVertexes = (nodes: INode[]) => {
     this.props.updateSelectIds(nodes);
+  };
+  handleSelectEdges = (edges: IPath[]) => {
+    this.props.updateSelectEdges(edges);
   };
 
   componentDidMount() {
@@ -98,89 +84,117 @@ class NebulaGraph extends React.Component<IProps, IState> {
     this.$tooltip
       .transition()
       .duration(200)
-      .style('display', 'block')
-      .style('opacity', '0.85')
-      .style('top', 0)
-      .style('left', 0);
+      .style('visibility', 'none')
+      .style('opacity', '0.95');
     window.addEventListener('resize', this.handleResize);
 
     this.$tooltip.on('mouseout', this.handleMouseOut);
-  }
-
-  componentDidUpdate(prevProps) {
-    const { space } = this.props;
-    if (prevProps.space !== space) {
-      this.props.updateShowingFields({
-        showTagFields: [],
-        showEdgeFields: [],
-      });
-    }
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
   }
 
-  handleMouseInNode = node => {
-    this.renderTooltip(node);
-    this.$tooltip.style('display', 'block');
+  handleMouseInNode = (node, event) => {
+    this.renderVertexTips(node);
+    this.renderTipPosition(event, 'node');
   };
 
-  handleMouseInLink = link => {
+  handleMouseInLink = (link, event) => {
+    this.renderPathTips(link);
+    this.renderTipPosition(event, 'link');
+  };
+
+  handleMouseOut = () => {
+    this.$tooltip.style('visibility', 'hidden');
+  };
+
+  renderPathTips = link => {
     const properties = link.edgeProp ? link.edgeProp.properties : {};
     const edgeFieldsValuePairStr = Object.keys(properties)
       .map(property => {
         const value = properties[property];
-        return `<p key=${property}>${link.type}.${property}: ${value}</p>`;
+        return `<div key=${property}><span>${link.type}.${property}: </span><span>${value}</span></div>`;
       })
       .join('');
-    this.$tooltip
-      .html(
-        `<p style="font-weight:600">Edge Details</p> <p>id: ${link.id}</p> ${edgeFieldsValuePairStr}`,
-      )
-      .style('display', 'block');
+    this.$tooltip.html(
+      `<div>Edge Details</div><div><span>id: </span><span>${link.id}</span></div> ${edgeFieldsValuePairStr}`,
+    );
   };
 
-  fixTooltip = () => {
-    this.$tooltip.style('display', 'block');
-    this.setState({
-      isFixToolTip: true,
-    });
-  };
-
-  hideTooltip = () => {
-    this.$tooltip.style('display', 'none');
-    this.setState({
-      isFixToolTip: false,
-    });
-  };
-
-  handleMouseOut = () => {
-    const { isFixToolTip } = this.state;
-    const { selectVertexes } = this.props;
-    if (!isFixToolTip) {
-      this.$tooltip.style('display', 'none');
-    } else if (isFixToolTip && selectVertexes.length === 1) {
-      this.renderTooltip(selectVertexes[0]);
-    }
-  };
-
-  renderTooltip = node => {
+  renderVertexTips = node => {
     const properties = node.nodeProp ? node.nodeProp.properties : {};
-    const vertexIDStr = `<p key='id'>Vertex ID: ${node.name}</p>`;
+    const vertexIDStr = `<div><span key='id'>vid: </span><span>${JSON.stringify(
+      node.name,
+    )}</span></div>`;
     const nodeFieldsValuePairStr = Object.keys(properties)
       .map(property => {
         const valueObj = properties[property];
         return Object.keys(valueObj)
           .map(fields => {
-            return `<p key=${fields}>${property}.${fields}: ${valueObj[fields]}</p>`;
+            return `<div key=${fields}><span>${property}.${fields}: </span><span>${JSON.stringify(
+              valueObj[fields],
+              (_, value) => {
+                if (typeof value === 'string') {
+                  return value.replace(/\u0000+$/, '');
+                }
+                return value;
+              },
+            )}</span></div>`;
           })
           .join('');
       })
       .join('');
     this.$tooltip.html(
-      `<p style="font-weight:600">Vertex Details</p> ${vertexIDStr} ${nodeFieldsValuePairStr}`,
+      `<div>Vertex Details</div>${vertexIDStr} ${nodeFieldsValuePairStr}`,
     );
+  };
+
+  renderTipPosition = (event, type) => {
+    const { width, height } = this.state;
+    const { canvasScale, canvasOffsetY, canvasOffsetX } = this.props;
+    const box = d3.select('.tooltip').node();
+    if (box) {
+      const {
+        width: boxW,
+        height: boxH,
+      } = (box as HTMLElement).getBoundingClientRect();
+      const target = d3.select(event.target);
+      let left = event.offsetX * canvasScale;
+      let top = event.offsetY * canvasScale;
+      let offsetX = 10 * canvasScale;
+      let offsetY = 10 * canvasScale;
+      if (type === 'node') {
+        left = Number(target.attr('cx')) * canvasScale + canvasOffsetX;
+        top = Number(target.attr('cy')) * canvasScale + canvasOffsetY;
+        offsetX = 20 * canvasScale;
+        offsetY = 20 * canvasScale;
+      } else if (type === 'link') {
+        const positionArr = target.attr('d').split(' ');
+        const sourceX = Number(positionArr[1]);
+        const targetX = Number(positionArr[4]);
+        const sourceY = Number(positionArr[2]);
+        const targetY = Number(positionArr[5]);
+        left = ((sourceX + targetX) / 2) * canvasScale + canvasOffsetX;
+        top = ((sourceY + targetY) / 2) * canvasScale + canvasOffsetY;
+        offsetX = 20 * canvasScale;
+        offsetY = 20 * canvasScale;
+      }
+      if (width - left - offsetX < boxW) {
+        left = left - boxW - offsetX;
+      } else {
+        left = left + offsetX;
+      }
+      if (height - top - offsetY < boxH) {
+        top = top - boxH + offsetY;
+      } else {
+        top = top + offsetY;
+      }
+      this.$tooltip
+        .style('top', top + 'px')
+        .style('left', left + 'px')
+        .style('visibility', 'initial');
+    }
   };
 
   handleResize = () => {
@@ -191,128 +205,27 @@ class NebulaGraph extends React.Component<IProps, IState> {
     });
   };
 
-  handleUndo = () => {
-    const { actionData, vertexes, edges } = this.props;
-    const data = actionData.pop() as any;
-    if (data.type === 'ADD') {
-      this.props.updateActionData(
-        actionData,
-        _.differenceBy(edges, data.edges, (e: IEdge) => e.uuid),
-        _.differenceBy(vertexes, data.vertexes, (v: INode) => v.uuid),
-      );
-    } else {
-      this.props.updateActionData(
-        actionData,
-        _.unionBy(edges, data.edges, (e: IEdge) => e.uuid),
-        _.unionBy(vertexes, data.vertexes, (v: INode) => v.uuid),
-      );
-    }
-  };
-
-  handleShowTags = async () => {
-    const { asyncGetTagsFields, tags } = this.props;
-    await asyncGetTagsFields({
-      tags,
-    });
-    this.settingHandler.show();
-  };
-
-  handleShowEdges = async () => {
-    const { asyncGetEdgeTypesFields, edgeTypes } = this.props;
-    const _edgeTypes = edgeTypes.map(i => ({
-      Name: i,
-    }));
-    await asyncGetEdgeTypesFields({
-      edgeTypes: _edgeTypes,
-    });
-    this.settingHandler.show();
-  };
-
-  handleSetting = (type: string) => {
-    if (type === 'tags') {
-      this.setState(
-        {
-          isTags: true,
-        },
-        this.handleShowTags,
-      );
-    } else {
-      this.setState(
-        {
-          isTags: false,
-        },
-        this.handleShowEdges,
-      );
-    }
-  };
-
-  handleEdgesNameChange = showEdgeFields => {
-    const { edges, updateShowingFields } = this.props;
-    edges.forEach((edge: any) => {
-      if (
-        !showEdgeFields.includes(`${edge.type}.type`) &&
-        showEdgeFields.includes(`${edge.type}._rank`)
-      ) {
-        showEdgeFields.splice(showEdgeFields.indexOf(`${edge.type}._rank`), 1);
-      }
-    });
-    updateShowingFields({
-      showEdgeFields,
-    });
-  };
-
-  handleTagsNameChange = showTagFields => {
-    this.props.updateShowingFields({
-      showTagFields,
-    });
-  };
-
   render() {
     const {
       vertexes,
       edges,
-      actionData,
-      tagsFields,
-      tags,
-      edgeTypes,
-      edgesFields,
       showTagFields,
       showEdgeFields,
       selectVertexes,
+      selectEdges,
     } = this.props;
-    const { width, height, isTags } = this.state;
+    const { width, height } = this.state;
     return (
       <div
         className="graph-wrap"
         ref={(ref: HTMLDivElement) => (this.ref = ref)}
       >
-        {/* // TODO: move into <Panel/> */}
-        <Button
-          className="show-btn"
-          onClick={() => this.handleSetting('tags')}
-          disabled={tags.length === 0 || vertexes.length === 0}
-        >
-          {intl.get('explore.showTags')}
-        </Button>
-        <Button
-          className="show-btn show-edges"
-          onClick={() => this.handleSetting('edges')}
-          disabled={edgeTypes.length === 0 || edges.length === 0}
-        >
-          {intl.get('explore.showEdges')}
-        </Button>
-        <Button
-          className="history-undo"
-          onClick={this.handleUndo}
-          disabled={actionData.length === 0}
-        >
-          {intl.get('explore.undo')}
-        </Button>
-        <Panel />
+        <Panel toolTipRef={this.$tooltip} />
         <NebulaD3
           width={width}
           height={height}
           selectedNodes={selectVertexes}
+          selectedPaths={selectEdges}
           showTagFields={showTagFields}
           showEdgeFields={showEdgeFields}
           data={{
@@ -323,34 +236,11 @@ class NebulaGraph extends React.Component<IProps, IState> {
           onMouseInNode={this.handleMouseInNode}
           onMouseOut={this.handleMouseOut}
           onSelectVertexes={this.handleSelectVertexes}
-          onDblClickNode={this.props.asyncBidirectExpand}
-          onClickNode={this.fixTooltip}
-          onClickEmptySvg={this.hideTooltip}
-          onD3Ref={this.props.onD3Ref}
-          minScale={MIN_SCALE}
-          maxScale={MAX_SCALE}
+          onSelectEdges={this.handleSelectEdges}
+          onDblClickNode={this.props.asyncAutoExpand}
         />
-        <Modal
-          wrapClassName="graph-setting"
-          handlerRef={handler => (this.settingHandler = handler)}
-          footer={
-            <Button
-              key="confirm"
-              type="primary"
-              onClick={() => this.settingHandler.hide()}
-            >
-              {intl.get('explore.confirm')}
-            </Button>
-          }
-        >
-          <Setting
-            showFields={isTags ? showTagFields : showEdgeFields}
-            fields={isTags ? tagsFields : edgesFields}
-            onNameChange={
-              isTags ? this.handleTagsNameChange : this.handleEdgesNameChange
-            }
-          />
-        </Modal>
+        <ExpandComponent />
+        <DisplayPanel />
       </div>
     );
   }

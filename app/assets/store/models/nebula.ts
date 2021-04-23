@@ -222,6 +222,7 @@ export const nebula = createModel({
       cookies.remove('nh');
       cookies.remove('nu');
       cookies.remove('np');
+      sessionStorage.removeItem('currentSpace');
       dispatch({ type: 'RESET_APP' });
     },
     // spaces
@@ -299,6 +300,7 @@ export const nebula = createModel({
           currentSpace: space,
           spaceVidType,
         });
+        sessionStorage.setItem('currentSpace', space);
       }
     },
 

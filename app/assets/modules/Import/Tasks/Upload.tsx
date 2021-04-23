@@ -192,15 +192,17 @@ class Import extends React.Component<IProps> {
           </div>
           {this.renderFileTable()}
         </div>
-        <Prev />
-        <Button
-          type="primary"
-          className="next"
-          disabled={!files.length}
-          onClick={this.handleNext}
-        >
-          {intl.get('import.next')}
-        </Button>
+        <div className="btns-import-step">
+          <Prev />
+          <Button
+            type="primary"
+            className="next"
+            disabled={!files.length}
+            onClick={this.handleNext}
+          >
+            {intl.get('import.next')}
+          </Button>
+        </div>
       </div>
     );
   }

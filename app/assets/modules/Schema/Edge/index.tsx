@@ -26,7 +26,7 @@ interface IProps
   match: match<{ space: string }>;
 }
 
-interface IEdge {
+interface IEdgeInfo {
   name: string;
   fields: IField[];
 }
@@ -40,7 +40,7 @@ interface IState {
   expandedRowKeys: number[];
 }
 
-function renderEdgeInfo(edge: IEdge) {
+function renderEdgeInfo(edge: IEdgeInfo) {
   const fieldsColumn = [
     {
       title: intl.get('common.propertyName'),

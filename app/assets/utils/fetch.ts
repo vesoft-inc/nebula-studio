@@ -54,7 +54,8 @@ export async function fetchVertexProps(payload: {
     gql,
   })) as any;
   if (code === 0) {
-    const vertexes = data.tables.map(vertex => {
+    const vertexList = data.tables.map(i => i._verticesParsedList).flat();
+    const vertexes = vertexList.map(vertex => {
       const _vertex: IMatchVertex = {};
       _vertex.vid = vertex.vid || '';
       _vertex.tags = vertex.tags || [];

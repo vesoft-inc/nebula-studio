@@ -1,0 +1,63 @@
+.d3-click-right-menu {
+	position: absolute;
+	visibility: hidden;
+	z-index: 1;
+	background: #fff;
+	border: 1px solid #d7d7d7;
+	box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.2);
+
+	.panel-btn-item,
+	.menu-color {
+		display: flex;
+		width: 182px;
+		height: 43px;
+		padding: 8px 9px;
+		align-items: center;
+
+		.btn-color {
+			width: 20px;
+			height: 20px;
+			position: absolute;
+			left: 12px;
+		}
+
+		.panel-menu-icon {
+			position: absolute;
+
+			svg {
+				width: 27px;
+				height: 27px;
+			}
+		}
+
+		span {
+			width: 100%;
+			text-align: center;
+			font-size: 14px;
+			letter-spacing: 0;
+			font-weight: 400;
+		}
+	}
+
+	.panel-btn-item:not(:first-child) {
+		border-top: none;
+	}
+
+	.panel-btn-item:not(:last-child) {
+		border-bottom: none;
+	}
+
+	.panel-btn-item:hover {
+		border-color: initial;
+	}
+
+	.panel-btn-item:not(.panel-disabled):hover,
+	.menu-color:not(.panel-disabled):hover {
+		background: #0091ff;
+		color: #fff;
+
+		svg {
+			fill: #fff;
+		}
+	}
+}

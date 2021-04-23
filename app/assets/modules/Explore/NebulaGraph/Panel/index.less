@@ -1,14 +1,31 @@
 .graph-wrap {
 	position: relative;
-	height: 90%;
+	height: calc(100% - 65px);
 	overflow: hidden;
 
 	> .panel {
-		float: right;
-		margin-right: 20px;
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+		top: 20px;
+		display: inline-flex;
+		background: #fff;
+		border: 1px solid #e8e8e8;
+		box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+		border-radius: 4px;
+		padding: 5px 12px 5px 22px;
 
-		.panel-delete {
-			margin-left: 20px;
+		.panel-group {
+			display: inline-flex;
+			align-items: center;
+
+			&:not(:first-child) {
+				margin-left: 10px;
+			}
+
+			&:not(:last-child) {
+				border-right: 1px solid #e8e8e8;
+			}
 		}
 	}
 }

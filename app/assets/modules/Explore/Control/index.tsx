@@ -5,6 +5,7 @@ import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
 import { Modal } from '#assets/components';
+import ExportBtn from '#assets/modules/Explore/NebulaGraph/Panel/Export';
 import { IDispatch, IRootState } from '#assets/store';
 
 import ImportNodes from './ImportNode';
@@ -37,7 +38,6 @@ interface IProps
     ReturnType<typeof mapDispatch>,
     FormComponentProps {
   onRef: any;
-  handleExportImg: () => void;
 }
 
 class Control extends React.Component<IProps, {}> {
@@ -76,10 +76,6 @@ class Control extends React.Component<IProps, {}> {
     }
   };
 
-  handleExportImg = () => {
-    this.props.handleExportImg();
-  };
-
   render() {
     const { spaces, currentSpace, vertexes } = this.props;
 
@@ -103,6 +99,7 @@ class Control extends React.Component<IProps, {}> {
             {intl.get('explore.clear')}
           </Button>
           <Button
+            type="primary"
             onClick={() => {
               if (this.importNodesHandler) {
                 this.importNodesHandler.show();
@@ -111,12 +108,7 @@ class Control extends React.Component<IProps, {}> {
           >
             {intl.get('explore.startWithVertices')}
           </Button>
-          <Button
-            disabled={vertexes.length === 0}
-            onClick={this.handleExportImg}
-          >
-            {intl.get('explore.exportToImg')}
-          </Button>
+          <ExportBtn disabled={vertexes.length === 0} />
           <Modal
             handlerRef={handler => (this.importNodesHandler = handler)}
             footer={null}

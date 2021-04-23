@@ -5,6 +5,7 @@ import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
 import { Modal } from '#assets/components';
+import { DEFAULT_EXPLORE_RULES } from '#assets/config/explore';
 import { IDispatch, IRootState } from '#assets/store';
 
 const Option = Select.Option;
@@ -20,7 +21,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
     await dispatch.nebula.asyncGetTags();
     await dispatch.nebula.asyncGetEdges();
     dispatch.explore.update({
-      exploreRules: {},
+      exploreRules: DEFAULT_EXPLORE_RULES,
     });
   },
   asyncGetTags: dispatch.nebula.asyncGetTags,
@@ -36,8 +37,8 @@ class Init extends React.Component<IProps> {
   modalHandler;
 
   async componentDidMount() {
-    // if no currentSpace opne the modal to select
-    if (!this.props.currentSpace) {
+    const sessionSpace = sessionStorage.getItem('currentSpace');
+    if (!this.props.currentSpace && !sessionSpace) {
       this.modalHandler.show();
     } else {
       await this.props.asyncGetTags();

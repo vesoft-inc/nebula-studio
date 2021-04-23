@@ -5,6 +5,10 @@ import _ from 'lodash';
 import intl from 'react-intl-universal';
 import { v4 as uuidv4 } from 'uuid';
 
+import {
+  DEFAULT_COLOR_PICK_LIST,
+  DEFAULT_EXPLORE_RULES,
+} from '#assets/config/explore';
 import service from '#assets/config/service';
 import {
   fetchBidirectVertexes,
@@ -16,8 +20,9 @@ import {
   convertBigNumberToString,
   handleVidStringName,
 } from '#assets/utils/function';
-import { getExploreGQL } from '#assets/utils/gql';
-import { nebulaToData, setLink } from '#assets/utils/nebulaToData';
+import { getExploreMatchGQL, getPathGQL } from '#assets/utils/gql';
+import { INode, IPath } from '#assets/utils/interface';
+import { parsePathToGraph, setLink } from '#assets/utils/parseData';
 
 function getBidrectVertexIds(data) {
   const { tables } = data;
@@ -34,21 +39,6 @@ function getBidrectVertexIds(data) {
   return ids;
 }
 
-export interface INode extends d3.SimulationNodeDatum {
-  name: string;
-  group?: number;
-  uuid: string;
-}
-
-export interface IEdge extends d3.SimulationLinkDatum<INode> {
-  id: string;
-  source: INode;
-  target: INode;
-  size: number;
-  type: string;
-  uuid: string;
-}
-
 interface IExportEdge {
   srcId: string;
   dstId: string;
@@ -60,35 +50,61 @@ interface IExportData {
   vertexes: string[];
   edges: IExportEdge[];
 }
+
+interface IRules {
+  edgeTypes?: string[];
+  edgeDirection?: string;
+  vertexColor?: string;
+  quantityLimit?: number;
+  stepsType?: string;
+  step?: number;
+  minStep?: number;
+  maxStep?: number;
+  customColor?: string;
+  filters?: any[];
+}
+
 interface IState {
   vertexes: INode[];
-  edges: IEdge[];
+  edges: IPath[];
   selectVertexes: INode[];
-  actionData: any[];
+  selectEdges: IPath[];
+  actionHistory: any[];
   step: number;
-  exploreRules: {
-    edgeTypes?: string[];
-    edgeDirection?: string;
-    vertexColor?: string;
-    quantityLimit?: number;
-  };
+  exploreRules: IRules;
   preloadData: IExportData;
   showTagFields: string[];
   showEdgeFields: string[];
 }
 
+const whichColor = (() => {
+  const colorsTotal = DEFAULT_COLOR_PICK_LIST.length;
+  let colorIndex = 0;
+  const colorsRecord = {};
+  return key => {
+    if (!colorsRecord[key]) {
+      colorsRecord[key] = DEFAULT_COLOR_PICK_LIST[colorIndex];
+      colorIndex = (colorIndex + 1) % colorsTotal;
+    }
+    return colorsRecord[key];
+  };
+})();
+
 function getGroup(tags, expand) {
-  if (expand && expand.vertexColor !== 'groupByTag') {
-    return 'step-' + expand.exploreStep;
-  } else {
+  if (expand && expand.vertexColor === 'groupByTag') {
     return 't-' + tags.sort().join('-');
   }
+  return '';
 }
 
 function getTagData(nodes, expand) {
   const data = nodes.map(node => {
     const { vid, tags, properties } = node;
     const group = getGroup(tags, expand);
+    const color =
+      expand && expand.customColor && expand.vertexColor === 'custom'
+        ? expand.customColor
+        : whichColor(group);
     const nodeProp = {
       tags,
       properties,
@@ -99,6 +115,7 @@ function getTagData(nodes, expand) {
       nodeProp,
       group,
       uuid,
+      color,
     };
   });
   return data;
@@ -109,14 +126,10 @@ export const explore = createModel({
     vertexes: [],
     edges: [],
     selectVertexes: [],
-    actionData: [],
+    selectEdges: [],
+    actionHistory: [],
     step: 0,
-    exploreRules: {
-      edgeTypes: [],
-      edgeDirection: '',
-      vertexColor: '',
-      quantityLimit: null,
-    },
+    exploreRules: DEFAULT_EXPLORE_RULES as IRules,
     preloadData: {
       vertexes: [],
       edges: [],
@@ -140,11 +153,11 @@ export const explore = createModel({
         vertexes: originVertexes,
         edges: originEdges,
         selectVertexes,
-        actionData,
+        actionHistory,
       } = state;
       const { vertexes: addVertexes, edges: addEdges } = payload;
 
-      const svg: any = d3.select('.output-graph');
+      const svg: any = d3.select('#output-graph');
       addVertexes.map(d => {
         d.x =
           _.meanBy(selectVertexes, 'x') ||
@@ -158,7 +171,7 @@ export const explore = createModel({
       const vertexes = _.uniqBy([...originVertexes, ...addVertexes], v =>
         convertBigNumberToString(v.name),
       );
-      actionData.push({
+      actionHistory.push({
         type: 'ADD',
         vertexes: _.differenceBy(addVertexes, originVertexes, v =>
           convertBigNumberToString(v.name),
@@ -173,7 +186,7 @@ export const explore = createModel({
         ...state,
         edges,
         vertexes,
-        actionData,
+        actionHistory,
       };
     },
 
@@ -182,13 +195,10 @@ export const explore = createModel({
         vertexes: [],
         edges: [],
         selectVertexes: [],
-        actionData: [],
+        selectEdges: [],
+        actionHistory: [],
         step: 0,
-        exploreRules: {
-          edgeTypes: [],
-          edgeDirection: '',
-          vertexColor: '',
-        },
+        exploreRules: DEFAULT_EXPLORE_RULES,
         preloadData: {
           vertexes: [],
           edges: [],
@@ -204,7 +214,7 @@ export const explore = createModel({
         ids: string[];
         expand?: {
           vertexColor: string;
-          exploreStep;
+          customColor;
         };
       },
       rootState,
@@ -232,33 +242,30 @@ export const explore = createModel({
       });
     },
 
-    async deleteNodesAndEdges(payload: {
-      selectVertexes: any[];
-      vertexes: INode[];
-      edges: IEdge[];
-      actionData: any[];
-    }) {
+    async deleteNodesAndEdges(_payload, rootState) {
       const {
         vertexes: originVertexes,
         edges,
         selectVertexes,
-        actionData,
-      } = payload;
+        selectEdges,
+        actionHistory,
+      } = rootState.explore;
       const originEdges = [...edges];
-      selectVertexes.forEach(selectVertexe => {
+      selectVertexes.forEach(item => {
         _.remove(
           originEdges,
-          v =>
-            v.source.uuid === selectVertexe.uuid ||
-            v.target.uuid === selectVertexe.uuid,
+          v => v.source.uuid === item.uuid || v.target.uuid === item.uuid,
         );
+      });
+      selectEdges.forEach(item => {
+        _.remove(originEdges, v => v.uuid === item.uuid);
       });
       const vertexes = _.differenceBy(
         originVertexes,
         selectVertexes,
-        v => v.uuid,
+        (v: INode) => v.uuid,
       );
-      actionData.push({
+      actionHistory.push({
         type: 'REMOVE',
         vertexes: selectVertexes,
         edges: _.differenceBy(
@@ -270,8 +277,9 @@ export const explore = createModel({
       this.update({
         vertexes,
         edges: originEdges,
-        actionData,
+        actionHistory,
         selectVertexes: [],
+        selectEdges: [],
       });
     },
 
@@ -281,21 +289,21 @@ export const explore = createModel({
       edgesFields: any[];
       edgeDirection: string;
       filters: any[];
-      exploreStep: number;
       vertexColor: string;
       quantityLimit: number | null;
+      stepsType: string;
+      step?: string;
+      minStep?: string;
+      maxStep?: string;
+      customColor?: string;
     }) {
-      const { edgesFields, exploreStep, vertexColor } = payload;
-      const { vertexes, edges } = (await this.asyncGetExpandData(
-        payload,
-      )) as any;
-      await this.asyncAddGraph({
-        edges,
-        vertexes,
+      const data = (await this.asyncGetExpandData(payload)) as any;
+      const { vertexColor, customColor } = payload;
+      await this.asyncGetExploreInfo({
+        data,
         expand: {
           vertexColor,
-          exploreStep,
-          edgesFields,
+          customColor,
         },
       });
     },
@@ -314,13 +322,20 @@ export const explore = createModel({
       }
     },
 
-    async asyncGetExploreVertex(payload: { ids: string[] }) {
-      const { ids } = payload;
+    async asyncGetExploreVertex(payload: {
+      ids: string[];
+      expand?: {
+        vertexColor: string;
+        customColor;
+      };
+    }) {
+      const { ids, expand } = payload;
       const _ids = _.uniqBy(ids, i => convertBigNumberToString(i));
       const vertexes: any =
         _ids.length > 0
           ? await this.asyncGetVertexes({
               ids: _ids,
+              expand,
             })
           : [];
       return _.uniqBy(vertexes, (i: any) =>
@@ -369,12 +384,8 @@ export const explore = createModel({
             },
             uuid: uuidv4(),
           };
-          if (expand && expand.vertexColor !== 'groupByTag') {
-            vertex.group = 'step-' + expand.exploreStep;
-          } else if (expand) {
+          if (expand && expand.vertexColor === 'groupByTag') {
             vertex.group = 't';
-          } else {
-            vertex.step = 0;
           }
           preAddVertexes.push(vertex);
         });
@@ -419,172 +430,10 @@ export const explore = createModel({
           ),
           type,
         });
-        _edges = res.tables.map(item => {
-          const edgeProp = {
-            properties: item.properties,
-          };
-          return {
-            source: convertBigNumberToString(item.srcID),
-            target: convertBigNumberToString(item.dstID),
-            id: `${type} ${item.srcID}->${item.dstID} @${item.rank}`,
-            type,
-            rank: item.rank,
-            edgeProp,
-            uuid: uuidv4(),
-          };
-        });
-      }
-      return _edges;
-    },
-
-    async asyncGetExploreInfo(data: IExportData) {
-      const { vertexes, edges } = data;
-      const _vertexes = await this.asyncGetExploreVertex({ ids: vertexes });
-      let _edges: any = _.groupBy(edges, e => e.edgeType);
-      _edges = await Promise.all(
-        Object.values(_edges).map(async item => {
-          return this.asyncGetExploreEdge(item);
-        }),
-      );
-      this.addNodesAndEdges({
-        vertexes: _vertexes,
-        edges: _edges.flat(),
-      });
-    },
-
-    async asyncBidirectExpand(_payload, rootState) {
-      const {
-        nebula: { edgeTypes },
-        explore: { selectVertexes },
-      } = rootState;
-      let vertexes = [] as any;
-      let edges = [] as any;
-      const {
-        vertexes: incomingV,
-        edges: incomingE,
-      } = (await this.asyncGetExpandData({
-        selectVertexes,
-        edgeTypes,
-        edgeDirection: 'incoming',
-      })) as any;
-      const {
-        vertexes: outgoingV,
-        edges: outgoingE,
-      } = (await this.asyncGetExpandData({
-        selectVertexes,
-        edgeTypes,
-        edgeDirection: 'outgoing',
-      })) as any;
-      vertexes = [...vertexes, ...incomingV, ...outgoingV];
-      edges = [...edges, ...incomingE, ...outgoingE];
-      await this.asyncAddGraph({
-        vertexes,
-        edges,
-      });
-    },
-
-    async asyncGetExpandData(
-      payload: {
-        selectVertexes: any[];
-        edgeTypes: string[];
-        edgesFields?: any[];
-        edgeDirection: string;
-        filters?: any[];
-        exploreStep?: number;
-        vertexColor?: string;
-        quantityLimit?: number | null;
-      },
-      rootState,
-    ) {
-      const {
-        selectVertexes,
-        edgeTypes,
-        edgeDirection,
-        filters,
-        quantityLimit,
-      } = payload;
-      const {
-        nebula: { spaceVidType },
-      } = rootState;
-      const gql = getExploreGQL({
-        selectVertexes,
-        edgeTypes,
-        edgeDirection,
-        filters,
-        quantityLimit,
-        spaceVidType,
-      });
-      const { code, data, message: errMsg } = (await service.execNGQL({
-        gql,
-      })) as any;
-      if (code === 0) {
-        const { vertexes, edges } = nebulaToData(
-          data.tables,
-          edgeTypes,
-          edgeDirection,
-          spaceVidType,
-        );
-        return {
-          vertexes,
-          edges,
-        };
-      } else {
-        message.warning(errMsg);
-        return {
-          vertexes: [],
-          edges: [],
-        };
-      }
-    },
-
-    async asyncAddGraph(
-      payload: {
-        vertexes;
-        edges;
-        expand;
-      },
-      rootState,
-    ) {
-      const {
-        explore: { vertexes: originVertexes, edges: originEdges },
-      } = rootState;
-      const { vertexes, edges, expand } = payload;
-      // fetch vertexes
-      const newVertexes = _.differenceBy(
-        vertexes,
-        originVertexes,
-        (vertex: any) => convertBigNumberToString(vertex.name),
-      );
-      const newIds = _.uniq(
-        newVertexes.map((i: any) => convertBigNumberToString(i.name)),
-      );
-      const _newVertexes =
-        newIds.length > 0
-          ? await this.asyncGetVertexes({
-              ids: newIds,
-              expand,
-            })
-          : [];
-      // fetch edges
-      const newEdges = _.differenceBy(
-        edges,
-        originEdges,
-        (edge: any) => '`' + edge.type + '`' + edge.id,
-      );
-      const edgeTypeGroup = _.groupBy(newEdges, (edge: any) => edge.type);
-      const edgeList = await Promise.all(
-        Object.keys(edgeTypeGroup).map(async type => {
-          const idRoutes = edgeTypeGroup[type].map((i: any) => i.id);
-          const edgeFields =
-            expand && expand.edgeFields
-              ? _.find(expand.edgesFields, type)
-              : null;
-          const res = await fetchEdgeProps({
-            idRoutes,
-            type,
-            edgeFields,
-          });
-          const _edges = res.tables.map(item => {
+        _edges = res.tables
+          .map(item => item._edgesParsedList)
+          .flat()
+          .map(item => {
             const edgeProp = {
               properties: item.properties,
             };
@@ -598,18 +447,142 @@ export const explore = createModel({
               uuid: uuidv4(),
             };
           });
-          return _edges;
+      }
+      return _edges;
+    },
+
+    async asyncGetExploreInfo(payload: {
+      data: IExportData;
+      expand?: {
+        vertexColor: string;
+        customColor;
+      };
+    }) {
+      const { data, expand } = payload;
+      const { vertexes, edges } = data;
+      const _vertexes = await this.asyncGetExploreVertex({
+        ids: vertexes,
+        expand,
+      });
+      let _edges: any = _.groupBy(edges, e => e.edgeType);
+      _edges = await Promise.all(
+        Object.values(_edges).map(async item => {
+          return this.asyncGetExploreEdge(item);
         }),
       );
-      const _newEdges = _.flatten(edgeList);
       this.addNodesAndEdges({
-        vertexes: _newVertexes,
-        edges: _newEdges,
+        vertexes: _vertexes,
+        edges: _edges.flat(),
       });
-      if (expand && expand.exploreStep) {
-        this.update({
-          step: expand.exploreStep,
-        });
+    },
+
+    async asyncAutoExpand(_payload, rootState) {
+      const {
+        nebula: { edgeTypes },
+        explore: { selectVertexes, exploreRules },
+      } = rootState;
+      const rules = { selectVertexes, ...exploreRules };
+      if (!rules.edgeTypes || rules.edgeTypes.length === 0) {
+        rules.edgeTypes = edgeTypes;
+      }
+      if (rules.stepsType === 'range' && (!rules.minStep || !rules.maxStep)) {
+        return message.warning('explore.missingParams');
+      }
+      const data = (await this.asyncGetExpandData(rules)) as any;
+      const { vertexColor, customColor } = rules;
+      await this.asyncGetExploreInfo({
+        data,
+        expand: {
+          vertexColor,
+          customColor,
+        },
+      });
+    },
+
+    async asyncGetExpandData(
+      payload: {
+        selectVertexes: any[];
+        edgeTypes: string[];
+        edgesFields?: any[];
+        edgeDirection: string;
+        filters?: any[];
+        vertexColor?: string;
+        quantityLimit?: number | null;
+        stepsType?: string;
+        step?: string;
+        minStep?: string;
+        maxStep?: string;
+      },
+      rootState,
+    ) {
+      const {
+        selectVertexes,
+        edgeTypes,
+        edgeDirection,
+        filters,
+        quantityLimit,
+        stepsType,
+        step,
+        minStep,
+        maxStep,
+      } = payload;
+      const {
+        nebula: { spaceVidType },
+      } = rootState;
+      const gql = getExploreMatchGQL({
+        selectVertexes,
+        edgeTypes,
+        edgeDirection,
+        filters,
+        quantityLimit,
+        spaceVidType,
+        stepsType,
+        step,
+        minStep,
+        maxStep,
+      });
+      const { code, data, message: errMsg } = (await service.execNGQL({
+        gql,
+      })) as any;
+      if (code === 0) {
+        const { vertexes, edges } = parsePathToGraph(data.tables, spaceVidType);
+        return {
+          vertexes,
+          edges,
+        };
+      } else {
+        message.warning(errMsg);
+        return {
+          vertexes: [],
+          edges: [],
+        };
+      }
+    },
+
+    async asyncGetPathResult(payload: {
+      type: string;
+      srcId: string[];
+      dstId: string[];
+      relation?: string[];
+      direction?: string;
+      stepLimit?: number | null;
+      quantityLimit?: number | null;
+      spaceVidType: string;
+    }) {
+      const { spaceVidType } = payload;
+      const gql = getPathGQL(payload);
+      const { code, data, message: errMsg } = (await service.execNGQL({
+        gql,
+      })) as any;
+      if (code === 0) {
+        if (data.tables.length === 0) {
+          message.warning(intl.get('common.noData'));
+        } else {
+          const _data = parsePathToGraph(data.tables, spaceVidType);
+          this.asyncGetExploreInfo({ data: _data });
+        }
+      } else {
+        message.warning(errMsg);
       }
     },
   }),

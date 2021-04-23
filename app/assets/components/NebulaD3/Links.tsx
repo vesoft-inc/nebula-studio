@@ -2,10 +2,13 @@ import * as d3 from 'd3';
 import _ from 'lodash';
 import * as React from 'react';
 
+import { IPath } from '#assets/utils/interface';
+
 interface IProps {
   links: any[];
-  onUpdataLinks: () => void;
-  onMouseInLink: (any) => void;
+  selectedPaths: any[];
+  onUpdateLinks: () => void;
+  onMouseInLink: (d, event) => void;
   onMouseOut: () => void;
 }
 
@@ -13,7 +16,7 @@ export default class Links extends React.Component<IProps, {}> {
   ref: SVGGElement;
 
   componentDidMount() {
-    this.linkRender(this.props.links);
+    this.linkRender(this.props.links, this.props.selectedPaths);
   }
 
   componentDidUpdate(prevProps) {
@@ -31,28 +34,42 @@ export default class Links extends React.Component<IProps, {}> {
         d3.select('#text-marker-id' + id).remove();
       });
     } else {
-      this.linkRender(this.props.links);
+      this.linkRender(this.props.links, this.props.selectedPaths);
     }
   }
 
-  linkRender(links) {
+  getNormalWidth = d => {
+    const { selectedPaths } = this.props;
+    return selectedPaths.map(path => path.id).includes(d.id) ? 3 : 2;
+  };
+
+  linkRender(links: IPath[], selectedPaths: IPath[]) {
+    const self = this;
+    const selectPathIds = selectedPaths.map(node => node.id);
     d3.select(this.ref)
       .selectAll('path')
       .data(links)
+      .classed('active-link', (d: IPath) => selectPathIds.includes(d.id))
       .enter()
       .append('svg:path')
-      .on('mouseover', (d: any) => {
-        this.props.onMouseInLink(d);
-      })
-      .on('mouseout', () => {
-        this.props.onMouseOut();
-      })
+      .attr('pointer-events', 'visibleStroke')
       .attr('class', 'link')
       .style('fill', 'none')
-      .style('stroke', '#999999')
-      .style('stroke-opacity', 0.6)
-      .attr('id', (d: any) => 'text-path-' + d.uuid)
-      .style('stroke-width', 2);
+      .style('stroke', '#595959')
+      .style('stroke-width', 2)
+      .on('mouseover', function(d) {
+        self.props.onMouseInLink(d, d3.event);
+        d3.select(this)
+          .classed('hovered-link', true)
+          .style('stroke-width', 3);
+      })
+      .on('mouseout', function() {
+        self.props.onMouseOut();
+        d3.select(this)
+          .classed('hovered-link', false)
+          .style('stroke-width', self.getNormalWidth);
+      })
+      .attr('id', (d: any) => 'text-path-' + d.uuid);
 
     d3.select(this.ref)
       .selectAll('text')
@@ -66,7 +83,7 @@ export default class Links extends React.Component<IProps, {}> {
       .attr('class', 'textPath');
 
     if (this.ref) {
-      this.props.onUpdataLinks();
+      this.props.onUpdateLinks();
     }
   }
 

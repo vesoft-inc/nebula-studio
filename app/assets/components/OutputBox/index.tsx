@@ -8,7 +8,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { Modal, OutputCsv } from '#assets/components';
 import { IDispatch, IRootState } from '#assets/store';
-import { handleVidStringName } from '#assets/utils/function';
+import { parseSubGraph } from '#assets/utils/parseData';
 import { trackEvent } from '#assets/utils/stat';
 
 import Export from './Export';
@@ -48,13 +48,15 @@ class OutputBox extends React.Component<IProps> {
 
   handleExplore = () => {
     const { result = {} } = this.props;
-    if (result.data.headers.includes('path')) {
-      this.parseToGraph('path');
-    } else if (
-      result.data.headers.includes('_vertices') &&
-      result.data.headers.includes('_edges')
+    if (
+      result.data.tables.filter(
+        item =>
+          item._verticesParsedList ||
+          item._edgesParsedList ||
+          item._pathsParsedList,
+      ).length > 0
     ) {
-      this.parseToGraph('subGraph');
+      this.parseToGraph();
     } else {
       if (this.importNodesHandler) {
         this.importNodesHandler.show();
@@ -62,75 +64,19 @@ class OutputBox extends React.Component<IProps> {
     }
   };
 
-  parseToGraph = type => {
+  parseToGraph = () => {
     const {
       result: {
         data: { tables },
       },
     } = this.props;
-    const { vertexes, edges } =
-      type === 'path'
-        ? this.parsePathToGraph(tables)
-        : this.parseSubGraph(tables);
+    const { spaceVidType } = this.props;
+    const { vertexes, edges } = parseSubGraph(tables, spaceVidType);
     this.props.updatePreloadData({
       vertexes: _.uniq(vertexes),
       edges: _.uniqBy(edges, (e: any) => e.id),
     });
     this.props.history.push('/explore');
-  };
-
-  parseSubGraph = data => {
-    const vertexes: any = [];
-    const edges: any = [];
-    const { spaceVidType } = this.props;
-    data.forEach(row => {
-      const { _edges_info: edgeList, _vertices_info: vertexList } = row;
-      vertexList.forEach(vertex => {
-        vertexes.push(vertex.vid);
-      });
-      edgeList.forEach(edge => {
-        const { dstID: dstId, srcID: srcId, rank, edgeName: edgeType } = edge;
-        edges.push({
-          srcId,
-          dstId,
-          edgeType,
-          rank,
-          id: `${edgeType} ${handleVidStringName(
-            srcId,
-            spaceVidType,
-          )}->${handleVidStringName(dstId, spaceVidType)}@${rank}}`,
-        });
-      });
-    });
-    return { vertexes, edges };
-  };
-
-  parsePathToGraph = data => {
-    const { spaceVidType } = this.props;
-    const vertexes: any = [];
-    const edges: any = [];
-    const relationships = data.map(i => i.relationships).flat();
-    relationships.forEach(relationship => {
-      const {
-        srcID: srcId,
-        dstID: dstId,
-        edgeName: edgeType,
-        rank,
-      } = relationship;
-      vertexes.push(srcId);
-      vertexes.push(dstId);
-      edges.push({
-        srcId,
-        dstId,
-        edgeType,
-        rank,
-        id: `${edgeType} ${handleVidStringName(
-          srcId,
-          spaceVidType,
-        )}->${handleVidStringName(dstId, spaceVidType)}@${rank}}`,
-      });
-    });
-    return { vertexes, edges };
   };
 
   handleTabChange = async key => {
@@ -168,9 +114,12 @@ class OutputBox extends React.Component<IProps> {
           };
         });
         showSubgraphs =
-          result.data.headers.includes('path') ||
-          (result.data.headers.includes('_vertices') &&
-            result.data.headers.includes('_edges'));
+          dataSource.filter(
+            item =>
+              item._verticesParsedList ||
+              item._edgesParsedList ||
+              item._pathsParsedList,
+          ).length > 0;
       }
     }
     return (
@@ -222,6 +171,10 @@ class OutputBox extends React.Component<IProps> {
                   bordered={true}
                   columns={columns}
                   dataSource={dataSource}
+                  pagination={{
+                    showTotal: () =>
+                      `${intl.get('common.total')} ${dataSource.length}`,
+                  }}
                   rowKey={(_, index) => index.toString()}
                 />
               </Tabs.TabPane>

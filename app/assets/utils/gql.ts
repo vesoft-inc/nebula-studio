@@ -17,13 +17,17 @@ interface IAlterConfig {
   };
 }
 
-export const getExploreGQL = (params: {
+export const getExploreMatchGQL = (params: {
   selectVertexes: any[];
   edgeTypes: string[];
   edgeDirection?: string;
   filters?: any[];
   quantityLimit?: number | null;
   spaceVidType: string;
+  stepsType?: string;
+  step?: string;
+  minStep?: string;
+  maxStep?: string;
 }) => {
   const {
     selectVertexes,
@@ -32,40 +36,32 @@ export const getExploreGQL = (params: {
     filters,
     quantityLimit,
     spaceVidType,
+    stepsType,
+    step,
+    minStep,
+    maxStep,
   } = params;
-  const wheres = filters
-    ? filters
-        .filter(filter => filter.field && filter.operator && filter.value)
-        .map(filter => `${filter.field} ${filter.operator} ${filter.value}`)
-        .join(`\n  AND `)
-    : '';
-  let direction;
-  switch (edgeDirection) {
-    case 'incoming':
-      direction = 'REVERSELY';
-      break;
-    default:
-      direction = ''; // default outgoing
+  let _step = '';
+  if (stepsType === 'single') {
+    _step = `*${step || 1}`;
+  } else if (stepsType === 'range' && minStep && maxStep) {
+    _step = `*${minStep}..${maxStep}`;
   }
-  const gql =
-    `GO FROM 
-  ${selectVertexes.map(i => handleVidStringName(i.name, spaceVidType))}
-OVER
-  ` +
-    '`' +
-    edgeTypes.join('`,`') +
-    '` ' +
-    `${direction} ${wheres ? `\nWHERE ${wheres}` : ''}
-YIELD 
-${edgeTypes
-  .map(type => {
-    const typeName = '`' + type + '`';
-    return `${typeName}._src as ${type}SourceId,\n  ${typeName}._dst as ${type}DestId,\n  ${typeName}._rank as ${type}Rank`;
-  })
-  .join(',\n')}
-` +
-    `| LIMIT ${quantityLimit ? quantityLimit : 100}`;
-
+  const _filters = filters
+    ? filters
+        .map(filter => `${filter.relation || ''} l.${filter.expression}`)
+        .join(`\n`)
+    : '';
+  const wheres = _filters ? `AND ALL(l IN e WHERE ${_filters})` : '';
+  const gql = `MATCH p=(v)${
+    edgeDirection === 'incoming' ? '<-' : '-'
+  }[e${edgeTypes.map(edge => `:${edge}`).join('|')}${_step}]${
+    edgeDirection === 'outgoing' ? '->' : '-'
+  }(v2) 
+WHERE id(v) IN [${selectVertexes
+    .map(i => handleVidStringName(i.name, spaceVidType))
+    .join(', ')}] 
+    ${wheres} RETURN p LIMIT ${quantityLimit ? quantityLimit : 100}`;
   return gql;
 };
 
@@ -234,5 +230,41 @@ export const getIndexCreateGQL = (params: {
     ? `on ${handleKeyword(associate)}(${fields.join(', ')})`
     : '';
   const gql = `CREATE ${type} INDEX ${handleKeyword(name)} ${combine}`;
+  return gql;
+};
+
+export const getPathGQL = (params: {
+  type: string;
+  srcId: string[];
+  dstId: string[];
+  relation?: string[];
+  direction?: string;
+  stepLimit?: number | null;
+  quantityLimit?: number | null;
+  spaceVidType: string;
+}) => {
+  const {
+    type,
+    srcId,
+    dstId,
+    relation,
+    direction,
+    stepLimit,
+    quantityLimit,
+    spaceVidType,
+  } = params;
+  const _srcIds = srcId
+    .map(item => handleVidStringName(item, spaceVidType))
+    .join(', ');
+  const _dstIds = dstId
+    .map(item => handleVidStringName(item, spaceVidType))
+    .join(', ');
+  const _relation = relation && relation.length > 0 ? relation.join(', ') : '*';
+  const gql =
+    `FIND ${type} PATH FROM ${_srcIds} TO ${_dstIds} over ${_relation}` +
+    `${direction ? ` ${direction}` : ''}` +
+    `${stepLimit ? ' UPTO ' + stepLimit + ' STEPS' : ''}` +
+    `${quantityLimit ? ' | LIMIT ' + quantityLimit : ''}`;
+
   return gql;
 };

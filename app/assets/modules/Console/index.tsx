@@ -145,7 +145,7 @@ class Console extends React.Component<IProps, IState> {
     const { isUpDown, history } = this.state;
     const { currentSpace, currentGQL, result, runGQLLoading } = this.props;
     return (
-      <div className="nebula-console">
+      <div className="nebula-console padding-page">
         <div className="ngql-content">
           <div className="mirror-wrap">
             <div className="mirror-nav">

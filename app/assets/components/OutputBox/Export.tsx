@@ -102,7 +102,7 @@ class Export extends React.Component<IProps> {
           {type === 'vertex' && (
             <>
               <p>{intl.get('console.exportVertex')}</p>
-              <Form.Item className="select-component" label="Vertex ID">
+              <Form.Item className="select-component" label="vid">
                 {getFieldDecorator('vertexId', {
                   rules: [
                     {

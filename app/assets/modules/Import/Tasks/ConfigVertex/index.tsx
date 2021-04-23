@@ -102,8 +102,10 @@ class ConfigNode extends React.PureComponent<IProps> {
             ))}
           </Tabs>
         </div>
-        <Prev />
-        <Next />
+        <div className="btns-import-step">
+          <Prev />
+          <Next />
+        </div>
       </div>
     );
   }

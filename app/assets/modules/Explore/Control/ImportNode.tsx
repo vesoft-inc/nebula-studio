@@ -4,6 +4,7 @@ import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 
+import AlgorithmQuery from './AlgorithmQuery';
 import CustomQuery from './CustomQuery';
 import IdQuery from './IdQuery';
 import IndexQuery from './IndexQuery';
@@ -33,6 +34,9 @@ class ImportNodes extends React.Component<IProps, IState> {
         </Tabs.TabPane>
         <Tabs.TabPane tab={intl.get('explore.queryByIndex')} key="index">
           <IndexQuery closeHandler={this.props.handler.hide} />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab={intl.get('explore.graphAlgorithm')} key="algorithm">
+          <AlgorithmQuery closeHandler={this.props.handler.hide} />
         </Tabs.TabPane>
         <Tabs.TabPane tab={intl.get('explore.queryByCustom')} key="custom">
           <CustomQuery />

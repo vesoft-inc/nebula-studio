@@ -9,7 +9,7 @@ p {
 	padding: 0;
 }
 
-.icon {
+.menu-icon {
 	width: 16px;
 	height: 16px;
 	vertical-align: -0.15em;
@@ -102,6 +102,12 @@ p {
 	.ant-layout-header {
 		display: flex;
 		z-index: 9;
+		padding-left: 18px;
+
+		.studio-logo img {
+			width: 126px;
+			height: 41px;
+		}
 
 		> ul {
 			flex: 1;
@@ -110,6 +116,7 @@ p {
 			font-size: 20px;
 			background: #00152a;
 			border: none;
+			padding-left: 15px;
 
 			a,
 			span,
@@ -150,9 +157,12 @@ p {
 	}
 
 	.ant-layout-content {
-		padding: 12px 4% 24px 4%;
 		height: 100%;
 		overflow: auto;
+
+		.padding-page {
+			padding: 12px 4% 24px 4%;
+		}
 	}
 }
 

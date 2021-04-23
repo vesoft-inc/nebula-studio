@@ -1,76 +1,148 @@
-import { Button, Tooltip } from 'antd';
-import React from 'react';
-import intl from 'react-intl-universal';
-import { connect } from 'react-redux';
+import React, { Fragment } from 'react';
 
-import { Modal } from '#assets/components';
-import { IDispatch, IRootState } from '#assets/store';
-
-import Expand from './Expand';
+import ColorPickerBtn from './ColorPicker';
+import DeleteBtn from './Delete';
+import ExpandBtn from './Expand';
+import HotkeysDescBtn from './HotKeysDescription';
 import './index.less';
+import Lock from './Lock';
+import MoveBtn from './Move';
+import PropsDisplayBtn from './PropsDisplay';
+import RollbackBtn from './Rollback';
+import SearchBtn from './Search';
+import Unlock from './Unlock';
+import ZoomBtn from './Zoom';
 
-const mapState = (state: IRootState) => ({
-  vertexes: state.explore.vertexes,
-  edges: state.explore.edges,
-  selectVertexes: state.explore.selectVertexes,
-  actionData: state.explore.actionData,
-});
+interface IProps {
+  toolTipRef;
+}
 
-const mapDispatch = (dispatch: IDispatch) => ({
-  delete: dispatch.explore.deleteNodesAndEdges,
-});
-
-type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
-
-class Panel extends React.Component<IProps, {}> {
+class Panel extends React.PureComponent<IProps> {
   modalHandler;
-  handleExpand = () => {
-    if (this.modalHandler) {
-      this.modalHandler.show();
-    }
-  };
+  zoomInBtn;
+  zoomOutBtn;
+  displayBtn;
+  rollbackBtn;
+  deleteBtn;
+  expandBtn;
+  componentDidMount() {
+    document.addEventListener('keydown', this.onKeyDown);
+  }
 
-  handleClose = () => {
-    if (this.modalHandler) {
-      this.modalHandler.hide();
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.onKeyDown);
+  }
+  onKeyDown = e => {
+    switch (true) {
+      case e.keyCode === 13 && e.shiftKey:
+        this.expandBtn.onKeydown();
+        break;
+      case e.keyCode === 189 && e.shiftKey:
+        // shift + '-' zoom out
+        this.zoomOutBtn.onKeydown();
+        break;
+      case e.keyCode === 187 && e.shiftKey:
+        // shift + '+' zoom in
+        this.zoomInBtn.onKeydown();
+        break;
+      case e.keyCode === 76 && e.shiftKey:
+        // shift + l open show modal
+        this.displayBtn.onKeydown();
+        break;
+      case e.keyCode === 90 && e.shiftKey:
+        // shift + z rollback
+        this.rollbackBtn.onKeydown();
+        break;
+      case e.keyCode === 8 && e.shiftKey:
+        // shift + del delete
+        this.deleteBtn.onKeydown();
+        break;
+      default:
+        break;
     }
-  };
-
-  handleDelete = () => {
-    const { vertexes, edges, selectVertexes, actionData } = this.props;
-    this.props.delete({ vertexes, edges, selectVertexes, actionData });
   };
 
   render() {
-    const { selectVertexes } = this.props;
+    const menuConfig = [
+      [
+        {
+          component: <ExpandBtn handlerRef={btn => (this.expandBtn = btn)} />,
+        },
+      ],
+      [
+        {
+          component: (
+            <ZoomBtn
+              type="zoom-in"
+              handlerRef={btn => (this.zoomInBtn = btn)}
+            />
+          ),
+        },
+        {
+          component: (
+            <ZoomBtn
+              type="zoom-out"
+              handlerRef={btn => (this.zoomOutBtn = btn)}
+            />
+          ),
+        },
+        {
+          component: <MoveBtn />,
+        },
+      ],
+      [
+        {
+          component: <ColorPickerBtn />,
+        },
+        {
+          component: (
+            <PropsDisplayBtn handlerRef={btn => (this.displayBtn = btn)} />
+          ),
+        },
+      ],
+      [
+        {
+          component: <Lock />,
+        },
+        {
+          component: <Unlock />,
+        },
+      ],
+      [
+        {
+          component: (
+            <RollbackBtn handlerRef={btn => (this.rollbackBtn = btn)} />
+          ),
+        },
+        {
+          component: (
+            <DeleteBtn
+              handlerRef={btn => (this.deleteBtn = btn)}
+              toolTipRef={this.props.toolTipRef}
+            />
+          ),
+        },
+      ],
+      [
+        {
+          component: <HotkeysDescBtn />,
+        },
+        {
+          component: <SearchBtn />,
+        },
+      ],
+    ];
     return (
       <div className="panel">
-        <Tooltip placement="topLeft" title={intl.get('explore.expandTip')}>
-          <Button
-            onClick={this.handleExpand}
-            disabled={selectVertexes.length === 0}
-          >
-            {intl.get('explore.expand')}
-          </Button>
-        </Tooltip>
-
-        <Button
-          onClick={this.handleDelete}
-          className="panel-delete"
-          disabled={selectVertexes.length === 0}
-        >
-          {intl.get('explore.deleteSelectNodes')}
-        </Button>
-        <Modal
-          handlerRef={handler => (this.modalHandler = handler)}
-          width={800}
-          maskClosable={false}
-          footer={null}
-        >
-          <Expand close={this.handleClose} />
-        </Modal>
+        {menuConfig.map((group, i) => (
+          <div className="panel-group" key={i}>
+            {group.map((item, index) => (
+              <Fragment key={index}>{item.component}</Fragment>
+            ))}
+          </div>
+        ))}
       </div>
     );
   }
 }
-export default connect(mapState, mapDispatch)(Panel);
+export default Panel;
