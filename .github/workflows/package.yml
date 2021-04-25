@@ -24,6 +24,6 @@ jobs:
       - name: Package
         run: bash ./scripts/package.sh
       - name: Upload oss
-        run: cd tmp/ && ossutil64 -e ${{ secrets.OSS_ENDPOINT }} -i ${{ secrets.OSS_ID }} -k ${{ secrets.OSS_SECRET }} -f cp ./  ${{ secrets.OSS_URL }} --include "nebula-graph-studio-*.rpm" --only-current-dir -r
+        run: cd tmp/ && ossutil64 -e ${{ secrets.OSS_ENDPOINT }} -i ${{ secrets.OSS_ID }} -k ${{ secrets.OSS_SECRET }} -f cp ./  ${{ secrets.OSS_URL }} --include "nebula-graph-studio-*.rpm*" --only-current-dir -r
 
     
