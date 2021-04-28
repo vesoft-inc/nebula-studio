@@ -138,6 +138,9 @@ class SearchBtn extends React.PureComponent<IProps> {
           tips={!showTitle ? intl.get('common.search') : undefined}
           iconfont="iconstudio-search"
           title={showTitle ? intl.get('common.search') : undefined}
+          trackCategory="explore"
+          trackAction="node_search"
+          trackLabel="from_panel"
           action={this.handleOpenModal}
         />
         <Modal

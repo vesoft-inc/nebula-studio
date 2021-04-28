@@ -71,6 +71,9 @@ class MoveBtn extends React.PureComponent<IProps> {
         iconfont="iconstudio-moving"
         action={this.handleStartZoom}
         disabled={vertexes.length === 0}
+        trackCategory="explore"
+        trackAction="canvas_move"
+        trackLabel="from_panel"
         title={showTitle ? intl.get('common.move') : undefined}
         active={isZoom ? true : false}
       />

@@ -345,11 +345,6 @@ class CreateTag extends React.Component<IProps, IState> {
               } else {
                 message.warning(res.message);
               }
-              trackEvent(
-                'schema',
-                'create_tag',
-                res.code === 0 ? 'ajax_success' : 'ajax_fail',
-              );
             });
         }
       }

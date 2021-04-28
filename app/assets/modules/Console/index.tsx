@@ -7,7 +7,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { CodeMirror, OutputBox } from '#assets/components';
 import { maxLineNum } from '#assets/config/nebulaQL';
 import { IDispatch, IRootState } from '#assets/store';
-import { trackEvent, trackPageView } from '#assets/utils/stat';
+import { trackPageView } from '#assets/utils/stat';
 
 import './index.less';
 import SpaceSearchInput from './SpaceSearchInput';
@@ -72,10 +72,17 @@ class Console extends React.Component<IProps, IState> {
       message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
       return;
     }
-    const reg = /(?<=[;?\s*]?)(?<![0-9a-zA-Z])USE `?[0-9a-zA-Z_]+`?(?=[\s*;?]?)/gm;
-    const _gql = gql.replace(/[\r\n]/g, '').toUpperCase();
-    // TODO this reg cannot avoid all situations like string vid fetch prop on * 'Fuse s'
-    if (_gql.match(reg)) {
+    // Hack:
+    // replace the string in quotes with a constant, avoid special symbols in quotation marks from affecting regex match
+    // then split the gql entered by the user into sentences based on semicolons
+    // use regex to determine whether each sentence is a 'use space' statement
+    const _gql = gql
+      .replace(/[\r\n]/g, '')
+      .replace(/(["'])[^]*?\1/g, '_CONTENT_')
+      .toUpperCase();
+    const sentenceList = _gql.split(';');
+    const reg = /^USE `?[0-9a-zA-Z_]+`?(?=[\s*;?]?)/gm;
+    if (sentenceList.some(sentence => sentence.match(reg))) {
       return message.error(intl.get('common.disablesUseToSwitchSpace'));
     }
     this.editor.execCommand('goDocEnd');
@@ -87,7 +94,6 @@ class Console extends React.Component<IProps, IState> {
     this.setState({
       isUpDown: true,
     });
-    trackEvent('console', 'run_code');
   };
 
   handleHistoryItem = (value: string) => {
@@ -190,7 +196,7 @@ class Console extends React.Component<IProps, IState> {
               onBlur={value => this.props.updateCurrentGQL(value)}
               onChangeLine={this.handleLineCount}
               ref={this.getInstance}
-              height={isUpDown ? '120px' : 24 * maxLineNum + 'px'}
+              height={isUpDown ? '240px' : 24 * maxLineNum + 'px'}
               onShiftEnter={this.handleRun}
               options={{
                 keyMap: 'sublime',

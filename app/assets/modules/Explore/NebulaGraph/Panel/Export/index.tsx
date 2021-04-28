@@ -121,11 +121,23 @@ class ExportButton extends React.PureComponent<IProps> {
     const { disabled } = this.props;
     const menu = (
       <Menu>
-        <Menu.Item disabled={disabled} onClick={this.handleExportImg}>
+        <Menu.Item
+          disabled={disabled}
+          data-track-category="explore"
+          data-track-action="export_img"
+          data-track-label="from_control"
+          onClick={this.handleExportImg}
+        >
           <IconFont type="iconstudio-exportimage" />
           {intl.get('explore.exportToImg')}
         </Menu.Item>
-        <Menu.Item disabled={disabled} onClick={this.handleExportCSV}>
+        <Menu.Item
+          disabled={disabled}
+          data-track-category="explore"
+          data-track-action="export_csv"
+          data-track-label="from_control"
+          onClick={this.handleExportCSV}
+        >
           <IconFont type="iconstudio-exportcsv" />
           {intl.get('explore.exportToCSV')}
         </Menu.Item>

@@ -8,7 +8,6 @@ import { connect } from 'react-redux';
 import { nodeIdRulesFn } from '#assets/config/rules';
 import { IDispatch } from '#assets/store';
 import readFileContent from '#assets/utils/file';
-import { trackEvent } from '#assets/utils/stat';
 
 import './index.less';
 
@@ -38,7 +37,6 @@ class IdQuery extends React.Component<IProps, IState> {
     };
   }
   handleImport = () => {
-    trackEvent('explore', 'query_by_id');
     this.props.form.validateFields(async (err, data) => {
       if (!err) {
         const { ids } = data;
@@ -98,7 +96,12 @@ class IdQuery extends React.Component<IProps, IState> {
               )}
             </Form.Item>
             <Form.Item className="btn-wrap">
-              <Button type="primary" onClick={this.handleImport}>
+              <Button
+                type="primary"
+                data-track-category="explore"
+                data-track-action="query_by_id"
+                onClick={this.handleImport}
+              >
                 {intl.get('explore.addConfirm')}
               </Button>
             </Form.Item>

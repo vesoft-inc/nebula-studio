@@ -77,6 +77,7 @@ class OutputBox extends React.Component<IProps> {
       edges: _.uniqBy(edges, (e: any) => e.id),
     });
     this.props.history.push('/explore');
+    trackEvent('navigation', 'view_explore', 'from_console_btn');
   };
 
   handleTabChange = async key => {

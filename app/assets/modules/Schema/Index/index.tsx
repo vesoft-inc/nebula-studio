@@ -13,7 +13,7 @@ import { connect } from 'react-redux';
 import { Link, match, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { IDispatch, IRootState } from '#assets/store';
-import { trackEvent, trackPageView } from '#assets/utils/stat';
+import { trackPageView } from '#assets/utils/stat';
 
 import './index.less';
 const { Option } = Select;
@@ -122,11 +122,6 @@ class IndexList extends React.Component<IProps, IState> {
       message.success(intl.get('common.deleteSuccess'));
       await this.props.asyncGetIndexList(type);
     }
-    trackEvent(
-      'schema',
-      'delete_index',
-      res.code === 0 ? 'ajax_success' : 'ajax_fail',
-    );
   };
 
   handleRowClick = async record => {
@@ -229,9 +224,9 @@ class IndexList extends React.Component<IProps, IState> {
           <Button type="primary">
             <Link
               to={`/space/${space}/index/create`}
-              onClick={() =>
-                trackEvent('navigation', 'view_index_create', 'from_index_list')
-              }
+              data-track-category="navigation"
+              data-track-action="view_index_create"
+              data-track-label="from_index_list"
             >
               <Icon type="plus" />
               {intl.get('common.create')}

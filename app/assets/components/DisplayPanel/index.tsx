@@ -63,11 +63,21 @@ class DisplayPanel extends React.PureComponent<IProps> {
           </Drawer>
           {!showDisplayPanel && (
             <div className="display-sider">
-              <div className="display-label" onClick={this.handleOpen}>
+              <div
+                className="display-label"
+                data-track-category="explore"
+                data-track-action="display_sider_open"
+                onClick={this.handleOpen}
+              >
                 <IconFont type="iconstudio-vertex" />
                 {selectVertexes.length}
               </div>
-              <div className="display-label" onClick={this.handleOpen}>
+              <div
+                className="display-label"
+                data-track-category="explore"
+                data-track-action="display_sider_open"
+                onClick={this.handleOpen}
+              >
                 <IconFont type="iconstudio-edge" />
                 {selectEdges.length}
               </div>
@@ -75,6 +85,8 @@ class DisplayPanel extends React.PureComponent<IProps> {
                 <IconFont
                   type="iconstudio-indentleft"
                   className="icon-collapse"
+                  data-track-category="explore"
+                  data-track-action="display_sider_open"
                   onClick={this.handleOpen}
                 />
               </div>

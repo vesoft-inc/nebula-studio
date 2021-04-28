@@ -53,6 +53,9 @@ class LockBtn extends React.PureComponent<IProps> {
         iconfont="iconstudio-lock"
         title={showTitle ? intl.get('common.lock') : undefined}
         action={this.handleLock}
+        trackCategory="explore"
+        trackAction="node_lock"
+        trackLabel="from_panel"
         disabled={selectVertexes.every(
           (selectVertexe: any) => selectVertexe.isFixed,
         )}

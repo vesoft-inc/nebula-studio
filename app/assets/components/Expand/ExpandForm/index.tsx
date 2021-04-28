@@ -467,7 +467,12 @@ class Expand extends React.Component<IProps, IState> {
             <div className="filter-component">
               <div className="filter-header">
                 <span>{intl.get('explore.filter')}</span>
-                <div className="btn-reset" onClick={this.handleResetFilters}>
+                <div
+                  className="btn-reset"
+                  data-track-category="explore"
+                  data-track-action="expand_filter_reset"
+                  onClick={this.handleResetFilters}
+                >
                   <IconFont type="iconstudio-remake" />
                   <span>{intl.get('import.reset')}</span>
                 </div>
@@ -484,7 +489,13 @@ class Expand extends React.Component<IProps, IState> {
                 onVisibleChange={this.handleVisibleChange}
                 trigger="click"
               >
-                <Button className="btn-add-filter" icon="plus" type="link">
+                <Button
+                  className="btn-add-filter"
+                  data-track-category="explore"
+                  data-track-action="expand_filter_add"
+                  icon="plus"
+                  type="link"
+                >
                   {intl.get('explore.addCondition')}
                 </Button>
               </Popover>
@@ -496,7 +507,12 @@ class Expand extends React.Component<IProps, IState> {
               this.gqlRef = handler;
             }}
           />
-          <Button className="btn-gql" onClick={this.handleViewGQL}>
+          <Button
+            className="btn-gql"
+            data-track-category="explore"
+            data-track-action="expand_gql_view"
+            onClick={this.handleViewGQL}
+          >
             {intl.get('common.exportNGQL')}
           </Button>
         </div>
@@ -505,11 +521,16 @@ class Expand extends React.Component<IProps, IState> {
             type="iconstudio-indentleft"
             className="btn-collapse"
             onClick={close}
+            data-track-category="explore"
+            data-track-action="expand_sider_close"
           />
           <Button
             type="primary"
             onClick={this.handleExpand}
             loading={!!getExpandLoading}
+            data-track-category="explore"
+            data-track-action="graph_expand"
+            data-track-label="from_sider"
             disabled={
               !selectVertexes.length ||
               !selectEdgeTypes ||

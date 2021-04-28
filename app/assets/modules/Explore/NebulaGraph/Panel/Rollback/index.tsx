@@ -69,6 +69,9 @@ class RollbackBtn extends React.PureComponent<IProps> {
         iconfont="iconstudio-back"
         title={showTitle ? intl.get('common.rollback') : undefined}
         action={this.handleRollback}
+        trackCategory="explore"
+        trackAction="explore_rollback"
+        trackLabel="from_panel"
         disabled={actionHistory.length === 0}
       />
     );

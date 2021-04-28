@@ -120,6 +120,8 @@ class DisplayComponent extends React.PureComponent<IProps, IState> {
           <div
             className={data.length > 0 ? 'btn-view' : 'btn-disabled'}
             onClick={data.length > 0 ? this.showModal : undefined}
+            data-track-category="explore"
+            data-track-action="select_info_modal_view"
           >
             <Tooltip title={intl.get('explore.viewDetails')}>
               <IconFont type="iconstudio-window" />
@@ -146,6 +148,9 @@ class DisplayComponent extends React.PureComponent<IProps, IState> {
         <div className="footer">
           <Button
             disabled={data.length === 0}
+            data-track-category="explore"
+            data-track-action="export_csv"
+            data-track-label="from_left_sider"
             onClick={
               data.length > 0
                 ? _.debounce(this.exportDataToCSV, 300)
@@ -157,7 +162,12 @@ class DisplayComponent extends React.PureComponent<IProps, IState> {
               ? intl.get('common.exportSelectVertexes')
               : intl.get('common.exportSelectEdges')}
           </Button>
-          <IconFont type="iconstudio-indentright" onClick={close} />
+          <IconFont
+            type="iconstudio-indentright"
+            data-track-category="explore"
+            data-track-action="display_sider_close"
+            onClick={close}
+          />
         </div>
         <SelectedGraphDetailShowModal
           handlerRef={modal => (this.SelectedGraphDetailShowModal = modal)}

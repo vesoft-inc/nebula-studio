@@ -95,11 +95,6 @@ class CreateSpace extends React.Component<IProps> {
         } else {
           message.warning(errorMsg);
         }
-        trackEvent(
-          'schema',
-          'create_space',
-          code === '0' ? 'ajax_success' : 'ajax_fail',
-        );
       }
     });
   };

@@ -53,6 +53,9 @@ class UnlockBtn extends React.Component<IProps> {
         iconfont="iconstudio-unlock"
         title={showTitle ? intl.get('common.unlock') : undefined}
         action={this.handleUnlock}
+        trackCategory="explore"
+        trackAction="node_unlock"
+        trackLabel="from_panel"
         disabled={
           selectVertexes.length === 0 ||
           selectVertexes.some((selectVertexe: any) => !selectVertexe.isFixed)

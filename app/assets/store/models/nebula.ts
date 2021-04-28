@@ -12,7 +12,6 @@ import {
   getSpaceCreateGQL,
   getTagOrEdgeCreateGQL,
 } from '#assets/utils/gql';
-import { trackEvent } from '#assets/utils/stat';
 
 interface IState {
   spaces: string[];
@@ -179,13 +178,20 @@ export const nebula = createModel({
       }
       const [address, _port] = host.split(':');
       const port = Number(_port);
-      const { code, message: errorMessage } = (await service.connectDB({
-        address,
-        port,
-        username,
-        password,
-      })) as any;
-      trackEvent('user', 'sign_in', code === 0 ? 'ajax_success' : 'ajax_fail');
+      const { code, message: errorMessage } = (await service.connectDB(
+        {
+          address,
+          port,
+          username,
+          password,
+        },
+        {
+          trackEventConfig: {
+            category: 'user',
+            action: 'sign_in',
+          },
+        },
+      )) as any;
       if (code === 0) {
         message.success(intl.get('configServer.success'));
         cookies.set('nh', host);
@@ -211,7 +217,15 @@ export const nebula = createModel({
       }
     },
     async asyncClearConfigServer() {
-      await service.disconnectDB();
+      await service.disconnectDB(
+        {},
+        {
+          trackEventConfig: {
+            category: 'user',
+            action: 'sign_out',
+          },
+        },
+      );
       this.update({
         host: '',
         username: '',
@@ -270,17 +284,33 @@ export const nebula = createModel({
     },
 
     async asyncDeleteSpace(space: string) {
-      const { code, data } = (await service.execNGQL({
-        gql: `DROP SPACE ${handleKeyword(space)}`,
-      })) as any;
+      const { code, data } = (await service.execNGQL(
+        {
+          gql: `DROP SPACE ${handleKeyword(space)}`,
+        },
+        {
+          trackEventConfig: {
+            category: 'schema',
+            action: 'delete_space',
+          },
+        },
+      )) as any;
       return { code, data };
     },
 
     async asyncCreateSpace(payload: { name: string; options: any }) {
       const gql = getSpaceCreateGQL(payload);
-      const { code, data, message } = (await service.execNGQL({
-        gql,
-      })) as any;
+      const { code, data, message } = (await service.execNGQL(
+        {
+          gql,
+        },
+        {
+          trackEventConfig: {
+            category: 'schema',
+            action: 'create_space',
+          },
+        },
+      )) as any;
       return { code, data, message };
     },
 
@@ -367,11 +397,19 @@ export const nebula = createModel({
     },
 
     async asyncDeleteTag(name: string) {
-      const { code, data, message } = (await service.execNGQL({
-        gql: `
+      const { code, data, message } = (await service.execNGQL(
+        {
+          gql: `
           DROP TAG ${handleKeyword(name)}
         `,
-      })) as any;
+        },
+        {
+          trackEventConfig: {
+            category: 'schema',
+            action: 'delete_tag',
+          },
+        },
+      )) as any;
       return { code, data, message };
     },
 
@@ -384,9 +422,17 @@ export const nebula = createModel({
       };
     }) {
       const gql = await getTagOrEdgeCreateGQL({ ...payload, type: 'TAG' });
-      const { code, data, message } = (await service.execNGQL({
-        gql,
-      })) as any;
+      const { code, data, message } = (await service.execNGQL(
+        {
+          gql,
+        },
+        {
+          trackEventConfig: {
+            category: 'schema',
+            action: 'create_tag',
+          },
+        },
+      )) as any;
       return { code, data, message };
     },
 
@@ -405,9 +451,17 @@ export const nebula = createModel({
       config: IAlterConfig;
     }) {
       const gql = getAlterGQL(payload);
-      const { code, data, message } = (await service.execNGQL({
-        gql,
-      })) as any;
+      const { code, data, message } = (await service.execNGQL(
+        {
+          gql,
+        },
+        {
+          trackEventConfig: {
+            category: 'schema',
+            action: `{payload.action === 'DROP' ? 'delete' : 'update'}_${payload.type.toLowerCase()}_property`,
+          },
+        },
+      )) as any;
       return { code, data, message };
     },
     // edges
@@ -484,11 +538,19 @@ export const nebula = createModel({
     },
 
     async asyncDeleteEdge(name: string) {
-      const { code, data, message } = (await service.execNGQL({
-        gql: `
+      const { code, data, message } = (await service.execNGQL(
+        {
+          gql: `
           DROP EDGE ${handleKeyword(name)}
         `,
-      })) as any;
+        },
+        {
+          trackEventConfig: {
+            category: 'schema',
+            action: 'delete_edge',
+          },
+        },
+      )) as any;
       return { code, data, message };
     },
 
@@ -501,9 +563,17 @@ export const nebula = createModel({
       };
     }) {
       const gql = await getTagOrEdgeCreateGQL({ ...payload, type: 'EDGE' });
-      const { code, data, message } = (await service.execNGQL({
-        gql,
-      })) as any;
+      const { code, data, message } = (await service.execNGQL(
+        {
+          gql,
+        },
+        {
+          trackEventConfig: {
+            category: 'schema',
+            action: 'create_edge',
+          },
+        },
+      )) as any;
       return { code, data, message };
     },
 
@@ -624,7 +694,7 @@ export const nebula = createModel({
         await Promise.all(
           res.data.map(async item => {
             const owner = await dispatch.nebula.asyncGetIndexOwner({
-              type: 'TAG',
+              type,
               name: item.name,
             });
             const index: IIndexList = {
@@ -649,11 +719,19 @@ export const nebula = createModel({
 
     async asyncDeleteIndex(payload: { type: IndexType; name: string }) {
       const { type, name } = payload;
-      const { code, data } = (await service.execNGQL({
-        gql: `
+      const { code, data } = (await service.execNGQL(
+        {
+          gql: `
           DROP ${type} INDEX ${handleKeyword(name)}
         `,
-      })) as any;
+        },
+        {
+          trackEventConfig: {
+            category: 'schema',
+            action: 'delete_index',
+          },
+        },
+      )) as any;
       return { code, data };
     },
 
@@ -678,9 +756,17 @@ export const nebula = createModel({
       fields: string[];
     }) {
       const gql = getIndexCreateGQL(payload);
-      const { code, data, message } = (await service.execNGQL({
-        gql,
-      })) as any;
+      const { code, data, message } = (await service.execNGQL(
+        {
+          gql,
+        },
+        {
+          trackEventConfig: {
+            category: 'schema',
+            action: 'create_index',
+          },
+        },
+      )) as any;
       return { code, data, message };
     },
   }),

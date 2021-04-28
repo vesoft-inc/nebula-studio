@@ -21,7 +21,15 @@ export const console = createModel({
   },
   effects: {
     async asyncRunGQL(gql) {
-      const result = (await service.execNGQL({ gql })) as any;
+      const result = (await service.execNGQL(
+        { gql },
+        {
+          trackEventConfig: {
+            category: 'console',
+            action: 'run_gql',
+          },
+        },
+      )) as any;
       this.update({
         result,
         currentGQL: gql,

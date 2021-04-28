@@ -203,11 +203,6 @@ class CreateIndex extends React.Component<IProps, IState> {
         } else {
           message.warning(res.message);
         }
-        trackEvent(
-          'schema',
-          'create_index',
-          res.code === 0 ? 'ajax_success' : 'ajax_fail',
-        );
       }
     });
   };

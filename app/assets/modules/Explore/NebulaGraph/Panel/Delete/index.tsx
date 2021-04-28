@@ -45,6 +45,9 @@ class DeleteBtn extends React.PureComponent<IProps> {
         iconfont="iconstudio-seletdelete"
         action={this.props.delete}
         title={showTitle ? intl.get('common.delete') : undefined}
+        trackCategory="explore"
+        trackAction="node_delete"
+        trackLabel="from_panel"
         disabled={selectVertexes.length === 0 && selectEdges.length === 0}
       />
     );

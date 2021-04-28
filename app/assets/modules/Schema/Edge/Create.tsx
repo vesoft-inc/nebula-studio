@@ -345,11 +345,6 @@ class CreateEdge extends React.Component<IProps, IState> {
               } else {
                 message.warning(res.message);
               }
-              trackEvent(
-                'schema',
-                'create_edge',
-                res.code === 0 ? 'ajax_success' : 'ajax_fail',
-              );
             });
         }
       }

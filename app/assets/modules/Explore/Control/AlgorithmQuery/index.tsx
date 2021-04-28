@@ -10,7 +10,6 @@ import GQLCodeMirror from '#assets/components/GQLCodeMirror';
 import { GRAPH_ALOGORITHM } from '#assets/config/explore';
 import { IDispatch, IRootState } from '#assets/store';
 import { getPathGQL } from '#assets/utils/gql';
-import { trackEvent } from '#assets/utils/stat';
 
 import './index.less';
 
@@ -58,7 +57,6 @@ class AlgorithmQuery extends React.Component<IProps> {
       stepLimit,
       quantityLimit,
     } = getFieldsValue();
-    trackEvent('explore', 'query_by_path');
     this.props.form.validateFields(async err => {
       if (!err) {
         await this.props.asyncGetPathResult({
@@ -214,7 +212,13 @@ class AlgorithmQuery extends React.Component<IProps> {
           </Form.Item>
         </Form>
         <GQLCodeMirror currentGQL={currentGQL} />
-        <Button onClick={this.handleInquiry} type="primary" loading={!!loading}>
+        <Button
+          data-track-category="explore"
+          data-track-action="query_by_path"
+          onClick={this.handleInquiry}
+          type="primary"
+          loading={!!loading}
+        >
           {intl.get('explore.quiry')}
         </Button>
       </div>

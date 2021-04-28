@@ -241,7 +241,13 @@ class SelectedGraphDetailShowModal extends React.PureComponent<IProps, IState> {
             {intl.get('common.total')}: {data.length}
           </span>
           <div className="btns">
-            <Button type="primary" onClick={this.handleExportToCSV}>
+            <Button
+              type="primary"
+              data-track-category="explore"
+              data-track-action="export_csv"
+              data-track-label="from_info_modal"
+              onClick={this.handleExportToCSV}
+            >
               {intl.get('explore.exportToCSV')}
             </Button>
             <Input.Search

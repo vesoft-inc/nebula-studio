@@ -135,6 +135,9 @@ class PropsDisplayBtn extends React.PureComponent<IProps, IState> {
           tips={!showTitle ? intl.get('common.show') : undefined}
           iconfont="iconstudio-show"
           title={showTitle ? intl.get('common.show') : undefined}
+          trackCategory="explore"
+          trackAction="props_display"
+          trackLabel="from_panel"
           action={this.handleOpenModal}
         />
         <Modal

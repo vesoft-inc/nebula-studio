@@ -95,11 +95,17 @@ class Control extends React.Component<IProps, {}> {
             type="default"
             disabled={vertexes.length === 0}
             onClick={this.handleClear}
+            data-track-category="explore"
+            data-track-action="clear_canvas"
+            data-track-label="from_control"
           >
             {intl.get('explore.clear')}
           </Button>
           <Button
             type="primary"
+            data-track-category="explore"
+            data-track-action="start_explore"
+            data-track-label="from_control"
             onClick={() => {
               if (this.importNodesHandler) {
                 this.importNodesHandler.show();

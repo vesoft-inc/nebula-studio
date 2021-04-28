@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 import { LanguageContext } from '#assets/context';
 import guideEnPng from '#assets/static/images/go-to-explore_en.png';
 import guideZhPng from '#assets/static/images/go-to-explore_zh.png';
-import { trackEvent } from '#assets/utils/stat';
 
 import './index.less';
 class CustomQuery extends React.PureComponent {
@@ -21,12 +20,12 @@ class CustomQuery extends React.PureComponent {
         />
         <p>{intl.get('explore.customQueryDescription')}</p>
         <div className="btn">
-          <Button onClick={() => trackEvent('explore', 'query_by_custom')}>
+          <Button>
             <Link
               to="/console"
-              onClick={() => {
-                trackEvent('navigation', 'view_console', 'from_explore_btn');
-              }}
+              data-track-category="navigation"
+              data-track-action="view_console"
+              data-track-label="from_explore_btn"
             >
               {intl.get('explore.openInConsole')}
             </Link>

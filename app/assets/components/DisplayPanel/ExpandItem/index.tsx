@@ -1,4 +1,5 @@
 import { Icon } from 'antd';
+import classnames from 'classnames';
 import React from 'react';
 import intl from 'react-intl-universal';
 
@@ -70,7 +71,7 @@ class RowItem extends React.PureComponent<IProps, IState> {
     return (
       <div className="display-row-item">
         <div
-          className={`item-header row ${expandedAll ? 'active' : ''}`}
+          className={classnames('item-header', 'row', { active: expandedAll })}
           onClick={this.toggleExpandAll}
         >
           {expandedAll ? <Icon type="down" /> : <Icon type="right" />}

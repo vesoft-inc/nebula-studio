@@ -63,6 +63,8 @@ class ExpandBtn extends React.PureComponent<IProps> {
                 <IconFont
                   type="iconstudio-expandcondition"
                   className="icon-expand"
+                  data-track-category="explore"
+                  data-track-action="expand_sider_open"
                 />
                 {intl.get('explore.expand')}
               </div>
@@ -71,6 +73,8 @@ class ExpandBtn extends React.PureComponent<IProps> {
                   type="iconstudio-indentright"
                   className="icon-collapse"
                   onClick={this.handleOpen}
+                  data-track-category="explore"
+                  data-track-action="expand_sider_open"
                 />
               </div>
             </div>

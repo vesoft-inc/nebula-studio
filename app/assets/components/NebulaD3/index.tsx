@@ -327,7 +327,7 @@ class NebulaD3 extends React.Component<IProps> {
   handleUpdateLinks = () => {
     if (this.force) {
       this.link = d3.selectAll('.link').on('click', this.handleEdgeClick);
-      d3.selectAll('.link:not(.hovered-link .active-link)')
+      d3.selectAll('.link:not(.active-link):not(.hovered-link)')
         .attr('marker-end', 'url(#marker)')
         .style('stroke', '#595959')
         .style('stroke-width', 2);

@@ -30,7 +30,7 @@ import { updateQueryStringParameter } from '#assets/utils';
 import './App.less';
 import ConfigServer from './modules/ConfigServer';
 import PrivateRoute from './PrivateRoute';
-import { trackEvent, trackPageView } from './utils/stat';
+import { handleTrackEvent, trackEvent, trackPageView } from './utils/stat';
 
 const { Header, Content } = Layout;
 const { Option } = Select;
@@ -121,6 +121,7 @@ class App extends React.Component<IProps, IState> {
     if (space) {
       this.props.asyncSwitchSpace(space);
     }
+    document.addEventListener('click', handleTrackEvent);
   }
 
   componentDidUpdate(prevProps: IProps) {
@@ -129,6 +130,9 @@ class App extends React.Component<IProps, IState> {
     }
   }
 
+  componentWillUnmount() {
+    document.removeEventListener('click', handleTrackEvent);
+  }
   renderMenu = () => {
     const path = this.props.location.pathname.split('/')[1] || '';
     this.setState({
@@ -137,13 +141,8 @@ class App extends React.Component<IProps, IState> {
   };
 
   handleClear = () => {
-    trackEvent('user', 'sign_out');
     this.props.asyncClearConfigServer();
   };
-
-  trackRoute(action: string) {
-    trackEvent('navigation', action, 'from_navigation');
-  }
 
   render() {
     const { appVersion } = this.props;
@@ -176,7 +175,9 @@ class App extends React.Component<IProps, IState> {
                   <Menu.Item key="schema">
                     <Link
                       to="/schema"
-                      onClick={() => this.trackRoute('view_schema')}
+                      data-track-category="navigation"
+                      data-track-action="view_schema"
+                      data-track-label="from_navigation"
                     >
                       <IconFont type="iconnav-model" />
                       {intl.get('common.schema')}
@@ -185,7 +186,9 @@ class App extends React.Component<IProps, IState> {
                   <Menu.Item key="import">
                     <Link
                       to="/import"
-                      onClick={() => this.trackRoute('view_import')}
+                      data-track-category="navigation"
+                      data-track-action="view_import"
+                      data-track-label="from_navigation"
                     >
                       <Icon type="import" />
                       {intl.get('common.import')}
@@ -194,7 +197,9 @@ class App extends React.Component<IProps, IState> {
                   <Menu.Item key="explore">
                     <Link
                       to="/explore"
-                      onClick={() => this.trackRoute('view_explore')}
+                      data-track-category="navigation"
+                      data-track-action="view_explore"
+                      data-track-label="from_navigation"
                     >
                       <Icon type="branches" />
                       {intl.get('common.explore')}
@@ -203,7 +208,9 @@ class App extends React.Component<IProps, IState> {
                   <Menu.Item key="console">
                     <Link
                       to="/console"
-                      onClick={() => this.trackRoute('view_console')}
+                      data-track-category="navigation"
+                      data-track-action="view_console"
+                      data-track-label="from_navigation"
                     >
                       <Icon type="code" />
                       {intl.get('common.console')}
@@ -286,7 +293,9 @@ class App extends React.Component<IProps, IState> {
                 </Dropdown>
                 <div
                   className="github-star"
-                  onClick={() => trackEvent('navigation', 'star_github')}
+                  data-track-category="navigation"
+                  data-track-action="star_github"
+                  data-track-label="from_navigation"
                 >
                   <a
                     className="github-button"
@@ -305,7 +314,13 @@ class App extends React.Component<IProps, IState> {
                       <Menu>
                         <Menu.Item>
                           <a
-                            href="https://github.com/vesoft-inc/nebula-web-docker/blob/master/v2/CHANGELOG.md"
+                            data-track-category="navigation"
+                            data-track-action="view_changelog"
+                            href={
+                              this.currentLocale === 'ZH_CN'
+                                ? 'https://github.com/vesoft-inc/nebula-graph-studio/blob/master/docs/CHANGELOG-zh.md'
+                                : 'https://github.com/vesoft-inc/nebula-graph-studio/blob/master/docs/CHANGELOG-en.md'
+                            }
                             target="_blank"
                           >
                             <Icon type="tags" />

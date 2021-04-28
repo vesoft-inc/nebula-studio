@@ -38,6 +38,9 @@ class HotKeysDesc extends React.PureComponent {
         <MenuButton
           tips={intl.get('common.hotKeys')}
           iconfont="iconstudio-hotkey"
+          trackCategory="explore"
+          trackAction="hot_keys_show"
+          trackLabel="from_panel"
           action={this.handleOpenModal}
         />
         <Modal

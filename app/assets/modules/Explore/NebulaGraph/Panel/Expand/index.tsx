@@ -39,6 +39,9 @@ class ExpandBtn extends React.PureComponent<IProps> {
           iconfont="iconstudio-expand"
           title={showTitle ? intl.get('explore.expand') : undefined}
           action={asyncAutoExpand}
+          trackCategory="explore"
+          trackAction="graph_expand"
+          trackLabel="from_panel"
           disabled={selectVertexes.length === 0}
         />
       </>

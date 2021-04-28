@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Link, match, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { IDispatch, IRootState } from '#assets/store';
-import { trackEvent, trackPageView } from '#assets/utils/stat';
+import { trackPageView } from '#assets/utils/stat';
 
 import './index.less';
 
@@ -94,11 +94,6 @@ class EdgeList extends React.Component<IProps, IState> {
     } else {
       message.warning(res.message);
     }
-    trackEvent(
-      'schema',
-      'delete_edge',
-      res.code === 0 ? 'ajax_success' : 'ajax_fail',
-    );
   };
 
   handleRowClick = async record => {
@@ -134,13 +129,9 @@ class EdgeList extends React.Component<IProps, IState> {
                   <Button shape="circle">
                     <Link
                       to={`/space/${space}/edge/edit/${edge.name}`}
-                      onClick={() =>
-                        trackEvent(
-                          'navigation',
-                          'view_edge_edit',
-                          'from_edge_list',
-                        )
-                      }
+                      data-track-category="navigation"
+                      data-track-action="view_edge_edit"
+                      data-track-label="from_edge_list"
                     >
                       <Icon type="form" className="edit-btn" />
                     </Link>
@@ -205,9 +196,9 @@ class EdgeList extends React.Component<IProps, IState> {
           <Button type="primary">
             <Link
               to={`/space/${space}/edge/create`}
-              onClick={() =>
-                trackEvent('navigation', 'view_edge_create', 'from_edge_list')
-              }
+              data-track-category="navigation"
+              data-track-action="view_edge_create"
+              data-track-label="from_edge_list"
             >
               <Icon type="plus" />
               {intl.get('common.create')}

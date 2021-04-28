@@ -76,6 +76,9 @@ class ZoomBtn extends React.PureComponent<IProps> {
             title={showTitle ? intl.get('common.zoomOut') : undefined}
             action={this.handleZoom}
             disabled={vertexes.length === 0 || scale === MIN_SCALE}
+            trackCategory="explore"
+            trackAction="canvas_zoom_out"
+            trackLabel="from_panel"
           />
         )}
         {type === 'zoom-in' && (
@@ -85,6 +88,9 @@ class ZoomBtn extends React.PureComponent<IProps> {
             title={showTitle ? intl.get('common.zoomIn') : undefined}
             action={this.handleZoom}
             disabled={vertexes.length === 0 || scale === MAX_SCALE}
+            trackCategory="explore"
+            trackAction="canvas_zoom_in"
+            trackLabel="from_panel"
           />
         )}
       </>

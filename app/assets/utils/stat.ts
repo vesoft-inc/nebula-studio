@@ -50,3 +50,30 @@ export const trackEvent = (
     }
   }
 };
+
+export const handleTrackEvent = event => {
+  let target;
+  if (event.target && event.target.dataset.trackCategory) {
+    target = event.target;
+  } else {
+    const _parentNode = event.target.parentNode;
+    if (_parentNode && _parentNode.dataset.trackCategory) {
+      target = _parentNode;
+    } else if (
+      _parentNode.tagName.toLowerCase() === 'svg' &&
+      _parentNode.parentNode.tagName.toLowerCase() === 'i' &&
+      _parentNode.parentNode.dataset.trackCategory
+    ) {
+      target = _parentNode.parentNode;
+    }
+  }
+  if (target) {
+    const {
+      trackCategory,
+      trackAction,
+      trackLabel,
+      trackValue,
+    } = target.dataset;
+    trackEvent(trackCategory, trackAction, trackLabel, trackValue);
+  }
+};

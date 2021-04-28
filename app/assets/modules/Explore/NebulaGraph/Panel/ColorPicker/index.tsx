@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as d3 from 'd3';
 import _ from 'lodash';
 import React from 'react';
@@ -74,9 +75,9 @@ const getColorIcon = props => {
     return (
       <>
         <div
-          className={`btn-color ${
-            !editing && selectVertexes.length === 0 ? 'btn-disabled' : ''
-          }`}
+          className={classnames('btn-color', {
+            'btn-disabled': !editing && selectVertexes.length === 0,
+          })}
           style={getColor(selectVertexes, currentColor, customColor)}
         />
         {showTitle && <span>{intl.get('common.color')}</span>}
@@ -85,9 +86,9 @@ const getColorIcon = props => {
   } else {
     return (
       <div
-        className={`btn-color ${
-          !editing && selectVertexes.length === 0 ? 'btn-disabled' : ''
-        }`}
+        className={classnames('btn-color', {
+          'btn-disabled': !editing && selectVertexes.length === 0,
+        })}
         style={getColor(selectVertexes, currentColor, customColor)}
       />
     );
@@ -142,6 +143,9 @@ class ColorPickerBtn extends React.PureComponent<IProps> {
             })
           )
         }
+        trackCategory="explore"
+        trackAction="color_picker"
+        trackLabel="from_panel"
         className="menu-color"
         tips={!showTitle ? intl.get('common.color') : undefined}
         disabled={selectVertexes.length === 0 && !editing}

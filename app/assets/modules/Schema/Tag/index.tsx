@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Link, match, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { IDispatch, IRootState } from '#assets/store';
-import { trackEvent, trackPageView } from '#assets/utils/stat';
+import { trackPageView } from '#assets/utils/stat';
 
 import './index.less';
 
@@ -94,11 +94,6 @@ class TagList extends React.Component<IProps, IState> {
     } else {
       message.warning(res.message);
     }
-    trackEvent(
-      'schema',
-      'delete_tag',
-      res.code === 0 ? 'ajax_success' : 'ajax_fail',
-    );
   };
 
   handleRowClick = async record => {
@@ -135,13 +130,9 @@ class TagList extends React.Component<IProps, IState> {
                   <Button shape="circle">
                     <Link
                       to={`/space/${space}/tag/edit/${tag.name}`}
-                      onClick={() =>
-                        trackEvent(
-                          'navigation',
-                          'view_tag_edit',
-                          'from_tag_list',
-                        )
-                      }
+                      data-track-category="navigation"
+                      data-track-action="view_tag_edit"
+                      data-track-label="from_tag_list"
                     >
                       <Icon type="form" className="edit-btn" />
                     </Link>
@@ -206,9 +197,9 @@ class TagList extends React.Component<IProps, IState> {
           <Button type="primary">
             <Link
               to={`/space/${space}/tag/create`}
-              onClick={() =>
-                trackEvent('navigation', 'view_tag_create', 'from_tag_list')
-              }
+              data-track-category="navigation"
+              data-track-action="view_tag_create"
+              data-track-label="from_tag_list"
             >
               <Icon type="plus" />
               {intl.get('common.create')}

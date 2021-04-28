@@ -21,7 +21,6 @@ import GQLCodeMirror from '#assets/components/GQLCodeMirror';
 import { IDispatch, IRootState } from '#assets/store';
 import { enumOfCompare } from '#assets/utils/constant';
 import { getExploreGQLWithIndex } from '#assets/utils/gql';
-import { trackEvent } from '#assets/utils/stat';
 
 import './IndexMatch.less';
 const Option = Select.Option;
@@ -232,7 +231,6 @@ class IndexMatch extends React.Component<IProps, IState> {
     const { filters } = this.state;
     const tag = getFieldValue('tag');
     const quantityLimit = getFieldValue('quantityLimit') || null;
-    trackEvent('explore', 'query_by_index');
     (this.props.asyncImportNodesWithIndex({
       filters,
       tag,
@@ -488,6 +486,8 @@ class IndexMatch extends React.Component<IProps, IState> {
         <GQLCodeMirror currentGQL={currentGQL} />
         <Button
           type="primary"
+          data-track-category="explore"
+          data-track-action="query_by_index"
           onClick={this.handleInquiry}
           disabled={
             !tag ||

@@ -34,12 +34,14 @@ const confirm = Modal.confirm;
 
 const mapState = (state: IRootState) => ({
   loading: state.loading.effects.nebula.asyncGetEdgeDetail,
+  editLoading: state.loading.effects.nebula.asyncAlterField,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetEdgeDetail: dispatch.nebula.asyncGetEdgeDetail,
   asyncAlterField: dispatch.nebula.asyncAlterField,
   asyncGetIndexTree: dispatch.nebula.asyncGetIndexTree,
+  asyncGetEdgeInfo: dispatch.nebula.asyncGetEdgeInfo,
 });
 
 interface IProps
@@ -61,6 +63,13 @@ interface IRequired {
 interface ITtl {
   col: string;
   duration: string;
+}
+
+interface IEdgeFeild {
+  Default: any;
+  Field: string;
+  Null: string;
+  Type: string;
 }
 interface IState extends IRequired {
   fieldList: IField[];
@@ -111,40 +120,34 @@ class EditEdge extends React.Component<IProps, IState> {
       params: { edge },
     } = match;
     const { code, data } = await this.props.asyncGetEdgeDetail(edge);
+    const {
+      code: propCode,
+      data: propData,
+    } = await this.props.asyncGetEdgeInfo(edge);
     if (code === 0) {
       const info = data.tables[0]['Create Edge'];
-      this.handleData(info);
+      const fieldInfo = propCode === 0 ? propData.tables : [];
+      this.handleData(info, fieldInfo);
     }
   };
 
-  handleData = (data: string) => {
-    const reg = /CREATE EDGE\s`\w+`\s(?<!string)\((.*)(?<!\d)\)\s+(ttl_duration = \d+),\s+(ttl_col\s+=\s+"?\w*"?)/gm;
+  handleData = (data: string, fieldInfo: IEdgeFeild[]) => {
+    const reg = /CREATE EDGE\s`\w+`\s\((.*)\)\s+(ttl_duration = \d+),\s+(ttl_col\s+=\s+"?\w*"?)/gm;
     const str = data.replaceAll(/[\r\n]/g, ' ');
     const infoList = reg.exec(str) || [];
-    const fieldStr =
-      infoList &&
-      infoList[1].slice(1, infoList[1].length - 1).replace(/[\r\n]/g, '');
-    const fields = fieldStr !== '' ? fieldStr.split(',') : [];
+    const fieldList: IField[] = fieldInfo.map(i => ({
+      name: i.Field,
+      showType: i.Type,
+      type: i.Type.startsWith('fixed_string') ? 'fixed_string' : i.Type,
+      allowNull: i.Null === 'YES',
+      value: i.Default,
+      fixedLength: i.Type.startsWith('fixed_string')
+        ? i.Type.replace(/[fixed_string(|)]/g, '')
+        : '',
+    }));
     const ttlDuration = (infoList && infoList[2].split(' = ')[1]) || '';
     const ttlCol =
       (infoList && infoList[3].split(' = ')[1].replace(/"/g, '')) || '';
-    const fieldList: IField[] = fields.map(i => {
-      const fieldReg = /`(.+)`\s+([0-9a-zA-Z\_\(\)]+)\s+(NOT NULL|NULL)(?:\sDEFAULT\s+(.+))?/g;
-      const result = fieldReg.exec(i) || [];
-      return {
-        name: result[1],
-        showType: result[2],
-        type: result[2].startsWith('fixed_string') ? 'fixed_string' : result[2],
-        allowNull: result[3] === 'NULL',
-        value:
-          result[4] === undefined
-            ? ''
-            : result[4].replace(/^"/, '').replace(/"$/, ''),
-        fixedLength: result[2].startsWith('fixed_string')
-          ? result[2].replace(/[fixed_string(|)]/g, '')
-          : '',
-      };
-    });
     const fieldRequired = fieldList.length > 0;
     const ttlRequired = ttlCol !== '';
     const ttlConfig = {
@@ -197,11 +200,6 @@ class EditEdge extends React.Component<IProps, IState> {
     } else {
       message.warning(res.message);
     }
-    trackEvent(
-      'schema',
-      'delete_edge_property',
-      res.code === 0 ? 'ajax_success' : 'ajax_fail',
-    );
   };
 
   handleEditField = (data: IField, index: number) => {
@@ -311,11 +309,6 @@ class EditEdge extends React.Component<IProps, IState> {
       } else {
         message.warning(res.message);
       }
-      trackEvent(
-        'schema',
-        'update_edge_property',
-        res.code === 0 ? 'ajax_success' : 'ajax_fail',
-      );
     }
   };
 
@@ -353,11 +346,6 @@ class EditEdge extends React.Component<IProps, IState> {
       } else {
         message.warning(res.message);
       }
-      trackEvent(
-        'schema',
-        'update_edge_ttl',
-        res.code === 0 ? 'ajax_success' : 'ajax_fail',
-      );
     }
   };
 
@@ -430,15 +418,11 @@ class EditEdge extends React.Component<IProps, IState> {
     } else {
       message.warning(res.message);
     }
-    trackEvent(
-      'schema',
-      'delete_edge_ttl',
-      res.code === 0 ? 'ajax_success' : 'ajax_fail',
-    );
   };
 
   renderFields = () => {
     const { editRow, fieldList, editField } = this.state;
+    const { editLoading } = this.props;
     const columns = [
       {
         title: intl.get('common.propertyName'),
@@ -560,6 +544,7 @@ class EditEdge extends React.Component<IProps, IState> {
                     type="link"
                     onClick={() => this.handleEditField(row, index)}
                     disabled={editRow !== null}
+                    loading={!!editLoading && editRow === index}
                   >
                     {intl.get('common.edit')}
                   </Button>
@@ -571,17 +556,29 @@ class EditEdge extends React.Component<IProps, IState> {
                     okText={intl.get('common.ok')}
                     cancelText={intl.get('common.cancel')}
                   >
-                    <Button type="link" disabled={editRow !== null}>
+                    <Button
+                      type="link"
+                      disabled={editRow !== null}
+                      loading={!!editLoading && editRow === index}
+                    >
                       {intl.get('common.delete')}
                     </Button>
                   </Popconfirm>
                 </>
               ) : (
                 <>
-                  <Button type="link" onClick={this.handleUpdateField}>
+                  <Button
+                    type="link"
+                    onClick={this.handleUpdateField}
+                    loading={!!editLoading && editRow === index}
+                  >
                     {intl.get('common.ok')}
                   </Button>
-                  <Button type="link" onClick={this.handleCancelEdit}>
+                  <Button
+                    type="link"
+                    onClick={this.handleCancelEdit}
+                    loading={!!editLoading && editRow === index}
+                  >
                     {intl.get('common.cancel')}
                   </Button>
                 </>

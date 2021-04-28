@@ -2,11 +2,11 @@ import { Button, Divider, Icon, message, Popconfirm, Table } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { Instruction } from '#assets/components';
 import { IDispatch, IRootState } from '#assets/store';
-import { trackEvent, trackPageView } from '#assets/utils/stat';
+import { trackPageView } from '#assets/utils/stat';
 
 import './index.less';
 
@@ -58,28 +58,10 @@ class Schema extends React.Component<IProps> {
         this.props.clearCurrentSpace();
       }
     }
-    trackEvent(
-      'schema',
-      'delete_space',
-      res.code === 0 ? 'ajax_success' : 'ajax_fail',
-    );
-  };
-
-  handleCreateSpace = () => {
-    this.props.history.push({
-      pathname: '/space/create',
-    });
-    trackEvent('navigation', 'view_space_create', 'from_space_list');
-  };
-
-  handleConfigSpace = async (space: string) => {
-    await this.props.asyncSwitchSpace(space);
-    this.props.history.push(`/space/${space}/tag/list`);
-    trackEvent('navigation', 'view_space_list', 'from_space_list');
   };
 
   render() {
-    const { loading, spaceList } = this.props;
+    const { loading, spaceList, asyncSwitchSpace } = this.props;
     const columns = [
       {
         title: intl.get('common.serialNumber'),
@@ -91,9 +73,15 @@ class Schema extends React.Component<IProps> {
         dataIndex: 'Name',
         align: 'center' as const,
         render: value => (
-          <Button type="link" onClick={() => this.handleConfigSpace(value)}>
+          <Link
+            to={`/space/${value}/tag/list`}
+            onClick={() => asyncSwitchSpace(value)}
+            data-track-category="navigation"
+            data-track-action="view_space_list"
+            data-track-label="from_space_list"
+          >
             {value}
-          </Button>
+          </Link>
         ),
       },
       {
@@ -159,11 +147,16 @@ class Schema extends React.Component<IProps> {
             return (
               <div className="operation">
                 <div>
-                  <Button
-                    shape="circle"
-                    onClick={() => this.handleConfigSpace(space.Name)}
-                  >
-                    <Icon type="tool" theme="twoTone" />
+                  <Button shape="circle">
+                    <Link
+                      to={`/space/${space.Name}/tag/list`}
+                      onClick={() => asyncSwitchSpace(space.Name)}
+                      data-track-category="navigation"
+                      data-track-action="view_space_list"
+                      data-track-label="from_space_list"
+                    >
+                      <Icon type="tool" theme="twoTone" />
+                    </Link>
                   </Button>
                   <Popconfirm
                     onConfirm={() => this.handleDeleteSpace(space.Name)}
@@ -193,9 +186,16 @@ class Schema extends React.Component<IProps> {
         </div>
         <Divider />
         <div className="btns">
-          <Button type="primary" onClick={this.handleCreateSpace}>
-            <Icon type="plus" />
-            {intl.get('common.create')}
+          <Button type="primary">
+            <Link
+              to="/space/create"
+              data-track-category="navigation"
+              data-track-action="view_space_create"
+              data-track-label="from_space_list"
+            >
+              <Icon type="plus" />
+              {intl.get('common.create')}
+            </Link>
           </Button>
         </div>
         <Table

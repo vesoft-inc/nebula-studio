@@ -1,6 +1,6 @@
 {
   "name": "nebula-graph-studio",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "nebula-graph-studio",
   "private": true,
   "egg": {
@@ -32,6 +32,7 @@
     "bignumber.js": "^9.0.1",
     "blueimp-canvas-to-blob": "^3.28.0",
     "child_process": "^1.0.2",
+    "classnames": "^2.3.1",
     "codemirror": "^5.49.0",
     "csvtojson": "^2.0.10",
     "d3": "^5.12.0",

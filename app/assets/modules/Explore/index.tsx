@@ -19,7 +19,6 @@ const mapState = (state: IRootState) => ({
 });
 
 type IProps = ReturnType<typeof mapState>;
-
 class Explore extends React.Component<IProps, {}> {
   controlComponent;
   componentDidMount() {
@@ -49,7 +48,13 @@ class Explore extends React.Component<IProps, {}> {
               <img className="empty-board" src={emptyPng} />
               <div>
                 <span>{intl.get('explore.noVertexPrompt')}</span>
-                <span className="btn" onClick={this.handleSearch}>
+                <span
+                  className="btn"
+                  onClick={this.handleSearch}
+                  data-track-category="explore"
+                  data-track-action="start_explore"
+                  data-track-label="from_canvas"
+                >
                   {intl.get('explore.search')}
                 </span>
               </div>
