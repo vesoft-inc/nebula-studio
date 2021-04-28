@@ -71,7 +71,7 @@ const sendRequest = async (type: string, api: string, params?, config?) => {
       res = (await service.get(api, { params, ...otherConfig })) as any;
       break;
     case 'post':
-      res = (await service.post(api, params, config)) as any;
+      res = (await service.post(api, params, otherConfig)) as any;
       break;
     case 'put':
       res = (await service.put(api, params, otherConfig)) as any;
@@ -103,7 +103,7 @@ const post = (api: string) => (params?: object, config = {} as any) =>
 const put = (api: string) => (params?: object, config = {}) =>
   sendRequest('put', api, params, config);
 
-const _delete = (api: string) => (params?: object) =>
-  sendRequest('delete', api, params);
+const _delete = (api: string) => (params?: object, config = {}) =>
+  sendRequest('delete', api, params, config);
 
 export { get, post, put, _delete };
