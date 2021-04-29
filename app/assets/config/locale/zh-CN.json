@@ -211,7 +211,8 @@
     "searchTip": "当前支持以下比较符 [=, >, <, !=, <>, <=, >=]",
     "expressionError": "表达式错误",
     "expandTips": "双击节点默认按当前配置快捷展开",
-    "missingParams": "参数缺失"
+    "missingParams": "参数缺失",
+    "emptyIndexTips": "无属性索引暂不支持查询数据功能，建议选择带属性索引查询"
   },
   "import": {
     "import":"导入",

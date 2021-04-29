@@ -436,12 +436,21 @@ class IndexMatch extends React.Component<IProps, IState> {
               <Select onChange={this.handleSelectIndex}>
                 {selectedTag &&
                   selectedTag.indexes.map(e => (
-                    <Option value={e.indexName} key={e.indexName}>
+                    <Option
+                      value={e.indexName}
+                      key={e.indexName}
+                      disabled={e.props.length === 0}
+                    >
                       {e.indexName} ({e.props.map(i => i.Field).join(', ')})
                     </Option>
                   ))}
               </Select>,
             )}
+            {selectedTag &&
+              selectedTag.indexes.filter(index => index.props.length === 0)
+                .length > 0 && (
+                <Instruction description={intl.get('explore.emptyIndexTips')} />
+              )}
           </Form.Item>
           <Form.Item label={intl.get('explore.quantityLimit')}>
             {getFieldDecorator('quantityLimit', {

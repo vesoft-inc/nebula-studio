@@ -163,7 +163,7 @@
     "runCodeInConsole": "Run code in the console",
     "indexLink": "For more information about index, see its ",
     "documentIntroduction": "documentation",
-    "selectIndex": "Select a Tag",
+    "selectIndex": "Select a Index",
     "paramFilter": "Use Index",
     "relationship": "Filter Logic",
     "operationConfirm": "This Delete operation will clear the following fields. Are you sure you want to continue the operation?",
@@ -211,7 +211,8 @@
     "searchTip": "The following comparison operators are currently supported [=, >, <, !=, <>, <=, >=]",
     "expressionError": "Expression error",
     "expandTips": "Double-click the vertex to quickly expand according to the current configuration by default",
-    "missingParams": "Missing parameters"
+    "missingParams": "Missing parameters",
+    "emptyIndexTips": "No attribute index currently does not support the data query function in Explore, Please select index with attribute for query"
   },
   "import": {
     "import": "Import",

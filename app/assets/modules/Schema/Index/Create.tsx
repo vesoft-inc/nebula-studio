@@ -343,11 +343,6 @@ class CreateIndex extends React.Component<IProps, IState> {
               {...fieldsLayout}
             >
               {getFieldDecorator('fields', {
-                rules: [
-                  {
-                    required: true,
-                  },
-                ],
                 initialValue: [],
               })(
                 <div className="tags">
