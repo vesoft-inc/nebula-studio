@@ -8,8 +8,6 @@ const disconnectDB = post('/api-nebula/db/disconnect');
 
 const importData = post('/api-import/submit');
 
-const runImport = post('/api/import/import');
-
 const stopImport = put('/api-import/stop');
 
 const createConfigFile = post('/api/import/config');
@@ -32,7 +30,6 @@ export default {
   connectDB,
   disconnectDB,
   importData,
-  runImport,
   stopImport,
   createConfigFile,
   getLog,

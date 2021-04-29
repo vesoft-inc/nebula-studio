@@ -289,7 +289,6 @@ export const importData = createModel({
         config,
       )) as any;
       if (errCode === 0) {
-        service.runImport({ taskId });
         this.update({
           taskId,
           isImporting: true,

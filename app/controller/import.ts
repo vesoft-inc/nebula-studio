@@ -12,14 +12,6 @@ if (!fs.existsSync(taskIdDir)) {
 }
 
 export default class ImportController extends Controller {
-  async import() {
-    const { ctx } = this;
-    ctx.response.body = {
-      data: [],
-      code: 0,
-    };
-  }
-
   async readLog() {
     const { ctx } = this;
     const { startByte, endByte, dir, taskId } = ctx.query;
