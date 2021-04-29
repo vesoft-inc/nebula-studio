@@ -14,10 +14,6 @@ if (!fs.existsSync(taskIdDir)) {
 export default class ImportController extends Controller {
   async import() {
     const { ctx } = this;
-    const { taskId } = ctx.request.body;
-    const taskIdJSON = require(taskIdDir);
-    taskIdJSON[taskId] = false;
-    fs.writeFileSync(taskIdDir, JSON.stringify(taskIdJSON));
     ctx.response.body = {
       data: [],
       code: 0,
