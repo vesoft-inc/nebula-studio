@@ -37,7 +37,6 @@ class IndexQuery extends React.Component<IProps> {
   }
 
   render() {
-    console.log('indexes', this.props.indexes);
     return (
       <>
         {this.props.indexes.length === 0 ? (
