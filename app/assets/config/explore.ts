@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js';
+import JSONBigint from 'json-bigint';
 import json2csv from 'json2csv';
 
 import { INode, IPath } from '#assets/utils/interface';
@@ -133,6 +135,8 @@ export const flattenData = data => {
           result[prop] = [];
         }
       }
+    } else if (BigNumber.isBigNumber(cur)) {
+      result[prop] = cur;
     } else {
       let isEmpty = true;
       Object.keys(cur).forEach(p => {
@@ -188,20 +192,18 @@ export const parseData = (data: INode[] | IPath[], type: 'vertex' | 'edge') => {
   data.forEach((item: any) => {
     const _result = {} as any;
     const properties =
-      type === 'vertex'
-        ? item.nodeProp.properties
-        : item.edge.edgeProp.properties;
+      type === 'vertex' ? item.nodeProp.properties : item.edgeProp.properties;
     const { result } = flattenData(properties) as any;
     if (type === 'vertex') {
       _result.vid = item.name;
-      _result.attributes = JSON.stringify(result);
+      _result.attributes = JSONBigint.stringify(result);
       tables.push(_result);
     } else if (type === 'edge') {
-      _result.type = item.edge.type;
-      _result.srcId = item.edge.source;
-      _result.dstId = item.edge.target;
-      _result.rank = item.edge.rank;
-      _result.attributes = JSON.stringify(result);
+      _result.type = item.type;
+      _result.srcId = item.source.name;
+      _result.dstId = item.target.name;
+      _result.rank = item.rank;
+      _result.attributes = JSONBigint.stringify(result);
       tables.push(_result);
     }
   });

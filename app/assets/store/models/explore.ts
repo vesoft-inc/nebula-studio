@@ -111,7 +111,7 @@ function getTagData(nodes, expand) {
     };
     const uuid = uuidv4();
     return {
-      name: vid,
+      name: convertBigNumberToString(vid),
       nodeProp,
       group,
       uuid,

@@ -17,6 +17,7 @@ const TabPane = Tabs.TabPane;
 const mapState = (state: IRootState) => ({
   selectVertexes: state.explore.selectVertexes,
   selectEdges: state.explore.selectEdges,
+  spaceVidType: state.nebula.spaceVidType,
 });
 
 interface IProps extends ReturnType<typeof mapState> {
@@ -66,8 +67,9 @@ class DisplayComponent extends React.PureComponent<IProps, IState> {
       {
         key: 'vid',
         value: data.name,
+        vidType: this.props.spaceVidType,
       },
-    ];
+    ] as any;
     const properties = data.nodeProp.properties;
     Object.keys(properties).forEach(property => {
       const valueObj = properties[property];

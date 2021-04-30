@@ -7,6 +7,7 @@ import { NebulaD3 } from '#assets/components';
 import DisplayPanel from '#assets/components/DisplayPanel';
 import ExpandComponent from '#assets/components/Expand';
 import { IDispatch, IRootState } from '#assets/store';
+import { convertBigNumberToString } from '#assets/utils/function';
 import { INode, IPath } from '#assets/utils/interface';
 
 import './index.less';
@@ -24,6 +25,7 @@ const mapState = (state: IRootState) => ({
   canvasScale: state.d3Graph.canvasScale,
   canvasOffsetX: state.d3Graph.canvasOffsetX,
   canvasOffsetY: state.d3Graph.canvasOffsetY,
+  spaceVidType: state.nebula.spaceVidType,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -124,23 +126,30 @@ class NebulaGraph extends React.Component<IProps, IState> {
 
   renderVertexTips = node => {
     const properties = node.nodeProp ? node.nodeProp.properties : {};
-    const vertexIDStr = `<div><span key='id'>vid: </span><span>${JSON.stringify(
-      node.name,
-    )}</span></div>`;
+    const vertexIDStr = `<div><span key='id'>vid: </span><span>${
+      this.props.spaceVidType === 'INT64'
+        ? node.name
+        : JSON.stringify(
+            // HACK: bigint to string, but json.stringify will show quotes
+            node.name,
+          )
+    }</span></div>`;
     const nodeFieldsValuePairStr = Object.keys(properties)
       .map(property => {
         const valueObj = properties[property];
         return Object.keys(valueObj)
           .map(fields => {
-            return `<div key=${fields}><span>${property}.${fields}: </span><span>${JSON.stringify(
-              valueObj[fields],
-              (_, value) => {
-                if (typeof value === 'string') {
-                  return value.replace(/\u0000+$/, '');
-                }
-                return value;
-              },
-            )}</span></div>`;
+            const value = valueObj[fields];
+            return `<div key=${fields}><span>${property}.${fields}: </span><span>${
+              typeof value !== 'string'
+                ? convertBigNumberToString(value)
+                : JSON.stringify(value, (_, value) => {
+                    if (typeof value === 'string') {
+                      return value.replace(/\u0000+$/, '');
+                    }
+                    return value;
+                  })
+            }</span></div>`;
           })
           .join('');
       })

@@ -4,6 +4,7 @@ import React from 'react';
 import intl from 'react-intl-universal';
 
 import IconFont from '#assets/components/Icon';
+import { convertBigNumberToString } from '#assets/utils/function';
 
 import './index.less';
 
@@ -53,15 +54,21 @@ class RowItem extends React.PureComponent<IProps, IState> {
     });
   };
 
-  handleShowValue = value => {
+  handleShowValue = data => {
+    const { key, value } = data;
     if (typeof value === 'string') {
-      return JSON.stringify(value, (_, v) => {
-        return v.replace(/\u0000+$/, '');
-      });
+      if (key === 'vid' && data.vidType === 'INT64') {
+        // HACK: bigint vid will be parsed as string, and show quotes in JSON.stringify
+        return value;
+      } else {
+        return JSON.stringify(value, (_, v) => {
+          return v.replace(/\u0000+$/, '');
+        });
+      }
     } else if (typeof value === 'boolean') {
       return value.toString();
     } else {
-      return value;
+      return convertBigNumberToString(value);
     }
   };
 
@@ -82,9 +89,7 @@ class RowItem extends React.PureComponent<IProps, IState> {
             {data.slice(0, EXPAND_NUM).map(item => (
               <div className="item-content" key={item.key}>
                 <span className="item-key">{item.key} :</span>
-                <span className="item-value">
-                  {this.handleShowValue(item.value)}
-                </span>
+                <span className="item-value">{this.handleShowValue(item)}</span>
               </div>
             ))}
             {needExpandRest && (
@@ -95,7 +100,7 @@ class RowItem extends React.PureComponent<IProps, IState> {
                       <div className="item-content" key={item.key}>
                         <span className="item-key">{item.key}</span>
                         <span className="item-value">
-                          {this.handleShowValue(item.value)}
+                          {this.handleShowValue(item)}
                         </span>
                       </div>
                     ))}

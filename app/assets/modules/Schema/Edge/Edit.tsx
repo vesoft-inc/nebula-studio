@@ -23,6 +23,7 @@ import { match, RouteComponentProps, withRouter } from 'react-router-dom';
 import GQLCodeMirror from '#assets/components/GQLCodeMirror';
 import { IDispatch, IRootState } from '#assets/store';
 import { dataType, nameReg, positiveIntegerReg } from '#assets/utils/constant';
+import { convertBigNumberToString } from '#assets/utils/function';
 import { getAlterGQL } from '#assets/utils/gql';
 import { trackEvent, trackPageView } from '#assets/utils/stat';
 
@@ -140,7 +141,7 @@ class EditEdge extends React.Component<IProps, IState> {
       showType: i.Type,
       type: i.Type.startsWith('fixed_string') ? 'fixed_string' : i.Type,
       allowNull: i.Null === 'YES',
-      value: i.Default,
+      value: convertBigNumberToString(i.Default),
       fixedLength: i.Type.startsWith('fixed_string')
         ? i.Type.replace(/[fixed_string(|)]/g, '')
         : '',

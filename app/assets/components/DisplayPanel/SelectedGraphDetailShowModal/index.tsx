@@ -1,4 +1,5 @@
 import { Button, Input, message, Table, Tabs, Tooltip } from 'antd';
+import JSONBigint from 'json-bigint';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
@@ -164,8 +165,8 @@ class SelectedGraphDetailShowModal extends React.PureComponent<IProps, IState> {
                     placement="topLeft"
                     title={
                       <pre>
-                        {JSON.stringify(
-                          JSON.parse(record),
+                        {JSONBigint.stringify(
+                          JSONBigint.parse(record),
                           (_, value) => {
                             if (typeof value === 'string') {
                               return value.replace(/\u0000+$/, '');
@@ -214,7 +215,13 @@ class SelectedGraphDetailShowModal extends React.PureComponent<IProps, IState> {
                   <Tooltip
                     placement="topLeft"
                     title={
-                      <pre>{JSON.stringify(JSON.parse(record), null, 2)}</pre>
+                      <pre>
+                        {JSONBigint.stringify(
+                          JSONBigint.parse(record),
+                          null,
+                          2,
+                        )}
+                      </pre>
                     }
                   >
                     {record}
