@@ -86,9 +86,6 @@ export function setLink(edges) {
   const linkGroup = {};
   // statistical linkMap linkGroup
   edges.forEach((link: any) => {
-    if (typeof link.source === 'string') {
-      link.edge = { ...link };
-    }
     const key = setLinkName(link);
     if (!linkGroup.hasOwnProperty(key)) {
       linkGroup[key] = [];

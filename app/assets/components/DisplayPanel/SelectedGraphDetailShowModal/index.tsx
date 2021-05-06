@@ -24,6 +24,7 @@ interface IState {
   _edges: any;
   originVertexes: any;
   originEdges: any;
+  searchValue: string;
 }
 class SelectedGraphDetailShowModal extends React.PureComponent<IProps, IState> {
   modalHandler;
@@ -35,6 +36,7 @@ class SelectedGraphDetailShowModal extends React.PureComponent<IProps, IState> {
       _edges: [],
       originVertexes: [],
       originEdges: [],
+      searchValue: '',
     };
   }
 
@@ -61,6 +63,7 @@ class SelectedGraphDetailShowModal extends React.PureComponent<IProps, IState> {
       originVertexes: parseData(vertexes, 'vertex').tables,
       _edges: parseData(edges, 'edge').tables,
       originEdges: parseData(edges, 'edge').tables,
+      searchValue: '',
     });
   };
 
@@ -71,6 +74,9 @@ class SelectedGraphDetailShowModal extends React.PureComponent<IProps, IState> {
     downloadCSVFiles({ headers, tables: data, title: tagType });
   };
 
+  handleUpdateValue = e => {
+    this.setState({ searchValue: e.target.value });
+  };
   handleSearch = value => {
     const { tagType, originVertexes, originEdges } = this.state;
     if (value) {
@@ -144,7 +150,7 @@ class SelectedGraphDetailShowModal extends React.PureComponent<IProps, IState> {
   };
 
   render() {
-    const { tagType, _vertexes, _edges } = this.state;
+    const { tagType, _vertexes, _edges, searchValue } = this.state;
     const data = tagType === 'vertex' ? _vertexes : _edges;
     const columns =
       tagType === 'vertex'
@@ -259,6 +265,8 @@ class SelectedGraphDetailShowModal extends React.PureComponent<IProps, IState> {
             </Button>
             <Input.Search
               placeholder="person.name > xx"
+              value={searchValue}
+              onChange={this.handleUpdateValue}
               onSearch={this.handleSearch}
             />
             <Instruction description={intl.get('explore.searchTip')} />

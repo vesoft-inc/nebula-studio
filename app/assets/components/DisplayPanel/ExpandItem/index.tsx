@@ -58,7 +58,6 @@ class RowItem extends React.PureComponent<IProps, IState> {
     const { key, value } = data;
     if (typeof value === 'string') {
       if (key === 'vid' && data.vidType === 'INT64') {
-        // HACK: bigint vid will be parsed as string, and show quotes in JSON.stringify
         return value;
       } else {
         return JSON.stringify(value, (_, v) => {
@@ -68,7 +67,7 @@ class RowItem extends React.PureComponent<IProps, IState> {
     } else if (typeof value === 'boolean') {
       return value.toString();
     } else {
-      return convertBigNumberToString(value);
+      return convertBigNumberToString(value); // TODO: bigint in props does not be convert
     }
   };
 
