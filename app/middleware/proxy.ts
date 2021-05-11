@@ -10,10 +10,7 @@ export default () => {
     if (proxyPath.test(ctx.request.url)) {
       const nebulaProxy = k2c(
         httpProxy({
-          // to promise that the nebula http client is in the same host with the console
-          target: `http://${
-            (ctx.request.header.host as string).split(':')[0]
-          }:8080`,
+          target: 'http://localhost:8080',
           pathRewrite: {
             '/api-nebula': '/api',
           },
