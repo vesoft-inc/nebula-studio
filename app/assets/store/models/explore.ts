@@ -90,17 +90,14 @@ const whichColor = (() => {
   };
 })();
 
-function getGroup(tags, expand) {
-  if (expand && expand.vertexColor === 'groupByTag') {
-    return 't-' + tags.sort().join('-');
-  }
-  return '';
+function getGroup(tags) {
+  return 't-' + tags.sort().join('-');
 }
 
 function getTagData(nodes, expand) {
   const data = nodes.map(node => {
     const { vid, tags, properties } = node;
-    const group = getGroup(tags, expand);
+    const group = getGroup(tags);
     const color =
       expand && expand.customColor && expand.vertexColor === 'custom'
         ? expand.customColor
