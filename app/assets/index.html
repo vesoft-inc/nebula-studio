@@ -92,6 +92,7 @@
 		</style>
 		{% if Env == 'prod' %}
         {{ helper.assets.getStyle('vendors.css') | safe }}
+        {{ helper.assets.getStyle('app.css') | safe }}
 		{% endif %}
 </head>
 

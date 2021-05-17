@@ -23,6 +23,7 @@ import Import from '#assets/modules/Import';
 import Schema from '#assets/modules/Schema';
 import CreateSpace from '#assets/modules/Schema/CreateSpace';
 import SpaceConfig from '#assets/modules/Schema/SpaceConfig';
+import '#assets/static/fonts/iconfont.css';
 import logo from '#assets/static/images/studio-logo.png';
 import { IDispatch, IRootState } from '#assets/store';
 import { updateQueryStringParameter } from '#assets/utils';
