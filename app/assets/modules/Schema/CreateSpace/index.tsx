@@ -40,7 +40,7 @@ const mapState = (state: IRootState) => ({
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetSpacesList: dispatch.nebula.asyncGetSpacesList,
   asyncCreateSpace: dispatch.nebula.asyncCreateSpace,
-  asyncGetMatchineNumber: dispatch.nebula.asyncGetMatchineNumber,
+  asyncGetMachineNumber: dispatch.nebula.asyncGetMachineNumber,
 });
 
 interface IProps
@@ -62,7 +62,7 @@ function getVidType(type: string, length?: string) {
 class CreateSpace extends React.Component<IProps> {
   componentDidMount() {
     trackPageView('/space/create');
-    this.props.asyncGetMatchineNumber();
+    this.props.asyncGetMachineNumber();
   }
 
   handleCreate = () => {

@@ -735,12 +735,12 @@ export const nebula = createModel({
       return { code, data };
     },
 
-    async asyncGetMatchineNumber() {
+    async asyncGetMachineNumber() {
       const { code, data } = (await service.execNGQL({
         gql: `SHOW HOSTS`,
       })) as any;
       if (code === 0) {
-        const activeMachineNum = data.tables.filter(i => i.Status === 'online')
+        const activeMachineNum = data.tables.filter(i => i.Status === 'ONLINE')
           .length;
         this.update({
           activeMachineNum: activeMachineNum || 1,

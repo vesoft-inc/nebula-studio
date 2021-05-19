@@ -7,10 +7,7 @@ interface IIconFontProps extends HTMLProps<HTMLElement> {
 const IconFont = (props: IIconFontProps) => {
   const { type, className, ...others } = props;
   return (
-    <span
-      className={`nebula-cloud-icon ${type} ${className}`}
-      {...others}
-    />
+    <span className={`nebula-cloud-icon ${type} ${className}`} {...others} />
   );
 };
 
