@@ -148,10 +148,19 @@ class App extends React.Component<IProps, IState> {
   render() {
     const { appVersion } = this.props;
     const { loading, activeMenu } = this.state;
+    const locale = cookies.get('locale');
     const nGQLHref =
-      cookies.get('locale') === 'ZH_CN'
+      locale === 'ZH_CN'
         ? 'https://docs.nebula-graph.com.cn/2.0/3.ngql-guide/1.nGQL-overview/1.overview/'
         : 'https://docs.nebula-graph.io/2.0/3.ngql-guide/1.nGQL-overview/1.overview/';
+    const mannualHref =
+      locale === 'ZH_CN'
+        ? 'https://docs.nebula-graph.com.cn/2.0.1/nebula-studio/about-studio/st-ug-what-is-graph-studio/'
+        : 'https://docs.nebula-graph.com.cn/2.0.1/nebula-studio/about-studio/st-ug-what-is-graph-studio/'; // TODO change english mannual
+    const versionLogHref =
+      locale === 'ZH_CN'
+        ? 'https://docs.nebula-graph.com.cn/2.0.1/nebula-studio/about-studio/st-ug-release-note/'
+        : 'https://docs.nebula-graph.io/master/nebula-studio/about-studio/st-ug-release-note/'; // TODO change english mannual
     return (
       <>
         <LanguageContext.Provider
@@ -256,10 +265,7 @@ class App extends React.Component<IProps, IState> {
                   overlay={
                     <Menu>
                       <Menu.Item onClick={() => trackPageView('/user-mannual')}>
-                        <a
-                          href="https://github.com/vesoft-inc/nebula-web-docker"
-                          target="_blank"
-                        >
+                        <a href={mannualHref} target="_blank">
                           <Icon type="compass" />
                           {intl.get('common.use')}
                         </a>
@@ -268,15 +274,6 @@ class App extends React.Component<IProps, IState> {
                         <a href={nGQLHref} target="_blank">
                           <Icon type="star" />
                           nGQL
-                        </a>
-                      </Menu.Item>
-                      <Menu.Item>
-                        <a
-                          href="https://github.com/vesoft-inc/nebula-web-docker/issues"
-                          target="_blank"
-                        >
-                          <Icon type="bug" />
-                          {intl.get('common.feedback')}
                         </a>
                       </Menu.Item>
                       <Menu.Item>
@@ -317,11 +314,7 @@ class App extends React.Component<IProps, IState> {
                           <a
                             data-track-category="navigation"
                             data-track-action="view_changelog"
-                            href={
-                              this.currentLocale === 'ZH_CN'
-                                ? 'https://github.com/vesoft-inc/nebula-graph-studio/blob/master/docs/CHANGELOG-zh.md'
-                                : 'https://github.com/vesoft-inc/nebula-graph-studio/blob/master/docs/CHANGELOG-en.md'
-                            }
+                            href={versionLogHref}
                             target="_blank"
                           >
                             <Icon type="tags" />

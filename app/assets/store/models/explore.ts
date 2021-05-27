@@ -483,7 +483,7 @@ export const explore = createModel({
         rules.edgeTypes = edgeTypes;
       }
       if (rules.stepsType === 'range' && (!rules.minStep || !rules.maxStep)) {
-        return message.warning('explore.missingParams');
+        return message.warning(intl.get('explore.missingParams'));
       }
       const data = (await this.asyncGetExpandData(rules)) as any;
       const { vertexColor, customColor } = rules;
