@@ -208,7 +208,7 @@ class OutputBox extends React.Component<IProps> {
             )}
           </Tabs>
         </div>
-        {result.code === 0 && result.data.timeCost && (
+        {result.code === 0 && result.data.timeCost !== undefined && (
           <div className="output-footer">
             <span>
               {`${intl.get('console.execTime')} ${result.data.timeCost /
