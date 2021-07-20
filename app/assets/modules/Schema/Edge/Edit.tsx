@@ -134,7 +134,7 @@ class EditEdge extends React.Component<IProps, IState> {
 
   handleData = (data: string, fieldInfo: IEdgeFeild[]) => {
     const reg = /CREATE EDGE\s`\w+`\s\((.*)\)\s+(ttl_duration = \d+),\s+(ttl_col\s+=\s+"?\w*"?)/gm;
-    const str = data.replaceAll(/[\r\n]/g, ' ');
+    const str = data.replace(/[\r\n]/g, ' ');
     const infoList = reg.exec(str) || [];
     const fieldList: IField[] = fieldInfo.map(i => ({
       name: i.Field,
