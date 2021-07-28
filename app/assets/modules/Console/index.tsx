@@ -18,16 +18,16 @@ interface IState {
 }
 
 const mapState = (state: IRootState) => ({
-  result: state.console.result,
-  currentGQL: state.console.currentGQL,
+  result: state._console.result,
+  currentGQL: state._console.currentGQL,
   currentSpace: state.nebula.currentSpace,
-  runGQLLoading: state.loading.effects.console.asyncRunGQL,
+  runGQLLoading: state.loading.effects._console.asyncRunGQL,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
-  asyncRunGQL: dispatch.console.asyncRunGQL,
+  asyncRunGQL: dispatch._console.asyncRunGQL,
   updateCurrentGQL: gql =>
-    dispatch.console.update({
+    dispatch._console.update({
       currentGQL: gql,
     }),
   asyncSwitchSpace: async space => {

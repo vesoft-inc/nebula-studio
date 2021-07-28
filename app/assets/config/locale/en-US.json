@@ -80,7 +80,8 @@
     "total": "Total",
     "exportSelectVertexes": "Export Vertexes to CSV",
     "exportSelectEdges": "Export Edges to CSV",
-    "noSelectedData": "No data currently selected"
+    "noSelectedData": "No data currently selected",
+    "namePlaceholder":"Please enter a search name"
   },
   "NGQLOutput": {
     "success": "Execution successful!"
@@ -131,6 +132,7 @@
     "startWithVertices": "Start with Vertices",
     "addConfirm": "Add",
     "expand": "Expand",
+    "unExpand": "Undo Expand",
     "undo": "Undo",
     "deleteSelectNodes": "Remove Select",
     "fileImport": "File Import",

@@ -1,13 +1,13 @@
 {
   "name": "nebula-graph-studio",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "nebula-graph-studio",
   "private": true,
   "egg": {
     "typescript": true
   },
   "scripts": {
-    "start": "egg-scripts start --daemon --title=egg-server-nebula-graph-studio",
+    "start": "egg-scripts start --daemon --title=egg-server-nebula-graph-studio --workers=3",
     "docker-start": "egg-scripts start --title=egg-server-nebula-graph-studio",
     "stop": "egg-scripts stop --title=egg-server-nebula-graph-studio",
     "dev": "egg-bin dev -r egg-ts-helper/register",

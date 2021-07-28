@@ -5,8 +5,10 @@ import { connect } from 'react-redux';
 import { Link, match, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { IDispatch, IRootState } from '#assets/store';
+import { sortByFieldAndFilter } from '#assets/utils/function';
 import { trackPageView } from '#assets/utils/stat';
 
+import Search from '../Search';
 import './index.less';
 
 const mapState = (state: IRootState) => ({
@@ -38,6 +40,7 @@ interface IField {
 
 interface IState {
   expandedRowKeys: number[];
+  searchVal: string;
 }
 
 function renderTagInfo(tag: ITag) {
@@ -72,6 +75,7 @@ class TagList extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       expandedRowKeys: [],
+      searchVal: '',
     };
   }
 
@@ -101,6 +105,12 @@ class TagList extends React.Component<IProps, IState> {
     const { expandedRowKeys } = this.state;
     this.setState({
       expandedRowKeys: expandedRowKeys.includes(key) ? [] : [key],
+    });
+  };
+
+  handleSearch = value => {
+    this.setState({
+      searchVal: value,
     });
   };
 
@@ -160,11 +170,16 @@ class TagList extends React.Component<IProps, IState> {
         },
       },
     ];
-    const { expandedRowKeys } = this.state;
+    const { expandedRowKeys, searchVal } = this.state;
+    const data = sortByFieldAndFilter({
+      field: 'name',
+      searchVal,
+      list: tagList,
+    });
     return (
       <Table
         className="expanded-table"
-        dataSource={tagList}
+        dataSource={data}
         columns={tagColumns}
         expandedRowRender={renderTagInfo}
         onRow={record => {
@@ -205,6 +220,7 @@ class TagList extends React.Component<IProps, IState> {
               {intl.get('common.create')}
             </Link>
           </Button>
+          <Search onSearch={this.handleSearch} />
         </div>
         {this.renderTagList()}
       </div>

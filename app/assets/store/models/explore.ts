@@ -239,6 +239,43 @@ export const explore = createModel({
       });
     },
 
+    async asyncUnExpand(_payload, rootState) {
+      const {
+        vertexes,
+        edges,
+        selectVertexes,
+        actionHistory,
+      } = rootState.explore;
+      const originEdges = [...edges];
+      const toDeleteVertexes = _.differenceBy(
+        vertexes,
+        selectVertexes,
+        (v: INode) => v.uuid,
+      );
+      toDeleteVertexes.forEach((v: INode) => {
+        _.remove(
+          originEdges,
+          e => e.source.uuid === v.uuid || e.target.uuid === v.uuid,
+        );
+      });
+      actionHistory.push({
+        type: 'REMOVE',
+        vertexes: toDeleteVertexes,
+        edges: _.differenceBy(
+          edges,
+          originEdges,
+          v => '`' + v.type + '`' + v.id,
+        ),
+      });
+      this.update({
+        vertexes: selectVertexes,
+        edges: originEdges,
+        actionHistory,
+        selectVertexes: [],
+        selectEdges: [],
+      });
+    },
+
     async deleteNodesAndEdges(_payload, rootState) {
       const {
         vertexes: originVertexes,

@@ -13,8 +13,10 @@ import { connect } from 'react-redux';
 import { Link, match, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { IDispatch, IRootState } from '#assets/store';
+import { sortByFieldAndFilter } from '#assets/utils/function';
 import { trackPageView } from '#assets/utils/stat';
 
+import Search from '../Search';
 import './index.less';
 const { Option } = Select;
 
@@ -38,6 +40,7 @@ interface IProps
 interface IState {
   indexType: IndexType;
   expandedRowKeys: number[];
+  searchVal: string;
 }
 
 type IndexType = 'TAG' | 'EDGE';
@@ -85,6 +88,7 @@ class IndexList extends React.Component<IProps, IState> {
     this.state = {
       indexType: 'TAG',
       expandedRowKeys: [],
+      searchVal: '',
     };
   }
 
@@ -132,10 +136,20 @@ class IndexList extends React.Component<IProps, IState> {
     });
   };
 
+  handleSearch = value => {
+    this.setState({
+      searchVal: value,
+    });
+  };
+
   renderIndexList = () => {
     const { loading, indexList } = this.props;
-    const { indexType, expandedRowKeys } = this.state;
-
+    const { indexType, expandedRowKeys, searchVal } = this.state;
+    const data = sortByFieldAndFilter({
+      field: 'name',
+      searchVal,
+      list: indexList,
+    });
     const indexColumns = [
       {
         title: intl.get('common.name'),
@@ -185,7 +199,7 @@ class IndexList extends React.Component<IProps, IState> {
     return (
       <Table
         className="expanded-table"
-        dataSource={indexList}
+        dataSource={data}
         columns={indexColumns}
         expandedRowRender={renderIndexInfo}
         expandedRowKeys={expandedRowKeys}
@@ -236,6 +250,7 @@ class IndexList extends React.Component<IProps, IState> {
             <Option value="TAG">Tag</Option>
             <Option value="EDGE">Edge Type</Option>
           </Select>
+          <Search onSearch={this.handleSearch} />
         </div>
         {this.renderIndexList()}
       </div>

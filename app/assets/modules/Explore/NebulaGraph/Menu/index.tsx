@@ -8,6 +8,7 @@ import Lock from '../Panel/Lock';
 import PropsDisplayBtn from '../Panel/PropsDisplay';
 import RollbackBtn from '../Panel/Rollback';
 import SearchBtn from '../Panel/Search';
+import UnExpandBtn from '../Panel/UnExpandBtn';
 import Unlock from '../Panel/Unlock';
 import ZoomBtn from '../Panel/Zoom';
 import './index.less';
@@ -62,6 +63,9 @@ class Menu extends React.PureComponent<IProps> {
     const menuConfig = [
       {
         component: <ExpandBtn showTitle={true} />,
+      },
+      {
+        component: <UnExpandBtn showTitle={true} />,
       },
       {
         component: <ZoomBtn type="zoom-in" showTitle={true} />,

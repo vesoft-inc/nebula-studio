@@ -5,8 +5,10 @@ import { connect } from 'react-redux';
 import { Link, match, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { IDispatch, IRootState } from '#assets/store';
+import { sortByFieldAndFilter } from '#assets/utils/function';
 import { trackPageView } from '#assets/utils/stat';
 
+import Search from '../Search';
 import './index.less';
 
 const mapState = (state: IRootState) => ({
@@ -38,6 +40,7 @@ interface IField {
 
 interface IState {
   expandedRowKeys: number[];
+  searchVal: string;
 }
 
 function renderEdgeInfo(edge: IEdgeInfo) {
@@ -72,6 +75,7 @@ class EdgeList extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       expandedRowKeys: [],
+      searchVal: '',
     };
   }
 
@@ -104,13 +108,24 @@ class EdgeList extends React.Component<IProps, IState> {
     });
   };
 
+  handleSearch = value => {
+    this.setState({
+      searchVal: value,
+    });
+  };
+
   renderEdgeList = () => {
     const { loading, edgeList } = this.props;
     const { match } = this.props;
     const {
       params: { space },
     } = match;
-    const { expandedRowKeys } = this.state;
+    const { expandedRowKeys, searchVal } = this.state;
+    const data = sortByFieldAndFilter({
+      field: 'name',
+      searchVal,
+      list: edgeList,
+    });
     const edgeColumn = [
       {
         title: intl.get('common.name'),
@@ -162,7 +177,7 @@ class EdgeList extends React.Component<IProps, IState> {
     return (
       <Table
         className="expanded-table"
-        dataSource={edgeList}
+        dataSource={data}
         columns={edgeColumn}
         expandedRowRender={renderEdgeInfo}
         onRow={record => {
@@ -204,6 +219,7 @@ class EdgeList extends React.Component<IProps, IState> {
               {intl.get('common.create')}
             </Link>
           </Button>
+          <Search onSearch={this.handleSearch} />
         </div>
         {this.renderEdgeList()}
       </div>

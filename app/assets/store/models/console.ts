@@ -6,7 +6,7 @@ interface IState {
   version: string;
 }
 
-export const console = createModel({
+export const _console = createModel({
   state: {
     currentGQL: 'SHOW SPACES;',
     result: {},

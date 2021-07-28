@@ -14,7 +14,7 @@ const mapState = (state: IRootState) => ({
 
 const mapDispatch = (dispatch: IDispatch) => ({
   updateCurrentGQL: gql =>
-    dispatch.console.update({
+    dispatch._console.update({
       currentGQL: gql,
     }),
 });

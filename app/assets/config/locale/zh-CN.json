@@ -80,7 +80,8 @@
     "total": "共计",
     "exportSelectVertexes": "导出选中点CSV",
     "exportSelectEdges": "导出选中边CSV",
-    "noSelectedData": "当前没有选中数据"
+    "noSelectedData": "当前没有选中数据",
+    "namePlaceholder":"请输入搜索名称"
   },
   "warning": {
     "configServer": "请先配置服务器",
@@ -133,6 +134,7 @@
     "undo": "回退",
     "deleteSelectNodes": "删除选中",
     "expand": "拓展",
+    "unExpand": "取消拓展",
     "fileImport": "文件导入",
     "importPlaceholder": "输入VID或者用于生成VID的数据，一行一个数据，按回车键断开。格式示例如下：\nstring1\nstring2\nstring3",
     "outgoing": "流出",

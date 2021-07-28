@@ -10,6 +10,7 @@ import MoveBtn from './Move';
 import PropsDisplayBtn from './PropsDisplay';
 import RollbackBtn from './Rollback';
 import SearchBtn from './Search';
+import UnExpandBtn from './UnExpandBtn';
 import Unlock from './Unlock';
 import ZoomBtn from './Zoom';
 
@@ -67,6 +68,9 @@ class Panel extends React.PureComponent<IProps> {
       [
         {
           component: <ExpandBtn handlerRef={btn => (this.expandBtn = btn)} />,
+        },
+        {
+          component: <UnExpandBtn />,
         },
       ],
       [
