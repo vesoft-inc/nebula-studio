@@ -71,14 +71,18 @@ interface IEdgeFeild {
   Field: string;
   Null: string;
   Type: string;
+  Comment: string;
 }
 interface IState extends IRequired {
   fieldList: IField[];
   ttlConfig: ITtl | null;
   editRow: number | null;
   editTtl: boolean;
+  editComment: boolean;
   editField: IEditField | null;
   editTtlConfig: ITtl | null;
+  comment: string;
+  temporaryComment: string;
 }
 
 type AlterType = 'ADD' | 'DROP' | 'CHANGE' | 'TTL';
@@ -89,6 +93,7 @@ interface IField {
   value: string;
   allowNull: boolean;
   fixedLength?: string;
+  comment?: string;
 }
 
 interface IEditField extends IField {
@@ -102,11 +107,14 @@ class EditEdge extends React.Component<IProps, IState> {
       fieldRequired: false,
       ttlRequired: false,
       editTtl: false,
+      editComment: false,
       fieldList: [],
       ttlConfig: null,
       editRow: null,
       editField: null,
       editTtlConfig: null,
+      comment: '',
+      temporaryComment: '',
     };
   }
 
@@ -133,7 +141,7 @@ class EditEdge extends React.Component<IProps, IState> {
   };
 
   handleData = (data: string, fieldInfo: IEdgeFeild[]) => {
-    const reg = /CREATE EDGE\s`\w+`\s\((.*)\)\s+(ttl_duration = \d+),\s+(ttl_col\s+=\s+"?\w*"?)/gm;
+    const reg = /CREATE EDGE\s`\w+`\s\((.*)\)\s+(ttl_duration = \d+),\s+(ttl_col = "\w*")(, comment = ".*")?/gm;
     const str = data.replace(/[\r\n]/g, ' ');
     const infoList = reg.exec(str) || [];
     const fieldList: IField[] = fieldInfo.map(i => ({
@@ -141,7 +149,8 @@ class EditEdge extends React.Component<IProps, IState> {
       showType: i.Type,
       type: i.Type.startsWith('fixed_string') ? 'fixed_string' : i.Type,
       allowNull: i.Null === 'YES',
-      value: convertBigNumberToString(i.Default),
+      comment: i.Comment === '_EMPTY_' ? '' : i.Comment,
+      value: i.Default === '_EMPTY_' ? '' : convertBigNumberToString(i.Default),
       fixedLength: i.Type.startsWith('fixed_string')
         ? i.Type.replace(/[fixed_string(|)]/g, '')
         : '',
@@ -149,6 +158,11 @@ class EditEdge extends React.Component<IProps, IState> {
     const ttlDuration = (infoList && infoList[2].split(' = ')[1]) || '';
     const ttlCol =
       (infoList && infoList[3].split(' = ')[1].replace(/"/g, '')) || '';
+    let comment = '';
+    if (infoList && infoList[4]) {
+      const str = infoList[4].split(' = ')[1];
+      comment = str.slice(1, str.length - 1);
+    }
     const fieldRequired = fieldList.length > 0;
     const ttlRequired = ttlCol !== '';
     const ttlConfig = {
@@ -156,6 +170,7 @@ class EditEdge extends React.Component<IProps, IState> {
       duration: ttlCol !== '' ? ttlDuration : '',
     };
     this.setState({
+      comment,
       fieldList,
       ttlConfig,
       fieldRequired,
@@ -169,6 +184,7 @@ class EditEdge extends React.Component<IProps, IState> {
       name: '',
       type: '',
       value: '',
+      comment: '',
       allowNull: true,
       fixedLength: '',
       alterType: 'ADD',
@@ -532,6 +548,25 @@ class EditEdge extends React.Component<IProps, IState> {
         },
       },
       {
+        title: intl.get('common.comment'),
+        dataIndex: 'comment',
+        align: 'center' as const,
+        render: (record, _, index) => {
+          if (editRow === index) {
+            return (
+              <Input
+                value={editField!.comment}
+                onChange={e =>
+                  this.handleChangeValue('comment', e.target.value)
+                }
+              />
+            );
+          } else {
+            return <span>{record}</span>;
+          }
+        },
+      },
+      {
         title: '',
         dataIndex: 'action',
         align: 'center' as const,
@@ -688,22 +723,35 @@ class EditEdge extends React.Component<IProps, IState> {
   };
 
   getGql = () => {
-    const { editField, editTtlConfig } = this.state;
-    if (editField || editTtlConfig) {
+    const {
+      editField,
+      editTtlConfig,
+      editComment,
+      temporaryComment,
+    } = this.state;
+    if (editField || editTtlConfig || editComment) {
       const { match } = this.props;
       const {
         params: { edge },
       } = match;
-      const action = editField ? editField.alterType : 'TTL';
-      const config = editField
-        ? {
-            fields: [editField],
-          }
-        : editTtlConfig
-        ? {
-            ttl: editTtlConfig,
-          }
-        : {};
+      let action;
+      let config = {};
+      if (editField) {
+        action = editField.alterType;
+        config = {
+          fields: [editField],
+        };
+      } else if (editComment) {
+        action = 'COMMENT';
+        config = {
+          comment: temporaryComment,
+        };
+      } else {
+        action = 'TTL';
+        config = {
+          ttl: editTtlConfig,
+        };
+      }
       const gql = getAlterGQL({
         type: 'EDGE',
         name: edge,
@@ -740,15 +788,64 @@ class EditEdge extends React.Component<IProps, IState> {
     }
   };
 
-  render() {
+  handleCommentEdit = () => {
+    this.setState({
+      editComment: true,
+      temporaryComment: this.state.comment,
+    });
+    this.props.asyncUpdateEditStatus(true);
+  };
+
+  handleCommentUpdate = async () => {
     const { match } = this.props;
-    const { fieldRequired, ttlRequired } = this.state;
+    const {
+      params: { edge },
+    } = match;
+    const { temporaryComment } = this.state;
+    const res = await this.props.asyncAlterField({
+      type: 'EDGE',
+      name: edge,
+      action: 'COMMENT',
+      config: {
+        comment: temporaryComment,
+      },
+    });
+    if (res.code === 0) {
+      message.success(intl.get('common.updateSuccess'));
+      this.getDetails();
+      this.setState({
+        editComment: false,
+        temporaryComment: '',
+      });
+      this.props.asyncUpdateEditStatus(false);
+    } else {
+      message.warning(res.message);
+    }
+  };
+
+  handleTemporaryValueUpdate = e => {
+    this.setState({
+      temporaryComment: e.target.value,
+    });
+  };
+
+  handleCancelCommentEdit = () => {
+    const { comment } = this.state;
+    this.setState({
+      editComment: false,
+      temporaryComment: comment,
+    });
+  };
+
+  render() {
+    const { match, editLoading } = this.props;
+    const { fieldRequired, ttlRequired, comment, editComment } = this.state;
     const {
       params: { edge },
     } = match;
     const outItemLayout = {
       labelCol: {
-        span: 1,
+        span: 2,
       },
       wrapperCol: {
         span: 6,
@@ -776,6 +873,45 @@ class EditEdge extends React.Component<IProps, IState> {
           <Form>
             <Form.Item label={intl.get('common.name')} {...outItemLayout}>
               {edge}
+            </Form.Item>
+            <Form.Item label={intl.get('common.comment')} {...outItemLayout}>
+              {!editComment && comment}
+              {editComment && (
+                <Input
+                  className="input-comment"
+                  defaultValue={comment}
+                  onChange={this.handleTemporaryValueUpdate}
+                />
+              )}
+              <div className="edit-btns">
+                {!editComment && (
+                  <Button
+                    type="link"
+                    onClick={this.handleCommentEdit}
+                    loading={!!editLoading}
+                  >
+                    {intl.get('common.edit')}
+                  </Button>
+                )}
+                {editComment && (
+                  <>
+                    <Button
+                      type="link"
+                      onClick={this.handleCommentUpdate}
+                      loading={!!editLoading}
+                    >
+                      {intl.get('common.ok')}
+                    </Button>
+                    <Button
+                      type="link"
+                      onClick={this.handleCancelCommentEdit}
+                      loading={!!editLoading}
+                    >
+                      {intl.get('common.cancel')}
+                    </Button>
+                  </>
+                )}
+              </div>
             </Form.Item>
             <Collapse
               activeKey={fieldRequired ? ['field'] : []}

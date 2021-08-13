@@ -1,0 +1,38 @@
+name: Studio Tar Package
+on:
+  push:
+    branches:
+      - master
+jobs:
+  package:
+    name: build package
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - centos7
+    container:
+      image: vesoft/nebula-dev:${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: 'master'
+          path: source/nebula-graph-studio
+      - uses: actions/checkout@v2
+        with:
+          repository: vesoft-inc/nebula-http-gateway
+          path: source/nebula-http-gateway
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.13.1'
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '10'
+      - name: ls
+        run: ls -a
+      - name: Package
+        run: bash ./source/nebula-graph-studio/scripts/tar-package.sh
+      - name: Upload to OSS
+        run: ls -a & ossutil64 -e ${{ secrets.OSS_ENDPOINT }} -i ${{ secrets.OSS_ID }} -k ${{ secrets.OSS_SECRET }} -f cp ./  ${{ secrets.OSS_URL }} --include "nebula-graph-studio-*.tar.gz" --only-current-dir -r
+
+    

@@ -5,12 +5,14 @@ interface IField {
   value?: string;
   allowNull?: boolean;
   fixedLength?: string;
+  comment?: string;
 }
 
 type IndexType = 'TAG' | 'EDGE';
-type AlterType = 'ADD' | 'DROP' | 'CHANGE' | 'TTL';
+type AlterType = 'ADD' | 'DROP' | 'CHANGE' | 'TTL' | 'COMMENT';
 interface IAlterConfig {
   fields?: IField[];
+  comment?: string;
   ttl?: {
     col?: string;
     duration?: string;
@@ -99,15 +101,14 @@ export const getExploreGQLWithIndex = (params: {
 
 export const getSpaceCreateGQL = (params: {
   name: string;
+  comment?: string | undefined;
   options: {
     partition_num: string | undefined;
     replica_factor: string | undefined;
-    charset: string | undefined;
-    collate: string | undefined;
-    vid_type: string | undefined;
+    vid_type: string;
   };
 }) => {
-  const { name, options } = params;
+  const { name, options, comment } = params;
   const optionsStr = Object.keys(options)
     .filter(i => options[i] !== undefined && options[i] !== '')
     .map(i => {
@@ -116,20 +117,21 @@ export const getSpaceCreateGQL = (params: {
     .join(', ');
   const gql = `CREATE SPACE ${handleKeyword(name)} ${
     optionsStr ? `(${optionsStr})` : ''
-  }`;
+  } ${comment ? `COMMENT = "${comment}"` : ''}`;
   return gql;
 };
 
 export const getTagOrEdgeCreateGQL = (params: {
   type: 'TAG' | 'EDGE';
   name: string;
+  comment?: string;
   fields?: IField[];
   ttlConfig?: {
     ttl_col: string;
     ttl_duration: number;
   };
 }) => {
-  const { type, name, fields, ttlConfig } = params;
+  const { type, name, fields, ttlConfig, comment } = params;
   const fieldsStr = fields
     ? fields
         .map(item => {
@@ -155,7 +157,14 @@ export const getTagOrEdgeCreateGQL = (params: {
               ? item.type
               : item.type + `(${item.fixedLength ? item.fixedLength : ''})`;
           const _null = item.allowNull ? 'NULL' : 'NOT NULL';
-          const conbine = [handleKeyword(item.name), _type, _null, valueStr];
+          const _comment = item.comment ? `COMMENT "${item.comment}"` : '';
+          const conbine = [
+            handleKeyword(item.name),
+            _type,
+            _null,
+            valueStr,
+            _comment,
+          ];
           return conbine.join(' ');
         })
         .join(', ')
@@ -166,7 +175,9 @@ export const getTagOrEdgeCreateGQL = (params: {
     : '';
   const gql = `CREATE ${type} ${handleKeyword(name)} ${
     fieldsStr.length > 0 ? `(${fieldsStr})` : '()'
-  } ${ttlStr}`;
+  } ${ttlStr} ${
+    comment ? `${ttlStr.length > 0 ? ', ' : ''}COMMENT = "${comment}"` : ''
+  }`;
   return gql;
 };
 
@@ -181,10 +192,12 @@ export const getAlterGQL = (params: {
   if (action === 'TTL' && config.ttl) {
     const { ttl } = config;
     content = `TTL_DURATION = ${ttl.duration || 0}, TTL_COL = "${ttl.col}"`;
-  } else if (action !== 'TTL' && config.fields) {
+  } else if (action === 'COMMENT' && config.comment) {
+    content = `COMMENT="${config.comment}"`;
+  } else if (action !== 'TTL' && action !== 'COMMENT' && config.fields) {
     const date = config.fields
       .map(item => {
-        const { name, type, value, fixedLength, allowNull } = item;
+        const { name, type, value, fixedLength, allowNull, comment } = item;
         if (action === 'DROP') {
           return name;
         } else {
@@ -209,6 +222,9 @@ export const getAlterGQL = (params: {
                 str += ` DEFAULT ${value}`;
             }
           }
+          if (comment) {
+            str += ` COMMENT "${comment}"`;
+          }
           return str;
         }
       })
@@ -223,13 +239,16 @@ export const getIndexCreateGQL = (params: {
   type: IndexType;
   name: string;
   associate: string;
+  comment?: string;
   fields: string[];
 }) => {
-  const { type, name, associate, fields } = params;
+  const { type, name, associate, fields, comment } = params;
   const combine = associate
     ? `on ${handleKeyword(associate)}(${fields.join(', ')})`
     : '';
-  const gql = `CREATE ${type} INDEX ${handleKeyword(name)} ${combine}`;
+  const gql = `CREATE ${type} INDEX ${handleKeyword(name)} ${combine} ${
+    comment ? `COMMENT = "${comment}"` : ''
+  }`;
   return gql;
 };
 

@@ -165,6 +165,11 @@ class IndexList extends React.Component<IProps, IState> {
         align: 'center' as const,
       },
       {
+        title: intl.get('common.comment'),
+        dataIndex: 'comment',
+        align: 'center' as const,
+      },
+      {
         title: intl.get('common.operation'),
         dataIndex: 'operation',
         align: 'center' as const,

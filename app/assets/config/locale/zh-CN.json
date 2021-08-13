@@ -81,7 +81,8 @@
     "exportSelectVertexes": "导出选中点CSV",
     "exportSelectEdges": "导出选中边CSV",
     "noSelectedData": "当前没有选中数据",
-    "namePlaceholder":"请输入搜索名称"
+    "namePlaceholder":"请输入搜索名称",
+    "comment": "描述"
   },
   "warning": {
     "configServer": "请先配置服务器",
@@ -298,7 +299,7 @@
     "replicaFactorDescription": "replica_factor 表示副本数量。默认值是 1，生产集群建议为 3。由于采用多数表决原理，因此需为奇数。",
     "charsetDescription": "charset 表示字符集，定义了字符以及字符的编码，默认为 utf8。",
     "collateDescription": "collate 表示字符序，定义了字符的比较规则，默认为 utf8_bin。",
-    "vidTypeDescription": "vid type 指定图空间中点 ID（VID）的数据类型。默认值为 FIXED_STRING(8)",
+    "vidTypeDescription": "vid type 指定图空间中点 ID（VID）的数据类型。",
     "createSuccess": "创建成功",
     "defineFields": "定义属性",
     "setTTL": "设置TTL",

@@ -30,4 +30,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: vesoft/nebula-graph-studio:v2
+        tags: vesoft/nebula-graph-studio:v3

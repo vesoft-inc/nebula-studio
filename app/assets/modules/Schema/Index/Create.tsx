@@ -22,7 +22,7 @@ const Option = Select.Option;
 type IndexType = 'TAG' | 'EDGE';
 
 const mapState = (state: IRootState) => ({
-  loading: state.loading.effects.nebula.asyncCreateTag,
+  loading: state.loading.effects.nebula.asyncCreateIndex,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -188,12 +188,13 @@ class CreateIndex extends React.Component<IProps, IState> {
     } = match;
     this.props.form.validateFields(async err => {
       if (!err) {
-        const { name, type, associate, fields } = getFieldsValue();
+        const { name, type, associate, fields, comment } = getFieldsValue();
         const res = await this.props.asyncCreateIndex({
           name,
           type,
           associate,
           fields,
+          comment,
         });
         if (res.code === 0) {
           message.success(intl.get('schema.createSuccess'));
@@ -257,6 +258,7 @@ class CreateIndex extends React.Component<IProps, IState> {
     const name = getFieldValue('name') || '';
     const type = getFieldValue('type');
     const associate = getFieldValue('associate') || '';
+    const comment = getFieldValue('comment') || '';
     const {
       typeList,
       fieldList,
@@ -272,6 +274,7 @@ class CreateIndex extends React.Component<IProps, IState> {
       name,
       associate,
       fields,
+      comment,
     });
     const { getFieldDecorator } = this.props.form;
     return (
@@ -360,6 +363,9 @@ class CreateIndex extends React.Component<IProps, IState> {
                   </Button>
                 </div>,
               )}
+            </Form.Item>
+            <Form.Item label={intl.get('common.comment')}>
+              {getFieldDecorator('comment')(<Input />)}
             </Form.Item>
           </Form>
           <GQLCodeMirror currentGQL={currentGQL} />

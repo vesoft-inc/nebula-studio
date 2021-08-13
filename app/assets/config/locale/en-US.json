@@ -81,7 +81,8 @@
     "exportSelectVertexes": "Export Vertexes to CSV",
     "exportSelectEdges": "Export Edges to CSV",
     "noSelectedData": "No data currently selected",
-    "namePlaceholder":"Please enter a search name"
+    "namePlaceholder":"Please enter a search name",
+    "comment": "Comment"
   },
   "NGQLOutput": {
     "success": "Execution successful!"
@@ -302,7 +303,7 @@
     "replicaFactorDescription": "replica_factor specifies the number of replicas in the cluster. The default replica factor is 1. The suggested number is 3 in cluster. It is usually 3 in production. Due to the majority voting principle, it must set to be odd.",
     "charsetDescription": "charset is short for character set. A character set is a set of symbols and encodings. The default value is utf8.",
     "collateDescription": "A collation is a set of rules for comparing characters in a character set. The default value is utf8_bin.",
-    "vidTypeDescription": "Specifies the data type of vertex IDs (VIDs) in a graph space. The default value is FIXED_STRING(8). ",
+    "vidTypeDescription": "Specifies the data type of vertex IDs (VIDs) in a graph space. ",
     "createSuccess": "Create Successfully",
     "defineFields": "Define Properties",
     "setTTL": "Set TTL",

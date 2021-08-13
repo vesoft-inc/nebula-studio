@@ -148,7 +148,7 @@ class CreateEdge extends React.Component<IProps, IState> {
     if (fieldRequired) {
       const formItems = keys.map((_, k: number) => (
         <div key={k} className="form-item">
-          <Col span={5}>
+          <Col span={4}>
             <Form.Item {...itemLayout}>
               {getFieldDecorator(`fields[${k}].name`, {
                 rules: nameRulesFn(intl),
@@ -158,7 +158,7 @@ class CreateEdge extends React.Component<IProps, IState> {
               )}
             </Form.Item>
           </Col>
-          <Col span={6}>
+          <Col span={5}>
             <Form.Item {...itemLayout} wrapperCol={{ span: 18 }}>
               {getFieldDecorator(`fields[${k}].type`, {
                 initialValue: '',
@@ -195,14 +195,14 @@ class CreateEdge extends React.Component<IProps, IState> {
             </Form.Item>
           </Col>
           <Col span={4}>
-            <Form.Item {...itemLayout}>
+            <Form.Item {...itemLayout} className="center">
               {getFieldDecorator(`fields[${k}].allowNull`, {
                 valuePropName: 'checked',
                 initialValue: true,
               })(<Checkbox />)}
             </Form.Item>
           </Col>
-          <Col span={6}>
+          <Col span={5}>
             <Form.Item {...itemLayout}>
               {fields && fields[k] && fields[k].type === 'timestamp' ? (
                 <Popover
@@ -229,6 +229,11 @@ class CreateEdge extends React.Component<IProps, IState> {
                   )}
                 </>
               )}
+            </Form.Item>
+          </Col>
+          <Col span={4}>
+            <Form.Item {...itemLayout}>
+              {getFieldDecorator(`fields[${k}].comment`)(<Input />)}
             </Form.Item>
           </Col>
           <Col span={2}>
@@ -327,7 +332,7 @@ class CreateEdge extends React.Component<IProps, IState> {
     this.props.form.validateFields(err => {
       const form = getFieldsValue();
       if (!err) {
-        const { name, fields, ttl: ttlConfig } = form;
+        const { name, fields, ttl: ttlConfig, comment } = form;
         const uniqFields = _.uniqBy(fields, 'name');
         if (fields && fields.length !== uniqFields.length) {
           return message.warning(intl.get('schema.uniqProperty'));
@@ -335,6 +340,7 @@ class CreateEdge extends React.Component<IProps, IState> {
           this.props
             .asyncCreateEdge({
               name,
+              comment,
               fields,
               ttlConfig,
             })
@@ -376,13 +382,14 @@ class CreateEdge extends React.Component<IProps, IState> {
     const fieldTable = this.renderFields();
     const ttlTable = this.renderTtlConfig();
     const edgeName = getFieldValue('name');
+    const comment = getFieldValue('comment');
     const fields = getFieldsValue().fields
       ? getFieldsValue().fields.filter(i => i)
       : [];
     const ttlConfig = getFieldsValue().ttl ? getFieldsValue().ttl : undefined;
     const outItemLayout = {
       labelCol: {
-        span: 1,
+        span: 2,
       },
       wrapperCol: {
         span: 6,
@@ -394,6 +401,7 @@ class CreateEdge extends React.Component<IProps, IState> {
           name: edgeName,
           fields,
           ttlConfig,
+          comment,
         })
       : '';
     const { getFieldDecorator } = this.props.form;
@@ -421,6 +429,9 @@ class CreateEdge extends React.Component<IProps, IState> {
                 rules: nameRulesFn(intl),
               })(<Input />)}
             </Form.Item>
+            <Form.Item label={intl.get('common.comment')} {...outItemLayout}>
+              {getFieldDecorator('comment')(<Input />)}
+            </Form.Item>
             <Collapse
               activeKey={fieldRequired ? ['field'] : []}
               expandIcon={() => {
@@ -432,10 +443,11 @@ class CreateEdge extends React.Component<IProps, IState> {
             >
               <Panel header={intl.get('schema.defineFields')} key="field">
                 <Row className="form-header">
-                  <Col span={5}>{intl.get('common.propertyName')}</Col>
+                  <Col span={4}>{intl.get('common.propertyName')}</Col>
                   <Col span={5}>{intl.get('common.dataType')}</Col>
-                  <Col span={5}>{intl.get('common.allowNull')}</Col>
+                  <Col span={4}>{intl.get('common.allowNull')}</Col>
                   <Col span={5}>{intl.get('common.defaults')}</Col>
+                  <Col span={4}>{intl.get('common.comment')}</Col>
                 </Row>
                 {fieldTable}
                 <Row className="form-footer">

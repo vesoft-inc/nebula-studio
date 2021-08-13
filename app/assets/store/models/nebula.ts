@@ -71,6 +71,7 @@ interface IEdge {
 interface IIndexList {
   name: string;
   owner: string;
+  comment?: string;
   fields: IField[];
 }
 
@@ -83,9 +84,10 @@ interface IProperty {
 }
 
 type IndexType = 'TAG' | 'EDGE';
-type AlterType = 'ADD' | 'DROP' | 'CHANGE' | 'TTL';
+type AlterType = 'ADD' | 'DROP' | 'CHANGE' | 'TTL' | 'COMMENT';
 interface IAlterConfig {
   fields?: IProperty[];
+  comment?: string;
   ttl?: {
     col?: string;
     duration?: string;
@@ -298,7 +300,11 @@ export const nebula = createModel({
       return { code, data };
     },
 
-    async asyncCreateSpace(payload: { name: string; options: any }) {
+    async asyncCreateSpace(payload: {
+      name: string;
+      options: any;
+      comment?: string;
+    }) {
       const gql = getSpaceCreateGQL(payload);
       const { code, data, message } = (await service.execNGQL(
         {
@@ -415,6 +421,7 @@ export const nebula = createModel({
 
     async asyncCreateTag(payload: {
       name: string;
+      comment?: string;
       fields?: IProperty[];
       ttlConfig?: {
         ttl_col: string;
@@ -556,6 +563,7 @@ export const nebula = createModel({
 
     async asyncCreateEdge(payload: {
       name: string;
+      comment?: string;
       fields?: IProperty[];
       ttlConfig?: {
         ttl_col: string;
@@ -595,7 +603,8 @@ export const nebula = createModel({
       if (code === 0) {
         const indexes = data.tables.map(item => {
           return {
-            name: item.Names,
+            name: item['Index Name'],
+            owner: item['By Tag'],
           };
         });
         this.update({
@@ -606,7 +615,7 @@ export const nebula = createModel({
       return { code, data };
     },
 
-    async asyncGetIndexOwner(payload: { type: IndexType; name: string }) {
+    async asyncGetIndexComment(payload: { type: IndexType; name: string }) {
       const { type, name } = payload;
       const { code, data } = (await service.execNGQL({
         gql: `
@@ -617,9 +626,10 @@ export const nebula = createModel({
         const _type = type === 'TAG' ? 'Tag' : 'Edge';
         const res =
           (data.tables && data.tables[0][`Create ${_type} Index`]) || '';
-        const reg = /.+\s+ON\s+`?(\w+)`?\s.+/g;
-        const owner = reg.exec(res);
-        return owner ? owner[1] : null;
+        const reg = /comment = "(.+)"/g;
+        const result = reg.exec(res);
+        const comment = result ? result[1] : null;
+        return comment;
       } else {
         return null;
       }
@@ -646,6 +656,7 @@ export const nebula = createModel({
             });
             return {
               indexName: item.name,
+              indexOwner: item.owner,
               props: code === 0 ? data.tables : [],
             };
           }),
@@ -653,16 +664,12 @@ export const nebula = createModel({
         const tree = [] as ITree[];
         await Promise.all(
           _indexes.map(async (item: any) => {
-            const data = await dispatch.nebula.asyncGetIndexOwner({
-              type,
-              name: item.indexName,
-            });
-            const tag = tree.filter(i => i.name === data);
+            const tag = tree.filter(i => i.name === item.indexOwner);
             if (tag.length > 0) {
               tag[0].indexes.push(item);
             } else {
               tree.push({
-                name: data,
+                name: item.indexOwner,
                 indexes: [item],
               });
             }
@@ -693,12 +700,13 @@ export const nebula = createModel({
         const indexList: IIndexList[] = [];
         await Promise.all(
           res.data.map(async item => {
-            const owner = await dispatch.nebula.asyncGetIndexOwner({
+            const comment = await dispatch.nebula.asyncGetIndexComment({
               type,
               name: item.name,
             });
             const index: IIndexList = {
-              owner,
+              owner: item.owner,
+              comment,
               name: item.name,
               fields: [],
             };
@@ -753,6 +761,7 @@ export const nebula = createModel({
       type: IndexType;
       name: string;
       associate: string;
+      comment?: string;
       fields: string[];
     }) {
       const gql = getIndexCreateGQL(payload);

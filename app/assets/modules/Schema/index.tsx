@@ -87,7 +87,7 @@ class Schema extends React.Component<IProps> {
       {
         title: (
           <>
-            <span>partition_num</span>
+            <span>Partition Number</span>
             <Instruction
               description={intl.get('schema.partitionNumDescription')}
             />
@@ -99,7 +99,7 @@ class Schema extends React.Component<IProps> {
       {
         title: (
           <>
-            <span>replica_factor</span>
+            <span>Replica Factor</span>
             <Instruction
               description={intl.get('schema.replicaFactorDescription')}
             />
@@ -111,7 +111,7 @@ class Schema extends React.Component<IProps> {
       {
         title: (
           <>
-            <span>charset</span>
+            <span>Charset</span>
             <Instruction description={intl.get('schema.charsetDescription')} />
           </>
         ),
@@ -121,7 +121,7 @@ class Schema extends React.Component<IProps> {
       {
         title: (
           <>
-            <span>collate</span>
+            <span>Collate</span>
             <Instruction description={intl.get('schema.collateDescription')} />
           </>
         ),
@@ -136,6 +136,22 @@ class Schema extends React.Component<IProps> {
           </>
         ),
         dataIndex: 'Vid Type',
+        align: 'center' as const,
+      },
+      {
+        title: 'Atomic Edge',
+        dataIndex: 'Atomic Edge',
+        align: 'center' as const,
+        render: value => String(value),
+      },
+      {
+        title: 'Group',
+        dataIndex: 'Group',
+        align: 'center' as const,
+      },
+      {
+        title: 'Comment',
+        dataIndex: 'Comment',
         align: 'center' as const,
       },
       {

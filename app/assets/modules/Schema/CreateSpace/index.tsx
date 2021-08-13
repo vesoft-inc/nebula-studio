@@ -50,12 +50,11 @@ interface IProps
     RouteComponentProps {}
 
 function getVidType(type: string, length?: string) {
-  let result: string | undefined;
+  let result;
   if (type === 'INT64') {
     result = type;
   } else if (type === 'FIXED_STRING') {
-    const _length = length || 8;
-    result = type + '(' + _length + ')';
+    result = type + '(' + (length || '') + ')';
   }
   return result;
 }
@@ -72,22 +71,20 @@ class CreateSpace extends React.Component<IProps> {
           name,
           partitionNum,
           replicaFactor,
-          charset,
-          collate,
           vidType,
           stringLength,
+          comment,
         } = this.props.form.getFieldsValue();
         const _vidType = getVidType(vidType, stringLength);
         const options = {
           partition_num: partitionNum,
           replica_factor: replicaFactor,
-          charset,
-          collate,
           vid_type: _vidType,
         };
         const { code, message: errorMsg } = await this.props.asyncCreateSpace({
           name,
           options,
+          comment,
         });
         if (code === 0) {
           this.props.history.push('/schema');
@@ -121,10 +118,9 @@ class CreateSpace extends React.Component<IProps> {
       name,
       partitionNum,
       replicaFactor,
-      charset,
-      collate,
       vidType,
       stringLength,
+      comment,
     } = getFieldsValue();
     const innerItemLayout = {
       labelCol: {
@@ -136,24 +132,23 @@ class CreateSpace extends React.Component<IProps> {
     };
     const outItemLayout = {
       labelCol: {
-        span: 1,
+        span: 2,
       },
       wrapperCol: {
-        span: 6,
+        span: 7,
       },
     };
     const _vidType = getVidType(vidType, stringLength);
     const options = {
       partition_num: partitionNum,
       replica_factor: replicaFactor,
-      charset,
-      collate,
       vid_type: _vidType,
     };
     const currentGQL = name
       ? getSpaceCreateGQL({
           name,
           options,
+          comment,
         })
       : '';
     return (
@@ -179,6 +174,46 @@ class CreateSpace extends React.Component<IProps> {
               {getFieldDecorator('name', {
                 rules: nameRulesFn(intl),
               })(<Input />)}
+            </Form.Item>
+            <Form.Item
+              {...outItemLayout}
+              label={
+                <>
+                  <span>vid type</span>
+                  <Instruction
+                    description={intl.get('schema.vidTypeDescription')}
+                  />
+                </>
+              }
+            >
+              {getFieldDecorator('vidType', {
+                rules: [
+                  {
+                    required: true,
+                  },
+                ],
+              })(
+                <Select placeholder="FIXED_STRING" className="select-vid-type">
+                  <Option value="FIXED_STRING">FIXED_STRING</Option>
+                  <Option value="INT64">INT64</Option>
+                </Select>,
+              )}
+              {vidType === 'FIXED_STRING' && (
+                <Form.Item className="item-string-length">
+                  {getFieldDecorator('stringLength', {
+                    rules: [
+                      {
+                        required: true,
+                        message: 'fix string length limit is required',
+                      },
+                      ...numberRulesFn(intl),
+                    ],
+                  })(<Input />)}
+                </Form.Item>
+              )}
+            </Form.Item>
+            <Form.Item label={intl.get('common.comment')} {...outItemLayout}>
+              {getFieldDecorator('comment')(<Input />)}
             </Form.Item>
             <Collapse>
               <Panel header={intl.get('common.optionalParameters')} key="ngql">
@@ -211,70 +246,6 @@ class CreateSpace extends React.Component<IProps> {
                   {getFieldDecorator('replicaFactor', {
                     rules: replicaRulesFn(intl, activeMachineNum),
                   })(<Input placeholder="1" />)}
-                </Form.Item>
-                <Form.Item
-                  label={
-                    <>
-                      <span>charset</span>
-                      <Instruction
-                        description={intl.get('schema.charsetDescription')}
-                      />
-                    </>
-                  }
-                >
-                  {getFieldDecorator('charset')(
-                    <Select placeholder="utf8">
-                      <Option value="utf8">utf8</Option>
-                    </Select>,
-                  )}
-                </Form.Item>
-                <Form.Item
-                  label={
-                    <>
-                      <span>collate</span>
-                      <Instruction
-                        description={intl.get('schema.collateDescription')}
-                      />
-                    </>
-                  }
-                >
-                  {getFieldDecorator('collate')(
-                    <Select placeholder="utf8_bin">
-                      <Option value="utf8_bin">utf8_bin</Option>
-                    </Select>,
-                  )}
-                </Form.Item>
-                <Form.Item
-                  label={
-                    <>
-                      <span>vid type</span>
-                      <Instruction
-                        description={intl.get('schema.vidTypeDescription')}
-                      />
-                    </>
-                  }
-                >
-                  {getFieldDecorator('vidType')(
-                    <Select
-                      placeholder="FIXED_STRING"
-                      className="select-vid-type"
-                    >
-                      <Option value="FIXED_STRING">FIXED_STRING</Option>
-                      <Option value="INT64">INT64</Option>
-                    </Select>,
-                  )}
-                  {vidType === 'FIXED_STRING' && (
-                    <Form.Item className="item-string-length">
-                      {getFieldDecorator('stringLength', {
-                        rules: numberRulesFn(intl),
-                      })(
-                        <Input
-                          className="input-string-length"
-                          placeholder="8"
-                        />,
-                      )}
-                    </Form.Item>
-                  )}
                 </Form.Item>
               </Panel>
             </Collapse>
