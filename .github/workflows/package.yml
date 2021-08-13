@@ -2,6 +2,7 @@ name: Studio RPM Relase
 on:
   push:
     branches:
+      - master
       - v2
 jobs:
   package:
@@ -16,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
         with:
-          ref: 'v2'
+          ref: 'master'
       - uses: actions/setup-node@v2
         with:
           node-version: '10'
