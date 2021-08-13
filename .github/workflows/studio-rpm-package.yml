@@ -22,6 +22,10 @@ jobs:
         with:
           repository: vesoft-inc/nebula-http-gateway
           path: source/nebula-http-gateway
+      - uses: actions/checkout@v2
+        with:
+          repository: vesoft-inc/nebula-importer
+          path: source/nebula-importer
       - uses: actions/setup-go@v2
         with:
           go-version: '^1.13.1'
@@ -29,7 +33,7 @@ jobs:
         with:
           node-version: '10'
       - name: Package
-        run: bash ./source/nebula-graph-studio/scripts/rpm-package.sh
+        run: bash ./source/nebula-graph-studio/scripts/rpm-package.sh ${{ secrets.GA_ID }}
       - name: Upload oss
         run: cd ./source/nebula-graph-studio/tmp/ && ossutil64 -e ${{ secrets.OSS_ENDPOINT }} -i ${{ secrets.OSS_ID }} -k ${{ secrets.OSS_SECRET }} -f cp ./  ${{ secrets.OSS_URL }} --include "nebula-graph-studio-*.rpm*" --only-current-dir -r
 

@@ -19,11 +19,17 @@ mv $STUDIO/vendors/gateway.conf $TARGET_GATEWAY/conf/app.conf
 mv $GATEWAY/nebula-httpd $TARGET_GATEWAY/
 
 ### nebula-importer
-mv  $STUDIO/vendors/nebula-importer $TARGET/nebula-importer/
+IMPORTER=$DIR/source/nebula-importer
+cd $IMPORTER
+make build
+mv $IMPORTER/nebula-importer $TARGET/nebula-importer/
 
 
 ### nebula graph studio relative ###
 cd $STUDIO
+
+bash ./scripts/setEventTracking.sh $1
+
 VERSION=`cat package.json | grep '"version":' | awk 'NR==1{print $2}' | awk -F'"' '{print $2}'`
 RELEASE=`cat package.json | grep '"release":' | awk 'NR==1{print $2}' | awk -F'"' '{print $2}'`
 
