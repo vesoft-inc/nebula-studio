@@ -15,10 +15,10 @@ $ ./nebula-importer --port 5699 --callback "http://0.0.0.0:7001/api/import/finis
 
 Start
 ```
-$ git clone https://github.com/vesoft-inc/nebula-importer.git
-$ cd nebula-importer
+$ git clone https://github.com/vesoft-inc/nebula-http-gateway.git
+$ cd nebula-http-gateway
 $ make build
-$ ./nebula-importer --port 5699 --callback "http://0.0.0.0:7001/api/import/finish"
+$ nohup ./nebula-httpd &
 ```
 
 ### Start nebula-graph-studio
@@ -31,3 +31,6 @@ $ npm run dev
 
 ## Documentation 
 [中文](https://docs.nebula-graph.com.cn/2.0.1/nebula-studio/about-studio/st-ug-what-is-graph-studio/)
+
+## Contributing
+Contributions are warmly welcomed and greatly appreciated. Please see [Guide Docs](https://github.com/vesoft-inc-private/nebula-graph-studio/blob/master/CONTRIBUTING.md) 

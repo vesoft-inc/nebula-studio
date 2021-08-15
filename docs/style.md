@@ -15,10 +15,7 @@ This is a full stack project including front and back end.
   - service -------------------------------------- back end service logic
   - router.ts ------------------------------------ back end router config
   - config --------------------------------------- node config folder refer to [Egg](https://eggjs.org/en/basics/config.html)
-- docker/ -------------------------------------------- docker run for Nebula Console
-- nebula-go-api ---------------------------------------- nebula restful api with golang
 - docs ----------------------------------------- document files about the project
-  - data-init.md ---------------------------- document for init nebula sample data
   - style.md -------------------------------- document for project develop style
 
 ## Stack
