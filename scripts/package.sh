@@ -3,6 +3,8 @@
 
 set -ex
 
+bash ./scripts/setEventTracking.sh $1
+
 npm install
 npm run build
 npm run tsc

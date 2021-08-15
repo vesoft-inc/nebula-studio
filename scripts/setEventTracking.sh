@@ -1,0 +1,1 @@
+sed -i "s~<!-- Global Event Tracking -->~<script async src='https://www.googletagmanager.com/gtag/js?id=$1'></script>\n<script>\nwindow.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\ngtag('js', new Date());\ngtag('config', '$1');\n</script>~g" ./app/assets/index.html
