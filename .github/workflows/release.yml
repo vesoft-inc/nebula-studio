@@ -10,7 +10,9 @@ jobs:
     -
       name: Checkout Github Action
       uses: actions/checkout@master
-
+    - 
+      name: Package
+      run: bash ./scripts/setEventTracking.sh ${{ secrets.GA_ID }}
     -
       name: Set up QEMU
       uses: docker/setup-qemu-action@v1
