@@ -179,7 +179,7 @@
     "emptyIndex": "No Index",
     "indexConditionDescription": "To use a multiple-field index for a query, use all the fields or only the first several fields in sequence. Do not skip any field from left to right and the first field is required.",
     "timestampInput": "Only numbers are supported for the timestamp field",
-    "documentIntroductionUrl": "https://docs.nebula-graph.io/manual-EN/2.query-language/4.statement-syntax/1.data-definition-statements/",
+    "documentIntroductionUrl": "https://docs.nebula-graph.com.cn/2.5.0/3.ngql-guide/14.native-index-statements/",
     "customQueryUrl": "https://cloud-cdn.nebula-graph.com.cn/studio-resource/go-to-explore_en.png",
     "pretreatmentExplaination": "Hash can pre-process data of the bool, double, int, or string type to generate VIDs, but UUID can pre-process data of the string type only. To generate VIDs by pre-processing strings, enclose each string with single or double quotes.",
     "exportToImg": "Export Graph",

@@ -151,16 +151,16 @@ class App extends React.Component<IProps, IState> {
     const locale = cookies.get('locale');
     const nGQLHref =
       locale === 'ZH_CN'
-        ? 'https://docs.nebula-graph.com.cn/2.0/3.ngql-guide/1.nGQL-overview/1.overview/'
-        : 'https://docs.nebula-graph.io/2.0/3.ngql-guide/1.nGQL-overview/1.overview/';
+        ? 'https://docs.nebula-graph.com.cn/2.5.0/3.ngql-guide/1.nGQL-overview/1.overview/'
+        : 'https://docs.nebula-graph.com.cn/2.5.0/3.ngql-guide/1.nGQL-overview/1.overview/'; // TODO update english mannual
     const mannualHref =
       locale === 'ZH_CN'
-        ? 'https://docs.nebula-graph.com.cn/2.0.1/nebula-studio/about-studio/st-ug-what-is-graph-studio/'
-        : 'https://docs.nebula-graph.com.cn/2.0.1/nebula-studio/about-studio/st-ug-what-is-graph-studio/'; // TODO change english mannual
+        ? 'https://docs.nebula-graph.com.cn/2.5.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/'
+        : 'https://docs.nebula-graph.com.cn/2.5.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/'; // TODO change english mannual
     const versionLogHref =
       locale === 'ZH_CN'
-        ? 'https://docs.nebula-graph.com.cn/2.0.1/nebula-studio/about-studio/st-ug-release-note/'
-        : 'https://docs.nebula-graph.io/master/nebula-studio/about-studio/st-ug-release-note/'; // TODO change english mannual
+        ? 'https://docs.nebula-graph.com.cn/2.5.0/nebula-studio/about-studio/st-ug-release-note/'
+        : 'https://docs.nebula-graph.com.cn/2.5.0/nebula-studio/about-studio/st-ug-release-note/'; // TODO change english mannual
     return (
       <>
         <LanguageContext.Provider
