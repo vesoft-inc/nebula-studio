@@ -2,7 +2,7 @@ name: Studio Tar Package
 on:
   push:
     branches:
-      - master
+      - hetao-test
 jobs:
   package:
     name: build package
@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: 'master'
+          ref: 'hetao-test'
           path: source/nebula-graph-studio
       - uses: actions/checkout@v2
         with:
@@ -37,6 +37,6 @@ jobs:
       - name: Package
         run: bash ./source/nebula-graph-studio/scripts/tar-package.sh ${{ secrets.GA_ID }}
       - name: Upload to OSS
-        run: ls -a & ossutil64 -e ${{ secrets.OSS_ENDPOINT }} -i ${{ secrets.OSS_ID }} -k ${{ secrets.OSS_SECRET }} -f cp ./  ${{ secrets.OSS_URL }} --include "nebula-graph-studio-*.tar.gz" --only-current-dir -r
+        run: bash ./source/nebula-graph-studio/scripts/tar-upload.sh ${{ secrets.OSS_ENDPOINT }} ${{ secrets.OSS_ID }} ${{ secrets.OSS_SECRET }} ${{ secrets.OSS_URL }}
 
     
