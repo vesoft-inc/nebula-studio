@@ -2,7 +2,7 @@ name: Studio Tar Package
 on:
   push:
     branches:
-      - hetao-test
+      - master
 jobs:
   package:
     name: build package
@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: 'hetao-test'
+          ref: 'master'
           path: source/nebula-graph-studio
       - uses: actions/checkout@v2
         with:
