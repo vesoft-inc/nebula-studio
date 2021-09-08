@@ -111,7 +111,7 @@ class App extends React.Component<IProps, IState> {
 
   componentWillMount() {
     // Initialize the import task
-    service.stopImport({ taskId: 'all' });
+    service.handleImportAction({ taskAction: 'actionStopAll' });
   }
 
   componentDidMount() {

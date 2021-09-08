@@ -5,32 +5,21 @@
 - Linux
 
 ## Download
-` wget https://oss-cdn.nebula-graph.com.cn/nebula-graph-studio/nebula-graph-studio-${version-release}.x86_64.tar.gz`
+`wget https://oss-cdn.nebula-graph.com.cn/nebula-graph-studio/nebula-graph-studio-${version}.x86_64.tar.gz`
 
 ## Unpress
-`tar -xvf nebula-graph-studio-${version-release}.x86_64.tar.gz`
+`tar -xvf nebula-graph-studio-${version}.x86_64.tar.gz`
 
 
 ## Directory descrption
 Three packages in nebula-graph-studio 
 - nebula-graph-studio ------------------------- FE service
-- nebula-importer ----------------------------- Data Import Service
 - nebula-http-gateway ----------------------- Network Service
 
 
 ## Quick Start
 
-1. Nebula-importer
-- packages： `nebula-importer`
-- location：in the same machine with nebula-graph-studio
-- Start：
-  ```bash
-  $ cd nebula-importer
-  $ ./nebula-importer --port 5699 --callback "http://0.0.0.0:7001/api/import/finish" &
-  ```
-  Service address: http://127.0.0.1:5699
-
-2. Nebula-http-gateway
+1. Nebula-http-gateway
 - packages: `nebula-http-gateway`
 - location：in the same machine with nebula-graph-studio
 - Start：
@@ -40,7 +29,7 @@ Three packages in nebula-graph-studio
   ```
 - Service address: http://127.0.0.1:8080
 
-3. nebula-graph-studio
+2. nebula-graph-studio
 - packages: `nebula-graph-studio`
 
 - Start:
@@ -58,7 +47,6 @@ url: http://{{ip}}:7001
 Using `kill pid` ：
 
 ```bash
-$ kill $(lsof -t -i :5699) # stop nebula-importer
 $ kill $(lsof -t -i :8080) # stop nebula-http-gateway
 $ cd nebula-graph-studio
 $ npm run stop # stop nebula-graph-studio

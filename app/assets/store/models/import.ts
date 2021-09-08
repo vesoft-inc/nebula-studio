@@ -285,25 +285,31 @@ export const importData = createModel({
         nebula: { spaceVidType },
       } = rootState;
       const config: any = configToJson({ ...payload, spaceVidType });
-      const { taskId, errCode, errMsg } = (await service.importData(
-        config,
-      )) as any;
-      if (errCode === 0) {
+      const { code, data, message } = (await service.importData({
+        configBody: config,
+        configPath: '',
+      })) as any;
+      if (code === 0) {
         this.update({
-          taskId,
+          taskId: data[0],
           isImporting: true,
         });
       } else {
-        message.error(errMsg);
+        message.error(message);
       }
-      return errCode;
+      return code;
+    },
+
+    async checkImportStatus(payload) {
+      const res = await service.handleImportAction(payload);
+      return res;
     },
 
     async stopImport(payload) {
       this.update({
         isImporting: false,
       });
-      service.stopImport(payload);
+      service.handleImportAction(payload);
     },
 
     async changeTagType(payload: {
