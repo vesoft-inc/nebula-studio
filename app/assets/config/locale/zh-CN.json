@@ -215,7 +215,8 @@
     "expressionError": "表达式错误",
     "expandTips": "双击节点默认按当前配置快捷展开",
     "missingParams": "参数缺失",
-    "emptyIndexTips": "无属性索引暂不支持查询数据功能，建议选择带属性索引查询"
+    "emptyIndexTips": "无属性索引暂不支持查询数据功能，建议选择带属性索引查询",
+    "docForFindPath": "https://docs.nebula-graph.com.cn/2.5.0/3.ngql-guide/16.subgraph-and-path/2.find-path/"
   },
   "import": {
     "import":"导入",

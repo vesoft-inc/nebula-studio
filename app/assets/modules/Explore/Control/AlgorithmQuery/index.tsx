@@ -39,10 +39,7 @@ class AlgorithmQuery extends React.Component<IProps> {
   }
 
   viewDoc = () => {
-    window.open(
-      'https://docs.nebula-graph.com.cn/2.5.0/3.ngql-guide/16.subgraph-and-path/2.find-path/',
-      '_blank',
-    );
+    window.open(intl.get('explore.docForFindPath'), '_blank');
   };
 
   handleInquiry = async () => {

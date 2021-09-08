@@ -68,6 +68,7 @@
     "unlock": "Unlock",
     "lock": "Lock",
     "moreSuggestion": "More Suggestion",
+    "algorithm": "Algorithm",
     "viewDocs": "View Docs",
     "hotKeys": "Shortcut Key",
     "show": "Show",
@@ -179,7 +180,7 @@
     "emptyIndex": "No Index",
     "indexConditionDescription": "To use a multiple-field index for a query, use all the fields or only the first several fields in sequence. Do not skip any field from left to right and the first field is required.",
     "timestampInput": "Only numbers are supported for the timestamp field",
-    "documentIntroductionUrl": "https://docs.nebula-graph.com.cn/2.5.0/3.ngql-guide/14.native-index-statements/",
+    "documentIntroductionUrl": "https://docs.nebula-graph.io/2.5.0/3.ngql-guide/14.native-index-statements/",
     "customQueryUrl": "https://cloud-cdn.nebula-graph.com.cn/studio-resource/go-to-explore_en.png",
     "pretreatmentExplaination": "Hash can pre-process data of the bool, double, int, or string type to generate VIDs, but UUID can pre-process data of the string type only. To generate VIDs by pre-processing strings, enclose each string with single or double quotes.",
     "exportToImg": "Export Graph",
@@ -189,7 +190,6 @@
     "expandTip": "Double-click any vertex to explore its related vertices and edges.",
     "hotKeysInstructions": "Shortcut Keys Instruction",
     "graphAlgorithm": "Graph Algorithm",
-    "algorithm": "Algorithm",
     "srcId": "Src ID",
     "dstId": "Dst ID",
     "relation": "Relation",
@@ -215,7 +215,8 @@
     "expressionError": "Expression error",
     "expandTips": "Double-click the vertex to quickly expand according to the current configuration by default",
     "missingParams": "Missing parameters",
-    "emptyIndexTips": "No attribute index currently does not support the data query function in Explore, Please select index with attribute for query"
+    "emptyIndexTips": "No attribute index currently does not support the data query function in Explore, Please select index with attribute for query",
+    "docForFindPath": "https://docs.nebula-graph.io/2.5.0/3.ngql-guide/16.subgraph-and-path/2.find-path/"
   },
   "import": {
     "import": "Import",
