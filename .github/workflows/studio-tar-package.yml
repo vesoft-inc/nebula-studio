@@ -1,8 +1,9 @@
 name: Studio Tar Package
 on:
-  push:
-    branches:
-      - master
+  release:
+    types:
+      - published
+jobs:
 jobs:
   package:
     name: build package
