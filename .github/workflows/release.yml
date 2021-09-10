@@ -1,8 +1,9 @@
 name: Studio Image Release
 on:
-  push:
-    branches:
-      - master
+  release:
+    types:
+      - published
+jobs:
 jobs:
   release-image:
     runs-on: ubuntu-latest
