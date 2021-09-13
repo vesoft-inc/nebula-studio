@@ -2,6 +2,9 @@
 Nebula Graph Studio (Studio for short) is a web-based visualization tool for Nebula Graph. With Studio, you can create a graph schema, import data, edit nGQL statements for data queries, and explore graphs.
 ![](./introduction.png)
 
+## Architecture
+![](architecture.png)
+
 ## Development Quick Start
 ### Set up nebula-importer
 ```
@@ -23,6 +26,30 @@ $ nohup ./nebula-httpd &
 ```
 $ npm install
 $ npm run dev
+```
+
+## Production Deploy
+
+### 1. Build
+```
+$ npm run install
+$ npm run build
+```
+
+### 2. Compile Typescript
+```
+$ npm run tsc
+```
+
+### 3. Deploy
+```
+$ npm run start
+```
+
+### 4. Stop Server
+Use when you want shutdown the web app
+```
+$ npm run stop
 ```
 
 ## Documentation 
