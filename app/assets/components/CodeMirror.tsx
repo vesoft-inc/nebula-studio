@@ -40,7 +40,7 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
           if (stream.eatSpace()) {
             return null;
           }
-          stream.eatWhile(/[\$\w\u4e00-\u9fa5]/);
+          stream.eatWhile(/[\$:\w\u4e00-\u9fa5]/);
           const cur = stream.current();
           if (keyWords.some(item => item === cur)) {
             return 'keyword';
@@ -127,6 +127,7 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
       change.preventDefault();
     }
   };
+
   codemirrorValueChange = (doc, change) => {
     if (change.origin !== 'setValue') {
       if (this.props.onChange) {
