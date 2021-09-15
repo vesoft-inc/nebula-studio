@@ -7,6 +7,8 @@ import { RouteComponentProps } from 'react-router-dom';
 import { CodeMirror, OutputBox } from '#assets/components';
 import { maxLineNum } from '#assets/config/nebulaQL';
 import { IDispatch, IRootState } from '#assets/store';
+import { checkBoolean, checkNumber } from '#assets/utils/function';
+import { getSessionStorage } from '#assets/utils/sessionStorage';
 import { trackPageView } from '#assets/utils/stat';
 
 import './index.less';
@@ -85,15 +87,60 @@ class Console extends React.Component<IProps, IState> {
     if (sentenceList.some(sentence => sentence.match(reg))) {
       return message.error(intl.get('common.disablesUseToSwitchSpace'));
     }
+    const { normalSentenceList, paramsMap } = this.handleParamDSL(sentenceList);
     this.editor.execCommand('goDocEnd');
     const history = this.getLocalStorage();
     history.push(gql);
     localStorage.setItem('history', JSON.stringify(history));
 
-    await this.props.asyncRunGQL(gql);
+    await this.props.asyncRunGQL({
+      gql: normalSentenceList.join(';'),
+      paramsMap,
+    });
     this.setState({
       isUpDown: true,
     });
+  };
+
+  // 处理:param 语法
+  handleParamDSL = (sentenceList: string[]) => {
+    const reg = /^\s*:PARAM \S+\s*=>\s*\S;?/gm;
+    const paramList: string[] = [];
+    const normalSentenceList: string[] = [];
+    sentenceList.forEach(sentence => {
+      if (sentence.match(reg)) {
+        paramList.push(sentence);
+      } else {
+        normalSentenceList.push(sentence);
+      }
+    });
+    const sessionStorage = getSessionStorage();
+    const paramsMap = JSON.parse(sessionStorage?.getItem('paramsMap') || '{}');
+    paramList.forEach(param => {
+      const items = param.split('=>');
+      const regMatch = items[0].match(/\s+\S+/);
+      if (regMatch) {
+        const key = regMatch[0].trim();
+        let value: string | number | boolean = items[1].trim();
+        value = this.parseValue(value);
+        paramsMap[key] = value;
+      }
+    });
+    sessionStorage?.setItem('paramsMap', JSON.stringify(paramsMap));
+    return {
+      normalSentenceList,
+      paramsMap,
+    };
+  };
+
+  parseValue = (value: string) => {
+    if (checkNumber(value)) {
+      return parseFloat(value);
+    }
+    if (checkBoolean(value)) {
+      return value === 'true';
+    }
+    return value;
   };
 
   handleHistoryItem = (value: string) => {

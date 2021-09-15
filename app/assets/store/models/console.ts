@@ -20,9 +20,12 @@ export const _console = createModel({
     },
   },
   effects: {
-    async asyncRunGQL(gql) {
+    async asyncRunGQL({ gql, paramsMap }) {
       const result = (await service.execNGQL(
-        { gql },
+        {
+          gql,
+          paramsMap,
+        },
         {
           trackEventConfig: {
             category: 'console',

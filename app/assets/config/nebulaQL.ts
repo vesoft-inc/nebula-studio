@@ -133,6 +133,7 @@ const nebulaWordsUppercase = [
   'USERS',
   'UUID',
   'VALUES',
+  ':PARAM',
 ];
 
 export const ban = ['use', 'USE'];
@@ -217,6 +218,8 @@ export const operators = [
   'MINUS',
   // uuid
   'uuid',
+  // assignment
+  '=>',
 ];
 
 const nebulaWordsLowercase = nebulaWordsUppercase.map(w => w.toLowerCase());

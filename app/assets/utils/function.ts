@@ -37,3 +37,19 @@ export const sortByFieldAndFilter = (payload: {
     return _.orderBy(list, [field], ['asc']);
   }
 };
+
+export function checkNumber(val: string) {
+  const reg = /^[0-9]+.?[0-9]*$/;
+  if (reg.test(val)) {
+    return true;
+  }
+  return false;
+}
+
+export function checkBoolean(val: string) {
+  const reg = /^false|FALSE|true|TRUE$/;
+  if (reg.test(val)) {
+    return true;
+  }
+  return false;
+}
