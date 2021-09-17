@@ -102,7 +102,7 @@ class Console extends React.Component<IProps, IState> {
     });
   };
 
-  // 处理:param 语法
+  // handle :param syntax
   handleParamDSL = (sentenceList: string[]) => {
     const reg = /^\s*:PARAM \S+\s*=>\s*\S;?/gm;
     const paramList: string[] = [];
