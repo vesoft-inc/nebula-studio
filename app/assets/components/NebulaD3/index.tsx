@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import * as React from 'react';
 import { connect } from 'react-redux';
 
+import IconCfg from '#assets/components/IconPicker/iconCfg';
 import Menu from '#assets/modules/Explore/NebulaGraph/Menu';
 import { IRootState } from '#assets/store';
 import { INode, IPath } from '#assets/utils/interface';
@@ -17,7 +18,6 @@ const mapState = (state: IRootState) => ({
   isZoom: state.d3Graph.isZoom,
   scale: state.d3Graph.canvasScale,
 });
-
 interface IProps extends ReturnType<typeof mapState> {
   width: number;
   height: number;
@@ -38,7 +38,8 @@ interface IProps extends ReturnType<typeof mapState> {
 }
 
 class NebulaD3 extends React.Component<IProps> {
-  nodeRef: SVGCircleElement;
+  nodeRef: SVGGElement;
+  circleRef: SVGCircleElement;
   canvasBoardRef: SVGCircleElement;
   force: any;
   svg: any;
@@ -46,6 +47,7 @@ class NebulaD3 extends React.Component<IProps> {
   link: any;
   linksText: any;
   nodeText: any;
+  iconText: any;
 
   componentDidMount() {
     this.svg = d3.select('#output-graph');
@@ -95,7 +97,10 @@ class NebulaD3 extends React.Component<IProps> {
 
   componentDidUpdate() {
     const { data, selectedNodes } = this.props;
-    this.handleUpdataNodes(data.vertexes, selectedNodes);
+    this.handleDeleteNodes(data.vertexes);
+    this.handleUpdateNodes(data.vertexes, selectedNodes);
+    this.handleUpdateIcons(data.vertexes);
+    this.force.on('tick', () => this.tick());
   }
 
   handleNodeClick = (d: any) => {
@@ -214,8 +219,8 @@ class NebulaD3 extends React.Component<IProps> {
         d.target.y
       );
     });
-
     this.node.attr('cx', d => d.x).attr('cy', d => d.y);
+    this.iconText?.attr('x', d => d.x).attr('y', d => d.y);
 
     d3.selectAll('.text')
       .attr('transform-origin', (d: any) => {
@@ -254,29 +259,7 @@ class NebulaD3 extends React.Component<IProps> {
     this.nodeRenderText();
   };
 
-  handleUpdataNodes(nodes: INode[], selectNodes: INode[]) {
-    const selectNodeNames = selectNodes.map(node => node.name);
-    d3.select(this.nodeRef)
-      .selectAll('circle')
-      .data(nodes)
-      .style('fill', (d: INode) => d.color)
-      .classed('active', (d: INode) => selectNodeNames.includes(d.name))
-      .enter()
-      .append<SVGCircleElement>('circle')
-      .attr('class', 'node')
-      .attr('r', 20)
-      .style('fill', (d: INode) => d.color) // HACK: Color distortion caused by delete node
-      .attr('id', (d: INode) => `node-${d.uuid}`)
-      .on('mouseover', (d: INode) => {
-        if (this.props.onMouseInNode) {
-          this.props.onMouseInNode(d, d3.event);
-        }
-      })
-      .on('mouseout', () => {
-        if (this.props.onMouseOut) {
-          this.props.onMouseOut();
-        }
-      });
+  handleDeleteNodes(nodes: INode[]) {
     const currentNodes = d3.selectAll('.node');
     if (nodes.length === 0) {
       currentNodes.remove();
@@ -287,11 +270,44 @@ class NebulaD3 extends React.Component<IProps> {
         return !ids.includes(data.name);
       });
       deleteNodes.remove();
-
       return;
     }
+  }
+
+  handleUpdateNodes(nodes: INode[], selectNodes: INode[]) {
+    const selectNodeIds = selectNodes.map(node => node.uuid);
+    d3.select(this.nodeRef)
+      .selectAll('circle')
+      .data(nodes)
+      .style('fill', (d: INode) => d.color)
+      .classed('active', (d: INode) => selectNodeIds.includes(d.uuid))
+      .attr('id', (d: INode) => `circle-${d.uuid}`)
+      .enter()
+      .append<SVGGElement>('g')
+      .attr('id', (d: INode) => `node_${d.uuid}`)
+      .attr('class', 'node')
+      .append<SVGCircleElement>('circle')
+      .attr('class', 'circle')
+      .attr('r', 20)
+      .style('fill', (d: INode) => d.color) // HACK: Color distortion caused by delete node
+      .on('mouseover', (d: INode) => {
+        if (this.props.onMouseInNode) {
+          this.props.onMouseInNode(d, d3.event);
+        }
+      })
+      .on('mouseout', () => {
+        if (this.props.onMouseOut) {
+          this.props.onMouseOut();
+        }
+      });
+
+    d3.select(this.nodeRef)
+      .selectAll('g')
+      .data(nodes)
+      .classed('active-node', (d: INode) => selectNodeIds.includes(d.uuid));
+
     this.node = d3
-      .selectAll('.node')
+      .selectAll('.circle')
       .on('click', this.handleNodeClick)
       .on('dblclick', this.props.onDblClickNode)
       .call(
@@ -301,8 +317,44 @@ class NebulaD3 extends React.Component<IProps> {
           .on('drag', d => this.dragged(d))
           .on('end', this.dragEnded) as any,
       );
-    this.force.on('tick', () => this.tick());
   }
+
+  handleUpdateIcons = (nodes: INode[]) => {
+    nodes.forEach(a => {
+      if (a.icon && !d3
+        .select('#node_' + a.uuid)
+        .select('.icon')
+        .node()) {
+      d3.selectAll('#node_' + a.uuid)
+          .append('text')
+          .attr('class', 'icon')
+          .attr('text-anchor', 'middle')
+          .attr('dominant-baseline', 'central')
+          .attr('stroke', 'black')
+          .attr('stroke-width', '0.00001%')
+          .attr('font-family', 'nebula-cloud-icon')
+          .attr('x', (d: any) => d.x)
+          .attr('y', (d: any) => d.y)
+          .attr('id', (d: any) => d.uuid)
+          .attr('font-size', '20px')
+          .text(IconCfg.filter(icon => icon.type === a.icon)[0].content);
+      }
+    });
+    if (d3.selectAll('.icon').node()) {
+      this.iconText = d3
+      .selectAll('.icon')
+      .on('click', this.handleNodeClick)
+      .on('dblclick', this.props.onDblClickNode)
+      .call(
+        d3
+          .drag()
+          .on('start', d => this.dragstart(d))
+          .on('drag', d => this.dragged(d))
+          .on('end', this.dragEnded) as any,
+      );
+    }
+    
+  };
 
   handleUpdataNodeTexts = () => {
     if (this.force) {
@@ -368,7 +420,6 @@ class NebulaD3 extends React.Component<IProps> {
     this.force
       .nodes(data.vertexes)
       .force('link', linkForce)
-      // .force('center', d3.forceCenter(width / 2, height / 2))
       .restart();
   }
 
@@ -444,6 +495,19 @@ class NebulaD3 extends React.Component<IProps> {
     });
   }
 
+  iconRenderText() {
+    const { data } = this.props;
+    data.vertexes.forEach((node: any) => {
+      if (node.nodeProp) {
+        d3.select('#icon_' + node.uuid)
+          .append('tspan')
+          .attr('x', (d: any) => d.x)
+          .attr('y', (d: any) => d.y)
+          .attr('dy', '1em');
+      }
+    });
+  }
+
   render() {
     this.computeDataByD3Force();
     const {
@@ -480,8 +544,8 @@ class NebulaD3 extends React.Component<IProps> {
               onMouseOut={onMouseOut}
             />
             <g
-              ref={(ref: SVGCircleElement) => (this.nodeRef = ref)}
               className="nebula-d3-nodes"
+              ref={(ref: SVGGElement) => (this.nodeRef = ref)}
             />
             <Labels
               nodes={data.vertexes}

@@ -4,6 +4,7 @@ export interface INode extends d3.SimulationNodeDatum {
   group: number;
   uuid: string;
   color: string;
+  icon: string;
 }
 
 export interface IPath extends d3.SimulationLinkDatum<INode> {

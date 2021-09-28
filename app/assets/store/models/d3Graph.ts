@@ -8,6 +8,7 @@ interface IState {
   showDisplayPanel: boolean;
   isZoom: boolean;
   lastColor: string;
+  lastIcon: string;
 }
 
 export const d3Graph = createModel({
@@ -18,6 +19,7 @@ export const d3Graph = createModel({
     showSider: true,
     showDisplayPanel: true,
     lastColor: '',
+    lastIcon: '',
     isZoom: false,
   },
   reducers: {

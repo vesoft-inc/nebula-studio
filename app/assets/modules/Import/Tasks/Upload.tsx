@@ -1,11 +1,19 @@
-import { Button, Checkbox, Icon, Modal, Popconfirm, Table, Upload } from 'antd';
+import {
+  Button,
+  Checkbox,
+  Icon,
+  message,
+  Modal,
+  Table,
+  Tooltip,
+  Upload,
+} from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
 import CSVPreviewLink from '#assets/components/CSVPreviewLink';
-import service from '#assets/config/service';
 import { IDispatch, IRootState } from '#assets/store';
 import { trackPageView } from '#assets/utils/stat';
 
@@ -74,15 +82,15 @@ class Import extends React.Component<IProps> {
     return file;
   };
 
-  handleFileDelete = async index => {
-    const { files } = this.props;
-    const data: any = await service.deteleFile({
-      filename: files[index].name,
-    });
-    if (data.code === 0) {
-      this.props.updateFiles(files.filter((_, i) => i !== index));
-    }
-  };
+  // handleFileDelete = async index => {
+  //   const { files } = this.props;
+  //   const data: any = await service.deteleFile({
+  //     filename: files[index].name,
+  //   });
+  //   if (data.code === 0) {
+  //     this.props.updateFiles(files.filter((_, i) => i !== index));
+  //   }
+  // };
 
   renderFileTable = () => {
     const { files, loading } = this.props;
@@ -127,7 +135,7 @@ class Import extends React.Component<IProps> {
       {
         title: intl.get('common.operation'),
         key: 'operation',
-        render: (_1, file, index) => {
+        render: (_1, file) => {
           if (file.content) {
             return (
               <div className="operation">
@@ -135,6 +143,8 @@ class Import extends React.Component<IProps> {
                   <CSVPreviewLink file={file}>
                     {intl.get('import.preview')}
                   </CSVPreviewLink>
+                  {/* 
+                  Hack: due to limited resource,can't upload and delete file in this version
                   <Popconfirm
                     onConfirm={() => this.handleFileDelete(index)}
                     title={intl.get('common.ask')}
@@ -142,7 +152,7 @@ class Import extends React.Component<IProps> {
                     cancelText={intl.get('common.cancel')}
                   >
                     <Button type="link">{intl.get('common.delete')}</Button>
-                  </Popconfirm>
+                  </Popconfirm> */}
                 </div>
               </div>
             );
@@ -170,6 +180,28 @@ class Import extends React.Component<IProps> {
   };
 
   render() {
+    const props = {
+      beforeUpload: (file, fileList) => {
+        let singleSizeSum = 0;
+        let sizeSum = 0;
+        fileList.forEach(a => {
+          singleSizeSum += a.size;
+        });
+        if (singleSizeSum > 1000000) {
+          message.error(intl.get('formRules.singleLimitFileData'));
+          return false;
+        }
+        const { files } = this.props;
+        files.forEach(a => {
+          sizeSum += a.size;
+        });
+        if (sizeSum + file.size > 1000000000) {
+          message.error(intl.get('formRules.SumLimitFileData'));
+          return false;
+        }
+        return true;
+      },
+    };
     const { files } = this.props;
     return (
       <div className="upload task">
@@ -177,6 +209,7 @@ class Import extends React.Component<IProps> {
           <div className="title">
             <h3>{intl.get('import.fileTitle')}</h3>
             <Upload
+              {...props}
               multiple={true}
               accept=".csv"
               showUploadList={false}
@@ -184,10 +217,13 @@ class Import extends React.Component<IProps> {
               action={'/api/files/upload'}
               onChange={this.handleUploadChange}
               transformFile={this.transformFile as any}
+              disabled={true}
             >
-              <Button className="upload-btn" type="default">
-                {intl.get('import.uploadFile')}
-              </Button>
+              <Tooltip title={intl.get('import.forbidUpload')}>
+                <Button className="upload-btn" type="default" disabled={true}>
+                  {intl.get('import.uploadFile')}
+                </Button>
+              </Tooltip>
             </Upload>
           </div>
           {this.renderFileTable()}

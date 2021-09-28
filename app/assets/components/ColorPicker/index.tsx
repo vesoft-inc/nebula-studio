@@ -1,4 +1,3 @@
-import { Popover } from 'antd';
 import React from 'react';
 import { TwitterPicker } from 'react-color';
 
@@ -38,23 +37,17 @@ class ColorPicker extends React.Component<IProps, IState> {
 
   render() {
     return (
-      <Popover
-        placement="bottom"
-        overlayClassName="popover-color"
-        content={
-          <TwitterPicker
-            width="240px"
-            className="custom-picker"
-            onChange={this.handleChange}
-            onChangeComplete={this.handleChangeComplete}
-            colors={COLOR_PICK_LIST}
-            triangle="hide"
-          />
-        }
-        trigger="click"
-      >
+      <div className="popover-color">
+        <TwitterPicker
+          width="240px"
+          className="custom-picker"
+          onChange={this.handleChange}
+          onChangeComplete={this.handleChangeComplete}
+          colors={COLOR_PICK_LIST}
+          triangle="hide"
+        />
         {this.props.children}
-      </Popover>
+      </div>
     );
   }
 }

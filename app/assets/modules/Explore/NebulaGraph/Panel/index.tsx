@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 
-import ColorPickerBtn from './ColorPicker';
 import DeleteBtn from './Delete';
 import ExpandBtn from './Expand';
 import HotkeysDescBtn from './HotKeysDescription';
@@ -12,6 +11,7 @@ import RollbackBtn from './Rollback';
 import SearchBtn from './Search';
 import UnExpandBtn from './UnExpandBtn';
 import Unlock from './Unlock';
+import VertexSet from './VertexSet';
 import ZoomBtn from './Zoom';
 
 interface IProps {
@@ -96,7 +96,7 @@ class Panel extends React.PureComponent<IProps> {
       ],
       [
         {
-          component: <ColorPickerBtn />,
+          component: <VertexSet showIcon={true} />,
         },
         {
           component: (

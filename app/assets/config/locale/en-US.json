@@ -73,7 +73,8 @@
     "show": "Show",
     "selected": "Selected",
     "search": "Search",
-    "color": "Color",
+    "color": "Color/Icon",
+    "icon": "Icon",
     "copy": "Copy",
     "copySuccess": "Copied to clipboard",
     "expansionConditions": "Expansion conditions",
@@ -117,7 +118,9 @@
     "ttlRequired": "Please select the corresponding property, and the data type of the property must be integer or timestamp",
     "ttlDurationRequired": "Please enter the time (in seconds)",
     "dataTypeRequired": "Please select the data type",
-    "fixedStringLength": "Fixed String length must be a positive integer"
+    "fixedStringLength": "Fixed String length must be a positive integer",
+    "singleLimitFileData": "Please reduce files to 1M",
+    "SumLimitFileData": "All files will be over 100M"
   },
   "console": {
     "cost": "Cost",
@@ -137,7 +140,7 @@
     "undo": "Undo",
     "deleteSelectNodes": "Remove Select",
     "fileImport": "File Import",
-    "importPlaceholder": "Enter VIDs or enter other data for VID generation, one data per line, and split them by pressing the Enter key. Here is an example:\nstring1\nstring2\nstring3",
+    "importPlaceholder": "Enter VIDs or enter other data for VID generation, one data per line, and split them by pressing the Enter key. Here is an example:\nplayer100\nplayer101\nteam200\nteam201",
     "outgoing": "Outgoing",
     "incoming": "Incoming",
     "bidirect": "Bidirect",
@@ -150,7 +153,7 @@
     "showTags": "Show Tags",
     "showEdges": "Show Edges",
     "confirm": "Confirm",
-    "vertexColor": "Vertex Color",
+    "vertexSets": "Vertex Color",
     "quantityLimit": "Query Limit",
     "groupByTag": "Group by vertex tag",
     "noVertexPrompt": "No vertices on the board. ",
@@ -203,7 +206,7 @@
     "singleStep": "Single",
     "rangeStep": "Range",
     "addCondition": "Add condition",
-    "customColor": "Custom Color",
+    "customColor": "Custom Color/Icon",
     "nodeSearch":"Artboard node search",
     "searchEmpty": "No data found",
     "selectedVertexes": "Selected Vertexes",
@@ -294,7 +297,8 @@
     "indexNotEmpty": "column index can't be null.",
     "reset": "Reset",
     "fileUploading": "Upload in progress. If you leave this page now, only the uploaded data are stored.",
-    "importFinished": "Import task has ended."
+    "importFinished": "Import task has ended.",
+    "forbidUpload": "Upload is forbidden"
   },
   "schema": {
     "spaceList": "Graph Space List",
