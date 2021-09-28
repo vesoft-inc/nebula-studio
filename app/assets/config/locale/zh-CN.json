@@ -74,8 +74,9 @@
     "show": "显示",
     "selected": "选中",
     "search": "查询",
-    "color": "颜色/图标",
+    "color": "颜色",
     "icon": "图标",
+    "vertexSets": "颜色/图标",
     "copy": "复制",
     "copySuccess": "已复制到剪切板",
     "total": "共计",
@@ -118,9 +119,7 @@
     "ttlRequired": "请选择TTL指定的属性, 且属性的数据类型需为integer或timestamp",
     "ttlDurationRequired": "请输入时间(s)",
     "dataTypeRequired": "请选择数据类型",
-    "fixedStringLength": "Fixed String 长度需为正整数",
-    "singleLimitFileData": "单次上传文件大小不得超过1M",
-    "SumLimitFileData": "文件大小超过100M"
+    "fixedStringLength": "Fixed String 长度需为正整数"
   },
   "console": {
     "cost": "开销",
@@ -140,7 +139,7 @@
     "expand": "拓展",
     "unExpand": "取消拓展",
     "fileImport": "文件导入",
-    "importPlaceholder": "输入VID或者用于生成VID的数据，一行一个数据，按回车键断开。数据示例：\nplayer100\nplayer101\nteam200\nteam201",
+    "importPlaceholder": "输入VID或者用于生成VID的数据，一行一个数据，按回车键断开。",
     "outgoing": "流出",
     "incoming": "流入",
     "bidirect": "双向",
@@ -294,7 +293,6 @@
     "reset": "重置",
     "fileUploading": "正在上传CSV文件，请等待。如果您离开当前页面，只有已上传的部分数据会被保留。",
     "importFinished": "导入任务已结束",
-    "forbidUpload": "在线使用，禁止上传"
   },
   "schema": {
     "spaceList": "图空间列表",

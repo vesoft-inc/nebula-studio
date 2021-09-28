@@ -73,8 +73,9 @@
     "show": "Show",
     "selected": "Selected",
     "search": "Search",
-    "color": "Color/Icon",
+    "color": "Color",
     "icon": "Icon",
+    "vertexSets": "Color/Icon",
     "copy": "Copy",
     "copySuccess": "Copied to clipboard",
     "expansionConditions": "Expansion conditions",
@@ -119,8 +120,6 @@
     "ttlDurationRequired": "Please enter the time (in seconds)",
     "dataTypeRequired": "Please select the data type",
     "fixedStringLength": "Fixed String length must be a positive integer",
-    "singleLimitFileData": "Please reduce files to 1M",
-    "SumLimitFileData": "All files will be over 100M"
   },
   "console": {
     "cost": "Cost",
@@ -140,7 +139,7 @@
     "undo": "Undo",
     "deleteSelectNodes": "Remove Select",
     "fileImport": "File Import",
-    "importPlaceholder": "Enter VIDs or enter other data for VID generation, one data per line, and split them by pressing the Enter key. Here is an example:\nplayer100\nplayer101\nteam200\nteam201",
+    "importPlaceholder": "Enter VIDs or enter other data for VID generation, one data per line, and split them by pressing the Enter key. ",
     "outgoing": "Outgoing",
     "incoming": "Incoming",
     "bidirect": "Bidirect",
@@ -297,8 +296,7 @@
     "indexNotEmpty": "column index can't be null.",
     "reset": "Reset",
     "fileUploading": "Upload in progress. If you leave this page now, only the uploaded data are stored.",
-    "importFinished": "Import task has ended.",
-    "forbidUpload": "Upload is forbidden"
+    "importFinished": "Import task has ended."
   },
   "schema": {
     "spaceList": "Graph Space List",

@@ -32,7 +32,7 @@ class CustomSet extends React.PureComponent<IProps> {
         return (
             <>
         <MenuButton
-            tips={!showTitle ? intl.get('common.color') : undefined}
+            tips={!showTitle ? intl.get('common.vertexSets') : undefined}
           component={
             <VertexDisplay
               showIcon={showIcon}

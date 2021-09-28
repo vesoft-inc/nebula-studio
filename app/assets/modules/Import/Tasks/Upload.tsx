@@ -137,7 +137,7 @@ class Import extends React.Component<IProps> {
       {
         title: intl.get('common.operation'),
         key: 'operation',
-        render: (_1, file,index) => {
+        render: (_1, file, index) => {
           if (file.content) {
             return (
               <div className="operation">
@@ -194,9 +194,8 @@ class Import extends React.Component<IProps> {
               action={'/api/files/upload'}
               onChange={this.handleUploadChange}
               transformFile={this.transformFile as any}
-              disabled={true}
             >
-              <Button className="upload-btn" type="default" disabled={true}>
+              <Button className="upload-btn" type="default">
                 {intl.get('import.uploadFile')}
               </Button>
             </Upload>

@@ -97,7 +97,7 @@ class VertexSet extends React.PureComponent<IProps, IState> {
     return (
       <>
         <MenuButton
-          tips={!showTitle ? intl.get('common.color') : undefined}
+          tips={!showTitle ? intl.get('common.vertexSets') : undefined}
           disabled={selectVertexes.length === 0 || editing}
           component={
             <VertexDisplay
@@ -109,7 +109,7 @@ class VertexSet extends React.PureComponent<IProps, IState> {
               currentIcon={currentIcon}
             />
           }
-          title={showTitle ? intl.get('common.color') : undefined}
+          title={showTitle ? intl.get('common.vertexSets') : undefined}
           trackCategory="explore"
           trackAction="color_picker"
           trackLabel="from_panel"
