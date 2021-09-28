@@ -139,7 +139,7 @@
     "expand": "拓展",
     "unExpand": "取消拓展",
     "fileImport": "文件导入",
-    "importPlaceholder": "输入VID或者用于生成VID的数据，一行一个数据，按回车键断开。",
+    "importPlaceholder": "输入VID或者用于生成VID的数据，一行一个数据，按回车键断开。格式示例如下：\nstring1\nstring2\nstring3",
     "outgoing": "流出",
     "incoming": "流入",
     "bidirect": "双向",
@@ -292,7 +292,7 @@
     "indexNotEmpty": "对应列标不能为空",
     "reset": "重置",
     "fileUploading": "正在上传CSV文件，请等待。如果您离开当前页面，只有已上传的部分数据会被保留。",
-    "importFinished": "导入任务已结束",
+    "importFinished": "导入任务已结束"
   },
   "schema": {
     "spaceList": "图空间列表",

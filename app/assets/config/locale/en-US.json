@@ -119,7 +119,7 @@
     "ttlRequired": "Please select the corresponding property, and the data type of the property must be integer or timestamp",
     "ttlDurationRequired": "Please enter the time (in seconds)",
     "dataTypeRequired": "Please select the data type",
-    "fixedStringLength": "Fixed String length must be a positive integer",
+    "fixedStringLength": "Fixed String length must be a positive integer"
   },
   "console": {
     "cost": "Cost",
@@ -139,7 +139,7 @@
     "undo": "Undo",
     "deleteSelectNodes": "Remove Select",
     "fileImport": "File Import",
-    "importPlaceholder": "Enter VIDs or enter other data for VID generation, one data per line, and split them by pressing the Enter key. ",
+    "importPlaceholder": "Enter VIDs or enter other data for VID generation, one data per line, and split them by pressing the Enter key. Here is an example:\nstring1\nstring2\nstring3",
     "outgoing": "Outgoing",
     "incoming": "Incoming",
     "bidirect": "Bidirect",
