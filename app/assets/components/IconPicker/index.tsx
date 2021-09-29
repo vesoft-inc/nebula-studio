@@ -18,7 +18,7 @@ const iconGroup = chunk(IconCfg, 16);
 
 function IconItem<T extends IIcon>({ icon, onClick }: { icon: T; onClick: (icon: T) => void; }) {
   const { type, content } = icon;
-  const iconElement = <Icon type={type} onClick={() => onClick(icon)} />;
+  const iconElement = <Icon type={type} key={type} onClick={() => onClick(icon)} />;
 
   return (
     <div className="icon-box">

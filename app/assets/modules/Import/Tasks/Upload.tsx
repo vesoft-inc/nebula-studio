@@ -2,10 +2,8 @@ import {
   Button,
   Checkbox,
   Icon,
-  message,
   Modal,
   Table,
-  Tooltip,
   Upload,
   Popconfirm,
 } from 'antd';
