@@ -146,7 +146,6 @@ class Expand extends React.Component<IProps, IState> {
     const { filters, customColor, customIcon } = this.state;
     this.props.form.validateFields(async err => {
       if (err) {
-        console.error(err);
         return;
       }
       const {
