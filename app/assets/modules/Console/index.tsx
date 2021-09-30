@@ -8,7 +8,6 @@ import { CodeMirror, OutputBox } from '#assets/components';
 import { maxLineNum } from '#assets/config/nebulaQL';
 import { IDispatch, IRootState } from '#assets/store';
 import { checkBoolean, checkNumber } from '#assets/utils/function';
-import { getSessionStorage } from '#assets/utils/sessionStorage';
 import { trackPageView } from '#assets/utils/stat';
 
 import './index.less';
@@ -114,7 +113,6 @@ class Console extends React.Component<IProps, IState> {
         normalSentenceList.push(sentence);
       }
     });
-    const sessionStorage = getSessionStorage();
     const paramsMap = JSON.parse(sessionStorage?.getItem('paramsMap') || '{}');
     paramList.forEach(param => {
       const items = param.split('=>');
