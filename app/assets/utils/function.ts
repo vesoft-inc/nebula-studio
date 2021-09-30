@@ -46,10 +46,15 @@ export function checkNumber(val: string) {
   return false;
 }
 
-export function checkBoolean(val: string) {
-  const reg = /^false|FALSE|true|TRUE$/;
-  if (reg.test(val)) {
-    return true;
+export const checkBoolean = (val: string) =>
+  /^false|FALSE|true|TRUE$/.test(val);
+
+export function safeParse<T extends unknown>(s: string): T | undefined {
+  try {
+    return JSON.parse(s);
+  } catch (error) {
+    /** error info */
+    console.error(`JSON parse error`, error);
+    return undefined;
   }
-  return false;
 }

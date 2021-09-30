@@ -7,7 +7,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { CodeMirror, OutputBox } from '#assets/components';
 import { maxLineNum } from '#assets/config/nebulaQL';
 import { IDispatch, IRootState } from '#assets/store';
-import { checkBoolean, checkNumber } from '#assets/utils/function';
+import { checkBoolean, checkNumber, safeParse } from '#assets/utils/function';
 import { trackPageView } from '#assets/utils/stat';
 
 import './index.less';
@@ -113,11 +113,13 @@ class Console extends React.Component<IProps, IState> {
         normalSentenceList.push(sentence);
       }
     });
-    const paramsMap = JSON.parse(sessionStorage?.getItem('paramsMap') || '{}');
+    const paramsMap = safeParse<object>(
+      `${sessionStorage?.getItem('paramsMap') || '{}'}`,
+    );
     paramList.forEach(param => {
       const items = param.split('=>');
       const regMatch = items[0].match(/\s+\S+/);
-      if (regMatch) {
+      if (regMatch && paramsMap) {
         const key = regMatch[0].trim();
         let value: string | number | boolean = items[1].trim();
         value = this.parseValue(value);
