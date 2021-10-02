@@ -131,18 +131,18 @@ class Import extends React.Component<IProps, IState> {
       taskID: taskId,
       taskAction: 'actionQuery',
     });
-    if (code === 0) {
-      const result = data.results ? data.results[0] : null;
-      // EXPLAIN: task status enum in http gateway
-      // statusStoped、statusProcessing、statusNotExisted、statusAborted, statusFinished
-      if (result && result.taskStatus !== 'statusProcessing') {
-        service.finishImport({ taskId });
-        clearTimeout(this.checkTimer);
-      } else {
-        this.checkTimer = setTimeout(this.checkIfFinished, 2000);
-      }
-    } else {
+    if (code !== 0) {
       message.warning(errMsg);
+      return;
+    }
+
+    const result = data.results?.[0];
+
+    if (result?.taskStatus !== 'statusProcessing') {
+      service.finishImport({ taskId });
+      clearTimeout(this.checkTimer);
+    } else {
+      this.checkTimer = setTimeout(this.checkIfFinished, 2000);
     }
   };
 
