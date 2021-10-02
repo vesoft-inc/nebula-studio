@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "egg-scripts start --daemon --title=egg-server-nebula-graph-studio --workers=3",
-    "docker-start": "egg-scripts start --title=egg-server-nebula-graph-studio",
+    "docker-start": "egg-scripts start --title=egg-server-nebula-graph-studio --workers=3",
     "stop": "egg-scripts stop --title=egg-server-nebula-graph-studio",
     "dev": "egg-bin dev -r egg-ts-helper/register",
     "debug": "egg-bin debug -r egg-ts-helper/register",
