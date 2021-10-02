@@ -25,13 +25,15 @@ class ColorPicker extends React.Component<IProps, IState> {
 
   handleChange = color => {
     if (this.props.handleChange) {
-      this.props.handleChange(color);
+      const { hex: _color } = color;
+      this.props.handleChange(_color);
     }
   };
 
   handleChangeComplete = (color, _event) => {
     if (this.props.handleChangeColorComplete) {
-      this.props.handleChangeColorComplete(color);
+      const { hex: _color } = color;
+      this.props.handleChangeColorComplete(_color);
     }
   };
 

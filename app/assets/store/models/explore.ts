@@ -100,11 +100,8 @@ function getTagData(nodes, expand) {
     const { vid, tags, properties } = node;
     const group = getGroup(tags);
     const color =
-      expand?.vertexSets === 'custom'
-        ? expand.customColor
-        : whichColor(group);
-    const icon =
-      expand?.vertexSets === 'custom' ? expand.customIcon : '';
+      expand?.vertexSets === 'custom' ? expand.customColor : whichColor(group);
+    const icon = expand?.vertexSets === 'custom' ? expand.customIcon : '';
     const nodeProp = {
       tags,
       properties,

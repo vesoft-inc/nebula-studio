@@ -321,11 +321,14 @@ class NebulaD3 extends React.Component<IProps> {
 
   handleUpdateIcons = (nodes: INode[]) => {
     nodes.forEach(a => {
-      if (a.icon && !d3
-        .select('#node_' + a.uuid)
-        .select('.icon')
-        .node()) {
-      d3.selectAll('#node_' + a.uuid)
+      if (
+        a.icon &&
+        !d3
+          .select('#node_' + a.uuid)
+          .select('.icon')
+          .node()
+      ) {
+        d3.selectAll('#node_' + a.uuid)
           .append('text')
           .attr('class', 'icon')
           .attr('text-anchor', 'middle')
@@ -342,18 +345,17 @@ class NebulaD3 extends React.Component<IProps> {
     });
     if (d3.selectAll('.icon').node()) {
       this.iconText = d3
-      .selectAll('.icon')
-      .on('click', this.handleNodeClick)
-      .on('dblclick', this.props.onDblClickNode)
-      .call(
-        d3
-          .drag()
-          .on('start', d => this.dragstart(d))
-          .on('drag', d => this.dragged(d))
-          .on('end', this.dragEnded) as any,
-      );
+        .selectAll('.icon')
+        .on('click', this.handleNodeClick)
+        .on('dblclick', this.props.onDblClickNode)
+        .call(
+          d3
+            .drag()
+            .on('start', d => this.dragstart(d))
+            .on('drag', d => this.dragged(d))
+            .on('end', this.dragEnded) as any,
+        );
     }
-    
   };
 
   handleUpdataNodeTexts = () => {

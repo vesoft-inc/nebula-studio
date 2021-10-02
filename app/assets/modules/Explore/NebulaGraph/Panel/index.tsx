@@ -11,7 +11,7 @@ import RollbackBtn from './Rollback';
 import SearchBtn from './Search';
 import UnExpandBtn from './UnExpandBtn';
 import Unlock from './Unlock';
-import VertexSet from './VertexSet';
+import VertexStyleSetBtn from './VertexStyleSetBtn';
 import ZoomBtn from './Zoom';
 
 interface IProps {
@@ -96,7 +96,7 @@ class Panel extends React.PureComponent<IProps> {
       ],
       [
         {
-          component: <VertexSet showIcon={true} />,
+          component: <VertexStyleSetBtn />,
         },
         {
           component: (

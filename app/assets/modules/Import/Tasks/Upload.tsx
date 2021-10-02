@@ -1,12 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  Icon,
-  Modal,
-  Table,
-  Upload,
-  Popconfirm,
-} from 'antd';
+import { Button, Checkbox, Icon, Modal, Popconfirm, Table, Upload } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';

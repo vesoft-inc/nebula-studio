@@ -9,7 +9,7 @@ import RollbackBtn from '../Panel/Rollback';
 import SearchBtn from '../Panel/Search';
 import UnExpandBtn from '../Panel/UnExpandBtn';
 import Unlock from '../Panel/Unlock';
-import VertexSet from '../Panel/VertexSet';
+import VertexStyleSetBtn from '../Panel/VertexStyleSetBtn';
 import ZoomBtn from '../Panel/Zoom';
 import './index.less';
 
@@ -74,7 +74,7 @@ class Menu extends React.PureComponent<IProps> {
         component: <ZoomBtn type="zoom-out" showTitle={true} />,
       },
       {
-        component: <VertexSet showTitle={true} showIcon={true} />,
+        component: <VertexStyleSetBtn showTitle={true} />,
       },
       {
         component: <PropsDisplayBtn showTitle={true} />,

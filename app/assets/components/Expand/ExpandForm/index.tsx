@@ -16,8 +16,8 @@ import { connect } from 'react-redux';
 import { Instruction } from '#assets/components';
 import GQLModal from '#assets/components/GQLModal';
 import IconFont from '#assets/components/Icon';
+import VertexStyleSet from '#assets/components/VertexStyleSet';
 import { DEFAULT_COLOR_PICKER } from '#assets/config/explore';
-import CustomSet from './CustomSet';
 import { IDispatch, IRootState } from '#assets/store';
 import { RELATION_OPERATORS } from '#assets/utils/constant';
 import { getExploreMatchGQL } from '#assets/utils/gql';
@@ -457,12 +457,11 @@ class Expand extends React.Component<IProps, IState> {
                   <Radio value="custom">
                     {intl.get('explore.customColor')}
                   </Radio>
-                  <CustomSet
-                    onColorChange={this.handleCustomColor}
-                    onIconChange={this.handleCustomIcon}
-                    customColor={customColor}
-                    customIcon={customIcon}
-                    showIcon={true}
+                  <VertexStyleSet
+                    handleChangeColorComplete={this.handleCustomColor}
+                    handleChangeIconComplete={this.handleCustomIcon}
+                    icon={customIcon}
+                    color={customColor}
                   />
                 </Radio.Group>,
               )}
