@@ -114,7 +114,18 @@ const CustomizeTooltipBtn = (props: IMenuButton) => {
           onClick={!disabled ? action : undefined}
         />
       ) : (
-        component
+        <div
+          className={classnames({
+            'panel-disabled': disabled,
+            'panel-actived': active,
+          })}
+          onClick={!disabled && action ? action : undefined}
+          data-track-category={trackCategory}
+          data-track-action={trackAction}
+          data-track-label={trackLabel}
+        >
+          {component}
+        </div>
       )}
     </Tooltip>
   );

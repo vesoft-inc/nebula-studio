@@ -1,0 +1,122 @@
+.btn-nodeStyle-set {
+	display: flex;
+	align-items: center;
+	width: 25px;
+	height: 25px;
+	margin-right: 10px;
+
+	.color-group {
+		display: inline-flex;
+		position: relative;
+		width: 30px;
+
+		.btn-color {
+			width: 25px;
+			height: 25px;
+			border-radius: 3px;
+			border: 1px solid rgba(0, 0, 0, 0.2);
+		}
+
+		> span {
+			display: inline-block;
+			width: 25px;
+			height: 25px;
+			border-radius: 3px;
+		}
+
+		.icon-selected {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			fill: white;
+			z-index: 10;
+			width: 16px;
+			height: 24px;
+		}
+	}
+
+	.circle {
+		display: inline-block;
+		width: 30px;
+		height: 30px;
+		border-radius: 25px;
+		cursor: pointer;
+		z-index: 3;
+
+		&:nth-child(2) {
+			position: absolute;
+			left: 5px;
+			z-index: 2;
+		}
+
+		&:nth-child(3) {
+			position: absolute;
+			left: 10px;
+			z-index: 1;
+		}
+	}
+
+	.btn-title {
+		padding-left: 10px;
+	}
+}
+
+.nodeStyle-popover {
+	width: 240px;
+}
+
+.tab-type-set {
+	.ant-tabs-nav-list {
+		width: 100%;
+
+		.ant-tabs-tab {
+			width: 50%;
+			margin: 0;
+			padding: 0;
+			height: 46px;
+
+			.ant-tabs-tab-btn {
+				width: 100%;
+				text-align: center;
+			}
+		}
+	}
+}
+
+.icon-group {
+	padding-bottom: 20px;
+	height: 240px;
+
+	.icon-box {
+		display: inline-block;
+		width: 40px;
+		height: 40px;
+		padding: 5px;
+		background-color: #f3f2f2;
+		cursor: pointer;
+		margin: 5px;
+	}
+}
+
+.ant-carousel .slick-dots-bottom {
+	bottom: 0;
+	height: 12px;
+	margin: 0;
+
+	li {
+		width: 24px;
+	}
+
+	li button {
+		width: 10px;
+		height: 10px;
+		border-radius: 10px;
+		background-color: #cec9c9;
+	}
+
+	li.slick-active button {
+		width: 10px;
+		background-color: gray;
+	}
+}

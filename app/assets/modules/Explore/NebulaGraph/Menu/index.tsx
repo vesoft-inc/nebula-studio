@@ -1,7 +1,6 @@
 import * as d3 from 'd3';
 import React, { Fragment } from 'react';
 
-import ColorPickerBtn from '../Panel/ColorPicker';
 import DeleteBtn from '../Panel/Delete';
 import ExpandBtn from '../Panel/Expand';
 import Lock from '../Panel/Lock';
@@ -10,6 +9,7 @@ import RollbackBtn from '../Panel/Rollback';
 import SearchBtn from '../Panel/Search';
 import UnExpandBtn from '../Panel/UnExpandBtn';
 import Unlock from '../Panel/Unlock';
+import VertexStyleSetBtn from '../Panel/VertexStyleSetBtn';
 import ZoomBtn from '../Panel/Zoom';
 import './index.less';
 
@@ -74,7 +74,7 @@ class Menu extends React.PureComponent<IProps> {
         component: <ZoomBtn type="zoom-out" showTitle={true} />,
       },
       {
-        component: <ColorPickerBtn showTitle={true} />,
+        component: <VertexStyleSetBtn showTitle={true} />,
       },
       {
         component: <PropsDisplayBtn showTitle={true} />,

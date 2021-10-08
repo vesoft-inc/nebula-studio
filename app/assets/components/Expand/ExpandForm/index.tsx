@@ -16,8 +16,8 @@ import { connect } from 'react-redux';
 import { Instruction } from '#assets/components';
 import GQLModal from '#assets/components/GQLModal';
 import IconFont from '#assets/components/Icon';
+import VertexStyleSet from '#assets/components/VertexStyleSet';
 import { DEFAULT_COLOR_PICKER } from '#assets/config/explore';
-import ColorPickerBtn from '#assets/modules/Explore/NebulaGraph/Panel/ColorPicker';
 import { IDispatch, IRootState } from '#assets/store';
 import { RELATION_OPERATORS } from '#assets/utils/constant';
 import { getExploreMatchGQL } from '#assets/utils/gql';
@@ -61,6 +61,7 @@ interface IState {
   filters: IFilter[];
   visible: boolean;
   customColor: string;
+  customIcon: string;
 }
 
 class Expand extends React.Component<IProps, IState> {
@@ -71,6 +72,7 @@ class Expand extends React.Component<IProps, IState> {
       filters: [],
       visible: false,
       customColor: DEFAULT_COLOR_PICKER,
+      customIcon: '',
     };
     this.gqlRef = React.createRef();
   }
@@ -78,10 +80,13 @@ class Expand extends React.Component<IProps, IState> {
   componentDidMount() {
     this.props.asyncGetEdgesAndFields();
     const {
-      exploreRules: { filters },
+      exploreRules: { filters, customIcon },
     } = this.props;
     if (filters) {
       this.setState({ filters });
+    }
+    if (customIcon) {
+      this.setState({ customIcon });
     }
   }
 
@@ -138,47 +143,49 @@ class Expand extends React.Component<IProps, IState> {
   handleExpand = () => {
     const { selectVertexes, edgesFields } = this.props;
     const { getFieldsValue } = this.props.form;
-    const { filters, customColor } = this.state;
+    const { filters, customColor, customIcon } = this.state;
     this.props.form.validateFields(async err => {
-      if (!err) {
-        const {
-          edgeTypes,
-          edgeDirection,
-          stepsType,
-          step,
-          minStep,
-          maxStep,
-          vertexColor,
-          quantityLimit,
-        } = getFieldsValue();
-        (this.props.asyncGetExpand({
-          filters,
-          selectVertexes,
-          edgeTypes,
-          edgesFields,
-          edgeDirection,
-          vertexColor,
-          quantityLimit,
-          stepsType,
-          step,
-          minStep,
-          maxStep,
-          customColor,
-        }) as any).then(
-          async () => {
-            message.success(intl.get('common.success'));
-            trackEvent('explore', 'expand', 'ajax success');
-          },
-          (e: any) => {
-            trackEvent('explore', 'expand', 'ajax fail');
-            if (e.message) {
-              message.error(e.message);
-            } else {
-              message.info(intl.get('common.noData'));
-            }
-          },
-        );
+      if (err) {
+        return;
       }
+      const {
+        edgeTypes,
+        edgeDirection,
+        stepsType,
+        step,
+        minStep,
+        maxStep,
+        vertexStyle,
+        quantityLimit,
+      } = getFieldsValue();
+      (this.props.asyncGetExpand({
+        filters,
+        selectVertexes,
+        edgeTypes,
+        edgesFields,
+        edgeDirection,
+        vertexStyle,
+        quantityLimit,
+        stepsType,
+        step,
+        minStep,
+        maxStep,
+        customColor,
+        customIcon,
+      }) as any).then(
+        async () => {
+          message.success(intl.get('common.success'));
+          trackEvent('explore', 'expand', 'ajax success');
+        },
+        (e: any) => {
+          trackEvent('explore', 'expand', 'ajax fail');
+          if (e.message) {
+            message.error(e.message);
+          } else {
+            message.info(intl.get('common.noData'));
+          }
+        },
+      );
     });
   };
 
@@ -230,9 +237,18 @@ class Expand extends React.Component<IProps, IState> {
     );
   };
 
+  handleCustomIcon = icon => {
+    this.setState(
+      {
+        customIcon: icon.content ? icon.type : '',
+      },
+      this.handleUpdateRules,
+    );
+  };
+
   handleUpdateRules = () => {
     const { getFieldsValue } = this.props.form;
-    const { filters, customColor } = this.state;
+    const { filters, customColor, customIcon } = this.state;
     setTimeout(() => {
       const {
         edgeTypes,
@@ -241,19 +257,20 @@ class Expand extends React.Component<IProps, IState> {
         step,
         minStep,
         maxStep,
-        vertexColor,
+        vertexStyle,
         quantityLimit,
       } = getFieldsValue();
       this.props.updateExploreRules({
         edgeTypes,
         edgeDirection,
-        vertexColor,
+        vertexStyle,
         quantityLimit,
         stepsType,
         step,
         minStep,
         maxStep,
         customColor,
+        customIcon,
         filters,
       });
     }, 100);
@@ -268,7 +285,7 @@ class Expand extends React.Component<IProps, IState> {
       close,
     } = this.props;
     const { getFieldDecorator, getFieldsValue } = this.props.form;
-    const { filters, customColor } = this.state;
+    const { filters, customColor, customIcon } = this.state;
     const {
       edgeTypes: selectEdgeTypes,
       edgeDirection,
@@ -424,9 +441,9 @@ class Expand extends React.Component<IProps, IState> {
                 </Form.Item>
               </div>
             )}
-            <Form.Item label={intl.get('explore.vertexColor')}>
-              {getFieldDecorator('vertexColor', {
-                initialValue: rules.vertexColor || 'groupByTag',
+            <Form.Item label={intl.get('explore.vertexStyle')}>
+              {getFieldDecorator('vertexStyle', {
+                initialValue: rules.vertexStyle || 'colorGroupByTag',
                 rules: [
                   {
                     required: true,
@@ -434,16 +451,17 @@ class Expand extends React.Component<IProps, IState> {
                 ],
               })(
                 <Radio.Group onChange={this.handleUpdateRules}>
-                  <Radio value="groupByTag">
-                    {intl.get('explore.groupByTag')}
+                  <Radio value="colorGroupByTag">
+                    {intl.get('explore.colorGroupByTag')}
                   </Radio>
                   <Radio value="custom">
-                    {intl.get('explore.customColor')}
+                    {intl.get('explore.customStyle')}
                   </Radio>
-                  <ColorPickerBtn
-                    onChange={this.handleCustomColor}
-                    customColor={customColor}
-                    editing={true}
+                  <VertexStyleSet
+                    handleChangeColorComplete={this.handleCustomColor}
+                    handleChangeIconComplete={this.handleCustomIcon}
+                    icon={customIcon}
+                    color={customColor}
                   />
                 </Radio.Group>,
               )}

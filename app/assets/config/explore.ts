@@ -222,6 +222,6 @@ export const DEFAULT_EXPLORE_RULES = {
   edgeDirection: 'outgoing',
   stepsType: 'single',
   step: 1,
-  vertexColor: 'groupByTag',
+  vertexStyle: 'colorGroupByTag',
   quantityLimit: 100,
 };
