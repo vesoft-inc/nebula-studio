@@ -89,7 +89,7 @@ class VertexStyleSetBtn extends React.PureComponent<IProps, IState> {
     return (
       <>
         <MenuButton
-          tips={!showTitle ? intl.get('common.vertexSets') : undefined}
+          tips={!showTitle ? intl.get('explore.vertexStyle') : undefined}
           disabled={selectVertexes.length === 0}
           component={
             selectVertexes.length > 0 ? (
@@ -103,7 +103,7 @@ class VertexStyleSetBtn extends React.PureComponent<IProps, IState> {
               <DisplayBtn icon={icon} color={color} />
             )
           }
-          title={showTitle ? intl.get('common.vertexSets') : undefined}
+          title={showTitle ? intl.get('explore.vertexStyle') : undefined}
           trackCategory="explore"
           trackAction="color_picker"
           trackLabel="from_panel"

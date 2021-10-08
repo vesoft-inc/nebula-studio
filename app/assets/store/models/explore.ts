@@ -54,7 +54,7 @@ interface IExportData {
 interface IRules {
   edgeTypes?: string[];
   edgeDirection?: string;
-  vertexSets?: string;
+  vertexStyle?: string;
   quantityLimit?: number;
   stepsType?: string;
   step?: number;
@@ -100,8 +100,8 @@ function getTagData(nodes, expand) {
     const { vid, tags, properties } = node;
     const group = getGroup(tags);
     const color =
-      expand?.vertexSets === 'custom' ? expand.customColor : whichColor(group);
-    const icon = expand?.vertexSets === 'custom' ? expand.customIcon : '';
+      expand?.vertexStyle === 'custom' ? expand.customColor : whichColor(group);
+    const icon = expand?.vertexStyle === 'custom' ? expand.customIcon : '';
     const nodeProp = {
       tags,
       properties,
@@ -211,7 +211,7 @@ export const explore = createModel({
       payload: {
         ids: string[];
         expand?: {
-          vertexSets: string;
+          vertexStyle: string;
           customColor;
           customIcon;
         };
@@ -325,7 +325,7 @@ export const explore = createModel({
       edgesFields: any[];
       edgeDirection: string;
       filters: any[];
-      vertexSets: string;
+      vertexStyle: string;
       quantityLimit: number | null;
       stepsType: string;
       step?: string;
@@ -335,11 +335,11 @@ export const explore = createModel({
       customIcon?: string;
     }) {
       const data = (await this.asyncGetExpandData(payload)) as any;
-      const { vertexSets, customColor, customIcon } = payload;
+      const { vertexStyle, customColor, customIcon } = payload;
       await this.asyncGetExploreInfo({
         data,
         expand: {
-          vertexSets,
+          vertexStyle,
           customColor,
           customIcon,
         },
@@ -363,7 +363,7 @@ export const explore = createModel({
     async asyncGetExploreVertex(payload: {
       ids: string[];
       expand?: {
-        vertexSets: string;
+        vertexStyle: string;
         customColor;
         customIcon;
       };
@@ -423,7 +423,7 @@ export const explore = createModel({
             },
             uuid: uuidv4(),
           };
-          if (expand && expand.vertexSets === 'groupByTag') {
+          if (expand && expand.vertexStyle === 'colorGroupByTag') {
             vertex.group = 't';
           }
           preAddVertexes.push(vertex);
@@ -493,7 +493,7 @@ export const explore = createModel({
     async asyncGetExploreInfo(payload: {
       data: IExportData;
       expand?: {
-        vertexSets: string;
+        vertexStyle: string;
         customColor;
         customIcon;
       };
@@ -529,11 +529,11 @@ export const explore = createModel({
         return message.warning(intl.get('explore.missingParams'));
       }
       const data = (await this.asyncGetExpandData(rules)) as any;
-      const { vertexSets, customColor, customIcon } = rules;
+      const { vertexStyle, customColor, customIcon } = rules;
       await this.asyncGetExploreInfo({
         data,
         expand: {
-          vertexSets,
+          vertexStyle,
           customColor,
           customIcon,
         },
@@ -547,7 +547,7 @@ export const explore = createModel({
         edgesFields?: any[];
         edgeDirection: string;
         filters?: any[];
-        vertexSets?: string;
+        vertexStyle?: string;
         quantityLimit?: number | null;
         stepsType?: string;
         step?: string;

@@ -155,7 +155,7 @@ class Expand extends React.Component<IProps, IState> {
         step,
         minStep,
         maxStep,
-        vertexSets,
+        vertexStyle,
         quantityLimit,
       } = getFieldsValue();
       (this.props.asyncGetExpand({
@@ -164,7 +164,7 @@ class Expand extends React.Component<IProps, IState> {
         edgeTypes,
         edgesFields,
         edgeDirection,
-        vertexSets,
+        vertexStyle,
         quantityLimit,
         stepsType,
         step,
@@ -240,7 +240,7 @@ class Expand extends React.Component<IProps, IState> {
   handleCustomIcon = icon => {
     this.setState(
       {
-        customIcon: icon.type,
+        customIcon: icon.content ? icon.type : '',
       },
       this.handleUpdateRules,
     );
@@ -257,13 +257,13 @@ class Expand extends React.Component<IProps, IState> {
         step,
         minStep,
         maxStep,
-        vertexSets,
+        vertexStyle,
         quantityLimit,
       } = getFieldsValue();
       this.props.updateExploreRules({
         edgeTypes,
         edgeDirection,
-        vertexSets,
+        vertexStyle,
         quantityLimit,
         stepsType,
         step,
@@ -441,9 +441,9 @@ class Expand extends React.Component<IProps, IState> {
                 </Form.Item>
               </div>
             )}
-            <Form.Item label={intl.get('explore.vertexSets')}>
-              {getFieldDecorator('vertexSets', {
-                initialValue: rules.vertexSets || 'groupByTag',
+            <Form.Item label={intl.get('explore.vertexStyle')}>
+              {getFieldDecorator('vertexStyle', {
+                initialValue: rules.vertexStyle || 'colorGroupByTag',
                 rules: [
                   {
                     required: true,
@@ -451,11 +451,11 @@ class Expand extends React.Component<IProps, IState> {
                 ],
               })(
                 <Radio.Group onChange={this.handleUpdateRules}>
-                  <Radio value="groupByTag">
-                    {intl.get('explore.groupByTag')}
+                  <Radio value="colorGroupByTag">
+                    {intl.get('explore.colorGroupByTag')}
                   </Radio>
                   <Radio value="custom">
-                    {intl.get('explore.customColor')}
+                    {intl.get('explore.customStyle')}
                   </Radio>
                   <VertexStyleSet
                     handleChangeColorComplete={this.handleCustomColor}
