@@ -120,12 +120,12 @@ class Import extends React.Component<IProps, IState> {
     });
     if (errCode === 0) {
       this.logTimer = setTimeout(this.readlog, 2000);
-      this.checkTimer = setTimeout(this.checkIfFinished, 2000);
+      this.checkTimer = setTimeout(this.checkIsFinished, 2000);
     }
     trackEvent('import', 'import_data', 'start');
   };
 
-  checkIfFinished = async () => {
+  checkIsFinished = async () => {
     const { taskId } = this.props;
     const { code, data, message: errMsg } = await this.props.checkImportStatus({
       taskID: taskId,
@@ -142,7 +142,7 @@ class Import extends React.Component<IProps, IState> {
       service.finishImport({ taskId });
       clearTimeout(this.checkTimer);
     } else {
-      this.checkTimer = setTimeout(this.checkIfFinished, 2000);
+      this.checkTimer = setTimeout(this.checkIsFinished, 2000);
     }
   };
 
