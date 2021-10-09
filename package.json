@@ -1,7 +1,6 @@
 {
   "name": "nebula-graph-studio",
   "version": "3.0.0",
-  "release": "1",
   "description": "nebula-graph-studio",
   "private": true,
   "egg": {

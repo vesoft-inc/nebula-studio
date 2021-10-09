@@ -16,19 +16,11 @@ make
 mv $GATEWAY/nebula-httpd $TARGET_GATEWAY/nebula-http-gateway
 mv $STUDIO/vendors/gateway.conf $TARGET_GATEWAY/nebula-http-gateway/conf/app.conf
 
-### nebula-importer ###
-IMPORTER=$DIR/source/nebula-importer
-cd $IMPORTER
-make build
-mv $IMPORTER/nebula-importer $STUDIO/vendors
-
 cd $STUDIO
 
 bash ./scripts/setEventTracking.sh $1
 
 VERSION=`cat package.json | grep '"version":' | awk 'NR==1{print $2}' | awk -F'"' '{print $2}'`
-RELEASE=`cat package.json | grep '"release":' | awk 'NR==1{print $2}' | awk -F'"' '{print $2}'`
-sed -i "s/CPACK_RPM_PACKAGE_RELEASE_TEMPLATE/$RELEASE/g" CMakeLists.txt
 sed -i "s/CPACK_PACKAGE_VERSION_TEMPLATE/$VERSION/g" CMakeLists.txt
 npm install --unsafe-perm
 npm run build

@@ -31,6 +31,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
   resetAllConfig: dispatch.importData.resetAllConfig,
   update: dispatch.importData.update,
   stopImport: dispatch.importData.stopImport,
+  checkImportStatus: dispatch.importData.checkImportStatus,
 });
 
 type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
@@ -44,6 +45,7 @@ interface IState {
 class Import extends React.Component<IProps, IState> {
   ref: HTMLDivElement;
   logTimer: any;
+  checkTimer: any;
 
   constructor(props: IProps) {
     super(props);
@@ -118,8 +120,30 @@ class Import extends React.Component<IProps, IState> {
     });
     if (errCode === 0) {
       this.logTimer = setTimeout(this.readlog, 2000);
+      this.checkTimer = setTimeout(this.checkIsFinished, 2000);
     }
     trackEvent('import', 'import_data', 'start');
+  };
+
+  checkIsFinished = async () => {
+    const { taskId } = this.props;
+    const { code, data, message: errMsg } = await this.props.checkImportStatus({
+      taskID: taskId,
+      taskAction: 'actionQuery',
+    });
+    if (code !== 0) {
+      message.warning(errMsg);
+      return;
+    }
+
+    const result = data.results?.[0];
+
+    if (result?.taskStatus !== 'statusProcessing') {
+      service.finishImport({ taskId });
+      clearTimeout(this.checkTimer);
+    } else {
+      this.checkTimer = setTimeout(this.checkIsFinished, 2000);
+    }
   };
 
   readlog = async () => {
@@ -194,7 +218,12 @@ class Import extends React.Component<IProps, IState> {
           </Button>
           <Button
             className="import-again"
-            onClick={() => this.props.stopImport({ taskId })}
+            onClick={() =>
+              this.props.stopImport({
+                taskID: taskId,
+                taskAction: 'actionStop',
+              })
+            }
             disabled={!isImporting}
           >
             {intl.get('import.endImport')}

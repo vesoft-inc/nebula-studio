@@ -6,13 +6,6 @@ Nebula Graph Studio (Studio for short) is a web-based visualization tool for Neb
 ![](architecture.png)
 
 ## Development Quick Start
-### Set up nebula-importer
-```
-$ git clone https://github.com/vesoft-inc/nebula-importer.git
-$ cd nebula-importer
-$ make build
-$ ./nebula-importer --port 5699 --callback "http://0.0.0.0:7001/api/import/finish"
-```
 
 ### Set up nebula-http-gateway
 ```

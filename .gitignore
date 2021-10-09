@@ -29,7 +29,6 @@ app/public/
 config/manifest.json
 nebula-go-api/nebula-go-api
 nebula-go-api/tmp
-package-lock.json
 scripts/data/
 typings
 docker/data

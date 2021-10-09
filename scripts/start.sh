@@ -2,5 +2,4 @@
 
 cd /usr/local/nebula-graph-studio/
 npm run start
-./vendors/nebula-importer --port 5699 --callback "http://0.0.0.0:7001/api/import/finish" &
 nohup ./vendors/nebula-http-gateway/nebula-httpd &
