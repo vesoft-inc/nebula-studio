@@ -408,7 +408,7 @@ export const explore = createModel({
         const addIds = notIncludedIds.filter(id => existedIds.includes(id));
         if (notExistIds.length > 0) {
           message.warning(
-            `${notExistIds.join(', ')}${intl.get('import.notExist')}`,
+            `${notExistIds.join(', ')} ${intl.get('import.notExist')}`,
           );
         }
         const {
