@@ -57,7 +57,7 @@ export const getExploreMatchGQL = (params: {
   const wheres = _filters ? `AND ALL(l IN e WHERE ${_filters})` : '';
   const gql = `MATCH p=(v)${
     edgeDirection === 'incoming' ? '<-' : '-'
-  }[e${edgeTypes.map(edge => `:${edge}`).join('|')}${_step}]${
+  }[e${edgeTypes.map(edge => `:${handleKeyword(edge)}`).join('|')}${_step}]${
     edgeDirection === 'outgoing' ? '->' : '-'
   }(v2) 
 WHERE id(v) IN [${selectVertexes
@@ -198,10 +198,11 @@ export const getAlterGQL = (params: {
     const date = config.fields
       .map(item => {
         const { name, type, value, fixedLength, allowNull, comment } = item;
+        const propertyName = handleKeyword(name);
         if (action === 'DROP') {
-          return name;
+          return propertyName;
         } else {
-          let str = `${name} ${
+          let str = `${propertyName} ${
             type !== 'fixed_string'
               ? type
               : type + `(${fixedLength ? item.fixedLength : ''})`
@@ -231,7 +232,7 @@ export const getAlterGQL = (params: {
       .join(', ');
     content = `${action} (${date})`;
   }
-  const gql = `ALTER ${type} ${name} ${content}`;
+  const gql = `ALTER ${type} ${handleKeyword(name)} ${content}`;
   return gql;
 };
 
