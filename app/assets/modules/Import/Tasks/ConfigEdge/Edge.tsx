@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 
 import CSVPreviewLink from '#assets/components/CSVPreviewLink';
 import { IDispatch, IRootState } from '#assets/store';
+import { dataType } from '#assets/utils/constant';
 
 import './Edge.less';
 
@@ -114,12 +115,13 @@ class Edge extends React.Component<IProps> {
             disabled={record.name === 'srcId' || record.name === 'dstId'}
             onChange={type => this.handleChangeEdgeType(record, type)}
           >
-            <Option value={'int'}>{'int'}</Option>
-            <Option value={'string'}>{'string'}</Option>
-            <Option value={'bool'}>{'bool'}</Option>
-            <Option value={'float'}>{'float'}</Option>
-            <Option value={'double'}>{'double'}</Option>
-            <Option value={'timestamp'}>{'timestamp'}</Option>
+            {dataType.map(item => {
+              return (
+                <Option value={item.value} key={item.value}>
+                  {item.label}
+                </Option>
+              );
+            })}
           </Select>
         ),
       },

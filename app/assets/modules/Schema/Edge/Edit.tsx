@@ -521,11 +521,13 @@ class EditEdge extends React.Component<IProps, IState> {
         align: 'center' as const,
         render: (record, row, index) => {
           if (editRow === index) {
-            return row.type === 'timestamp' ? (
+            return ['date', 'time', 'datetime', 'timestamp'].includes(
+              row.type,
+            ) ? (
               <Popover
                 trigger="focus"
                 placement="right"
-                content={intl.getHTML('schema.timestampFormat')}
+                content={intl.getHTML(`schema.${row.type}Format`)}
               >
                 <Input
                   value={editField!.value}

@@ -93,10 +93,6 @@ export const enumOfCompare = {
 
 export const dataType = [
   {
-    value: 'double',
-    label: 'double',
-  },
-  {
     value: 'int',
     label: 'int',
   },
@@ -109,12 +105,44 @@ export const dataType = [
     label: 'string',
   },
   {
-    value: 'timestamp',
-    label: 'timestamp',
-  },
-  {
     value: 'fixed_string',
     label: 'fixed_string',
+  },
+  {
+    value: 'double',
+    label: 'double',
+  },
+  {
+    value: 'int32',
+    label: 'int32',
+  },
+  {
+    value: 'int16',
+    label: 'int16',
+  },
+  {
+    value: 'int8',
+    label: 'int8',
+  },
+  {
+    value: 'float',
+    label: 'float',
+  },
+  {
+    value: 'date',
+    label: 'date',
+  },
+  {
+    value: 'time',
+    label: 'time',
+  },
+  {
+    value: 'datetime',
+    label: 'datetime',
+  },
+  {
+    value: 'timestamp',
+    label: 'timestamp',
   },
 ];
 
