@@ -204,11 +204,15 @@ class CreateEdge extends React.Component<IProps, IState> {
           </Col>
           <Col span={5}>
             <Form.Item {...itemLayout}>
-              {fields && fields[k] && fields[k].type === 'timestamp' ? (
+              {fields &&
+              fields[k] &&
+              ['date', 'time', 'datetime', 'timestamp'].includes(
+                fields[k].type,
+              ) ? (
                 <Popover
                   trigger="focus"
                   placement="right"
-                  content={intl.getHTML('schema.timestampFormat')}
+                  content={intl.getHTML(`schema.${fields[k].type}Format`)}
                 >
                   {getFieldDecorator(`fields[${k}].value`, {
                     initialValue: '',

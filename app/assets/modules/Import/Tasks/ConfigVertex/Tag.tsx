@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 
 import CSVPreviewLink from '#assets/components/CSVPreviewLink';
 import { IDispatch, IRootState } from '#assets/store';
+import { dataType } from '#assets/utils/constant';
 
 import './Tag.less';
 
@@ -138,12 +139,13 @@ class Tag extends React.Component<IProps> {
             value={value}
             onChange={type => this.handleChangeTagType(record, tag, type)}
           >
-            <Option value={'int'}>{'int'}</Option>
-            <Option value={'string'}>{'string'}</Option>
-            <Option value={'bool'}>{'bool'}</Option>
-            <Option value={'float'}>{'float'}</Option>
-            <Option value={'double'}>{'double'}</Option>
-            <Option value={'timestamp'}>{'timestamp'}</Option>
+            {dataType.map(item => {
+              return (
+                <Option value={item.value} key={item.value}>
+                  {item.label}
+                </Option>
+              );
+            })}
           </Select>
         ),
       },
