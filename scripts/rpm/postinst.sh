@@ -6,4 +6,4 @@ chmod 755 ./vendors/nebula-http-gateway/nebula-httpd
 chmod 777 ./tmp/
 tar -xzvf node_modules.tar.gz
 
-bash ./scripts/start.sh
+bash ./scripts/rpm/start.sh

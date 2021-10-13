@@ -1,17 +1,74 @@
-name: Studio Image Release
+name: Studio Release
 on:
   release:
     types:
       - published
 jobs:
-  release-image:
+  tar-package:
+    name: build tar package
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - centos7
+    container:
+      image: vesoft/nebula-dev:${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: source/nebula-graph-studio
+      - uses: actions/checkout@v2
+        with:
+          repository: vesoft-inc/nebula-http-gateway
+          path: source/nebula-http-gateway
+          ref: v2.0
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.13.1'
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '10'
+      - name: Package
+        run: bash ./source/nebula-graph-studio/scripts/tar/pack.sh
+      - name: Upload to OSS
+        run: bash ./source/nebula-graph-studio/scripts/tar/upload.sh ${{ secrets.OSS_ENDPOINT }} ${{ secrets.OSS_ID }} ${{ secrets.OSS_SECRET }} ${{ secrets.OSS_URL }}
+  rpm-package:
+    name: build rpm package
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - centos7
+    container:
+      image: vesoft/nebula-dev:${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: source/nebula-graph-studio
+      - uses: actions/checkout@v2
+        with:
+          repository: vesoft-inc/nebula-http-gateway
+          path: source/nebula-http-gateway
+          ref: v2.0
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.13.1'
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '10'
+      - name: Package
+        run: bash ./source/nebula-graph-studio/scripts/rpm/pack.sh
+      - name: Upload oss
+        run: bash ./source/nebula-graph-studio/scripts/rpm/upload.sh ${{ secrets.OSS_ENDPOINT }} ${{ secrets.OSS_ID }} ${{ secrets.OSS_SECRET }} ${{ secrets.OSS_URL }}
+  docker-image:
+    name: docker image build
     runs-on: ubuntu-latest
     steps:
     -
       name: Checkout Github Action
       uses: actions/checkout@master
     - 
-      name: Package
+      name: set track
       run: bash ./scripts/setEventTracking.sh ${{ secrets.GA_ID }}
     -
       name: Set up QEMU
