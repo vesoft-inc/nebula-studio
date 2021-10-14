@@ -5,5 +5,5 @@
 # kill nebula-http-gateway server
 set +e
 cd /usr/local/nebula-graph-studio/
-bash ./scripts/stop.sh
+bash ./scripts/rpm/stop.sh
 set -e
