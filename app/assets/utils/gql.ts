@@ -57,7 +57,7 @@ export const getExploreMatchGQL = (params: {
   const wheres = _filters ? `AND ALL(l IN e WHERE ${_filters})` : '';
   const gql = `MATCH p=(v)${
     edgeDirection === 'incoming' ? '<-' : '-'
-  }[e${edgeTypes.map(edge => `:${edge}`).join('|')}${_step}]${
+  }[e${edgeTypes.map(edge => `:${handleKeyword(edge)}`).join('|')}${_step}]${
     edgeDirection === 'outgoing' ? '->' : '-'
   }(v2) 
 WHERE id(v) IN [${selectVertexes
@@ -198,40 +198,40 @@ export const getAlterGQL = (params: {
     const date = config.fields
       .map(item => {
         const { name, type, value, fixedLength, allowNull, comment } = item;
+        const propertyName = handleKeyword(name);
         if (action === 'DROP') {
-          return name;
-        } else {
-          let str = `${name} ${
-            type !== 'fixed_string'
-              ? type
-              : type + `(${fixedLength ? item.fixedLength : ''})`
-          } ${allowNull ? 'NULL' : 'NOT NULL'}`;
-          if (value) {
-            switch (type) {
-              case 'string':
-              case 'fixed_string':
-                str += ` DEFAULT "${value}"`;
-                break;
-              case 'timestamp':
-                const timestampReg = /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})$/;
-                str += timestampReg.test(value)
-                  ? ` DEFAULT "${value}"`
-                  : ` DEFAULT ${value}`;
-                break;
-              default:
-                str += ` DEFAULT ${value}`;
-            }
-          }
-          if (comment) {
-            str += ` COMMENT "${comment}"`;
-          }
-          return str;
+          return propertyName;
         }
+        let str = `${propertyName} ${
+          type !== 'fixed_string'
+            ? type
+            : type + `(${fixedLength ? item.fixedLength : ''})`
+        } ${allowNull ? 'NULL' : 'NOT NULL'}`;
+        if (value) {
+          switch (type) {
+            case 'string':
+            case 'fixed_string':
+              str += ` DEFAULT "${value}"`;
+              break;
+            case 'timestamp':
+              const timestampReg = /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})$/;
+              str += timestampReg.test(value)
+                ? ` DEFAULT "${value}"`
+                : ` DEFAULT ${value}`;
+              break;
+            default:
+              str += ` DEFAULT ${value}`;
+          }
+        }
+        if (comment) {
+          str += ` COMMENT "${comment}"`;
+        }
+        return str;
       })
       .join(', ');
     content = `${action} (${date})`;
   }
-  const gql = `ALTER ${type} ${name} ${content}`;
+  const gql = `ALTER ${type} ${handleKeyword(name)} ${content}`;
   return gql;
 };
 
