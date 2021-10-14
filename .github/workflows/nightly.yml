@@ -1,4 +1,4 @@
-name: Studio RPM Package
+name: Studio nightly Package
 on:
   push:
     branches:
