@@ -19,7 +19,7 @@ import { connect } from 'react-redux';
 import { Instruction } from '#assets/components';
 import GQLCodeMirror from '#assets/components/GQLCodeMirror';
 import { IDispatch, IRootState } from '#assets/store';
-import { enumOfCompare } from '#assets/utils/constant';
+import { ENUM_OF_COMPARE } from '#assets/utils/constant';
 import { getExploreGQLWithIndex } from '#assets/utils/gql';
 
 import './IndexMatch.less';
@@ -340,7 +340,7 @@ class IndexMatch extends React.Component<IProps, IState> {
               value={record.operator}
               onChange={value => this.handleSelect(value, 'operator', index)}
             >
-              {enumOfCompare[type].map(i => (
+              {ENUM_OF_COMPARE[type].map(i => (
                 <Option value={i.value} key={i.value}>
                   {i.label}
                 </Option>

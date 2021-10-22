@@ -22,7 +22,12 @@ import { match, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import GQLCodeMirror from '#assets/components/GQLCodeMirror';
 import { IDispatch, IRootState } from '#assets/store';
-import { dataType, nameReg, positiveIntegerReg } from '#assets/utils/constant';
+import {
+  DATA_TYPE,
+  EXPLAIN_DATA_TYPE,
+  NAME_REGEX,
+  POSITIVE_INTEGER_REGEX,
+} from '#assets/utils/constant';
 import { convertBigNumberToString } from '#assets/utils/function';
 import { getAlterGQL } from '#assets/utils/gql';
 import { trackEvent, trackPageView } from '#assets/utils/stat';
@@ -300,10 +305,13 @@ class EditTag extends React.Component<IProps, IState> {
       if (name === '' || type === '') {
         return message.warning(intl.get('schema.fieldRequired'));
       }
-      if (name !== '' && !nameReg.test(name)) {
+      if (name !== '' && !NAME_REGEX.test(name)) {
         return message.warning(intl.get('formRules.nameValidate'));
       }
-      if (type === 'fixed_string' && !fixedLength?.match(positiveIntegerReg)) {
+      if (
+        type === 'fixed_string' &&
+        !fixedLength?.match(POSITIVE_INTEGER_REGEX)
+      ) {
         return message.warning(intl.get('formRules.fixedStringLength'));
       }
       const res = await this.props.asyncAlterField({
@@ -472,7 +480,7 @@ class EditTag extends React.Component<IProps, IState> {
                   value={editField!.type}
                   onChange={value => this.handleChangeValue('type', value)}
                 >
-                  {dataType.map(item => {
+                  {DATA_TYPE.map(item => {
                     return (
                       <Option value={item.value} key={item.value}>
                         {item.label}
@@ -521,9 +529,7 @@ class EditTag extends React.Component<IProps, IState> {
         align: 'center' as const,
         render: (record, row, index) => {
           if (editRow === index) {
-            return ['date', 'time', 'datetime', 'timestamp'].includes(
-              row.type,
-            ) ? (
+            return EXPLAIN_DATA_TYPE.includes(row.type) ? (
               <Popover
                 trigger="focus"
                 placement="right"

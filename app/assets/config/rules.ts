@@ -1,4 +1,4 @@
-import { nameReg, positiveIntegerReg } from '#assets/utils/constant';
+import { NAME_REGEX, POSITIVE_INTEGER_REGEX } from '#assets/utils/constant';
 
 export const hostRulesFn = intl => [
   {
@@ -38,21 +38,21 @@ export const nameRulesFn = intl => [
     message: intl.get('formRules.nameRequired'),
   },
   {
-    pattern: nameReg,
+    pattern: NAME_REGEX,
     message: intl.get('formRules.nameValidate'),
   },
 ];
 
 export const numberRulesFn = intl => [
   {
-    pattern: positiveIntegerReg,
+    pattern: POSITIVE_INTEGER_REGEX,
     message: intl.get('formRules.numberRequired'),
   },
 ];
 
 export const replicaRulesFn = (intl, activeMachineNum) => [
   {
-    pattern: positiveIntegerReg,
+    pattern: POSITIVE_INTEGER_REGEX,
     message: intl.get('formRules.numberRequired'),
   },
   {
