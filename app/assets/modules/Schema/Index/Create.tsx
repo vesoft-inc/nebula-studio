@@ -10,7 +10,7 @@ import { Instruction, Modal as ModalComponent } from '#assets/components';
 import GQLCodeMirror from '#assets/components/GQLCodeMirror';
 import { nameRulesFn } from '#assets/config/rules';
 import { IDispatch, IRootState } from '#assets/store';
-import { positiveIntegerReg } from '#assets/utils/constant';
+import { POSITIVE_INTEGER_REGEX } from '#assets/utils/constant';
 import { getIndexCreateGQL } from '#assets/utils/gql';
 import { trackEvent, trackPageView } from '#assets/utils/stat';
 
@@ -213,7 +213,7 @@ class CreateIndex extends React.Component<IProps, IState> {
     const { setFieldsValue, getFieldValue } = this.props.form;
     if (
       selectedFieldType === 'string' &&
-      !indexLength.match(positiveIntegerReg)
+      !indexLength.match(POSITIVE_INTEGER_REGEX)
     ) {
       return message.warning(intl.get('schema.indexedLengthRequired'));
     }

@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 
 import CSVPreviewLink from '#assets/components/CSVPreviewLink';
 import { IDispatch, IRootState } from '#assets/store';
-import { dataType } from '#assets/utils/constant';
+import { DATA_TYPE } from '#assets/utils/constant';
 
 import './Tag.less';
 
@@ -136,10 +136,11 @@ class Tag extends React.Component<IProps> {
         dataIndex: 'type',
         render: (value, record) => (
           <Select
+            showSearch={true}
             value={value}
             onChange={type => this.handleChangeTagType(record, tag, type)}
           >
-            {dataType.map(item => {
+            {DATA_TYPE.map(item => {
               return (
                 <Option value={item.value} key={item.value}>
                   {item.label}

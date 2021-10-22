@@ -1,4 +1,4 @@
-export const enumOfCompare = {
+export const ENUM_OF_COMPARE = {
   int64: [
     {
       label: '==',
@@ -91,7 +91,7 @@ export const enumOfCompare = {
   ],
 };
 
-export const dataType = [
+export const DATA_TYPE = [
   {
     value: 'int',
     label: 'int',
@@ -144,6 +144,22 @@ export const dataType = [
     value: 'timestamp',
     label: 'timestamp',
   },
+  {
+    value: 'geography',
+    label: 'geography',
+  },
+  {
+    value: 'geography(point)',
+    label: 'geography(point)',
+  },
+  {
+    value: 'geography(linestring)',
+    label: 'geography(linestring)',
+  },
+  {
+    value: 'geography(polygon)',
+    label: 'geography(polygon)',
+  },
 ];
 
 export const RELATION_OPERATORS = [
@@ -165,5 +181,16 @@ export const RELATION_OPERATORS = [
   },
 ];
 
-export const nameReg = /^[a-zA-Z][a-zA-Z0-9_]*$/;
-export const positiveIntegerReg = /^[1-9]\d*$/g;
+export const EXPLAIN_DATA_TYPE = [
+  'date',
+  'time',
+  'datetime',
+  'timestamp',
+  'geography',
+  'geography(point)',
+  'geography(linestring)',
+  'geography(polygon)',
+];
+
+export const NAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+export const POSITIVE_INTEGER_REGEX = /^[1-9]\d*$/g;

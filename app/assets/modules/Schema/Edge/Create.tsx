@@ -22,7 +22,7 @@ import { match, RouteComponentProps, withRouter } from 'react-router-dom';
 import GQLCodeMirror from '#assets/components/GQLCodeMirror';
 import { nameRulesFn, numberRulesFn } from '#assets/config/rules';
 import { IDispatch, IRootState } from '#assets/store';
-import { dataType } from '#assets/utils/constant';
+import { DATA_TYPE, EXPLAIN_DATA_TYPE } from '#assets/utils/constant';
 import { getTagOrEdgeCreateGQL } from '#assets/utils/gql';
 import { trackEvent, trackPageView } from '#assets/utils/stat';
 
@@ -169,8 +169,8 @@ class CreateEdge extends React.Component<IProps, IState> {
                   },
                 ],
               })(
-                <Select className="select-type">
-                  {dataType.map(item => {
+                <Select className="select-type" showSearch={true}>
+                  {DATA_TYPE.map(item => {
                     return (
                       <Option value={item.value} key={item.value}>
                         {item.label}
@@ -206,9 +206,7 @@ class CreateEdge extends React.Component<IProps, IState> {
             <Form.Item {...itemLayout}>
               {fields &&
               fields[k] &&
-              ['date', 'time', 'datetime', 'timestamp'].includes(
-                fields[k].type,
-              ) ? (
+              EXPLAIN_DATA_TYPE.includes(fields[k].type) ? (
                 <Popover
                   trigger="focus"
                   placement="right"
