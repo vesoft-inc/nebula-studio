@@ -467,6 +467,7 @@ class EditTag extends React.Component<IProps, IState> {
             return (
               <>
                 <Select
+                  showSearch={true}
                   className="select-type"
                   value={editField!.type}
                   onChange={value => this.handleChangeValue('type', value)}

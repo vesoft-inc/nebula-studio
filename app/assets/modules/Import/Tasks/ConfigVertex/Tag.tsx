@@ -136,6 +136,7 @@ class Tag extends React.Component<IProps> {
         dataIndex: 'type',
         render: (value, record) => (
           <Select
+            showSearch={true}
             value={value}
             onChange={type => this.handleChangeTagType(record, tag, type)}
           >

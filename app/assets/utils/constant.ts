@@ -144,6 +144,22 @@ export const dataType = [
     value: 'timestamp',
     label: 'timestamp',
   },
+  {
+    value: 'geography',
+    label: 'geography',
+  },
+  {
+    value: 'geography(point)',
+    label: 'geography(point)',
+  },
+  {
+    value: 'geography(linestring)',
+    label: 'geography(linestring)',
+  },
+  {
+    value: 'geography(polygon)',
+    label: 'geography(polygon)',
+  },
 ];
 
 export const RELATION_OPERATORS = [

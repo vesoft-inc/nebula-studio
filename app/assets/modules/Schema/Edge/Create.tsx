@@ -169,7 +169,7 @@ class CreateEdge extends React.Component<IProps, IState> {
                   },
                 ],
               })(
-                <Select className="select-type">
+                <Select className="select-type" showSearch={true}>
                   {dataType.map(item => {
                     return (
                       <Option value={item.value} key={item.value}>
