@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "nebula-studio.fullname" . }}-web
+  labels:
+    {{- include "nebula-studio.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 7000
+{{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.port }}
+{{- end }}
+      protocol: TCP
+  selector:
+    {{- include "nebula-studio.selectorLabels" . | nindent 4 }}

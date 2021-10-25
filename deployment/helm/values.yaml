@@ -1,0 +1,43 @@
+
+replicaCount: 1
+
+image:
+  pullPolicy: IfNotPresent
+  httpGateway:
+    repository: vesoft/nebula-http-gateway
+    tag: v2
+  nebulaImporter:
+    repository: vesoft/nebula-importer
+    tag: v2
+  nebulaStudio:
+    repository: vesoft/nebula-graph-studio
+    tag: v3
+  nginx:
+    repository: nginx
+    tag: alpine
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 7001
+
+resources:
+  httpGateway:
+  nebulaImporter:
+  nebulaStudio:
+  nginx:
+
+persistent:
+  storageClassName: ""
+  size: 5Gi
+
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
