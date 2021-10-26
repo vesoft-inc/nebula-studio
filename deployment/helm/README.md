@@ -48,7 +48,7 @@ $ helm uninstall my-studio
 |-----------|-------------|---------|
 | replicaCount  | Replica Count for StatefulSet  | 0  |
 | image.httpGateway.repository  |  The repository for http grateway's image  | vesoft/nebula-http-gateway  |
-| image.nebulaImporter.repository  |  The repository for nebula-importer ateway's image  | vesoft/nebula-importer  |
+| image.nebulaImporter.repository  |  The repository for nebula-importer gateway's image  | vesoft/nebula-importer  |
 | image.nebulaStudio.repository  |  The repository for nebula graph studio's image  | vesoft/nebula-graph-studio |
 | image.nginx.repository  |  The repository for nginx's image  | nginx  |
 | image.httpGateway.tag  |  The tag for http grateway's image  | v2  |
