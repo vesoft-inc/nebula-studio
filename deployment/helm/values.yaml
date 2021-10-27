@@ -4,7 +4,7 @@ image:
   pullPolicy: IfNotPresent
   httpGateway:
     name: vesoft/nebula-http-gateway
-    version: v2
+    version: v2.1.0
   nebulaImporter:
     name: vesoft/nebula-importer
     version: v2

@@ -24,7 +24,7 @@ spec:
       {{- end }}
       containers:
         - name: http-gateway
-          image: "{{ .Values.image.httpGateway.name }}:{{ .Values.image.httpGateway.version | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.httpGateway.name }}:{{ .Values.image.httpGateway.version }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: USER
@@ -43,7 +43,7 @@ spec:
           resources:
             {{- toYaml .Values.resources.httpGateway | nindent 12 }}
         - name: nebula-importer
-          image: "{{ .Values.image.nebulaImporter.name }}:{{ .Values.image.nebulaImporter.version | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.nebulaImporter.name }}:{{ .Values.image.nebulaImporter.version }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 5699
@@ -66,7 +66,7 @@ spec:
             - name: upload-data
               mountPath: /uploads
         - name: nebula-studio
-          image: "{{ .Values.image.nebulaStudio.name }}:{{ .Values.image.nebulaStudio.version | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.nebulaStudio.name }}:{{ .Values.image.nebulaStudio.version }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: UPLOAD_DIR
@@ -95,7 +95,7 @@ spec:
             - name: upload-data
               mountPath: /uploads
         - name: nginx
-          image: "{{ .Values.image.nginx.name }}:{{ .Values.image.nginx.version | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.nginx.name }}:{{ .Values.image.nginx.version }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 7000
