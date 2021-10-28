@@ -42,29 +42,6 @@ spec:
               port: 8080
           resources:
             {{- toYaml .Values.resources.httpGateway | nindent 12 }}
-        - name: nebula-importer
-          image: "{{ .Values.image.nebulaImporter.name }}:{{ .Values.image.nebulaImporter.version }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - containerPort: 5699
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /tasks
-              port: 5699
-          readinessProbe:
-            httpGet:
-              path: /tasks
-              port: 5699
-          resources:
-            {{- toYaml .Values.resources.nebulaImporter | nindent 12 }}
-          command:
-            - nebula-importer
-            - "--port=5699"
-            - "--callback=http://127.0.0.1:7000/api/import/finish"
-          volumeMounts:
-            - name: upload-data
-              mountPath: /uploads
         - name: nebula-studio
           image: "{{ .Values.image.nebulaStudio.name }}:{{ .Values.image.nebulaStudio.version }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}

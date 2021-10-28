@@ -48,17 +48,14 @@ $ helm uninstall my-studio
 |-----------|-------------|---------|
 | replicaCount  | Replicas for Deployment  | 0  |
 | image.httpGateway.name  |  The image name of nebula-http-gateway  | vesoft/nebula-http-gateway  |
-| image.nebulaImporter.name  |  The image name of nebula-importer  | vesoft/nebula-importer  |
 | image.nebulaStudio.name  |  The image name of nebula-graph-studio  | vesoft/nebula-graph-studio |
 | image.nginx.name  |  The image name of nginx  | nginx  |
-| image.httpGateway.version  |  The image version nebula-http-gateway  | v2  |
-| image.nebulaImporter.version  |  The image version nebula-importer  | v2  |
-| image.nebulaStudio.version  |  The image version nebula-graph-studio  | v3  |
+| image.httpGateway.version  |  The image version nebula-http-gateway  | v2.1.0  |
+| image.nebulaStudio.version  |  The image version nebula-graph-studio  | v3.1.0  |
 | image.nginx.version  |  The image version of nginx  | alpine  |
 | service.type  | The service type, should be one of ['NodePort', 'ClusterIP', 'LoadBalancer'] |  ClusterIP  |
 | service.port  | The expose port for nebula-graph-studio's web |  7001  |
 | resources.httpGateway  | The resource limits/requests for nebula-http-gateway | {}  |
-| resources.nebulaImporter  | The resource limits/requests for nebula-importer | {}  |
 | resources.nebulaStudio  | The resource limits/requests for nebula-studio | {}  |
 | resources.nginx  | The resource limits/requests for nginx | {}  |
 | persistent.storageClassName  | The storageClassName for PVC if not using default  | ""  |

@@ -5,12 +5,9 @@ image:
   httpGateway:
     name: vesoft/nebula-http-gateway
     version: v2.1.0
-  nebulaImporter:
-    name: vesoft/nebula-importer
-    version: v2.6.0
   nebulaStudio:
     name: vesoft/nebula-graph-studio
-    version: v3
+    version: v3.1.0
   nginx:
     name: nginx
     version: alpine
@@ -26,7 +23,6 @@ service:
 
 resources:
   httpGateway:
-  nebulaImporter:
   nebulaStudio:
   nginx:
 
