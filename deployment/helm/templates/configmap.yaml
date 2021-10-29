@@ -26,8 +26,4 @@ data:
       location ~ ^/api-nebula/([A-Za-z0-9\/]+) {
         proxy_pass http://127.0.0.1:8080/api/$1;
       }
-
-      location ~ ^/api-import/([A-Za-z0-9\/]+) {
-        proxy_pass http://127.0.0.1:5699/$1;
-      }
     }

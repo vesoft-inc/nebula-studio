@@ -46,21 +46,18 @@ $ helm uninstall my-studio
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| replicaCount  | Replica Count for StatefulSet  | 0  |
-| image.httpGateway.repository  |  The repository for http gateway's image  | vesoft/nebula-http-gateway  |
-| image.nebulaImporter.repository  |  The repository for nebula-importer gateway's image  | vesoft/nebula-importer  |
-| image.nebulaStudio.repository  |  The repository for nebula graph studio's image  | vesoft/nebula-graph-studio |
-| image.nginx.repository  |  The repository for nginx's image  | nginx  |
-| image.httpGateway.tag  |  The tag for http grateway's image  | v2  |
-| image.nebulaImporter.tag  |  The tag for nebula-importer ateway's image  | v2  |
-| image.nebulaStudio.tag  |  The tag for nebula graph studio's image  | v3  |
-| image.nginx.tag  |  The tag for nginx's image  | alpine  |
+| replicaCount  | Replicas for Deployment  | 0  |
+| image.httpGateway.name  |  The image name of nebula-http-gateway  | vesoft/nebula-http-gateway  |
+| image.nebulaStudio.name  |  The image name of nebula-graph-studio  | vesoft/nebula-graph-studio |
+| image.nginx.name  |  The image name of nginx  | nginx  |
+| image.httpGateway.version  |  The image version nebula-http-gateway  | v2.1.0  |
+| image.nebulaStudio.version  |  The image version nebula-graph-studio  | v3.1.0  |
+| image.nginx.version  |  The image version of nginx  | alpine  |
 | service.type  | The service type, should be one of ['NodePort', 'ClusterIP', 'LoadBalancer'] |  ClusterIP  |
 | service.port  | The expose port for nebula-graph-studio's web |  7001  |
-| resources.httpGateway  | The resource limits/requests for http gateway | {}  |
-| resources.nebulaImporter  | The resource limits/requests for nebular importer | {}  |
-| resources.nebulaStudio  | The resource limits/requests for nebula studio | {}  |
+| resources.httpGateway  | The resource limits/requests for nebula-http-gateway | {}  |
+| resources.nebulaStudio  | The resource limits/requests for nebula-studio | {}  |
 | resources.nginx  | The resource limits/requests for nginx | {}  |
 | persistent.storageClassName  | The storageClassName for PVC if not using default  | ""  |
-| persistent.size  | The size for upload-data persistent storage | 5Gi  |
+| persistent.size  | The persistent volume size | 5Gi  |
 

@@ -1,20 +1,16 @@
-
 replicaCount: 1
 
 image:
   pullPolicy: IfNotPresent
   httpGateway:
-    repository: vesoft/nebula-http-gateway
-    tag: v2
-  nebulaImporter:
-    repository: vesoft/nebula-importer
-    tag: v2
+    name: vesoft/nebula-http-gateway
+    version: v2.1.0
   nebulaStudio:
-    repository: vesoft/nebula-graph-studio
-    tag: v3
+    name: vesoft/nebula-graph-studio
+    version: v3.1.0
   nginx:
-    repository: nginx
-    tag: alpine
+    name: nginx
+    version: alpine
 
 imagePullSecrets: []
 
@@ -27,7 +23,6 @@ service:
 
 resources:
   httpGateway:
-  nebulaImporter:
   nebulaStudio:
   nginx:
 
@@ -35,6 +30,7 @@ persistent:
   storageClassName: ""
   size: 5Gi
 
+podAnnotations: {}
 
 nodeSelector: {}
 
