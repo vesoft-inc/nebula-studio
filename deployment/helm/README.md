@@ -50,7 +50,7 @@ $ helm uninstall my-studio
 | image.httpGateway.name  |  The image name of nebula-http-gateway  | vesoft/nebula-http-gateway  |
 | image.nebulaStudio.name  |  The image name of nebula-graph-studio  | vesoft/nebula-graph-studio |
 | image.nginx.name  |  The image name of nginx  | nginx  |
-| image.httpGateway.version  |  The image version nebula-http-gateway  | v2.1.0  |
+| image.httpGateway.version  |  The image version nebula-http-gateway  | v2.1.1  |
 | image.nebulaStudio.version  |  The image version nebula-graph-studio  | v3.1.0  |
 | image.nginx.version  |  The image version of nginx  | alpine  |
 | service.type  | The service type, should be one of ['NodePort', 'ClusterIP', 'LoadBalancer'] |  ClusterIP  |
