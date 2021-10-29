@@ -21,7 +21,7 @@ jobs:
         with:
           repository: vesoft-inc/nebula-http-gateway
           path: source/nebula-http-gateway
-          ref: v2.0
+          ref: v2.1.0
       - uses: actions/setup-go@v2
         with:
           go-version: '^1.13.1'
@@ -49,7 +49,7 @@ jobs:
         with:
           repository: vesoft-inc/nebula-http-gateway
           path: source/nebula-http-gateway
-          ref: v2.0
+          ref: v2.1.0
       - uses: actions/setup-go@v2
         with:
           go-version: '^1.13.1'
