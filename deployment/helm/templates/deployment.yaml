@@ -42,12 +42,15 @@ spec:
               port: 8080
           resources:
             {{- toYaml .Values.resources.httpGateway | nindent 12 }}
+          volumeMounts:
+            - name: upload-data
+              mountPath: /upload
         - name: nebula-studio
           image: "{{ .Values.image.nebulaStudio.name }}:{{ .Values.image.nebulaStudio.version }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: UPLOAD_DIR
-              value: /uploads
+              value: /upload
           ports:
             - containerPort: 7001
               protocol: TCP
@@ -70,7 +73,7 @@ spec:
             {{- toYaml .Values.resources.nebulaStudio | nindent 12 }}
           volumeMounts:
             - name: upload-data
-              mountPath: /uploads
+              mountPath: /upload
         - name: nginx
           image: "{{ .Values.image.nginx.name }}:{{ .Values.image.nginx.version }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -89,7 +92,7 @@ spec:
             {{- toYaml .Values.resources.nginx | nindent 12 }}
           volumeMounts:
             - name: upload-data
-              mountPath: /uploads
+              mountPath: /upload
             - name: nginx-config
               mountPath: /etc/nginx/conf.d/nebula.conf
               subPath: nginx.conf
