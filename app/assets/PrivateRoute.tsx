@@ -7,13 +7,12 @@ import { IRootState } from './store';
 const mapState = (state: IRootState) => ({
   host: state.nebula.host,
   username: state.nebula.username,
-  password: state.nebula.password,
 });
 
 const mapDispatch = () => ({});
 
 const PrivateRoute = ({ component: Component, render, ...rest }) => {
-  if (rest.host && rest.username && rest.password) {
+  if (rest.host && rest.username) {
     return Component ? (
       <Route {...rest} render={props => <Component {...props} />} />
     ) : (

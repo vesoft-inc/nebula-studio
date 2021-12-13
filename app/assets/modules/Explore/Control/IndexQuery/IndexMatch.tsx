@@ -337,6 +337,7 @@ class IndexMatch extends React.Component<IProps, IState> {
             : record.type;
           return (
             <Select
+              dropdownMatchSelectWidth={false}
               value={record.operator}
               onChange={value => this.handleSelect(value, 'operator', index)}
             >

@@ -39,7 +39,7 @@ const ConfigServerForm = Form.create<IProps>()((props: IProps) => {
       <FormItem label={intl.get('configServer.host')}>
         {getFieldDecorator('host', {
           rules: hostRulesFn(intl),
-        })(<Input />)}
+        })(<Input placeholder="GraphD Host: Port" />)}
       </FormItem>
       <FormItem label={intl.get('configServer.username')}>
         {getFieldDecorator('username', {

@@ -13,7 +13,6 @@ const mapState = (state: IRootState) => ({
   activeStep: state.importData.activeStep,
   currentSpace: state.nebula.currentSpace,
   username: state.nebula.username,
-  password: state.nebula.password,
   host: state.nebula.host,
 });
 

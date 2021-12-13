@@ -30,6 +30,18 @@ export const ENUM_OF_COMPARE = {
       label: '==',
       value: '==',
     },
+    {
+      label: 'CONTAINS',
+      value: 'CONTAINS',
+    },
+    {
+      label: 'STARTS WITH',
+      value: 'STARTS WITH',
+    },
+    {
+      label: 'ENDS WITH',
+      value: 'ENDS WITH',
+    },
   ],
   bool: [
     {

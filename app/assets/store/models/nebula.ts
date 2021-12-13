@@ -20,7 +20,6 @@ interface IState {
   edgeTypes: string[];
   host: string;
   username: string;
-  password: string;
   tagsFields: any[];
   edgesFields: any[];
   indexes: any[];
@@ -98,7 +97,6 @@ export const nebula = createModel({
   state: {
     username: cookies.get('nu'),
     host: cookies.get('nh'),
-    password: cookies.get('np'),
     spaces: [],
     currentSpace: '',
     spaceVidType: '',
@@ -198,11 +196,9 @@ export const nebula = createModel({
         message.success(intl.get('configServer.success'));
         cookies.set('nh', host);
         cookies.set('nu', username);
-        cookies.set('np', password);
         this.update({
           host,
           username,
-          password,
         });
         return true;
       } else {
@@ -210,11 +206,9 @@ export const nebula = createModel({
         this.update({
           host: '',
           username: '',
-          password: '',
         });
         cookies.remove('nh');
         cookies.remove('nu');
-        cookies.remove('np');
         return false;
       }
     },
@@ -231,13 +225,11 @@ export const nebula = createModel({
       this.update({
         host: '',
         username: '',
-        password: '',
         spaces: [],
         currentSpace: '',
       });
       cookies.remove('nh');
       cookies.remove('nu');
-      cookies.remove('np');
       sessionStorage.removeItem('currentSpace');
       dispatch({ type: 'RESET_APP' });
     },

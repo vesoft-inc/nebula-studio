@@ -54,6 +54,7 @@ export default class Links extends React.Component<IProps, {}> {
       .append('svg:path')
       .attr('pointer-events', 'visibleStroke')
       .attr('class', 'link')
+      .classed('ring', (d: IPath) => d.source.name === d.target.name)
       .style('fill', 'none')
       .style('stroke', '#595959')
       .style('stroke-width', 2)
