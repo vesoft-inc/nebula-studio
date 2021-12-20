@@ -1,15 +1,16 @@
-import { Button, message, Tabs } from 'antd';
+import { Button, Input, message, Tabs } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
+import { Modal } from '#assets/components';
 import service from '#assets/config/service';
 import { IDispatch, IRootState } from '#assets/store';
 import { configToJson, getStringByteLength } from '#assets/utils/import';
 import { trackEvent, trackPageView } from '#assets/utils/stat';
 
+import './Import.less';
 import Prev from './Prev';
-
 const { TabPane } = Tabs;
 const mapState = (state: IRootState) => ({
   activeStep: state.importData.activeStep,
@@ -21,7 +22,6 @@ const mapState = (state: IRootState) => ({
   taskId: state.importData.taskId,
   currentSpace: state.nebula.currentSpace,
   username: state.nebula.username,
-  password: state.nebula.password,
   host: state.nebula.host,
   spaceVidType: state.nebula.spaceVidType,
 });
@@ -38,14 +38,24 @@ type IProps = ReturnType<typeof mapState> & ReturnType<typeof mapDispatch>;
 
 interface IState {
   activeKey: string;
+  password: string;
   startByte: number;
   endByte: number;
+}
+
+enum ITaskStatus {
+  'statusFinished' = 'statusFinished',
+  'statusStoped' = 'statusStoped',
+  'statusProcessing' = 'statusProcessing',
+  'statusNotExisted' = 'statusNotExisted',
+  'statusAborted' = 'statusAborted',
 }
 
 class Import extends React.Component<IProps, IState> {
   ref: HTMLDivElement;
   logTimer: any;
   checkTimer: any;
+  modalHandle;
 
   constructor(props: IProps) {
     super(props);
@@ -53,14 +63,22 @@ class Import extends React.Component<IProps, IState> {
       activeKey: 'log',
       startByte: 0,
       endByte: 1000000,
+      password: '',
     };
   }
 
   componentDidMount() {
+    trackPageView('/import/data');
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.logTimer);
+  }
+
+  createConfigFile = async () => {
     const {
       currentSpace,
       username,
-      password,
       host,
       vertexesConfig,
       edgesConfig,
@@ -68,6 +86,7 @@ class Import extends React.Component<IProps, IState> {
       activeStep,
       spaceVidType,
     } = this.props;
+    const { password } = this.state;
     const config: any = configToJson({
       currentSpace,
       username,
@@ -79,35 +98,27 @@ class Import extends React.Component<IProps, IState> {
       activeStep,
       spaceVidType,
     });
-    service
-      .createConfigFile({
-        config,
-        mountPath,
-      })
-      .then((result: any) => {
-        if (result.code !== 0) {
-          message.error(intl.get('import.createConfigError'));
-        }
-      });
-
-    trackPageView('/import/data');
-  }
-
-  componentWillUnmount() {
-    clearTimeout(this.logTimer);
-  }
+    const res = await service.createConfigFile({
+      config,
+      mountPath,
+    });
+    if (res.code !== 0) {
+      message.error(intl.get('import.createConfigError'));
+    }
+  };
 
   handleRunImport = async () => {
     const {
       currentSpace,
       username,
-      password,
       host,
       vertexesConfig,
       edgesConfig,
       mountPath,
       activeStep,
     } = this.props;
+    const { password } = this.state;
+    this.ref.innerHTML = '';
     const errCode: any = await this.props.importData({
       currentSpace,
       username,
@@ -125,6 +136,18 @@ class Import extends React.Component<IProps, IState> {
     trackEvent('import', 'import_data', 'start');
   };
 
+  handleOpen = () => {
+    if (this.modalHandle) {
+      this.modalHandle.show();
+      this.setState({ password: '' });
+    }
+  };
+  handleClose = () => {
+    if (this.modalHandle) {
+      this.modalHandle.hide();
+    }
+  };
+
   checkIsFinished = async () => {
     const { taskId } = this.props;
     const { code, data, message: errMsg } = await this.props.checkImportStatus({
@@ -137,8 +160,13 @@ class Import extends React.Component<IProps, IState> {
     }
 
     const result = data.results?.[0];
-
-    if (result?.taskStatus !== 'statusProcessing') {
+    if (result?.taskStatus !== ITaskStatus.statusProcessing) {
+      if (result.taskMessage) {
+        message.warning(result.taskMessage);
+      }
+      if (result?.taskStatus === ITaskStatus.statusFinished) {
+        message.success(intl.get('import.importFinished'));
+      }
       service.finishImport({ taskId });
       clearTimeout(this.checkTimer);
     } else {
@@ -178,7 +206,6 @@ class Import extends React.Component<IProps, IState> {
         update({
           isImporting: false,
         });
-        message.success(intl.get('import.importFinished'));
         clearTimeout(this.logTimer);
         trackEvent('import', 'import_data', 'finish');
       }
@@ -197,6 +224,12 @@ class Import extends React.Component<IProps, IState> {
     this.handleRunImport();
   };
 
+  handleImportStart = async () => {
+    this.handleClose();
+    await this.createConfigFile();
+    await this.handleRunImport();
+  };
+
   render() {
     const {
       isImporting,
@@ -205,13 +238,13 @@ class Import extends React.Component<IProps, IState> {
       mountPath,
       taskId,
     } = this.props;
-    const { activeKey } = this.state;
+    const { activeKey, password } = this.state;
     return (
       <div className="import">
         <div className="import-btn">
           <Button
             className="import-again"
-            onClick={this.handleRunImport}
+            onClick={this.handleOpen}
             loading={isImporting}
           >
             {intl.get('import.runImport')}
@@ -307,6 +340,28 @@ class Import extends React.Component<IProps, IState> {
             </div>
           </TabPane>
         </Tabs>
+        <Modal
+          title={intl.get('import.enterPassword')}
+          className="password-modal"
+          handlerRef={handle => (this.modalHandle = handle)}
+          footer={false}
+        >
+          <Input.Password
+            onChange={e => this.setState({ password: e.target.value })}
+          />
+          <div className="btns">
+            <Button onClick={this.handleClose}>
+              {intl.get('common.cancel')}
+            </Button>
+            <Button
+              type="primary"
+              disabled={!password}
+              onClick={this.handleImportStart}
+            >
+              {intl.get('common.confirm')}
+            </Button>
+          </div>
+        </Modal>
       </div>
     );
   }

@@ -285,7 +285,7 @@ export const importData = createModel({
         nebula: { spaceVidType },
       } = rootState;
       const config: any = configToJson({ ...payload, spaceVidType });
-      const { code, data, message } = (await service.importData({
+      const { code, data, message: errorMsg } = (await service.importData({
         configBody: config,
         configPath: '',
       })) as any;
@@ -295,7 +295,7 @@ export const importData = createModel({
           isImporting: true,
         });
       } else {
-        message.error(message);
+        message.error(errorMsg);
       }
       return code;
     },

@@ -151,7 +151,8 @@ class NebulaD3 extends React.Component<IProps> {
   tick = () => {
     this.link.attr('d', (d: any) => {
       if (d.target.name === d.source.name) {
-        const dr = 30 / d.linknum;
+        const param = d.size > 1 ? 50 : 30;
+        const dr = param / d.linknum;
         return (
           'M' +
           d.source.x +
