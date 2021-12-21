@@ -23,6 +23,8 @@ export async function fetchEdgeProps(payload: {
         gql += `,${edgeType}.${edgeField}`;
       }
     });
+  } else {
+    gql += ' YIELD edge as `_edge`';
   }
 
   const { data } = (await service.execNGQL({
@@ -73,7 +75,7 @@ export async function fetchBidirectVertexes(payload: {
 }) {
   const { ids, spaceVidType } = payload;
   const _ids = ids.map(id => handleVidStringName(id, spaceVidType)).join(', ');
-  const gql = `GO FROM ${_ids} OVER * BIDIRECT`;
+  const gql = `GO FROM ${_ids} OVER * BIDIRECT yield edge as \`_edge\``;
   const { code, data, message } = (await service.execNGQL({
     gql,
   })) as any;

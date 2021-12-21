@@ -26,17 +26,16 @@ import { parsePathToGraph, setLink } from '#assets/utils/parseData';
 
 function getBidrectVertexIds(data) {
   const { tables } = data;
-  // go from nqgl return [{*._dst: id}]
-  const ids = _.uniq(
-    tables
-      .map(row => {
-        return Object.values(row);
-      })
-      .flat(),
-  )
-    .filter(id => id !== 0)
-    .map(id => String(id));
-  return ids;
+  // go from yield edge nqgl return [{_edgesParsedList: srcID: xx, dstID: xx}]
+  const vertexIds: string[] = [];
+  tables.forEach(item => {
+    item._edgesParsedList.forEach(edge => {
+      const { dstID, srcID } = edge;
+      vertexIds.push(String(dstID));
+      vertexIds.push(String(srcID));
+    });
+  });
+  return _.uniq(vertexIds);
 }
 
 interface IExportEdge {
@@ -95,7 +94,7 @@ function getGroup(tags) {
   return 't-' + tags.sort().join('-');
 }
 
-function getTagData(nodes, expand) {
+function getTagData(nodes, expand?) {
   const data = nodes.map(node => {
     const { vid, tags, properties } = node;
     const group = getGroup(tags);
@@ -352,9 +351,21 @@ export const explore = createModel({
       quantityLimit: number | null;
     }) {
       const { code, data, message } = await fetchVertexPropsWithIndex(payload);
-      if (code === 0 && data.tables.length !== 0) {
-        const ids = data.tables && data.tables.map(i => i.VertexID || i._vid);
-        this.asyncImportNodes({ ids });
+      if (code === 0) {
+        if (data.tables.length === 0) {
+          message.info(intl.get('common.noData'));
+        } else {
+          const vertexList = data.tables.map(i => i._verticesParsedList).flat();
+          const vertexes = vertexList.map(({ vid, tags, properties }) => ({
+            vid: vid || '',
+            tags: tags || [],
+            properties: properties || {},
+          }));
+          this.addNodesAndEdges({
+            vertexes: getTagData(vertexes),
+            edges: [],
+          });
+        }
       } else {
         throw new Error(message);
       }
@@ -437,19 +448,9 @@ export const explore = createModel({
       const {
         nebula: { spaceVidType },
       } = rootState;
-      // If these ids have hanging edges, get the src/dst id of these input ids on the hanging edges
-      let bidirectRes = await fetchBidirectVertexes({ ids, spaceVidType });
-      let _ids =
-        bidirectRes.code === 0 ? getBidrectVertexIds(bidirectRes.data) : [];
-      if (_ids.length > 0) {
-        // Batch query cannot accurately know which input ids have hanging edges
-        // So use the result ids to query the corresponding ids on all edges
-        // these ids must include vertex id of the haning edge
-        bidirectRes = await fetchBidirectVertexes({ ids: _ids, spaceVidType });
-        _ids =
-          bidirectRes.code === 0 ? getBidrectVertexIds(bidirectRes.data) : [];
-      }
-      return _ids;
+      const res = await fetchBidirectVertexes({ ids, spaceVidType });
+      const vertexIds = res.code === 0 ? getBidrectVertexIds(res.data) : [];
+      return vertexIds.filter(id => ids.includes(id));
     },
 
     async asyncGetExploreEdge(edgeList: IExportEdge[], rootState) {
