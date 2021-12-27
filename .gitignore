@@ -33,3 +33,4 @@ scripts/data/
 typings
 docker/data
 tmp
+server/data

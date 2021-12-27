@@ -1,0 +1,7 @@
+web:
+#  task_id_path:
+#  upload_dir:
+#  tasks_dir:
+#  sqlitedb_file_path:
+#  ip:
+  port: 7001
