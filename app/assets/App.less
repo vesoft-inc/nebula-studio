@@ -1,3 +1,5 @@
+@import '~#assets/common.less';
+
 html body {
 	height: 100%;
 	padding: 0;
@@ -58,7 +60,7 @@ p {
 	background: #d2d5da;
 
 	.github-star {
-		height: 64px;
+		height: @navHeight;
 		display: flex;
 		align-items: center;
 		margin-right: 8px;
@@ -103,6 +105,7 @@ p {
 		display: flex;
 		z-index: 9;
 		padding-left: 18px;
+		height: @navHeight;
 
 		.studio-logo img {
 			width: 126px;
