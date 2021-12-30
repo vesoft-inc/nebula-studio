@@ -172,6 +172,10 @@ export const DATA_TYPE = [
     value: 'geography(polygon)',
     label: 'geography(polygon)',
   },
+  {
+    value: 'duration',
+    label: 'duration',
+  },
 ];
 
 export const RELATION_OPERATORS = [
@@ -202,6 +206,7 @@ export const EXPLAIN_DATA_TYPE = [
   'geography(point)',
   'geography(linestring)',
   'geography(polygon)',
+  'duration',
 ];
 
 export const NAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_]*$/;

@@ -321,6 +321,7 @@
     "geography(point)Format": "Supported data inserting methods: <br /> Call function ST_GeogFromText('POINT()'), for example:ST_GeogFromText('POINT(6 10)')",
     "geography(linestring)Format": "Supported data inserting methods: <br /> Call function ST_GeogFromText('LINESTRING()'), for example:ST_GeogFromText('LINESTRING(3 4,10 50,20 25)')",
     "geography(polygon)Format": "Supported data inserting methods: <br /> Call function ST_GeogFromText('POLYGON()'), for example:ST_GeogFromText('POLYGON((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))')",
+    "durationFormat": "Supported data inserting methods: <br /> Call function duration(<map>), for example:duration({years: 1, seconds: 0})",
     "cancelOperation": "Do you want to close this panel",
     "cancelPropmt": "If you close the panel, the configuration will be deleted automatically. Are you sure that you want to close the panel?",
     "fieldDisabled": "A TTL configuration is set for this property, so it cannot be edited. If you want to edit this property, delete the TTL configuration.",
