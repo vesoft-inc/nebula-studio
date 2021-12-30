@@ -140,6 +140,7 @@
     "undo": "Undo",
     "deleteSelectNodes": "Remove Selected Nodes",
     "fileImport": "Import File",
+    "sampleImport": "Import Sample",
     "importPlaceholder": "Enter VIDs or other data for VID generation, one data per line, and split them by pressing the Enter key. Here is an example:\nstring1\nstring2\nstring3",
     "outgoing": "Outgoing",
     "incoming": "Incoming",

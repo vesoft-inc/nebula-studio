@@ -601,6 +601,25 @@ export const explore = createModel({
       }
     },
 
+    async asyncGetSampleVertic() {
+      const { code, data } = (await service.execNGQL({
+        gql: 'MATCH (v) return v limit 30',
+      })) as any;
+      if (code === 0) {
+        const vertexList = data.tables.map(i => i._verticesParsedList).flat();
+        const vertexes = vertexList.map(({ vid, tags, properties }) => ({
+          vid: vid || '',
+          tags: tags || [],
+          properties: properties || {},
+        }));
+        this.addNodesAndEdges({
+          vertexes: getTagData(vertexes),
+          edges: [],
+        });
+      }
+      return { code, data };
+    },
+
     async asyncGetPathResult(payload: {
       type: string;
       srcId: string[];
