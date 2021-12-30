@@ -317,6 +317,7 @@
     "geography(point)Format": "geo(point) 类型支持插入方式: <br /> 调用函数 ST_GeogFromText('POINT()')，例如：ST_GeogFromText('POINT(6 10)')",
     "geography(linestring)Format": "geo(linestring) 类型支持插入方式: <br /> 调用函数 ST_GeogFromText('LINESTRING()')，例如：ST_GeogFromText('LINESTRING(3 4,10 50,20 25)')",
     "geography(polygon)Format": "geo(polygon) 类型支持插入方式: <br /> 调用函数 ST_GeogFromText('POLYGON()')，例如：ST_GeogFromText('POLYGON((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))')",
+    "durationFormat": "duration 类型支持插入方式: <br /> 调用函数 duration(<map>)，例如：duration({years: 1, seconds: 0})",
     "cancelOperation": "是否取消配置并关闭面板",
     "cancelPropmt": "关闭面板将删除所有属性，是否继续？",
     "fieldDisabled": "该属性被 ttl_col 引用，不支持更改操作，如要更改，请先更新 ttl",

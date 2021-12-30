@@ -116,7 +116,18 @@ class NebulaGraph extends React.Component<IProps, IState> {
     const edgeFieldsValuePairStr = Object.keys(properties)
       .map(property => {
         const value = properties[property];
-        return `<div key=${property}><span>${link.type}.${property}: </span><span>${value}</span></div>`;
+        return `<div key=${property}><span>${
+          link.type
+        }.${property}: </span><span>${
+          typeof value !== 'string'
+            ? convertBigNumberToString(value)
+            : JSON.stringify(value, (_, value) => {
+                if (typeof value === 'string') {
+                  return value.replace(/\u0000+$/, '');
+                }
+                return value;
+              })
+        }</span></div>`;
       })
       .join('');
     this.$tooltip.html(
