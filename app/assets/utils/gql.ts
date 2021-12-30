@@ -95,7 +95,7 @@ export const getExploreGQLWithIndex = (params: {
     `LOOKUP ON
   ${handleKeyword(tag)} ${wheres ? `\nWHERE ${wheres}` : ''}
     ` +
-    ` yield vertex as \`_vertex\` | LIMIT ${
+    ` yield vertex as \`vertex_\` | LIMIT ${
       quantityLimit ? quantityLimit : 100
     }`;
 
@@ -286,7 +286,7 @@ export const getPathGQL = (params: {
     `FIND ${type} PATH FROM ${_srcIds} TO ${_dstIds} over ${_relation}` +
     `${direction ? ` ${direction}` : ''}` +
     `${stepLimit ? ' UPTO ' + stepLimit + ' STEPS' : ''}` +
-    ' yield path as `_path`' +
+    ' yield path as `paths_`' +
     `${quantityLimit ? ' | LIMIT ' + quantityLimit : ''}`;
 
   return gql;
