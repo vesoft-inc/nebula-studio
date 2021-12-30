@@ -24,7 +24,7 @@ export async function fetchEdgeProps(payload: {
       }
     });
   } else {
-    gql += ' YIELD edge as `_edge`';
+    gql += ' YIELD edge as `edges_`';
   }
 
   const { data } = (await service.execNGQL({
