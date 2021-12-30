@@ -298,6 +298,7 @@
   "schema": {
     "spaceList": "图空间列表",
     "backToSpaceList": "图空间列表",
+    "useSpaceErrTip": "图空间未找到。立刻尝试使用刚创建的图空间可能会失败，因为创建是异步实现的。为确保数据同步，后续操作能顺利进行，请等待 2 个心跳周期（20 秒）。",
     "partitionNumDescription": "partition_num 表示数据分片数量。默认值为 100。建议为硬盘数量的 5 倍。",
     "replicaFactorDescription": "replica_factor 表示副本数量。默认值是 1，生产集群建议为 3。由于采用多数表决原理，因此需为奇数。",
     "charsetDescription": "charset 表示字符集，定义了字符以及字符的编码，默认为 utf8。",

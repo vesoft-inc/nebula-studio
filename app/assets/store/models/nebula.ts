@@ -313,7 +313,7 @@ export const nebula = createModel({
     },
 
     async asyncSwitchSpace(space: string) {
-      const { code } = (await service.execNGQL({
+      const { code, message } = (await service.execNGQL({
         // HACK: Processing keyword
         gql: 'use' + '`' + space + '`;',
       })) as any;
@@ -329,6 +329,8 @@ export const nebula = createModel({
           spaceVidType,
         });
         sessionStorage.setItem('currentSpace', space);
+      } else {
+        return message;
       }
     },
 

@@ -19,10 +19,8 @@ const mapState = (state: IRootState) => ({
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetSpacesList: dispatch.nebula.asyncGetSpacesList,
   asyncDeleteSpace: dispatch.nebula.asyncDeleteSpace,
-  asyncSwitchSpace: async space => {
-    await dispatch.nebula.asyncSwitchSpace(space);
-    await dispatch.explore.clear();
-  },
+  asyncSwitchSpace: dispatch.nebula.asyncSwitchSpace,
+  asyncClearExplore: dispatch.explore.clear,
   clearCurrentSpace: () =>
     dispatch.nebula.update({
       currentSpace: '',
@@ -60,6 +58,16 @@ class Schema extends React.Component<IProps> {
     }
   };
 
+  handleSwitchSpace = async (space: string) => {
+    const { asyncSwitchSpace, history, asyncClearExplore } = this.props;
+    const err = await asyncSwitchSpace(space);
+    if (!err) {
+      await asyncClearExplore();
+      history.push(`/space/${space}/tag/list`);
+    } else if (err && err.toLowerCase().includes('spacenotfound')) {
+      message.warning(intl.get('schema.useSpaceErrTip'));
+    }
+  };
   render() {
     const { loading, spaceList, asyncSwitchSpace } = this.props;
     const columns = [
@@ -73,15 +81,15 @@ class Schema extends React.Component<IProps> {
         dataIndex: 'Name',
         align: 'center' as const,
         render: value => (
-          <Link
-            to={`/space/${value}/tag/list`}
-            onClick={() => asyncSwitchSpace(value)}
+          <Button
+            type="link"
+            onClick={() => this.handleSwitchSpace(value)}
             data-track-category="navigation"
             data-track-action="view_space_list"
             data-track-label="from_space_list"
           >
             {value}
-          </Link>
+          </Button>
         ),
       },
       {
@@ -163,16 +171,14 @@ class Schema extends React.Component<IProps> {
             return (
               <div className="operation">
                 <div>
-                  <Button shape="circle">
-                    <Link
-                      to={`/space/${space.Name}/tag/list`}
-                      onClick={() => asyncSwitchSpace(space.Name)}
-                      data-track-category="navigation"
-                      data-track-action="view_space_list"
-                      data-track-label="from_space_list"
-                    >
-                      <Icon type="tool" theme="twoTone" />
-                    </Link>
+                  <Button
+                    shape="circle"
+                    onClick={() => asyncSwitchSpace(space.Name)}
+                    data-track-category="navigation"
+                    data-track-action="view_space_list"
+                    data-track-label="from_space_list"
+                  >
+                    <Icon type="tool" theme="twoTone" />
                   </Button>
                   <Popconfirm
                     onConfirm={() => this.handleDeleteSpace(space.Name)}
