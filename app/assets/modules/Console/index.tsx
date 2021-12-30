@@ -15,17 +15,20 @@ import SpaceSearchInput from './SpaceSearchInput';
 interface IState {
   isUpDown: boolean;
   history: boolean;
+  visible: boolean;
 }
 
 const mapState = (state: IRootState) => ({
   result: state._console.result,
   currentGQL: state._console.currentGQL,
+  paramsMap: state._console.paramsMap,
   currentSpace: state.nebula.currentSpace,
   runGQLLoading: state.loading.effects._console.asyncRunGQL,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncRunGQL: dispatch._console.asyncRunGQL,
+  asyncGetParams: dispatch._console.asyncGetParams,
   updateCurrentGQL: gql =>
     dispatch._console.update({
       currentGQL: gql,
@@ -41,6 +44,8 @@ interface IProps
     ReturnType<typeof mapDispatch>,
     RouteComponentProps {}
 
+// split from semicolon out of quotation marks
+const SEMICOLON_REG = /((?:[^;'"]*(?:"(?:\\.|[^"])*"|'(?:\\.|[^'])*')[^;'"]*)+)|;/;
 class Console extends React.Component<IProps, IState> {
   codemirror;
   editor;
@@ -51,11 +56,13 @@ class Console extends React.Component<IProps, IState> {
     this.state = {
       isUpDown: true,
       history: false,
+      visible: false,
     };
   }
 
   componentDidMount() {
     trackPageView('/console');
+    this.props.asyncGetParams();
   }
 
   getLocalStorage = () => {
@@ -66,31 +73,35 @@ class Console extends React.Component<IProps, IState> {
     return [];
   };
 
+  handleSaveQuery = (query: string) => {
+    if (query !== '') {
+      const history = this.getLocalStorage();
+      history.push(query);
+      localStorage.setItem('history', JSON.stringify(history));
+    }
+  };
+
+  checkSwitchSpaceGql = (query: string) => {
+    const queryList = query.split(SEMICOLON_REG).filter(Boolean);
+    const reg = /^USE `?[0-9a-zA-Z_]+`?(?=[\s*;?]?)/gim;
+    if (queryList.some(sentence => sentence.trim().match(reg))) {
+      return intl.get('common.disablesUseToSwitchSpace');
+    }
+  };
   handleRun = async () => {
-    const gql = this.editor.getValue();
-    if (!gql) {
+    const query = this.editor.getValue();
+    if (!query) {
       message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
       return;
     }
-    // Hack:
-    // replace the string in quotes with a constant, avoid special symbols in quotation marks from affecting regex match
-    // then split the gql entered by the user into sentences based on semicolons
-    // use regex to determine whether each sentence is a 'use space' statement
-    const _gql = gql
-      .replace(/[\r\n]/g, '')
-      .replace(/(["'])[^]*?\1/g, '_CONTENT_')
-      .toUpperCase();
-    const sentenceList = _gql.split(';');
-    const reg = /^USE `?[0-9a-zA-Z_]+`?(?=[\s*;?]?)/gm;
-    if (sentenceList.some(sentence => sentence.match(reg))) {
-      return message.error(intl.get('common.disablesUseToSwitchSpace'));
+    const errInfo = this.checkSwitchSpaceGql(query);
+    if (errInfo) {
+      return message.error(errInfo);
     }
-    this.editor.execCommand('goDocEnd');
-    const history = this.getLocalStorage();
-    history.push(gql);
-    localStorage.setItem('history', JSON.stringify(history));
 
-    await this.props.asyncRunGQL(gql);
+    this.editor.execCommand('goDocEnd');
+    this.handleSaveQuery(query);
+    await this.props.asyncRunGQL(query);
     this.setState({
       isUpDown: true,
     });
@@ -147,9 +158,22 @@ class Console extends React.Component<IProps, IState> {
     return str.substring(0, 300) + '...';
   };
 
+  toggleDrawer = () => {
+    const { visible } = this.state;
+    this.setState({
+      visible: !visible,
+    });
+  };
+
   render() {
     const { isUpDown, history } = this.state;
-    const { currentSpace, currentGQL, result, runGQLLoading } = this.props;
+    const {
+      currentSpace,
+      currentGQL,
+      result,
+      runGQLLoading,
+      paramsMap,
+    } = this.props;
     return (
       <div className="nebula-console padding-page">
         <div className="ngql-content">
@@ -191,19 +215,38 @@ class Console extends React.Component<IProps, IState> {
                 </Tooltip>
               </div>
             </div>
-            <CodeMirror
-              value={currentGQL}
-              onBlur={value => this.props.updateCurrentGQL(value)}
-              onChangeLine={this.handleLineCount}
-              ref={this.getInstance}
-              height={isUpDown ? '240px' : 24 * maxLineNum + 'px'}
-              onShiftEnter={this.handleRun}
-              options={{
-                keyMap: 'sublime',
-                fullScreen: true,
-                mode: 'nebula',
-              }}
-            />
+            <div className="mirror-content">
+              <Tooltip
+                title={intl.get('console.parameterDisplay')}
+                placement="right"
+              >
+                <Icon
+                  type="file-search"
+                  className="btn-drawer"
+                  onClick={this.toggleDrawer}
+                />
+              </Tooltip>
+              {this.state.visible && (
+                <div className="param-box">
+                  {Object.entries(paramsMap).map(([k, v]) => (
+                    <p key={k}>{`${k} => ${JSON.stringify(v)}`}</p>
+                  ))}
+                </div>
+              )}
+              <CodeMirror
+                value={currentGQL}
+                onBlur={value => this.props.updateCurrentGQL(value)}
+                onChangeLine={this.handleLineCount}
+                ref={this.getInstance}
+                height={isUpDown ? '240px' : 24 * maxLineNum + 'px'}
+                onShiftEnter={this.handleRun}
+                options={{
+                  keyMap: 'sublime',
+                  fullScreen: true,
+                  mode: 'nebula',
+                }}
+              />
+            </div>
           </div>
         </div>
         <div className="result-wrap">

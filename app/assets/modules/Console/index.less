@@ -16,9 +16,21 @@
 			flex-direction: column;
 			align-items: center;
 
-			> .CodeMirror {
+			.mirror-content {
 				width: 100%;
+				display: flex;
+				align-items: center;
+
+				.btn-drawer {
+					cursor: pointer;
+				}
+
+				> .CodeMirror {
+					min-height: 240px;
+					width: 100%;
+				}
 			}
+
 
 			.mirror-nav {
 				display: flex;
@@ -79,7 +91,7 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		margin: 32px 0;
+		margin: 15px 0;
 	}
 }
 
@@ -124,3 +136,18 @@
 	}
 }
 
+.param-box {
+	padding: 10px;
+	background-color: white;
+	height: 100%;
+	margin-left: 5px;
+	max-width: 320px;
+	overflow: auto;
+	max-height: 240px;
+
+	p {
+		font-size: 12px;
+		word-break: break-all;
+		margin-bottom: 8px;
+	}
+}

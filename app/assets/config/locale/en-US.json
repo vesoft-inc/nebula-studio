@@ -127,7 +127,8 @@
     "exportVertex": "Please choose the column representing vertex IDs from the table",
     "exportEdge": "Please choose the columns representing source vertex ID, destination vertex ID, and rank of an edge",
     "showSubgraphs": "View Subgraphs",
-    "deleteHistory": "Clear History"
+    "deleteHistory": "Clear History",
+    "parameterDisplay": "Custom Parameters Display"
   },
   "explore": {
     "clear": "Clear",

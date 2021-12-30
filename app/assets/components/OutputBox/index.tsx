@@ -85,12 +85,22 @@ class OutputBox extends React.Component<IProps> {
   };
   render() {
     const { value, result = {} } = this.props;
-    let columns = [];
+    let columns = [] as any;
     let showSubgraphs = false;
-    const dataSource =
-      result.data && result.data.tables ? result.data.tables : [];
+    let dataSource = [] as any;
+    if (result.data && result.data.tables.length > 0) {
+      dataSource = result.data.tables;
+    } else if (result.data?.localParams) {
+      const params = {};
+      {
+        Object.entries(result.data?.localParams).forEach(
+          ([k, v]) => (params[k] = JSON.stringify(v)),
+        );
+      }
+      dataSource = [{ ...params }];
+    }
     if (result.code === 0) {
-      if (result.data && result.data.headers) {
+      if (result.data && result.data.headers.length > 0) {
         columns = result.data.headers.map(column => {
           return {
             title: column,
@@ -121,6 +131,24 @@ class OutputBox extends React.Component<IProps> {
               item._edgesParsedList ||
               item._pathsParsedList,
           ).length > 0;
+      } else if (result.data?.localParams) {
+        columns = Object.keys(result.data?.localParams).map(column => {
+          return {
+            title: column,
+            dataIndex: column,
+            render: value => {
+              if (typeof value === 'boolean') {
+                return value.toString();
+              } else if (
+                typeof value === 'number' ||
+                BigNumber.isBigNumber(value)
+              ) {
+                return value.toString();
+              }
+              return value;
+            },
+          };
+        });
       }
     }
     return (
