@@ -15,7 +15,7 @@ const { TabPane } = Tabs;
 const mapState = (state: IRootState) => ({
   activeStep: state.importData.activeStep,
   importLoading: state.loading.effects.importData.importData,
-  mountPath: state.importData.mountPath,
+  taskDir: state.importData.taskDir,
   isImporting: state.importData.isImporting,
   vertexesConfig: state.importData.vertexesConfig,
   edgesConfig: state.importData.edgesConfig,
@@ -82,7 +82,7 @@ class Import extends React.Component<IProps, IState> {
       host,
       vertexesConfig,
       edgesConfig,
-      mountPath,
+      taskDir,
       activeStep,
       spaceVidType,
     } = this.props;
@@ -94,13 +94,13 @@ class Import extends React.Component<IProps, IState> {
       host,
       vertexesConfig,
       edgesConfig,
-      mountPath,
+      taskDir,
       activeStep,
       spaceVidType,
     });
     const res = await service.createConfigFile({
       config,
-      mountPath,
+      mountPath: taskDir,
     });
     if (res.code !== 0) {
       message.error(intl.get('import.createConfigError'));
@@ -114,7 +114,7 @@ class Import extends React.Component<IProps, IState> {
       host,
       vertexesConfig,
       edgesConfig,
-      mountPath,
+      taskDir,
       activeStep,
     } = this.props;
     const { password } = this.state;
@@ -126,11 +126,11 @@ class Import extends React.Component<IProps, IState> {
       host,
       vertexesConfig,
       edgesConfig,
-      mountPath,
+      taskDir,
       activeStep,
     });
     if (errCode === 0) {
-      this.logTimer = setTimeout(this.readlog, 2000);
+      this.logTimer = setTimeout(this.readlog, 3000);
       this.checkTimer = setTimeout(this.checkIsFinished, 2000);
     }
     trackEvent('import', 'import_data', 'start');
@@ -176,14 +176,14 @@ class Import extends React.Component<IProps, IState> {
 
   readlog = async () => {
     const { startByte, endByte } = this.state;
-    const { mountPath, taskId, update } = this.props;
+    const { taskDir, taskId, update } = this.props;
     const result: any = await service.getLog({
-      dir: mountPath,
+      dir: taskDir,
       startByte,
       endByte,
       taskId,
     });
-    const byteLength = getStringByteLength(result.data);
+    const byteLength = result.data ? getStringByteLength(result.data) : 0;
     if (result.data && result.code === 0) {
       this.setState(
         {
@@ -235,7 +235,7 @@ class Import extends React.Component<IProps, IState> {
       isImporting,
       vertexesConfig,
       edgesConfig,
-      mountPath,
+      taskDir,
       taskId,
     } = this.props;
     const { activeKey, password } = this.state;
@@ -281,13 +281,13 @@ class Import extends React.Component<IProps, IState> {
             <div className="import-export">
               <div>
                 {intl.get('import.configFile')}
-                <a href={`${mountPath}/tmp/config.yaml`} target="__blank">
+                <a href={`${taskDir}/config.yaml`} target="__blank">
                   config.yaml
                 </a>
               </div>
               <div>
                 {intl.get('import.logFile')}
-                <a href={`${mountPath}/tmp/import.log`} target="__blank">
+                <a href={`${taskDir}/import.log`} target="__blank">
                   import.log
                 </a>
               </div>
@@ -305,7 +305,7 @@ class Import extends React.Component<IProps, IState> {
                     <p>
                       {intl.get('import.vertexErrorFile')}
                       <a
-                        href={`${mountPath}/tmp/err/${vertex.name}Fail.csv`}
+                        href={`${taskDir}/err/${vertex.name}Fail.csv`}
                         target="__blank"
                       >
                         {vertex.name}Fail.csv
@@ -328,7 +328,7 @@ class Import extends React.Component<IProps, IState> {
                     <p>
                       {intl.get('import.edgeErrorFilePath')}
                       <a
-                        href={`${mountPath}/tmp/err/${edge.name}Fail.csv`}
+                        href={`${taskDir}/err/${edge.name}Fail.csv`}
                         target="__blank"
                       >
                         {edge.name}Fail.csv

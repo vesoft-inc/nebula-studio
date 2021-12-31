@@ -71,10 +71,6 @@
 			top: 200px;
 		}
 		</style>
-		{% if Env == 'prod' %}
-        {{ helper.assets.getStyle('vendors.css') | safe }}
-        {{ helper.assets.getStyle('app.css') | safe }}
-		{% endif %}
 </head>
 
 <body style='background: #f0f2f5;'>
@@ -83,13 +79,6 @@
             <div></div>
         </div>
     </div>
-    {% if Env == 'prod' %}
-        {{ helper.assets.getScript('app.js') | safe }}
-        {{ helper.assets.getScript('vendors.js') | safe }}
-        {{ helper.assets.getScript('manifest.js') | safe }}
-    {% else %}
-        {{ helper.assets.getScript('app.js') | safe }}
-		{% endif %}
 </body>
 
 </html>

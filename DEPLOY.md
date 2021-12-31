@@ -1,7 +1,6 @@
 # Nebula Graph Studio Tar Package Deploy Guide
 
 ## Environment
-- Node.js (>= 10.12.0)
 - Linux
 
 ## Download

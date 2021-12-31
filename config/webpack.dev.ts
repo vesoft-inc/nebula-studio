@@ -13,7 +13,7 @@ const devConfig = {
 
   output: {
     filename: '[name].js',
-    publicPath: 'http://127.0.0.1:8888/',
+    publicPath: 'http://127.0.0.1:7001/',
   },
 
   module: {
@@ -26,12 +26,24 @@ const devConfig = {
   },
 
   devServer: {
-    port: 8888,
+    port: 7001,
     headers: { 'Access-Control-Allow-Origin': '*' },
     contentBase: path.join(__dirname, '../public'),
     historyApiFallback: true,
     host: 'localhost',
     disableHostCheck: true,
+    proxy: [
+      {
+        path: '/api-nebula/**',
+        target: 'http://127.0.0.1:9000',
+        changeOrigin: true,
+      },
+      {
+        path: '/api/**',
+        target: 'http://127.0.0.1:9000',
+        changeOrigin: true,
+      },
+    ]
   },
 };
 

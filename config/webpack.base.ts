@@ -1,7 +1,8 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import path from 'path';
+import path, { resolve } from 'path';
 import webpack from 'webpack';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import Package from '../package.json'
 
 const commonConfig = {
   entry: {
@@ -16,7 +17,7 @@ const commonConfig = {
           {
             loader: 'ts-loader',
             options: {
-              configFile: path.join(__dirname, '../tsconfig.front.json'),
+              configFile: path.join(__dirname, '../tsconfig.json'),
             },
           },
         ],
@@ -64,12 +65,14 @@ const commonConfig = {
     new webpack.DefinePlugin({
       'process.env': {
         NO_INTL: JSON.stringify(process.env.npm_config_nointl ? '1' : '0'),
+        VERSION: JSON.stringify(Package.version),
       },
     }),
 
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: path.join(__dirname, '../app/assets/index.html'),
+      favicon: resolve(__dirname, '../favicon.ico'),
       minify: {
         collapseWhitespace: true,
         removeComments: true,

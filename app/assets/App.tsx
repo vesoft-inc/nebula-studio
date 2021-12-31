@@ -43,7 +43,6 @@ interface IState {
 
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncClearConfigServer: dispatch.nebula.asyncClearConfigServer,
-  asyncGetAppInfo: dispatch.app.asyncGetAppInfo,
   asyncSwitchSpace: dispatch.nebula.asyncSwitchSpace,
 });
 
@@ -117,7 +116,6 @@ class App extends React.Component<IProps, IState> {
   componentDidMount() {
     this.loadIntlLocale();
     this.renderMenu();
-    this.props.asyncGetAppInfo();
     const space = sessionStorage.getItem('currentSpace');
     if (space) {
       this.props.asyncSwitchSpace(space);
@@ -297,7 +295,7 @@ class App extends React.Component<IProps, IState> {
                 >
                   <a
                     className="github-button"
-                    href="https://github.com/vesoft-inc/nebula-graph"
+                    href="https://github.com/vesoft-inc/nebula"
                     data-size="large"
                     data-show-count="true"
                     aria-label="Star vesoft-inc/nebula on GitHub"

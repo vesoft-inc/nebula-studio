@@ -27,7 +27,8 @@ interface IEdgeConfig {
 interface IState {
   currentStep: number;
   activeStep: number;
-  mountPath: string;
+  taskDir: string;
+  uploadDir: string;
   files: any[];
   vertexesConfig: IVertexConfig[];
   edgesConfig: IEdgeConfig[];
@@ -43,8 +44,8 @@ export const importData = createModel({
   state: {
     activeStep: 0,
     currentStep: 0,
-    // the mountPath config by the env variable of WORKING_DIR, upload file must be in that dir.
-    mountPath: '',
+    taskDir: '',
+    uploadDir: '',
     files: [] as any[],
     vertexesConfig: [] as IVertexConfig[],
     edgesConfig: [] as IEdgeConfig[],
@@ -510,10 +511,11 @@ export const importData = createModel({
 
     async asyncGetImportWorkingDir() {
       const { code, data } = (await service.getImportWokingDir()) as any;
-      const { dir } = data;
-      if (code === 0 && dir) {
+      if (code === 0) {
+        const { taskDir, uploadDir } = data;
         this.update({
-          mountPath: dir.endsWith('/') ? dir.substring(0, dir.length - 1) : dir,
+          taskDir,
+          uploadDir,
         });
       } else {
         message.warning(intl.get('import.mountPathWarning'), 5);

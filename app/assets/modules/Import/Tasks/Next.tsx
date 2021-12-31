@@ -9,7 +9,6 @@ import { IDispatch, IRootState } from '#assets/store';
 const mapState = (state: IRootState) => ({
   vertexesConfig: state.importData.vertexesConfig,
   edgesConfig: state.importData.edgesConfig,
-  mountPath: state.importData.mountPath,
   activeStep: state.importData.activeStep,
   currentSpace: state.nebula.currentSpace,
   username: state.nebula.username,

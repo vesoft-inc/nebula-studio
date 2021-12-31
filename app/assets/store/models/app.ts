@@ -8,7 +8,7 @@ interface IState {
 
 export const app = createModel({
   state: {
-    version: '',
+    version: process.env.VERSION,
   },
   reducers: {
     update: (state: IState, payload: any) => {
@@ -19,16 +19,12 @@ export const app = createModel({
     },
   },
   effects: {
-    async asyncGetAppInfo() {
-      const appInfo = await service.getAppInfo();
-
-      this.update({
-        ...appInfo,
-      });
-    },
-
     async asyncGetImportFiles() {
       const { code, data } = (await service.getFiles()) as any;
+      return { code, data };
+    },
+    async asyncUploadFile(payload) {
+      const { code, data } = (await service.uploadFiles(payload)) as any;
       return { code, data };
     },
   },

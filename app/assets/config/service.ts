@@ -1,4 +1,4 @@
-import { _delete, get, post } from '../utils/http';
+import { _delete, get, post, put } from '../utils/http';
 
 const execNGQL = post('/api-nebula/db/exec');
 
@@ -23,7 +23,13 @@ const deteleFile = params => {
 };
 const getFiles = get('/api/files');
 const getAppInfo = get('/api/app');
-
+const uploadFiles = (params?, config?) =>
+  put('/api/files')(params, {
+    ...config,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 export default {
   execNGQL,
   connectDB,
@@ -37,4 +43,5 @@ export default {
   deteleFile,
   getFiles,
   getAppInfo,
+  uploadFiles,
 };

@@ -11,20 +11,20 @@ export function configToJson(payload) {
     host,
     vertexesConfig,
     edgesConfig,
-    mountPath,
+    taskDir,
     activeStep,
     spaceVidType,
   } = payload;
   const vertexToJSON = vertexDataToJSON(
     vertexesConfig,
     activeStep,
-    mountPath,
+    taskDir,
     spaceVidType,
   );
   const edgeToJSON = edgeDataToJSON(
     edgesConfig,
     activeStep,
-    mountPath,
+    taskDir,
     spaceVidType,
   );
   const files: any[] = [...vertexToJSON, ...edgeToJSON];
@@ -32,6 +32,7 @@ export function configToJson(payload) {
     version: 'v2',
     description: 'web console import',
     clientSettings: {
+      retry: 3,
       concurrency: 10,
       channelBufferSize: 128,
       space: currentSpace,
@@ -41,7 +42,7 @@ export function configToJson(payload) {
         address: host,
       },
     },
-    logPath: mountPath + '/tmp/import.log',
+    logPath: taskDir + '/import.log',
     files,
   };
   return configJson;
@@ -50,7 +51,7 @@ export function configToJson(payload) {
 export function edgeDataToJSON(
   config: any,
   activeStep: number,
-  mountPath: string,
+  taskDir: string,
   spaceVidType: string,
 ) {
   const limit = activeStep === 2 || activeStep === 3 ? 10 : undefined;
@@ -93,7 +94,7 @@ export function edgeDataToJSON(
     });
     const edgeConfig = {
       path: edge.file.path,
-      failDataPath: `${mountPath}/tmp//err/${edge.name}Fail.csv`,
+      failDataPath: `${taskDir}/err/${edge.name}Fail.csv`,
       batchSize: 10,
       limit,
       type: 'csv',
@@ -108,7 +109,7 @@ export function edgeDataToJSON(
           srcVID: edge.srcVID,
           dstVID: edge.dstVID,
           rank: edge.rank,
-          withRanking: false,
+          withRanking: edge.rank?.index !== undefined ? true : false,
           props: edgePorps,
         },
       },
@@ -121,7 +122,7 @@ export function edgeDataToJSON(
 export function vertexDataToJSON(
   config: any,
   activeStep: number,
-  mountPath: string,
+  taskDir: string,
   spaceVidType: string,
 ) {
   const limit = activeStep === 2 || activeStep === 3 ? 10 : undefined;
@@ -149,7 +150,7 @@ export function vertexDataToJSON(
     });
     const vertexConfig: any = {
       path: vertex.file.path,
-      failDataPath: `${mountPath}/tmp/err/${vertex.name}Fail.csv`,
+      failDataPath: `${taskDir}/err/${vertex.name}Fail.csv`,
       batchSize: 10,
       limit,
       type: 'csv',
