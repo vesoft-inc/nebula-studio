@@ -6,15 +6,18 @@ import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
 import { nodeIdRulesFn } from '#assets/config/rules';
-import { IDispatch } from '#assets/store';
+import { IDispatch, IRootState } from '#assets/store';
 import readFileContent from '#assets/utils/file';
 
 import './index.less';
 
 const { TextArea } = Input;
-const mapState = () => ({});
+const mapState = (state: IRootState) => ({
+  sampleLoading: !!state.loading.effects.explore.asyncGetSampleVertic,
+});
 const mapDispatch = (dispatch: IDispatch) => ({
   asyncImportNodes: dispatch.explore.asyncImportNodes,
+  asyncGetSampleVertic: dispatch.explore.asyncGetSampleVertic,
 });
 
 interface IProps
@@ -66,15 +69,26 @@ class IdQuery extends React.Component<IProps, IState> {
     this.props.form.setFieldsValue({ ids });
   };
 
+  handleImportSample = async () => {
+    const { asyncGetSampleVertic, closeHandler } = this.props;
+    const { code } = await asyncGetSampleVertic();
+    if (code === 0) {
+      closeHandler();
+    }
+  };
   render() {
     const { getFieldDecorator } = this.props.form;
     const { loading } = this.state;
+    const { sampleLoading } = this.props;
     return (
       <Spin spinning={loading}>
         <div className="import-node">
           <div className="header">
             <span>{intl.get('explore.idToBeQueried')}</span>
             <div className="btn-upload">
+              <Button onClick={this.handleImportSample} loading={sampleLoading}>
+                {intl.get('explore.sampleImport')}
+              </Button>
               <Upload
                 beforeUpload={() => false}
                 onChange={this.handleFileImport}

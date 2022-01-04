@@ -139,6 +139,7 @@
     "expand": "拓展",
     "unExpand": "取消拓展",
     "fileImport": "文件导入",
+    "sampleImport": "样本导入",
     "importPlaceholder": "输入VID或者用于生成VID的数据，一行一个数据，按回车键断开。格式示例如下：\nstring1\nstring2\nstring3",
     "outgoing": "流出",
     "incoming": "流入",
