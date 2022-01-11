@@ -11,10 +11,10 @@ const publicConfig = {
   // devtool: 'cheap-module-source-map',
   mode: 'production',
   output: {
-    path: path.join(__dirname, '../app/public/'),
+    path: path.join(__dirname, '../dist/'),
     filename: '[name].[chunkhash].js',
     chunkFilename: '[name].[contenthash].js',
-    publicPath: '/public/',
+    publicPath: '/assets/',
   },
   module: {
     rules: [
@@ -55,7 +55,7 @@ const publicConfig = {
       },
     }),
 
-    new CleanWebpackPlugin(['public/*.*'], {
+    new CleanWebpackPlugin(['dist/*.*'], {
       root: path.join(__dirname, '../'),
     }),
 

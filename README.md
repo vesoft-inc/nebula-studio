@@ -7,42 +7,43 @@ Nebula Graph Studio (Studio for short) is a web-based visualization tool for Neb
 
 ## Development Quick Start
 
-### Set up nebula-http-gateway
-```
-$ git clone https://github.com/vesoft-inc/nebula-http-gateway.git
-$ cd nebula-http-gateway
-$ make build
-$ nohup ./nebula-httpd &
-```
-
 ### Set up nebula-graph-studio
 ```
 $ npm install
 $ npm run dev
 ```
+### Set up go-server
+```
+$ cd server
+$ go build -o server
+$ nohup ./server &
+```
 
 ## Production Deploy
 
-### 1. Build
+### 1. Build Web
 ```
 $ npm run install
 $ npm run build
 ```
 
-### 2. Compile Typescript
+### 1. Build Web
 ```
-$ npm run tsc
+// remove default port 7001 in config/example-config.yaml first
+$ cd server
+$ go build -o server
 ```
 
-### 3. Deploy
+### 3. Start
 ```
-$ npm run start
+$ mv dist server/assets
+$ nohup ./server &
 ```
 
 ### 4. Stop Server
 Use when you want shutdown the web app
 ```
-$ npm run stop
+kill -9 $(lsof -t -i :7001)
 ```
 
 ## Documentation 

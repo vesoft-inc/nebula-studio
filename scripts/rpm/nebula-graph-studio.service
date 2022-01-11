@@ -1,0 +1,12 @@
+[Unit]
+Description=Nebula Graph Studio
+AssertPathExists=PREFIX_TEMPLATE/nebula-graph-studio/
+[Service]
+Restart=always
+StartLimitInterval=0
+RestartSec=10
+WorkingDirectory=PREFIX_TEMPLATE/nebula-graph-studio/
+ExecStart=PREFIX_TEMPLATE/nebula-graph-studio/server
+
+[Install]
+WantedBy=multi-user.target

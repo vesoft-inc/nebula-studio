@@ -3,7 +3,7 @@ all: check build
 check: fmt vet
 
 build:
-	go build -o nebula-studio-server main.go
+	go build -o server main.go
 
 run:
 	go run main.go

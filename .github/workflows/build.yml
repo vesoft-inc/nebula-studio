@@ -1,0 +1,39 @@
+name: 'Build and upload'
+on:
+  workflow_call:
+    secrets:
+      oss_endpoint:
+        required: true
+      oss_id:
+        required: true
+      oss_secret:
+        required: true
+      oss_url:
+        required: true
+jobs:
+  package:
+    name: build package
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        os:
+          - centos7
+    container:
+      image: vesoft/nebula-dev:${{ matrix.os }}
+    steps:
+      - uses: webiny/action-post-run@2.0.1
+        with:
+          run: sh -c "find . -mindepth 1 -delete"
+      - uses: actions/checkout@v2
+        with:
+          path: source/nebula-graph-studio
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.17.0'
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '10'
+      - name: Package
+        run: bash ./source/nebula-graph-studio/scripts/pack.sh
+      - name: Upload to OSS
+        run: bash ./source/nebula-graph-studio/scripts/upload.sh ${{ secrets.oss_endpoint }} ${{ secrets.oss_id }} ${{ secrets.oss_secret }} ${{ secrets.oss_url }}

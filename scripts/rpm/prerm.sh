@@ -1,9 +1,8 @@
 #!/bin/bash
 
-# will exec before studio rpm rm
+# will exec before explorer rpm rm
 
-# kill nebula-http-gateway server
 set +e
-cd /usr/local/nebula-graph-studio/
-bash ./scripts/rpm/stop.sh
+cd $RPM_INSTALL_PREFIX/nebula-graph-studio/
+bash ./scripts/stop_with_system.sh
 set -e

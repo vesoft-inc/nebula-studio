@@ -1,17 +1,17 @@
-# nebula-studio-server
+# server
 
 Go server to provide a http interface for the Nebula Studio
 
 ## Build
 
 ```
-$ go build -o nebula-studio-server
+$ go build -o server
 ```
 
 ## Run
 
 ```
-$ ./nebula-studio-server -studio-config="./config/example-config.yaml"
+$ ./server -studio-config="./config/example-config.yaml"
 ```
 
 ## Required

@@ -4,62 +4,13 @@ on:
     branches:
       - master
 jobs:
-  tar-package:
-    name: build tar package
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os:
-          - centos7
-    container:
-      image: vesoft/nebula-dev:${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          path: source/nebula-graph-studio
-      - uses: actions/checkout@v2
-        with:
-          repository: vesoft-inc/nebula-http-gateway
-          path: source/nebula-http-gateway
-          ref: v2.1.1
-      - uses: actions/setup-go@v2
-        with:
-          go-version: '^1.13.1'
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '10'
-      - name: Package
-        run: bash ./source/nebula-graph-studio/scripts/tar/pack.sh
-      - name: Upload to OSS
-        run: bash ./source/nebula-graph-studio/scripts/tar/upload.sh ${{ secrets.OSS_ENDPOINT }} ${{ secrets.OSS_ID }} ${{ secrets.OSS_SECRET }} ${{ secrets.OSS_TEST_URL }}
-  rpm-package:
-    name: build rpm package
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os:
-          - centos7
-    container:
-      image: vesoft/nebula-dev:${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          path: source/nebula-graph-studio
-      - uses: actions/checkout@v2
-        with:
-          repository: vesoft-inc/nebula-http-gateway
-          path: source/nebula-http-gateway
-          ref: v2.1.1
-      - uses: actions/setup-go@v2
-        with:
-          go-version: '^1.13.1'
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '10'
-      - name: Package
-        run: bash ./source/nebula-graph-studio/scripts/rpm/pack.sh
-      - name: Upload oss
-        run: bash ./source/nebula-graph-studio/scripts/rpm/upload.sh ${{ secrets.OSS_ENDPOINT }} ${{ secrets.OSS_ID }} ${{ secrets.OSS_SECRET }} ${{ secrets.OSS_TEST_URL }}
+  call-workflow:
+    uses: vesoft-inc/nebula-studio/.github/workflows/build.yml@master
+    secrets:
+      oss_endpoint: ${{ secrets.OSS_ENDPOINT }}
+      oss_id: ${{ secrets.OSS_ID }}
+      oss_secret: ${{ secrets.OSS_SECRET }}
+      oss_url: ${{ secrets.OSS_TEST_URL }}
   docker-image:
     name: docker image build
     runs-on: ubuntu-latest
