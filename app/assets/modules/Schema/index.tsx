@@ -11,7 +11,9 @@ import { trackPageView } from '#assets/utils/stat';
 import './index.less';
 
 const mapState = (state: IRootState) => ({
-  loading: state.loading.effects.nebula.asyncGetSpacesList,
+  loading:
+    !!state.loading.effects.nebula.asyncGetSpacesList ||
+    !!state.loading.effects.nebula.asyncSwitchSpace,
   spaceList: state.nebula.spaceList,
   currentSpace: state.nebula.currentSpace,
 });
@@ -69,7 +71,7 @@ class Schema extends React.Component<IProps> {
     }
   };
   render() {
-    const { loading, spaceList, asyncSwitchSpace } = this.props;
+    const { loading, spaceList } = this.props;
     const columns = [
       {
         title: intl.get('common.serialNumber'),
@@ -173,7 +175,7 @@ class Schema extends React.Component<IProps> {
                 <div>
                   <Button
                     shape="circle"
-                    onClick={() => asyncSwitchSpace(space.Name)}
+                    onClick={() => this.handleSwitchSpace(space.Name)}
                     data-track-category="navigation"
                     data-track-action="view_space_list"
                     data-track-label="from_space_list"
