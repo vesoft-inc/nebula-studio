@@ -1,10 +1,7 @@
 logs/
 npm-debug.log
 node_modules/
-coverage/
 .idea/
-run/
-logs/
 .DS_Store
 .vscode
 *.swp
@@ -14,23 +11,14 @@ logs/
 .github/workflows/nodejs.yml
 
 app/**/*.js
-test/**/*.js
 config/**/*.js
 app/**/*.map
-test/**/*.map
 config/**/*.map
-app/public/
+dist/
 
-!.autod.conf.js
 !.eslintrc.js
 !.prettierrc.js
 !.commitlint.js
 !app/assets/**/*.js
-config/manifest.json
-nebula-go-api/nebula-go-api
-nebula-go-api/tmp
-scripts/data/
-typings
-docker/data
 tmp
 server/data

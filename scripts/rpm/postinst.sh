@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # will exec when studio rpm installed
-cd /usr/local/nebula-graph-studio/
-chmod 755 ./vendors/nebula-http-gateway/nebula-httpd
+cd $RPM_INSTALL_PREFIX/nebula-graph-studio/
+sed -i "s?PREFIX_TEMPLATE?$RPM_INSTALL_PREFIX?g" `grep -rl "PREFIX_TEMPLATE" ./scripts/`
+chmod 755 ./server
 chmod 777 ./tmp/
-tar -xzvf node_modules.tar.gz
 
-bash ./scripts/rpm/start.sh
+bash ./scripts/start_with_system.sh

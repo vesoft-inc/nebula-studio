@@ -11,10 +11,10 @@ This is a full stack project including front and back end.
     - utils ------------------------------------ front end utils
     - index.html ----------------------------- entry template index.html
     - index.tsx ------------------------------- entry to all js* files
-  - controller ----------------------------------- node controller api for back end
-  - service -------------------------------------- back end service logic
-  - router.ts ------------------------------------ back end router config
-  - config --------------------------------------- node config folder refer to [Egg](https://eggjs.org/en/basics/config.html)
+  - config -------------------------------------- webpack config
+  - deployment -------------------------------------- helm deployment
+  - server -------------------------------------- back end service logic
+  - scripts ------------------------------------ packaging script
 - docs ----------------------------------------- document files about the project
   - style.md -------------------------------- document for project develop style
 
@@ -26,7 +26,7 @@ This is a full stack project including front and back end.
   - Babel
   - ...
 - Back End
-  - [Egg](https://eggjs.org/en/intro/index.html)
+  - [Iris](https://github.com/kataras/iris)
 
 ## Code Style
 - Use English
