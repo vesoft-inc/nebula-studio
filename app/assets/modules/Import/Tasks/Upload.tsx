@@ -1,4 +1,4 @@
-import { Button, Checkbox, Icon, Modal, Popconfirm, Table, Upload } from 'antd';
+import { Button, Checkbox, Popconfirm, Table, Upload } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
@@ -11,16 +11,18 @@ import { trackPageView } from '#assets/utils/stat';
 
 import Prev from './Prev';
 import './Upload.less';
-const confirm = Modal.confirm;
 const mapState = (state: IRootState) => ({
   files: state.importData.files,
-  mountPath: state.importData.mountPath,
-  loading: state.loading.effects.app.asyncGetImportFiles,
+  uploadDir: state.importData.uploadDir,
+  loading:
+    !!state.loading.effects.app.asyncGetImportFiles ||
+    !!state.loading.effects.app.asyncUploadFile,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
   nextStep: dispatch.importData.nextStep,
   asyncGetImportFiles: dispatch.app.asyncGetImportFiles,
+  asyncUploadFile: dispatch.app.asyncUploadFile,
   updateFiles: files => {
     dispatch.importData.update({
       files,
@@ -51,25 +53,12 @@ class Import extends React.Component<IProps> {
   };
 
   handleNext = () => {
-    const self = this;
-    const { files } = self.props;
-    const uploading =
-      files.filter(i => i.status && i.status === 'uploading').length > 0;
-    if (uploading) {
-      confirm({
-        title: intl.get('import.fileUploading'),
-        onOk() {
-          self.props.nextStep();
-        },
-      });
-    } else {
-      self.props.nextStep();
-    }
+    this.props.nextStep();
   };
 
   transformFile = async file => {
-    const { mountPath } = this.props;
-    file.path = `${mountPath}/${file.name}`;
+    const { uploadDir } = this.props;
+    file.path = `${uploadDir}/${file.name}`;
     file.withHeader = false;
     return file;
   };
@@ -90,18 +79,6 @@ class Import extends React.Component<IProps> {
       {
         title: intl.get('import.fileName'),
         dataIndex: 'name',
-        render: (record, row) => {
-          if (row.status && (row.status === 'uploading' || !!loading)) {
-            return (
-              <>
-                <Icon type="loading" className="loading-upload" />
-                {record}
-              </>
-            );
-          } else {
-            return <span>{record}</span>;
-          }
-        },
       },
       {
         title: intl.get('import.withHeader'),
@@ -162,15 +139,20 @@ class Import extends React.Component<IProps> {
     );
   };
 
-  handleUploadChange = ({ fileList }) => {
-    this.props.updateFiles(_.uniqBy(fileList, 'name'));
-    if (fileList.filter(i => i.status === 'uploading').length === 0) {
+  handleUpdate = async (options: any) => {
+    const data = new FormData();
+    data.append('file', options.file);
+    const config = {
+      headers: {
+        'content-type': 'multipart/form-data',
+      },
+    };
+    await this.props.asyncUploadFile(data, config).then(_ => {
       this.getFiles();
-    }
+    });
   };
-
   render() {
-    const { files } = this.props;
+    const { files, loading } = this.props;
     return (
       <div className="upload task">
         <div className="files">
@@ -181,8 +163,11 @@ class Import extends React.Component<IProps> {
               accept=".csv"
               showUploadList={false}
               fileList={files}
-              action={'/api/files/upload'}
-              onChange={this.handleUploadChange}
+              method="PUT"
+              headers={{
+                'content-type': 'multipart/form-data',
+              }}
+              customRequest={this.handleUpdate}
               transformFile={this.transformFile as any}
             >
               <Button className="upload-btn" type="default">
@@ -197,7 +182,7 @@ class Import extends React.Component<IProps> {
           <Button
             type="primary"
             className="next"
-            disabled={!files.length}
+            disabled={!files.length || loading}
             onClick={this.handleNext}
           >
             {intl.get('import.next')}

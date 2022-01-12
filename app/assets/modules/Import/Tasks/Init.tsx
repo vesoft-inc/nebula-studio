@@ -13,7 +13,7 @@ const mapState = (state: IRootState) => ({
   spaces: state.nebula.spaces,
   currentSpace: state.nebula.currentSpace,
   currentStep: state.importData.currentStep,
-  mountPath: state.importData.mountPath,
+  uploadDir: state.importData.uploadDir,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -61,7 +61,7 @@ class Init extends React.Component<IProps, {}> {
       spaces,
       currentSpace,
       currentStep,
-      mountPath,
+      uploadDir,
       form: { getFieldDecorator, getFieldValue },
     } = this.props;
     return (
@@ -90,7 +90,7 @@ class Init extends React.Component<IProps, {}> {
           type="primary"
           className="next"
           onClick={this.handleNext}
-          disabled={!getFieldValue('space') || !mountPath}
+          disabled={!getFieldValue('space') || !uploadDir}
         >
           {intl.get('import.next')}
         </Button>

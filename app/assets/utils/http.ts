@@ -39,6 +39,7 @@ service.interceptors.response.use(
       errMsg &&
       (errMsg.includes('connection refused') ||
         errMsg.includes('broken pipe') ||
+        errMsg.includes('session expired') ||
         errMsg.includes('an existing connection was forcibly closed'))
     ) {
       message.warning(intl.get('warning.connectError'));

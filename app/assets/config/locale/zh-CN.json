@@ -293,7 +293,6 @@
     "datasource": "数据源",
     "indexNotEmpty": "对应列标不能为空",
     "reset": "重置",
-    "fileUploading": "正在上传CSV文件，请等待。如果您离开当前页面，只有已上传的部分数据会被保留。",
     "importFinished": "导入任务已结束",
     "enterPassword": "请输入 nebula 账号密码"
   },

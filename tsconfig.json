@@ -24,9 +24,15 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "module": "esnext",
     "baseUrl": ".",
     "paths": {
       "#assets/*": ["app/assets/*"]
+    }
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
     }
   }
 }

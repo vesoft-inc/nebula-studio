@@ -3,7 +3,6 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
 import webpack from 'webpack';
-import ManifestPlugin from 'webpack-manifest-plugin';
 import merge from 'webpack-merge';
 
 import commonConfig from './webpack.base';
@@ -63,11 +62,6 @@ const publicConfig = {
     new MiniCssExtractPlugin({
       filename: '[name].[hash].css',
       chunkFilename: '[id].[hash].css',
-    }),
-
-    new ManifestPlugin({
-      fileName: path.resolve(__dirname, '../config/manifest.json'),
-      publicPath: '',
     }),
   ],
 };
