@@ -8,11 +8,12 @@ STUDIO=$DIR/source/nebula-graph-studio
 
 cd $STUDIO
 bash ./scripts/build.sh $1
+cd $DIR
 case $2 in
   centos7)
-    bash ./scripts/pack_CentOS.sh
+    bash $STUDIO/scripts/pack_CentOS.sh
     ;;
   ubuntu1604)
-    bash ./scripts/pack_Ubuntu.sh
+    bash $STUDIO/scripts/pack_Ubuntu.sh
     ;;
 esac

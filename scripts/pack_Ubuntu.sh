@@ -14,7 +14,7 @@ cp -r $STUDIO/scripts/deb $PACKAGE/lib/
 mv $PACKAGE/lib/CMakeLists.txt $PACKAGE/
 
 cp -r $STUDIO/server/config $PACKAGE/
-cp -r server $PACKAGE/
+cp -r $STUDIO/server/server $PACKAGE/
 
 cd $PACKAGE
 mkdir -p tmp
