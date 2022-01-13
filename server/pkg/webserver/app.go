@@ -15,12 +15,6 @@ func InitApp() *iris.Application {
 	app.Use(recover.New())
 	app.Use(logger.New())
 
-	app.HandleDir("/", iris.Dir("./assets"), iris.DirOptions{
-		IndexName: "/index.html",
-		SPA:       true,
-	})
-	app.HandleDir("/assets", iris.Dir("./assets"))
-
 	APIRoute := &base.Route{
 		Path: "",
 		SubRoutes: []base.Route{
