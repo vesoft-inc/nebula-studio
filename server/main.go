@@ -3,7 +3,6 @@ package main
 import (
 	"embed"
 	"flag"
-	"io/fs"
 	"net/http"
 	"strconv"
 
@@ -16,7 +15,7 @@ import (
 	"go.uber.org/zap"
 )
 
-//go:embed assets
+//go:embed assets/*
 var assets embed.FS
 
 func main() {
@@ -43,13 +42,10 @@ func main() {
 	importer.InitDB()
 
 	app := webserver.InitApp()
-
-	sub, _ := fs.Sub(assets, "assets")
-	app.HandleDir("/", http.FS(sub), iris.DirOptions{
-		IndexName: "/index.html",
+	app.HandleDir("/", http.FS(assets), iris.DirOptions{
+		IndexName: "/assets/index.html",
 		SPA:       true,
 	})
-	app.HandleDir("/assets", http.FS(sub))
 
 	if err := app.Listen(address + ":" + strconv.Itoa(port)); err != nil && err != http.ErrServerClosed {
 		zap.L().Fatal("Listen failed", zap.Error(err))

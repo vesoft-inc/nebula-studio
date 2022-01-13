@@ -29,7 +29,7 @@ type (
 )
 
 const (
-	DefaultFilesDataDir      = "data"
+	DefaultFilesDataDir     = "data"
 	DefaultTaskIdPath       = "data/taskId.data"
 	DefaultUploadDir        = "data/upload"
 	DefaultTasksDir         = "data/tasks"
@@ -52,9 +52,9 @@ func (c *Config) Complete() {
 
 func (w *Web) Complete() {
 	if w.TaskIdPath == "" {
-		_, err := os.Stat(DefaultFilesDataDir )
+		_, err := os.Stat(DefaultFilesDataDir)
 		if os.IsNotExist(err) {
-			os.MkdirAll(DefaultFilesDataDir , 0766)
+			os.MkdirAll(DefaultFilesDataDir, 0766)
 		}
 		abs, _ := filepath.Abs(DefaultTaskIdPath)
 		_, err = ioutil.ReadFile(abs)
@@ -87,9 +87,9 @@ func (w *Web) Complete() {
 		}
 	}
 	if w.SqlitedbFilePath == "" {
-		_, err := os.Stat(DefaultFilesDataDir )
+		_, err := os.Stat(DefaultFilesDataDir)
 		if os.IsNotExist(err) {
-			os.MkdirAll(DefaultFilesDataDir , 0766)
+			os.MkdirAll(DefaultFilesDataDir, 0766)
 		}
 		abs, _ := filepath.Abs(DefaultSqlitedbFilePath)
 		w.SqlitedbFilePath = abs
