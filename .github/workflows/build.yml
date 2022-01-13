@@ -10,6 +10,8 @@ on:
         required: true
       oss_url:
         required: true
+      ga_id:
+        required: true
 jobs:
   package:
     name: build package
@@ -18,6 +20,7 @@ jobs:
       matrix:
         os:
           - centos7
+          - ubuntu1604
     container:
       image: vesoft/nebula-dev:${{ matrix.os }}
     steps:
@@ -34,6 +37,6 @@ jobs:
         with:
           node-version: '10'
       - name: Package
-        run: bash ./source/nebula-graph-studio/scripts/pack.sh
+        run: bash ./source/nebula-graph-studio/scripts/pack.sh ${{ secrets.ga_id }} ${{ matrix.os }}
       - name: Upload to OSS
-        run: bash ./source/nebula-graph-studio/scripts/upload.sh ${{ secrets.oss_endpoint }} ${{ secrets.oss_id }} ${{ secrets.oss_secret }} ${{ secrets.oss_url }}
+        run: bash ./source/nebula-graph-studio/scripts/upload.sh ${{ secrets.oss_endpoint }} ${{ secrets.oss_id }} ${{ secrets.oss_secret }} ${{ secrets.oss_url }} ${{ matrix.os }}

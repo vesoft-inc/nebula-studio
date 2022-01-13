@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project("Nebula Graph Studio")
 # package name
-set(CPACK_PACKAGE_NAME "nebula graph studio")
+set(CPACK_PACKAGE_NAME "nebula-graph-studio")
 set(CPACK_RPM_PACKAGE_ARCHITECTURE "x86_64")
 set(CPACK_SET_DESTDIR OFF)
 set(CPACK_RPM_PACKAGE_RELOCATABLE ON)
@@ -25,6 +25,8 @@ set(CPACK_RPM_POST_UNINSTALL_SCRIPT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/scripts/pos
 set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/usr/local")
 
 # DEB
+set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/scripts/debpostinst;${CMAKE_CURRENT_SOURCE_DIR}/scripts/debprerm")
 set(CPACK_PACKAGE_CONTACT "https://discuss.nebula-graph.com.cn/")
 
 include(CPack)

@@ -1,0 +1,12 @@
+[Unit]
+Description=Nebula Graph Studio
+AssertPathExists=/usr/local/nebula-graph-studio/
+[Service]
+Restart=always
+StartLimitInterval=0
+RestartSec=10
+WorkingDirectory=/usr/local/nebula-graph-studio/
+ExecStart=/usr/local/nebula-graph-studio/server
+
+[Install]
+WantedBy=multi-user.target

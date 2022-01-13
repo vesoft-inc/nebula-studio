@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# will exec before explorer deb rm
+
+set +e
+cd /usr/local/nebula-graph-studio/
+bash ./lib/stop_with_system.sh
+set -e

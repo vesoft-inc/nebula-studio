@@ -25,15 +25,12 @@ ENV GOPROXY https://goproxy.cn,direct
 WORKDIR /server
 
 COPY server .
-COPY --from=nodebuilder /web/dist /server/assets/
+COPY --from=nodebuilder /web/dist/ /server/assets
 RUN go mod download
 RUN apk add build-base
 RUN go build -ldflags="-s -w" -o /server/server /server/main.go
 
 FROM alpine
-
-RUN apk update --no-cache && apk add --no-cache ca-certificates tzdata
-ENV TZ Asia/Shanghai
 
 WORKDIR /app
 COPY --from=gobuilder /server/server /app/server

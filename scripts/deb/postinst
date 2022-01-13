@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# will exec when studio deb installed
+set -e
+cd /usr/local/nebula-graph-studio/
+sudo chmod 755 ./server
+sudo chmod 777 ./tmp/
+
+bash ./lib/start_with_system.sh
