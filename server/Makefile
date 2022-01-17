@@ -1,9 +1,12 @@
-all: check build
+all: tidy check build
 
 check: fmt vet
 
+tidy:
+	go mod tidy
+
 build:
-	go build -o server main.go
+	go build -o nebula-studio-server main.go
 
 run:
 	go run main.go
