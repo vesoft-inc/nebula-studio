@@ -6,4 +6,4 @@ sed -i "s?PREFIX_TEMPLATE?$RPM_INSTALL_PREFIX?g" `grep -rl "PREFIX_TEMPLATE" ./s
 chmod 755 ./server
 chmod 777 ./tmp/
 
-bash ./scripts/start_with_system.sh
+bash ./scripts/start.sh

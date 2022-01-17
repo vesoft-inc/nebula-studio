@@ -27,7 +27,7 @@
     "module": "esnext",
     "baseUrl": ".",
     "paths": {
-      "#assets/*": ["app/assets/*"]
+      "#app/*": ["app/*"]
     }
   },
   "ts-node": {

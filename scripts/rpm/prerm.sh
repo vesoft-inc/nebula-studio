@@ -4,5 +4,5 @@
 
 set +e
 cd $RPM_INSTALL_PREFIX/nebula-graph-studio/
-bash ./scripts/stop_with_system.sh
+bash ./scripts/stop.sh
 set -e

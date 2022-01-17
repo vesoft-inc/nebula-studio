@@ -16,7 +16,7 @@
     "adjacent-overload-signatures": true,
     "member-access": [false],
     "jsx-wrap-multiline": false,
-    "no-implicit-dependencies": [true, ["#assets"]],
+    "no-implicit-dependencies": [true, ["#app"]],
     "no-object-literal-type-assertion": false,
     "jsx-no-lambda": false,
     "jsx-no-multiline-js": false,
@@ -31,7 +31,7 @@
         "grouped-imports": true,
         "groups": [
             { "match": "^[@a-zA-Z]+", "order": 0 },
-            { "match": "^#assets", "order": 1 },
+            { "match": "^#app", "order": 1 },
             { "name": "current dir", "match": "^[.]", "order": 2 },
             { "name": "parent_dir", "match": "^[.][.]", "order": 3 },
             { "match": ".less", "order": 4 }

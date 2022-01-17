@@ -4,5 +4,5 @@
 
 set +e
 cd /usr/local/nebula-graph-studio/
-bash ./lib/stop_with_system.sh
+bash ./lib/stop.sh
 set -e

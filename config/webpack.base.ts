@@ -6,7 +6,7 @@ import Package from '../package.json'
 
 const commonConfig = {
   entry: {
-    app: [path.join(__dirname, '../app/assets/index.tsx')],
+    app: [path.join(__dirname, '../app/index.tsx')],
   },
   module: {
     rules: [
@@ -21,7 +21,7 @@ const commonConfig = {
             },
           },
         ],
-        include: path.join(__dirname, '../app/assets'),
+        include: path.join(__dirname, '../app'),
       },
       {
         test: /\.less/,
@@ -71,7 +71,7 @@ const commonConfig = {
 
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: path.join(__dirname, '../app/assets/index.html'),
+      template: path.join(__dirname, '../app/index.html'),
       favicon: resolve(__dirname, '../favicon.ico'),
       minify: {
         collapseWhitespace: true,
@@ -87,7 +87,7 @@ const commonConfig = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.css', '.woff', '.woff2', 'ttf'],
     alias: {
-      '#assets': path.join(__dirname, '../app/assets/'),
+      '#app': path.join(__dirname, '../app/'),
       // fix this: https://github.com/react-component/table/issues/368
       'react-dom': '@hot-loader/react-dom'
     },

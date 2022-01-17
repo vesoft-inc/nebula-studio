@@ -19,7 +19,7 @@ dist/
 !.eslintrc.js
 !.prettierrc.js
 !.commitlint.js
-!app/assets/**/*.js
+!app/**/*.js
 tmp
 server/data
 assets/
