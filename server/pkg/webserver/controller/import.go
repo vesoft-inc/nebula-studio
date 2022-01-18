@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	importconfig "github.com/vesoft-inc/nebula-importer/pkg/config"
 	"github.com/vesoft-inc/nebula-studio/server/pkg/config"
@@ -63,24 +62,12 @@ func ReadLog(ctx iris.Context) base.Result {
 			}
 		}
 	}
-	if len(bytes) == 0 {
-		if taskIdJSON[taskId] {
-			return base.Response{
-				Code: base.Success,
-				Data: "",
-			}
-		} else {
-			time.Sleep(1 * time.Second)
-			bytes, err = readFile(path, startByte, endByte)
-			if err != nil {
-				return base.Response{
-					Code:    base.Error,
-					Message: err.Error(),
-				}
-			}
+	if len(bytes) == 0 && taskIdJSON[taskId]{
+		return base.Response{
+			Code: base.Success,
+			Data: "",
 		}
 	}
-
 	if len(bytes) == 0 {
 		return base.Response{
 			Code: base.Error,

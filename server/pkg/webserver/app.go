@@ -10,7 +10,6 @@ import (
 )
 
 func InitApp() *iris.Application {
-
 	app := iris.New()
 	app.Use(recover.New())
 	app.Use(logger.New())

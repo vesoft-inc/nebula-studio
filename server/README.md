@@ -1,17 +1,17 @@
-# server
+# nebula-studio-server
 
 Go server to provide a http interface for the Nebula Studio
 
 ## Build
 
 ```
-$ go build -o server
+$ go build -o nebula-studio-server
 ```
 
 ## Run
 
 ```
-$ ./server -studio-config="./config/example-config.yaml"
+$ ./nebula-studio-server -studio-config="./config/example-config.yaml"
 ```
 
 ## Required
@@ -100,7 +100,7 @@ Response:
 The request json body:
 
 ```json
-{"configBody":{"version":"v2","description":"web console import","clientSettings":{"retry":3,"concurrency":10,"channelBufferSize":128,"space":"basketballplayer","connection":{"user":"root","password":"123","address":"192.168.8.145:9669"}},"logPath":"E:\\NebulaProject\\新建文件夹\\nebula-studio\\server\\data\\tasks/import.log","files":[{"path":"E:\\NebulaProject\\新建文件夹\\nebula-studio\\server\\data\\upload\\player.csv","failDataPath":"E:\\NebulaProject\\新建文件夹\\nebula-studio\\server\\data\\tasks/err/数据源 1Fail.csv","batchSize":10,"type":"csv","csv":{"withHeader":false,"withLabel":false},"schema":{"type":"vertex","vertex":{"vid":{"index":0,"type":"string"},"tags":[{"name":"player","props":[{"name":"name","type":"string","index":1},{"name":"age","type":"int","index":2}]}]}}}]},"configPath":""}
+{"configBody":{"version":"v2","description":"web console import","clientSettings":{"retry":3,"concurrency":10,"channelBufferSize":128,"space":"basketballplayer","connection":{"user":"root","password":"123","address":"192.168.8.145:9669"}},"logPath":"E:\\NebulaProject\\test\\nebula-studio\\server\\data\\tasks/import.log","files":[{"path":"E:\\NebulaProject\\test\\nebula-studio\\server\\data\\upload\\player.csv","failDataPath":"E:\\NebulaProject\\test\\nebula-studio\\server\\data\\tasks/err/data 1Fail.csv","batchSize":10,"type":"csv","csv":{"withHeader":false,"withLabel":false},"schema":{"type":"vertex","vertex":{"vid":{"index":0,"type":"string"},"tags":[{"name":"player","props":[{"name":"name","type":"string","index":1},{"name":"age","type":"int","index":2}]}]}}}]},"configPath":""}
 ```
 
 Response:
@@ -175,7 +175,7 @@ Response:
           "30"
         ]
       ],
-      "path": "E:\\NebulaProject\\新建文件夹\\nebula-studio\\server\\data\\upload\\player.csv",
+      "path": "E:\\NebulaProject\\test\\nebula-studio\\server\\data\\upload\\player.csv",
       "withHeader": false,
       "dataType": "all",
       "name": "player.csv",
@@ -212,20 +212,20 @@ Response:
 ```
 #### ReadLog API
 Use params:
-http://localhost:7001/api/import/log?dir=E:\NebulaProject\新建文件夹\nebula-studio\server\data\tasks&startByte=0&endByte=1000000&taskId=4
+http://localhost:7001/api/import/log?dir=E:\NebulaProject\test\nebula-studio\server\data\tasks&startByte=0&endByte=1000000&taskId=4
 Response:
 
 ```json
 {
   "code": 0,
   "message": "",
-  "data": "2022/01/11 16:33:48 [INFO] clientmgr.go:28: Create 10 Nebula Graph clients\u003cbr /\u003e2022/01/11 16:33:48 [INFO] reader.go:64: Start to read file(0): E:\\NebulaProject\\新建文件夹\\nebula-studio\\server\\data\\upload\\player.csv, schema: \u003c :VID(string),player.name:string,player.age:int \u003e\u003cbr /\u003e2022/01/11 16:33:48 [INFO] reader.go:180: Total lines of file(E:\\NebulaProject\\新建文件夹\\nebula-studio\\server\\data\\upload\\player.csv) is: 52, error lines: 0\u003cbr /\u003e2022/01/11 16:33:48 [INFO] statsmgr.go:62: Done(E:\\NebulaProject\\新建文件夹\\nebula-studio\\server\\data\\upload\\player.csv): Time(1.45s), Finished(52), Failed(0), Read Failed(0), Latency AVG(6182us), Batches Req AVG(48887us), Rows AVG(35.87/s)\u003cbr /\u003e"
-}xxxxxxxxxx {  "code": 0,  "message": "",  "data": "2022/01/11 16:33:48 [INFO] clientmgr.go:28: Create 10 Nebula Graph clients\u003cbr /\u003e2022/01/11 16:33:48 [INFO] reader.go:64: Start to read file(0): E:\\NebulaProject\\新建文件夹\\nebula-studio\\server\\data\\upload\\player.csv, schema: \u003c :VID(string),player.name:string,player.age:int \u003e\u003cbr /\u003e2022/01/11 16:33:48 [INFO] reader.go:180: Total lines of file(E:\\NebulaProject\\新建文件夹\\nebula-studio\\server\\data\\upload\\player.csv) is: 52, error lines: 0\u003cbr /\u003e2022/01/11 16:33:48 [INFO] statsmgr.go:62: Done(E:\\NebulaProject\\新建文件夹\\nebula-studio\\server\\data\\upload\\player.csv): Time(1.45s), Finished(52), Failed(0), Read Failed(0), Latency AVG(6182us), Batches Req AVG(48887us), Rows AVG(35.87/s)\u003cbr /\u003e"}{    "code": 0,    "message": "",    "data": "hell"}
+  "data": "2022/01/11 16:33:48 [INFO] clientmgr.go:28: Create 10 Nebula Graph clients\u003cbr /\u003e2022/01/11 16:33:48 [INFO] reader.go:64: Start to read file(0): E:\\NebulaProject\\test\\nebula-studio\\server\\data\\upload\\player.csv, schema: \u003c :VID(string),player.name:string,player.age:int \u003e\u003cbr /\u003e2022/01/11 16:33:48 [INFO] reader.go:180: Total lines of file(E:\\NebulaProject\\test\\nebula-studio\\server\\data\\upload\\player.csv) is: 52, error lines: 0\u003cbr /\u003e2022/01/11 16:33:48 [INFO] statsmgr.go:62: Done(E:\\NebulaProject\\test\\nebula-studio\\server\\data\\upload\\player.csv): Time(1.45s), Finished(52), Failed(0), Read Failed(0), Latency AVG(6182us), Batches Req AVG(48887us), Rows AVG(35.87/s)\u003cbr /\u003e"
+}xxxxxxxxxx {  "code": 0,  "message": "",  "data": "2022/01/11 16:33:48 [INFO] clientmgr.go:28: Create 10 Nebula Graph clients\u003cbr /\u003e2022/01/11 16:33:48 [INFO] reader.go:64: Start to read file(0): E:\\NebulaProject\\test\\nebula-studio\\server\\data\\upload\\player.csv, schema: \u003c :VID(string),player.name:string,player.age:int \u003e\u003cbr /\u003e2022/01/11 16:33:48 [INFO] reader.go:180: Total lines of file(E:\\NebulaProject\\test\\nebula-studio\\server\\data\\upload\\player.csv) is: 52, error lines: 0\u003cbr /\u003e2022/01/11 16:33:48 [INFO] statsmgr.go:62: Done(E:\\NebulaProject\\test\\nebula-studio\\server\\data\\upload\\player.csv): Time(1.45s), Finished(52), Failed(0), Read Failed(0), Latency AVG(6182us), Batches Req AVG(48887us), Rows AVG(35.87/s)\u003cbr /\u003e"}{    "code": 0,    "message": "",    "data": "hell"}
 ```
 #### CreateConfigFile API
 Create a config file in config_dir
 ```json
-{"config":{"version":"v2","description":"web console import","clientSettings":{"retry":3,"concurrency":10,"channelBufferSize":128,"space":"basketballplayer","connection":{"user":"root","password":"123","address":"192.168.8.145:9669"}},"logPath":"E:\\NebulaProject\\新建文件夹\\nebula-studio\\server\\data\\tasks/import.log","files":[]},"mountPath":"E:\\NebulaProject\\新建文件夹\\nebula-studio\\server\\data\\tasks"}
+{"config":{"version":"v2","description":"web console import","clientSettings":{"retry":3,"concurrency":10,"channelBufferSize":128,"space":"basketballplayer","connection":{"user":"root","password":"123","address":"192.168.8.145:9669"}},"logPath":"E:\\NebulaProject\\test\\nebula-studio\\server\\data\\tasks/import.log","files":[]},"mountPath":"E:\\NebulaProject\\test\\nebula-studio\\server\\data\\tasks"}
 ```
 
 Response:
@@ -266,8 +266,8 @@ Response:
     "code": 0,
     "message": "",
     "data": {
-        "taskDir": "E:\\NebulaProject\\新建文件夹\\nebula-studio\\server\\data\\tasks",
-        "uploadDir": "E:\\NebulaProject\\新建文件夹\\nebula-studio\\server\\data\\upload"
+        "taskDir": "E:\\NebulaProject\\test\\nebula-studio\\server\\data\\tasks",
+        "uploadDir": "E:\\NebulaProject\\test\\nebula-studio\\server\\data\\upload"
     }
 }
 ```

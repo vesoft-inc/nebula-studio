@@ -165,8 +165,8 @@ github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf35Ld67mk=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
-github.com/satori/go.uuid v1.2.0 h1:0uYX9dsZ2yD7q2RtLRtPSdGDWzjeM3TbMJP9utgA0ww=
-github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
+github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b h1:gQZ0qzfKHQIybLANtM3mBXNUtOfsCFXeTsnBqCsx1KM=
+github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
 github.com/schollz/closestmatch v2.1.0+incompatible h1:Uel2GXEpJqOWBrlyI+oY9LTiyyjYS17cCYRqP13/SHk=
 github.com/schollz/closestmatch v2.1.0+incompatible/go.mod h1:RtP1ddjLong6gTkbtmuhtR2uUrrJOpYzYRvbcPAid+g=
 github.com/sergi/go-diff v1.1.0 h1:we8PVUC3FE2uYfodKH/nBHMSetSfHDR6scGdBi+erh0=
@@ -204,8 +204,8 @@ github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6Kllzaw
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
 github.com/vesoft-inc/nebula-go/v2 v2.5.2-0.20211210024917-9461e07cdca2 h1:ivN82oSpM/kNCZVdzoCSj1IT4ZDW7Xi2juhAZvh7eF8=
 github.com/vesoft-inc/nebula-go/v2 v2.5.2-0.20211210024917-9461e07cdca2/go.mod h1:fehDUs97/mpmxXi9WezhznX0Dg7hmQRUoOWgDZv9zG0=
-github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220110103328-26a3128a0a75 h1:DwPSDgWIAnsbm0WoWqsmez1hh9xy4bRXyBWOf5DSQig=
-github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220110103328-26a3128a0a75/go.mod h1:8XT+4RxlFycZiHZbgsi/cbUem4M3YEeYulSyyY//mXU=
+github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220117031841-e6c6fbd0b32b h1:dDuCHb4DdhxMLqqJsJd6XE3d5Yh0jKrVYUFTrdsjixk=
+github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220117031841-e6c6fbd0b32b/go.mod h1:sFEvE+cY4TgwqWx6H6msOqAUzRhsEHHKaaMgIZENHuQ=
 github.com/vesoft-inc/nebula-importer v1.0.1-0.20211213064541-05a8646be295 h1:YdBNGn+5YyIuQ6cWjIPCvSJW/3qj5ck5UIWGeh4hXNI=
 github.com/vesoft-inc/nebula-importer v1.0.1-0.20211213064541-05a8646be295/go.mod h1:0nHCbr2/nckhfxAA8sDbwxkNzA9YyXazWKyVMT/PfPo=
 github.com/vmihailenco/msgpack/v5 v5.3.4 h1:qMKAwOV+meBw2Y8k9cVwAy7qErtYCwBzZ2ellBfvnqc=

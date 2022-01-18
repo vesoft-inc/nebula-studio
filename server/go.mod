@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/kataras/iris/v12 v12.2.0-alpha4
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
-	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220110103328-26a3128a0a75
+	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220117031841-e6c6fbd0b32b
 	github.com/vesoft-inc/nebula-importer v1.0.1-0.20211213064541-05a8646be295
 	go.uber.org/zap v1.17.0
 	gopkg.in/yaml.v2 v2.4.0
@@ -41,7 +41,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/satori/go.uuid v1.2.0 // indirect
+	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b // indirect
 	github.com/schollz/closestmatch v2.1.0+incompatible // indirect
 	github.com/smartystreets/goconvey v1.7.2 // indirect
 	github.com/tdewolff/minify/v2 v2.9.22 // indirect
