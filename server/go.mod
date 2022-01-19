@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/kataras/iris/v12 v12.2.0-alpha4
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
-	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220117031841-e6c6fbd0b32b
+	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220119025135-9c14441ae6d0
 	github.com/vesoft-inc/nebula-importer v1.0.1-0.20211213064541-05a8646be295
 	go.uber.org/zap v1.17.0
 	gopkg.in/yaml.v2 v2.4.0
