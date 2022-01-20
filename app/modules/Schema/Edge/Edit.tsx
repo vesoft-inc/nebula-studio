@@ -5,20 +5,20 @@ import {
   Col,
   Collapse,
   Form,
-  Icon,
   Input,
-  message,
   Modal,
   Popconfirm,
   Popover,
   Select,
   Table,
+  message,
 } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
-import { match, RouteComponentProps, withRouter } from 'react-router-dom';
+import { RouteComponentProps, match, withRouter } from 'react-router-dom';
+import { LeftOutlined } from '@ant-design/icons';
 
 import GQLCodeMirror from '#app/components/GQLCodeMirror';
 import { IDispatch, IRootState } from '#app/store';
@@ -52,8 +52,8 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    RouteComponentProps {
+  ReturnType<typeof mapDispatch>,
+  RouteComponentProps {
   match: match<{
     space: string;
     edge: string;
@@ -128,7 +128,7 @@ class EditEdge extends React.Component<IProps, IState> {
     this.getDetails();
   }
 
-  getDetails = async () => {
+  getDetails = async() => {
     const { match } = this.props;
     const {
       params: { edge },
@@ -203,7 +203,7 @@ class EditEdge extends React.Component<IProps, IState> {
     this.props.asyncUpdateEditStatus(true);
   };
 
-  handleDeleteField = async (fields: IField[]) => {
+  handleDeleteField = async(fields: IField[]) => {
     const { match } = this.props;
     const {
       params: { edge },
@@ -295,7 +295,7 @@ class EditEdge extends React.Component<IProps, IState> {
     });
   };
 
-  handleUpdateField = async () => {
+  handleUpdateField = async() => {
     const { match } = this.props;
     const {
       params: { edge },
@@ -337,7 +337,7 @@ class EditEdge extends React.Component<IProps, IState> {
     }
   };
 
-  handleUpdateTtl = async () => {
+  handleUpdateTtl = async() => {
     const { match } = this.props;
     const {
       params: { edge },
@@ -374,7 +374,7 @@ class EditEdge extends React.Component<IProps, IState> {
     }
   };
 
-  handleTogglePanels = async (e: string | string[], type: string) => {
+  handleTogglePanels = async(e: string | string[], type: string) => {
     const { match } = this.props;
     const {
       params: { edge },
@@ -403,7 +403,7 @@ class EditEdge extends React.Component<IProps, IState> {
         content: intl.get('schema.cancelPropmt'),
         okText: intl.get('common.yes'),
         cancelText: intl.get('common.no'),
-        onOk: async () => {
+        onOk: async() => {
           if (type === 'field') {
             const data = this.state.fieldList.filter(i => i.name !== '');
             if (data.length > 0) {
@@ -422,7 +422,7 @@ class EditEdge extends React.Component<IProps, IState> {
     }
   };
 
-  handleDeleteTtl = async () => {
+  handleDeleteTtl = async() => {
     const { match } = this.props;
     const {
       params: { edge },
@@ -637,7 +637,7 @@ class EditEdge extends React.Component<IProps, IState> {
       <Table
         columns={columns}
         dataSource={fieldList}
-        rowKey={(_, index) => index.toString()}
+        rowKey={(_, index) => index!.toString()}
         pagination={false}
         footer={() => (
           <Button
@@ -805,7 +805,7 @@ class EditEdge extends React.Component<IProps, IState> {
     this.props.asyncUpdateEditStatus(true);
   };
 
-  handleCommentUpdate = async () => {
+  handleCommentUpdate = async() => {
     const { match } = this.props;
     const {
       params: { edge },
@@ -874,7 +874,7 @@ class EditEdge extends React.Component<IProps, IState> {
             <Breadcrumb.Item>{intl.get('common.edit')}</Breadcrumb.Item>
           </Breadcrumb>
           <Button onClick={this.goBack}>
-            <Icon type="left" />
+            <LeftOutlined />
             {intl.get('schema.backToEdgeList')}
           </Button>
         </header>

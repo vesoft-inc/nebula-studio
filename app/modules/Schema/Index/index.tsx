@@ -1,22 +1,22 @@
 import {
   Breadcrumb,
   Button,
-  Icon,
-  message,
   Popconfirm,
   Select,
   Table,
+  message,
 } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
-import { Link, match, RouteComponentProps, withRouter } from 'react-router-dom';
+import { Link, RouteComponentProps, match, withRouter } from 'react-router-dom';
+import { DeleteTwoTone, PlusOutlined } from '@ant-design/icons';
 
+import Search from '../Search';
 import { IDispatch, IRootState } from '#app/store';
 import { sortByFieldAndFilter } from '#app/utils/function';
 import { trackPageView } from '#app/utils/stat';
 
-import Search from '../Search';
 import './index.less';
 const { Option } = Select;
 
@@ -32,8 +32,8 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    RouteComponentProps {
+  ReturnType<typeof mapDispatch>,
+  RouteComponentProps {
   match: match<{ space: string }>;
 }
 
@@ -117,7 +117,7 @@ class IndexList extends React.Component<IProps, IState> {
     });
   };
 
-  handleDeleteIndex = async (type, name) => {
+  handleDeleteIndex = async(type, name) => {
     const res = await this.props.asyncDeleteIndex({
       type,
       name,
@@ -187,9 +187,7 @@ class IndexList extends React.Component<IProps, IState> {
                     cancelText={intl.get('common.cancel')}
                   >
                     <Button shape="circle">
-                      <Icon
-                        type="delete"
-                        theme="twoTone"
+                      <DeleteTwoTone
                         twoToneColor="#CF1322"
                       />
                     </Button>
@@ -247,7 +245,7 @@ class IndexList extends React.Component<IProps, IState> {
               data-track-action="view_index_create"
               data-track-label="from_index_list"
             >
-              <Icon type="plus" />
+              <PlusOutlined />
               {intl.get('common.create')}
             </Link>
           </Button>

@@ -2,9 +2,9 @@ import { Carousel, Popover } from 'antd';
 import { chunk } from 'lodash';
 import React from 'react';
 
+import IconCfg from './iconCfg';
 import Icon from '#app/components/Icon';
 
-import IconCfg from './iconCfg';
 import './index.less';
 
 interface IIcon {

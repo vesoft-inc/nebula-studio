@@ -1,9 +1,10 @@
-import { Button, Icon, Table, Tooltip } from 'antd';
+import { Button, Table, Tooltip } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 
 import { Modal } from '.';
 import './CSVPreviewLink.less';
+import { InfoCircleOutlined } from '@ant-design/icons';
 
 interface IProps {
   file: any;
@@ -31,30 +32,30 @@ class CSVPreviewLink extends React.PureComponent<IProps> {
     const { content } = this.props.file;
     const columns = content.length
       ? content[0].map((_, index) => {
-          const textIndex = index;
-          return {
-            title: onMapping ? (
-              <>
-                <Button
-                  type="primary"
-                  className="csv-select-index"
-                  onClick={() => this.handleMapping(textIndex)}
-                >{`column ${textIndex}`}</Button>
-                <Tooltip
-                  title={intl.get('import.setMappingTip', {
-                    prop,
-                    index: textIndex,
-                  })}
-                >
-                  <Icon type="info-circle" />
-                </Tooltip>
-              </>
-            ) : (
-              `column ${textIndex}`
-            ),
-            dataIndex: index,
-          };
-        })
+        const textIndex = index;
+        return {
+          title: onMapping ? (
+            <>
+              <Button
+                type="primary"
+                className="csv-select-index"
+                onClick={() => this.handleMapping(textIndex)}
+              >{`column ${textIndex}`}</Button>
+              <Tooltip
+                title={intl.get('import.setMappingTip', {
+                  prop,
+                  index: textIndex,
+                })}
+              >
+                <InfoCircleOutlined />
+              </Tooltip>
+            </>
+          ) : (
+            `column ${textIndex}`
+          ),
+          dataIndex: index,
+        };
+      })
       : [];
 
     return (
@@ -75,7 +76,7 @@ class CSVPreviewLink extends React.PureComponent<IProps> {
               dataSource={content}
               columns={columns}
               pagination={false}
-              rowKey={(_, index) => index.toString()}
+              rowKey={(_, index) => index!.toString()}
             />
             <div className="operation">
               {onMapping && (

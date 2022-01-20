@@ -3,18 +3,19 @@ import {
   Button,
   Collapse,
   Divider,
-  Icon,
+  Form,
   Input,
-  message,
   Modal,
   Select,
+  message
 } from 'antd';
-import Form, { FormComponentProps } from 'antd/lib/form';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { LeftOutlined, PlusOutlined } from '@ant-design/icons';
 
+import { FormInstance } from 'antd/es/form';
 import { Instruction } from '#app/components';
 import GQLCodeMirror from '#app/components/GQLCodeMirror';
 import { nameRulesFn, numberRulesFn, replicaRulesFn } from '#app/config/rules';
@@ -41,9 +42,8 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    FormComponentProps,
-    RouteComponentProps {}
+  ReturnType<typeof mapDispatch>,
+  RouteComponentProps {}
 
 function getVidType(type: string, length?: string) {
   let result;
@@ -55,39 +55,38 @@ function getVidType(type: string, length?: string) {
   return result;
 }
 class CreateSpace extends React.Component<IProps> {
+  formRef = React.createRef<FormInstance>()
   componentDidMount() {
     trackPageView('/space/create');
     this.props.asyncGetMachineNumber();
   }
 
   handleCreate = () => {
-    this.props.form.validateFields(async err => {
-      if (!err) {
-        const {
-          name,
-          partitionNum,
-          replicaFactor,
-          vidType,
-          stringLength,
-          comment,
-        } = this.props.form.getFieldsValue();
-        const _vidType = getVidType(vidType, stringLength);
-        const options = {
-          partition_num: partitionNum,
-          replica_factor: replicaFactor,
-          vid_type: _vidType,
-        };
-        const { code, message: errorMsg } = await this.props.asyncCreateSpace({
-          name,
-          options,
-          comment,
-        });
-        if (code === 0) {
-          this.props.history.push('/schema');
-          message.success(intl.get('schema.createSuccess'));
-        } else {
-          message.warning(errorMsg);
-        }
+    this.formRef.current!.validateFields().then(async() => {
+      const {
+        name,
+        partitionNum,
+        replicaFactor,
+        vidType,
+        stringLength,
+        comment,
+      } = this.formRef.current!.getFieldsValue();
+      const _vidType = getVidType(vidType, stringLength);
+      const options = {
+        partition_num: partitionNum,
+        replica_factor: replicaFactor,
+        vid_type: _vidType,
+      };
+      const { code, message: errorMsg } = await this.props.asyncCreateSpace({
+        name,
+        options,
+        comment,
+      });
+      if (code === 0) {
+        this.props.history.push('/schema');
+        message.success(intl.get('schema.createSuccess'));
+      } else {
+        message.warning(errorMsg);
       }
     });
   };
@@ -109,7 +108,7 @@ class CreateSpace extends React.Component<IProps> {
 
   render() {
     const { loading, activeMachineNum } = this.props;
-    const { getFieldDecorator, getFieldsValue } = this.props.form;
+    const { getFieldsValue } = this.formRef.current!;
     const {
       name,
       partitionNum,
@@ -142,10 +141,10 @@ class CreateSpace extends React.Component<IProps> {
     };
     const currentGQL = name
       ? getSpaceCreateGQL({
-          name,
-          options,
-          comment,
-        })
+        name,
+        options,
+        comment,
+      })
       : '';
     return (
       <div className="nebula-space">
@@ -159,17 +158,15 @@ class CreateSpace extends React.Component<IProps> {
             <Breadcrumb.Item>{intl.get('common.create')}</Breadcrumb.Item>
           </Breadcrumb>
           <Button onClick={this.goBack}>
-            <Icon type="left" />
+            <LeftOutlined />
             {intl.get('schema.backToSpaceList')}
           </Button>
         </header>
         <Divider />
         <div className="space-form">
-          <Form {...innerItemLayout}>
-            <Form.Item label={intl.get('common.name')} {...outItemLayout}>
-              {getFieldDecorator('name', {
-                rules: nameRulesFn(intl),
-              })(<Input />)}
+          <Form {...innerItemLayout} ref={this.formRef}>
+            <Form.Item label={intl.get('common.name')} {...outItemLayout} name="name" rules={nameRulesFn(intl)}>
+              <Input />
             </Form.Item>
             <Form.Item
               {...outItemLayout}
@@ -181,35 +178,27 @@ class CreateSpace extends React.Component<IProps> {
                   />
                 </>
               }
+              name="vidType"
+              rules={[{ required: true }]}
             >
-              {getFieldDecorator('vidType', {
-                rules: [
+              <Select placeholder="FIXED_STRING" className="select-vid-type">
+                <Option value="FIXED_STRING">FIXED_STRING</Option>
+                <Option value="INT64">INT64</Option>
+              </Select>
+              {vidType === 'FIXED_STRING' && (
+                <Form.Item className="item-string-length" name="stringLength" rules={[
                   {
                     required: true,
+                    message: 'fix string length limit is required',
                   },
-                ],
-              })(
-                <Select placeholder="FIXED_STRING" className="select-vid-type">
-                  <Option value="FIXED_STRING">FIXED_STRING</Option>
-                  <Option value="INT64">INT64</Option>
-                </Select>,
-              )}
-              {vidType === 'FIXED_STRING' && (
-                <Form.Item className="item-string-length">
-                  {getFieldDecorator('stringLength', {
-                    rules: [
-                      {
-                        required: true,
-                        message: 'fix string length limit is required',
-                      },
-                      ...numberRulesFn(intl),
-                    ],
-                  })(<Input />)}
+                  ...numberRulesFn(intl),
+                ]}>
+                  <Input />
                 </Form.Item>
               )}
             </Form.Item>
-            <Form.Item label={intl.get('common.comment')} {...outItemLayout}>
-              {getFieldDecorator('comment')(<Input />)}
+            <Form.Item label={intl.get('common.comment')} {...outItemLayout} name="comment">
+              <Input />
             </Form.Item>
             <Collapse>
               <Panel header={intl.get('common.optionalParameters')} key="ngql">
@@ -222,10 +211,10 @@ class CreateSpace extends React.Component<IProps> {
                       />
                     </>
                   }
+                  name="partitionNum"
+                  rules={numberRulesFn(intl)}
                 >
-                  {getFieldDecorator('partitionNum', {
-                    rules: numberRulesFn(intl),
-                  })(<Input placeholder="100" />)}
+                  <Input placeholder="100" />
                 </Form.Item>
                 <Form.Item
                   label={
@@ -238,10 +227,10 @@ class CreateSpace extends React.Component<IProps> {
                       />
                     </>
                   }
+                  name="replicaFactor"
+                  rules={replicaRulesFn(intl, activeMachineNum)}
                 >
-                  {getFieldDecorator('replicaFactor', {
-                    rules: replicaRulesFn(intl, activeMachineNum),
-                  })(<Input placeholder="1" />)}
+                  <Input placeholder="1" />
                 </Form.Item>
               </Panel>
             </Collapse>
@@ -253,7 +242,7 @@ class CreateSpace extends React.Component<IProps> {
               loading={!!loading}
               onClick={this.handleCreate}
             >
-              <Icon type="plus" />
+              <PlusOutlined />
               {intl.get('common.create')}
             </Button>
           </div>
@@ -264,5 +253,5 @@ class CreateSpace extends React.Component<IProps> {
 }
 
 export default withRouter(
-  connect(mapState, mapDispatch)(Form.create<IProps>()(CreateSpace)),
+  connect(mapState, mapDispatch)(CreateSpace),
 );

@@ -4,13 +4,13 @@ import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
+import ExpandItem from '../ExpandItem';
+import SelectedGraphDetailShowModal from '../SelectedGraphDetailShowModal';
 import IconFont from '#app/components/Icon';
 import { exportDataToCSV } from '#app/config/explore';
 import { IRootState } from '#app/store';
 import { INode, IPath } from '#app/utils/interface';
 
-import ExpandItem from '../ExpandItem';
-import SelectedGraphDetailShowModal from '../SelectedGraphDetailShowModal';
 import './index.less';
 const TabPane = Tabs.TabPane;
 
@@ -41,7 +41,7 @@ class DisplayComponent extends React.PureComponent<IProps, IState> {
     this.SelectedGraphDetailShowModal.show(tagType);
   };
 
-  handleChangeType = async (key: string) => {
+  handleChangeType = async(key: string) => {
     this.setState({
       tagType: key,
     } as Pick<IState, keyof IState>);

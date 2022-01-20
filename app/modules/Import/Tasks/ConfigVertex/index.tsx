@@ -1,17 +1,18 @@
-import { Button, Icon, Popconfirm, Tabs } from 'antd';
+import { Button, Popconfirm, Tabs } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
+import { CloseOutlined } from '@ant-design/icons';
 
-import CSVPreviewLink from '#app/components/CSVPreviewLink';
-import { IDispatch, IRootState } from '#app/store';
-import { trackPageView } from '#app/utils/stat';
 
 import Add, { AddType } from '../Add';
 import Next from '../Next';
 import Prev from '../Prev';
 import './index.less';
 import TagList from './TagList';
+import { trackPageView } from '#app/utils/stat';
+import { IDispatch, IRootState } from '#app/store';
+import CSVPreviewLink from '#app/components/CSVPreviewLink';
 
 const { TabPane } = Tabs;
 
@@ -84,7 +85,7 @@ class ConfigNode extends React.PureComponent<IProps> {
                           e.stopPropagation();
                         }}
                       >
-                        <Icon type="close" />
+                        <CloseOutlined />
                       </Button>
                     </Popconfirm>
                   </p>

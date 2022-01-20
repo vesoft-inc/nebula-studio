@@ -3,9 +3,9 @@ import axios from 'axios';
 import JSONBigint from 'json-bigint';
 import intl from 'react-intl-universal';
 
+import { trackEvent } from './stat';
 import { store } from '#app/store';
 
-import { trackEvent } from './stat';
 
 const service = axios.create({
   transformResponse: [
@@ -66,7 +66,7 @@ service.interceptors.response.use(
   },
 );
 
-const sendRequest = async (type: string, api: string, params?, config?) => {
+const sendRequest = async(type: string, api: string, params?, config?) => {
   const { trackEventConfig, ...otherConfig } = config;
   let res;
   switch (type) {

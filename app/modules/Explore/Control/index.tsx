@@ -1,14 +1,13 @@
-import { Button, Form, Modal as AntdModal, Select } from 'antd';
-import { FormComponentProps } from 'antd/lib/form/Form';
+import { Modal as AntdModal, Button, Form, Select } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
+import ImportNodes from './ImportNode';
 import { Modal } from '#app/components';
 import ExportBtn from '#app/modules/Explore/NebulaGraph/Panel/Export';
 import { IDispatch, IRootState } from '#app/store';
 
-import ImportNodes from './ImportNode';
 import './index.less';
 
 const Option = Select.Option;
@@ -35,12 +34,11 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    FormComponentProps {
+  ReturnType<typeof mapDispatch> {
   onRef: any;
 }
 
-class Control extends React.Component<IProps, {}> {
+class Control extends React.Component<IProps> {
   importNodesHandler;
   componentDidMount() {
     this.props.asyncGetSpaces();

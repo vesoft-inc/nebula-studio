@@ -2,15 +2,15 @@ import * as d3 from 'd3';
 import * as React from 'react';
 import { connect } from 'react-redux';
 
+import SelectIds from './SelectIds';
+import Labels from './NodeTexts';
+import Links from './Links';
 import IconCfg from '#app/components/IconPicker/iconCfg';
 import Menu from '#app/modules/Explore/NebulaGraph/Menu';
 import { IRootState } from '#app/store';
 import { INode, IPath } from '#app/utils/interface';
 
 import './index.less';
-import Links from './Links';
-import Labels from './NodeTexts';
-import SelectIds from './SelectIds';
 
 const mapState = (state: IRootState) => ({
   offsetX: state.d3Graph.canvasOffsetX,
