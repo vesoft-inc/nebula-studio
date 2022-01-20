@@ -1,4 +1,5 @@
 import { createModel } from '@rematch/core';
+import type { IRootModel } from '.';
 
 import service from '#app/config/service';
 
@@ -28,14 +29,14 @@ const splitQuery = (query: string) => {
   };
 };
 
-export const _console = createModel({
+export const _console = createModel<IRootModel>()({
   state: {
     currentGQL: 'SHOW SPACES;',
     result: {},
     paramsMap: null,
   } as IState,
   reducers: {
-    update: (state: IState, payload: any) => {
+    update: (state: IState, payload: object): IState => {
       return {
         ...state,
         ...payload,
@@ -43,7 +44,7 @@ export const _console = createModel({
     },
   },
   effects: {
-    async asyncRunGQL(gql) {
+    async asyncRunGQL(gql: string) {
       const { gqlList, paramList } = splitQuery(gql);
       const result = (await service.execNGQL(
         {

@@ -1,14 +1,12 @@
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
-// import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
-import webpack from 'webpack';
+import webpack, { Configuration } from 'webpack';
 import merge from 'webpack-merge';
 
 import commonConfig from './webpack.base';
 
-const publicConfig = {
-  // devtool: 'cheap-module-source-map',
+const publicConfig: Configuration = {
   mode: 'production',
   output: {
     path: path.join(__dirname, '../dist/'),
@@ -24,29 +22,6 @@ const publicConfig = {
       },
     ],
   },
-  // optimization: {
-  //   minimizer: [
-  //     new UglifyJsPlugin({
-  //       cache: true,
-  //       parallel: true,
-  //       sourceMap: true, // set to true if you want JS source maps
-  //     }),
-  //   ],
-  //   namedModules: true,
-  //   namedChunks: true,
-  //   runtimeChunk: {
-  //     name: 'manifest',
-  //   },
-  //   splitChunks: {
-  //     cacheGroups: {
-  //       vendors: {
-  //         name: 'vendors',
-  //         test: /node_modules/,
-  //         chunks: 'all',
-  //       },
-  //     },
-  //   },
-  // },
 
   plugins: [
     new webpack.DefinePlugin({

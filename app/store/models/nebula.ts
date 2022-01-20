@@ -3,6 +3,7 @@ import { message } from 'antd';
 import cookies from 'js-cookie';
 import _ from 'lodash';
 import intl from 'react-intl-universal';
+import type { IRootModel } from '.';
 
 import service from '#app/config/service';
 import { handleKeyword } from '#app/utils/function';
@@ -23,6 +24,7 @@ interface IState {
   tagsFields: any[];
   edgesFields: any[];
   indexes: any[];
+  tags: any[];
   tagIndexTree: ITree[];
   edgeIndexTree: ITree[];
   spaceList: ISpace[];
@@ -93,7 +95,7 @@ interface IAlterConfig {
   };
 }
 
-export const nebula = createModel({
+export const nebula = createModel<IRootModel>()({
   state: {
     username: cookies.get('nu'),
     host: cookies.get('nh'),
@@ -115,9 +117,9 @@ export const nebula = createModel({
     edgeList: [],
     // index
     indexList: [],
-  },
+  } as IState,
   reducers: {
-    update: (state: IState, payload: any) => {
+    update: (state: IState, payload: object): IState => {
       return {
         ...state,
         ...payload,

@@ -1,16 +1,18 @@
-/**
- * inspired by rematch: https://github.com/rematch/rematch
- */
 import { RematchDispatch, RematchRootState, init } from '@rematch/core';
-import createLoadingPlugin from '@rematch/loading';
+import loading, { ExtraModelsFromLoading } from '@rematch/loading';
+import immerPlugin from '@rematch/immer';
 
-import * as models from './models';
+import { IRootModel, models } from './models';
 
-const loading = createLoadingPlugin({});
 
-export const store = init({
+type FullModel = ExtraModelsFromLoading<IRootModel>
+  
+export const store = init<IRootModel, FullModel>({
   models,
-  plugins: [loading],
+  plugins: [
+    loading(),
+    immerPlugin()
+  ],
   redux: {
     devtoolOptions: {},
     rootReducers: { RESET_APP: () => undefined },
@@ -18,12 +20,5 @@ export const store = init({
 });
 
 export type IStore = typeof store;
-export type IDispatch = RematchDispatch<typeof models>;
-interface ILoadingPlugin {
-  loading: {
-    models: RematchRootState<typeof models>;
-    // you can use effects here for getting async effect loading state
-    effects: IDispatch;
-  };
-}
-export type IRootState = RematchRootState<typeof models> & ILoadingPlugin;
+export type IDispatch = RematchDispatch<IRootModel>;
+export type IRootState = RematchRootState<IRootModel, FullModel>

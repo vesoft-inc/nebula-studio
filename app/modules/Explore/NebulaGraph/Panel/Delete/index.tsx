@@ -19,7 +19,7 @@ interface IProps
   ReturnType<typeof mapDispatch> {
   showTitle?: boolean;
   handlerRef?: (handler) => void;
-  toolTipRef: any;
+  toolTipRef?: any;
 }
 
 class DeleteBtn extends React.PureComponent<IProps> {
@@ -34,7 +34,7 @@ class DeleteBtn extends React.PureComponent<IProps> {
     const { selectVertexes, selectEdges } = this.props;
     if (selectVertexes.length > 0 || selectEdges.length > 0) {
       this.props.delete();
-      this.props.toolTipRef.style('visibility', 'hidden');
+      this.props.toolTipRef?.style('visibility', 'hidden');
     }
   };
   render() {

@@ -24,9 +24,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetImportFiles: dispatch.app.asyncGetImportFiles,
   asyncUploadFile: dispatch.app.asyncUploadFile,
   updateFiles: files => {
-    dispatch.importData.update({
-      files,
-    });
+    dispatch.importData.update({ files });
   },
 });
 
@@ -147,7 +145,7 @@ class Import extends React.Component<IProps> {
         'content-type': 'multipart/form-data',
       },
     };
-    await this.props.asyncUploadFile(data, config).then(_ => {
+    await this.props.asyncUploadFile({ data, config }).then(_ => {
       this.getFiles();
     });
   };
