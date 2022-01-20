@@ -31,6 +31,8 @@ const Tasks = (props: IProps) => {
       return <ConfigEdge />;
     case 4:
       return <Import />;
+    default:
+      return null;
   }
 };
 

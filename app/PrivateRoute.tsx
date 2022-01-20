@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Redirect, Route } from 'react-router-dom';
-
+import { RouteProps } from 'react-router';
 import { IRootState } from './store';
 
 const mapState = (state: IRootState) => ({
@@ -11,10 +11,10 @@ const mapState = (state: IRootState) => ({
 
 const mapDispatch = () => ({});
 
-interface IProps extends ReturnType<typeof mapDispatch>,
+interface IProps extends RouteProps, ReturnType<typeof mapDispatch>,
   ReturnType<typeof mapState>{
-  component: any;
-  render: any
+  component?: any;
+  render?: any
 }
 
 const PrivateRoute = (props: IProps) => {
@@ -26,7 +26,7 @@ const PrivateRoute = (props: IProps) => {
       <Route render={render} {...rest} />
     );
   } else {
-    return <Redirect to="/connect-server" {...rest} />;
+    return <Redirect to="/connect-server" />;
   }
 };
 

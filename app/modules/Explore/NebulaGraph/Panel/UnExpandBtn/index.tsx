@@ -18,7 +18,7 @@ interface IProps
   extends ReturnType<typeof mapState>,
   ReturnType<typeof mapDispatch> {
   showTitle?: boolean;
-  toolTipRef: any;
+  toolTipRef?: any;
 }
 
 class UnExpandBtn extends React.PureComponent<IProps> {
