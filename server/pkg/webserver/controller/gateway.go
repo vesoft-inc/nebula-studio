@@ -3,7 +3,6 @@ package controller
 import (
 	"fmt"
 
-	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/types"
 	importconfig "github.com/vesoft-inc/nebula-importer/pkg/config"
@@ -25,7 +24,6 @@ type connectDBParams struct {
 	Port     int    `json:"port"`
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Version  string `json:"version"`
 }
 
 type disConnectDBParams struct {
@@ -77,10 +75,7 @@ func ConnectDB(ctx iris.Context) base.Result {
 			Message: err.Error(),
 		}
 	}
-	if params.Version == "" {
-		params.Version = string(nebula.VersionAuto)
-	}
-	nsid, err := dao.Connect(params.Address, params.Port, params.Username, params.Password, nebula.Version(params.Version))
+	nsid, err := dao.Connect(params.Address, params.Port, params.Username, params.Password)
 	//sessions.Get(ctx).Set("nsid", nsid)
 	if err != nil {
 		zap.L().Warn("connect DB fail", zap.Error(err))
