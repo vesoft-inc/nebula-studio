@@ -1,24 +1,25 @@
-import { Alert, Button, Icon, Table, Tabs } from 'antd';
+import { Alert, Button, Table, Tabs } from 'antd';
 import { BigNumber } from 'bignumber.js';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { AlertOutlined, ShareAltOutlined, TableOutlined } from '@ant-design/icons';
 
+import Export from './Export';
+import Graphviz from './Graphviz';
 import { Modal, OutputCsv } from '#app/components';
 import { IDispatch, IRootState } from '#app/store';
 import { parseSubGraph } from '#app/utils/parseData';
 import { trackEvent } from '#app/utils/stat';
 
-import Export from './Export';
-import Graphviz from './Graphviz';
 import './index.less';
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    RouteComponentProps {
+  ReturnType<typeof mapDispatch>,
+  RouteComponentProps {
   value: string;
   result: any;
   onHistoryItem: (value: string) => void;
@@ -173,7 +174,7 @@ class OutputBox extends React.Component<IProps> {
               <Tabs.TabPane
                 tab={
                   <>
-                    <Icon type="table" />
+                    <TableOutlined />
                     {intl.get('common.table')}
                   </>
                 }
@@ -204,7 +205,7 @@ class OutputBox extends React.Component<IProps> {
                     showTotal: () =>
                       `${intl.get('common.total')} ${dataSource.length}`,
                   }}
-                  rowKey={(_, index) => index.toString()}
+                  rowKey={(_, index) => index!.toString()}
                 />
               </Tabs.TabPane>
             )}
@@ -212,7 +213,7 @@ class OutputBox extends React.Component<IProps> {
               <Tabs.TabPane
                 tab={
                   <>
-                    <Icon type="share-alt" />
+                    <ShareAltOutlined />
                     {intl.get('common.graph')}
                   </>
                 }
@@ -225,7 +226,7 @@ class OutputBox extends React.Component<IProps> {
               <Tabs.TabPane
                 tab={
                   <>
-                    <Icon type="alert" />
+                    <AlertOutlined />
                     {intl.get('common.log')}
                   </>
                 }

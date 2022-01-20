@@ -9,7 +9,7 @@ interface IProps {
   onUpDataNodeTexts: () => void;
 }
 
-export default class NodeTexts extends React.Component<IProps, {}> {
+export default class NodeTexts extends React.Component<IProps, Record<string, unknown>> {
   ref: SVGGElement;
 
   componentDidMount() {

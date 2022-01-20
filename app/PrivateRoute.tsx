@@ -11,7 +11,14 @@ const mapState = (state: IRootState) => ({
 
 const mapDispatch = () => ({});
 
-const PrivateRoute = ({ component: Component, render, ...rest }) => {
+interface IProps extends ReturnType<typeof mapDispatch>,
+  ReturnType<typeof mapState>{
+  component: any;
+  render: any
+}
+
+const PrivateRoute = (props: IProps) => {
+  const { component: Component, render, ...rest } = props;
   if (rest.host && rest.username) {
     return Component ? (
       <Route {...rest} render={props => <Component {...props} />} />

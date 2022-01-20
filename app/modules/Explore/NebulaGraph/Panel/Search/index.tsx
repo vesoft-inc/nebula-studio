@@ -10,7 +10,7 @@ import { IDispatch, IRootState } from '#app/store';
 import { INode } from '#app/utils/interface';
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {
+  ReturnType<typeof mapDispatch> {
   showTitle?: boolean;
 }
 const mapState = (state: IRootState) => ({
@@ -58,7 +58,7 @@ class SearchBtn extends React.PureComponent<IProps> {
 
   handleSearchNodes = value => {
     const { vertexes, updateSelectIds } = this.props;
-    const selectVertexes = [];
+    const selectVertexes: INode[] = [];
     const reg = /([a-zA-Z0-9_.]*)\s*([\=\>\<\!]+)\s*(.*)/g;
     const searchInfo = reg.exec(value) || [];
     if (searchInfo.length > 0) {

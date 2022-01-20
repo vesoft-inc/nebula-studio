@@ -1,5 +1,4 @@
-import { Select } from 'antd';
-import Form, { FormComponentProps } from 'antd/lib/form';
+import { Form, Select } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
@@ -30,8 +29,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    FormComponentProps {}
+  ReturnType<typeof mapDispatch> {}
 
 class Init extends React.Component<IProps> {
   modalHandler;
@@ -53,7 +51,6 @@ class Init extends React.Component<IProps> {
 
   render() {
     const { spaces } = this.props;
-    const { getFieldDecorator } = this.props.form;
     return (
       <Modal
         handlerRef={handler => (this.modalHandler = handler)}
@@ -64,16 +61,14 @@ class Init extends React.Component<IProps> {
       >
         <h3>{intl.get('explore.selectSpace')}</h3>
         <Form>
-          <Form.Item>
-            {getFieldDecorator('space')(
-              <Select onChange={this.handleSelectChange}>
-                {spaces.map(space => (
-                  <Option value={space} key={space}>
-                    {space}
-                  </Option>
-                ))}
-              </Select>,
-            )}
+          <Form.Item name="space">
+            <Select onChange={this.handleSelectChange}>
+              {spaces.map(space => (
+                <Option value={space} key={space}>
+                  {space}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>
@@ -81,4 +76,4 @@ class Init extends React.Component<IProps> {
   }
 }
 
-export default connect(mapState, mapDispatch)(Form.create<IProps>()(Init));
+export default connect(mapState, mapDispatch)(Init);

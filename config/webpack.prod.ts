@@ -1,7 +1,7 @@
-import CleanWebpackPlugin from 'clean-webpack-plugin';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
-import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
+// import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
 import webpack from 'webpack';
 import merge from 'webpack-merge';
 
@@ -24,29 +24,29 @@ const publicConfig = {
       },
     ],
   },
-  optimization: {
-    minimizer: [
-      new UglifyJsPlugin({
-        cache: true,
-        parallel: true,
-        sourceMap: true, // set to true if you want JS source maps
-      }),
-    ],
-    namedModules: true,
-    namedChunks: true,
-    runtimeChunk: {
-      name: 'manifest',
-    },
-    splitChunks: {
-      cacheGroups: {
-        vendors: {
-          name: 'vendors',
-          test: /node_modules/,
-          chunks: 'all',
-        },
-      },
-    },
-  },
+  // optimization: {
+  //   minimizer: [
+  //     new UglifyJsPlugin({
+  //       cache: true,
+  //       parallel: true,
+  //       sourceMap: true, // set to true if you want JS source maps
+  //     }),
+  //   ],
+  //   namedModules: true,
+  //   namedChunks: true,
+  //   runtimeChunk: {
+  //     name: 'manifest',
+  //   },
+  //   splitChunks: {
+  //     cacheGroups: {
+  //       vendors: {
+  //         name: 'vendors',
+  //         test: /node_modules/,
+  //         chunks: 'all',
+  //       },
+  //     },
+  //   },
+  // },
 
   plugins: [
     new webpack.DefinePlugin({
@@ -55,9 +55,7 @@ const publicConfig = {
       },
     }),
 
-    new CleanWebpackPlugin(['dist/*.*'], {
-      root: path.join(__dirname, '../'),
-    }),
+    new CleanWebpackPlugin(),
 
     new MiniCssExtractPlugin({
       filename: '[name].[hash].css',

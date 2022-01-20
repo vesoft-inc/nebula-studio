@@ -51,7 +51,7 @@ class HotKeysDesc extends React.PureComponent {
             <a
               className="btn-git"
               href="https://github.com/vesoft-inc/nebula-web-docker/issues"
-              target="_blank"
+              target="_blank" rel="noreferrer"
             >
               {intl.get('common.moreSuggestion')}
             </a>
@@ -60,7 +60,7 @@ class HotKeysDesc extends React.PureComponent {
           <Table
             dataSource={HOT_KEYS(intl)}
             columns={columns}
-            rowKey={(_, index) => index.toString()}
+            rowKey={(_, index) => index!.toString()}
             pagination={false}
           />
         </Modal>

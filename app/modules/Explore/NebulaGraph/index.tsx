@@ -3,6 +3,7 @@ import _ from 'lodash';
 import React from 'react';
 import { connect } from 'react-redux';
 
+import Panel from './Panel';
 import { NebulaD3 } from '#app/components';
 import DisplayPanel from '#app/components/DisplayPanel';
 import ExpandComponent from '#app/components/Expand';
@@ -11,7 +12,6 @@ import { convertBigNumberToString } from '#app/utils/function';
 import { INode, IPath } from '#app/utils/interface';
 
 import './index.less';
-import Panel from './Panel';
 
 const mapState = (state: IRootState) => ({
   vertexes: state.explore.vertexes,
@@ -49,7 +49,7 @@ interface IState {
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {}
+  ReturnType<typeof mapDispatch> {}
 class NebulaGraph extends React.Component<IProps, IState> {
   settingHandler;
   $tooltip;
@@ -122,11 +122,11 @@ class NebulaGraph extends React.Component<IProps, IState> {
           typeof value !== 'string'
             ? convertBigNumberToString(value)
             : JSON.stringify(value, (_, value) => {
-                if (typeof value === 'string') {
-                  return value.replace(/\u0000+$/, '');
-                }
-                return value;
-              })
+              if (typeof value === 'string') {
+                return value.replace(/\u0000+$/, '');
+              }
+              return value;
+            })
         }</span></div>`;
       })
       .join('');
@@ -141,9 +141,9 @@ class NebulaGraph extends React.Component<IProps, IState> {
       this.props.spaceVidType === 'INT64'
         ? node.name
         : JSON.stringify(
-            // HACK: bigint to string, but json.stringify will show quotes
-            node.name,
-          )
+          // HACK: bigint to string, but json.stringify will show quotes
+          node.name,
+        )
     }</span></div>`;
     const nodeFieldsValuePairStr = Object.keys(properties)
       .map(property => {
@@ -155,11 +155,11 @@ class NebulaGraph extends React.Component<IProps, IState> {
               typeof value !== 'string'
                 ? convertBigNumberToString(value)
                 : JSON.stringify(value, (_, value) => {
-                    if (typeof value === 'string') {
-                      return value.replace(/\u0000+$/, '');
-                    }
-                    return value;
-                  })
+                  if (typeof value === 'string') {
+                    return value.replace(/\u0000+$/, '');
+                  }
+                  return value;
+                })
             }</span></div>`;
           })
           .join('');

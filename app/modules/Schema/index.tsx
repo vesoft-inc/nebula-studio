@@ -1,9 +1,10 @@
-import { Button, Divider, Icon, message, Popconfirm, Table } from 'antd';
+import { Button, Divider, Popconfirm, Table, message } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 
+import { DeleteTwoTone, PlusOutlined, ToolTwoTone } from '@ant-design/icons';
 import { Instruction } from '#app/components';
 import { IDispatch, IRootState } from '#app/store';
 import { trackPageView } from '#app/utils/stat';
@@ -31,8 +32,8 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    RouteComponentProps {}
+  ReturnType<typeof mapDispatch>,
+  RouteComponentProps {}
 
 class Schema extends React.Component<IProps> {
   constructor(props: IProps) {
@@ -48,7 +49,7 @@ class Schema extends React.Component<IProps> {
     this.props.asyncGetSpacesList();
   };
 
-  handleDeleteSpace = async (name: string) => {
+  handleDeleteSpace = async(name: string) => {
     const res = await this.props.asyncDeleteSpace(name);
     if (res.code === 0) {
       const { currentSpace } = this.props;
@@ -60,7 +61,7 @@ class Schema extends React.Component<IProps> {
     }
   };
 
-  handleSwitchSpace = async (space: string) => {
+  handleSwitchSpace = async(space: string) => {
     const { asyncSwitchSpace, history, asyncClearExplore } = this.props;
     const err = await asyncSwitchSpace(space);
     if (!err) {
@@ -180,7 +181,7 @@ class Schema extends React.Component<IProps> {
                     data-track-action="view_space_list"
                     data-track-label="from_space_list"
                   >
-                    <Icon type="tool" theme="twoTone" />
+                    <ToolTwoTone />
                   </Button>
                   <Popconfirm
                     onConfirm={() => this.handleDeleteSpace(space.Name)}
@@ -189,9 +190,7 @@ class Schema extends React.Component<IProps> {
                     cancelText={intl.get('common.cancel')}
                   >
                     <Button shape="circle">
-                      <Icon
-                        type="delete"
-                        theme="twoTone"
+                      <DeleteTwoTone
                         twoToneColor="#CF1322"
                       />
                     </Button>
@@ -217,7 +216,7 @@ class Schema extends React.Component<IProps> {
               data-track-action="view_space_create"
               data-track-label="from_space_list"
             >
-              <Icon type="plus" />
+              <PlusOutlined />
               {intl.get('common.create')}
             </Link>
           </Button>

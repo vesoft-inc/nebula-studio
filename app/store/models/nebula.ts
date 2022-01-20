@@ -260,7 +260,7 @@ export const nebula = createModel({
       if (res.data) {
         const spaces: ISpace[] = [];
         await Promise.all(
-          res.data.map(async (item, i) => {
+          res.data.map(async(item, i) => {
             const { code, data } = await dispatch.nebula.asyncGetSpaceInfo(
               item,
             );
@@ -643,7 +643,7 @@ export const nebula = createModel({
       const { code, data } = await dispatch.nebula.asyncGetIndexes(type);
       if (code === 0) {
         const _indexes = await Promise.all(
-          data.map(async (item: any) => {
+          data.map(async(item: any) => {
             const { code, data } = await dispatch.nebula.asyncGetIndexFields({
               type,
               name: item.name,
@@ -657,7 +657,7 @@ export const nebula = createModel({
         );
         const tree = [] as ITree[];
         await Promise.all(
-          _indexes.map(async (item: any) => {
+          _indexes.map(async(item: any) => {
             const tag = tree.filter(i => i.name === item.indexOwner);
             if (tag.length > 0) {
               tag[0].indexes.push(item);

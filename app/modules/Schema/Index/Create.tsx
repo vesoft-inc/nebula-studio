@@ -1,11 +1,13 @@
-import { Breadcrumb, Button, Icon, Input, message, Modal, Select } from 'antd';
-import Form, { FormComponentProps } from 'antd/lib/form';
+import { Breadcrumb, Button, Form, Input, Modal, Select, message } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
-import { match, RouteComponentProps, withRouter } from 'react-router-dom';
+import { RouteComponentProps, match, withRouter } from 'react-router-dom';
 
+import { LeftOutlined, PlusOutlined } from '@ant-design/icons';
+import { FormInstance } from 'antd/es/form';
+import DraggableTags from './DraggableTags';
 import { Instruction, Modal as ModalComponent } from '#app/components';
 import GQLCodeMirror from '#app/components/GQLCodeMirror';
 import { nameRulesFn } from '#app/config/rules';
@@ -15,7 +17,6 @@ import { getIndexCreateGQL } from '#app/utils/gql';
 import { trackEvent, trackPageView } from '#app/utils/stat';
 
 import './Create.less';
-import DraggableTags from './DraggableTags';
 const confirm = Modal.confirm;
 
 const Option = Select.Option;
@@ -35,9 +36,8 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    FormComponentProps,
-    RouteComponentProps {
+  ReturnType<typeof mapDispatch>,
+  RouteComponentProps {
   match: match<{ space: string }>;
 }
 interface IType {
@@ -77,6 +77,7 @@ const fieldsLayout = {
 
 class CreateIndex extends React.Component<IProps, IState> {
   modalHandler;
+  formRef = React.createRef<FormInstance>()
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -99,8 +100,8 @@ class CreateIndex extends React.Component<IProps, IState> {
     }
   }
 
-  getAssociatedList = async (type?: IndexType) => {
-    const { getFieldValue, setFieldsValue } = this.props.form;
+  getAssociatedList = async(type?: IndexType) => {
+    const { getFieldValue, setFieldsValue } = this.formRef.current!;
     const associatedType = type ? type : getFieldValue('type');
     const res =
       associatedType === 'TAG'
@@ -118,7 +119,7 @@ class CreateIndex extends React.Component<IProps, IState> {
   };
 
   getFieldList = async value => {
-    const { getFieldValue, setFieldsValue } = this.props.form;
+    const { getFieldValue, setFieldsValue } = this.formRef.current!;
     const type = getFieldValue('type');
     const res =
       type === 'TAG'
@@ -135,14 +136,14 @@ class CreateIndex extends React.Component<IProps, IState> {
   };
 
   updateFields = (data: string[]) => {
-    const { setFieldsValue } = this.props.form;
+    const { setFieldsValue } = this.formRef.current!;
     setFieldsValue({
       fields: data,
     });
   };
 
   removeField = (field: string) => {
-    const { setFieldsValue, getFieldValue } = this.props.form;
+    const { setFieldsValue, getFieldValue } = this.formRef.current!;
     const fields = getFieldValue('fields');
     setFieldsValue({
       fields: fields.filter(i => i !== field),
@@ -181,36 +182,34 @@ class CreateIndex extends React.Component<IProps, IState> {
   };
 
   handleCreate = () => {
-    const { getFieldsValue } = this.props.form;
+    const { getFieldsValue } = this.formRef.current!;
     const { match } = this.props;
     const {
       params: { space },
     } = match;
-    this.props.form.validateFields(async err => {
-      if (!err) {
-        const { name, type, associate, fields, comment } = getFieldsValue();
-        const res = await this.props.asyncCreateIndex({
-          name,
-          type,
-          associate,
-          fields,
-          comment,
+    this.formRef.current!.validateFields().then(async() => {
+      const { name, type, associate, fields, comment } = getFieldsValue();
+      const res = await this.props.asyncCreateIndex({
+        name,
+        type,
+        associate,
+        fields,
+        comment,
+      });
+      if (res.code === 0) {
+        message.success(intl.get('schema.createSuccess'));
+        this.props.history.push(`/space/${space}/index/list`, {
+          indexType: type,
         });
-        if (res.code === 0) {
-          message.success(intl.get('schema.createSuccess'));
-          this.props.history.push(`/space/${space}/index/list`, {
-            indexType: type,
-          });
-        } else {
-          message.warning(res.message);
-        }
+      } else {
+        message.warning(res.message);
       }
     });
   };
 
   handleAddField = () => {
     const { selectedField, indexLength, selectedFieldType } = this.state;
-    const { setFieldsValue, getFieldValue } = this.props.form;
+    const { setFieldsValue, getFieldValue } = this.formRef.current!;
     if (
       selectedFieldType === 'string' &&
       !indexLength.match(POSITIVE_INTEGER_REGEX)
@@ -253,7 +252,7 @@ class CreateIndex extends React.Component<IProps, IState> {
 
   render() {
     const { loading } = this.props;
-    const { getFieldValue } = this.props.form;
+    const { getFieldValue } = this.formRef.current!;
     const fields = getFieldValue('fields') || [];
     const name = getFieldValue('name') || '';
     const type = getFieldValue('type');
@@ -276,7 +275,6 @@ class CreateIndex extends React.Component<IProps, IState> {
       fields,
       comment,
     });
-    const { getFieldDecorator } = this.props.form;
     return (
       <div className="space-config-component nebula-index-create">
         <header>
@@ -290,48 +288,29 @@ class CreateIndex extends React.Component<IProps, IState> {
             <Breadcrumb.Item>{intl.get('common.create')}</Breadcrumb.Item>
           </Breadcrumb>
           <Button onClick={this.goBack}>
-            <Icon type="left" />
+            <LeftOutlined />
             {intl.get('schema.backToIndexList')}
           </Button>
         </header>
         <div className="index-form">
-          <Form {...itemLayout}>
-            <Form.Item label={intl.get('schema.indexType')}>
-              {getFieldDecorator('type', {
-                rules: [
-                  {
-                    required: true,
-                  },
-                ],
-                initialValue: 'TAG',
-              })(
-                <Select onChange={this.getAssociatedList}>
-                  <Option value="TAG">Tag</Option>
-                  <Option value="EDGE">Edge Type</Option>
-                </Select>,
-              )}
+          <Form {...itemLayout} ref={this.formRef}>
+            <Form.Item label={intl.get('schema.indexType')} name="type" rules={[{ required: true }]} initialValue="TAG">
+              <Select onChange={this.getAssociatedList}>
+                <Option value="TAG">Tag</Option>
+                <Option value="EDGE">Edge Type</Option>
+              </Select>
             </Form.Item>
-            <Form.Item label={intl.get('common.name')}>
-              {getFieldDecorator('associate', {
-                rules: [
-                  {
-                    required: true,
-                  },
-                ],
-              })(
-                <Select onChange={this.getFieldList}>
-                  {typeList.map((item, index) => (
-                    <Option value={item.Name} key={`${index}_${item.Name}`}>
-                      {item.Name}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
+            <Form.Item label={intl.get('common.name')} name="associate" rules={[{ required: true }]}>
+              <Select onChange={this.getFieldList}>
+                {typeList.map((item, index) => (
+                  <Option value={item.Name} key={`${index}_${item.Name}`}>
+                    {item.Name}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
-            <Form.Item label={intl.get('schema.indexName')}>
-              {getFieldDecorator('name', {
-                rules: nameRulesFn(intl),
-              })(<Input />)}
+            <Form.Item label={intl.get('schema.indexName')} name="name" rules={nameRulesFn(intl)}>
+              <Input />
             </Form.Item>
             <Form.Item
               className="item-field"
@@ -344,28 +323,26 @@ class CreateIndex extends React.Component<IProps, IState> {
                 </>
               }
               {...fieldsLayout}
+              name="fields"
+              initialValue={[]}
             >
-              {getFieldDecorator('fields', {
-                initialValue: [],
-              })(
-                <div className="tags">
-                  <DraggableTags
-                    data={fields}
-                    updateData={this.updateFields}
-                    removeData={this.removeField}
-                  />
-                  <Button
-                    type="link"
-                    className="btn-field-add"
-                    onClick={this.handleOpenModal}
-                  >
-                    {intl.get('common.add')}
-                  </Button>
-                </div>,
-              )}
+              <div className="tags">
+                <DraggableTags
+                  data={fields}
+                  updateData={this.updateFields}
+                  removeData={this.removeField}
+                />
+                <Button
+                  type="link"
+                  className="btn-field-add"
+                  onClick={this.handleOpenModal}
+                >
+                  {intl.get('common.add')}
+                </Button>
+              </div>
             </Form.Item>
-            <Form.Item label={intl.get('common.comment')}>
-              {getFieldDecorator('comment')(<Input />)}
+            <Form.Item label={intl.get('common.comment')} name="comment">
+              <Input />
             </Form.Item>
           </Form>
           <GQLCodeMirror currentGQL={currentGQL} />
@@ -375,7 +352,7 @@ class CreateIndex extends React.Component<IProps, IState> {
               loading={!!loading}
               onClick={this.handleCreate}
             >
-              <Icon type="plus" />
+              <PlusOutlined />
               {intl.get('common.create')}
             </Button>
           </div>
@@ -436,5 +413,5 @@ class CreateIndex extends React.Component<IProps, IState> {
 }
 
 export default withRouter(
-  connect(mapState, mapDispatch)(Form.create<IProps>()(CreateIndex)),
+  connect(mapState, mapDispatch)(CreateIndex),
 );

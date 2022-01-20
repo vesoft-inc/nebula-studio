@@ -1,10 +1,10 @@
 import { Button, Divider, Form, Input, Select } from 'antd';
-import { FormComponentProps } from 'antd/lib/form/Form';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
+import { FormInstance } from 'antd/es/form';
 import { Instruction } from '#app/components';
 import GQLCodeMirror from '#app/components/GQLCodeMirror';
 import { GRAPH_ALOGORITHM } from '#app/config/explore';
@@ -28,12 +28,12 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    FormComponentProps {
+  ReturnType<typeof mapDispatch> {
   closeHandler: any;
 }
 
 class AlgorithmQuery extends React.Component<IProps> {
+  formRef = React.createRef<FormInstance>()
   componentDidMount() {
     this.props.asyncGetEdges();
   }
@@ -42,8 +42,7 @@ class AlgorithmQuery extends React.Component<IProps> {
     window.open(intl.get('explore.docForFindPath'), '_blank');
   };
 
-  handleInquiry = async () => {
-    const { getFieldsValue } = this.props.form;
+  handleInquiry = async(data) => {
     const { spaceVidType } = this.props;
     const {
       type,
@@ -53,26 +52,22 @@ class AlgorithmQuery extends React.Component<IProps> {
       direction,
       stepLimit,
       quantityLimit,
-    } = getFieldsValue();
-    this.props.form.validateFields(async err => {
-      if (!err) {
-        await this.props.asyncGetPathResult({
-          spaceVidType,
-          type,
-          srcId,
-          dstId,
-          relation,
-          direction,
-          stepLimit,
-          quantityLimit,
-        });
-        this.props.closeHandler();
-      }
+    } = data;
+    await this.props.asyncGetPathResult({
+      spaceVidType,
+      type,
+      srcId,
+      dstId,
+      relation,
+      direction,
+      stepLimit,
+      quantityLimit,
     });
+    this.props.closeHandler();
   };
 
   render() {
-    const { getFieldDecorator, getFieldsValue } = this.props.form;
+    const { getFieldsValue } = this.formRef.current!;
     const { edgeTypes, spaceVidType, loading } = this.props;
     const formItemLayout = {
       labelCol: {
@@ -94,38 +89,32 @@ class AlgorithmQuery extends React.Component<IProps> {
     const currentGQL =
       type && srcId && dstId
         ? getPathGQL({
-            spaceVidType,
-            type,
-            srcId,
-            dstId,
-            relation,
-            direction,
-            stepLimit,
-            quantityLimit,
-          })
+          spaceVidType,
+          type,
+          srcId,
+          dstId,
+          relation,
+          direction,
+          stepLimit,
+          quantityLimit,
+        })
         : '';
     return (
       <div className="algorithm-query">
-        <Form {...formItemLayout} className="algorithm-form">
+        <Form {...formItemLayout} className="algorithm-form" onFinish={this.handleInquiry}>
           <Form.Item
             label={intl.get('common.algorithm')}
             className="select-algorithm"
+            name="type"
+            rules={[{ required: true }]}
           >
-            {getFieldDecorator('type', {
-              rules: [
-                {
-                  required: true,
-                },
-              ],
-            })(
-              <Select>
-                {GRAPH_ALOGORITHM(intl).map(item => (
-                  <Option value={item.value} key={item.value}>
-                    {item.label}
-                  </Option>
-                ))}
-              </Select>,
-            )}
+            <Select>
+              {GRAPH_ALOGORITHM(intl).map(item => (
+                <Option value={item.value} key={item.value}>
+                  {item.label}
+                </Option>
+              ))}
+            </Select>
             <Instruction
               description={intl.get('common.viewDocs')}
               onClick={this.viewDoc}
@@ -134,93 +123,83 @@ class AlgorithmQuery extends React.Component<IProps> {
           <Divider orientation="center">
             {intl.get('explore.algorithmParams')}
           </Divider>
-          <Form.Item label={intl.get('explore.srcId')}>
-            {getFieldDecorator('srcId', {
-              rules: [
-                {
-                  required: true,
-                  message: 'Src ID is required',
-                },
-              ],
-            })(<Select mode="tags" />)}
+          <Form.Item label={intl.get('explore.srcId')} name="srcId" rules={[
+            {
+              required: true,
+              message: 'Src ID is required',
+            },
+          ]}>
+            <Select mode="tags" />
           </Form.Item>
-          <Form.Item label={intl.get('explore.dstId')}>
-            {getFieldDecorator('dstId', {
-              rules: [
-                {
-                  required: true,
-                  message: 'Dst ID is required',
-                },
-              ],
-            })(<Select mode="tags" />)}
+          <Form.Item label={intl.get('explore.dstId')} name="dstId" rules={[
+            {
+              required: true,
+              message: 'Dst ID is required',
+            },
+          ]}>
+            <Select mode="tags" />
           </Form.Item>
-          <Form.Item label={intl.get('explore.relation')}>
-            {getFieldDecorator('relation')(
-              <Select mode="multiple">
-                {edgeTypes.map(e => (
-                  <Option value={e} key={e}>
-                    {e}
-                  </Option>
-                ))}
-              </Select>,
-            )}
+          <Form.Item label={intl.get('explore.relation')} name="relation">
+            <Select mode="multiple">
+              {edgeTypes.map(e => (
+                <Option value={e} key={e}>
+                  {e}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
-          <Form.Item label={intl.get('explore.direction')}>
-            {getFieldDecorator('direction')(
-              <Select allowClear={true}>
-                <Option value="REVERSELY" key="REVERSELY">
+          <Form.Item label={intl.get('explore.direction')} name="direction">
+            <Select allowClear={true}>
+              <Option value="REVERSELY" key="REVERSELY">
                   REVERSELY
-                </Option>
-                <Option value="BIDIRECT" key="BIDIRECT">
+              </Option>
+              <Option value="BIDIRECT" key="BIDIRECT">
                   BIDIRECT
-                </Option>
-              </Select>,
-            )}
+              </Option>
+            </Select>
           </Form.Item>
-          <Form.Item label={intl.get('explore.stepLimit')}>
-            {getFieldDecorator('stepLimit', {
-              rules: [
-                {
-                  message: intl.get('formRules.positiveIntegerRequired'),
-                  pattern: /^\d+$/,
-                  transform(value) {
-                    if (value) {
-                      return Number(value);
-                    }
-                  },
-                },
-              ],
-            })(<Input type="number" />)}
+          <Form.Item label={intl.get('explore.stepLimit')} name="stepLimit" rules={[
+            {
+              message: intl.get('formRules.positiveIntegerRequired'),
+              pattern: /^\d+$/,
+              transform(value) {
+                if (value) {
+                  return Number(value);
+                }
+              },
+            },
+          ]}>
+            <Input type="number" />
           </Form.Item>
-          <Form.Item label={intl.get('explore.quantityLimit')}>
-            {getFieldDecorator('quantityLimit', {
-              rules: [
-                {
-                  message: intl.get('formRules.positiveIntegerRequired'),
-                  pattern: /^\d+$/,
-                  transform(value) {
-                    if (value) {
-                      return Number(value);
-                    }
-                  },
-                },
-              ],
-            })(<Input type="number" />)}
+          <Form.Item label={intl.get('explore.quantityLimit')} name="quantityLimit" rules={[
+            {
+              message: intl.get('formRules.positiveIntegerRequired'),
+              pattern: /^\d+$/,
+              transform(value) {
+                if (value) {
+                  return Number(value);
+                }
+              },
+            },
+          ]}>
+            <Input type="number" />
           </Form.Item>
         </Form>
         <GQLCodeMirror currentGQL={currentGQL} />
-        <Button
-          data-track-category="explore"
-          data-track-action="query_by_path"
-          onClick={this.handleInquiry}
-          type="primary"
-          loading={!!loading}
-        >
-          {intl.get('explore.quiry')}
-        </Button>
+        <Form.Item noStyle={true}>
+          <Button
+            data-track-category="explore"
+            data-track-action="query_by_path"
+            htmlType="submit"
+            type="primary"
+            loading={!!loading}
+          >
+            {intl.get('explore.quiry')}
+          </Button>
+        </Form.Item>
       </div>
     );
   }
 }
 
-export default connect(mapState, mapDispatch)(Form.create()(AlgorithmQuery));
+export default connect(mapState, mapDispatch)(AlgorithmQuery);

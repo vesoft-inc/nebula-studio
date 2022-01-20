@@ -51,8 +51,8 @@ export const getExploreMatchGQL = (params: {
   }
   const _filters = filters
     ? filters
-        .map(filter => `${filter.relation || ''} l.${filter.expression}`)
-        .join(`\n`)
+      .map(filter => `${filter.relation || ''} l.${filter.expression}`)
+      .join(`\n`)
     : '';
   const wheres = _filters ? `AND ALL(l IN e WHERE ${_filters})` : '';
   const gql = `MATCH p=(v)${
@@ -137,40 +137,40 @@ export const getTagOrEdgeCreateGQL = (params: {
   const { type, name, fields, ttlConfig, comment } = params;
   const fieldsStr = fields
     ? fields
-        .map(item => {
-          let valueStr = '';
-          if (item.value) {
-            switch (item.type) {
-              case 'string':
-              case 'fixed_string':
-                valueStr = `DEFAULT "${item.value}"`;
-                break;
-              case 'timestamp':
-                const timestampReg = /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})$/;
-                valueStr = timestampReg.test(item.value)
-                  ? `DEFAULT "${item.value}"`
-                  : `DEFAULT ${item.value}`;
-                break;
-              default:
-                valueStr = `DEFAULT ${item.value}`;
-            }
+      .map(item => {
+        let valueStr = '';
+        if (item.value) {
+          switch (item.type) {
+            case 'string':
+            case 'fixed_string':
+              valueStr = `DEFAULT "${item.value}"`;
+              break;
+            case 'timestamp':
+              const timestampReg = /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})$/;
+              valueStr = timestampReg.test(item.value)
+                ? `DEFAULT "${item.value}"`
+                : `DEFAULT ${item.value}`;
+              break;
+            default:
+              valueStr = `DEFAULT ${item.value}`;
           }
-          const _type =
+        }
+        const _type =
             item.type !== 'fixed_string'
               ? item.type
               : item.type + `(${item.fixedLength ? item.fixedLength : ''})`;
-          const _null = item.allowNull ? 'NULL' : 'NOT NULL';
-          const _comment = item.comment ? `COMMENT "${item.comment}"` : '';
-          const conbine = [
-            handleKeyword(item.name),
-            _type,
-            _null,
-            valueStr,
-            _comment,
-          ];
-          return conbine.join(' ');
-        })
-        .join(', ')
+        const _null = item.allowNull ? 'NULL' : 'NOT NULL';
+        const _comment = item.comment ? `COMMENT "${item.comment}"` : '';
+        const conbine = [
+          handleKeyword(item.name),
+          _type,
+          _null,
+          valueStr,
+          _comment,
+        ];
+        return conbine.join(' ');
+      })
+      .join(', ')
     : '';
   const ttlStr = ttlConfig
     ? `TTL_DURATION = ${ttlConfig.ttl_duration ||

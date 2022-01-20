@@ -28,7 +28,7 @@ const devConfig = {
   devServer: {
     port: 7001,
     headers: { 'Access-Control-Allow-Origin': '*' },
-    contentBase: path.join(__dirname, '../public'),
+    contentBase: path.join(__dirname, '../dist'),
     historyApiFallback: true,
     host: 'localhost',
     disableHostCheck: true,

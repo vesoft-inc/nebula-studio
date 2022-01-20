@@ -1,8 +1,9 @@
-import { Button, Input, message, Tabs } from 'antd';
+import { Button, Input, Tabs, message } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
+import Prev from './Prev';
 import { Modal } from '#app/components';
 import service from '#app/config/service';
 import { IDispatch, IRootState } from '#app/store';
@@ -10,7 +11,6 @@ import { configToJson, getStringByteLength } from '#app/utils/import';
 import { trackEvent, trackPageView } from '#app/utils/stat';
 
 import './Import.less';
-import Prev from './Prev';
 const { TabPane } = Tabs;
 const mapState = (state: IRootState) => ({
   activeStep: state.importData.activeStep,
@@ -75,7 +75,7 @@ class Import extends React.Component<IProps, IState> {
     clearTimeout(this.logTimer);
   }
 
-  createConfigFile = async () => {
+  createConfigFile = async() => {
     const {
       currentSpace,
       username,
@@ -107,7 +107,7 @@ class Import extends React.Component<IProps, IState> {
     }
   };
 
-  handleRunImport = async () => {
+  handleRunImport = async() => {
     const {
       currentSpace,
       username,
@@ -194,7 +194,7 @@ class Import extends React.Component<IProps, IState> {
     }
   };
 
-  readlog = async () => {
+  readlog = async() => {
     const { startByte, endByte } = this.state;
     const { taskDir, taskId } = this.props;
     const { code, data } = await service.getLog({
@@ -231,7 +231,7 @@ class Import extends React.Component<IProps, IState> {
     this.handleRunImport();
   };
 
-  handleImportStart = async () => {
+  handleImportStart = async() => {
     this.handleClose();
     await this.createConfigFile();
     await this.handleRunImport();

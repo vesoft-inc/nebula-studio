@@ -15,6 +15,7 @@ interface IProps {
 }
 /**
  * Test line and line acrosses
+ *
  * @method isIntersectedLines
  * @param a1 - The start point of the first line
  * @param a2 - The end point of the first line
@@ -40,7 +41,7 @@ function isIntersectedLines(a1, a2, b1, b2) {
   return false;
 }
 
-export default class SelectIds extends React.Component<IProps, {}> {
+export default class SelectIds extends React.Component<IProps, Record<string, unknown>> {
   componentDidMount() {
     const { nodes, links } = this.props;
     if (nodes.length !== 0 || links.length !== 0) {

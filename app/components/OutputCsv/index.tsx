@@ -30,6 +30,7 @@ export default class OutputCsv extends React.PureComponent<IProps> {
     }
 
     const _utf = '\uFEFF';
+    // @ts-ignore
     if (window.Blob && window.URL && window.URL.createObjectURL) {
       const csvBlob = new Blob([_utf + csv], {
         type: 'text/csv',

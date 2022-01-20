@@ -3,6 +3,7 @@ import path, { resolve } from 'path';
 import webpack from 'webpack';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import Package from '../package.json'
+import AntdDayjsWebpackPlugin from 'antd-dayjs-webpack-plugin';
 
 const commonConfig = {
   entry: {
@@ -31,7 +32,9 @@ const commonConfig = {
           {
             loader: 'less-loader',
             options: {
-              javascriptEnabled: true,
+              lessOptions: {
+                javascriptEnabled: true,
+              }
             },
           },
         ],
@@ -83,6 +86,7 @@ const commonConfig = {
       },
     }),
     new webpack.HashedModuleIdsPlugin(),
+    new AntdDayjsWebpackPlugin()
   ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.css', '.woff', '.woff2', 'ttf'],

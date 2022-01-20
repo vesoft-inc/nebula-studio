@@ -1,8 +1,8 @@
-import { Icon } from 'antd';
 import classnames from 'classnames';
 import React from 'react';
 import intl from 'react-intl-universal';
 
+import { DownOutlined, RightOutlined } from '@ant-design/icons';
 import IconFont from '#app/components/Icon';
 import { convertBigNumberToString } from '#app/utils/function';
 
@@ -80,7 +80,7 @@ class RowItem extends React.PureComponent<IProps, IState> {
           className={classnames('item-header', 'row', { active: expandedAll })}
           onClick={this.toggleExpandAll}
         >
-          {expandedAll ? <Icon type="down" /> : <Icon type="right" />}
+          {expandedAll ? <DownOutlined /> : <RightOutlined />}
           <span className="display-header-title">{title}</span>
         </div>
         {expandedAll && (

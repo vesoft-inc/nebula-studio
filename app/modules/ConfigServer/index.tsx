@@ -1,4 +1,3 @@
-import { WrappedFormUtils } from 'antd/lib/form/Form';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
@@ -18,23 +17,19 @@ const mapState = () => ({});
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    RouteComponentProps {}
+  ReturnType<typeof mapDispatch>,
+  RouteComponentProps {}
 
 class ConfigServer extends React.Component<IProps> {
   componentDidMount() {
     trackPageView('/connect-server');
   }
 
-  handleConfigServer = (form: WrappedFormUtils) => {
-    form.validateFields(async (err, data) => {
-      if (!err) {
-        const ok = await this.props.asyncConfigServer(data);
-        if (ok) {
-          this.props.history.replace('/');
-        }
-      }
-    });
+  handleConfigServer = async(values: any) => {
+    const ok = await this.props.asyncConfigServer(values);
+    if (ok) {
+      this.props.history.replace('/');
+    }
   };
   render() {
     return (

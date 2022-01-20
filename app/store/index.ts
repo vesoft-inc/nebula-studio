@@ -1,7 +1,7 @@
 /**
  * inspired by rematch: https://github.com/rematch/rematch
  */
-import { init, RematchDispatch, RematchRootState } from '@rematch/core';
+import { RematchDispatch, RematchRootState, init } from '@rematch/core';
 import createLoadingPlugin from '@rematch/loading';
 
 import * as models from './models';

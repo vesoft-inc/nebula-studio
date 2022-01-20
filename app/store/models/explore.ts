@@ -384,9 +384,9 @@ export const explore = createModel({
       const vertexes: any =
         _ids.length > 0
           ? await this.asyncGetVertexes({
-              ids: _ids,
-              expand,
-            })
+            ids: _ids,
+            expand,
+          })
           : [];
       return _.uniqBy(vertexes, (i: any) =>
         convertBigNumberToString(i.name),

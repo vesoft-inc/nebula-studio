@@ -23,14 +23,14 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {}
+  ReturnType<typeof mapDispatch> {}
 
 class Next extends React.Component<IProps> {
   constructor(props) {
     super(props);
   }
 
-  handleNext = async () => {
+  handleNext = async() => {
     const {
       vertexesConfig,
       edgesConfig,

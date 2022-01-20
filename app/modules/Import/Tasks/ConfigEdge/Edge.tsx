@@ -1,9 +1,10 @@
-import { Form, Icon, Select, Table, Tooltip } from 'antd';
+import { Form, Select, Table, Tooltip } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
+import { InfoCircleOutlined } from '@ant-design/icons';
 import CSVPreviewLink from '#app/components/CSVPreviewLink';
 import { IDispatch, IRootState } from '#app/store';
 import { DATA_TYPE } from '#app/utils/constant';
@@ -37,7 +38,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {}
+  ReturnType<typeof mapDispatch> {}
 
 class Edge extends React.Component<IProps> {
   handleEdgeTypeChange = async edgeType => {
@@ -58,13 +59,13 @@ class Edge extends React.Component<IProps> {
       <p className="title-content">
         {title}
         <Tooltip title={desc}>
-          <Icon type="info-circle" />
+          <InfoCircleOutlined />
         </Tooltip>
       </p>
     );
   };
 
-  handleChangeEdgeType = async (record, type) => {
+  handleChangeEdgeType = async(record, type) => {
     const { edge, changeEdgeFieldType } = this.props;
     await changeEdgeFieldType({ edge, propName: record.name, type });
   };
