@@ -25,8 +25,8 @@ $ ./nebula-studio-server -studio-config="./config/example-config.yaml"
 
 | Name               | Path                      | Method   |
 | ------------------ | ------------------------- | -------- |
-| ExecNGQL           | /api-nebula/db/connect   | POST     |
-| ConnectDB          | /api-nebula/db/exec       | POST     |
+| ExecNGQL           | /api-nebula/db/exec | POST     |
+| ConnectDB          | /api-nebula/db/connect | POST     |
 | DisconnectDB       | /api-nebula/db/disconnect | POST     |
 | ImportData         | /api-nebula/task/import   | POST     |
 | HandleImportAction | /api-nebula/import/action | POST     |
@@ -74,13 +74,13 @@ Response:
 
 ```json
 {
-  "code": 0,
-  "message": "",
-  "data": {
-    "nsid": "ae50dc65-0ef4-48f3-8f55-6a562a7e2ed7"
-  }
+    "code": 0,
+    "message": "",
+    "data": {
+        "nsid": "e870674d-6ebc-4d9d-a1f7-bf59fdca24e8",
+        "version": "v2.6"
+    }
 }
-
 ```
 
 #### DisconnectDB API
