@@ -17,11 +17,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { Instruction } from '#app/components';
 import GQLCodeMirror from '#app/components/GQLCodeMirror';
-import {
-  nameRulesFn,
-  numberRulesFn,
-  replicaRulesFn,
-} from '#app/config/rules';
+import { nameRulesFn, numberRulesFn, replicaRulesFn } from '#app/config/rules';
 import { IDispatch, IRootState } from '#app/store';
 import { getSpaceCreateGQL } from '#app/utils/gql';
 import { trackEvent, trackPageView } from '#app/utils/stat';

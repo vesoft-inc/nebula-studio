@@ -130,8 +130,7 @@ class Import extends React.Component<IProps, IState> {
       activeStep,
     });
     if (errCode === 0) {
-      this.logTimer = setTimeout(this.readlog, 3000);
-      this.checkTimer = setTimeout(this.checkIsFinished, 2000);
+      this.checkTimer = setTimeout(this.checkTaskStatus, 3000);
     }
     trackEvent('import', 'import_data', 'start');
   };
@@ -148,12 +147,14 @@ class Import extends React.Component<IProps, IState> {
     }
   };
 
-  checkIsFinished = async () => {
+  checkTaskStatus = async () => {
     const { taskId } = this.props;
     const { code, data, message: errMsg } = await this.props.checkImportStatus({
       taskID: taskId,
       taskAction: 'actionQuery',
     });
+    await this.readlog();
+
     if (code !== 0) {
       message.warning(errMsg);
       return;
@@ -165,50 +166,56 @@ class Import extends React.Component<IProps, IState> {
         message.warning(result.taskMessage);
       }
       if (result?.taskStatus === ITaskStatus.statusFinished) {
-        message.success(intl.get('import.importFinished'));
+        trackEvent('import', 'import_data', 'finish');
       }
+      this.logTimer = setTimeout(this.checkLogFinished, 3000);
       service.finishImport({ taskId });
       clearTimeout(this.checkTimer);
     } else {
-      this.checkTimer = setTimeout(this.checkIsFinished, 2000);
+      this.checkTimer = setTimeout(this.checkTaskStatus, 3000);
+    }
+  };
+
+  checkLogFinished = async () => {
+    const { update } = this.props;
+    const empty = await this.readlog();
+    if (empty) {
+      message.success(intl.get('import.importFinished'));
+      this.setState({
+        startByte: 0,
+        endByte: 1000000,
+      });
+      update({
+        isImporting: false,
+      });
+      clearTimeout(this.logTimer);
+    } else {
+      this.logTimer = setTimeout(this.checkLogFinished, 3000);
     }
   };
 
   readlog = async () => {
     const { startByte, endByte } = this.state;
-    const { taskDir, taskId, update } = this.props;
-    const result: any = await service.getLog({
+    const { taskDir, taskId } = this.props;
+    const { code, data } = await service.getLog({
       dir: taskDir,
       startByte,
       endByte,
       taskId,
     });
-    const byteLength = result.data ? getStringByteLength(result.data) : 0;
-    if (result.data && result.code === 0) {
-      this.setState(
-        {
+    const byteLength = data ? getStringByteLength(data) : 0;
+    if (code === 0) {
+      if (data) {
+        this.setState({
           startByte: startByte + byteLength,
           endByte: startByte + byteLength + 1000000,
-        },
-        () => {
-          this.logTimer = setTimeout(this.readlog, 2000);
-        },
-      );
-      this.ref.innerHTML += result.data;
-    } else {
-      if (result.code === 0) {
-        this.logTimer = setTimeout(this.readlog, 2000);
+        });
+        this.ref.innerHTML += data;
       } else {
-        this.setState({
-          startByte: 0,
-          endByte: 1000000,
-        });
-        update({
-          isImporting: false,
-        });
-        clearTimeout(this.logTimer);
-        trackEvent('import', 'import_data', 'finish');
+        return true;
       }
+    } else {
+      return true;
     }
     this.ref.scrollTop = this.ref.scrollHeight;
   };
