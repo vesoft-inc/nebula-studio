@@ -75,8 +75,10 @@ func ConnectDB(ctx iris.Context) base.Result {
 			Message: err.Error(),
 		}
 	}
-	nsid, err := dao.Connect(params.Address, params.Port, params.Username, params.Password)
-	//sessions.Get(ctx).Set("nsid", nsid)
+	clientInfo, err := dao.Connect(params.Address, params.Port, params.Username, params.Password)
+	if err != nil {
+		return nil
+	}
 	if err != nil {
 		zap.L().Warn("connect DB fail", zap.Error(err))
 		return base.Response{
@@ -85,7 +87,10 @@ func ConnectDB(ctx iris.Context) base.Result {
 		}
 	}
 	data := make(map[string]string)
+	nsid := clientInfo.ClientID
+	version := clientInfo.NebulaVersion
 	data["nsid"] = nsid
+	data["version"] = string(version)
 	ctx.SetCookieKV("nsid", nsid)
 	return base.Response{
 		Code: base.Success,
