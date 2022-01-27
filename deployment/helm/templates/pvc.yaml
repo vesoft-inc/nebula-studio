@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "nebula-studio.fullname" . }}-upload-data
+  name: {{ include "nebula-studio.name" . }}-upload-data
 spec:
   accessModes: ["ReadWriteOnce"]
   {{- if .Values.persistent.storageClassName }}
