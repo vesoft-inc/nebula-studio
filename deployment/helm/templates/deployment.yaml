@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "nebula-studio.fullname" . }}
+  name: {{ include "nebula-studio.name" . }}
   labels:
     {{- include "nebula-studio.labels" . | nindent 4 }}
 spec:
@@ -23,29 +23,11 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: http-gateway
-          image: "{{ .Values.image.httpGateway.name }}:{{ .Values.image.httpGateway.version }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-            - name: USER
-              value: root
-          ports:
-            - containerPort: 8080
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8080
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 8080
-          resources:
-            {{- toYaml .Values.resources.httpGateway | nindent 12 }}
-          volumeMounts:
-            - name: upload-data
-              mountPath: /upload
         - name: nebula-studio
+          command:
+            - ./server
+          args:
+            - --studio-config=config/config.yaml
           image: "{{ .Values.image.nebulaStudio.name }}:{{ .Values.image.nebulaStudio.version }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
@@ -55,57 +37,39 @@ spec:
             - containerPort: 7001
               protocol: TCP
           livenessProbe:
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
             httpGet:
               path: /
               port: 7001
           readinessProbe:
+            failureThreshold: 3
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
             httpGet:
               path: /
               port: 7001
-          # Patch due to https://github.com/vesoft-inc/nebula-studio/issues/22
-          command:
-            - sh
-            - -c
-            - |
-              sed 's/\(.*docker-start.*studio\)",/\1 --workers=3",/' -i package.json
-              npm run docker-start
           resources:
             {{- toYaml .Values.resources.nebulaStudio | nindent 12 }}
           volumeMounts:
             - name: upload-data
               mountPath: /upload
-        - name: nginx
-          image: "{{ .Values.image.nginx.name }}:{{ .Values.image.nginx.version }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - containerPort: 7000
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 7000
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 7000
-          resources:
-            {{- toYaml .Values.resources.nginx | nindent 12 }}
-          volumeMounts:
-            - name: upload-data
-              mountPath: /upload
-            - name: nginx-config
-              mountPath: /etc/nginx/conf.d/nebula.conf
-              subPath: nginx.conf
+            - name: studio-config
+              mountPath: /app/config
+              readOnly: true
       volumes:
-        - name: nginx-config
+        - name: studio-config
           configMap:
-            name: {{ include "nebula-studio.fullname" . }}-nginx-config
+            name: {{ include "nebula-studio.name" . }}-config
             items:
-              - key: nginx.conf
-                path: nginx.conf
+              - key: config.yaml
+                path: config.yaml
         - name: upload-data
           persistentVolumeClaim:
-            claimName: {{ include "nebula-studio.fullname" . }}-upload-data
+            claimName: {{ include "nebula-studio.name" . }}-upload-data
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

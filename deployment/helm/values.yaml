@@ -2,15 +2,9 @@ replicaCount: 1
 
 image:
   pullPolicy: IfNotPresent
-  httpGateway:
-    name: vesoft/nebula-http-gateway
-    version: v2.1.1
   nebulaStudio:
     name: vesoft/nebula-graph-studio
-    version: v3.1.0
-  nginx:
-    name: nginx
-    version: alpine
+    version: v3.2.0
 
 imagePullSecrets: []
 
@@ -20,11 +14,10 @@ fullnameOverride: ""
 service:
   type: ClusterIP
   port: 7001
+  nodePort: 32701
 
 resources:
-  httpGateway:
   nebulaStudio:
-  nginx:
 
 persistent:
   storageClassName: ""
