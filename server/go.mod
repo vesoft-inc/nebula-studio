@@ -3,12 +3,16 @@ module github.com/vesoft-inc/nebula-studio/server
 go 1.17
 
 require (
+	github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394
 	github.com/kataras/iris/v12 v12.2.0-alpha4
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
+	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca
 	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220124093655-f7f5b4c63e6a
-	github.com/vesoft-inc/nebula-importer v1.0.1-0.20211213064541-05a8646be295
+	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220314055243-ece1a79d37e5
 	go.uber.org/zap v1.17.0
 	gopkg.in/yaml.v2 v2.4.0
+	gorm.io/driver/sqlite v1.2.6
+	gorm.io/gorm v1.22.5
 )
 
 require (
@@ -29,6 +33,8 @@ require (
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/iris-contrib/jade v1.1.4 // indirect
 	github.com/iris-contrib/schema v0.0.6 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.4 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kataras/blocks v0.0.4 // indirect
 	github.com/kataras/golog v0.1.7 // indirect
@@ -47,7 +53,7 @@ require (
 	github.com/tdewolff/minify/v2 v2.9.22 // indirect
 	github.com/tdewolff/parse/v2 v2.5.21 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/vesoft-inc/nebula-go/v2 v2.5.2-0.20211210024917-9461e07cdca2 // indirect
+	github.com/vesoft-inc/nebula-go/v3 v3.0.0-20220214062853-d0c59964d0af // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.4 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/yosssi/ace v0.0.5 // indirect

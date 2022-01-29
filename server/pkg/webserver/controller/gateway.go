@@ -1,14 +1,12 @@
 package controller
 
 import (
-	"fmt"
+	"encoding/base64"
+	"strings"
 
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/types"
-	importconfig "github.com/vesoft-inc/nebula-importer/pkg/config"
-	importerErrors "github.com/vesoft-inc/nebula-importer/pkg/errors"
 	"github.com/vesoft-inc/nebula-studio/server/pkg/webserver/base"
-	"github.com/vesoft-inc/nebula-studio/server/pkg/webserver/service/importer"
 
 	"github.com/kataras/iris/v12"
 	"go.uber.org/zap"
@@ -20,30 +18,17 @@ type execNGQLParams struct {
 }
 
 type connectDBParams struct {
-	Address  string `json:"address"`
-	Port     int    `json:"port"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Address string `json:"address"`
+	Port    int    `json:"port"`
 }
 
 type disConnectDBParams struct {
 	Nsid string `json:"nsid"`
 }
 
-type importDataParams struct {
-	ConfigPath string                   `json:"configPath"`
-	ConfigBody *importconfig.YAMLConfig `json:"configBody"`
-}
-
-type handleImportActionParams struct {
-	TaskId     string `json:"taskId"`
-	TaskAction string `json:"taskAction"`
-}
-
 func ExecNGQL(ctx iris.Context) base.Result {
 	params := new(execNGQLParams)
-	err := ctx.ReadJSON(params)
-	if err != nil {
+	if err := ctx.ReadJSON(params); err != nil {
 		zap.L().Warn("execNGQLParams get fail", zap.Error(err))
 		return base.Response{
 			Code:    base.Error,
@@ -66,19 +51,40 @@ func ExecNGQL(ctx iris.Context) base.Result {
 }
 
 func ConnectDB(ctx iris.Context) base.Result {
-	params := new(connectDBParams)
-	err := ctx.ReadJSON(params)
+	token := ctx.GetHeader("Authorization")
+	tokenSlice := strings.Split(token, " ")
+	if len(tokenSlice) != 2 {
+		return base.Response{
+			Code:    base.AuthorizationError,
+			Message: "Not get token",
+		}
+	}
+
+	decode, err := base64.StdEncoding.DecodeString(tokenSlice[1])
 	if err != nil {
+		return base.Response{
+			Code:    base.AuthorizationError,
+			Message: err.Error(),
+		}
+	}
+	account := strings.Split(string(decode), ":")
+	if len(account) < 2 {
+		return base.Response{
+			Code:    base.AuthorizationError,
+			Message: "len of account is less than two",
+		}
+	}
+	username, password := account[0], account[1]
+
+	params := new(connectDBParams)
+	if err = ctx.ReadJSON(params); err != nil {
 		zap.L().Warn("connectDBParams get fail", zap.Error(err))
 		return base.Response{
 			Code:    base.Error,
 			Message: err.Error(),
 		}
 	}
-	clientInfo, err := dao.Connect(params.Address, params.Port, params.Username, params.Password)
-	if err != nil {
-		return nil
-	}
+	clientInfo, err := dao.Connect(params.Address, params.Port, username, password)
 	if err != nil {
 		zap.L().Warn("connect DB fail", zap.Error(err))
 		return base.Response{
@@ -87,11 +93,9 @@ func ConnectDB(ctx iris.Context) base.Result {
 		}
 	}
 	data := make(map[string]string)
-	nsid := clientInfo.ClientID
-	version := clientInfo.NebulaVersion
-	data["nsid"] = nsid
-	data["version"] = string(version)
-	ctx.SetCookieKV("nsid", nsid)
+	data["nsid"] = clientInfo.ClientID
+	data["version"] = string(clientInfo.NebulaVersion)
+	ctx.SetCookieKV("nsid", data["nsid"])
 	return base.Response{
 		Code: base.Success,
 		Data: data,
@@ -100,8 +104,7 @@ func ConnectDB(ctx iris.Context) base.Result {
 
 func DisconnectDB(ctx iris.Context) base.Result {
 	params := new(disConnectDBParams)
-	err := ctx.ReadJSON(params)
-	if err != nil {
+	if err := ctx.ReadJSON(params); err != nil {
 		zap.L().Warn("disConnectDBParams get fail", zap.Error(err))
 		return base.Response{
 			Code:    base.Error,
@@ -111,60 +114,5 @@ func DisconnectDB(ctx iris.Context) base.Result {
 	dao.Disconnect(params.Nsid)
 	return base.Response{
 		Code: base.Success,
-	}
-}
-
-func ImportData(ctx iris.Context) base.Result {
-	taskId := importer.NewTaskID()
-	task := importer.NewTask(taskId)
-	importer.GetTaskMgr().PutTask(taskId, &task)
-	params := new(importDataParams)
-	err := ctx.ReadJSON(params)
-	if err != nil {
-		zap.L().Warn("importDataParams get fail", zap.Error(err))
-		err = importerErrors.Wrap(importerErrors.InvalidConfigPathOrFormat, err)
-	} else {
-		err = importer.Import(taskId, params.ConfigPath, params.ConfigBody)
-	}
-
-	if err != nil {
-		// task err: import task not start err handle
-		task.TaskStatus = importer.StatusAborted.String()
-		zap.L().Error(fmt.Sprintf("Failed to start a import task: `%s`, task result: `%v`", taskId, err))
-		return base.Response{
-			Code:    base.Error,
-			Message: err.Error(),
-		}
-	}
-
-	return base.Response{
-		Code:    base.Success,
-		Data:    []string{taskId},
-		Message: fmt.Sprintf("Import task %s submit successfully", taskId),
-	}
-}
-
-func HandleImportAction(ctx iris.Context) base.Result {
-	params := new(handleImportActionParams)
-	err := ctx.ReadJSON(params)
-	if err != nil {
-		zap.L().Warn("handleImportActionParams get fail", zap.Error(err))
-		return base.Response{
-			Code:    base.Error,
-			Message: err.Error(),
-		}
-	}
-	data, err := importer.ImportAction(params.TaskId, importer.NewTaskAction(params.TaskAction))
-	if err != nil {
-		zap.L().Warn("importAction fail", zap.Error(err))
-		return base.Response{
-			Code:    base.Error,
-			Message: err.Error(),
-		}
-	}
-	return base.Response{
-		Code:    base.Success,
-		Message: "Processing a task action successfully",
-		Data:    data,
 	}
 }
