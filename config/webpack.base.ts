@@ -108,6 +108,7 @@ const commonConfig: Configuration = {
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.css', '.woff', '.woff2', 'ttf'],
     alias: {
       '#app': path.join(__dirname, '../app/'),
+      '@appv2': path.join(__dirname, '../app-v2/'),
       'react-dom': '@hot-loader/react-dom',
     },
   },
