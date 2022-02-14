@@ -39,6 +39,10 @@ const commonConfig: Configuration = {
             options: {
               lessOptions: {
                 javascriptEnabled: true,
+                modifyVars: {
+                  'menu-dark-bg': '#2F3A4A',
+                  'primary-color': '#2F80ED',
+                }
               }
             },
           },
@@ -91,7 +95,7 @@ const commonConfig: Configuration = {
 
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: path.join(__dirname, '../app/index.html'),
+      template: path.join(__dirname, '../app-v2/index.html'),
       favicon: resolve(__dirname, '../favicon.ico'),
       minify: {
         collapseWhitespace: true,
@@ -108,6 +112,7 @@ const commonConfig: Configuration = {
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.css', '.woff', '.woff2', 'ttf'],
     alias: {
       '#app': path.join(__dirname, '../app/'),
+      '@appv2': path.join(__dirname, '../app-v2/'),
       'react-dom': '@hot-loader/react-dom',
     },
   },

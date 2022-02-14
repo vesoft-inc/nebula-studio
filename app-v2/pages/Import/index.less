@@ -1,0 +1,29 @@
+.nebua-import-page {
+  padding: 25px 35px;
+  .tab-header {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #D5DDEB;
+    .import-tab {
+      background: #E9EDEF;
+      border-radius: 20px;
+      padding: 4px;
+      width: 400px;
+      display: flex;
+      justify-content: center;
+      .ant-radio-button-wrapper {
+        border-radius: 20px;
+        flex: 1;
+        text-align: center;
+        border: none;
+        &:not(.ant-radio-button-wrapper-checked) {
+          background: none;
+        }
+        &::before {
+          width: 0;
+        }
+      }
+    }
+  }
+}
