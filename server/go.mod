@@ -6,7 +6,7 @@ require (
 	github.com/kataras/iris/v12 v12.2.0-alpha4
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220124093655-f7f5b4c63e6a
-	github.com/vesoft-inc/nebula-importer v1.0.1-0.20211213064541-05a8646be295
+	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220214094549-1dd8e730a586
 	go.uber.org/zap v1.17.0
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -47,7 +47,7 @@ require (
 	github.com/tdewolff/minify/v2 v2.9.22 // indirect
 	github.com/tdewolff/parse/v2 v2.5.21 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/vesoft-inc/nebula-go/v2 v2.5.2-0.20211210024917-9461e07cdca2 // indirect
+	github.com/vesoft-inc/nebula-go/v3 v3.0.0-20220214062853-d0c59964d0af // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.4 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/yosssi/ace v0.0.5 // indirect
