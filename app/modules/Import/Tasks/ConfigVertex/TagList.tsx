@@ -2,9 +2,9 @@ import { Button } from 'antd';
 import React from 'react';
 import { connect } from 'react-redux';
 
+import Tag from './Tag';
 import { IDispatch, IRootState } from '#app/store';
 
-import Tag from './Tag';
 import './TagList.less';
 
 const mapState = (state: IRootState) => ({
@@ -23,7 +23,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {}
+  ReturnType<typeof mapDispatch> {}
 
 class TagList extends React.Component<IProps> {
   render() {

@@ -1,4 +1,4 @@
-import { Button, Input, message, Table, Tabs, Tooltip } from 'antd';
+import { Button, Input, Table, Tabs, Tooltip, message } from 'antd';
 import JSONBigint from 'json-bigint';
 import _ from 'lodash';
 import React from 'react';
@@ -55,7 +55,7 @@ class SelectedGraphDetailShowModal extends React.PureComponent<IProps, IState> {
     }
   };
 
-  handleChangeType = async (key: string) => {
+  handleChangeType = async(key: string) => {
     const { vertexes, edges } = this.props;
     this.setState({
       tagType: key,
@@ -155,87 +155,87 @@ class SelectedGraphDetailShowModal extends React.PureComponent<IProps, IState> {
     const columns =
       tagType === 'vertex'
         ? [
-            {
-              title: 'vid',
-              dataIndex: 'vid',
-              align: 'center' as const,
+          {
+            title: 'vid',
+            dataIndex: 'vid',
+            align: 'center' as const,
+          },
+          {
+            title: 'attributes',
+            dataIndex: 'attributes',
+            ellipsis: true,
+            align: 'center' as const,
+            render: record => {
+              return (
+                <Tooltip
+                  placement="topLeft"
+                  title={
+                    <pre>
+                      {JSONBigint.stringify(
+                        JSONBigint.parse(record),
+                        (_, value) => {
+                          if (typeof value === 'string') {
+                            return value.replace(/\u0000+$/, '');
+                          }
+                          return value;
+                        },
+                        2,
+                      )}
+                    </pre>
+                  }
+                >
+                  {record}
+                </Tooltip>
+              );
             },
-            {
-              title: 'attributes',
-              dataIndex: 'attributes',
-              ellipsis: true,
-              align: 'center' as const,
-              render: record => {
-                return (
-                  <Tooltip
-                    placement="topLeft"
-                    title={
-                      <pre>
-                        {JSONBigint.stringify(
-                          JSONBigint.parse(record),
-                          (_, value) => {
-                            if (typeof value === 'string') {
-                              return value.replace(/\u0000+$/, '');
-                            }
-                            return value;
-                          },
-                          2,
-                        )}
-                      </pre>
-                    }
-                  >
-                    {record}
-                  </Tooltip>
-                );
-              },
-            },
-          ]
+          },
+        ]
         : [
-            {
-              title: 'type',
-              dataIndex: 'type',
-              align: 'center' as const,
+          {
+            title: 'type',
+            dataIndex: 'type',
+            align: 'center' as const,
+          },
+          {
+            title: 'rank',
+            dataIndex: 'rank',
+            align: 'center' as const,
+          },
+          {
+            title: 'srcId',
+            dataIndex: 'srcId',
+            align: 'center' as const,
+          },
+          {
+            title: 'dstId',
+            dataIndex: 'dstId',
+            align: 'center' as const,
+          },
+          {
+            title: 'attributes',
+            dataIndex: 'attributes',
+            ellipsis: true,
+            align: 'center' as const,
+            render: record => {
+              return (
+                <Tooltip
+                  placement="topLeft"
+                  title={
+                    <pre>
+                      {JSONBigint.stringify(
+                        JSONBigint.parse(record),
+                        null,
+                        2,
+                      )}
+                    </pre>
+                  }
+                >
+                  {record}
+                </Tooltip>
+              );
             },
-            {
-              title: 'rank',
-              dataIndex: 'rank',
-              align: 'center' as const,
-            },
-            {
-              title: 'srcId',
-              dataIndex: 'srcId',
-              align: 'center' as const,
-            },
-            {
-              title: 'dstId',
-              dataIndex: 'dstId',
-              align: 'center' as const,
-            },
-            {
-              title: 'attributes',
-              dataIndex: 'attributes',
-              ellipsis: true,
-              align: 'center' as const,
-              render: record => {
-                return (
-                  <Tooltip
-                    placement="topLeft"
-                    title={
-                      <pre>
-                        {JSONBigint.stringify(
-                          JSONBigint.parse(record),
-                          null,
-                          2,
-                        )}
-                      </pre>
-                    }
-                  >
-                    {record}
-                  </Tooltip>
-                );
-              },
-            },
-          ];
+          },
+        ];
     return (
       <Modal
         className="modal-show-selected"
@@ -275,7 +275,7 @@ class SelectedGraphDetailShowModal extends React.PureComponent<IProps, IState> {
         <Table
           columns={columns}
           dataSource={data}
-          rowKey={(_, index) => index.toString()}
+          rowKey={(_, index) => index!.toString()}
         />
       </Modal>
     );

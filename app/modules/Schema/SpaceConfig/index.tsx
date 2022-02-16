@@ -1,12 +1,10 @@
-import { Button, Divider, Icon, Modal, Tabs } from 'antd';
+import { Button, Divider, Modal, Tabs } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
-import { match, RouteComponentProps, withRouter } from 'react-router-dom';
+import { RouteComponentProps, match, withRouter } from 'react-router-dom';
 
-import PrivateRoute from '#app/PrivateRoute';
-import { IDispatch, IRootState } from '#app/store';
-import { trackEvent } from '#app/utils/stat';
+import { LeftOutlined } from '@ant-design/icons';
 
 import SpaceSearchInput from '../../Console/SpaceSearchInput';
 import EdgeList from '../Edge';
@@ -17,6 +15,9 @@ import IndexList from '../Index/index';
 import TagList from '../Tag';
 import CreateTag from '../Tag/Create';
 import EditTag from '../Tag/Edit';
+import { trackEvent } from '#app/utils/stat';
+import { IDispatch, IRootState } from '#app/store';
+import PrivateRoute from '#app/PrivateRoute';
 import './index.less';
 
 const TabPane = Tabs.TabPane;
@@ -27,7 +28,7 @@ const mapState = (state: IRootState) => ({
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
-  asyncSwitchSpace: async (space: string) => {
+  asyncSwitchSpace: async(space: string) => {
     await dispatch.nebula.asyncSwitchSpace(space);
     await dispatch.explore.clear();
   },
@@ -35,8 +36,8 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    RouteComponentProps {
+  ReturnType<typeof mapDispatch>,
+  RouteComponentProps {
   match: match<{
     type: string;
     action: string;
@@ -129,7 +130,7 @@ class SpaceConfig extends React.Component<IProps, IState> {
             )}
           </div>
           <Button onClick={this.goBack}>
-            <Icon type="left" />
+            <LeftOutlined />
             {intl.get('schema.backToSpaceList')}
           </Button>
         </div>

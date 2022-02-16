@@ -2,20 +2,19 @@ import {
   Button,
   Divider,
   Form,
-  Icon,
   Input,
   List,
-  message,
   Modal,
   Radio,
   Select,
   Table,
+  message,
 } from 'antd';
-import { FormComponentProps } from 'antd/lib/form';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
-
+import { FormInstance } from 'antd/es/form';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { Instruction } from '#app/components';
 import GQLCodeMirror from '#app/components/GQLCodeMirror';
 import { IDispatch, IRootState } from '#app/store';
@@ -37,8 +36,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    FormComponentProps {
+  ReturnType<typeof mapDispatch> {
   closeHandler: any;
 }
 
@@ -74,6 +72,7 @@ interface IState {
 }
 
 class IndexMatch extends React.Component<IProps, IState> {
+  formRef = React.createRef<FormInstance>()
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -86,7 +85,7 @@ class IndexMatch extends React.Component<IProps, IState> {
 
   handleSelectTag = value => {
     const { tags } = this.props;
-    const { setFieldsValue } = this.props.form;
+    const { setFieldsValue } = this.formRef.current!;
     const selectedTag = tags.filter(item => item.name === value)[0] || {};
     this.setState({
       selectedTag,
@@ -227,7 +226,7 @@ class IndexMatch extends React.Component<IProps, IState> {
   };
 
   handleInquiry = () => {
-    const { getFieldValue } = this.props.form;
+    const { getFieldValue } = this.formRef.current!;
     const { filters } = this.state;
     const tag = getFieldValue('tag');
     const quantityLimit = getFieldValue('quantityLimit') || null;
@@ -250,7 +249,7 @@ class IndexMatch extends React.Component<IProps, IState> {
   };
 
   render() {
-    const { getFieldDecorator, getFieldValue } = this.props.form;
+    const { getFieldValue } = this.formRef.current!;
     const { selectedTag, filters, filterProps } = this.state;
     const { tags } = this.props;
     const { getQueryLoading } = this.props;
@@ -263,10 +262,10 @@ class IndexMatch extends React.Component<IProps, IState> {
     const currentGQL =
       tag && index
         ? getExploreGQLWithIndex({
-            tag,
-            quantityLimit,
-            filters,
-          })
+          tag,
+          quantityLimit,
+          filters,
+        })
         : '';
     const columns = [
       {
@@ -395,11 +394,10 @@ class IndexMatch extends React.Component<IProps, IState> {
         key: 'delete',
         render: (_1, _2, index) =>
           index > 0 && (
-            <Icon
+            <DeleteOutlined
               onClick={() => {
                 this.handleFilterDelete(index);
               }}
-              type="delete"
             />
           ),
       },
@@ -407,35 +405,28 @@ class IndexMatch extends React.Component<IProps, IState> {
     return (
       <div className="query-index">
         <Form>
-          <Form.Item label="TAG">
-            {getFieldDecorator('tag', {
-              rules: [
-                {
-                  required: true,
-                  message: 'Tag is required',
-                },
-              ],
-            })(
-              <Select onChange={this.handleSelectTag}>
-                {tags.map(e => (
-                  <Option value={e.name} key={e.name}>
-                    {e.name}
-                  </Option>
-                ))}
-              </Select>,
-            )}
+          <Form.Item label="TAG" name="tag" rules={[
+            {
+              required: true,
+              message: 'Tag is required',
+            },
+          ]}>
+            <Select onChange={this.handleSelectTag}>
+              {tags.map(e => (
+                <Option value={e.name} key={e.name}>
+                  {e.name}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
-          <Form.Item label={intl.get('explore.selectIndex')}>
-            {getFieldDecorator('index', {
-              rules: [
-                {
-                  required: true,
-                  message: 'Index is required',
-                },
-              ],
-            })(
-              <Select onChange={this.handleSelectIndex}>
-                {selectedTag &&
+          <Form.Item label={intl.get('explore.selectIndex')} name="index" rules={[
+            {
+              required: true,
+              message: 'Index is required',
+            },
+          ]}>
+            <Select onChange={this.handleSelectIndex}>
+              {selectedTag &&
                   selectedTag.indexes.map(e => (
                     <Option
                       value={e.indexName}
@@ -445,28 +436,25 @@ class IndexMatch extends React.Component<IProps, IState> {
                       {e.indexName} ({e.props.map(i => i.Field).join(', ')})
                     </Option>
                   ))}
-              </Select>,
-            )}
+            </Select>
             {selectedTag &&
               selectedTag.indexes.filter(index => index.props.length === 0)
                 .length > 0 && (
-                <Instruction description={intl.get('explore.emptyIndexTips')} />
-              )}
+              <Instruction description={intl.get('explore.emptyIndexTips')} />
+            )}
           </Form.Item>
-          <Form.Item label={intl.get('explore.quantityLimit')}>
-            {getFieldDecorator('quantityLimit', {
-              rules: [
-                {
-                  message: intl.get('formRules.positiveIntegerRequired'),
-                  pattern: /^\d+$/,
-                  transform(value) {
-                    if (value) {
-                      return Number(value);
-                    }
-                  },
-                },
-              ],
-            })(<Input type="number" />)}
+          <Form.Item label={intl.get('explore.quantityLimit')} name="quantityLimit" rules={[
+            {
+              message: intl.get('formRules.positiveIntegerRequired'),
+              pattern: /^\d+$/,
+              transform(value) {
+                if (value) {
+                  return Number(value);
+                }
+              },
+            },
+          ]}>
+            <Input type="number" />
           </Form.Item>
           <List
             className="comment-list"
@@ -484,10 +472,10 @@ class IndexMatch extends React.Component<IProps, IState> {
               <Table
                 columns={columns}
                 dataSource={filters}
-                rowKey={(_, index) => index.toString()}
+                rowKey={(_, index) => index!.toString()}
                 pagination={false}
                 footer={() => (
-                  <Icon type="plus" onClick={this.handleFilterAdd} />
+                  <PlusOutlined onClick={this.handleFilterAdd} />
                 )}
               />
             </li>
@@ -514,4 +502,4 @@ class IndexMatch extends React.Component<IProps, IState> {
   }
 }
 
-export default connect(mapState, mapDispatch)(Form.create()(IndexMatch));
+export default connect(mapState, mapDispatch)(IndexMatch);

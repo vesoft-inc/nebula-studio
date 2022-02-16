@@ -1,12 +1,11 @@
-import { FormComponentProps } from 'antd/lib/form/Form';
 import _ from 'lodash';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { IDispatch, IRootState } from '#app/store';
 
 import IndexIntroduction from './IndexIntroduction';
 import IndexMatch from './IndexMatch';
+import { IDispatch, IRootState } from '#app/store';
 
 const mapState = (state: IRootState) => ({
   indexes: state.nebula.indexes,
@@ -18,8 +17,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    FormComponentProps {
+  ReturnType<typeof mapDispatch> {
   closeHandler: any;
 }
 

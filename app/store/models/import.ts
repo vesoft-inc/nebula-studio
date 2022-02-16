@@ -1,6 +1,7 @@
 import { createModel } from '@rematch/core';
 import { message } from 'antd';
 import intl from 'react-intl-universal';
+import type { IRootModel } from '.';
 
 import service from '#app/config/service';
 import { handleKeyword } from '#app/utils/function';
@@ -41,7 +42,7 @@ interface IState {
   taskId: string;
 }
 
-export const importData = createModel({
+export const importData = createModel<IRootModel>()({
   state: {
     activeStep: 0,
     currentStep: 0,
@@ -56,15 +57,15 @@ export const importData = createModel({
     taskId: 'all',
     vertexAddCount: 1,
     edgeAddCount: 1,
-  },
+  } as IState,
   reducers: {
-    update: (state: IState, payload: any) => {
+    update: (state: IState, payload: object): IState => {
       return {
         ...state,
         ...payload,
       };
     },
-    newVertexConfig: (state: IState, payload: any) => {
+    newVertexConfig: (state: IState, payload: Record<string, unknown>): IState => {
       const { file } = payload;
       const { vertexesConfig, vertexAddCount } = state;
       const vertexName = `${intl.get('import.datasource')} ${vertexAddCount}`;
@@ -92,7 +93,7 @@ export const importData = createModel({
         vertexesConfig,
       };
     },
-    deleteVertexConfig: (state: IState, payload: any) => {
+    deleteVertexConfig: (state: IState, payload: Record<string, unknown>) => {
       const { vertexName } = payload;
       const { vertexesConfig, activeVertexIndex } = state;
       let deleteIndex;
@@ -163,7 +164,7 @@ export const importData = createModel({
         vertexesConfig: [...vertexesConfig],
       };
     },
-    newEdgeConfig: (state: IState, payload: any) => {
+    newEdgeConfig: (state: IState, payload: Record<string, unknown>) => {
       const { file } = payload;
       const { edgesConfig, edgeAddCount } = state;
       const edgeName = `Edge ${edgeAddCount}`;
@@ -183,7 +184,7 @@ export const importData = createModel({
         edgeAddCount: edgeAddCount + 1,
       };
     },
-    deleteEdgeConfig: (state: IState, payload: any) => {
+    deleteEdgeConfig: (state: IState, payload: Record<string, unknown>) => {
       const { edgesConfig, activeEdgeIndex } = state;
       const { edgeName } = payload;
       let deleteIndex;
@@ -282,7 +283,7 @@ export const importData = createModel({
         isImporting: false,
       });
     },
-    async importData(payload, rootState) {
+    async importData(payload: Record<string, unknown>, rootState) {
       const {
         nebula: { spaceVidType },
       } = rootState;
@@ -302,12 +303,12 @@ export const importData = createModel({
       return code;
     },
 
-    async checkImportStatus(payload) {
+    async checkImportStatus(payload: Record<string, unknown>) {
       const res = await service.handleImportAction(payload);
       return res;
     },
 
-    async stopImport(payload) {
+    async stopImport(payload: Record<string, unknown>) {
       this.update({
         isImporting: false,
       });

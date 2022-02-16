@@ -12,7 +12,7 @@ interface IProps {
   onMouseOut: () => void;
 }
 
-export default class Links extends React.Component<IProps, {}> {
+export default class Links extends React.Component<IProps, Record<string, unknown>> {
   ref: SVGGElement;
 
   componentDidMount() {

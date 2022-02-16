@@ -1,4 +1,4 @@
-import { Icon, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
 import classnames from 'classnames';
 import React from 'react';
 
@@ -8,7 +8,6 @@ import './index.less';
 interface IBtnProps {
   disabled?: boolean;
   action?: () => void;
-  icon?: string;
   iconfont?: string;
   title?: string;
   className?: string;
@@ -24,7 +23,6 @@ interface IMenuButton extends IBtnProps {
 }
 const CustomizeButton = (props: IBtnProps) => {
   const {
-    icon,
     iconfont,
     action,
     disabled,
@@ -49,15 +47,6 @@ const CustomizeButton = (props: IBtnProps) => {
       data-track-action={trackAction}
       data-track-label={trackLabel}
     >
-      {icon && (
-        <Icon
-          type={icon}
-          data-track-category={trackCategory}
-          data-track-action={trackAction}
-          data-track-label={trackLabel}
-          className="panel-menu-icon"
-        />
-      )}
       {iconfont && (
         <IconFont
           type={iconfont}
@@ -76,7 +65,6 @@ const CustomizeButton = (props: IBtnProps) => {
 // antd Tooltip can't wrap custom component
 const CustomizeTooltipBtn = (props: IMenuButton) => {
   const {
-    icon,
     iconfont,
     action,
     disabled,
@@ -89,19 +77,7 @@ const CustomizeTooltipBtn = (props: IMenuButton) => {
   } = props;
   return (
     <Tooltip title={tips}>
-      {icon ? (
-        <Icon
-          type={icon}
-          className={classnames('panel-menu-icon', {
-            'panel-disabled': disabled,
-            'panel-actived': active,
-          })}
-          data-track-category={trackCategory}
-          data-track-action={trackAction}
-          data-track-label={trackLabel}
-          onClick={!disabled ? action : undefined}
-        />
-      ) : iconfont ? (
+      {iconfont ? (
         <IconFont
           type={iconfont}
           className={classnames('panel-menu-icon', {

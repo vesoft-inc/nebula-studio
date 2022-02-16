@@ -1,16 +1,17 @@
-import { Button, Icon, Popconfirm, Tabs } from 'antd';
+import { Button, Popconfirm, Tabs } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
-import CSVPreviewLink from '#app/components/CSVPreviewLink';
-import { IDispatch, IRootState } from '#app/store';
-import { trackPageView } from '#app/utils/stat';
+import { CloseOutlined } from '@ant-design/icons';
 
 import Add, { AddType } from '../Add';
 import Next from '../Next';
 import Prev from '../Prev';
 import Edge from './Edge';
+import { trackPageView } from '#app/utils/stat';
+import { IDispatch, IRootState } from '#app/store';
+import CSVPreviewLink from '#app/components/CSVPreviewLink';
 import './index.less';
 
 const { TabPane } = Tabs;
@@ -36,7 +37,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {}
+  ReturnType<typeof mapDispatch> {}
 
 class ConfigEdge extends React.Component<IProps> {
   handleTabClick = key => {
@@ -84,7 +85,7 @@ class ConfigEdge extends React.Component<IProps> {
                           e.stopPropagation();
                         }}
                       >
-                        <Icon type="close" />
+                        <CloseOutlined />
                       </Button>
                     </Popconfirm>
                   </p>

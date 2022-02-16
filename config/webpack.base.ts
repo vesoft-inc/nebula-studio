@@ -1,17 +1,18 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path, { resolve } from 'path';
-import webpack from 'webpack';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-import Package from '../package.json'
+import webpack, { Configuration } from 'webpack';
+import Package from '../package.json';
+import AntdDayjsWebpackPlugin from 'antd-dayjs-webpack-plugin';
 
-const commonConfig = {
+const commonConfig: Configuration = {
   entry: {
     app: [path.join(__dirname, '../app/index.tsx')],
   },
   module: {
+    exprContextCritical: true,
     rules: [
       {
-        test: /\.(js|jsx|ts|tsx)$/,
+        test: /\.(ts|tsx)$/,
         use: [
           'babel-loader',
           {
@@ -24,6 +25,11 @@ const commonConfig = {
         include: path.join(__dirname, '../app'),
       },
       {
+        test: /\.(js|jsx)$/,
+        use: ['babel-loader'],
+        include: path.join(__dirname, '../app'),
+      },
+      {
         test: /\.less/,
         use: [
           'style-loader',
@@ -31,7 +37,9 @@ const commonConfig = {
           {
             loader: 'less-loader',
             options: {
-              javascriptEnabled: true,
+              lessOptions: {
+                javascriptEnabled: true,
+              }
             },
           },
         ],
@@ -42,7 +50,7 @@ const commonConfig = {
           {
             loader: 'file-loader',
             options: {
-              name: "[path][name].[ext]",
+              name: '[path][name].[ext]',
               esModule: false,
             }
           }
@@ -60,6 +68,18 @@ const commonConfig = {
         ],
       },
     ],
+  },
+  optimization: {
+    moduleIds: 'deterministic',
+    runtimeChunk: {
+      name: 'runtime',
+    },
+    splitChunks: {
+      chunks: 'all',
+      maxInitialRequests: 10,
+      maxSize: 2000000,
+      minSize: 800000,
+    }
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -82,20 +102,16 @@ const commonConfig = {
         useShortDoctype: true,
       },
     }),
-    new webpack.HashedModuleIdsPlugin(),
+    new AntdDayjsWebpackPlugin(),
   ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.css', '.woff', '.woff2', 'ttf'],
     alias: {
       '#app': path.join(__dirname, '../app/'),
-      // fix this: https://github.com/react-component/table/issues/368
-      'react-dom': '@hot-loader/react-dom'
+      'react-dom': '@hot-loader/react-dom',
     },
   },
 };
 
-if (process.env.npm_config_report) {
-  commonConfig.plugins.push(new BundleAnalyzerPlugin());
-}
 
 export default commonConfig;

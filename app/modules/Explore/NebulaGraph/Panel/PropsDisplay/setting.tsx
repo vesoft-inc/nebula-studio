@@ -8,7 +8,7 @@ interface IProps {
   onNameChange: (showFields) => void;
 }
 
-class Setting extends React.PureComponent<IProps, {}> {
+class Setting extends React.PureComponent<IProps> {
   nameToOptions = (tag: string, name: any) => {
     const { value } = this.props;
     return name.map(itme => {

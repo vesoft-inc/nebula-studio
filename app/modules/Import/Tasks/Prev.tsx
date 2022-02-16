@@ -21,7 +21,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {
+  ReturnType<typeof mapDispatch> {
   disabled?: boolean;
 }
 
@@ -30,7 +30,7 @@ class Prev extends React.Component<IProps> {
     super(props);
   }
 
-  handleGoBack = async () => {
+  handleGoBack = async() => {
     const { activeStep, updateActiveStep } = this.props;
     updateActiveStep(activeStep - 1);
   };

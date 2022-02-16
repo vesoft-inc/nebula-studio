@@ -5,14 +5,13 @@ import {
   Col,
   Collapse,
   Form,
-  Icon,
   Input,
-  message,
   Modal,
   Popconfirm,
   Popover,
   Select,
   Table,
+  message,
 } from 'antd';
 import _ from 'lodash';
 import React from 'react';
@@ -399,7 +398,7 @@ class EditEdge extends React.Component<IProps, IState> {
         content: intl.get('schema.cancelPropmt'),
         okText: intl.get('common.yes'),
         cancelText: intl.get('common.no'),
-        onOk: async () => {
+        onOk: async() => {
           if (type === 'field') {
             const data = this.state.fieldList.filter(i => i.name !== '');
             if (data.length > 0) {
@@ -630,7 +629,7 @@ class EditEdge extends React.Component<IProps, IState> {
       <Table
         columns={columns}
         dataSource={fieldList}
-        rowKey={(_, index) => index.toString()}
+        rowKey={(_, index) => index!.toString()}
         pagination={false}
         footer={() => (
           <Button
@@ -860,7 +859,7 @@ class EditEdge extends React.Component<IProps, IState> {
             <Breadcrumb.Item>{intl.get('common.edit')}</Breadcrumb.Item>
           </Breadcrumb>
           <Button onClick={this.goBack}>
-            <Icon type="left" />
+            <LeftOutlined />
             {intl.get('schema.backToEdgeList')}
           </Button>
         </header>

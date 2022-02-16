@@ -16,7 +16,7 @@ const mapDispatch = () => ({});
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {}
+  ReturnType<typeof mapDispatch> {}
 
 class Import extends React.Component<IProps> {
   constructor(props: IProps) {

@@ -1,8 +1,8 @@
 import { Button, Form, Select } from 'antd';
-import { FormComponentProps } from 'antd/lib/form';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
+import { FormInstance } from 'antd/es/form';
 
 import { IDispatch, IRootState } from '#app/store';
 import { trackPageView } from '#app/utils/stat';
@@ -35,10 +35,10 @@ const FormItem = Form.Item;
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    FormComponentProps {}
+  ReturnType<typeof mapDispatch> {}
 
-class Init extends React.Component<IProps, {}> {
+class Init extends React.Component<IProps> {
+  formRef = React.createRef<FormInstance>()
   componentDidMount() {
     this.props.asyncGetImportWorkingDir();
     this.props.asyncGetSpaces();
@@ -47,9 +47,9 @@ class Init extends React.Component<IProps, {}> {
   }
 
   handleNext = () => {
-    this.props.form.validateFields((err, values: any) => {
+    this.formRef.current!.validateFields().then(values => {
       const { space } = values;
-      if (!err && space) {
+      if (space) {
         this.props.asyncSwitchSpace(space);
         this.props.nextStep();
       }
@@ -62,41 +62,35 @@ class Init extends React.Component<IProps, {}> {
       currentSpace,
       currentStep,
       uploadDir,
-      form: { getFieldDecorator, getFieldValue },
     } = this.props;
     return (
       <div className="init task">
-        <Form layout="inline">
-          <FormItem label={intl.get('common.currentSpace')}>
-            {getFieldDecorator('space', {
-              initialValue: currentSpace,
-              rules: [
-                {
-                  required: true,
-                },
-              ],
-            })(
-              <Select disabled={currentStep > 0}>
-                {spaces.map(space => (
-                  <Option value={space} key={space}>
-                    {space}
-                  </Option>
-                ))}
-              </Select>,
-            )}
+        <Form layout="inline" ref={this.formRef}>
+          <FormItem label={intl.get('common.currentSpace')} name="space" initialValue={currentSpace} rules={[{ required: true }]}>
+            <Select disabled={currentStep > 0}>
+              {spaces.map(space => (
+                <Option value={space} key={space}>
+                  {space}
+                </Option>
+              ))}
+            </Select>
           </FormItem>
         </Form>
-        <Button
-          type="primary"
-          className="next"
-          onClick={this.handleNext}
-          disabled={!getFieldValue('space') || !uploadDir}
-        >
-          {intl.get('import.next')}
-        </Button>
+        <FormItem noStyle={true}>
+          {({ getFieldValue }) =>
+            <Button
+              type="primary"
+              className="next"
+              onClick={this.handleNext}
+              disabled={!getFieldValue('space') || !uploadDir}
+            >
+              {intl.get('import.next')}
+            </Button>
+          }
+        </FormItem>
       </div>
     );
   }
 }
 
-export default connect(mapState, mapDispatch)(Form.create()(Init));
+export default connect(mapState, mapDispatch)(Init);

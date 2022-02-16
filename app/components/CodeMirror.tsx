@@ -147,7 +147,7 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
     }
   };
 
-  async componentWillReceiveProps(nextProps) {
+  async UNSAFE_componentWillReceiveProps(nextProps) {
     const { options, value } = nextProps;
     await this.setOptions(options);
     if (value !== this.editor.getValue()) {

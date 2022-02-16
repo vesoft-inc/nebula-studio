@@ -1,8 +1,9 @@
-import { Button, Card, Icon, Tooltip } from 'antd';
+import { Button, Card, Tooltip } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { InfoCircleTwoTone } from '@ant-design/icons';
 
 import { IDispatch, IRootState } from '#app/store';
 
@@ -21,8 +22,8 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    RouteComponentProps {}
+  ReturnType<typeof mapDispatch>,
+  RouteComponentProps {}
 
 const demo = `CREATE TAG INDEX index_player ON player(name, age);`;
 class IndexIntroduction extends React.Component<IProps> {
@@ -37,7 +38,7 @@ class IndexIntroduction extends React.Component<IProps> {
     return (
       <div>
         <div className="warning">
-          <Icon type="info-circle" theme="twoTone" twoToneColor="#FAAD14" />
+          <InfoCircleTwoTone twoToneColor="#FAAD14" />
           <span>{intl.get('explore.emptyIndex')}</span>
         </div>
         <p className="guide">
@@ -63,7 +64,7 @@ class IndexIntroduction extends React.Component<IProps> {
         </Card>
         <span className="link">
           {intl.get('explore.indexLink')}
-          <a href={intl.get('explore.documentIntroductionUrl')} target="_blank">
+          <a href={intl.get('explore.documentIntroductionUrl')} target="_blank" rel="noreferrer">
             {intl.get('explore.documentIntroduction')}
           </a>
         </span>

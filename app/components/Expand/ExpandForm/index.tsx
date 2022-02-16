@@ -2,17 +2,18 @@ import {
   Button,
   Form,
   Input,
-  message,
   Popover,
   Radio,
   Select,
   Tag,
+  message,
 } from 'antd';
-import { FormComponentProps } from 'antd/lib/form';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
+import { FormInstance } from 'antd/es/form';
 
+import AddFilterForm from '../AddFilterForm';
 import { Instruction } from '#app/components';
 import GQLModal from '#app/components/GQLModal';
 import IconFont from '#app/components/Icon';
@@ -23,7 +24,6 @@ import { RELATION_OPERATORS } from '#app/utils/constant';
 import { getExploreMatchGQL } from '#app/utils/gql';
 import { trackEvent } from '#app/utils/stat';
 
-import AddFilterForm from '../AddFilterForm';
 import './index.less';
 
 const Option = Select.Option;
@@ -46,9 +46,8 @@ const mapDispatch = (dispatch: IDispatch) => ({
 });
 
 interface IProps
-  extends FormComponentProps,
-    ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {
+  extends ReturnType<typeof mapState>,
+  ReturnType<typeof mapDispatch> {
   close: () => void;
 }
 
@@ -66,6 +65,7 @@ interface IState {
 
 class Expand extends React.Component<IProps, IState> {
   gqlRef;
+  formRef = React.createRef<FormInstance>()
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -142,12 +142,8 @@ class Expand extends React.Component<IProps, IState> {
 
   handleExpand = () => {
     const { selectVertexes, edgesFields } = this.props;
-    const { getFieldsValue } = this.props.form;
     const { filters, customColor, customIcon } = this.state;
-    this.props.form.validateFields(async err => {
-      if (err) {
-        return;
-      }
+    this.formRef.current!.validateFields().then(async() => {
       const {
         edgeTypes,
         edgeDirection,
@@ -157,7 +153,7 @@ class Expand extends React.Component<IProps, IState> {
         maxStep,
         vertexStyle,
         quantityLimit,
-      } = getFieldsValue();
+      } = this.formRef.current!.getFieldsValue();
       (this.props.asyncGetExpand({
         filters,
         selectVertexes,
@@ -173,7 +169,7 @@ class Expand extends React.Component<IProps, IState> {
         customColor,
         customIcon,
       }) as any).then(
-        async () => {
+        async() => {
           message.success(intl.get('common.success'));
           trackEvent('explore', 'expand', 'ajax success');
         },
@@ -197,9 +193,9 @@ class Expand extends React.Component<IProps, IState> {
       filters.length === 0
         ? { expression }
         : {
-            relation: 'AND',
-            expression,
-          };
+          relation: 'AND',
+          expression,
+        };
     this.setState(
       {
         filters: [...filters, newFilter],
@@ -247,7 +243,6 @@ class Expand extends React.Component<IProps, IState> {
   };
 
   handleUpdateRules = () => {
-    const { getFieldsValue } = this.props.form;
     const { filters, customColor, customIcon } = this.state;
     setTimeout(() => {
       const {
@@ -259,7 +254,7 @@ class Expand extends React.Component<IProps, IState> {
         maxStep,
         vertexStyle,
         quantityLimit,
-      } = getFieldsValue();
+      } = this.formRef.current!.getFieldsValue();
       this.props.updateExploreRules({
         edgeTypes,
         edgeDirection,
@@ -284,7 +279,6 @@ class Expand extends React.Component<IProps, IState> {
       spaceVidType,
       close,
     } = this.props;
-    const { getFieldDecorator, getFieldsValue } = this.props.form;
     const { filters, customColor, customIcon } = this.state;
     const {
       edgeTypes: selectEdgeTypes,
@@ -294,182 +288,106 @@ class Expand extends React.Component<IProps, IState> {
       minStep,
       maxStep,
       quantityLimit,
-    } = getFieldsValue();
+    } = this.formRef.current!.getFieldsValue();
     const currentGQL =
       selectEdgeTypes && selectEdgeTypes.length
         ? getExploreMatchGQL({
-            selectVertexes,
-            edgeTypes: selectEdgeTypes,
-            filters,
-            edgeDirection,
-            quantityLimit,
-            spaceVidType,
-            stepsType,
-            step,
-            minStep,
-            maxStep,
-          })
+          selectVertexes,
+          edgeTypes: selectEdgeTypes,
+          filters,
+          edgeDirection,
+          quantityLimit,
+          spaceVidType,
+          stepsType,
+          step,
+          minStep,
+          maxStep,
+        })
         : '';
     const fieldTable = this.renderFilters();
     return (
       <div className="graph-expand">
         <div className="expand-config">
-          <Form colon={false}>
-            <Form.Item label={intl.get('common.edge')}>
-              {getFieldDecorator('edgeTypes', {
-                initialValue:
-                  rules.edgeTypes && rules.edgeTypes.length > 0
-                    ? rules.edgeTypes
-                    : edgeTypes,
-                rules: [
-                  {
-                    required: true,
-                    message: 'Edge Type is required',
-                  },
-                ],
-              })(
-                <Select mode="multiple" onChange={this.handleUpdateRules}>
-                  {edgeTypes.map(e => (
-                    <Option value={e} key={e}>
-                      {e}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
+          <Form colon={false} ref={this.formRef} initialValues={{
+            edgeTypes: rules.edgeTypes && rules.edgeTypes.length > 0
+              ? rules.edgeTypes
+              : edgeTypes,
+            edgeDirection: rules.edgeDirection || 'outgoing',
+            stepsType: rules.stepsType || 'single',
+            step: rules.step || '1',
+            minStep: rules.minStep || '',
+            maxStep: rules.maxStep || '',
+            vertexStyle: rules.vertexStyle || 'colorGroupByTag',
+            quantityLimit: rules.quantityLimit || 100,
+
+          }}>
+            <Form.Item label={intl.get('common.edge')} name="edgeTypes" rules={[
+              {
+                required: true,
+                message: 'Edge Type is required',
+              },
+            ]}>
+              <Select mode="multiple" onChange={this.handleUpdateRules}>
+                {edgeTypes.map(e => (
+                  <Option value={e} key={e}>
+                    {e}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
-            <Form.Item label={intl.get('explore.direction')}>
-              {getFieldDecorator('edgeDirection', {
-                initialValue: rules.edgeDirection || 'outgoing',
-                rules: [
-                  {
-                    required: true,
-                  },
-                ],
-              })(
-                <Select onChange={this.handleUpdateRules}>
-                  <Option value="outgoing">
-                    {intl.get('explore.outgoing')}
-                  </Option>
-                  <Option value="incoming">
-                    {intl.get('explore.incoming')}
-                  </Option>
-                  <Option value="bidirect">
-                    {intl.get('explore.bidirect')}
-                  </Option>
-                </Select>,
-              )}
+            <Form.Item label={intl.get('explore.direction')} name="edgeDirection" rules={[
+              {
+                required: true,
+              },
+            ]}>
+              <Select onChange={this.handleUpdateRules}>
+                <Option value="outgoing">
+                  {intl.get('explore.outgoing')}
+                </Option>
+                <Option value="incoming">
+                  {intl.get('explore.incoming')}
+                </Option>
+                <Option value="bidirect">
+                  {intl.get('explore.bidirect')}
+                </Option>
+              </Select>
             </Form.Item>
             <Form.Item
               label={intl.get('explore.steps')}
               className="select-step-type"
+              name="stepsType"
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
             >
-              {getFieldDecorator('stepsType', {
-                initialValue: rules.stepsType || 'single',
-                rules: [
-                  {
-                    required: true,
-                  },
-                ],
-              })(
-                <Radio.Group onChange={this.handleUpdateRules}>
-                  <Radio value="single">{intl.get('explore.singleStep')}</Radio>
-                  <Radio value="range">{intl.get('explore.rangeStep')}</Radio>
-                </Radio.Group>,
-              )}
+              <Radio.Group onChange={this.handleUpdateRules}>
+                <Radio value="single">{intl.get('explore.singleStep')}</Radio>
+                <Radio value="range">{intl.get('explore.rangeStep')}</Radio>
+              </Radio.Group>
             </Form.Item>
             {stepsType === 'single' && (
-              <Form.Item className="input-step">
-                {getFieldDecorator('step', {
-                  initialValue: rules.step || '1',
-                  rules: [
-                    {
-                      message: intl.get('formRules.positiveIntegerRequired'),
-                      pattern: /^\d+$/,
-                      transform(value) {
-                        if (value) {
-                          return Number(value);
-                        }
-                      },
-                    },
-                    {
-                      required: true,
-                    },
-                  ],
-                })(<Input type="number" onChange={this.handleUpdateRules} />)}
+              <Form.Item className="input-step" name="step" rules={[
+                {
+                  message: intl.get('formRules.positiveIntegerRequired'),
+                  pattern: /^\d+$/,
+                  transform(value) {
+                    if (value) {
+                      return Number(value);
+                    }
+                  },
+                },
+                {
+                  required: true,
+                },
+              ]}>
+                <Input type="number" onChange={this.handleUpdateRules} />)
               </Form.Item>
             )}
             {stepsType === 'range' && (
               <div className="input-step">
-                <Form.Item>
-                  {getFieldDecorator('minStep', {
-                    initialValue: rules.minStep || '',
-                    rules: [
-                      {
-                        message: intl.get('formRules.positiveIntegerRequired'),
-                        pattern: /^\d+$/,
-                        transform(value) {
-                          if (value) {
-                            return Number(value);
-                          }
-                        },
-                      },
-                      {
-                        required: true,
-                      },
-                    ],
-                  })(<Input type="number" onChange={this.handleUpdateRules} />)}
-                </Form.Item>
-                -
-                <Form.Item>
-                  {getFieldDecorator('maxStep', {
-                    initialValue: rules.maxStep || '',
-                    rules: [
-                      {
-                        message: intl.get('formRules.positiveIntegerRequired'),
-                        pattern: /^\d+$/,
-                        transform(value) {
-                          if (value) {
-                            return Number(value);
-                          }
-                        },
-                      },
-                      {
-                        required: true,
-                      },
-                    ],
-                  })(<Input type="number" onChange={this.handleUpdateRules} />)}
-                </Form.Item>
-              </div>
-            )}
-            <Form.Item label={intl.get('explore.vertexStyle')}>
-              {getFieldDecorator('vertexStyle', {
-                initialValue: rules.vertexStyle || 'colorGroupByTag',
-                rules: [
-                  {
-                    required: true,
-                  },
-                ],
-              })(
-                <Radio.Group onChange={this.handleUpdateRules}>
-                  <Radio value="colorGroupByTag">
-                    {intl.get('explore.colorGroupByTag')}
-                  </Radio>
-                  <Radio value="custom">
-                    {intl.get('explore.customStyle')}
-                  </Radio>
-                  <VertexStyleSet
-                    handleChangeColorComplete={this.handleCustomColor}
-                    handleChangeIconComplete={this.handleCustomIcon}
-                    icon={customIcon}
-                    color={customColor}
-                  />
-                </Radio.Group>,
-              )}
-            </Form.Item>
-            <Form.Item label={intl.get('explore.quantityLimit')}>
-              {getFieldDecorator('quantityLimit', {
-                initialValue: rules.quantityLimit || 100,
-                rules: [
+                <Form.Item name="minStep" rules={[
                   {
                     message: intl.get('formRules.positiveIntegerRequired'),
                     pattern: /^\d+$/,
@@ -479,8 +397,59 @@ class Expand extends React.Component<IProps, IState> {
                       }
                     },
                   },
-                ],
-              })(<Input type="number" onChange={this.handleUpdateRules} />)}
+                  {
+                    required: true,
+                  },
+                ]}>
+                  <Input type="number" onChange={this.handleUpdateRules} />
+                </Form.Item>
+                -
+                <Form.Item name="maxStep" rules={[
+                  {
+                    message: intl.get('formRules.positiveIntegerRequired'),
+                    pattern: /^\d+$/,
+                    transform(value) {
+                      if (value) {
+                        return Number(value);
+                      }
+                    },
+                  },
+                  {
+                    required: true,
+                  },
+                ]}>
+                  <Input type="number" onChange={this.handleUpdateRules} />
+                </Form.Item>
+              </div>
+            )}
+            <Form.Item label={intl.get('explore.vertexStyle')} name="vertexStyle" rules={[{ required: true }]}>
+              <Radio.Group onChange={this.handleUpdateRules}>
+                <Radio value="colorGroupByTag">
+                  {intl.get('explore.colorGroupByTag')}
+                </Radio>
+                <Radio value="custom">
+                  {intl.get('explore.customStyle')}
+                </Radio>
+                <VertexStyleSet
+                  handleChangeColorComplete={this.handleCustomColor}
+                  handleChangeIconComplete={this.handleCustomIcon}
+                  icon={customIcon}
+                  color={customColor}
+                />
+              </Radio.Group>
+            </Form.Item>
+            <Form.Item label={intl.get('explore.quantityLimit')} name="quantityLimit" rules={[
+              {
+                message: intl.get('formRules.positiveIntegerRequired'),
+                pattern: /^\d+$/,
+                transform(value) {
+                  if (value) {
+                    return Number(value);
+                  }
+                },
+              },
+            ]}>
+              <Input type="number" onChange={this.handleUpdateRules} />
             </Form.Item>
             <div className="filter-component">
               <div className="filter-header">
@@ -565,4 +534,4 @@ class Expand extends React.Component<IProps, IState> {
   }
 }
 
-export default connect(mapState, mapDispatch)(Form.create()(Expand));
+export default connect(mapState, mapDispatch)(Expand);

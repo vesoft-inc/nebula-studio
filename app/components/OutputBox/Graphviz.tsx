@@ -1,4 +1,4 @@
-import { graphviz, GraphvizOptions } from 'd3-graphviz';
+import { GraphvizOptions, graphviz } from 'd3-graphviz';
 import _ from 'lodash';
 import * as React from 'react';
 

@@ -32,7 +32,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {
+  ReturnType<typeof mapDispatch> {
   showTitle?: boolean;
   handlerRef?: (handler) => void;
 }
@@ -69,7 +69,7 @@ class PropsDisplayBtn extends React.PureComponent<IProps, IState> {
     });
   };
 
-  handleOpenModal = async () => {
+  handleOpenModal = async() => {
     if (this.modalHandler) {
       await this.handleGetFields('tags');
       this.initCheckbox();
@@ -84,7 +84,7 @@ class PropsDisplayBtn extends React.PureComponent<IProps, IState> {
     }
   };
 
-  handleGetFields = async (type: string) => {
+  handleGetFields = async(type: string) => {
     if (type === 'tags') {
       const { asyncGetTagsFields, tags } = this.props;
       await asyncGetTagsFields({
@@ -101,7 +101,7 @@ class PropsDisplayBtn extends React.PureComponent<IProps, IState> {
     }
   };
 
-  handleChangeType = async (key: string) => {
+  handleChangeType = async(key: string) => {
     await this.handleGetFields(key);
     this.setState({
       tagType: key,

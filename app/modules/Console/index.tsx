@@ -1,16 +1,17 @@
-import { Button, Icon, List, message, Modal, Tooltip } from 'antd';
+import { Button, List, Modal, Tooltip, message } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 
+import { DeleteOutlined, FileSearchOutlined, HistoryOutlined, LoadingOutlined, PlayCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import SpaceSearchInput from './SpaceSearchInput';
 import { CodeMirror, OutputBox } from '#app/components';
 import { maxLineNum } from '#app/config/nebulaQL';
 import { IDispatch, IRootState } from '#app/store';
 import { trackPageView } from '#app/utils/stat';
 
 import './index.less';
-import SpaceSearchInput from './SpaceSearchInput';
 
 interface IState {
   isUpDown: boolean;
@@ -41,8 +42,8 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    RouteComponentProps {}
+  ReturnType<typeof mapDispatch>,
+  RouteComponentProps {}
 
 // split from semicolon out of quotation marks
 const SEMICOLON_REG = /((?:[^;'"]*(?:"(?:\\.|[^"])*"|'(?:\\.|[^'])*')[^;'"]*)+)|;/;
@@ -88,7 +89,7 @@ class Console extends React.Component<IProps, IState> {
       return intl.get('common.disablesUseToSwitchSpace');
     }
   };
-  handleRun = async () => {
+  handleRun = async() => {
     const query = this.editor.getValue();
     if (!query) {
       message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
@@ -185,18 +186,17 @@ class Console extends React.Component<IProps, IState> {
                 value={currentSpace}
               />
               <Tooltip title={intl.get('common.spaceTip')} placement="right">
-                <Icon type="question-circle" theme="outlined" />
+                <QuestionCircleOutlined />
               </Tooltip>
               <div className="operation">
                 <Tooltip title={intl.get('common.empty')} placement="bottom">
-                  <Icon type="delete" onClick={this.handleEmptyNgql} />
+                  <DeleteOutlined onClick={this.handleEmptyNgql} />
                 </Tooltip>
                 <Tooltip
                   title={intl.get('common.seeTheHistory')}
                   placement="bottom"
                 >
-                  <Icon
-                    type="history"
+                  <HistoryOutlined
                     onClick={() => {
                       this.setState({ history: true });
                     }}
@@ -204,11 +204,9 @@ class Console extends React.Component<IProps, IState> {
                 </Tooltip>
                 <Tooltip title={intl.get('common.run')} placement="bottom">
                   {!!runGQLLoading ? (
-                    <Icon type="loading" />
+                    <LoadingOutlined />
                   ) : (
-                    <Icon
-                      type="play-circle"
-                      theme="twoTone"
+                    <PlayCircleOutlined
                       onClick={() => this.handleRun()}
                     />
                   )}
@@ -220,9 +218,7 @@ class Console extends React.Component<IProps, IState> {
                 title={intl.get('console.parameterDisplay')}
                 placement="right"
               >
-                <Icon
-                  type="file-search"
-                  className="btn-drawer"
+                <FileSearchOutlined
                   onClick={this.toggleDrawer}
                 />
               </Tooltip>

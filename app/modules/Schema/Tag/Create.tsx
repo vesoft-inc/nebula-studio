@@ -4,15 +4,14 @@ import {
   Checkbox,
   Col,
   Collapse,
-  Icon,
+  Form,
   Input,
-  message,
   Modal,
   Popover,
   Row,
   Select,
+  message
 } from 'antd';
-import Form, { FormComponentProps } from 'antd/lib/form';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
@@ -55,6 +54,7 @@ interface IState {
 }
 
 class CreateTag extends React.Component<IProps, IState> {
+  formRef = React.createRef<FormInstance>()
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -67,8 +67,8 @@ class CreateTag extends React.Component<IProps, IState> {
     trackPageView('/schema/config/tag/create');
   }
 
-  handleAddProperty = async () => {
-    const { form } = this.props;
+  handleAddProperty = async() => {
+    const form = this.formRef.current!;
     const keys = form.getFieldValue('keys');
     const nextKeys = keys.concat(id++);
     await form.setFieldsValue({
@@ -77,7 +77,7 @@ class CreateTag extends React.Component<IProps, IState> {
   };
 
   handleDeleteField = (index: number) => {
-    const { form } = this.props;
+    const form = this.formRef.current!;
     const keys = form.getFieldValue('keys');
     const fields = form.getFieldValue('fields');
     if (keys.length === 1) {
@@ -88,14 +88,11 @@ class CreateTag extends React.Component<IProps, IState> {
         keys: keys.filter((_, i) => i !== index),
         fields: fields.filter((_, i) => i !== index),
       },
-      () => {
-        this.forceUpdate();
-      },
     );
   };
 
-  handleTogglePanels = async (e: string | string[], type: string) => {
-    const { setFieldsValue } = this.props.form;
+  handleTogglePanels = async(e: string | string[], type: string) => {
+    const { setFieldsValue } = this.formRef.current!;
     const self = this;
     const key = `${type}Required`;
     if (e.length > 0) {
@@ -108,7 +105,7 @@ class CreateTag extends React.Component<IProps, IState> {
         content: intl.get('schema.cancelPropmt'),
         okText: intl.get('common.yes'),
         cancelText: intl.get('common.no'),
-        onOk: async () => {
+        onOk: async() => {
           await self.setState({
             [key]: false,
           } as Pick<IState, keyof IState>);
@@ -130,8 +127,7 @@ class CreateTag extends React.Component<IProps, IState> {
 
   renderFields = () => {
     const { fieldRequired } = this.state;
-    const { getFieldDecorator, getFieldsValue } = this.props.form;
-    getFieldDecorator('keys', { initialValue: [0] });
+    const { getFieldsValue } = this.formRef.current!;
     const form = getFieldsValue();
     const { keys, fields } = form;
     const itemLayout = {
@@ -148,100 +144,74 @@ class CreateTag extends React.Component<IProps, IState> {
       const formItems = keys.map((_, k: number) => (
         <div key={k} className="form-item">
           <Col span={4}>
-            <Form.Item {...itemLayout}>
-              {getFieldDecorator(`fields[${k}].name`, {
-                rules: nameRulesFn(intl),
-                initialValue: '',
-              })(
-                <Input placeholder={intl.get('formRules.propertyRequired')} />,
-              )}
+            <Form.Item {...itemLayout} name={`fields[${k}].name`} rules={nameRulesFn(intl)} initialValue="">
+              <Input placeholder={intl.get('formRules.propertyRequired')} />
             </Form.Item>
           </Col>
           <Col span={5}>
-            <Form.Item {...itemLayout} wrapperCol={{ span: 18 }}>
-              {getFieldDecorator(`fields[${k}].type`, {
-                initialValue: '',
-                rules: [
+            <Form.Item {...itemLayout} wrapperCol={{ span: 18 }} name={`fields[${k}].type`} rules={[
+              {
+                required: true,
+                message: intl.get('formRules.dataTypeRequired'),
+              },
+            ]} initialValue="">
+              <Select className="select-type" showSearch={true}>
+                {DATA_TYPE.map(item => {
+                  return (
+                    <Option value={item.value} key={item.value}>
+                      {item.label}
+                    </Option>
+                  );
+                })}
+              </Select>
+              {fields && fields[k] && fields[k].type === 'fixed_string' && (
+                <Form.Item className="item-string-length" name={`fields[${k}].fixedLength`} rules={[
+                  ...numberRulesFn(intl),
                   {
                     required: true,
-                    message: intl.get('formRules.dataTypeRequired'),
+                    message: intl.get('formRules.numberRequired'),
                   },
-                ],
-              })(
-                <Select className="select-type" showSearch={true}>
-                  {DATA_TYPE.map(item => {
-                    return (
-                      <Option value={item.value} key={item.value}>
-                        {item.label}
-                      </Option>
-                    );
-                  })}
-                </Select>,
-              )}
-              {fields && fields[k] && fields[k].type === 'fixed_string' && (
-                <Form.Item className="item-string-length">
-                  {getFieldDecorator(`fields[${k}].fixedLength`, {
-                    rules: [
-                      ...numberRulesFn(intl),
-                      {
-                        required: true,
-                        message: intl.get('formRules.numberRequired'),
-                      },
-                    ],
-                  })(<Input className="input-string-length" />)}
+                ]}>
+                  <Input className="input-string-length" />
                 </Form.Item>
               )}
             </Form.Item>
           </Col>
           <Col span={4}>
-            <Form.Item {...itemLayout} className="center">
-              {getFieldDecorator(`fields[${k}].allowNull`, {
-                valuePropName: 'checked',
-                initialValue: true,
-              })(<Checkbox />)}
+            <Form.Item {...itemLayout} className="center" name={`fields[${k}].allowNull`} initialValue={true} valuePropName="checked">
+              <Checkbox />
             </Form.Item>
           </Col>
           <Col span={5}>
-            <Form.Item {...itemLayout}>
+            <Form.Item {...itemLayout} name={`fields[${k}].value`} initialValue="">
               {fields &&
               fields[k] &&
               EXPLAIN_DATA_TYPE.includes(fields[k].type) ? (
-                <Popover
-                  trigger="focus"
-                  placement="right"
-                  content={intl.getHTML(`schema.${fields[k].type}Format`)}
-                >
-                  {getFieldDecorator(`fields[${k}].value`, {
-                    initialValue: '',
-                  })(
+                  <Popover
+                    trigger="focus"
+                    placement="right"
+                    content={intl.getHTML(`schema.${fields[k].type}Format`)}
+                  >
                     <Input
                       placeholder={intl.get('formRules.defaultRequired')}
-                    />,
-                  )}
-                </Popover>
-              ) : (
-                <>
-                  {getFieldDecorator(`fields[${k}].value`, {
-                    initialValue: '',
-                  })(
-                    <Input
-                      placeholder={intl.get('formRules.defaultRequired')}
-                    />,
-                  )}
-                </>
-              )}
+                    />
+                  </Popover>
+                ) : (
+                  <Input
+                    placeholder={intl.get('formRules.defaultRequired')}
+                  />
+                )}
             </Form.Item>
           </Col>
           <Col span={4}>
-            <Form.Item {...itemLayout}>
-              {getFieldDecorator(`fields[${k}].comment`)(<Input />)}
+            <Form.Item {...itemLayout} name={`fields[${k}].comment`}>
+              <Input />
             </Form.Item>
           </Col>
           <Col span={2}>
             {keys.length > 1 && (
-              <Icon
+              <MinusCircleOutlined
                 className="delete-button"
-                type="minus-circle-o"
                 onClick={() => this.handleDeleteField(k)}
               />
             )}
@@ -256,7 +226,7 @@ class CreateTag extends React.Component<IProps, IState> {
 
   renderTtlConfig = () => {
     const { ttlRequired } = this.state;
-    const { getFieldDecorator, getFieldsValue } = this.props.form;
+    const { getFieldsValue } = this.formRef.current!;
     const innerItemLayout = {
       labelCol: {
         span: 8,
@@ -273,48 +243,40 @@ class CreateTag extends React.Component<IProps, IState> {
       return (
         <>
           <Col span={12}>
-            <Form.Item label="TTL_COL" {...innerItemLayout}>
-              {getFieldDecorator('ttl.ttl_col', {
-                rules: [
-                  {
-                    required: true,
-                    message: intl.get('formRules.ttlRequired'),
-                  },
-                ],
-              })(
-                <Select>
-                  {ttlOptions.map(i => (
-                    <Option value={i.name} key={i.name}>
-                      {i.name}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
+            <Form.Item label="TTL_COL" {...innerItemLayout} name="ttl.ttl_col" rules={[
+              {
+                required: true,
+                message: intl.get('formRules.ttlRequired'),
+              },
+            ]}>
+              <Select>
+                {ttlOptions.map(i => (
+                  <Option value={i.name} key={i.name}>
+                    {i.name}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="TTL_DURATION" {...innerItemLayout}>
-              {getFieldDecorator('ttl.ttl_duration', {
-                rules: [
-                  {
-                    required: true,
-                    message: intl.get('formRules.ttlDurationRequired'),
-                  },
-                  {
-                    message: intl.get('formRules.positiveIntegerRequired'),
-                    pattern: /^\d+$/,
-                    transform(value) {
-                      if (value) {
-                        return Number(value);
-                      }
-                    },
-                  },
-                ],
-              })(
-                <Input
-                  placeholder={intl.get('formRules.ttlDurationRequired')}
-                />,
-              )}
+            <Form.Item label="TTL_DURATION" {...innerItemLayout} name="ttl.ttl_duration" rules={[
+              {
+                required: true,
+                message: intl.get('formRules.ttlDurationRequired'),
+              },
+              {
+                message: intl.get('formRules.positiveIntegerRequired'),
+                pattern: /^\d+$/,
+                transform(value) {
+                  if (value) {
+                    return Number(value);
+                  }
+                },
+              },
+            ]}>
+              <Input
+                placeholder={intl.get('formRules.ttlDurationRequired')}
+              />
             </Form.Item>
           </Col>
         </>
@@ -374,7 +336,7 @@ class CreateTag extends React.Component<IProps, IState> {
   render() {
     const { loading } = this.props;
     const { fieldRequired, ttlRequired } = this.state;
-    const { getFieldsValue, getFieldValue } = this.props.form;
+    const { getFieldsValue, getFieldValue } = this.formRef.current!;
     const fieldTable = this.renderFields();
     const ttlTable = this.renderTtlConfig();
     const tagName = getFieldValue('name');
@@ -393,14 +355,13 @@ class CreateTag extends React.Component<IProps, IState> {
     };
     const currentGQL = tagName
       ? getTagOrEdgeCreateGQL({
-          type: 'TAG',
-          name: tagName,
-          fields,
-          ttlConfig,
-          comment,
-        })
+        type: 'TAG',
+        name: tagName,
+        fields,
+        ttlConfig,
+        comment,
+      })
       : '';
-    const { getFieldDecorator } = this.props.form;
     return (
       <div className="space-config-component nebula-tag-create">
         <header>
@@ -414,19 +375,17 @@ class CreateTag extends React.Component<IProps, IState> {
             <Breadcrumb.Item>{intl.get('common.create')}</Breadcrumb.Item>
           </Breadcrumb>
           <Button onClick={this.goBack}>
-            <Icon type="left" />
+            <LeftOutlined />
             {intl.get('schema.backToTagList')}
           </Button>
         </header>
         <div className="tag-form">
-          <Form>
-            <Form.Item label={intl.get('common.name')} {...outItemLayout}>
-              {getFieldDecorator('name', {
-                rules: nameRulesFn(intl),
-              })(<Input />)}
+          <Form ref={this.formRef} initialValues={{ keys: 0 }}>
+            <Form.Item label={intl.get('common.name')} {...outItemLayout} name="name" rules={nameRulesFn(intl)}>
+              <Input />
             </Form.Item>
-            <Form.Item label={intl.get('common.comment')} {...outItemLayout}>
-              {getFieldDecorator('comment')(<Input />)}
+            <Form.Item label={intl.get('common.comment')} {...outItemLayout} name="comment">
+              <Input />
             </Form.Item>
             <Collapse
               activeKey={fieldRequired ? ['field'] : []}
@@ -474,7 +433,7 @@ class CreateTag extends React.Component<IProps, IState> {
               loading={!!loading}
               onClick={this.handleCreate}
             >
-              <Icon type="plus" />
+              <PlusOutlined />
               {intl.get('common.create')}
             </Button>
           </div>
@@ -485,5 +444,5 @@ class CreateTag extends React.Component<IProps, IState> {
 }
 
 export default withRouter(
-  connect(mapState, mapDispatch)(Form.create<IProps>()(CreateTag)),
+  connect(mapState, mapDispatch)(CreateTag),
 );

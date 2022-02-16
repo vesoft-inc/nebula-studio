@@ -1,14 +1,14 @@
-import { Breadcrumb, Button, Icon, message, Popconfirm, Table } from 'antd';
+import { Breadcrumb, Button, Popconfirm, Table, message } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 
+import Search from '../Search';
 import { IDispatch, IRootState } from '#app/store';
 import { sortByFieldAndFilter } from '#app/utils/function';
 import { trackPageView } from '#app/utils/stat';
 
-import Search from '../Search';
 import './index.less';
 
 const mapState = (state: IRootState) => ({
@@ -145,7 +145,7 @@ class TagList extends React.Component<IProps, IState> {
                       data-track-action="view_tag_edit"
                       data-track-label="from_tag_list"
                     >
-                      <Icon type="form" className="edit-btn" />
+                      <FormOutlined className="edit-btn" />
                     </Link>
                   </Button>
                   <Popconfirm
@@ -157,9 +157,7 @@ class TagList extends React.Component<IProps, IState> {
                     cancelText={intl.get('common.cancel')}
                   >
                     <Button shape="circle">
-                      <Icon
-                        type="delete"
-                        theme="twoTone"
+                      <DeleteTwoTone
                         twoToneColor="#CF1322"
                       />
                     </Button>
@@ -213,7 +211,7 @@ class TagList extends React.Component<IProps, IState> {
               data-track-action="view_tag_create"
               data-track-label="from_tag_list"
             >
-              <Icon type="plus" />
+              <PlusOutlined />
               {intl.get('common.create')}
             </Link>
           </Button>

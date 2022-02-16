@@ -37,7 +37,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {}
+  ReturnType<typeof mapDispatch> {}
 
 class InitVertexes extends React.Component<IProps> {
   modalHandler;
@@ -49,7 +49,7 @@ class InitVertexes extends React.Component<IProps> {
     }
   }
 
-  handleInsert = async (type?) => {
+  handleInsert = async(type?) => {
     if (type === 'clear') {
       await this.props.clearExplore();
     }

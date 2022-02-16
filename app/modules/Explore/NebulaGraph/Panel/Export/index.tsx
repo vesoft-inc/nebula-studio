@@ -1,4 +1,4 @@
-import { Button, Dropdown, Icon, Menu, message } from 'antd';
+import { Button, Dropdown, Menu, message } from 'antd';
 import * as d3 from 'd3';
 import { saveAs } from 'file-saver';
 import json2csv from 'json2csv';
@@ -6,6 +6,7 @@ import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
+import { DownOutlined } from '@ant-design/icons';
 import IconFont from '#app/components/Icon';
 import { exportDataToCSV } from '#app/config/explore';
 import { IRootState } from '#app/store';
@@ -59,7 +60,7 @@ const mapState = (state: IRootState) => ({
 const mapDispatch = () => ({});
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {
+  ReturnType<typeof mapDispatch> {
   disabled: boolean;
 }
 
@@ -95,6 +96,7 @@ class ExportButton extends React.PureComponent<IProps> {
         // IE10 or Edge browsers
         const BOM = '\uFEFF';
         const csvData = new Blob([BOM + result], { type: 'text/csv' });
+        // @ts-ignore
         navigator.msSaveBlob(csvData, `test.csv`);
       } else {
         // Non-Internet Explorer
@@ -147,7 +149,7 @@ class ExportButton extends React.PureComponent<IProps> {
       <Dropdown overlay={menu}>
         <Button className="btn-export">
           {intl.get('explore.export')}
-          <Icon type="down" className="btn-icon" />
+          <DownOutlined className="btn-icon" />
         </Button>
       </Dropdown>
     );

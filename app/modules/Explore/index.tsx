@@ -3,8 +3,6 @@ import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
-import emptyPng from '#app/static/images/explore-empty.png';
-import { IRootState } from '#app/store';
 import { trackPageView } from '#app/utils/stat';
 
 import Control from './Control';
@@ -12,6 +10,8 @@ import './index.less';
 import Init from './Init';
 import InitVertexes from './InitVertexes';
 import NebulaGraph from './NebulaGraph';
+import { IRootState } from '#app/store';
+import emptyPng from '#app/static/images/explore-empty.png';
 
 const mapState = (state: IRootState) => ({
   vertexes: state.explore.vertexes,
@@ -19,7 +19,7 @@ const mapState = (state: IRootState) => ({
 });
 
 type IProps = ReturnType<typeof mapState>;
-class Explore extends React.Component<IProps, {}> {
+class Explore extends React.Component<IProps> {
   controlComponent;
   componentDidMount() {
     trackPageView('/explore');
