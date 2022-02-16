@@ -8,8 +8,8 @@ export enum ITaskStatus {
 }
 
 export interface ITaskStats {
-  totalLine: number;
-  totalCount: number;
+  TotalLine: number;
+  TotalCount: number;
   numFailed: number;
   numReadFailed: number;
 }
@@ -41,4 +41,5 @@ export interface IEdgeConfig {
 
 export interface IBasicConfig {
   taskName: string;
+  batchSize?: string;
 }

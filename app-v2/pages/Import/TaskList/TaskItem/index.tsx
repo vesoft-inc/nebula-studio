@@ -1,39 +1,103 @@
-import { Button, Progress } from 'antd';
+import { Button, Progress, Popconfirm } from 'antd';
 import _ from 'lodash';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import intl from 'react-intl-universal'
 import './index.less';
 import { ITaskItem } from '@appv2/interfaces/import'
-
+import { ITaskStatus } from '@appv2/interfaces/import'
+import dayjs from 'dayjs'
 interface IProps {
   data: ITaskItem;
+  handleStop: (id: number) => void
+  handleDelete: (id: number) => void
 }
 
+
+const COLOR_MAP = {
+  'success': {
+    from: '#8EDD3F',
+    to: '#27AE60',
+  },
+  'normal': {
+    from: '#8EDD3F',
+    to: '#27AE60',
+  },
+  'execption': {
+    from: '#EB5757',
+    to: '#EB5757',
+  },
+  'active': {
+    from: '#8EDD3F',
+    to: '#27AE60',
+  },
+}
 const TaskItem = (props: IProps) => {
-  const { data } = props;
+  const { 
+    data: { 
+      space,
+      taskID, 
+      name, 
+      statsQuery: { TotalCount, TotalLine }, 
+      taskStatus, 
+      updatedTime, 
+      createdTime 
+    }, 
+    handleStop, 
+    handleDelete } = props;
+  const [status, setStatus] = useState<"success" | "active" | "normal" | "exception" | undefined>(undefined)
+
+  useEffect(() => {
+    if(taskStatus === ITaskStatus.statusFinished) {
+      setStatus('success')
+    } else if(taskStatus === ITaskStatus.statusProcessing) {
+      setStatus('active')
+    } else {
+      setStatus('exception')
+    }
+  }, [taskStatus])
   return (
     <div className="task-item">
       <div className="row">
-        <span>Space: {data.space}</span>
-        <Button type="link" size='small'>Download Config</Button>
+        <span>{intl.get('common.space')}: {space}</span>
+        <Button type="link" size='small'>{intl.get('import.downloadConfig')}</Button>
       </div>
       <div className="row">
         <div className="progress">
           <div className="progress-info">
-            <span className="task-name">{data.name}</span>
+            <span className="task-name">{name}</span>
             <div className="more-info">
               <span>
-                {data.statsQuery.totalCount} Lines / {data.statsQuery.totalLine}{' '}
-                Lines
+                {TotalCount} {intl.get('import.lines')} / {TotalLine}{' '}
+                {intl.get('import.lines')}
               </span>
-              <span>00:10:23</span>
+              <span>{dayjs.duration(dayjs.unix(updatedTime).diff(dayjs.unix(createdTime))).format('HH:mm:ss')}</span>
             </div>
           </div>
-          <Progress percent={30} />
+          <Progress status={status} percent={TotalCount / TotalLine * 100} strokeColor={status && COLOR_MAP[status]} />
         </div>
         <div className="operations">
-          <Button>Details</Button>
-          <Button>View Logs</Button>
-          <Button>Cancel</Button>
+          <Button>{intl.get('import.details')}</Button>
+          <Button>{intl.get('import.viewLogs')}</Button>
+          {taskStatus === ITaskStatus.statusProcessing && 
+          <Popconfirm
+            placement="left"
+            title={intl.get('import.endImport')}
+            onConfirm={() => handleStop(taskID)}
+            okText={intl.get('common.confirm')}
+            cancelText={intl.get('common.cancel')}
+          >
+            <Button>{intl.get('import.endImport')}</Button>
+          </Popconfirm>}
+          {taskStatus !== ITaskStatus.statusProcessing && 
+          <Popconfirm
+            placement="left"
+            title={intl.get('common.delete')}
+            onConfirm={() => handleDelete(taskID)}
+            okText={intl.get('common.confirm')}
+            cancelText={intl.get('common.cancel')}
+          >
+            <Button>{intl.get('common.delete')}</Button>
+          </Popconfirm>}
         </div>
       </div>
     </div>

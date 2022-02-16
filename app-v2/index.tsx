@@ -7,7 +7,10 @@ import { observer } from 'mobx-react-lite';
 import Import from '@appv2/pages/Import';
 import TaskCreate from '@appv2/pages/Import/TaskCreate';
 import rootStore, { StoreProvider } from './stores';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 
+dayjs.extend(duration)
 const PageRoot = observer(() => {
   return (
     <StoreProvider value={rootStore}>

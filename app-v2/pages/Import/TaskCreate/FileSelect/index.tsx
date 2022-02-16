@@ -18,6 +18,7 @@ const FileSelect = (props: IProps) => {
   const { files, dataImport: { update, verticesConfig, edgesConfig } } = useStore();
   const { fileList, asyncGetFiles } = files;
   const [modalVisible, setModalVisible] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 })
   const onFinish = (value) => {
     const file = fileList.filter(item => item.name === value.name)[0];
     if(type === 'vertices') {
@@ -41,20 +42,31 @@ const FileSelect = (props: IProps) => {
     }
     setModalVisible(false)
   }
+  const handleOpen = e => {
+    setPosition({
+      x: e.clientX,
+      y: e.clientY,
+    })
+    setModalVisible(true)
+  }
   useEffect(() => {
     asyncGetFiles();
   }, [])
   return (
     <div className='file-select'>
-      <Button type='primary' onClick={() => setModalVisible(true)}>
+      <Button type='primary' onClick={handleOpen}>
         + {intl.get('import.bindDatasource')}
       </Button>
       <Modal
+        width={300}
         className="add-file-select"
         visible={modalVisible}
         destroyOnClose={true}
         onCancel={() => setModalVisible(false)}
         footer={false}
+        closable={false}
+        mask={false}
+        style={{ top: position.y || undefined, left: position.x || undefined }}
       >
         <Form onFinish={onFinish}>
           <FormItem label={intl.get('import.fileName')} name="name" rules={[{ required: true }]}>

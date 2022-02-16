@@ -5,7 +5,6 @@ import intl from 'react-intl-universal';
 import { handleVidStringName } from './function';
 
 export function configToJson(payload) {
-  console.log('payload', payload)
   const {
     space,
     username,
@@ -15,16 +14,19 @@ export function configToJson(payload) {
     edgesConfig,
     taskDir,
     spaceVidType,
+    batchSize
   } = payload;
   const vertexToJSON = vertexDataToJSON(
     verticesConfig,
     taskDir,
     spaceVidType,
+    batchSize
   );
   const edgeToJSON = edgeDataToJSON(
     edgesConfig,
     taskDir,
     spaceVidType,
+    batchSize
   );
   const files: any[] = [...vertexToJSON, ...edgeToJSON];
   const configJson = {
@@ -51,8 +53,8 @@ export function edgeDataToJSON(
   config: any,
   taskDir: string,
   spaceVidType: string,
+  batchSize?: string,
 ) {
-  const limit = 10;
   const files = config.map(edge => {
     const edgePorps: any[] = [];
     _.sortBy(edge.props, t => t.mapping).forEach(prop => {
@@ -88,11 +90,11 @@ export function edgeDataToJSON(
           edgePorps.push(_prop);
       }
     });
+    const fileName = edge.file.name.replace('.csv', '')
     const edgeConfig = {
       path: edge.file.path,
-      failDataPath: `${taskDir}/err/${edge.name}Fail.csv`,
-      batchSize: 60,
-      limit,
+      failDataPath: `${taskDir}/err/${fileName}Fail.csv`,
+      batchSize: Number(batchSize) || 60,
       type: 'csv',
       csv: {
         withHeader: false,
@@ -119,8 +121,8 @@ export function vertexDataToJSON(
   config: any,
   taskDir: string,
   spaceVidType: string,
+  batchSize?: string
 ) {
-  const limit = 10;
   const files = config.map(vertex => {
     const tags = vertex.tags.map(tag => {
       const props = tag.props
@@ -141,11 +143,11 @@ export function vertexDataToJSON(
       };
       return _tag;
     });
+    const fileName = vertex.file.name.replace('.csv', '')
     const vertexConfig: any = {
       path: vertex.file.path,
-      failDataPath: `${taskDir}/err/${vertex.name}Fail.csv`,
-      batchSize: 60,
-      limit,
+      failDataPath: `${taskDir}/err/${fileName}Fail.csv`,
+      batchSize: Number(batchSize) || 60,
       type: 'csv',
       csv: {
         withHeader: false,

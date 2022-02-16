@@ -1,8 +1,6 @@
-import { Button, Table, Tooltip } from 'antd';
-import React from 'react';
+import { Button, Table, Tooltip, Modal } from 'antd';
+import React, { useState } from 'react';
 import intl from 'react-intl-universal';
-
-import { Modal } from '../';
 import './index.less';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,27 +10,27 @@ interface IProps {
   children: string;
   onMapping?: (index) => void;
   prop?: string;
+  centered?: boolean
 }
 
-class CSVPreviewLink extends React.PureComponent<IProps> {
-  modalHandler;
-  handleLinkClick = e => {
+const CSVPreviewLink = (props: IProps) => {
+  const { onMapping, prop, file: { content }, children, centered } = props;
+  const [visible, setVisible] = useState(false)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const handleLinkClick = e => {
+    setPosition({
+      x: e.clientX,
+      y: e.clientY,
+    })
     e.stopPropagation()
-    if (this.modalHandler) {
-      this.modalHandler.show();
-    }
+    setVisible(true)
   };
 
-  handleMapping = index => {
-    if (this.props.onMapping) {
-      this.props.onMapping(index);
-      this.modalHandler.hide();
-    }
+  const handleMapping = index => {
+    onMapping && onMapping(index)
+    setVisible(false)
   };
-  render() {
-    const { onMapping, prop } = this.props;
-    const { content } = this.props.file;
-    const columns = content.length
+  const columns = content.length
       ? content[0].map((_, index) => {
         const textIndex = index;
         return {
@@ -41,7 +39,7 @@ class CSVPreviewLink extends React.PureComponent<IProps> {
               <Button
                 type="primary"
                 className="csv-select-index"
-                onClick={() => this.handleMapping(textIndex)}
+                onClick={() => handleMapping(textIndex)}
               >{`column ${textIndex}`}</Button>
               <Tooltip
                 title={intl.get('import.setMappingTip', {
@@ -59,39 +57,38 @@ class CSVPreviewLink extends React.PureComponent<IProps> {
         };
       })
       : [];
-
-    return (
-      <>
-        <Button type="link" className='btn-preview' onClick={this.handleLinkClick}>
-          {this.props.children}
-        </Button>
-        <Modal
-          handlerRef={handler => {
-            this.modalHandler = handler;
-          }}
-          footer={false}
-          width={1000}
-        >
-          <div className="csv-preview">
-            <Table
-              bordered={true}
-              dataSource={content}
-              columns={columns}
-              pagination={false}
-              rowKey={() => uuidv4()}
-            />
-            <div className="operation">
-              {onMapping && (
-                <Button onClick={() => this.handleMapping(null)}>
-                  {intl.get('import.ignore')}
-                </Button>
-              )}
-            </div>
+  return (
+    <>
+      <Button type="link" className='btn-preview' onClick={handleLinkClick}>
+        {children}
+      </Button>
+      <Modal
+        className='preview-modal'
+        visible={visible}
+        onCancel={() => setVisible(false)}
+        footer={false}
+        mask={false}
+        style={centered ? undefined : { top: position.y || undefined, left: position.x || undefined, margin: 0}}
+      >
+        <div className="csv-preview">
+          <Table
+            bordered={true}
+            dataSource={content}
+            columns={columns}
+            pagination={false}
+            rowKey={() => uuidv4()}
+          />
+          <div className="operation">
+            {onMapping && (
+              <Button onClick={() => handleMapping(null)}>
+                {intl.get('import.ignore')}
+              </Button>
+            )}
           </div>
-        </Modal>
-      </>
-    );
-  }
+        </div>
+      </Modal>
+    </>
+  );
 }
 
 export default CSVPreviewLink;

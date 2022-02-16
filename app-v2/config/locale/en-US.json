@@ -84,7 +84,8 @@
     "exportSelectEdges": "Export Edges to CSV",
     "noSelectedData": "No data currently selected",
     "namePlaceholder": "Please enter a search name",
-    "comment": "Comment"
+    "comment": "Comment",
+    "space": "Space"
   },
   "NGQLOutput": {
     "success": "Execution successful!"
@@ -222,18 +223,29 @@
     "docForFindPath": "https://docs.nebula-graph.io/2.5.0/3.ngql-guide/16.subgraph-and-path/2.find-path/"
   },
   "import": {
+    "vertexID": "Vertex ID",
     "import": "Import",
     "selectSpace": "Select Space",
     "uploadFile": "Upload Files",
-    "vertex": "Map Vertices",
+    "uploadSuccess": "Upload Successfully.",
+    "importData": "Import Data",
+    "createTask": "New Import",
+    "uploadTemp": "Import Template",
+    "downloadConfig": "Download Config",
+    "viewLogs": "View Logs",
+    "details": "Details",
+    "lines": "Lines",
+    "taskList": "Task List",
+    "taskName": "Task Name",
+    "vertices": "Map Vertices",
     "edge": "Map Edges",
-    "runImport": "Start Import",
+    "runImport": "Import",
     "next": "Next",
     "goback": "Prev",
     "mountPath": "Mount Path",
     "importConfigValidationSuccess": "The configuration validation was successful",
     "mountPathPlaceholder": "Please input the docker data mount path",
-    "fileName": "Name",
+    "fileName": "File Name",
     "withHeader": "Header",
     "fileType": "Type",
     "fileSize": "Size",
@@ -298,7 +310,12 @@
     "indexNotEmpty": "column index can't be null.",
     "reset": "Reset",
     "importFinished": "Import task has ended.",
-    "enterPassword": "Please enter your nebula account password"
+    "enterPassword": "Please enter your nebula account password",
+    "isEmpty": "is empty",
+    "startImporting": "Start importing",
+    "stopImportingSuccess": "Stop import successfully.",
+    "deleteSuccess": "Delete task successfully",
+    "batchSize": "Batch Size"
   },
   "schema": {
     "spaceList": "Graph Space List",

@@ -70,6 +70,23 @@ export class ImportStore {
     return code;
   }
 
+  stopTask = async (taskID: number) => {
+    const res = await service.handleImportAction({
+      taskID: taskID.toString(),
+      taskAction: 'actionStop',
+    })
+    return res
+  }
+
+  deleteTask = async (taskID: number) => {
+    // TODO update delete api
+    const res = await service.handleImportAction({
+      taskID: taskID.toString(),
+      taskAction: 'actionStop',
+    })
+    return res
+  }
+
   asyncUpdateTagConfig = async (payload: { 
     tag: string; 
     tagIndex: number;
@@ -133,7 +150,6 @@ export class ImportStore {
         const res =
           (createTag.data.tables && createTag.data.tables[0]['Create Edge']) ||
           '';
-        // HACK: createTag split to ↵
         const fields = res.split(/\n|\r\n/);
         fields.forEach(field => {
           const fieldArr = field.trim().split(/\s|\s+/);
@@ -202,7 +218,6 @@ export class ImportStore {
     field?: string,
     value?: any
   }) => {
-    console.time('update')
     const { configIndex, tagIndex, propIndex, field, value} = payload;
     if(propIndex === undefined) {
       const tags = this.verticesConfig[configIndex].tags
@@ -211,7 +226,6 @@ export class ImportStore {
       const tag = this.verticesConfig[configIndex].tags[tagIndex];
       tag.props[propIndex][field!] = value;
     }
-    console.timeEnd('update')
   }
 
   updateEdgePropMapping = (payload: {

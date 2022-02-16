@@ -83,7 +83,8 @@
     "exportSelectEdges": "导出选中边CSV",
     "noSelectedData": "当前没有选中数据",
     "namePlaceholder":"请输入搜索名称",
-    "comment": "描述"
+    "comment": "描述",
+    "space": "图空间"
   },
   "warning": {
     "configServer": "请先配置服务器",
@@ -222,10 +223,21 @@
     "docForFindPath": "https://docs.nebula-graph.com.cn/2.5.0/3.ngql-guide/16.subgraph-and-path/2.find-path/"
   },
   "import": {
+    "vertexID": "Vertex ID",
     "import":"导入",
-    "selectSpace": "选择Space",
+    "selectSpace": "选择 Space",
     "uploadFile": "上传文件",
-    "vertex": "关联点",
+    "uploadSuccess": "上传文件成功",
+    "importData": "导入数据",
+    "createTask": "创建导入任务",
+    "uploadTemp": "导入模板",
+    "downloadConfig": "下载配置文件",
+    "viewLogs": "查看日志",
+    "details": "详情",
+    "lines": "行",
+    "taskList": "任务列表",
+    "taskName": "任务名称",
+    "vertices": "关联点",
     "edge": "关联边",
     "runImport": "导入",
     "next": "下一步",
@@ -294,7 +306,12 @@
     "indexNotEmpty": "对应列标不能为空",
     "reset": "重置",
     "importFinished": "导入任务已结束",
-    "enterPassword": "请输入 nebula 账号密码"
+    "enterPassword": "请输入 nebula 账号密码",
+    "isEmpty": "为空",
+    "startImporting": "开始导入",
+    "stopImportingSuccess": "已停止导入",
+    "deleteSuccess": "已删除任务记录",
+    "batchSize": "批处理量"
   },
   "schema": {
     "spaceList": "图空间列表",

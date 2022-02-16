@@ -1,7 +1,7 @@
 import { Radio } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation, Route } from 'react-router-dom';
-
+import intl from 'react-intl-universal'
 import { trackPageView } from '@appv2/utils/stat';
 
 import FileUpload from './FileUpload';
@@ -14,7 +14,6 @@ const NewImport = () => {
   const [tab, setTab] = useState('files');
   useEffect(() => {
     const path = location.pathname;
-    console.log('path', path)
     setTab(path.includes('files') ? 'files' : 'tasks')
     trackPageView('/import');
   }, []);
@@ -31,8 +30,8 @@ const NewImport = () => {
           buttonStyle="solid"
           onChange={handleTabChange}
         >
-          <Radio.Button value="files">Upload Files</Radio.Button>
-          <Radio.Button value="tasks">Import Data</Radio.Button>
+          <Radio.Button value="files">{intl.get('import.uploadFile')}</Radio.Button>
+          <Radio.Button value="tasks">{intl.get('import.importData')}</Radio.Button>
         </Radio.Group>
       </div>
       <div>

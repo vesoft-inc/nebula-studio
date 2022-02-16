@@ -12,6 +12,7 @@ import { configToJson } from '@appv2/utils/import';
 import intl from 'react-intl-universal'
 import './index.less';
 import { useHistory } from 'react-router-dom';
+import { POSITIVE_INTEGER_REGEX } from '@appv2/utils/constant'
 const Option = Select.Option;
 
 const TaskCreate = () => {
@@ -24,11 +25,11 @@ const TaskCreate = () => {
   const routes = [
     {
       path: '/import/tasks',
-      breadcrumbName: 'Task List',
+      breadcrumbName: intl.get('import.taskList'),
     },
     {
       path: '#',
-      breadcrumbName: 'Create New Import Task',
+      breadcrumbName: intl.get('import.createTask'),
     },
   ];
 
@@ -40,20 +41,24 @@ const TaskCreate = () => {
       console.log('err', err)
     }
   }
-  const handleStartImport = (password?: string) => {
-      if(password) {
-        const config: any = configToJson({ 
-          ...basicConfig,
-          currentSpace,
-          taskDir,
-          verticesConfig: verticesConfig, 
-          edgesConfig: edgesConfig, 
-          host, 
-          username,
-          password,
-          spaceVidType });
-        importTask(config, basicConfig.taskName);
+  const handleStartImport = async (password?: string) => {
+    if(password) {
+      const config: any = configToJson({ 
+        ...basicConfig,
+        space: currentSpace,
+        taskDir,
+        verticesConfig: verticesConfig, 
+        edgesConfig: edgesConfig, 
+        host, 
+        username,
+        password,
+        spaceVidType });
+      const code = await importTask(config, basicConfig.taskName);
+      if(code === 0) {
+        message.success('import.startImporting')
+        history.push('/import/tasks')
       }
+    }
     setVisible(false);
   }
 
@@ -65,12 +70,12 @@ const TaskCreate = () => {
         throw new Error();
       }
       if(config.tags.length === 0) {
-        message.error(`Tag Mapping is empty`);
+        message.error(`Tag Mapping ${intl.get('import.isEmpty')}`);
         throw new Error();
       }
       config.tags.forEach(tag => {
         if (!tag.name) {
-          message.error(`Tag is empty`);
+          message.error(`Tag ${intl.get('import.isEmpty')}`);
           throw new Error();
         }
         tag.props.forEach(prop => {
@@ -83,7 +88,7 @@ const TaskCreate = () => {
     })
     edgesConfig.forEach(edge => {
       if (!edge.type) {
-        message.error(`edgeType is empty`);
+        message.error(`edgeType ${intl.get('import.isEmpty')}`);
         throw new Error();
       }
       edge.props.forEach(prop => {
@@ -93,6 +98,10 @@ const TaskCreate = () => {
         }
       });
     })
+    if(basicConfig.batchSize && !POSITIVE_INTEGER_REGEX.test(basicConfig.batchSize)) {
+      message.error(`${intl.get('import.batchSize')} ${intl.get('formRules.numberRequired')}`);
+      throw new Error();
+    }
   }
 
   const clearConfig = () => {
@@ -116,7 +125,7 @@ const TaskCreate = () => {
       <Breadcrumb routes={routes} />
       <div className="create-form">
         <Form className='basic-config' layout='vertical'>
-          <Form.Item label="Space" required={true}>
+          <Form.Item label={intl.get('common.space')} required={true}>
             <Select value={currentSpace} onChange={value => updateSpaceInfo(value)}>
               {spaces.map(space => (
                 <Option value={space} key={space}>
@@ -125,13 +134,19 @@ const TaskCreate = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item label="Task Name" required={true}>
+          <Form.Item label={intl.get('import.taskName')} required={true}>
             <Input value={basicConfig.taskName} onChange={e => updateBasicConfig('taskName', e.target.value)} />
+          </Form.Item>
+          <Form.Item label={intl.get('import.batchSize')} name='batchSize' rules={[{
+             pattern: POSITIVE_INTEGER_REGEX,
+             message: intl.get('formRules.numberRequired'),
+          }]}>
+            <Input placeholder='60' value={basicConfig.batchSize} onChange={e => updateBasicConfig('batchSize', e.target.value)} />
           </Form.Item>
         </Form>
         <div className='map-config'>
           <Form className='config-column' layout='vertical'>
-            <Form.Item label='Map Vertices' required={true}>
+            <Form.Item label={intl.get('import.vertices')} required={true}>
               <div className='container'>
                 <FileSelect type='vertices' />
                 {verticesConfig.map((item, index) => <SchemaConfig type='vertices' key={item.name} data={item} configIndex={index} />)}
@@ -139,7 +154,7 @@ const TaskCreate = () => {
             </Form.Item>
           </Form>
           <Form className='config-column' layout='vertical'>
-            <Form.Item label='Map Edges' required={true}>
+            <Form.Item label={intl.get('import.edge')} required={true}>
               <div className='container'>
                 <FileSelect type='edge' />
                 {edgesConfig.map((item, index) => <SchemaConfig type='edge' key={item.name} data={item} configIndex={index} />)}
@@ -149,12 +164,11 @@ const TaskCreate = () => {
         </div>
       </div>
       <div className='footer'>
-        <Button onClick={() => history.push('/import/tasks')}>Cancel</Button>
+        <Button onClick={() => history.push('/import/tasks')}>{intl.get('common.cancel')}</Button>
         <Button type='primary' disabled={
-          Object.values(basicConfig).some(item => !item)
-          || !verticesConfig.length
-          || !edgesConfig.length
-        } onClick={openPasswordModal}>Import</Button>
+          basicConfig.taskName === ''
+          || (!verticesConfig.length && !edgesConfig.length)
+        } onClick={openPasswordModal}>{intl.get('import.runImport')}</Button>
       </div>
       <PasswordInputModal visible={modalVisible} onConfirm={handleStartImport} />
     </div>

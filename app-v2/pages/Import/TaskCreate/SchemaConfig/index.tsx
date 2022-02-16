@@ -6,9 +6,10 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '@appv2/stores';
 import CSVPreviewLink from '@appv2/components/CSVPreviewLink';
 import TagConfig from './TagConfig'
-import './index.less';
+import intl from 'react-intl-universal';
 import EdgeConfig from './EdgeConfig';
 const { Panel } = Collapse;
+import './index.less';
 
 interface IProps {
   type: 'vertices' | 'edge'
@@ -63,7 +64,7 @@ const SchemaConfig = (props: IProps) => {
                 })
               }
               file={data.file}
-              prop={data.name}
+              prop={intl.get('import.vertexID')}
             >
               {data.idMapping === null ? 'Select CSV Index' : `Column ${data.idMapping}`}
             </CSVPreviewLink>

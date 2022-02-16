@@ -1,6 +1,6 @@
 import { Button, Checkbox, Popconfirm, Table, Upload } from 'antd';
 import _ from 'lodash';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 
 import CSVPreviewLink from '@appv2/components/CSVPreviewLink';
@@ -15,6 +15,7 @@ import './index.less';
 const FileUpload = () => {
   const { files } = useStore();
   const { fileList, uploadDir, asyncDeleteFile, asyncGetFiles, asyncUploadFile, asyncGetUploadDir } = files;
+  const [loading, setLoading] = useState(false)
   const transformFile = async file => {
     file.path = `${uploadDir}/${file.name}`;
     file.withHeader = false;
@@ -22,6 +23,7 @@ const FileUpload = () => {
   };
 
   const handleUpdate = async (options: any) => {
+    setLoading(true)
     const data = new FormData();
     data.append('file', options.file);
     const config = {
@@ -32,6 +34,7 @@ const FileUpload = () => {
     await asyncUploadFile({ data, config }).then(_ => {
       asyncGetFiles();
     });
+    setLoading(false)
   };
   useEffect(() => {
     asyncGetFiles();
@@ -62,7 +65,7 @@ const FileUpload = () => {
           return (
             <div className="operation">
               <div>
-                <CSVPreviewLink file={file}>
+                <CSVPreviewLink file={file} centered={true}>
                   {intl.get('import.preview')}
                 </CSVPreviewLink>
                 <Popconfirm
@@ -101,7 +104,7 @@ const FileUpload = () => {
       <div className="file-list">
         <h3>{intl.get('import.fileTitle')}</h3>
         <Table
-          // loading={!!loading}
+          loading={!!loading}
           dataSource={fileList}
           columns={columns}
           rowKey="name"
