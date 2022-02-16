@@ -1,5 +1,5 @@
-import { Button, Form, Select, Modal } from 'antd';
-import React, { useState, useEffect } from 'react';
+import { Button, Form, Modal, Select } from 'antd';
+import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@appv2/stores';
@@ -18,7 +18,7 @@ const FileSelect = (props: IProps) => {
   const { files, dataImport: { update, verticesConfig, edgesConfig } } = useStore();
   const { fileList, asyncGetFiles } = files;
   const [modalVisible, setModalVisible] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const [position, setPosition] = useState({ x: 0, y: 0 });
   const onFinish = (value) => {
     const file = fileList.filter(item => item.name === value.name)[0];
     if(type === 'vertices') {
@@ -29,7 +29,7 @@ const FileSelect = (props: IProps) => {
           tags: [],
           idMapping: null,
         }]
-      })
+      });
     } else {
       update({
         edgesConfig: [...edgesConfig, {
@@ -38,23 +38,23 @@ const FileSelect = (props: IProps) => {
           props: [],
           type: '',
         }]
-      })
+      });
     }
-    setModalVisible(false)
-  }
+    setModalVisible(false);
+  };
   const handleOpen = e => {
     setPosition({
       x: e.clientX,
       y: e.clientY,
-    })
-    setModalVisible(true)
-  }
+    });
+    setModalVisible(true);
+  };
   useEffect(() => {
     asyncGetFiles();
-  }, [])
+  }, []);
   return (
-    <div className='file-select'>
-      <Button type='primary' onClick={handleOpen}>
+    <div className="file-select">
+      <Button type="primary" onClick={handleOpen}>
         + {intl.get('import.bindDatasource')}
       </Button>
       <Modal
@@ -78,13 +78,13 @@ const FileSelect = (props: IProps) => {
               ))}
             </Select>
           </FormItem>
-          <Button htmlType='submit'>
+          <Button htmlType="submit">
             {intl.get('import.confirm')}
           </Button>
         </Form>
       </Modal>
     </div>
   );
-}
+};
 
 export default observer(FileSelect);

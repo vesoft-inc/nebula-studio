@@ -5,10 +5,10 @@ import { Link } from 'react-router-dom';
 import './index.less';
 
 interface IProps {
-  routes: Array<{
+  routes: {
     path: string;
     breadcrumbName: string;
-  }>;
+  }[];
   ExtraNode?: JSX.Element;
 }
 

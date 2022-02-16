@@ -39,6 +39,9 @@ const commonConfig: Configuration = {
             options: {
               lessOptions: {
                 javascriptEnabled: true,
+                modifyVars: {
+                  'menu-dark-bg': '#2F3A4A',
+                }
               }
             },
           },
@@ -91,7 +94,7 @@ const commonConfig: Configuration = {
 
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: path.join(__dirname, '../app/index.html'),
+      template: path.join(__dirname, '../app-v2/index.html'),
       favicon: resolve(__dirname, '../favicon.ico'),
       minify: {
         collapseWhitespace: true,

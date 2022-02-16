@@ -6,8 +6,7 @@ import { hostRulesFn, passwordRulesFn, usernameRulesFn } from '@appv2/config/rul
 import { observer } from 'mobx-react-lite';
 import { trackPageView } from '@appv2/utils/stat';
 import { useStore } from '@appv2/stores';
-// import nebulaLogo from '@public/images/nebula_logo.png';
-// import loginBackgroundImage from '@public/images/background_login.png';
+import nebulaLogo from '@appv2/static/images/nebula_logo.png';
 import LanguageSelect from './LanguageSelect';
 
 import './index.less';
@@ -26,12 +25,12 @@ const LoginPage: React.FC = () => {
   const history = useHistory();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const onConfig = async (values: any) => {
+  const onConfig = async(values: any) => {
     setLoading(true);
-    const ok = await global.asyncLogin(values);
+    const ok = await global.login(values);
+    setLoading(false);
     setTimeout(() => {
-      setLoading(false);
-      ok && history.replace(`/import${location.search}`);
+      ok && history.replace(`/console${location.search}`);
     }, 300);
   };
 
@@ -40,12 +39,11 @@ const LoginPage: React.FC = () => {
   }, []);
 
   return (
-    // <div className="explore-login" style={{ backgroundImage: `url(${loginBackgroundImage})` }}>
-    <div className="explore-login">
+    <div className="studio-login">
       <div className="content">
         <div className="header">
-          {/* <img className="logo" src={nebulaLogo} /> */}
-          <span className="title">Nebula Explorer</span>
+          <img className="logo" src={nebulaLogo} />
+          <span className="title">Nebula Studio</span>
         </div>
         <Form className="login-form" layout="horizontal" {...fomrItemLayout} onFinish={onConfig}>
           <FormItem noStyle={true}>

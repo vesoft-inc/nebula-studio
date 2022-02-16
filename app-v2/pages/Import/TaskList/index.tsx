@@ -1,9 +1,9 @@
 import { Button, message } from 'antd';
 import _ from 'lodash';
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import TaskItem from './TaskItem';
 import { useHistory } from 'react-router-dom';
-import intl from 'react-intl-universal'
+import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 
 import { useStore } from '@appv2/stores';
@@ -15,28 +15,28 @@ import { ITaskStatus } from '@appv2/interfaces/import';
 let isMounted = true;
 
 const TaskList = () => {
-  const timer = useRef<any>(null)
+  const timer = useRef<any>(null);
   const { dataImport } = useStore();
   const history = useHistory();
   const { taskList, asyncGetTaskList, stopTask, deleteTask } = dataImport;
-  const handleTaskStop = useCallback(async (id: number) => {
-    clearTimeout(timer.current)
-    const { code } = await stopTask(id)
+  const handleTaskStop = useCallback(async(id: number) => {
+    clearTimeout(timer.current);
+    const { code } = await stopTask(id);
     if(code === 0) {
       message.info(intl.get('import.stopImportingSuccess'));
       await asyncGetTaskList();
     }
-  }, [])
-  const handleTaskDelete = useCallback(async (id: number) => {
-    clearTimeout(timer.current)
-    const { code } = await deleteTask(id)
+  }, []);
+  const handleTaskDelete = useCallback(async(id: number) => {
+    clearTimeout(timer.current);
+    const { code } = await deleteTask(id);
     if(code === 0) {
       message.info(intl.get('import.deleteSuccess'));
       await asyncGetTaskList();
     }
-  }, [])
+  }, []);
   useEffect(() => {
-    isMounted = true
+    isMounted = true;
     asyncGetTaskList();
     trackPageView('/import/tasks');
     return () => {
@@ -45,13 +45,13 @@ const TaskList = () => {
     };
   }, []);
   useEffect(() => {
-    const needRefresh = taskList.filter(item => item.taskStatus === ITaskStatus.statusProcessing).length > 0
+    const needRefresh = taskList.filter(item => item.taskStatus === ITaskStatus.statusProcessing).length > 0;
     if(needRefresh && isMounted) {
-      timer.current = setTimeout(asyncGetTaskList, 2000)
+      timer.current = setTimeout(asyncGetTaskList, 2000);
     } else {
-      clearTimeout(timer.current)
+      clearTimeout(timer.current);
     }
-  }, [taskList])
+  }, [taskList]);
   return (
     <div className="nebula-data-import">
       <div className="task-btns">

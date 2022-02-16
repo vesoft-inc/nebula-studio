@@ -22,14 +22,6 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "import": "Import",
-    "help": "Help",
-    "use": "Use Manual",
-    "release": "New Version",
-    "nebula": "Nebula",
-    "setting": "Setting",
-    "feedback": "Feedback",
-    "forum": "Help Forum",
-    "forumLink": "https://discuss.nebula-graph.io/",
     "ask": "Are you sure to proceed?",
     "output": "Export CSV File",
     "openInExplore": "Open In Explore",
@@ -85,7 +77,8 @@
     "noSelectedData": "No data currently selected",
     "namePlaceholder": "Please enter a search name",
     "comment": "Comment",
-    "space": "Space"
+    "space": "Space",
+    "version": "Version"
   },
   "NGQLOutput": {
     "success": "Execution successful!"
@@ -358,5 +351,17 @@
     "backToIndexList": "Back to Index List",
     "leavePage": "Whether to leave the current page?",
     "leavePagePrompt": "You have unsaved changes to the record on this tab. If you leave this tab without saving the changes, they will be lost. Are you sure that you want to leave?"
+  },
+  "menu": {
+    "use": "Use Manual",
+    "release": "New Version",
+    "forum": "Help Forum",
+    "nGql": "nGQL"
+  },
+  "link": {
+    "nGQLHref": "https://docs.nebula-graph.io/3.0.0/3.ngql-guide/1.nGQL-overview/1.overview/",
+    "mannualHref": "https://docs.nebula-graph.io/3.0.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/",
+    "versionLogHref": "https://docs.nebula-graph.io/3.0.0/nebula-studio/about-studio/st-ug-release-note/",
+    "forumLink": "https://discuss.nebula-graph.io/"
   }
 }

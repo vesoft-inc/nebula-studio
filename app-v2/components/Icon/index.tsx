@@ -1,22 +1,15 @@
-import React, { SVGProps } from 'react';
+import React, { HTMLProps } from 'react';
 
-import './index.less';
-interface IProps extends SVGProps<any> {
+interface IIconFontProps extends HTMLProps<HTMLElement> {
   type: string;
-  className?: string;
+  className?: string
 }
 
-const Icon = (props: IProps) => {
+const IconFont = (props: IIconFontProps) => {
   const { type, className, ...others } = props;
   return (
-    <svg
-      className={`icon ${className ? className : ''}`}
-      aria-hidden="true"
-      {...others}
-    >
-      <use xlinkHref={`#${type}`} />
-    </svg>
+    <span className={`nebula-studio-icon ${type} ${className}`} {...others} />
   );
 };
 
-export default Icon;
+export default IconFont;

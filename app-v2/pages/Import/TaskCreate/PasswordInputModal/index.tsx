@@ -1,4 +1,4 @@
-import { Button, Modal, Input } from 'antd';
+import { Button, Input, Modal } from 'antd';
 import _ from 'lodash';
 import React, { useState } from 'react';
 import intl from 'react-intl-universal';
@@ -14,7 +14,7 @@ const PasswordInputModal = (props: IProps) => {
   const handleConfirm = (password?: string) => {
     onConfirm(password);
     setPassword('');
-  }
+  };
   return (
     <Modal
       title={intl.get('import.enterPassword')}

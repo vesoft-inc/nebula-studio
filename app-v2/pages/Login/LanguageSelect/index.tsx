@@ -1,21 +1,20 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Select } from 'antd';
 import { INTL_LOCALE_SELECT } from '@appv2/config';
-import { useStore } from '@appv2/stores';
 import Icon from '@appv2/components/Icon';
+import { LanguageContext } from '@appv2/context';
 
 import './index.less';
 const Option = Select.Option;
 
 const LanguageSelect: React.FC = () => {
-  const { global } = useStore();
-  const { currentLocale, asyncChangeLocale } = global;
+  const { currentLocale, toggleLanguage } = useContext(LanguageContext);
   return (
     <Select
       className="select-lang"
       size="small"
       value={currentLocale}
-      onChange={asyncChangeLocale}
+      onChange={toggleLanguage}
       optionLabelProp="label"
     >
       {Object.keys(INTL_LOCALE_SELECT).map(locale => (

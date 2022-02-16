@@ -16,7 +16,7 @@ export class ConsoleStore {
     Object.keys(param).forEach(key => (this[key] = param[key]));
   };
 
-  asyncRunGQL = async (gql: string) => {
+  asyncRunGQL = async(gql: string) => {
     this.update({ runGQLLoading: true });
     try {
       const result = await service.execNGQL(

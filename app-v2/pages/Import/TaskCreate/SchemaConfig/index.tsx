@@ -1,11 +1,11 @@
 import { Button, Collapse } from 'antd';
 import _ from 'lodash';
 import React from 'react';
-import { CloseOutlined } from '@ant-design/icons'
+import { CloseOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@appv2/stores';
 import CSVPreviewLink from '@appv2/components/CSVPreviewLink';
-import TagConfig from './TagConfig'
+import TagConfig from './TagConfig';
 import intl from 'react-intl-universal';
 import EdgeConfig from './EdgeConfig';
 const { Panel } = Collapse;
@@ -29,17 +29,17 @@ const SchemaConfig = (props: IProps) => {
         name: '',
         props: []
       }]
-    })
-  }
+    });
+  };
 
   const handleRemove = (event, index: number) => {
     event.stopPropagation();
     if(type === 'vertices') {
-      updateVerticesConfig({ index })
+      updateVerticesConfig({ index });
     } else {
-      updateEdgeConfig({ index })
+      updateEdgeConfig({ index });
     }
-  }
+  };
   return (
     <Collapse
       bordered={false}
@@ -47,14 +47,14 @@ const SchemaConfig = (props: IProps) => {
       className="config-collapse"
     >
       <Panel header={<>
-        <span className='config-count'>{type} {configIndex + 1}</span>
+        <span className="config-count">{type} {configIndex + 1}</span>
         <CSVPreviewLink file={data.file}>
           {data.file.name}
         </CSVPreviewLink>
-      </>} key="default" extra={<CloseOutlined className='btn-close' onClick={(e) => handleRemove(e, configIndex)} />}>
-        <div className='config-item'>
-          {type === 'vertices' && <div className='id-row'>
-            <span className='label'>vertexID</span>
+      </>} key="default" extra={<CloseOutlined className="btn-close" onClick={(e) => handleRemove(e, configIndex)} />}>
+        <div className="config-item">
+          {type === 'vertices' && <div className="id-row">
+            <span className="label">vertexID</span>
             <CSVPreviewLink
               onMapping={columnIndex =>
                 updateVerticesConfig({
@@ -71,7 +71,7 @@ const SchemaConfig = (props: IProps) => {
           </div>}
           {type === 'vertices' && data.tags.map((tag, tagIndex) => <TagConfig key={tagIndex} file={data.file} tag={tag} tagIndex={tagIndex} configIndex={configIndex} />)}
           {type === 'edge' && <EdgeConfig configIndex={configIndex} edge={data} />}
-          {type === 'vertices' && <div className='btns'>
+          {type === 'vertices' && <div className="btns">
             <Button type="default" onClick={() => addTag(configIndex)}>
               + Add Tag
             </Button>

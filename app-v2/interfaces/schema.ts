@@ -26,7 +26,7 @@ export interface ITag {
   name: string;
   fields: IField[];
 }
-export  interface IEdge {
+export interface IEdge {
   name: string;
   fields: IField[];
 }

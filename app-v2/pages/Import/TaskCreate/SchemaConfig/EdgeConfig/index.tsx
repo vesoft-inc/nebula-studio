@@ -1,8 +1,8 @@
 import { Select, Table } from 'antd';
 import _ from 'lodash';
 import React from 'react';
-import intl from 'react-intl-universal'
-import { CloseOutlined } from '@ant-design/icons'
+import intl from 'react-intl-universal';
+import { CloseOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@appv2/stores';
 import CSVPreviewLink from '@appv2/components/CSVPreviewLink';
@@ -14,26 +14,26 @@ interface IProps {
   edge: any;
 }
 const EdgeConfig = (configProps: IProps) => {
-  const { configIndex, edge: { type, props, file} } = configProps;
+  const { configIndex, edge: { type, props, file } } = configProps;
   const { dataImport, schema } = useStore();
   const { updateEdgeConfig, updateEdgePropMapping } = dataImport;
   const { edgeTypes } = schema;
 
   const handleEdgeChange = (index: number, value: string) => {
-    updateEdgeConfig({ index, edgeType: value})
-  }
+    updateEdgeConfig({ index, edgeType: value });
+  };
 
   const handleRemoveEdge = () => {
-    updateEdgePropMapping({ configIndex })
-  }
+    updateEdgePropMapping({ configIndex });
+  };
   const handlePropChange = (index, field, value) => {
     updateEdgePropMapping({
       configIndex,
       propIndex: index,
       field,
       value
-    })
-  }
+    });
+  };
 
   const columns = [
     {
@@ -64,13 +64,13 @@ const EdgeConfig = (configProps: IProps) => {
       title: intl.get('common.type'),
       dataIndex: 'type',
     },
-  ]
+  ];
 
   return (
-    <div className='tag-config-container'>
-      <div className='tag-select-row'>
-        <div className='left'>
-          <span className='label'>Edge Type</span>
+    <div className="tag-config-container">
+      <div className="tag-select-row">
+        <div className="left">
+          <span className="label">Edge Type</span>
           <Select
             bordered={false}
             className="tag-select"
@@ -85,7 +85,7 @@ const EdgeConfig = (configProps: IProps) => {
             ))}
           </Select>
         </div>
-        <CloseOutlined className='btn-close' onClick={handleRemoveEdge} />
+        <CloseOutlined className="btn-close" onClick={handleRemoveEdge} />
       </div>
       {type && <Table
         className="props-table"

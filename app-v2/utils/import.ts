@@ -90,7 +90,7 @@ export function edgeDataToJSON(
           edgePorps.push(_prop);
       }
     });
-    const fileName = edge.file.name.replace('.csv', '')
+    const fileName = edge.file.name.replace('.csv', '');
     const edgeConfig = {
       path: edge.file.path,
       failDataPath: `${taskDir}/err/${fileName}Fail.csv`,
@@ -143,7 +143,7 @@ export function vertexDataToJSON(
       };
       return _tag;
     });
-    const fileName = vertex.file.name.replace('.csv', '')
+    const fileName = vertex.file.name.replace('.csv', '');
     const vertexConfig: any = {
       path: vertex.file.path,
       failDataPath: `${taskDir}/err/${fileName}Fail.csv`,

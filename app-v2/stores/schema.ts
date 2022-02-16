@@ -1,8 +1,8 @@
-import { makeAutoObservable, observable, action } from 'mobx';
+import { action, makeAutoObservable, observable } from 'mobx';
 import service from '@appv2/config/service';
-import { ITag, IEdge, IIndexList, ITree, ISpace} from '@appv2/interfaces/schema'
+import { IEdge, IIndexList, ISpace, ITag, ITree } from '@appv2/interfaces/schema';
 import { handleKeyword } from '@appv2/utils/function';
-import { findIndex } from 'lodash'
+import { findIndex } from 'lodash';
 export class SchemaStore {
   spaces: string[] = [];
   currentSpace: string = sessionStorage.getItem('currentSpace') || '';
@@ -45,12 +45,12 @@ export class SchemaStore {
 
 
   // switch space
-  updateSpaceInfo = async (space: string) => {
+  updateSpaceInfo = async(space: string) => {
     await this.switchSpace(space);
     await this.getSchemaInfo();
   }
 
-  switchSpace = async (space: string) => {
+  switchSpace = async(space: string) => {
     const { code } = (await service.execNGQL({
       // HACK: Processing keyword
       gql: 'use' + '`' + space + '`;',
@@ -66,12 +66,12 @@ export class SchemaStore {
     }
   };
 
-  getSchemaInfo = async () => {
+  getSchemaInfo = async() => {
     const [tags, edges] = await Promise.all([this.getTags(), this.getEdges()]);
     this.update({ tags, edgeTypes: edges });
   }
 
-  getSpaces = async () => {
+  getSpaces = async() => {
     const { code, data } = (await service.execNGQL({
       gql: 'show spaces;',
     })) as any;
@@ -93,7 +93,7 @@ export class SchemaStore {
     return { code, data };
   }
 
-  asyncGetSpacesList = async (_payload) => {
+  asyncGetSpacesList = async(_payload) => {
     const res = await this.getSpaces();
     if (res.data) {
       const spaces: ISpace[] = [];
@@ -116,7 +116,7 @@ export class SchemaStore {
   }
 
   // edges
-  getEdges = async () => {
+  getEdges = async() => {
     const { code, data } = (await service.execNGQL({
       gql: `
         show edges;
@@ -129,14 +129,14 @@ export class SchemaStore {
     }
   }
 
-  getEdgeInfo = async (edge: string) => {
+  getEdgeInfo = async(edge: string) => {
     const { code, data } = (await service.execNGQL({
       gql: 'desc edge' + '`' + edge + '`;',
     })) as any;
     return { code, data };
   }
 
-  getEdgeDetail = async (name: string) => {
+  getEdgeDetail = async(name: string) => {
     const gql = `SHOW CREATE EDGE ${handleKeyword(name)}`;
     const { code, data, message } = (await service.execNGQL({
       gql,
@@ -165,7 +165,7 @@ export class SchemaStore {
     this.tagsFields[!~index ? this.tagsFields.length : index] = { tag, fields: tagFields };
   };
 
-  getTagsFields = async (payload: { tags: any[] }) => {
+  getTagsFields = async(payload: { tags: any[] }) => {
     const { tags } = payload;
     await Promise.all(
       tags.map(async item => {
@@ -181,14 +181,14 @@ export class SchemaStore {
     );
   };
 
-  getTagInfo = async (tag: string) => {
+  getTagInfo = async(tag: string) => {
     const { code, data } = (await service.execNGQL({
       gql: 'desc tag ' + '`' + tag + '`;',
     })) as any;
     return { code, data };
   }
 
-  getTagDetail = async (name: string) => {
+  getTagDetail = async(name: string) => {
     const gql = `SHOW CREATE TAG ${handleKeyword(name)}`;
     const { code, data, message } = (await service.execNGQL({
       gql,

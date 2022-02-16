@@ -15,15 +15,15 @@ import './index.less';
 const FileUpload = () => {
   const { files } = useStore();
   const { fileList, uploadDir, asyncDeleteFile, asyncGetFiles, asyncUploadFile, asyncGetUploadDir } = files;
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const transformFile = async file => {
     file.path = `${uploadDir}/${file.name}`;
     file.withHeader = false;
     return file;
   };
 
-  const handleUpdate = async (options: any) => {
-    setLoading(true)
+  const handleUpdate = async(options: any) => {
+    setLoading(true);
     const data = new FormData();
     data.append('file', options.file);
     const config = {
@@ -34,7 +34,7 @@ const FileUpload = () => {
     await asyncUploadFile({ data, config }).then(_ => {
       asyncGetFiles();
     });
-    setLoading(false)
+    setLoading(false);
   };
   useEffect(() => {
     asyncGetFiles();

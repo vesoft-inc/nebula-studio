@@ -1,11 +1,10 @@
-import { Button, Progress, Popconfirm } from 'antd';
+import { Button, Popconfirm, Progress } from 'antd';
 import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
-import intl from 'react-intl-universal'
+import intl from 'react-intl-universal';
 import './index.less';
-import { ITaskItem } from '@appv2/interfaces/import'
-import { ITaskStatus } from '@appv2/interfaces/import'
-import dayjs from 'dayjs'
+import { ITaskItem, ITaskStatus } from '@appv2/interfaces/import';
+import dayjs from 'dayjs';
 interface IProps {
   data: ITaskItem;
   handleStop: (id: number) => void
@@ -30,7 +29,7 @@ const COLOR_MAP = {
     from: '#8EDD3F',
     to: '#27AE60',
   },
-}
+};
 const TaskItem = (props: IProps) => {
   const { 
     data: { 
@@ -44,22 +43,22 @@ const TaskItem = (props: IProps) => {
     }, 
     handleStop, 
     handleDelete } = props;
-  const [status, setStatus] = useState<"success" | "active" | "normal" | "exception" | undefined>(undefined)
+  const [status, setStatus] = useState<'success' | 'active' | 'normal' | 'exception' | undefined>(undefined);
 
   useEffect(() => {
     if(taskStatus === ITaskStatus.statusFinished) {
-      setStatus('success')
+      setStatus('success');
     } else if(taskStatus === ITaskStatus.statusProcessing) {
-      setStatus('active')
+      setStatus('active');
     } else {
-      setStatus('exception')
+      setStatus('exception');
     }
-  }, [taskStatus])
+  }, [taskStatus]);
   return (
     <div className="task-item">
       <div className="row">
         <span>{intl.get('common.space')}: {space}</span>
-        <Button type="link" size='small'>{intl.get('import.downloadConfig')}</Button>
+        <Button type="link" size="small">{intl.get('import.downloadConfig')}</Button>
       </div>
       <div className="row">
         <div className="progress">

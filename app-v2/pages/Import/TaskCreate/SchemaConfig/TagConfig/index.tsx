@@ -1,8 +1,8 @@
 import { Select, Table } from 'antd';
 import _ from 'lodash';
 import React from 'react';
-import intl from 'react-intl-universal'
-import { CloseOutlined } from '@ant-design/icons'
+import intl from 'react-intl-universal';
+import { CloseOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@appv2/stores';
 import CSVPreviewLink from '@appv2/components/CSVPreviewLink';
@@ -22,8 +22,8 @@ const VerticesConfig = (props: IProps) => {
   const { tags } = schema;
 
   const handleTagChange = (configIndex: number, tagIndex: number, value: string) => {
-    asyncUpdateTagConfig({ configIndex, tagIndex, tag: value})
-  }
+    asyncUpdateTagConfig({ configIndex, tagIndex, tag: value });
+  };
 
   const handlePropChange = (index, field, value) => {
     updateTagPropMapping({
@@ -32,8 +32,8 @@ const VerticesConfig = (props: IProps) => {
       propIndex: index,
       field,
       value
-    })
-  }
+    });
+  };
 
   const columns = [
     {
@@ -62,17 +62,17 @@ const VerticesConfig = (props: IProps) => {
       title: intl.get('common.type'),
       dataIndex: 'type',
     },
-  ]
+  ];
 
   const handleRemoveTag = () => {
-    updateTagPropMapping({ configIndex, tagIndex })
-  }
-  console.log('render', tag)
+    updateTagPropMapping({ configIndex, tagIndex });
+  };
+  console.log('render', tag);
   return (
-    <div className='tag-config-container'>
-      <div className='tag-select-row'>
-        <div className='left'>
-          <span className='label'>Tag</span>
+    <div className="tag-config-container">
+      <div className="tag-select-row">
+        <div className="left">
+          <span className="label">Tag</span>
           <Select
             bordered={false}
             className="tag-select"
@@ -87,7 +87,7 @@ const VerticesConfig = (props: IProps) => {
             ))}
           </Select>
         </div>
-        <CloseOutlined className='btn-close' onClick={handleRemoveTag} />
+        <CloseOutlined className="btn-close" onClick={handleRemoveTag} />
       </div>
       {tag.name && <Table
         className="props-table"

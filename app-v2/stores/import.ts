@@ -1,6 +1,6 @@
-import { makeAutoObservable, action, observable, runInAction } from 'mobx';
+import { action, makeAutoObservable, observable, runInAction } from 'mobx';
 import service from '@appv2/config/service';
-import { IBasicConfig, ITaskItem, IVerticesConfig, IEdgeConfig } from '@appv2/interfaces/import';
+import { IBasicConfig, IEdgeConfig, ITaskItem, IVerticesConfig } from '@appv2/interfaces/import';
 import { getRootStore } from '.';
 import { message } from 'antd';
 export class ImportStore {
@@ -9,7 +9,7 @@ export class ImportStore {
   verticesConfig: IVerticesConfig[] = [];
   edgesConfig: IEdgeConfig[] = [];
 
-  basicConfig: IBasicConfig = { taskName: ''};
+  basicConfig: IBasicConfig = { taskName: '' };
   constructor() {
     makeAutoObservable(this, {
       taskList: observable,
@@ -25,15 +25,15 @@ export class ImportStore {
     });
   }
 
-  update = (payload: Record<string, any> ) => {
-    Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
-  };
-
   get rootStore() {
     return getRootStore();
   }
 
-  asyncGetTaskList = async () => {
+  update = (payload: Record<string, any>) => {
+    Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
+  };
+
+  asyncGetTaskList = async() => {
     const { code, data } = await service.handleImportAction({
       taskAction: 'actionQueryAll',
     });
@@ -44,7 +44,7 @@ export class ImportStore {
     }
   };
 
-  asyncGetTaskDir = async () => {
+  asyncGetTaskDir = async() => {
     const { code, data } = (await service.getTaskDir()) as any;
     if (code === 0) {
       const { taskDir } = data;
@@ -54,7 +54,7 @@ export class ImportStore {
     }
   };
   
-  importTask = async (config, name) => {
+  importTask = async(config, name) => {
     const { code, data, message: errorMsg } = (await service.importData({
       configBody: config,
       configPath: '',
@@ -70,30 +70,30 @@ export class ImportStore {
     return code;
   }
 
-  stopTask = async (taskID: number) => {
+  stopTask = async(taskID: number) => {
     const res = await service.handleImportAction({
       taskID: taskID.toString(),
       taskAction: 'actionStop',
-    })
-    return res
+    });
+    return res;
   }
 
-  deleteTask = async (taskID: number) => {
+  deleteTask = async(taskID: number) => {
     // TODO update delete api
     const res = await service.handleImportAction({
       taskID: taskID.toString(),
       taskAction: 'actionStop',
-    })
-    return res
+    });
+    return res;
   }
 
-  asyncUpdateTagConfig = async (payload: { 
+  asyncUpdateTagConfig = async(payload: { 
     tag: string; 
     tagIndex: number;
     configIndex: number;
-   }) => {
+  }) => {
     const { schema } = this.rootStore;
-    const { getTagInfo, getTagDetail } = schema
+    const { getTagInfo, getTagDetail } = schema;
     const { tag, tagIndex, configIndex } = payload;
     const { code, data } = await getTagInfo(tag);
     const createTag = await getTagDetail(tag);
@@ -127,23 +127,23 @@ export class ImportStore {
         this.verticesConfig[configIndex].tags[tagIndex] = {
           name: tag,
           props
-        }
-      })
+        };
+      });
     }
   }
 
   updateBasicConfig = (key: string, value: any) => {
-    this.basicConfig[key] = value
+    this.basicConfig[key] = value;
   }
 
-  updateEdgeConfig = async (payload: { edgeType?: string, index: number; }) => {
+  updateEdgeConfig = async(payload: { edgeType?: string, index: number; }) => {
     const { edgeType, index } = payload;
     if(!edgeType) {
-      this.edgesConfig = this.edgesConfig.splice(index, 1)
+      this.edgesConfig = this.edgesConfig.splice(index, 1);
     } else {
       const { schema } = this.rootStore;
-      const { getEdgeInfo, getEdgeDetail, spaceVidType } = schema
-      const { code, data } = await getEdgeInfo(edgeType)
+      const { getEdgeInfo, getEdgeDetail, spaceVidType } = schema;
+      const { code, data } = await getEdgeInfo(edgeType);
       const createTag = await getEdgeDetail(edgeType);
       const defaultValueFields: any[] = [];
       if (!!createTag) {
@@ -193,7 +193,7 @@ export class ImportStore {
             },
             ...props,
           ];
-        })
+        });
       }
     }
   }
@@ -205,9 +205,9 @@ export class ImportStore {
   }) => {
     const { index, key, value } = payload;
     if(key) {
-      this.verticesConfig[index][key] = value
+      this.verticesConfig[index][key] = value;
     } else {
-      this.verticesConfig.splice(index, 1)
+      this.verticesConfig.splice(index, 1);
     }
   }
 
@@ -218,10 +218,10 @@ export class ImportStore {
     field?: string,
     value?: any
   }) => {
-    const { configIndex, tagIndex, propIndex, field, value} = payload;
+    const { configIndex, tagIndex, propIndex, field, value } = payload;
     if(propIndex === undefined) {
-      const tags = this.verticesConfig[configIndex].tags
-      tags.splice(tagIndex, 1)
+      const tags = this.verticesConfig[configIndex].tags;
+      tags.splice(tagIndex, 1);
     } else {
       const tag = this.verticesConfig[configIndex].tags[tagIndex];
       tag.props[propIndex][field!] = value;
@@ -234,7 +234,7 @@ export class ImportStore {
     field?,
     value?
   }) => {
-    const { configIndex, propIndex, field, value} = payload;
+    const { configIndex, propIndex, field, value } = payload;
     if(propIndex === undefined) {
       this.edgesConfig[configIndex].type = '';
       this.edgesConfig[configIndex].props = [];
