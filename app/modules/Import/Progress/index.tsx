@@ -19,9 +19,9 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {}
+  ReturnType<typeof mapDispatch> {}
 
-class Progress extends React.Component<IProps, {}> {
+class Progress extends React.Component<IProps> {
   stepsStatus = index => {
     const { currentStep, activeStep } = this.props;
     if (index === activeStep) {

@@ -1,5 +1,5 @@
 import path from 'path';
-import merge from 'webpack-merge';
+import { mergeWithCustomize } from 'webpack-merge';
 import commonConfig from './webpack.base';
 
 const devConfig = {
@@ -28,10 +28,24 @@ const devConfig = {
   devServer: {
     port: 7001,
     headers: { 'Access-Control-Allow-Origin': '*' },
-    contentBase: path.join(__dirname, '../public'),
     historyApiFallback: true,
     host: 'localhost',
-    disableHostCheck: true,
+    allowedHosts: 'all',
+    hot: true,
+    client: {
+      overlay: {
+        errors: true,
+        warnings: false,
+      }
+    },
+    static: {
+      staticOptions: {
+        directory: path.resolve(__dirname, '../dist'),
+        publicPath: '/',
+        // redirect: true,
+        serveIndex: true,
+      },
+    },
     proxy: [
       {
         path: '/api-nebula/**',
@@ -47,7 +61,7 @@ const devConfig = {
   },
 };
 
-module.exports = merge({
+module.exports = mergeWithCustomize({
   customizeArray(_, b, key) {
     if (key === 'entry.app') {
       return b;

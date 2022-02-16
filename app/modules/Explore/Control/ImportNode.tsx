@@ -1,5 +1,4 @@
-import { Form, Tabs } from 'antd';
-import { FormComponentProps } from 'antd/lib/form/Form';
+import { Tabs } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
@@ -9,7 +8,7 @@ import CustomQuery from './CustomQuery';
 import IdQuery from './IdQuery';
 import IndexQuery from './IndexQuery';
 
-interface IProps extends FormComponentProps {
+interface IProps {
   handler: any;
 }
 
@@ -46,4 +45,4 @@ class ImportNodes extends React.Component<IProps, IState> {
   }
 }
 
-export default Form.create<IProps>()(ImportNodes);
+export default ImportNodes;

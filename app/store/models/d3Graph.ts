@@ -1,4 +1,5 @@
 import { createModel } from '@rematch/core';
+import type { IRootModel } from '.';
 
 interface IState {
   canvasOffsetX: number;
@@ -9,7 +10,7 @@ interface IState {
   isZoom: boolean;
 }
 
-export const d3Graph = createModel({
+export const d3Graph = createModel<IRootModel>()({
   state: {
     canvasOffsetX: 0,
     canvasOffsetY: 0,
@@ -17,9 +18,9 @@ export const d3Graph = createModel({
     showSider: true,
     showDisplayPanel: true,
     isZoom: false,
-  },
+  } as IState,
   reducers: {
-    update: (state: IState, payload: any): IState => {
+    update: (state: IState, payload: object): IState => {
       return {
         ...state,
         ...payload,

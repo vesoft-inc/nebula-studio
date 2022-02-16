@@ -1,14 +1,15 @@
-import { Breadcrumb, Button, Icon, message, Popconfirm, Table } from 'antd';
+import { Breadcrumb, Button, Popconfirm, Table, message } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
-import { Link, match, RouteComponentProps, withRouter } from 'react-router-dom';
+import { Link, RouteComponentProps, match, withRouter } from 'react-router-dom';
 
+import { DeleteTwoTone, FormOutlined, PlusOutlined } from '@ant-design/icons';
+import Search from '../Search';
 import { IDispatch, IRootState } from '#app/store';
 import { sortByFieldAndFilter } from '#app/utils/function';
 import { trackPageView } from '#app/utils/stat';
 
-import Search from '../Search';
 import './index.less';
 
 const mapState = (state: IRootState) => ({
@@ -23,8 +24,8 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    RouteComponentProps {
+  ReturnType<typeof mapDispatch>,
+  RouteComponentProps {
   match: match<{ space: string }>;
 }
 
@@ -148,7 +149,7 @@ class EdgeList extends React.Component<IProps, IState> {
                       data-track-action="view_edge_edit"
                       data-track-label="from_edge_list"
                     >
-                      <Icon type="form" className="edit-btn" />
+                      <FormOutlined className="edit-btn" />
                     </Link>
                   </Button>
                   <Popconfirm
@@ -160,9 +161,7 @@ class EdgeList extends React.Component<IProps, IState> {
                     cancelText={intl.get('common.cancel')}
                   >
                     <Button shape="circle">
-                      <Icon
-                        type="delete"
-                        theme="twoTone"
+                      <DeleteTwoTone
                         twoToneColor="#CF1322"
                       />
                     </Button>
@@ -215,7 +214,7 @@ class EdgeList extends React.Component<IProps, IState> {
               data-track-action="view_edge_create"
               data-track-label="from_edge_list"
             >
-              <Icon type="plus" />
+              <PlusOutlined />
               {intl.get('common.create')}
             </Link>
           </Button>

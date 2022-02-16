@@ -1,10 +1,10 @@
 import { Button, Form, Input, Spin, Upload } from 'antd';
-import { FormComponentProps } from 'antd/lib/form/Form';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
+import { FormInstance } from 'antd/es/form';
 import { nodeIdRulesFn } from '#app/config/rules';
 import { IDispatch, IRootState } from '#app/store';
 import readFileContent from '#app/utils/file';
@@ -22,8 +22,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch>,
-    FormComponentProps {
+  ReturnType<typeof mapDispatch> {
   closeHandler: any;
 }
 
@@ -32,6 +31,7 @@ interface IState {
 }
 
 class IdQuery extends React.Component<IProps, IState> {
+  formRef = React.createRef<FormInstance>()
   constructor(props: IProps) {
     super(props);
 
@@ -39,18 +39,14 @@ class IdQuery extends React.Component<IProps, IState> {
       loading: false,
     };
   }
-  handleImport = () => {
-    this.props.form.validateFields(async (err, data) => {
-      if (!err) {
-        const { ids } = data;
-        const _ids = ids.trim().split('\n');
-        this.props.asyncImportNodes({ ids: _ids });
-        this.props.closeHandler();
-      }
-    });
+  handleImport = data => {
+    const { ids } = data;
+    const _ids = ids.trim().split('\n');
+    this.props.asyncImportNodes({ ids: _ids });
+    this.props.closeHandler();
   };
 
-  handleFileImport = async ({ file }) => {
+  handleFileImport = async({ file }) => {
     this.setState({
       loading: true,
     });
@@ -58,18 +54,18 @@ class IdQuery extends React.Component<IProps, IState> {
     this.setState({
       loading: false,
     });
-    this.props.form.setFieldsValue({
+    this.formRef.current!.setFieldsValue({
       ids,
     });
   };
 
   resetValidator = () => {
-    const ids = this.props.form.getFieldValue('ids');
-    this.props.form.resetFields(['ids']);
-    this.props.form.setFieldsValue({ ids });
+    const ids = this.formRef.current!.getFieldValue('ids');
+    this.formRef.current!.resetFields(['ids']);
+    this.formRef.current!.setFieldsValue({ ids });
   };
 
-  handleImportSample = async () => {
+  handleImportSample = async() => {
     const { asyncGetSampleVertic, closeHandler } = this.props;
     const { code } = await asyncGetSampleVertic();
     if (code === 0) {
@@ -77,7 +73,6 @@ class IdQuery extends React.Component<IProps, IState> {
     }
   };
   render() {
-    const { getFieldDecorator } = this.props.form;
     const { loading } = this.state;
     const { sampleLoading } = this.props;
     return (
@@ -98,23 +93,19 @@ class IdQuery extends React.Component<IProps, IState> {
               </Upload>
             </div>
           </div>
-          <Form layout="horizontal">
-            <Form.Item>
-              {getFieldDecorator('ids', {
-                rules: nodeIdRulesFn(intl),
-              })(
-                <TextArea
-                  placeholder={intl.get('explore.importPlaceholder')}
-                  rows={12}
-                />,
-              )}
+          <Form layout="horizontal" ref={this.formRef} onFinish={this.handleImport}>
+            <Form.Item name="ids" rules={nodeIdRulesFn(intl)}>
+              <TextArea
+                placeholder={intl.get('explore.importPlaceholder')}
+                rows={12}
+              />
             </Form.Item>
             <Form.Item className="btn-wrap">
               <Button
                 type="primary"
+                htmlType="submit"
                 data-track-category="explore"
                 data-track-action="query_by_id"
-                onClick={this.handleImport}
               >
                 {intl.get('explore.addConfirm')}
               </Button>
@@ -126,4 +117,4 @@ class IdQuery extends React.Component<IProps, IState> {
   }
 }
 
-export default connect(mapState, mapDispatch)(Form.create<IProps>()(IdQuery));
+export default connect(mapState, mapDispatch)(IdQuery);

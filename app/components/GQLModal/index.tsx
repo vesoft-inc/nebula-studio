@@ -3,9 +3,9 @@ import React from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import intl from 'react-intl-universal';
 
+import { Modal } from '..';
 import { CodeMirror } from '#app/components';
 
-import { Modal } from '..';
 import './index.less';
 interface IModalHandler {
   show: (callback?: any) => void;

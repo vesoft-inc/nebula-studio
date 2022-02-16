@@ -1,8 +1,9 @@
-import { Button, Form, Icon, Popconfirm, Select, Table, Tooltip } from 'antd';
+import { Button, Form, Popconfirm, Select, Table, Tooltip } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
+import { InfoCircleOutlined } from '@ant-design/icons';
 
 import CSVPreviewLink from '#app/components/CSVPreviewLink';
 import { IDispatch, IRootState } from '#app/store';
@@ -40,7 +41,7 @@ const mapDispatch = (dispatch: IDispatch) => {
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {
+  ReturnType<typeof mapDispatch> {
   data: any;
   index: number;
 }
@@ -82,13 +83,13 @@ class Tag extends React.Component<IProps> {
       <p className="title-content">
         {title}
         <Tooltip title={desc}>
-          <Icon type="info-circle" />
+          <InfoCircleOutlined />
         </Tooltip>
       </p>
     );
   };
 
-  handleChangeTagType = async (record, tag, type) => {
+  handleChangeTagType = async(record, tag, type) => {
     const { activeVertexIndex, vertexesConfig, changeTagType } = this.props;
     await changeTagType({
       activeVertexIndex,
@@ -242,7 +243,7 @@ class Tag extends React.Component<IProps> {
               okText={intl.get('common.ok')}
               cancelText={intl.get('common.cancel')}
             >
-              <Button type="danger">{intl.get('common.delete')}</Button>
+              <Button danger={true}>{intl.get('common.delete')}</Button>
             </Popconfirm>
           </FormItem>
         </div>

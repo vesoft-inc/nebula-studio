@@ -166,6 +166,7 @@ export const downloadCSVFiles = ({ headers, tables, title }) => {
       // IE10 or Edge browsers
       const BOM = '\uFEFF';
       const csvData = new Blob([BOM + result], { type: 'text/csv' });
+      // @ts-ignore
       navigator.msSaveBlob(csvData, `test.csv`);
     } else {
       // Non-Internet Explorer

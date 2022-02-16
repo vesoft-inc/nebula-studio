@@ -4,12 +4,12 @@ import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
+import Prev from './Prev';
 import CSVPreviewLink from '#app/components/CSVPreviewLink';
 import service from '#app/config/service';
 import { IDispatch, IRootState } from '#app/store';
 import { trackPageView } from '#app/utils/stat';
 
-import Prev from './Prev';
 import './Upload.less';
 const mapState = (state: IRootState) => ({
   files: state.importData.files,
@@ -24,15 +24,13 @@ const mapDispatch = (dispatch: IDispatch) => ({
   asyncGetImportFiles: dispatch.app.asyncGetImportFiles,
   asyncUploadFile: dispatch.app.asyncUploadFile,
   updateFiles: files => {
-    dispatch.importData.update({
-      files,
-    });
+    dispatch.importData.update({ files });
   },
 });
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {}
+  ReturnType<typeof mapDispatch> {}
 
 class Import extends React.Component<IProps> {
   previewHandler;
@@ -45,7 +43,7 @@ class Import extends React.Component<IProps> {
     trackPageView('/import/upload');
   }
 
-  getFiles = async () => {
+  getFiles = async() => {
     const { code, data } = await this.props.asyncGetImportFiles();
     if (code === 0) {
       this.props.updateFiles(data);
@@ -139,7 +137,7 @@ class Import extends React.Component<IProps> {
     );
   };
 
-  handleUpdate = async (options: any) => {
+  handleUpdate = async(options: any) => {
     const data = new FormData();
     data.append('file', options.file);
     const config = {
@@ -147,7 +145,7 @@ class Import extends React.Component<IProps> {
         'content-type': 'multipart/form-data',
       },
     };
-    await this.props.asyncUploadFile(data, config).then(_ => {
+    await this.props.asyncUploadFile({ data, config }).then(_ => {
       this.getFiles();
     });
   };

@@ -3,6 +3,7 @@ import { message } from 'antd';
 import cookies from 'js-cookie';
 import _ from 'lodash';
 import intl from 'react-intl-universal';
+import type { IRootModel } from '.';
 
 import service from '#app/config/service';
 import { handleKeyword } from '#app/utils/function';
@@ -23,6 +24,7 @@ interface IState {
   tagsFields: any[];
   edgesFields: any[];
   indexes: any[];
+  tags: any[];
   tagIndexTree: ITree[];
   edgeIndexTree: ITree[];
   spaceList: ISpace[];
@@ -93,7 +95,7 @@ interface IAlterConfig {
   };
 }
 
-export const nebula = createModel({
+export const nebula = createModel<IRootModel>()({
   state: {
     username: cookies.get('nu'),
     host: cookies.get('nh'),
@@ -115,9 +117,9 @@ export const nebula = createModel({
     edgeList: [],
     // index
     indexList: [],
-  },
+  } as IState,
   reducers: {
-    update: (state: IState, payload: any) => {
+    update: (state: IState, payload: object): IState => {
       return {
         ...state,
         ...payload,
@@ -260,7 +262,7 @@ export const nebula = createModel({
       if (res.data) {
         const spaces: ISpace[] = [];
         await Promise.all(
-          res.data.map(async (item, i) => {
+          res.data.map(async(item, i) => {
             const { code, data } = await dispatch.nebula.asyncGetSpaceInfo(
               item,
             );
@@ -643,7 +645,7 @@ export const nebula = createModel({
       const { code, data } = await dispatch.nebula.asyncGetIndexes(type);
       if (code === 0) {
         const _indexes = await Promise.all(
-          data.map(async (item: any) => {
+          data.map(async(item: any) => {
             const { code, data } = await dispatch.nebula.asyncGetIndexFields({
               type,
               name: item.name,
@@ -657,7 +659,7 @@ export const nebula = createModel({
         );
         const tree = [] as ITree[];
         await Promise.all(
-          _indexes.map(async (item: any) => {
+          _indexes.map(async(item: any) => {
             const tag = tree.filter(i => i.name === item.indexOwner);
             if (tag.length > 0) {
               tag[0].indexes.push(item);

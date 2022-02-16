@@ -1,4 +1,4 @@
-import { Dropdown, Icon, Layout, Menu, Select, Spin } from 'antd';
+import { Dropdown, Layout, Menu, Select, Spin } from 'antd';
 import cookies from 'js-cookie';
 import React from 'react';
 import { hot } from 'react-hot-loader/root';
@@ -13,8 +13,11 @@ import {
   withRouter,
 } from 'react-router-dom';
 
+import { BranchesOutlined, CodeOutlined, CompassOutlined, DownOutlined, ImportOutlined, LogoutOutlined, QuestionCircleOutlined, StarOutlined, TagsOutlined } from '@ant-design/icons';
+import ConfigServer from './modules/ConfigServer';
+import PrivateRoute from './PrivateRoute';
 import IconFont from '#app/components/Icon';
-import { INTL_LOCALE_SELECT, INTL_LOCALES } from '#app/config';
+import { INTL_LOCALES, INTL_LOCALE_SELECT } from '#app/config';
 import service from '#app/config/service';
 import { LanguageContext } from '#app/context';
 import Console from '#app/modules/Console';
@@ -29,8 +32,6 @@ import { IDispatch, IRootState } from '#app/store';
 import { updateQueryStringParameter } from '#app/utils';
 
 import './App.less';
-import ConfigServer from './modules/ConfigServer';
-import PrivateRoute from './PrivateRoute';
 import { handleTrackEvent, trackEvent, trackPageView } from './utils/stat';
 
 const { Header, Content } = Layout;
@@ -52,8 +53,8 @@ const mapState = (state: IRootState) => ({
 
 interface IProps
   extends RouteComponentProps,
-    ReturnType<typeof mapDispatch>,
-    ReturnType<typeof mapState> {}
+  ReturnType<typeof mapDispatch>,
+  ReturnType<typeof mapState> {}
 
 class App extends React.Component<IProps, IState> {
   currentLocale;
@@ -108,7 +109,7 @@ class App extends React.Component<IProps, IState> {
     });
   };
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     // Initialize the import task
     service.handleImportAction({ taskAction: 'actionStopAll' });
   }
@@ -198,7 +199,7 @@ class App extends React.Component<IProps, IState> {
                       data-track-action="view_import"
                       data-track-label="from_navigation"
                     >
-                      <Icon type="import" />
+                      <ImportOutlined />
                       {intl.get('common.import')}
                     </Link>
                   </Menu.Item>
@@ -209,7 +210,7 @@ class App extends React.Component<IProps, IState> {
                       data-track-action="view_explore"
                       data-track-label="from_navigation"
                     >
-                      <Icon type="branches" />
+                      <BranchesOutlined />
                       {intl.get('common.explore')}
                     </Link>
                   </Menu.Item>
@@ -220,7 +221,7 @@ class App extends React.Component<IProps, IState> {
                       data-track-action="view_console"
                       data-track-label="from_navigation"
                     >
-                      <Icon type="code" />
+                      <CodeOutlined />
                       {intl.get('common.console')}
                     </Link>
                   </Menu.Item>
@@ -247,7 +248,7 @@ class App extends React.Component<IProps, IState> {
                     <Menu>
                       <Menu.Item>
                         <a onClick={this.handleClear}>
-                          <Icon type="logout" />
+                          <LogoutOutlined />
                           {intl.get('configServer.clear')}
                         </a>
                       </Menu.Item>
@@ -255,7 +256,7 @@ class App extends React.Component<IProps, IState> {
                   }
                 >
                   <a className="ant-dropdown-link">
-                    {intl.get('common.setting')} <Icon type="down" />
+                    {intl.get('common.setting')} <DownOutlined />
                   </a>
                 </Dropdown>
                 <Dropdown
@@ -263,20 +264,20 @@ class App extends React.Component<IProps, IState> {
                   overlay={
                     <Menu>
                       <Menu.Item onClick={() => trackPageView('/user-mannual')}>
-                        <a href={mannualHref} target="_blank">
-                          <Icon type="compass" />
+                        <a href={mannualHref} target="_blank" rel="noreferrer">
+                          <CompassOutlined />
                           {intl.get('common.use')}
                         </a>
                       </Menu.Item>
                       <Menu.Item onClick={() => trackPageView('/nebula-doc')}>
-                        <a href={nGQLHref} target="_blank">
-                          <Icon type="star" />
+                        <a href={nGQLHref} target="_blank" rel="noreferrer">
+                          <StarOutlined />
                           nGQL
                         </a>
                       </Menu.Item>
                       <Menu.Item>
-                        <a href={intl.get('common.forumLink')} target="_blank">
-                          <Icon type="question" />
+                        <a href={intl.get('common.forumLink')} target="_blank" rel="noreferrer">
+                          <QuestionCircleOutlined />
                           {intl.get('common.forum')}
                         </a>
                       </Menu.Item>
@@ -284,7 +285,7 @@ class App extends React.Component<IProps, IState> {
                   }
                 >
                   <a className="ant-dropdown-link">
-                    {intl.get('common.help')} <Icon type="down" />
+                    {intl.get('common.help')} <DownOutlined />
                   </a>
                 </Dropdown>
                 <div
@@ -313,9 +314,9 @@ class App extends React.Component<IProps, IState> {
                             data-track-category="navigation"
                             data-track-action="view_changelog"
                             href={versionLogHref}
-                            target="_blank"
+                            target="_blank" rel="noreferrer"
                           >
-                            <Icon type="tags" />
+                            <TagsOutlined />
                             {intl.get('common.release')}
                           </a>
                         </Menu.Item>
@@ -324,7 +325,7 @@ class App extends React.Component<IProps, IState> {
                   >
                     <a>
                       v{appVersion}
-                      <Icon type="down" />
+                      <DownOutlined />
                     </a>
                   </Dropdown>
                 )}

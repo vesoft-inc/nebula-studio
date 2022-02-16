@@ -5,7 +5,7 @@ import { getExploreGQLWithIndex } from '#app/utils/gql';
 interface IMatchVertex {
   vid?: string;
   tags?: string[];
-  properties?: {};
+  properties?: Record<string, unknown>;
 }
 
 export async function fetchEdgeProps(payload: {

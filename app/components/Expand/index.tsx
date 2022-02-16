@@ -4,10 +4,10 @@ import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
 
+import Expand from './ExpandForm';
 import IconFont from '#app/components/Icon';
 import { IDispatch, IRootState } from '#app/store';
 
-import Expand from './ExpandForm';
 import './index.less';
 
 const mapState = (state: IRootState) => ({
@@ -22,7 +22,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
 
 interface IProps
   extends ReturnType<typeof mapState>,
-    ReturnType<typeof mapDispatch> {
+  ReturnType<typeof mapDispatch> {
   showTitle?: boolean;
 }
 

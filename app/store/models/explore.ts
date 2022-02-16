@@ -4,6 +4,7 @@ import * as d3 from 'd3';
 import _ from 'lodash';
 import intl from 'react-intl-universal';
 import { v4 as uuidv4 } from 'uuid';
+import type { IRootModel } from '.';
 
 import {
   DEFAULT_COLOR_PICK_LIST,
@@ -118,7 +119,7 @@ function getTagData(nodes, expand?) {
   return data;
 }
 
-export const explore = createModel({
+export const explore = createModel<IRootModel>()({
   state: {
     vertexes: [],
     edges: [],
@@ -133,9 +134,9 @@ export const explore = createModel({
     },
     showTagFields: [],
     showEdgeFields: [],
-  },
+  } as IState,
   reducers: {
-    update: (state: IState, payload: any): IState => {
+    update: (state: IState, payload: Record<string, unknown>): IState => {
       if (payload.edges) {
         setLink(payload.edges);
       }
@@ -384,9 +385,9 @@ export const explore = createModel({
       const vertexes: any =
         _ids.length > 0
           ? await this.asyncGetVertexes({
-              ids: _ids,
-              expand,
-            })
+            ids: _ids,
+            expand,
+          })
           : [];
       return _.uniqBy(vertexes, (i: any) =>
         convertBigNumberToString(i.name),

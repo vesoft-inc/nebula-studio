@@ -1,4 +1,5 @@
 import { createModel } from '@rematch/core';
+import type { IRootModel } from '.';
 
 import service from '#app/config/service';
 
@@ -6,12 +7,12 @@ interface IState {
   version: string;
 }
 
-export const app = createModel({
+export const app = createModel<IRootModel>()({
   state: {
     version: process.env.VERSION,
-  },
+  } as IState,
   reducers: {
-    update: (state: IState, payload: any) => {
+    update: (state: IState, payload: object): IState => {
       return {
         ...state,
         ...payload,
@@ -23,9 +24,10 @@ export const app = createModel({
       const { code, data } = (await service.getFiles()) as any;
       return { code, data };
     },
-    async asyncUploadFile(payload) {
-      const { code, data } = (await service.uploadFiles(payload)) as any;
-      return { code, data };
+    async asyncUploadFile(payload: Record<string, unknown>) {
+      const { data, config } = payload;
+      const res = (await service.uploadFiles(data, config)) as any;
+      return res;
     },
   },
 });
