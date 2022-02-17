@@ -3,14 +3,15 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ include "nebula-studio.name" . }}-upload-data
 spec:
-  accessModes: ["ReadWriteOnce"]
+  accessModes:
+    - ReadWriteOnce
   {{- if .Values.persistent.storageClassName }}
-    storageClassName: {{ .Values.persistent.storageClassName  }}
+  storageClassName: {{ .Values.persistent.storageClassName  }}
   {{- end }}
   resources:
     requests:
-    {{- if .Values.persistent.size }}
+      {{- if .Values.persistent.size }}
       storage: {{ .Values.persistent.size  }}
-    {{- else }}
+      {{- else }}
       storage: 5Gi
-    {{- end }}
+      {{- end }}
