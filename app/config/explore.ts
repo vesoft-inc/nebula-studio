@@ -169,10 +169,9 @@ export const downloadCSVFiles = ({ headers, tables, title }) => {
       navigator.msSaveBlob(csvData, `test.csv`);
     } else {
       // Non-Internet Explorer
-      const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + result;
       // Use the download property of the A tag to implement the download function
       const link = document.createElement('a');
-      link.href = encodeURI(csvContent);
+      link.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(result);
       link.download = `${title}.csv`;
       document.body.appendChild(link);
       link.click();
