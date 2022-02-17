@@ -51,7 +51,7 @@ export class SchemaStore {
   }
 
   switchSpace = async(space: string) => {
-    const { code } = (await service.execNGQL({
+    const { code, message } = (await service.execNGQL({
       // HACK: Processing keyword
       gql: 'use' + '`' + space + '`;',
     })) as any;
@@ -63,6 +63,8 @@ export class SchemaStore {
         spaceVidType: data?.tables?.[0]?.['Vid Type'] || 'FIXED_STRING(8)',
       });
       sessionStorage.setItem('currentSpace', space);
+    } else {
+      return message;
     }
   };
 
@@ -93,7 +95,7 @@ export class SchemaStore {
     return { code, data };
   }
 
-  asyncGetSpacesList = async(_payload) => {
+  getSpacesList = async() => {
     const res = await this.getSpaces();
     if (res.data) {
       const spaces: ISpace[] = [];
@@ -113,6 +115,21 @@ export class SchemaStore {
         spaceList: spaces.sort((a, b) => a.serialNumber - b.serialNumber),
       });
     }
+  }
+
+  deleteSpace = async(space: string) => {
+    const { code, data } = (await service.execNGQL(
+      {
+        gql: `DROP SPACE ${handleKeyword(space)}`,
+      },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: 'delete_space',
+        },
+      },
+    )) as any;
+    return { code, data };
   }
 
   // edges

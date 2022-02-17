@@ -368,5 +368,21 @@
     "mannualHref": "https://docs.nebula-graph.io/3.0.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/",
     "versionLogHref": "https://docs.nebula-graph.io/3.0.0/nebula-studio/about-studio/st-ug-release-note/",
     "forumLink": "https://discuss.nebula-graph.io/"
+  },
+  "_schema": {
+    "spaceList": "Graph Space List",
+    "createSpace": "Create Space",
+    "No": "No",
+    "spaceName": "Name",
+    "partitionNumber": "Partition Number",
+    "replicaFactor": "Replica Factor",
+    "charset": "Charset",
+    "collate": "Collate",
+    "vidType": "Vid Type",
+    "atomicEdge": "Atomic Edge",
+    "group": "Group",
+    "comment": "Comment",
+    "operations": "Operations",
+    "useSpaceErrTip": "Space not found. Trying to use a newly created graph space may fail because the creation is implemented asynchronously. To make sure the follow-up operations work as expected, Wait for two heartbeat cycles, i.e., 20 seconds."
   }
 }

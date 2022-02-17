@@ -364,5 +364,21 @@
     "mannualHref": "https://docs.nebula-graph.com.cn/3.0.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/",
     "versionLogHref": "https://docs.nebula-graph.com.cn/3.0.0/nebula-studio/about-studio/st-ug-release-note/",
     "forumLink": "https://discuss.nebula-graph.com.cn/"
+  },
+  "_schema": {
+    "spaceList": "图空间列表",
+    "createSpace": "创建图空间",
+    "No": "序号",
+    "spaceName": "名称",
+    "partitionNumber": "Partition Number",
+    "replicaFactor": "Replica Factor",
+    "charset": "Charset",
+    "collate": "Collate",
+    "vidType": "Vid Type",
+    "atomicEdge": "Atomic Edge",
+    "group": "Group",
+    "comment": "Comment",
+    "operations": "操作",
+    "useSpaceErrTip": "图空间未找到。立刻尝试使用刚创建的图空间可能会失败，因为创建是异步实现的。为确保数据同步，后续操作能顺利进行，请等待 2 个心跳周期（20 秒）。"
   }
 }

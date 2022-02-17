@@ -1,6 +1,7 @@
+@import '~@appv2/common.less';
 .config-collapse {
   background: #F3F6F9;
-  border: 1px solid #D5DDEB;
+  border: 1px solid @gray;
   box-sizing: border-box;
   border-radius: 6px;
   margin-bottom: 20px;
@@ -18,7 +19,7 @@
     .id-row {
       padding: 10px 15px;
       background: #FFFFFF;
-      border: 1px solid #D5DDEB;
+      border: 1px solid @gray;
       box-sizing: border-box;
       border-radius: 3px;
       margin-bottom: 10px;
@@ -26,6 +27,27 @@
     .btns {
       text-align: center;
     }
+  }
+  .config-container {
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    background: #FFFFFF;
+    border: 1px solid @gray;
+    box-sizing: border-box;
+    border-radius: 3px;
+    .tag-select-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .left {
+        display: flex;
+        align-items: center;
+        .tag-select {
+          min-width: 60px;
+        }
+      }
+    }
+  
   }
   .btn-close {
     cursor: pointer;

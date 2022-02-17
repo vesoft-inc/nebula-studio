@@ -1,10 +1,16 @@
 import { lazy } from 'react';
 
+const Schema = lazy(() => import('@appv2/pages/Schema'));
 const Import = lazy(() => import('@appv2/pages/Import'));
 const TaskCreate = lazy(() => import('@appv2/pages/Import/TaskCreate'));
 
 
 export const RoutesList = [
+  {
+    path: '/schema',
+    component: Schema,
+    exact: true,
+  },
   {
     path: '/import/create',
     component: TaskCreate,
