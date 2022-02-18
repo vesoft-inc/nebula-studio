@@ -147,7 +147,7 @@ class Import extends React.Component<IProps, IState> {
     }
   };
 
-  checkTaskStatus = async () => {
+  checkTaskStatus = async() => {
     const { taskId } = this.props;
     const { code, data, message: errMsg } = await this.props.checkImportStatus({
       taskID: taskId,
@@ -176,7 +176,7 @@ class Import extends React.Component<IProps, IState> {
     }
   };
 
-  checkLogFinished = async () => {
+  checkLogFinished = async() => {
     const { update } = this.props;
     const empty = await this.readlog();
     if (empty) {
