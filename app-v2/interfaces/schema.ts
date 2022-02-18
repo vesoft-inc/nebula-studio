@@ -43,6 +43,7 @@ export interface IProperty {
   value?: string;
   allowNull?: boolean;
   fixedLength?: string;
+  comment?: string;
 }
 
 export type IndexType = 'TAG' | 'EDGE';

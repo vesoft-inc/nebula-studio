@@ -8,9 +8,6 @@ import { useStore } from '@appv2/stores';
 import './index.less';
 import { Link, useHistory } from 'react-router-dom';
 
-
-
-
 const Schema = () => {
   const { schema } = useStore();
   const [loading, setLoading] = useState(false);
@@ -136,7 +133,7 @@ const Schema = () => {
       },
     },
   ];
-  return <div className="schema-page">
+  return <div className="schema-page center-layout">
     <div className="schema-header">
       {intl.get('_schema.spaceList')}
     </div>

@@ -31,7 +31,7 @@
     "name": "Name",
     "operation": "Operations",
     "delete": "Delete",
-    "optionalParameters": "Optional Parameters",
+    "optional": "Optional",
     "exportNGQL": "View nGQL",
     "field": "Field",
     "relatedProperties": "Related Properties",
@@ -383,6 +383,7 @@
     "group": "Group",
     "comment": "Comment",
     "operations": "Operations",
-    "useSpaceErrTip": "Space not found. Trying to use a newly created graph space may fail because the creation is implemented asynchronously. To make sure the follow-up operations work as expected, Wait for two heartbeat cycles, i.e., 20 seconds."
+    "useSpaceErrTip": "Space not found. Trying to use a newly created graph space may fail because the creation is implemented asynchronously. To make sure the follow-up operations work as expected, Wait for two heartbeat cycles, i.e., 20 seconds.",
+    "spaceNameEnter": "Please enter the space name"
   }
 }

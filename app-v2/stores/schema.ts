@@ -3,6 +3,7 @@ import service from '@appv2/config/service';
 import { IEdge, IIndexList, ISpace, ITag, ITree } from '@appv2/interfaces/schema';
 import { handleKeyword } from '@appv2/utils/function';
 import { findIndex } from 'lodash';
+
 export class SchemaStore {
   spaces: string[] = [];
   currentSpace: string = sessionStorage.getItem('currentSpace') || '';
@@ -15,7 +16,7 @@ export class SchemaStore {
   tagIndexTree: ITree[] = [];
   edgeIndexTree: ITree[] = [];
   spaceList: ISpace[] = [];
-  activeMachineNum: number;
+  activeMachineNum: number = 1;
   tagList: ITag[] = [];
   edgeList: IEdge[] = [];
   indexList: IIndexList[] = [];
@@ -88,7 +89,7 @@ export class SchemaStore {
     }
   };
 
-  async getSpaceInfo(space: string) {
+  getSpaceInfo = async(space: string) => {
     const { code, data } = (await service.execNGQL({
       gql: `DESCRIBE SPACE ${handleKeyword(space)}`,
     })) as any;
@@ -129,6 +130,35 @@ export class SchemaStore {
         },
       },
     )) as any;
+    return { code, data };
+  }
+
+  createSpace = async(gql: string) => {
+    const { code, data, message } = (await service.execNGQL(
+      {
+        gql,
+      },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: 'create_space',
+        },
+      },
+    )) as any;
+    return { code, data, message };
+  }
+
+  getMachineNumber = async() => {
+    const { code, data } = (await service.execNGQL({
+      gql: `SHOW HOSTS`,
+    })) as any;
+    if (code === 0) {
+      const activeMachineNum = data.tables.filter(i => i.Status === 'ONLINE')
+        .length;
+      this.update({
+        activeMachineNum: activeMachineNum || 1,
+      });
+    }
     return { code, data };
   }
 

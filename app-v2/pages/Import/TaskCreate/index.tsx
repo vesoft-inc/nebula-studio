@@ -131,7 +131,7 @@ const TaskCreate = () => {
   return (
     <div className="nebula-import-create">
       <Breadcrumb routes={routes} />
-      <div className="create-form">
+      <div className="create-form  center-layout">
         <Form className="basic-config" layout="vertical" {...formItemLayout}>
           <Row>
             <Col span={12}>

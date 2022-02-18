@@ -44,7 +44,8 @@ const commonConfig: Configuration = {
                   'menu-dark-bg': '#2F3A4A',
                   'table-header-bg': '#E9EDEF',
                   'table-header-color': '#465B7A',
-                  'table-header-cell-split-color': '#E9EDEF'
+                  'table-header-cell-split-color': '#E9EDEF',
+                  'layout-body-background': '#F8F8F8'
                 }
               }
             },

@@ -31,7 +31,7 @@
     "name": "名称",
     "operation": "操作",
     "delete": "删除",
-    "optionalParameters": "可选参数",
+    "optional": "可选",
     "exportNGQL": "对应的nGQL语句",
     "field": "字段",
     "relatedProperties": "相关属性",
@@ -379,6 +379,7 @@
     "group": "Group",
     "comment": "Comment",
     "operations": "操作",
-    "useSpaceErrTip": "图空间未找到。立刻尝试使用刚创建的图空间可能会失败，因为创建是异步实现的。为确保数据同步，后续操作能顺利进行，请等待 2 个心跳周期（20 秒）。"
+    "useSpaceErrTip": "图空间未找到。立刻尝试使用刚创建的图空间可能会失败，因为创建是异步实现的。为确保数据同步，后续操作能顺利进行，请等待 2 个心跳周期（20 秒）。",
+    "spaceNameEnter": "请输入图空间名称"
   }
 }
