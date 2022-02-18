@@ -177,7 +177,7 @@ module.exports = {
             'error',
             10
         ],
-        'no-bitwise': 'error',
+        'no-bitwise': 'off',
         'no-caller': 'error',
         'no-cond-assign': 'error',
         'no-console': [

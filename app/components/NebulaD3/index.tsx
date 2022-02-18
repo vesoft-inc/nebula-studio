@@ -336,7 +336,7 @@ class NebulaD3 extends React.Component<IProps> {
           .attr('dominant-baseline', 'central')
           .attr('stroke', 'black')
           .attr('stroke-width', '0.00001%')
-          .attr('font-family', 'nebula-cloud-icon')
+          .attr('font-family', 'nebula-studio-icon')
           .attr('x', (d: any) => d.x)
           .attr('y', (d: any) => d.y)
           .attr('id', (d: any) => d.uuid)
