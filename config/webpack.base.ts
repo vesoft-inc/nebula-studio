@@ -40,8 +40,12 @@ const commonConfig: Configuration = {
               lessOptions: {
                 javascriptEnabled: true,
                 modifyVars: {
-                  'menu-dark-bg': '#2F3A4A',
                   'primary-color': '#2F80ED',
+                  'menu-dark-bg': '#2F3A4A',
+                  'table-header-bg': '#E9EDEF',
+                  'table-header-color': '#465B7A',
+                  'table-header-cell-split-color': '#E9EDEF',
+                  'layout-body-background': '#F8F8F8'
                 }
               }
             },

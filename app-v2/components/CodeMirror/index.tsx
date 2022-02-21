@@ -10,9 +10,9 @@ import 'codemirror/mode/meta';
 import 'codemirror/theme/monokai.css';
 import React from 'react';
 
-import { ban, keyWords, maxLineNum, operators } from '#app/config/nebulaQL';
+import { ban, keyWords, maxLineNum, operators } from '@appv2/config/nebulaQL';
 
-import './Codemirror.less';
+import './index.less';
 
 interface IProps {
   options?: object;
@@ -51,10 +51,6 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
           }
           stream.next();
         },
-        // blockCommentStart: '/*',
-        // blockCommentEnd: '*/',
-        // lineComment: '//' ? '#' : '--',
-        // closeBrackets: '()[]{}\'\'""``',
       };
     });
 
@@ -69,7 +65,9 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
         return;
       }
 
-      const list = [...keyWords, ...operators, ...ban].filter(item => item.startsWith(str));
+      const list = [...keyWords, ...operators, ...ban].filter(item => {
+        return item.indexOf(str) === 0;
+      });
 
       if (list.length) {
         return {
@@ -112,12 +110,16 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
   }
 
   blur = instance => {
-    this.props.onBlur?.(instance.doc.getValue());
+    if (this.props.onBlur) {
+      this.props.onBlur(instance.doc.getValue());
+    }
   };
 
   keydown = (_, change) => {
     if (change.shiftKey === true && change.keyCode === 13) {
-      this.props.onShiftEnter?.();
+      if (this.props.onShiftEnter) {
+        this.props.onShiftEnter();
+      }
       change.preventDefault();
     }
   };

@@ -1,23 +1,6 @@
-import { handleKeyword, handleVidStringName } from '#app/utils/function';
-interface IField {
-  name: string;
-  type: string;
-  value?: string;
-  allowNull?: boolean;
-  fixedLength?: string;
-  comment?: string;
-}
+import { handleKeyword, handleVidStringName } from '@appv2/utils/function';
+import { AlterType, IAlterConfig, IProperty, IndexType } from '@appv2/interfaces/schema';
 
-type IndexType = 'TAG' | 'EDGE';
-type AlterType = 'ADD' | 'DROP' | 'CHANGE' | 'TTL' | 'COMMENT';
-interface IAlterConfig {
-  fields?: IField[];
-  comment?: string;
-  ttl?: {
-    col?: string;
-    duration?: string;
-  };
-}
 
 export const getExploreMatchGQL = (params: {
   selectVertexes: any[];
@@ -128,7 +111,7 @@ export const getTagOrEdgeCreateGQL = (params: {
   type: 'TAG' | 'EDGE';
   name: string;
   comment?: string;
-  fields?: IField[];
+  fields?: IProperty[];
   ttlConfig?: {
     ttl_col: string;
     ttl_duration: number;

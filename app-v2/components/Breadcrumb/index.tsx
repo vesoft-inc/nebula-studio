@@ -1,4 +1,4 @@
-import { PageHeader } from 'antd';
+import { Breadcrumb, PageHeader } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -9,7 +9,7 @@ interface IProps {
     path: string;
     breadcrumbName: string;
   }[];
-  ExtraNode?: JSX.Element;
+  extraNode?: JSX.Element;
 }
 
 const itemRender = (route, _params, routes, _paths) => {
@@ -31,16 +31,24 @@ const itemRender = (route, _params, routes, _paths) => {
   );
 };
 
-const Breadcrumb: React.FC<IProps> = (props: IProps) => {
-  const { routes, ExtraNode } = props;
+const NebulaBreadcrumb: React.FC<IProps> = (props: IProps) => {
+  const { routes, extraNode } = props;
   return (
     <PageHeader
       title={null}
       className="nebula-breadcrumb"
-      breadcrumb={{ routes, itemRender }}
-      extra={ExtraNode}
+      breadcrumbRender={() => {
+        return <>
+          <Breadcrumb 
+            className="center-layout"
+            routes={routes} 
+            itemRender={itemRender} 
+          />
+          {extraNode}
+        </>;
+      }}
     />
   );
 };
 
-export default Breadcrumb;
+export default NebulaBreadcrumb;
