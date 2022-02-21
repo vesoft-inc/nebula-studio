@@ -10,7 +10,7 @@ import 'codemirror/mode/meta';
 import 'codemirror/theme/monokai.css';
 import React from 'react';
 
-import { ban, keyWords, maxLineNum, operators } from '#app/config/nebulaQL';
+import { ban, keyWords, maxLineNum, operators } from '@appv2/config/nebulaQL';
 
 import './Codemirror.less';
 

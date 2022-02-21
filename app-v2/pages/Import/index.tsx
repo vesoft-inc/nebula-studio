@@ -23,9 +23,9 @@ const NewImport = () => {
   };
   return (
     <div className="nebua-import-page center-layout">
-      <div className="tab-header">
+      <div className="studio-tab-header">
         <Radio.Group
-          className="import-tab"
+          className="nebula-tab-group"
           value={tab}
           buttonStyle="solid"
           onChange={handleTabChange}
