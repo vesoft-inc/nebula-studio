@@ -3,6 +3,7 @@ import service from '@appv2/config/service';
 import { IEdge, IIndexList, ISpace, ITag, ITree } from '@appv2/interfaces/schema';
 import { handleKeyword } from '@appv2/utils/function';
 import { findIndex } from 'lodash';
+
 export class SchemaStore {
   spaces: string[] = [];
   currentSpace: string = sessionStorage.getItem('currentSpace') || '';
@@ -15,7 +16,7 @@ export class SchemaStore {
   tagIndexTree: ITree[] = [];
   edgeIndexTree: ITree[] = [];
   spaceList: ISpace[] = [];
-  activeMachineNum: number;
+  activeMachineNum: number = 1;
   tagList: ITag[] = [];
   edgeList: IEdge[] = [];
   indexList: IIndexList[] = [];
@@ -51,7 +52,7 @@ export class SchemaStore {
   }
 
   switchSpace = async(space: string) => {
-    const { code } = (await service.execNGQL({
+    const { code, message } = (await service.execNGQL({
       // HACK: Processing keyword
       gql: 'use' + '`' + space + '`;',
     })) as any;
@@ -63,6 +64,8 @@ export class SchemaStore {
         spaceVidType: data?.tables?.[0]?.['Vid Type'] || 'FIXED_STRING(8)',
       });
       sessionStorage.setItem('currentSpace', space);
+    } else {
+      return message;
     }
   };
 
@@ -86,14 +89,14 @@ export class SchemaStore {
     }
   };
 
-  async getSpaceInfo(space: string) {
+  getSpaceInfo = async(space: string) => {
     const { code, data } = (await service.execNGQL({
       gql: `DESCRIBE SPACE ${handleKeyword(space)}`,
     })) as any;
     return { code, data };
   }
 
-  asyncGetSpacesList = async(_payload) => {
+  getSpacesList = async() => {
     const res = await this.getSpaces();
     if (res.data) {
       const spaces: ISpace[] = [];
@@ -113,6 +116,50 @@ export class SchemaStore {
         spaceList: spaces.sort((a, b) => a.serialNumber - b.serialNumber),
       });
     }
+  }
+
+  deleteSpace = async(space: string) => {
+    const { code, data } = (await service.execNGQL(
+      {
+        gql: `DROP SPACE ${handleKeyword(space)}`,
+      },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: 'delete_space',
+        },
+      },
+    )) as any;
+    return { code, data };
+  }
+
+  createSpace = async(gql: string) => {
+    const { code, data, message } = (await service.execNGQL(
+      {
+        gql,
+      },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: 'create_space',
+        },
+      },
+    )) as any;
+    return { code, data, message };
+  }
+
+  getMachineNumber = async() => {
+    const { code, data } = (await service.execNGQL({
+      gql: `SHOW HOSTS`,
+    })) as any;
+    if (code === 0) {
+      const activeMachineNum = data.tables.filter(i => i.Status === 'ONLINE')
+        .length;
+      this.update({
+        activeMachineNum: activeMachineNum || 1,
+      });
+    }
+    return { code, data };
   }
 
   // edges

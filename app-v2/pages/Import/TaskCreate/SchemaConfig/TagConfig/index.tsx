@@ -6,7 +6,6 @@ import { CloseOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@appv2/stores';
 import CSVPreviewLink from '@appv2/components/CSVPreviewLink';
-import './index.less';
 const Option = Select.Option;
 
 interface IProps {
@@ -67,7 +66,7 @@ const VerticesConfig = (props: IProps) => {
     updateTagPropMapping({ configIndex, tagIndex });
   };
   return (
-    <div className="tag-config-container">
+    <div className="config-container">
       <div className="tag-select-row">
         <div className="left">
           <span className="label">Tag</span>

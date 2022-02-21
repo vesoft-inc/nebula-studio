@@ -22,7 +22,7 @@ const NewImport = () => {
     history.push(`/import/${e.target.value}`);
   };
   return (
-    <div className="nebua-import-page">
+    <div className="nebua-import-page center-layout">
       <div className="tab-header">
         <Radio.Group
           className="import-tab"

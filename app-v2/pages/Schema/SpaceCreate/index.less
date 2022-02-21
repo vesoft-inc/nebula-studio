@@ -1,0 +1,34 @@
+@import '~@appv2/common.less';
+.nebula-space-page {
+  .config-container {
+    padding: 25px 0 110px;
+    .space-form {
+      border-bottom: 1px solid @gray;
+      padding-bottom: 20px;
+      .item-string-length {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 100px;
+      }
+    }
+  }
+  .footer {
+    position: fixed;
+    bottom: 0;
+    z-index: 10;
+    width: 100%;
+    height: 98px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    box-shadow: 0px -4px 4px rgba(0, 0, 0, 0.1);
+    button {
+      width: 236px;
+      &:not(:last-child) {
+        margin-right: 50px;
+      }
+    }
+  }
+}
