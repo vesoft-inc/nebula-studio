@@ -60,7 +60,7 @@ const FileUpload = () => {
     {
       title: intl.get('common.operation'),
       key: 'operation',
-      render: (_1, file, index) => {
+      render: (_, file, index) => {
         if (file.content) {
           return (
             <div className="operation">

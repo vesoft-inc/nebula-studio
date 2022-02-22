@@ -2,6 +2,7 @@ import { lazy } from 'react';
 
 const Schema = lazy(() => import('@appv2/pages/Schema'));
 const SpaceCreate = lazy(() => import('@appv2/pages/Schema/SpaceCreate'));
+const SpaceConfig = lazy(() => import('@appv2/pages/Schema/SpaceConfig'));
 const Import = lazy(() => import('@appv2/pages/Import'));
 const TaskCreate = lazy(() => import('@appv2/pages/Import/TaskCreate'));
 
@@ -13,9 +14,13 @@ export const RoutesList = [
     exact: true,
   },
   {
-    path: '/space/create',
+    path: '/schema/space/create',
     component: SpaceCreate,
     exact: true,
+  },
+  {
+    path: '/schema/:space/:type?/:action?/:module?',
+    component: SpaceConfig,
   },
   {
     path: '/import/create',

@@ -13,10 +13,11 @@ import '@appv2/static/fonts/iconfont.css';
 import Cookie from 'js-cookie';
 import { INTL_LOCALES } from '@appv2/config/constants';
 import { LanguageContext } from '@appv2/context';
-import './common.less';
 const Login = lazy(() => import('@appv2/pages/Login'));
 const MainPage = lazy(() => import('@appv2/pages/MainPage'));
 
+import './common.less';
+import './app.less';
 dayjs.extend(duration);
 
 const defaultLanguage = Cookie.get('lang') || document.documentElement.getAttribute('lang');

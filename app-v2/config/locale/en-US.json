@@ -75,10 +75,11 @@
     "exportSelectVertexes": "Export Vertexes to CSV",
     "exportSelectEdges": "Export Edges to CSV",
     "noSelectedData": "No data currently selected",
-    "namePlaceholder": "Please enter a search name",
+    "namePlaceholder": "Please enter the {name} name",
     "comment": "Comment",
     "space": "Space",
-    "version": "Version"
+    "version": "Version",
+    "statistics": "Statistics"
   },
   "NGQLOutput": {
     "success": "Execution successful!"
@@ -384,6 +385,7 @@
     "comment": "Comment",
     "operations": "Operations",
     "useSpaceErrTip": "Space not found. Trying to use a newly created graph space may fail because the creation is implemented asynchronously. To make sure the follow-up operations work as expected, Wait for two heartbeat cycles, i.e., 20 seconds.",
-    "spaceNameEnter": "Please enter the space name"
+    "spaceNameEnter": "Please enter the space name",
+    "propertyCount": "Property Num"
   }
 }

@@ -54,14 +54,12 @@ const SpaceCreate = () => {
   const handleCreate = () => {
     setLoading(true);
     form.validateFields().then(async() => {
-      const { code, message: errorMsg } = await createSpace(gql);
+      const { code } = await createSpace(gql);
       setLoading(false);
       if (code === 0) {
         history.push('/schema');
         message.success(intl.get('schema.createSuccess'));
-      } else {
-        message.warning(errorMsg);
-      }
+      } 
     }).catch(_ => {
       setLoading(false);
     });
@@ -93,7 +91,7 @@ const SpaceCreate = () => {
     }
   };
   useEffect(() => {
-    trackPageView('/space/create');
+    trackPageView('/schema/space/create');
     getMachineNumber();
   }, []);
   return (

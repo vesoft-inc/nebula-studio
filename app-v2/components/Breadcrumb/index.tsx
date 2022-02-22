@@ -38,14 +38,13 @@ const NebulaBreadcrumb: React.FC<IProps> = (props: IProps) => {
       title={null}
       className="nebula-breadcrumb"
       breadcrumbRender={() => {
-        return <>
+        return <div className="breadcrumb-container center-layout">
           <Breadcrumb 
-            className="center-layout"
             routes={routes} 
             itemRender={itemRender} 
           />
           {extraNode}
-        </>;
+        </div>;
       }}
     />
   );
