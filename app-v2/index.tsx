@@ -9,7 +9,6 @@ import dayjs from 'dayjs';
 import intl from 'react-intl-universal';
 import duration from 'dayjs/plugin/duration';
 import AuthorizedRoute from './AuthorizedRoute';
-import '@appv2/static/fonts/iconfont.css';
 import Cookie from 'js-cookie';
 import { INTL_LOCALES } from '@appv2/config/constants';
 import { LanguageContext } from '@appv2/context';

@@ -2,10 +2,9 @@ import { Button, Checkbox, Popconfirm, Table, Upload } from 'antd';
 import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
-
+import Icon from '@appv2/components/Icon';
 import CSVPreviewLink from '@appv2/components/CSVPreviewLink';
 import { observer } from 'mobx-react-lite';
-
 import { useStore } from '@appv2/stores';
 import { getFileSize } from '@appv2/utils/file';
 import { trackPageView } from '@appv2/utils/stat';
@@ -65,8 +64,8 @@ const FileUpload = () => {
           return (
             <div className="operation">
               <div>
-                <CSVPreviewLink file={file}>
-                  {intl.get('import.preview')}
+                <CSVPreviewLink file={file} btnType="default">
+                  <Icon type="icon-btn-detail" />
                 </CSVPreviewLink>
                 <Popconfirm
                   onConfirm={() => asyncDeleteFile(index)}
@@ -74,7 +73,9 @@ const FileUpload = () => {
                   okText={intl.get('common.ok')}
                   cancelText={intl.get('common.cancel')}
                 >
-                  <Button type="link">{intl.get('common.delete')}</Button>
+                  <Button className="warning-btn">
+                    <Icon type="icon-btn-delete" />
+                  </Button>
                 </Popconfirm>
               </div>
             </div>
@@ -97,8 +98,8 @@ const FileUpload = () => {
         customRequest={handleUpdate}
         beforeUpload={transformFile as any}
       >
-        <Button className="upload-btn" type="primary">
-          + {intl.get('import.uploadFile')}
+        <Button className="studio-add-btn upload-btn" type="primary">
+          <Icon className="studio-add-btn-icon" type="icon-btn-add" />{intl.get('import.uploadFile')}
         </Button>
       </Upload>
       <div className="file-list">

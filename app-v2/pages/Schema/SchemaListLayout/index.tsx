@@ -4,7 +4,7 @@ import intl from 'react-intl-universal';
 import { Link, useParams } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import Search from '../Search';
-
+import Icon from '@appv2/components/Icon';
 import './index.less';
 
 interface IProps {
@@ -13,11 +13,12 @@ interface IProps {
   columns: any;
   loading: boolean;
   renderExpandInfo: (record) => any;
-  children?: any
+  children?: any;
+  type: string
 }
 const SchemaListLayout = (props: IProps) => {
-  const { onSearch, data, columns, loading, renderExpandInfo, children } = props;
-  const { space, type } = useParams() as { space :string, type: string, module?: string };
+  const { onSearch, data, columns, loading, renderExpandInfo, children, type } = props;
+  const { space } = useParams() as { space :string, module?: string };
   const [expandKeys, setExpandKeys] = useState<any[]>([]);
   const handleRowClick = row => {
     const { name: key } = row;
@@ -27,14 +28,14 @@ const SchemaListLayout = (props: IProps) => {
   return (
     <div className="nebula-schema-config-list">
       <div className="header">
-        <Button type="primary">
+        <Button type="primary" className="studio-add-btn">
           <Link
             to={`/schema/${space}/${type}/create`}
             data-track-category="navigation"
             data-track-action={`view_${type}_create`}
             data-track-label={`from_${type}_list`}
           >
-            + {intl.get('common.create')}
+            <Icon className="studio-add-btn-icon" type="icon-btn-add" />{intl.get('common.create')}
           </Link>
         </Button>
         <Search onSearch={onSearch} type={intl.get('common.edge').toLowerCase()} />

@@ -7,7 +7,7 @@
 	display: flex;
 	padding-left: 0;
 	padding-right: 0;
-	.arrow-icon {
+	.arrow-icon > svg {
 		width: 23px;
 		height: 23px;
 		margin-right: 15px;
@@ -18,10 +18,16 @@
 		align-items: center;
 	}
 	.ant-breadcrumb {
+		display: inline-flex;
+		align-items: center;
 		font-size: 18px;
 		& > span {
+			display: inline-flex;
+			align-items: center;
 			a, span {
 				font-weight: 300;
+				display: inline-flex;
+				align-items: center;
 			}
 		}
 		& > span:last-child {

@@ -37,7 +37,7 @@ service.interceptors.response.use(
     if (
       code === -1 &&
       errMsg &&
-      (errMsg.includes('connection refused') ||
+      (errMsg.includes('Connection refused') ||
         errMsg.includes('broken pipe') ||
         errMsg.includes('session expired') ||
         errMsg.includes('an existing connection was forcibly closed'))
