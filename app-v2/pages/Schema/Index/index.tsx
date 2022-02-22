@@ -2,7 +2,7 @@ import { Button, Popconfirm, Radio, Table, message } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import intl from 'react-intl-universal';
 import { Link, useHistory, useParams } from 'react-router-dom';
-import { DeleteTwoTone, FormOutlined } from '@ant-design/icons';
+import Icon from '@appv2/components/Icon';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@appv2/stores';
 import { sortByFieldAndFilter } from '@appv2/utils/function';
@@ -90,7 +90,7 @@ const IndexList = () => {
                     data-track-action="view_index_edit"
                     data-track-label="from_index_list"
                   >
-                    <FormOutlined className="edit-btn" />
+                    <Icon type="icon-btn-edit" />
                   </Link>
                 </Button>
                 <Popconfirm
@@ -102,9 +102,7 @@ const IndexList = () => {
                   cancelText={intl.get('common.cancel')}
                 >
                   <Button className="warning-btn" onClick={e => e.stopPropagation()}>
-                    <DeleteTwoTone
-                      twoToneColor="#CF1322"
-                    />
+                    <Icon type="icon-btn-delete" />
                   </Button>
                 </Popconfirm>
               </div>
@@ -133,6 +131,7 @@ const IndexList = () => {
   return <SchemaListLayout 
     loading={loading}
     data={data}
+    type="index"
     columns={columns}
     renderExpandInfo={renderIndexInfo}
     onSearch={setSearchVal} >

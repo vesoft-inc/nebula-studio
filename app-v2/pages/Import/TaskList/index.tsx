@@ -5,7 +5,7 @@ import TaskItem from './TaskItem';
 import { useHistory } from 'react-router-dom';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
-
+import Icon from '@appv2/components/Icon';
 import { useStore } from '@appv2/stores';
 import { trackPageView } from '@appv2/utils/stat';
 
@@ -56,11 +56,11 @@ const TaskList = () => {
     <div className="nebula-data-import">
       <div className="task-btns">
         <Button
-          className="upload-btn"
+          className="studio-add-btn upload-btn"
           type="primary"
           onClick={() => history.push('/import/create')}
         >
-          {intl.get('import.createTask')}
+          <Icon className="studio-add-btn-icon" type="icon-btn-add" />{intl.get('import.createTask')}
         </Button>
         <Button className="upload-btn" type="default">
           {intl.get('import.uploadTemp')}

@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '@appv2/stores';
 import { v4 as uuidv4 } from 'uuid';
 import './index.less';
+import Icon from '@appv2/components/Icon';
 
 const Option = Select.Option;
 
@@ -69,8 +70,9 @@ const FileSelect = (props: IProps) => {
       </Form>}
       title={intl.get('import.selectFile')}
     >
-      <Button type="primary" className="btn-bind-source" onClick={() => setVisible(true)}>
-        + {intl.get('import.bindDatasource')}
+      <Button type="primary" className="studio-add-btn-icon btn-bind-source" onClick={() => setVisible(true)}>
+        <Icon className="studio-add-btn-icon" type="icon-btn-add" />
+        {intl.get('import.bindDatasource')}
       </Button>
     </Popover>
   );

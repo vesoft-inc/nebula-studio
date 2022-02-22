@@ -55,12 +55,13 @@ const PageHeader = (props: IProps) => {
       >
         {menus.map(item => <Menu.Item key={item.key}>
           <Link
+            className="nav-link"
             to={item.path}
             data-track-category={item.track.category}
             data-track-action={item.track.action}
             data-track-label={item.track.label}
           >
-            <Icon type={item.icon} />
+            <Icon className="nav-icon" type={item.icon} />
             {intl.get(item.intlKey)}
           </Link>
         </Menu.Item>)}

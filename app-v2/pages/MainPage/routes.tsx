@@ -42,7 +42,7 @@ export const MENU_LIST = [
       action: 'view_schema',
       label: 'from_navigation'
     },
-    icon: 'iconnav-model',
+    icon: 'icon-nav-schema',
     intlKey: 'common.schema'
   },
   {
@@ -53,7 +53,7 @@ export const MENU_LIST = [
       action: 'view_import',
       label: 'from_navigation'
     },
-    icon: 'iconnav-model',
+    icon: 'icon-btn-download',
     intlKey: 'common.import'
   },
   {
@@ -64,7 +64,7 @@ export const MENU_LIST = [
       action: 'view_console',
       label: 'from_navigation'
     },
-    icon: 'iconnav-model',
+    icon: 'icon-nav-console',
     intlKey: 'common.console'
   },
 ];

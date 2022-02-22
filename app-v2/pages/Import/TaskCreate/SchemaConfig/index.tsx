@@ -9,6 +9,8 @@ import TagConfig from './TagConfig';
 import intl from 'react-intl-universal';
 import EdgeConfig from './EdgeConfig';
 const { Panel } = Collapse;
+import Icon from '@appv2/components/Icon';
+
 import './index.less';
 
 interface IProps {
@@ -71,8 +73,9 @@ const SchemaConfig = (props: IProps) => {
           {type === 'vertices' && data.tags.map((tag, tagIndex) => <TagConfig key={tagIndex} file={data.file} tag={tag} tagIndex={tagIndex} configIndex={configIndex} />)}
           {type === 'edge' && <EdgeConfig configIndex={configIndex} edge={data} />}
           {type === 'vertices' && <div className="btns">
-            <Button type="default" onClick={() => addTag(configIndex)}>
-              + {intl.get('import.addTag')}
+            <Button className="primary-btn studio-add-btn-icon" onClick={() => addTag(configIndex)}>
+              <Icon className="studio-add-btn-icon" type="icon-btn-add" />
+              {intl.get('import.addTag')}
             </Button>
           </div>}
         </div>

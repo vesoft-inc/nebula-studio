@@ -6,6 +6,7 @@ import './index.less';
 import { ITaskItem, ITaskStatus } from '@appv2/interfaces/import';
 import dayjs from 'dayjs';
 import { floor } from 'lodash';
+import Icon from '@appv2/components/Icon';
 interface IProps {
   data: ITaskItem;
   handleStop: (id: number) => void;
@@ -73,7 +74,10 @@ const TaskItem = (props: IProps) => {
     <div className="task-item">
       <div className="row">
         <span>{intl.get('common.space')}: {space}</span>
-        <Button type="link" size="small" onClick={() => handleDownload(taskID)}>{intl.get('import.downloadConfig')}</Button>
+        <Button type="link" size="small" onClick={() => handleDownload(taskID)}>
+          <Icon type="icon-btn-download" />
+          {intl.get('import.downloadConfig')}
+        </Button>
       </div>
       <div className="row">
         <div className="progress">
@@ -107,8 +111,8 @@ const TaskItem = (props: IProps) => {
             strokeColor={status && COLOR_MAP[status]} />
         </div>
         <div className="operations">
-          <Button>{intl.get('import.details')}</Button>
-          <Button type="primary">{intl.get('import.viewLogs')}</Button>
+          <Button className="primary-btn">{intl.get('import.details')}</Button>
+          <Button className="primary-btn">{intl.get('import.viewLogs')}</Button>
           {taskStatus === ITaskStatus.statusProcessing && 
           <Popconfirm
             placement="left"
@@ -117,7 +121,7 @@ const TaskItem = (props: IProps) => {
             okText={intl.get('common.confirm')}
             cancelText={intl.get('common.cancel')}
           >
-            <Button>{intl.get('import.endImport')}</Button>
+            <Button className="cancel-btn">{intl.get('import.endImport')}</Button>
           </Popconfirm>}
           {taskStatus !== ITaskStatus.statusProcessing && 
           <Popconfirm
