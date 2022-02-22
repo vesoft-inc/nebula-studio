@@ -67,6 +67,11 @@
 	color: @red;
 	border-color: @red;
 
+	svg {
+		width: 20px;
+		height: 20px;
+	}
+
 	&:hover {
 		color: @red;
 		border-color: @red;
@@ -76,9 +81,59 @@
 .ant-btn.primary-btn {
 	color: @blue;
 	border-color: @blue;
+	display: inline-flex;
+	align-items: center;
+
+	svg {
+		width: 20px;
+		height: 20px;
+	}
 
 	&:hover {
 		color: @blue;
 		border-color: @blue;
 	}
 }
+
+.ant-btn.cancel-btn {
+	color: @darkGray;
+	border-color: @darkGray;
+
+	svg {
+		width: 20px;
+		height: 20px;
+	}
+
+	&:hover {
+		color: @darkGray;
+		border-color: @darkGray;
+	}
+}
+
+.ant-btn.studio-add-btn {
+	border-radius: 3px;
+	display: inline-flex;
+	align-items: center;
+	padding: 0 29px;
+
+	a {
+		display: flex;
+		align-items: center;
+	}
+
+	.studio-add-btn-icon {
+		display: inline-flex;
+		margin-right: 10px;
+		height: 22px;
+
+		> svg {
+			width: 22px;
+			height: 22px;
+		}
+
+		& ~ span {
+			margin-left: 0;
+		}
+	}
+}
+

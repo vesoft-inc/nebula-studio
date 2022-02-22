@@ -2,7 +2,7 @@ import { Button, Popconfirm, Table, message } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import intl from 'react-intl-universal';
 import { Link, useParams } from 'react-router-dom';
-import { DeleteTwoTone, FormOutlined } from '@ant-design/icons';
+import Icon from '@appv2/components/Icon';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@appv2/stores';
 import { sortByFieldAndFilter } from '@appv2/utils/function';
@@ -44,7 +44,7 @@ function renderEdgeInfo(edge: IEdge) {
 }
 
 const EdgeList = () => {
-  const { space } = useParams() as {space :string, type: string};
+  const { space } = useParams() as { space :string };
   const { schema: { edgeList, deleteEdge, getEdgeList } } = useStore();
   const [searchVal, setSearchVal] = useState('');
   const [loading, setLoading] = useState(false);
@@ -89,7 +89,7 @@ const EdgeList = () => {
                     data-track-action="view_edge_edit"
                     data-track-label="from_edge_list"
                   >
-                    <FormOutlined className="edit-btn" />
+                    <Icon type="icon-btn-edit" />
                   </Link>
                 </Button>
                 <Popconfirm
@@ -101,9 +101,7 @@ const EdgeList = () => {
                   cancelText={intl.get('common.cancel')}
                 >
                   <Button className="warning-btn" onClick={e => e.stopPropagation()}>
-                    <DeleteTwoTone
-                      twoToneColor="#CF1322"
-                    />
+                    <Icon type="icon-btn-delete" />
                   </Button>
                 </Popconfirm>
               </div>
@@ -124,6 +122,7 @@ const EdgeList = () => {
     }));
   }, [edgeList, searchVal]);
   return <SchemaListLayout 
+    type="edge"
     loading={loading}
     data={data}
     columns={columns}

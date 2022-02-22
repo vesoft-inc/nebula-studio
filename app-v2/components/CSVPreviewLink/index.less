@@ -10,6 +10,19 @@
 		th {
 			text-align: center;
 		}
+		.ant-table-tbody {
+			tr {
+				background-color: #F3F6F9;
+			}
+		}
+	}
+	.noBackground {
+		.ant-table-thead > tr > th {
+			background-color: #fff;
+			&::before {
+				content: none !important;
+			}
+		}
 	}
 
 	> .operation {

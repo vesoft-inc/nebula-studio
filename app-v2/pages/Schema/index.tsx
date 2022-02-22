@@ -123,7 +123,7 @@ const Schema = () => {
                 cancelText={intl.get('common.cancel')}
               >
                 <Button className="warning-btn">
-                  <Icon type="iconimage-icon16" />
+                  <Icon type="icon-btn-delete" />
                 </Button>
               </Popconfirm>
             </div>
@@ -137,14 +137,14 @@ const Schema = () => {
       {intl.get('_schema.spaceList')}
     </div>
     <div className="schema-container">
-      <Button className="btn-create" type="primary">
+      <Button className="studio-add-btn btn-create" type="primary">
         <Link
           to="/schema/space/create"
           data-track-category="navigation"
           data-track-action="view_space_create"
           data-track-label="from_space_list"
         >
-          + {intl.get('_schema.createSpace')}
+          <Icon className="studio-add-btn-icon" type="icon-btn-add" />{intl.get('_schema.createSpace')}
         </Link>
       </Button>
       <Table

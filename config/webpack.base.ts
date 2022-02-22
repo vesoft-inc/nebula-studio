@@ -45,7 +45,9 @@ const commonConfig: Configuration = {
                   'table-header-bg': '#E9EDEF',
                   'table-header-color': '#465B7A',
                   'table-header-cell-split-color': '#E9EDEF',
-                  'layout-body-background': '#F8F8F8'
+                  'layout-body-background': '#F8F8F8',
+                  'font-family': 'Robot, sans-serif',
+                  'height-base': '38px'
                 }
               }
             },

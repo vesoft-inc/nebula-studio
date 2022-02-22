@@ -1,17 +1,20 @@
 import { Button, Popover, Table } from 'antd';
+import { } from 'antd/lib/button';
 import React, { useState } from 'react';
 import intl from 'react-intl-universal';
-import './index.less';
 import { v4 as uuidv4 } from 'uuid';
+import './index.less';
+import classNames from 'classnames';
 
 interface IProps {
   file: any;
-  children: string;
+  children: any;
   onMapping?: (index) => void;
+  btnType?: string
 }
 
 const CSVPreviewLink = (props: IProps) => {
-  const { onMapping, file: { content }, children } = props;
+  const { onMapping, file: { content }, children, btnType } = props;
   const [visible, setVisible] = useState(false);
   const handleLinkClick = e => {
     e.stopPropagation();
@@ -48,7 +51,7 @@ const CSVPreviewLink = (props: IProps) => {
       onVisibleChange={visible => setVisible(visible)}
       content={<div className="csv-preview">
         <Table
-          bordered={true}
+          className={classNames({ 'noBackground': !!onMapping })}
           dataSource={content}
           columns={columns}
           pagination={false}
@@ -63,7 +66,7 @@ const CSVPreviewLink = (props: IProps) => {
         </div>
       </div>}
     >
-      <Button type="link" className="btn-preview" onClick={handleLinkClick}>
+      <Button type={btnType as any || 'link'} className={classNames('btn-preview', { 'primary-btn': btnType === 'default' })} onClick={handleLinkClick}>
         {children}
       </Button>
     </Popover>

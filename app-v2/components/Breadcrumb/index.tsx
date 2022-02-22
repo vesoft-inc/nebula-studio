@@ -1,6 +1,7 @@
 import { Breadcrumb, PageHeader } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Icon from '@appv2/components/Icon';
 
 import './index.less';
 
@@ -21,7 +22,7 @@ const itemRender = (route, _params, routes, _paths) => {
     <Link to={route.path}>
       {first ? (
         <>
-          {/* <BorderVerticleOutlined className="arrow-icon" /> */}
+          <Icon className="arrow-icon" type="icon-btn-return" />
           {route.breadcrumbName}
         </>
       ) : (

@@ -2,7 +2,7 @@ import { Button, Popconfirm, Table, message } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import intl from 'react-intl-universal';
 import { Link, useParams } from 'react-router-dom';
-import { DeleteTwoTone, FormOutlined } from '@ant-design/icons';
+import Icon from '@appv2/components/Icon';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@appv2/stores';
 import { sortByFieldAndFilter } from '@appv2/utils/function';
@@ -44,7 +44,7 @@ function renderTagInfo(tag: ITag) {
 }
 
 const TagList = () => {
-  const { space } = useParams() as {space :string, type: string};
+  const { space } = useParams() as {space :string};
   const { schema: { tagList, deleteTag, getTagList } } = useStore();
   const [searchVal, setSearchVal] = useState('');
   const [loading, setLoading] = useState(false);
@@ -92,7 +92,7 @@ const TagList = () => {
                   data-track-action="view_tag_edit"
                   data-track-label="from_tag_list"
                 >
-                  <FormOutlined className="edit-btn" />
+                  <Icon type="icon-btn-edit" />
                 </Link>
               </Button>
               <Popconfirm
@@ -104,9 +104,7 @@ const TagList = () => {
                 cancelText={intl.get('common.cancel')}
               >
                 <Button className="warning-btn" onClick={e => e.stopPropagation()}>
-                  <DeleteTwoTone
-                    twoToneColor="#CF1322"
-                  />
+                  <Icon type="icon-btn-delete" />
                 </Button>
               </Popconfirm>
             </div>
@@ -128,6 +126,7 @@ const TagList = () => {
   }, [tagList, searchVal]);
 
   return <SchemaListLayout 
+    type="tag"
     loading={loading}
     data={data}
     columns={columns}

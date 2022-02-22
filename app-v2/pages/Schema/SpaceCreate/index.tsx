@@ -119,15 +119,17 @@ const SpaceCreate = () => {
               <FormItem noStyle={true} dependencies={['vidType']}>
                 {({ getFieldValue }) => {
                   const vidType = getFieldValue('vidType');
-                  return vidType === 'FIXED_STRING' ? <Form.Item className="item-string-length" name="stringLength" rules={[
-                    {
-                      required: true,
-                      message: 'fix string length limit is required',
-                    },
-                    ...numberRulesFn(intl),
-                  ]}>
-                    <Input />
-                  </Form.Item>
+                  return vidType === 'FIXED_STRING' ? <Col offset={11} className="item-string-length">
+                    <Form.Item name="stringLength" rules={[
+                      {
+                        required: true,
+                        message: 'fix string length limit is required',
+                      },
+                      ...numberRulesFn(intl),
+                    ]}>
+                      <Input />
+                    </Form.Item>
+                  </Col>
                     : null;
                 }}
               </FormItem>
