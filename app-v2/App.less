@@ -1,0 +1,84 @@
+@import './common.less';
+
+@font-face {
+	font-family: 'Roboto-Black';
+	src: url(~@appv2/static/fonts/Roboto-Black.ttf);
+}
+
+@font-face {
+	font-family: 'Roboto-Bold';
+	src: url(~@appv2/static/fonts/Roboto-Bold.ttf);
+}
+
+@font-face {
+	font-family: 'Roboto-Light';
+	src: url(~@appv2/static/fonts/Roboto-Light.ttf);
+}
+
+@font-face {
+	font-family: 'Roboto-Medium';
+	src: url(~@appv2/static/fonts/Roboto-Medium.ttf);
+}
+
+@font-face {
+	font-family: 'Roboto-Regular';
+	src: url(~@appv2/static/fonts/Roboto-Regular.ttf);
+}
+
+.center-layout {
+	width: @containerWidth;
+	margin: 0 auto;
+}
+
+.studio-tab-header {
+	display: flex;
+	justify-content: center;
+	padding-bottom: 16px;
+	border-bottom: 1px solid @gray;
+}
+
+.ant-radio-group.nebula-tab-group {
+	background: #e9edef;
+	border-radius: 20px;
+	padding: 4px;
+	min-width: 400px;
+	display: flex;
+	justify-content: center;
+
+	.ant-radio-button-wrapper {
+		border-radius: 20px;
+		flex: 1;
+		text-align: center;
+		border: none;
+		white-space: nowrap;
+		color: #465b7a;
+
+		&:not(.ant-radio-button-wrapper-checked) {
+			background: none;
+		}
+
+		&::before {
+			width: 0;
+		}
+	}
+}
+
+.ant-btn.warning-btn {
+	color: @red;
+	border-color: @red;
+
+	&:hover {
+		color: @red;
+		border-color: @red;
+	}
+}
+
+.ant-btn.primary-btn {
+	color: @blue;
+	border-color: @blue;
+
+	&:hover {
+		color: @blue;
+		border-color: @blue;
+	}
+}

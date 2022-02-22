@@ -1,8 +1,13 @@
 import { action, makeAutoObservable, observable } from 'mobx';
 import service from '@appv2/config/service';
-import { IEdge, IIndexList, ISpace, ITag, ITree } from '@appv2/interfaces/schema';
+import { AlterType, IAlterConfig, IEdge, IIndexList, IProperty, ISpace, ITag, ITree, IndexType } from '@appv2/interfaces/schema';
 import { handleKeyword } from '@appv2/utils/function';
 import { findIndex } from 'lodash';
+import {
+  getAlterGQL,
+  getIndexCreateGQL,
+  getTagOrEdgeCreateGQL,
+} from '@appv2/utils/gql';
 
 export class SchemaStore {
   spaces: string[] = [];
@@ -37,7 +42,9 @@ export class SchemaStore {
       tagList: observable,
       edgeList: observable,
       indexList: observable,
-      update: action
+      update: action,
+      addEdgesName: action,
+      addTagsName: action,
     });
   }
 
@@ -191,6 +198,100 @@ export class SchemaStore {
     return { code, data, message };
   }
 
+  getEdgeTypesFields = async(payload: { edgeTypes: any[] }) => {
+    const { edgeTypes } = payload;
+    await Promise.all(
+      edgeTypes.map(async item => {
+        const { code, data } = await this.getEdgeInfo(
+          item,
+        );
+        if (code === 0) {
+          const edgeFields = data.tables.map(item => item.Field);
+          this.addEdgesName({
+            edgeType: item,
+            edgeFields: ['type', '_rank', ...edgeFields],
+          });
+        }
+      }),
+    );
+  }
+
+  getEdgesAndFields = async() => {
+    const edgeTypes = await this.getEdges();
+    if (edgeTypes) {
+      this.getEdgeTypesFields({ edgeTypes });
+    }
+  }
+
+  getEdgeList = async() => {
+    const edgeTypes = await this.getEdges();
+    if (edgeTypes) {
+      const edgeList: IEdge[] = [];
+      await Promise.all(
+        edgeTypes.map(async item => {
+          const edge: IEdge = {
+            name: item,
+            fields: [],
+          };
+          const { code, data } = await this.getEdgeInfo(
+            item,
+          );
+          if (code === 0) {
+            edge.fields = data.tables;
+          }
+          edgeList.push(edge);
+        }),
+      );
+      this.update({ edgeList });
+    }
+  }
+
+  deleteEdge = async(name: string) => {
+    const { code, data, message } = (await service.execNGQL(
+      {
+        gql: `
+        DROP EDGE ${handleKeyword(name)}
+      `,
+      },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: 'delete_edge',
+        },
+      },
+    )) as any;
+    return { code, data, message };
+  }
+
+  createEdge = async(payload: {
+    name: string;
+    comment?: string;
+    fields?: IProperty[];
+    ttlConfig?: {
+      ttl_col: string;
+      ttl_duration: number;
+    };
+  }) => {
+    const gql = await getTagOrEdgeCreateGQL({ ...payload, type: 'EDGE' });
+    const { code, data, message } = (await service.execNGQL(
+      {
+        gql,
+      },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: 'create_edge',
+        },
+      },
+    )) as any;
+    return { code, data, message };
+  }
+
+  addEdgesName = async(payload: any) => {
+    const { edgeType, edgeFields } = payload;
+    const index = findIndex(this.edgesFields, edgeType);
+    this.edgesFields[!~index ? this.edgesFields.length : index] = { [edgeType]: edgeFields };
+  }
 
   // tags
   async getTags() {
@@ -240,6 +341,260 @@ export class SchemaStore {
     const { code, data, message } = (await service.execNGQL({
       gql,
     })) as any;
+    return { code, data, message };
+  }
+
+  getTagList = async() => {
+    const tags = await this.getTags();
+    if (tags) {
+      const tagList: ITag[] = [];
+      await Promise.all(
+        tags.map(async item => {
+          const tag: ITag = {
+            name: item,
+            fields: [],
+          };
+          const { code, data } = await this.getTagInfo(
+            item,
+          );
+          if (code === 0) {
+            tag.fields = data.tables;
+          }
+          tagList.push(tag);
+        }),
+      );
+      this.update({ tagList });
+    }
+  }
+
+  deleteTag = async(name: string) => {
+    const { code, data, message } = (await service.execNGQL(
+      {
+        gql: `
+        DROP TAG ${handleKeyword(name)}
+      `,
+      },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: 'delete_tag',
+        },
+      },
+    )) as any;
+    return { code, data, message };
+  }
+
+  createTag = async(payload: {
+    name: string;
+    comment?: string;
+    fields?: IProperty[];
+    ttlConfig?: {
+      ttl_col: string;
+      ttl_duration: number;
+    };
+  }) => {
+    const gql = await getTagOrEdgeCreateGQL({ ...payload, type: 'TAG' });
+    const { code, data, message } = (await service.execNGQL(
+      {
+        gql,
+      },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: 'create_tag',
+        },
+      },
+    )) as any;
+    return { code, data, message };
+  }
+
+  alterField = async(payload: {
+    type: IndexType;
+    name: string;
+    action: AlterType;
+    config: IAlterConfig;
+  }) => {
+    const gql = getAlterGQL(payload);
+    const { code, data, message } = (await service.execNGQL(
+      {
+        gql,
+      },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: `{payload.action === 'DROP' ? 'delete' : 'update'}_${payload.type.toLowerCase()}_property`,
+        },
+      },
+    )) as any;
+    return { code, data, message };
+  }
+
+  // indexes
+  getIndexes = async(type: IndexType) => {
+    const { code, data } = (await service.execNGQL({
+      gql: `
+        SHOW ${type} INDEXES
+      `,
+    })) as any;
+    if (code === 0) {
+      const indexes = data.tables.map(item => {
+        return {
+          name: item['Index Name'],
+          owner: item['By Tag'],
+        };
+      });
+      this.update({
+        indexes,
+      });
+      return indexes;
+    }
+  }
+
+  getIndexComment = async(payload: { type: IndexType; name: string }) => {
+    const { type, name } = payload;
+    const { code, data } = (await service.execNGQL({
+      gql: `
+        SHOW CREATE ${type} index ${handleKeyword(name)}
+      `,
+    })) as any;
+    if (code === 0) {
+      const _type = type === 'TAG' ? 'Tag' : 'Edge';
+      const res = data.tables[0]?.[`Create ${_type} Index`] || '';
+      const reg = /comment = "(.+)"/g;
+      const result = reg.exec(res);
+      const comment = result?.[1] || null;
+      return comment;
+    } else {
+      return null;
+    }
+  }
+
+  getIndexFields = async(payload: { type: IndexType; name: string }) => {
+    const { type, name } = payload;
+    const { code, data } = (await service.execNGQL({
+      gql: `
+        DESCRIBE ${type} INDEX ${handleKeyword(name)}
+      `,
+    })) as any;
+    return { code, data };
+  }
+
+  getIndexTree = async(type: IndexType) => {
+    const indexes = await this.getIndexes(type);
+    if (indexes) {
+      const _indexes = await Promise.all(
+        indexes.map(async(item: any) => {
+          const { code, data } = await this.getIndexFields({
+            type,
+            name: item.name,
+          });
+          return {
+            indexName: item.name,
+            indexOwner: item.owner,
+            props: code === 0 ? data.tables : [],
+          };
+        }),
+      );
+      const tree = [] as ITree[];
+      await Promise.all(
+        _indexes.map(async(item: any) => {
+          const tag = tree.filter(i => i.name === item.indexOwner);
+          if (tag.length > 0) {
+            tag[0].indexes.push(item);
+          } else {
+            tree.push({
+              name: item.indexOwner,
+              indexes: [item],
+            });
+          }
+          return tree;
+        }),
+      );
+      // Explain: tags/edges format:
+      /* [{  name: 'xxx',
+           indexes: [{
+             indexName: 'xxx',
+             props: [{
+               Field: 'name',
+               Type: 'string'
+             }]
+           }]
+        }] */
+      const key = type === 'TAG' ? 'tagIndexTree' : 'edgeIndexTree';
+      this.update({
+        [key]: tree,
+      });
+      return tree;
+    }
+  }
+
+  getIndexList = async(type: IndexType) => {
+    const indexes = await this.getIndexes(type);
+    if (indexes) {
+      const indexList: IIndexList[] = [];
+      await Promise.all(
+        indexes.map(async item => {
+          const comment = await this.getIndexComment({
+            type,
+            name: item.name,
+          });
+          const index: IIndexList = {
+            owner: item.owner,
+            comment,
+            name: item.name,
+            fields: [],
+          };
+
+          const { code, data } = await this.getIndexFields({
+            type,
+            name: item.name,
+          });
+          if (code === 0) {
+            index.fields = data.tables;
+          }
+          indexList.push(index);
+        }),
+      );
+      this.update({ indexList });
+    }
+  }
+
+  deleteIndex = async(payload: { type: IndexType; name: string }) => {
+    const { type, name } = payload;
+    const { code, data } = (await service.execNGQL(
+      {
+        gql: `
+        DROP ${type} INDEX ${handleKeyword(name)}
+      `,
+      },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: 'delete_index',
+        },
+      },
+    )) as any;
+    return { code, data };
+  }
+  createIndex = async(payload: {
+    type: IndexType;
+    name: string;
+    associate: string;
+    comment?: string;
+    fields: string[];
+  }) => {
+    const gql = getIndexCreateGQL(payload);
+    const { code, data, message } = (await service.execNGQL(
+      {
+        gql,
+      },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: 'create_index',
+        },
+      },
+    )) as any;
     return { code, data, message };
   }
 }

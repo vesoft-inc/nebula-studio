@@ -35,7 +35,7 @@ const Schema = () => {
   const handleSwitchSpace = async(space: string) => {
     const err = await switchSpace(space);
     if (!err) {
-      history.push(`/space/${space}/tag/list`);
+      history.push(`/schema/${space}/tag/list`);
     } else if (err && err.toLowerCase().includes('spacenotfound')) {
       message.warning(intl.get('_schema.useSpaceErrTip'));
     }
@@ -103,30 +103,29 @@ const Schema = () => {
     {
       title: intl.get('_schema.operations'),
       dataIndex: 'operation',
-      render: (_1, space) => {
+      render: (_, space) => {
         if (space.ID) {
           return (
             <div className="operation">
-              <div>
-                <Button
-                  onClick={() => handleSwitchSpace(space.Name)}
-                  data-track-category="navigation"
-                  data-track-action="view_space_list"
-                  data-track-label="from_space_list"
-                >
-                  <Icon type="iconimage-icon17" />
+              <Button
+                className="primary-btn"
+                onClick={() => handleSwitchSpace(space.Name)}
+                data-track-category="navigation"
+                data-track-action="view_space_list"
+                data-track-label="from_space_list"
+              >
+                {intl.get('common.schema')}
+              </Button>
+              <Popconfirm
+                onConfirm={() => handleDeleteSpace(space.Name)}
+                title={intl.get('common.ask')}
+                okText={intl.get('common.ok')}
+                cancelText={intl.get('common.cancel')}
+              >
+                <Button className="warning-btn">
+                  <Icon type="iconimage-icon16" />
                 </Button>
-                <Popconfirm
-                  onConfirm={() => handleDeleteSpace(space.Name)}
-                  title={intl.get('common.ask')}
-                  okText={intl.get('common.ok')}
-                  cancelText={intl.get('common.cancel')}
-                >
-                  <Button>
-                    <Icon type="iconimage-icon16" />
-                  </Button>
-                </Popconfirm>
-              </div>
+              </Popconfirm>
             </div>
           );
         }
@@ -140,7 +139,7 @@ const Schema = () => {
     <div className="schema-container">
       <Button className="btn-create" type="primary">
         <Link
-          to="/space/create"
+          to="/schema/space/create"
           data-track-category="navigation"
           data-track-action="view_space_create"
           data-track-label="from_space_list"

@@ -74,10 +74,11 @@
     "exportSelectVertexes": "导出选中点CSV",
     "exportSelectEdges": "导出选中边CSV",
     "noSelectedData": "当前没有选中数据",
-    "namePlaceholder":"请输入搜索名称",
+    "namePlaceholder":"请输入{name}名",
     "comment": "描述",
     "space": "图空间",
-    "version": "版本"
+    "version": "版本",
+    "statistics": "统计"
   },
   "warning": {
     "configServer": "请先配置服务器",
@@ -380,6 +381,7 @@
     "comment": "Comment",
     "operations": "操作",
     "useSpaceErrTip": "图空间未找到。立刻尝试使用刚创建的图空间可能会失败，因为创建是异步实现的。为确保数据同步，后续操作能顺利进行，请等待 2 个心跳周期（20 秒）。",
-    "spaceNameEnter": "请输入图空间名称"
+    "spaceNameEnter": "请输入图空间名称",
+    "propertyCount": "属性数量"
   }
 }

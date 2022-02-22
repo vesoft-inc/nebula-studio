@@ -33,7 +33,7 @@ export interface IEdge {
 export interface IIndexList {
   name: string;
   owner: string;
-  comment?: string;
+  comment?: string | null;
   fields: IField[];
 }
 
