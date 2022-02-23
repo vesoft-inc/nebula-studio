@@ -12,22 +12,9 @@ const commonConfig: Configuration = {
     exprContextCritical: true,
     rules: [
       {
-        test: /\.(ts|tsx)$/,
-        use: [
-          'babel-loader',
-          {
-            loader: 'ts-loader',
-            options: {
-              configFile: path.join(__dirname, '../tsconfig.json'),
-            },
-          },
-        ],
-        include: path.join(__dirname, '../app'),
-      },
-      {
-        test: /\.(js|jsx)$/,
-        use: ['babel-loader'],
-        include: path.join(__dirname, '../app'),
+        test: /\.(j|t)sx?$/,
+        exclude: /node_modules/,
+        use: 'babel-loader',
       },
       {
         test: /\.less/,
@@ -47,9 +34,9 @@ const commonConfig: Configuration = {
                   'table-header-cell-split-color': '#E9EDEF',
                   'layout-body-background': '#F8F8F8',
                   'font-family': 'Robot, sans-serif',
-                  'height-base': '38px'
-                }
-              }
+                  'height-base': '38px',
+                },
+              },
             },
           },
         ],
@@ -62,8 +49,8 @@ const commonConfig: Configuration = {
             options: {
               name: '[path][name].[ext]',
               esModule: false,
-            }
-          }
+            },
+          },
         ],
       },
       {
@@ -89,7 +76,7 @@ const commonConfig: Configuration = {
       maxInitialRequests: 10,
       maxSize: 2000000,
       minSize: 800000,
-    }
+    },
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -115,7 +102,17 @@ const commonConfig: Configuration = {
     new AntdDayjsWebpackPlugin(),
   ],
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.css', '.woff', '.woff2', 'ttf'],
+    extensions: [
+      '.ts',
+      '.tsx',
+      '.js',
+      '.jsx',
+      '.json',
+      '.css',
+      '.woff',
+      '.woff2',
+      'ttf',
+    ],
     alias: {
       '#app': path.join(__dirname, '../app/'),
       '@appv2': path.join(__dirname, '../app-v2/'),
@@ -123,6 +120,5 @@ const commonConfig: Configuration = {
     },
   },
 };
-
 
 export default commonConfig;
