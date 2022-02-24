@@ -88,7 +88,7 @@ const commonConfig: Configuration = {
 
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: path.join(__dirname, '../app-v2/index.html'),
+      template: path.join(__dirname, '../app/index.html'),
       favicon: resolve(__dirname, '../favicon.ico'),
       minify: {
         collapseWhitespace: true,
@@ -115,7 +115,7 @@ const commonConfig: Configuration = {
     ],
     alias: {
       '#app': path.join(__dirname, '../app/'),
-      '@appv2': path.join(__dirname, '../app-v2/'),
+      '@app': path.join(__dirname, '../app/'),
       'react-dom': '@hot-loader/react-dom',
     },
   },
