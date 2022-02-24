@@ -1,23 +1,5 @@
-import { handleKeyword, handleVidStringName } from '#app/utils/function';
-interface IField {
-  name: string;
-  type: string;
-  value?: string;
-  allowNull?: boolean;
-  fixedLength?: string;
-  comment?: string;
-}
-
-type IndexType = 'TAG' | 'EDGE';
-type AlterType = 'ADD' | 'DROP' | 'CHANGE' | 'TTL' | 'COMMENT';
-interface IAlterConfig {
-  fields?: IField[];
-  comment?: string;
-  ttl?: {
-    col?: string;
-    duration?: string;
-  };
-}
+import { handleKeyword, handleVidStringName } from '@app/utils/function';
+import { IAlterForm, IProperty, ISchemaType, IndexType } from '@app/interfaces/schema';
 
 export const getExploreMatchGQL = (params: {
   selectVertexes: any[];
@@ -125,18 +107,16 @@ export const getSpaceCreateGQL = (params: {
 };
 
 export const getTagOrEdgeCreateGQL = (params: {
-  type: 'TAG' | 'EDGE';
+  type: ISchemaType;
   name: string;
   comment?: string;
-  fields?: IField[];
-  ttlConfig?: {
-    ttl_col: string;
-    ttl_duration: number;
-  };
+  properties?: IProperty[];
+  ttl_col?: string;
+  ttl_duration?: number;
 }) => {
-  const { type, name, fields, ttlConfig, comment } = params;
-  const fieldsStr = fields
-    ? fields
+  const { type, name, properties, ttl_col, ttl_duration, comment } = params;
+  const propertiesStr = properties
+    ? properties
       .map(item => {
         let valueStr = '';
         if (item.value) {
@@ -172,24 +152,19 @@ export const getTagOrEdgeCreateGQL = (params: {
       })
       .join(', ')
     : '';
-  const ttlStr = ttlConfig
-    ? `TTL_DURATION = ${ttlConfig.ttl_duration ||
-        ''}, TTL_COL = "${ttlConfig.ttl_col || ''}"`
+  const ttlStr = ttl_col
+    ? `TTL_DURATION = ${ttl_duration ||
+        ''}, TTL_COL = "${ttl_col || ''}"`
     : '';
   const gql = `CREATE ${type} ${handleKeyword(name)} ${
-    fieldsStr.length > 0 ? `(${fieldsStr})` : '()'
+    propertiesStr.length > 0 ? `(${propertiesStr})` : '()'
   } ${ttlStr} ${
     comment ? `${ttlStr.length > 0 ? ', ' : ''}COMMENT = "${comment}"` : ''
   }`;
   return gql;
 };
 
-export const getAlterGQL = (params: {
-  type: IndexType;
-  name: string;
-  action: AlterType;
-  config: IAlterConfig;
-}) => {
+export const getAlterGQL = (params: IAlterForm) => {
   let content;
   const { type, name, action, config } = params;
   if (action === 'TTL' && config.ttl) {

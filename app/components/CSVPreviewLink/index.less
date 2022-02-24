@@ -1,0 +1,46 @@
+@import '~@app/common.less';
+.popover-preview {
+	max-width: 80%;
+}
+.csv-preview {
+	padding: 16px 8px 50px;
+	overflow: auto;
+
+	table {
+		td,
+		th {
+			text-align: center;
+		}
+		.ant-table-tbody {
+			tr {
+				background-color: @lightBlue;
+			}
+		}
+	}
+	.noBackground {
+		.ant-table-thead > tr > th {
+			background-color: #fff;
+			&::before {
+				content: none !important;
+			}
+		}
+	}
+
+	> .operation {
+		padding-bottom: 25px;
+		text-align: center;
+		position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+	}
+
+	.csv-select-index {
+		margin-right: 10px;
+	}
+
+	.anticon {
+		font-size: 16px;
+	}
+}
+

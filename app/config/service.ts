@@ -10,12 +10,12 @@ const importData = post('/api-nebula/task/import');
 
 const handleImportAction = post('/api-nebula/task/import/action');
 
-const createConfigFile = post('/api/import/config');
-
 const getLog = get('/api/import/log');
 const finishImport = post('/api/import/finish');
 
 const getImportWokingDir = get('/api/import/working_dir');
+const getUploadDir = get('/api/import/working_dir');
+const getTaskDir = get('/api/import/task_dir');
 
 const deteleFile = params => {
   const { filename } = params;
@@ -37,9 +37,10 @@ export default {
   importData,
   finishImport,
   handleImportAction,
-  createConfigFile,
   getLog,
   getImportWokingDir,
+  getUploadDir,
+  getTaskDir,
   deteleFile,
   getFiles,
   getAppInfo,

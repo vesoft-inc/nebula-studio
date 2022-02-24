@@ -1,7 +1,7 @@
 import { BigNumber } from 'bignumber.js';
 import _ from 'lodash';
 
-import { keyWords } from '#app/config/nebulaQL';
+import { keyWords } from '@app/config/nebulaQL';
 
 export const handleKeyword = (name: string) => {
   return keyWords.includes(name.toLowerCase()) ? `\`${name}\`` : name;
