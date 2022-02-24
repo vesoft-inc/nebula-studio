@@ -28,7 +28,7 @@
     "baseUrl": ".",
     "paths": {
       "@public/*": ["public/*"],
-      "@appv2/*": ["app-v2/*"]
+      "@app/*": ["app/*"]
     }
   },
   "ts-node": {

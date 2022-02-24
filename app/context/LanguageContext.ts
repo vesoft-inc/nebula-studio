@@ -1,10 +1,14 @@
 import React from 'react';
-
-import { INTL_LOCALE_SELECT } from '../config';
-
+import intl from 'react-intl-universal';
+import Cookie from 'js-cookie';
+import { INTL_LOCALES, INTL_LOCALE_SELECT } from '@app/config/constants';
 export const LanguageContext = React.createContext({
   currentLocale: INTL_LOCALE_SELECT.EN_US.NAME,
-  toggleLanguage: (locale: string) => {
-    console.log('Select locale:', locale);
+  toggleLanguage: (currentLocale: string) => {
+    Cookie.set('lang', currentLocale);
+    intl.init({
+      currentLocale,
+      locales: INTL_LOCALES,
+    });
   },
 });

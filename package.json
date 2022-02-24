@@ -5,9 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "webpack-dev-server --config ./config/webpack.dev.ts --mode development --color --progress --hot",
-    "dev2": "webpack-dev-server --config ./config/webpack.dev2.ts --mode development --color --progress --hot",
-    "lint": "eslint 'app-v2/**/*.{ts,tsx}' && stylelint **/*.{html,less}",
-    "lint-fix": "eslint 'app-v2/**/*.{ts,tsx}' --fix && stylelint **/*.{html,less} --fix",
+    "lint": "eslint 'app/**/*.{ts,tsx}' && stylelint **/*.{html,less}",
+    "lint-fix": "eslint 'app/**/*.{ts,tsx}' --fix && stylelint **/*.{html,less} --fix",
     "build": "webpack --config config/webpack.prod.ts"
   },
   "dependencies": {
