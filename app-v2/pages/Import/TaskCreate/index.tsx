@@ -119,6 +119,11 @@ const TaskCreate = () => {
       edgesConfig: []
     });
   };
+  const handleSpaceChange = (space: string) => {
+    clearConfig();
+    updateSpaceInfo(space);
+  };
+
   useEffect(() => {
     asyncGetTaskDir();
     getSpaces();
@@ -131,12 +136,12 @@ const TaskCreate = () => {
   return (
     <div className="nebula-import-create">
       <Breadcrumb routes={routes} />
-      <div className="create-form  center-layout">
+      <div className="create-form center-layout">
         <Form className="basic-config" layout="vertical" {...formItemLayout}>
           <Row>
             <Col span={12}>
               <Form.Item label={intl.get('common.space')} required={true}>
-                <Select value={currentSpace} onChange={value => updateSpaceInfo(value)}>
+                <Select value={currentSpace} onChange={value => handleSpaceChange(value)}>
                   {spaces.map(space => (
                     <Option value={space} key={space}>
                       {space}
@@ -181,7 +186,7 @@ const TaskCreate = () => {
           </Form>
         </div>
       </div>
-      <div className="footer">
+      <div className="studio-form-footer">
         <Button onClick={() => history.push('/import/tasks')}>{intl.get('common.cancel')}</Button>
         <Button type="primary" disabled={
           basicConfig.taskName === ''

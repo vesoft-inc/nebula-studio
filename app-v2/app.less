@@ -25,6 +25,10 @@
 	src: url(~@appv2/static/fonts/Roboto-Regular.ttf);
 }
 
+#app {
+	font-family: Roboto-Regular, sans-serif;
+}
+
 .center-layout {
 	width: @containerWidth;
 	margin: 0 auto;
@@ -38,7 +42,7 @@
 }
 
 .ant-radio-group.nebula-tab-group {
-	background: #e9edef;
+	background: @lightGray;
 	border-radius: 20px;
 	padding: 4px;
 	min-width: 400px;
@@ -81,8 +85,6 @@
 .ant-btn.primary-btn {
 	color: @blue;
 	border-color: @blue;
-	display: inline-flex;
-	align-items: center;
 
 	svg {
 		width: 20px;
@@ -137,3 +139,28 @@
 	}
 }
 
+.studio-form-footer {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	z-index: 10;
+	width: 100%;
+	height: 98px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #fff;
+	box-shadow: 0 -4px 4px rgba(0, 0, 0, 0.1);
+
+	button {
+		width: 236px;
+
+		&:not(:last-child) {
+			margin-right: 50px;
+		}
+	}
+}
+
+.ant-form-item-label label {
+	font-family: Roboto-Bold, sans-serif;
+}

@@ -62,13 +62,13 @@ const HelpMenu = () => {
           href={intl.get('link.versionLogHref')}
           target="_blank" rel="noreferrer"
         >
-          <Icon className="menu-icon" type="icon-btn-save" />
+          <Icon className="menu-icon" type="icon-nav-version" />
           {intl.get('menu.release')}
         </a>
       </Menu.Item>
       <Menu.Item key="user-logout">
         <span className="nebula-link" onClick={logout}>
-          <Icon className="menu-icon" type="icon-btn-save" />
+          <Icon className="menu-icon" type="icon-nav-clear" />
           {intl.get('configServer.clear')}
         </span>
       </Menu.Item>

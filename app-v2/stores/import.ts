@@ -98,10 +98,10 @@ export class ImportStore {
     configIndex: number;
   }) => {
     const { schema } = this.rootStore;
-    const { getTagInfo, getTagDetail } = schema;
+    const { getTagOrEdgeInfo, getTagOrEdgeDetail } = schema;
     const { tag, tagIndex, configIndex } = payload;
-    const { code, data } = await getTagInfo(tag);
-    const createTag = await getTagDetail(tag);
+    const { code, data } = await getTagOrEdgeInfo('tag', tag);
+    const createTag = await getTagOrEdgeDetail('tag', tag);
     const defaultValueFields: any[] = [];
     if (!!createTag) {
       const res =
@@ -147,9 +147,9 @@ export class ImportStore {
       this.edgesConfig = this.edgesConfig.splice(index, 1);
     } else {
       const { schema } = this.rootStore;
-      const { getEdgeInfo, getEdgeDetail, spaceVidType } = schema;
-      const { code, data } = await getEdgeInfo(edgeType);
-      const createTag = await getEdgeDetail(edgeType);
+      const { getTagOrEdgeInfo, getTagOrEdgeDetail, spaceVidType } = schema;
+      const { code, data } = await getTagOrEdgeInfo('edge', edgeType);
+      const createTag = await getTagOrEdgeDetail('edge', edgeType);
       const defaultValueFields: any[] = [];
       if (!!createTag) {
         const res =

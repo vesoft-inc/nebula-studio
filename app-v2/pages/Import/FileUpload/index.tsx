@@ -63,21 +63,19 @@ const FileUpload = () => {
         if (file.content) {
           return (
             <div className="operation">
-              <div>
-                <CSVPreviewLink file={file} btnType="default">
-                  <Icon type="icon-btn-detail" />
-                </CSVPreviewLink>
-                <Popconfirm
-                  onConfirm={() => asyncDeleteFile(index)}
-                  title={intl.get('common.ask')}
-                  okText={intl.get('common.ok')}
-                  cancelText={intl.get('common.cancel')}
-                >
-                  <Button className="warning-btn">
-                    <Icon type="icon-btn-delete" />
-                  </Button>
-                </Popconfirm>
-              </div>
+              <CSVPreviewLink file={file} btnType="default">
+                <Icon type="icon-btn-detail" />
+              </CSVPreviewLink>
+              <Popconfirm
+                onConfirm={() => asyncDeleteFile(index)}
+                title={intl.get('common.ask')}
+                okText={intl.get('common.ok')}
+                cancelText={intl.get('common.cancel')}
+              >
+                <Button className="warning-btn">
+                  <Icon type="icon-btn-delete" />
+                </Button>
+              </Popconfirm>
             </div>
           );
         }

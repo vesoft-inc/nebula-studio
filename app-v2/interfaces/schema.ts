@@ -44,9 +44,11 @@ export interface IProperty {
   allowNull?: boolean;
   fixedLength?: string;
   comment?: string;
+  showType?: string;
 }
 
-export type IndexType = 'TAG' | 'EDGE';
+export type IndexType = 'tag' | 'edge';
+export type ISchemaType = 'tag' | 'edge';
 export type AlterType = 'ADD' | 'DROP' | 'CHANGE' | 'TTL' | 'COMMENT';
 export interface IAlterConfig {
   fields?: IProperty[];
@@ -55,4 +57,11 @@ export interface IAlterConfig {
     col?: string;
     duration?: string;
   };
+}
+
+export interface IAlterForm {
+  type: ISchemaType;
+  name: string;
+  action: AlterType;
+  config: IAlterConfig;
 }
