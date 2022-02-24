@@ -7,7 +7,8 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '@appv2/stores';
 import { sortByFieldAndFilter } from '@appv2/utils/function';
 import { IIndexList, IndexType } from '@appv2/interfaces/schema';
-import SchemaListLayout from '../SchemaListLayout';
+import CommonLayout from '../CommonLayout';
+import Cookie from 'js-cookie';
 
 import './index.less';
 
@@ -111,7 +112,7 @@ const IndexList = () => {
         }
       },
     },
-  ], [indexType]);
+  ], [indexType, Cookie.get('lang')]);
 
   const handleTabChange = e => {
     setIndexType(e.target.value);
@@ -128,7 +129,7 @@ const IndexList = () => {
       list: indexList,
     }));
   }, [indexList, searchVal]);
-  return <SchemaListLayout 
+  return <CommonLayout 
     loading={loading}
     data={data}
     type="index"
@@ -146,7 +147,7 @@ const IndexList = () => {
         <Radio.Button value="edge">{intl.get('common.edge')}</Radio.Button>
       </Radio.Group>
     </div>
-  </SchemaListLayout>;
+  </CommonLayout>;
 };
 
 export default observer(IndexList);

@@ -33,7 +33,7 @@ const commonConfig: Configuration = {
                   'table-header-color': '#465B7A',
                   'table-header-cell-split-color': '#E9EDEF',
                   'layout-body-background': '#F8F8F8',
-                  'font-family': 'Robot, sans-serif',
+                  'font-family': 'Robot-Regular, sans-serif',
                   'height-base': '38px',
                 },
               },

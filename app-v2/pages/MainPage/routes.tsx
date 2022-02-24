@@ -2,7 +2,7 @@ import { lazy } from 'react';
 
 const Schema = lazy(() => import('@appv2/pages/Schema'));
 const SpaceCreate = lazy(() => import('@appv2/pages/Schema/SpaceCreate'));
-const SpaceConfig = lazy(() => import('@appv2/pages/Schema/SpaceConfig'));
+const SchemaConfig = lazy(() => import('@appv2/pages/Schema/SchemaConfig'));
 const Import = lazy(() => import('@appv2/pages/Import'));
 const TaskCreate = lazy(() => import('@appv2/pages/Import/TaskCreate'));
 
@@ -20,7 +20,7 @@ export const RoutesList = [
   },
   {
     path: '/schema/:space/:type?/:action?/:module?',
-    component: SpaceConfig,
+    component: SchemaConfig,
   },
   {
     path: '/import/create',

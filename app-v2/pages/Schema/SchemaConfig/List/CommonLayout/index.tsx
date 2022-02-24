@@ -16,7 +16,7 @@ interface IProps {
   children?: any;
   type: string
 }
-const SchemaListLayout = (props: IProps) => {
+const CommonLayout = (props: IProps) => {
   const { onSearch, data, columns, loading, renderExpandInfo, children, type } = props;
   const { space } = useParams() as { space :string, module?: string };
   const [expandKeys, setExpandKeys] = useState<any[]>([]);
@@ -57,4 +57,4 @@ const SchemaListLayout = (props: IProps) => {
   );
 };
 
-export default observer(SchemaListLayout);
+export default observer(CommonLayout);

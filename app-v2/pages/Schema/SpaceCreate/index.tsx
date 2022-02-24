@@ -12,6 +12,7 @@ import intl from 'react-intl-universal';
 import './index.less';
 import { useHistory } from 'react-router-dom';
 import FormItem from 'antd/lib/form/FormItem';
+import Cookie from 'js-cookie';
 const Option = Select.Option;
 
 function getVidType(type: string, length?: string) {
@@ -49,7 +50,7 @@ const SpaceCreate = () => {
       path: '#',
       breadcrumbName: intl.get('_schema.createSpace'),
     },
-  ], []);
+  ], [Cookie.get('lang')]);
 
   const handleCreate = () => {
     setLoading(true);
@@ -173,7 +174,7 @@ const SpaceCreate = () => {
         </Form>
         <GQLCodeMirror currentGQL={gql} />
       </div>
-      <div className="footer">
+      <div className="studio-form-footer">
         <Button onClick={() => history.push('/schema')}>{intl.get('common.cancel')}</Button>
         <Button type="primary" loading={loading} onClick={handleCreate}>{intl.get('common.create')}</Button>
       </div>
