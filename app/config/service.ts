@@ -13,6 +13,7 @@ const importData = post('/api-nebula/task/import');
 const handleImportAction = post('/api-nebula/task/import/action');
 
 const getLog = get('/api/import/log');
+const getErrLog = get('/api/import/err_log');
 const finishImport = post('/api/import/finish');
 
 const getImportWokingDir = get('/api/import/working_dir');
@@ -31,6 +32,15 @@ const uploadFiles = (params?, config?) =>
       'Content-Type': 'multipart/form-data',
     },
   });
+
+
+const getTaskLogs = (params?, config?) => {
+  const { id, ...others } = params;
+  return get(`/api/import/task_log_paths/${id}`)(others, config);
+};
+
+const getTaskConfigUrl = (id: number) => `/api-nebula/task/import/config/${id}`;
+const getTaskLogUrl = (path: string) => `/api-nebula/task/import/log?pathName=${encodeURI(path)}`;
 export default {
   execNGQL,
   batchExecNGQL,
@@ -40,10 +50,14 @@ export default {
   finishImport,
   handleImportAction,
   getLog,
+  getErrLog,
   getImportWokingDir,
   getUploadDir,
   getTaskDir,
   deteleFile,
   getFiles,
   uploadFiles,
+  getTaskConfigUrl,
+  getTaskLogs,
+  getTaskLogUrl
 };
