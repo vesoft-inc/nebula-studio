@@ -4,7 +4,7 @@ import JSONBigint from 'json-bigint';
 import intl from 'react-intl-universal';
 
 import { trackEvent } from './stat';
-import { store } from '#app/store';
+import { getRootStore } from '@appv2/stores';
 
 
 const service = axios.create({
@@ -43,9 +43,7 @@ service.interceptors.response.use(
         errMsg.includes('an existing connection was forcibly closed'))
     ) {
       message.warning(intl.get('warning.connectError'));
-      store.dispatch({
-        type: 'nebula/asyncClearConfigServer',
-      });
+      getRootStore().global.logout();
     } else if (code === -1 && errMsg) {
       message.warning(errMsg);
     }

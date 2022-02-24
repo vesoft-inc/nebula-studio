@@ -73,7 +73,7 @@ const SchemaConfig = (props: IProps) => {
           {type === 'vertices' && data.tags.map((tag, tagIndex) => <TagConfig key={tagIndex} file={data.file} tag={tag} tagIndex={tagIndex} configIndex={configIndex} />)}
           {type === 'edge' && <EdgeConfig configIndex={configIndex} edge={data} />}
           {type === 'vertices' && <div className="btns">
-            <Button className="primary-btn studio-add-btn-icon" onClick={() => addTag(configIndex)}>
+            <Button className="primary-btn studio-add-btn" onClick={() => addTag(configIndex)}>
               <Icon className="studio-add-btn-icon" type="icon-btn-add" />
               {intl.get('import.addTag')}
             </Button>

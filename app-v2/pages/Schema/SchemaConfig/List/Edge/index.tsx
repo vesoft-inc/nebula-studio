@@ -6,10 +6,11 @@ import Icon from '@appv2/components/Icon';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@appv2/stores';
 import { sortByFieldAndFilter } from '@appv2/utils/function';
-import { ITag } from '@appv2/interfaces/schema';
-import SchemaListLayout from '../SchemaListLayout';
+import { IEdge } from '@appv2/interfaces/schema';
+import Cookie from 'js-cookie';
+import CommonLayout from '../CommonLayout';
 
-function renderTagInfo(tag: ITag) {
+function renderEdgeInfo(edge: IEdge) {
   const fieldsColumn = [
     {
       title: intl.get('common.propertyName'),
@@ -31,11 +32,11 @@ function renderTagInfo(tag: ITag) {
   return (
     <div>
       <p className="table-inner-title">
-        {tag.name} {intl.get('common.relatedProperties')}:
+        {edge.name} {intl.get('common.relatedProperties')}:
       </p>
       <Table
         columns={fieldsColumn}
-        dataSource={tag.fields}
+        dataSource={edge.fields}
         rowKey="Field"
         pagination={false}
       />
@@ -43,26 +44,25 @@ function renderTagInfo(tag: ITag) {
   );
 }
 
-const TagList = () => {
-  const { space } = useParams() as {space :string};
-  const { schema: { tagList, deleteTag, getTagList } } = useStore();
+const EdgeList = () => {
+  const { space } = useParams() as { space :string };
+  const { schema: { edgeList, deleteEdge, getEdgeList } } = useStore();
   const [searchVal, setSearchVal] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const getData = async() => {
     setLoading(true);
-    await getTagList();
+    await getEdgeList();
     setSearchVal('');
     setLoading(false);
   };
-  const handleDeleteTag = async(name: string) => {
-    const res = await deleteTag(name);
+  const handleDeleteEdge = async(name: string) => {
+    const res = await deleteEdge(name);
     if (res.code === 0) {
       message.success(intl.get('common.deleteSuccess'));
       await getData();
     }
   };
-
   const columns = useMemo(() => [
     {
       title: intl.get('common.name'),
@@ -73,47 +73,45 @@ const TagList = () => {
       title: intl.get('_schema.propertyCount'),
       dataIndex: 'count',
       width: '33%',
-      render: (_, tag) => tag.fields?.length || 0
+      render: (_, edge) => edge.fields?.length || 0
     },
     {
       title: intl.get('common.operation'),
       dataIndex: 'operation',
-      render: (_, tag) => {
-        if (!tag.name) {
-          return null;
-        }
-        return (
-          <div className="operation">
-            <div>
-              <Button className="primary-btn">
-                <Link
-                  to={`/schema/${space}/tag/edit/${tag.name}`}
-                  data-track-category="navigation"
-                  data-track-action="view_tag_edit"
-                  data-track-label="from_tag_list"
-                >
-                  <Icon type="icon-btn-edit" />
-                </Link>
-              </Button>
-              <Popconfirm
-                onConfirm={() => {
-                  handleDeleteTag(tag.name);
-                }}
-                title={intl.get('common.ask')}
-                okText={intl.get('common.ok')}
-                cancelText={intl.get('common.cancel')}
-              >
-                <Button className="warning-btn" onClick={e => e.stopPropagation()}>
-                  <Icon type="icon-btn-delete" />
+      render: (_, edge) => {
+        if (edge.name) {
+          return (
+            <div className="operation">
+              <div>
+                <Button className="primary-btn">
+                  <Link
+                    to={`/schema/${space}/edge/edit/${edge.name}`}
+                    data-track-category="navigation"
+                    data-track-action="view_edge_edit"
+                    data-track-label="from_edge_list"
+                  >
+                    <Icon type="icon-btn-edit" />
+                  </Link>
                 </Button>
-              </Popconfirm>
+                <Popconfirm
+                  onConfirm={() => {
+                    handleDeleteEdge(edge.name);
+                  }}
+                  title={intl.get('common.ask')}
+                  okText={intl.get('common.ok')}
+                  cancelText={intl.get('common.cancel')}
+                >
+                  <Button className="warning-btn" onClick={e => e.stopPropagation()}>
+                    <Icon type="icon-btn-delete" />
+                  </Button>
+                </Popconfirm>
+              </div>
             </div>
-          </div>
-        );
+          );
+        }
       },
     },
-  ], [tagList]);
-
+  ], [edgeList, Cookie.get('lang')]);
   useEffect(() => {
     getData();
   }, [space]);
@@ -121,17 +119,16 @@ const TagList = () => {
     setData(sortByFieldAndFilter({
       field: 'name',
       searchVal,
-      list: tagList,
+      list: edgeList,
     }));
-  }, [tagList, searchVal]);
-
-  return <SchemaListLayout 
-    type="tag"
+  }, [edgeList, searchVal]);
+  return <CommonLayout 
+    type="edge"
     loading={loading}
     data={data}
     columns={columns}
-    renderExpandInfo={renderTagInfo}
+    renderExpandInfo={renderEdgeInfo}
     onSearch={setSearchVal} />;
 };
 
-export default observer(TagList);
+export default observer(EdgeList);

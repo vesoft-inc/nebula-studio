@@ -1,12 +1,11 @@
 import { action, makeAutoObservable, observable } from 'mobx';
 import service from '@appv2/config/service';
-import { AlterType, IAlterConfig, IEdge, IIndexList, IProperty, ISpace, ITag, ITree, IndexType } from '@appv2/interfaces/schema';
+import { IAlterForm, IEdge, IIndexList, ISchemaType, ISpace, ITag, ITree, IndexType } from '@appv2/interfaces/schema';
 import { handleKeyword } from '@appv2/utils/function';
 import { findIndex } from 'lodash';
 import {
   getAlterGQL,
   getIndexCreateGQL,
-  getTagOrEdgeCreateGQL,
 } from '@appv2/utils/gql';
 
 export class SchemaStore {
@@ -183,28 +182,11 @@ export class SchemaStore {
     }
   }
 
-  getEdgeInfo = async(edge: string) => {
-    const { code, data } = (await service.execNGQL({
-      gql: 'desc edge' + '`' + edge + '`;',
-    })) as any;
-    return { code, data };
-  }
-
-  getEdgeDetail = async(name: string) => {
-    const gql = `SHOW CREATE EDGE ${handleKeyword(name)}`;
-    const { code, data, message } = (await service.execNGQL({
-      gql,
-    })) as any;
-    return { code, data, message };
-  }
-
   getEdgeTypesFields = async(payload: { edgeTypes: any[] }) => {
     const { edgeTypes } = payload;
     await Promise.all(
       edgeTypes.map(async item => {
-        const { code, data } = await this.getEdgeInfo(
-          item,
-        );
+        const { code, data } = await this.getTagOrEdgeInfo('edge', item);
         if (code === 0) {
           const edgeFields = data.tables.map(item => item.Field);
           this.addEdgesName({
@@ -233,9 +215,7 @@ export class SchemaStore {
             name: item,
             fields: [],
           };
-          const { code, data } = await this.getEdgeInfo(
-            item,
-          );
+          const { code, data } = await this.getTagOrEdgeInfo('edge', item);
           if (code === 0) {
             edge.fields = data.tables;
           }
@@ -257,30 +237,6 @@ export class SchemaStore {
         trackEventConfig: {
           category: 'schema',
           action: 'delete_edge',
-        },
-      },
-    )) as any;
-    return { code, data, message };
-  }
-
-  createEdge = async(payload: {
-    name: string;
-    comment?: string;
-    fields?: IProperty[];
-    ttlConfig?: {
-      ttl_col: string;
-      ttl_duration: number;
-    };
-  }) => {
-    const gql = await getTagOrEdgeCreateGQL({ ...payload, type: 'EDGE' });
-    const { code, data, message } = (await service.execNGQL(
-      {
-        gql,
-      },
-      {
-        trackEventConfig: {
-          category: 'schema',
-          action: 'create_edge',
         },
       },
     )) as any;
@@ -317,7 +273,7 @@ export class SchemaStore {
     const { tags } = payload;
     await Promise.all(
       tags.map(async item => {
-        const { code, data } = await this.getTagInfo(item);
+        const { code, data } = await this.getTagOrEdgeInfo('tag', item);
         if (code === 0) {
           const tagFields = data.tables.map(item => ({
             field: item.Field,
@@ -329,21 +285,6 @@ export class SchemaStore {
     );
   };
 
-  getTagInfo = async(tag: string) => {
-    const { code, data } = (await service.execNGQL({
-      gql: 'desc tag ' + '`' + tag + '`;',
-    })) as any;
-    return { code, data };
-  }
-
-  getTagDetail = async(name: string) => {
-    const gql = `SHOW CREATE TAG ${handleKeyword(name)}`;
-    const { code, data, message } = (await service.execNGQL({
-      gql,
-    })) as any;
-    return { code, data, message };
-  }
-
   getTagList = async() => {
     const tags = await this.getTags();
     if (tags) {
@@ -354,9 +295,7 @@ export class SchemaStore {
             name: item,
             fields: [],
           };
-          const { code, data } = await this.getTagInfo(
-            item,
-          );
+          const { code, data } = await this.getTagOrEdgeInfo('tag', item);
           if (code === 0) {
             tag.fields = data.tables;
           }
@@ -384,16 +323,11 @@ export class SchemaStore {
     return { code, data, message };
   }
 
-  createTag = async(payload: {
-    name: string;
-    comment?: string;
-    fields?: IProperty[];
-    ttlConfig?: {
-      ttl_col: string;
-      ttl_duration: number;
-    };
+  createTagOrEdge = async(payload: {
+    type: ISchemaType,
+    gql: string
   }) => {
-    const gql = await getTagOrEdgeCreateGQL({ ...payload, type: 'TAG' });
+    const { type, gql } = payload;
     const { code, data, message } = (await service.execNGQL(
       {
         gql,
@@ -401,19 +335,14 @@ export class SchemaStore {
       {
         trackEventConfig: {
           category: 'schema',
-          action: 'create_tag',
+          action: `create_${type.toLowerCase()}`,
         },
       },
     )) as any;
     return { code, data, message };
   }
 
-  alterField = async(payload: {
-    type: IndexType;
-    name: string;
-    action: AlterType;
-    config: IAlterConfig;
-  }) => {
+  alterField = async(payload: IAlterForm) => {
     const gql = getAlterGQL(payload);
     const { code, data, message } = (await service.execNGQL(
       {
@@ -427,6 +356,22 @@ export class SchemaStore {
       },
     )) as any;
     return { code, data, message };
+  }
+
+  getTagOrEdgeDetail = async(type: ISchemaType, name: string) => {
+    const gql = `show create ${type} ${handleKeyword(name)}`;
+    const { code, data, message } = (await service.execNGQL({
+      gql,
+    })) as any;
+    return { code, data, message };
+  }
+
+  getTagOrEdgeInfo = async(type: ISchemaType, name: string) => {
+    const gql = `desc ${type} ` + '`' + name + '`;';
+    const { code, data } = (await service.execNGQL({
+      gql,
+    })) as any;
+    return { code, data };
   }
 
   // indexes
@@ -458,7 +403,7 @@ export class SchemaStore {
       `,
     })) as any;
     if (code === 0) {
-      const _type = type === 'TAG' ? 'Tag' : 'Edge';
+      const _type = type === 'tag' ? 'tag' : 'edge';
       const res = data.tables[0]?.[`Create ${_type} Index`] || '';
       const reg = /comment = "(.+)"/g;
       const result = reg.exec(res);
@@ -520,7 +465,7 @@ export class SchemaStore {
              }]
            }]
         }] */
-      const key = type === 'TAG' ? 'tagIndexTree' : 'edgeIndexTree';
+      const key = type === 'tag' ? 'tagIndexTree' : 'edgeIndexTree';
       this.update({
         [key]: tree,
       });
