@@ -1,10 +1,10 @@
 
 export enum ITaskStatus {
-  'statusFinished' = 'statusFinished',
-  'statusStoped' = 'statusStoped',
-  'statusProcessing' = 'statusProcessing',
-  'statusNotExisted' = 'statusNotExisted',
-  'statusAborted' = 'statusAborted',
+  'StatusFinished' = 'statusFinished',
+  'StatusStoped' = 'statusStoped',
+  'StatusProcessing' = 'statusProcessing',
+  'StatusNotExisted' = 'statusNotExisted',
+  'StatusAborted' = 'statusAborted',
 }
 
 export interface ITaskStats {

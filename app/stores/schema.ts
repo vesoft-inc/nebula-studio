@@ -571,12 +571,46 @@ export class SchemaStore {
     })) as any;
     if (code === 0) {
       return data.tables
-        .filter(item => item['Index Status'] !== IJobStatus.finished)
+        .filter(item => item['Index Status'] !== IJobStatus.Finished)
         .map(item => item.Name);
     }
     return null;
   }
 
+  // stats
+  submitStats = async() => {
+    const { code, data } = (await service.execNGQL(
+      {
+        gql: `
+        SUBMIT JOB STATS
+      `,
+      },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: 'submit_stats',
+        },
+      },
+    )) as any;
+    return { code, data };
+  }
+
+  getStats = async() => {
+    const { code, data } = (await service.execNGQL({
+      gql: `
+        SHOW STATS
+      `,
+    })) as any;
+    return { code, data };
+  }
+
+  getJobStatus = async(id?) => {
+    const gql = id === undefined ? 'SHOW JOBS' : `SHOW JOB ${id}`;
+    const { code, data } = (await service.execNGQL({
+      gql,
+    })) as any;
+    return { code, data };
+  }
 }
 
 const schemaStore = new SchemaStore();

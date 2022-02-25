@@ -370,7 +370,14 @@
     "geography(linestring)Format": "geo(linestring) 类型支持插入方式: <br /> 调用函数 ST_GeogFromText('LINESTRING()')，例如：ST_GeogFromText('LINESTRING(3 4,10 50,20 25)')",
     "geography(polygon)Format": "geo(polygon) 类型支持插入方式: <br /> 调用函数 ST_GeogFromText('POLYGON()')，例如：ST_GeogFromText('POLYGON((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))')",
     "durationFormat": "duration 类型支持插入方式: <br /> 调用函数 duration(<map>)，例如：duration({years: 1, seconds: 0})",
-    "setTTL": "设置TTL（存活时间）"
+    "setTTL": "设置TTL（存活时间）",
+    "refresh": "更新",
+    "lastRefreshTime": "上次更新时间",
+    "statsType": "维度",
+    "statsName": "名称",
+    "statsCount": "数量",
+    "statError": "统计失败，请重试",
+    "statFinished": "统计结束"
   },
   "menu": {
     "use": "使用手册",

@@ -45,7 +45,7 @@ const TaskList = () => {
     };
   }, []);
   useEffect(() => {
-    const needRefresh = taskList.filter(item => item.taskStatus === ITaskStatus.statusProcessing).length > 0;
+    const needRefresh = taskList.filter(item => item.taskStatus === ITaskStatus.StatusProcessing).length > 0;
     if(needRefresh && isMounted) {
       timer.current = setTimeout(asyncGetTaskList, 2000);
     } else {
