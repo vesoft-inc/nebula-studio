@@ -218,13 +218,13 @@ export const getIndexCreateGQL = (params: {
   name: string;
   associate: string;
   comment?: string;
-  fields: string[];
+  fields?: string[];
 }) => {
   const { type, name, associate, fields, comment } = params;
   const combine = associate
-    ? `on ${handleKeyword(associate)}(${fields.join(', ')})`
+    ? `on ${handleKeyword(associate)}(${fields?.join(', ')})`
     : '';
-  const gql = `CREATE ${type} INDEX ${handleKeyword(name)} ${combine} ${
+  const gql = `CREATE ${type.toUpperCase()} INDEX ${handleKeyword(name)} ${combine} ${
     comment ? `COMMENT = "${comment}"` : ''
   }`;
   return gql;

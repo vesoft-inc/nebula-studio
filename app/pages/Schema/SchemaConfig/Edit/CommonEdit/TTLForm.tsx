@@ -137,7 +137,7 @@ const formRef = ((props: IProps) => {
       layout="vertical">
       <Form.Item>
         <Checkbox disabled={editDisabled} checked={ttlRequired} onChange={handleClearTtl}>
-          <span className="label">{intl.get('_schema.setTTL')}</span>
+          <span className="label">{intl.get('schema.setTTL')}</span>
         </Checkbox>
       </Form.Item>
       {!isEdit && <Form.Item noStyle={true}>

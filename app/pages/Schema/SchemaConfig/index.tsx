@@ -8,6 +8,7 @@ import TagList from './List/Tag';
 import EdgeList from './List/Edge';
 import IndexList from './List/Index/index';
 import CommonCreate from './Create/CommonCreate';
+import IndexCreate from './Create/IndexCreate';
 import CommonEdit from './Edit/CommonEdit';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
@@ -26,7 +27,7 @@ const SchemaConfig = () => {
       return [
         {
           path: '/schema',
-          breadcrumbName: intl.get('_schema.spaceList'),
+          breadcrumbName: intl.get('schema.spaceList'),
         },
         {
           path: '#',
@@ -37,15 +38,15 @@ const SchemaConfig = () => {
       return [
         {
           path: '/schema',
-          breadcrumbName: intl.get('_schema.spaceList'),
+          breadcrumbName: intl.get('schema.spaceList'),
         },
         {
           path: `/schema/${space}/${type}/list`,
-          breadcrumbName: intl.get('_schema.configTypeList', { space, type: intl.get(`common.${type}`) }),
+          breadcrumbName: intl.get('schema.configTypeList', { space, type: intl.get(`common.${type}`) }),
         },
         {
           path: '#',
-          breadcrumbName: intl.get('_schema.configTypeAction', { 
+          breadcrumbName: intl.get('schema.configTypeAction', { 
             action: intl.get(`common.${action}`), 
             type: intl.get(`common.${type}`) }),
         },
@@ -133,11 +134,11 @@ const SchemaConfig = () => {
             render={() => <CommonEdit editType="edge" />}
           />
           
-          {/* <Route
-            path={`/space/:space/index/create`}
+          <Route
+            path={`/schema/:space/index/create`}
             exact={true}
-            component={CreateIndex}
-          /> */}
+            component={IndexCreate}
+          />
         </>
       </div>
     </div>

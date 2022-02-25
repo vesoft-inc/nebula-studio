@@ -37,7 +37,7 @@ const Schema = () => {
     if (!err) {
       history.push(`/schema/${space}/tag/list`);
     } else if (err && err.toLowerCase().includes('spacenotfound')) {
-      message.warning(intl.get('_schema.useSpaceErrTip'));
+      message.warning(intl.get('schema.useSpaceErrTip'));
     }
   };
   const getSpaces = async() => {
@@ -47,12 +47,12 @@ const Schema = () => {
   };
   const columns = [
     {
-      title: intl.get('_schema.No'),
+      title: intl.get('schema.No'),
       dataIndex: 'serialNumber',
       align: 'center' as const,
     },
     {
-      title: intl.get('_schema.spaceName'),
+      title: intl.get('schema.spaceName'),
       dataIndex: 'Name',
       render: value => (
         <Button
@@ -68,40 +68,40 @@ const Schema = () => {
       ),
     },
     {
-      title: intl.get('_schema.partitionNumber'),
+      title: intl.get('schema.partitionNumber'),
       dataIndex: 'Partition Number',
     },
     {
-      title: intl.get('_schema.replicaFactor'),
+      title: intl.get('schema.replicaFactor'),
       dataIndex: 'Replica Factor',
     },
     {
-      title: intl.get('_schema.charset'),
+      title: intl.get('schema.charset'),
       dataIndex: 'Charset',
     },
     {
-      title: intl.get('_schema.collate'),
+      title: intl.get('schema.collate'),
       dataIndex: 'Collate',
     },
     {
-      title: intl.get('_schema.vidType'),
+      title: intl.get('schema.vidType'),
       dataIndex: 'Vid Type',
     },
     {
-      title: intl.get('_schema.atomicEdge'),
+      title: intl.get('schema.atomicEdge'),
       dataIndex: 'Atomic Edge',
       render: value => String(value),
     },
     {
-      title: intl.get('_schema.group'),
+      title: intl.get('schema.group'),
       dataIndex: 'Group',
     },
     {
-      title: intl.get('_schema.comment'),
+      title: intl.get('schema.comment'),
       dataIndex: 'Comment',
     },
     {
-      title: intl.get('_schema.operations'),
+      title: intl.get('schema.operations'),
       dataIndex: 'operation',
       render: (_, space) => {
         if (space.ID) {
@@ -134,7 +134,7 @@ const Schema = () => {
   ];
   return <div className="schema-page center-layout">
     <div className="schema-header">
-      {intl.get('_schema.spaceList')}
+      {intl.get('schema.spaceList')}
     </div>
     <div className="schema-container">
       <Button className="studio-add-btn btn-create" type="primary">
@@ -144,7 +144,7 @@ const Schema = () => {
           data-track-action="view_space_create"
           data-track-label="from_space_list"
         >
-          <Icon className="studio-add-btn-icon" type="icon-btn-add" />{intl.get('_schema.createSpace')}
+          <Icon className="studio-add-btn-icon" type="icon-btn-add" />{intl.get('schema.createSpace')}
         </Link>
       </Button>
       <Table

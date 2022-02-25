@@ -139,7 +139,7 @@ export const EditRow = (props: IEditProps) => {
                   <Popover
                     trigger="focus"
                     placement="right"
-                    content={intl.getHTML(`_schema.${type}Format`)}
+                    content={intl.getHTML(`schema.${type}Format`)}
                   >
                     <Form.Item name="value" initialValue={value}>
                       <Input />

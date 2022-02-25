@@ -1,5 +1,5 @@
 import { Button, Popconfirm, Radio, Table, message } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import intl from 'react-intl-universal';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import Icon from '@app/components/Icon';
@@ -40,23 +40,52 @@ function renderIndexInfo(index: IIndexList) {
 
 const IndexList = () => {
   const { space, module } = useParams() as {space :string, module: string};
-  const { schema: { indexList, deleteIndex, getIndexList } } = useStore();
+  const { schema: { indexList, deleteIndex, getIndexList, rebuildIndex, getRebuildIndexes } } = useStore();
   const [searchVal, setSearchVal] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [indexType, setIndexType] = useState<any>(module as any || 'tag');
+  const [rebuildList, setRebuildList] = useState<IIndexList[] | null>(null);
+  const rebuildTimer = useRef<NodeJS.Timeout | null>(null);
   const history = useHistory();
   const getData = async() => {
     setLoading(true);
     await getIndexList(indexType);
+    await getRebuildData(indexType);
     setSearchVal('');
     setLoading(false);
   };
-  const handleDeleteIndex = async(type: IndexType, name: string) => {
+  const handleDeleteIndex = async(event, type: IndexType, name: string) => {
+    event.stopPropagation();
     const res = await deleteIndex({ type, name });
     if (res.code === 0) {
       message.success(intl.get('common.deleteSuccess'));
       getData();
+    }
+  };
+
+  const getRebuildData = async(type: IndexType) => {
+    rebuildTimer.current && clearTimeout(rebuildTimer.current);
+    const data = await getRebuildIndexes(type);
+    if (data && data.length > 0) {
+      setRebuildList(data);
+      rebuildTimer.current = setTimeout(() => {
+        getRebuildData(type);
+      }, 2000);
+    } else {
+      setRebuildList([]);
+      rebuildTimer.current && clearTimeout(rebuildTimer.current);
+    }
+  };
+
+  const handleRebuild = async(event, type: IndexType, name: string) => {
+    event.stopPropagation();
+    const res = await rebuildIndex({
+      type,
+      name,
+    });
+    if (res.code === 0) {
+      getRebuildData(type);
     }
   };
   const columns = useMemo(() => [
@@ -80,47 +109,48 @@ const IndexList = () => {
       title: intl.get('common.operation'),
       dataIndex: 'operation',
       render: (_, index) => {
+        const isRebuild = rebuildList?.some(i => i === index.name);
         if (index.name) {
           return (
             <div className="operation">
-              <div>
-                <Button className="primary-btn">
-                  <Link
-                    to={`/schema/${space}/index/edit/${index.name}`}
-                    data-track-category="navigation"
-                    data-track-action="view_index_edit"
-                    data-track-label="from_index_list"
-                  >
-                    <Icon type="icon-btn-edit" />
-                  </Link>
+              <Button 
+                loading={isRebuild} 
+                onClick={(e) => handleRebuild(e, indexType, index.name)}
+                className="primary-btn">
+                {intl.get('schema.rebuild')}
+              </Button>
+              <Popconfirm
+                onConfirm={(e) => {
+                  handleDeleteIndex(e, indexType, index.name);
+                }}
+                title={intl.get('common.ask')}
+                okText={intl.get('common.ok')}
+                cancelText={intl.get('common.cancel')}
+              >
+                <Button className="warning-btn" onClick={e => e.stopPropagation()}>
+                  <Icon type="icon-btn-delete" />
                 </Button>
-                <Popconfirm
-                  onConfirm={() => {
-                    handleDeleteIndex(indexType, index.name);
-                  }}
-                  title={intl.get('common.ask')}
-                  okText={intl.get('common.ok')}
-                  cancelText={intl.get('common.cancel')}
-                >
-                  <Button className="warning-btn" onClick={e => e.stopPropagation()}>
-                    <Icon type="icon-btn-delete" />
-                  </Button>
-                </Popconfirm>
-              </div>
+              </Popconfirm>
             </div>
           );
         }
       },
     },
-  ], [indexType, Cookie.get('lang')]);
+  ], [indexType, Cookie.get('lang'), rebuildList]);
 
   const handleTabChange = e => {
+    rebuildTimer.current && clearTimeout(rebuildTimer.current);
     setIndexType(e.target.value);
+    setRebuildList([]);
     history.replace(`/schema/${space}/index/list/${e.target.value}`);
   };
   useEffect(() => {
+    rebuildTimer.current && clearTimeout(rebuildTimer.current);
     module && setIndexType(module as IndexType);
     getData();
+    return () => {
+      rebuildTimer.current && clearTimeout(rebuildTimer.current);
+    };
   }, [module, space]);
   useEffect(() => {
     setData(sortByFieldAndFilter({

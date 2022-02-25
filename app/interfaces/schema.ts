@@ -65,3 +65,12 @@ export interface IAlterForm {
   action: AlterType;
   config: IAlterConfig;
 }
+
+export enum IJobStatus {
+  queue = 'QUEUE',
+  running = 'RUNNING',
+  finished = 'FINISHED',
+  failed = 'FAILED',
+  stopped = 'STOPPED',
+  removed = 'REMOVED',
+}
