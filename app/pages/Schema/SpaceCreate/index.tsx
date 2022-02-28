@@ -44,11 +44,11 @@ const SpaceCreate = () => {
   const routes = useMemo(() => [
     {
       path: '/schema',
-      breadcrumbName: intl.get('_schema.spaceList'),
+      breadcrumbName: intl.get('schema.spaceList'),
     },
     {
       path: '#',
-      breadcrumbName: intl.get('_schema.createSpace'),
+      breadcrumbName: intl.get('schema.createSpace'),
     },
   ], [Cookie.get('lang')]);
 
@@ -103,7 +103,7 @@ const SpaceCreate = () => {
           <Row>
             <Col span={12}>
               <Form.Item label={intl.get('common.name')} name="name" rules={nameRulesFn(intl)}>
-                <Input placeholder={intl.get('_schema.spaceNameEnter')} />
+                <Input placeholder={intl.get('schema.spaceNameEnter')} />
               </Form.Item>
             </Col>
             <Col span={12}>

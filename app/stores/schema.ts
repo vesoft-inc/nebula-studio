@@ -1,6 +1,6 @@
 import { action, makeAutoObservable, observable } from 'mobx';
 import service from '@app/config/service';
-import { IAlterForm, IEdge, IIndexList, ISchemaType, ISpace, ITag, ITree, IndexType } from '@app/interfaces/schema';
+import { IAlterForm, IEdge, IIndexList, IJobStatus, ISchemaType, ISpace, ITag, ITree, IndexType } from '@app/interfaces/schema';
 import { handleKeyword } from '@app/utils/function';
 import { findIndex } from 'lodash';
 import {
@@ -250,7 +250,7 @@ export class SchemaStore {
   }
 
   // tags
-  async getTags() {
+  getTags = async() => {
     const { code, data } = (await service.execNGQL({
       gql: `
         SHOW TAGS;
@@ -382,10 +382,11 @@ export class SchemaStore {
       `,
     })) as any;
     if (code === 0) {
+      const key = type === 'tag' ? 'By Tag' : 'By Edge';
       const indexes = data.tables.map(item => {
         return {
           name: item['Index Name'],
-          owner: item['By Tag'],
+          owner: item[key],
         };
       });
       this.update({
@@ -521,6 +522,7 @@ export class SchemaStore {
     )) as any;
     return { code, data };
   }
+
   createIndex = async(payload: {
     type: IndexType;
     name: string;
@@ -542,6 +544,39 @@ export class SchemaStore {
     )) as any;
     return { code, data, message };
   }
+
+  rebuildIndex = async(payload: { type: IndexType; name: string }) => {
+    const { type, name } = payload;
+    const { code, data } = (await service.execNGQL(
+      {
+        gql: `
+        REBUILD ${type} INDEX ${handleKeyword(name)}
+      `,
+      },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: 'rebuild_index',
+        },
+      },
+    )) as any;
+    return { code, data };
+  }
+
+  getRebuildIndexes = async(type: IndexType) => {
+    const { code, data } = (await service.execNGQL({
+      gql: `
+        SHOW ${type} INDEX STATUS
+      `,
+    })) as any;
+    if (code === 0) {
+      return data.tables
+        .filter(item => item['Index Status'] !== IJobStatus.finished)
+        .map(item => item.Name);
+    }
+    return null;
+  }
+
 }
 
 const schemaStore = new SchemaStore();
