@@ -374,7 +374,14 @@
     "geography(linestring)Format": "Supported data inserting methods: <br /> Call function ST_GeogFromText('LINESTRING()'), for example:ST_GeogFromText('LINESTRING(3 4,10 50,20 25)')",
     "geography(polygon)Format": "Supported data inserting methods: <br /> Call function ST_GeogFromText('POLYGON()'), for example:ST_GeogFromText('POLYGON((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))')",
     "durationFormat": "Supported data inserting methods: <br /> Call function duration(<map>), for example:duration({years: 1, seconds: 0})",
-    "setTTL": "Set TTL (Time To Live)"
+    "setTTL": "Set TTL (Time To Live)",
+    "refresh": "Refresh",
+    "lastRefreshTime": "Last refreshed time",
+    "statsType": "Type",
+    "statsName": "Name",
+    "statsCount": "Count",
+    "statError": "Update Failed, Please try again.",
+    "statFinished": "Statistics end"
   },
   "menu": {
     "use": "Use Manual",

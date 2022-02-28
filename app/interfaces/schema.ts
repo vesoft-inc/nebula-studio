@@ -67,10 +67,10 @@ export interface IAlterForm {
 }
 
 export enum IJobStatus {
-  queue = 'QUEUE',
-  running = 'RUNNING',
-  finished = 'FINISHED',
-  failed = 'FAILED',
-  stopped = 'STOPPED',
-  removed = 'REMOVED',
+  Queue = 'QUEUE',
+  Running = 'RUNNING',
+  Finished = 'FINISHED',
+  Failed = 'FAILED',
+  Stopped = 'STOPPED',
+  Removed = 'REMOVED',
 }

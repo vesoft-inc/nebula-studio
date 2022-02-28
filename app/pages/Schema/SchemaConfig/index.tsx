@@ -7,6 +7,7 @@ import Breadcrumb from '@app/components/Breadcrumb';
 import TagList from './List/Tag';
 import EdgeList from './List/Edge';
 import IndexList from './List/Index/index';
+import SpaceStats from './List/SpaceStats';
 import CommonCreate from './Create/CommonCreate';
 import IndexCreate from './Create/IndexCreate';
 import CommonEdit from './Edit/CommonEdit';
@@ -112,6 +113,11 @@ const SchemaConfig = () => {
             path="/schema/:space/index/list/:module?"
             exact={true}
             component={IndexList}
+          />
+          <Route
+            path="/schema/:space/statistic/list"
+            exact={true}
+            component={SpaceStats}
           />
           <Route
             path={`/schema/:space/tag/create`}
