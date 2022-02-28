@@ -337,6 +337,7 @@
     "indexType": "Index Type",
     "indexName": "Index Name",
     "indexFields": "Indexed Properties",
+    "associateName": "Associated {type} name",
     "dragSorting": "(Drag to Sort)",
     "selectFields": "Choose Property",
     "indexedLength": "Indexed length",
@@ -346,22 +347,8 @@
     "backToEdgeList": "Back to Edge Type List",
     "backToIndexList": "Back to Index List",
     "leavePage": "Whether to leave the current page?",
-    "leavePagePrompt": "You have unsaved changes to the record on this tab. If you leave this tab without saving the changes, they will be lost. Are you sure that you want to leave?"
-  },
-  "menu": {
-    "use": "Use Manual",
-    "release": "New Version",
-    "forum": "Help Forum",
-    "nGql": "nGQL"
-  },
-  "link": {
-    "nGQLHref": "https://docs.nebula-graph.io/3.0.0/3.ngql-guide/1.nGQL-overview/1.overview/",
-    "mannualHref": "https://docs.nebula-graph.io/3.0.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/",
-    "versionLogHref": "https://docs.nebula-graph.io/3.0.0/nebula-studio/about-studio/st-ug-release-note/",
-    "forumLink": "https://discuss.nebula-graph.io/"
-  },
-  "_schema": {
-    "spaceList": "Graph Space List",
+    "leavePagePrompt": "You have unsaved changes to the record on this tab. If you leave this tab without saving the changes, they will be lost. Are you sure that you want to leave?",
+    "rebuild": "Rebuild",
     "createSpace": "Create Space",
     "No": "No",
     "spaceName": "Name",
@@ -374,12 +361,10 @@
     "group": "Group",
     "comment": "Comment",
     "operations": "Operations",
-    "useSpaceErrTip": "Space not found. Trying to use a newly created graph space may fail because the creation is implemented asynchronously. To make sure the follow-up operations work as expected, Wait for two heartbeat cycles, i.e., 20 seconds.",
     "spaceNameEnter": "Please enter the space name",
     "propertyCount": "Property Num",
     "configTypeList": "{space} {type} List",
     "configTypeAction": "{action} {type}",
-    "defineFields": "Define Properties",
     "timestampFormat": "Supported data inserting methods: <br />1. call function now()  <br />2. call function timestamp(), for example: timestamp('2021-07-05T06:18:43.984000')  <br />3. Input the timestamp directly, namely the number of seconds from 1970-01-01 00:00:00",
     "dateFormat": "Supported data inserting methods: <br />Call function date(), for example: date('2021-03-17')",
     "timeFormat": "Supported data inserting methods: <br />Call function time(), for example: time('17:53:59')",
@@ -390,5 +375,17 @@
     "geography(polygon)Format": "Supported data inserting methods: <br /> Call function ST_GeogFromText('POLYGON()'), for example:ST_GeogFromText('POLYGON((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))')",
     "durationFormat": "Supported data inserting methods: <br /> Call function duration(<map>), for example:duration({years: 1, seconds: 0})",
     "setTTL": "Set TTL (Time To Live)"
+  },
+  "menu": {
+    "use": "Use Manual",
+    "release": "New Version",
+    "forum": "Help Forum",
+    "nGql": "nGQL"
+  },
+  "link": {
+    "nGQLHref": "https://docs.nebula-graph.io/3.0.0/3.ngql-guide/1.nGQL-overview/1.overview/",
+    "mannualHref": "https://docs.nebula-graph.io/3.0.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/",
+    "versionLogHref": "https://docs.nebula-graph.io/3.0.0/nebula-studio/about-studio/st-ug-release-note/",
+    "forumLink": "https://discuss.nebula-graph.io/"
   }
 }

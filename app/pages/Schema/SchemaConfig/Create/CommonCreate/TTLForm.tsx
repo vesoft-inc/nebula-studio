@@ -33,7 +33,7 @@ const formRef = ((props: IProps) => {
       <div className="form-item">
         <Form.Item name="ttlRequired" valuePropName="checked" initialValue={false}>
           <Checkbox onChange={handleClearTtl}>
-            <span className="label">{intl.get('_schema.setTTL')}</span>
+            <span className="label">{intl.get('schema.setTTL')}</span>
           </Checkbox>
         </Form.Item>
         <Form.Item noStyle={true} shouldUpdate={true}>

@@ -65,7 +65,7 @@ const PropertiesForm = (props: IProps) => {
       <div className="form-item">
         <Form.Item name="propertiesRequired" valuePropName="checked" initialValue={true}>
           <Checkbox onChange={handleClearProperties}>
-            <span className="label">{intl.get('_schema.defineFields')}</span>
+            <span className="label">{intl.get('schema.defineFields')}</span>
           </Checkbox>
         </Form.Item>
         <Form.Item noStyle={true} shouldUpdate={true}>
@@ -164,7 +164,7 @@ const PropertiesForm = (props: IProps) => {
                                       <Popover
                                         trigger="focus"
                                         placement="right"
-                                        content={intl.getHTML(`_schema.${properties[index].type}Format`)}
+                                        content={intl.getHTML(`schema.${properties[index].type}Format`)}
                                       >
                                         <Form.Item {...restField} {...itemLayout} name={[name, 'value']}>
                                           <Input />

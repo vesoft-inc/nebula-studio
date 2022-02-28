@@ -148,7 +148,7 @@ const PropertiesForm = (props: IProps) => {
       onFinish={handlePropertyUpdate}>
       <Form.Item>
         <Checkbox disabled={editDisabled} checked={propertyRequired} onChange={handleClearProperties}>
-          <span className="label">{intl.get('_schema.defineFields')}</span>
+          <span className="label">{intl.get('schema.defineFields')}</span>
         </Checkbox>
       </Form.Item>
       <Form.Item noStyle={true} shouldUpdate={true}>

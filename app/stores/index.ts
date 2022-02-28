@@ -8,7 +8,7 @@ import schema from './schema';
 const rootStore = { global, files, console, dataImport, schema };
 const rootStoreRef = { current: rootStore };
 // @ts-ignore
-window.rootStore = rootStore;
+window.studioStore = rootStore;
 export const getRootStore = () => rootStoreRef.current;
 
 export const storeContext = createContext(rootStore);

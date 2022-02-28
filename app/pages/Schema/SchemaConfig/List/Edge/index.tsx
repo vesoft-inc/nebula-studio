@@ -70,7 +70,7 @@ const EdgeList = () => {
       width: '33%',
     },
     {
-      title: intl.get('_schema.propertyCount'),
+      title: intl.get('schema.propertyCount'),
       dataIndex: 'count',
       width: '33%',
       render: (_, edge) => edge.fields?.length || 0
@@ -82,30 +82,28 @@ const EdgeList = () => {
         if (edge.name) {
           return (
             <div className="operation">
-              <div>
-                <Button className="primary-btn">
-                  <Link
-                    to={`/schema/${space}/edge/edit/${edge.name}`}
-                    data-track-category="navigation"
-                    data-track-action="view_edge_edit"
-                    data-track-label="from_edge_list"
-                  >
-                    <Icon type="icon-btn-edit" />
-                  </Link>
-                </Button>
-                <Popconfirm
-                  onConfirm={() => {
-                    handleDeleteEdge(edge.name);
-                  }}
-                  title={intl.get('common.ask')}
-                  okText={intl.get('common.ok')}
-                  cancelText={intl.get('common.cancel')}
+              <Button className="primary-btn">
+                <Link
+                  to={`/schema/${space}/edge/edit/${edge.name}`}
+                  data-track-category="navigation"
+                  data-track-action="view_edge_edit"
+                  data-track-label="from_edge_list"
                 >
-                  <Button className="warning-btn" onClick={e => e.stopPropagation()}>
-                    <Icon type="icon-btn-delete" />
-                  </Button>
-                </Popconfirm>
-              </div>
+                  <Icon type="icon-btn-edit" />
+                </Link>
+              </Button>
+              <Popconfirm
+                onConfirm={() => {
+                  handleDeleteEdge(edge.name);
+                }}
+                title={intl.get('common.ask')}
+                okText={intl.get('common.ok')}
+                cancelText={intl.get('common.cancel')}
+              >
+                <Button className="warning-btn" onClick={e => e.stopPropagation()}>
+                  <Icon type="icon-btn-delete" />
+                </Button>
+              </Popconfirm>
             </div>
           );
         }
