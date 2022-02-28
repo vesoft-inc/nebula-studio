@@ -51,9 +51,9 @@ const TaskItem = (props: IProps) => {
   const [status, setStatus] = useState<'success' | 'active' | 'normal' | 'exception' | undefined>(undefined);
   const [extraMsg, setExtraMsg] = useState('');
   useEffect(() => {
-    if(taskStatus === ITaskStatus.statusFinished) {
+    if(taskStatus === ITaskStatus.StatusFinished) {
       setStatus('success');
-    } else if(taskStatus === ITaskStatus.statusProcessing) {
+    } else if(taskStatus === ITaskStatus.StatusProcessing) {
       setStatus('active');
       const info: string[] = [];
       if(numFailed > 0) {
@@ -84,22 +84,22 @@ const TaskItem = (props: IProps) => {
           <div className="progress-info">
             <span className="task-name">
               {name}
-              {taskStatus === ITaskStatus.statusFinished && <span className="complete-info">
+              {taskStatus === ITaskStatus.StatusFinished && <span className="complete-info">
                 <CheckCircleFilled />
                 {intl.get('import.importCompleted')}
                 {extraMsg && ` (${extraMsg})`}
               </span>}
-              {taskStatus === ITaskStatus.statusAborted && <span className="error-info">
+              {taskStatus === ITaskStatus.StatusAborted && <span className="error-info">
                 {intl.get('import.importFailed')}
                 {extraMsg && ` (${extraMsg})`}
               </span>}
-              {taskStatus === ITaskStatus.statusStoped && <span className="error-info">
+              {taskStatus === ITaskStatus.StatusStoped && <span className="error-info">
                 {intl.get('import.importStopped')}
               </span>}
             </span>
             <div className="more-info">
               <span>
-                {taskStatus !== ITaskStatus.statusFinished && `${totalCount} ${intl.get('import.lines')} / `}
+                {taskStatus !== ITaskStatus.StatusFinished && `${totalCount} ${intl.get('import.lines')} / `}
                 {totalLine}{' '}{intl.get('import.lines')}
               </span>
               <span>{dayjs.duration(dayjs.unix(updatedTime).diff(dayjs.unix(createdTime))).format('HH:mm:ss')}</span>
@@ -107,13 +107,13 @@ const TaskItem = (props: IProps) => {
           </div>
           <Progress 
             status={status} 
-            percent={taskStatus !== ITaskStatus.statusFinished ? floor(totalCount / totalLine * 100, 2) : 100} 
+            percent={taskStatus !== ITaskStatus.StatusFinished ? floor(totalCount / totalLine * 100, 2) : 100} 
             strokeColor={status && COLOR_MAP[status]} />
         </div>
         <div className="operations">
           <Button className="primary-btn">{intl.get('import.details')}</Button>
           <Button className="primary-btn">{intl.get('import.viewLogs')}</Button>
-          {taskStatus === ITaskStatus.statusProcessing && 
+          {taskStatus === ITaskStatus.StatusProcessing && 
           <Popconfirm
             placement="left"
             title={intl.get('import.endImport')}
@@ -123,7 +123,7 @@ const TaskItem = (props: IProps) => {
           >
             <Button className="cancel-btn">{intl.get('import.endImport')}</Button>
           </Popconfirm>}
-          {taskStatus !== ITaskStatus.statusProcessing && 
+          {taskStatus !== ITaskStatus.StatusProcessing && 
           <Popconfirm
             placement="left"
             title={intl.get('common.ask')}
