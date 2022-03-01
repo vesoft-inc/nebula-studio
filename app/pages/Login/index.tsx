@@ -65,11 +65,10 @@ const LoginPage: React.FC = () => {
         <div className="footer">
           <div className="info">
             <span className="version">
-              {intl.get('common.version')}：{version}
+              {intl.get('common.version')}：v{version}
             </span>
             <LanguageSelect />
           </div>
-          <span className="copyright">Copyright © vesoft inc. - A product of vesoft inc.</span>
         </div>
       </div>
     </div>

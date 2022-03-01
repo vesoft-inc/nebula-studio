@@ -75,7 +75,7 @@ const TaskItem = (props: IProps) => {
       <div className="row">
         <span>{intl.get('common.space')}: {space}</span>
         <Button type="link" size="small" onClick={() => handleDownload(taskID)}>
-          <Icon type="icon-btn-download" />
+          <Icon type="icon-studio-btn-download" />
           {intl.get('import.downloadConfig')}
         </Button>
       </div>

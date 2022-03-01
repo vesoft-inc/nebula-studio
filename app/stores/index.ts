@@ -10,7 +10,12 @@ const rootStoreRef = { current: rootStore };
 // @ts-ignore
 window.studioStore = rootStore;
 export const getRootStore = () => rootStoreRef.current;
-
+export const resetStore = () => {
+  Object.keys(rootStore).forEach(key => {
+    const module = rootStore[key];
+    module.resetModel && module.resetModel();
+  });
+};
 export const storeContext = createContext(rootStore);
 export const StoreProvider = storeContext.Provider;
 export function useStore() {

@@ -89,7 +89,7 @@ const EdgeList = () => {
                   data-track-action="view_edge_edit"
                   data-track-label="from_edge_list"
                 >
-                  <Icon type="icon-btn-edit" />
+                  <Icon type="icon-studio-btn-edit" />
                 </Link>
               </Button>
               <Popconfirm
@@ -101,7 +101,7 @@ const EdgeList = () => {
                 cancelText={intl.get('common.cancel')}
               >
                 <Button className="warning-btn" onClick={e => e.stopPropagation()}>
-                  <Icon type="icon-btn-delete" />
+                  <Icon type="icon-studio-btn-delete" />
                 </Button>
               </Popconfirm>
             </div>

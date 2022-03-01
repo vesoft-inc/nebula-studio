@@ -84,7 +84,7 @@ const PropertiesForm = (props: IProps) => {
                             className="studio-add-btn" 
                             disabled={!propertiesRequired}
                             onClick={() => handlePropertyAdd(add)}>
-                            <Icon className="studio-add-btn-icon" type="icon-btn-add" />
+                            <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />
                             {intl.get('common.addProperty')}
                           </Button>
                         </Form.Item>

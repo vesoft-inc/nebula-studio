@@ -35,7 +35,7 @@ const CommonLayout = (props: IProps) => {
             data-track-action={`view_${type}_create`}
             data-track-label={`from_${type}_list`}
           >
-            <Icon className="studio-add-btn-icon" type="icon-btn-add" />{intl.get('common.create')}
+            <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />{intl.get('common.create')}
           </Link>
         </Button>
         <Search onSearch={onSearch} type={intl.get('common.edge').toLowerCase()} />

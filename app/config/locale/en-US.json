@@ -79,7 +79,8 @@
     "comment": "Comment",
     "space": "Space",
     "version": "Version",
-    "statistics": "Statistics"
+    "statistics": "Statistics",
+    "download": "Download"
   },
   "NGQLOutput": {
     "success": "Execution successful!"
@@ -96,7 +97,7 @@
     "success": "succeed",
     "fail": "Failed",
     "clear": "Clear Connection",
-    "title": "Configure Server"
+    "title": "Connect to Nebula Graph"
   },
   "formRules": {
     "hostRequired": "Host Required",
@@ -123,7 +124,12 @@
     "exportEdge": "Please choose the columns representing source vertex ID, destination vertex ID, and rank of an edge",
     "showSubgraphs": "View Subgraphs",
     "deleteHistory": "Clear History",
-    "parameterDisplay": "Custom Parameters Display"
+    "cypherParam": "Cypher Parameter",
+    "favorites": "Favorites",
+    "addToFavorites": "Add to favorites",
+    "unfavorite": "Unfavorite",
+    "clearFavorites": "Clear Favorites",
+    "graphviz": "Graphviz"
   },
   "explore": {
     "clear": "Clear",

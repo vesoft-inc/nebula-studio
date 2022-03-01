@@ -1,0 +1,173 @@
+@import '~@app/common.less';
+.nebula-console {
+  .space-select {
+    display: flex;
+    align-items: center;
+    padding: 10px 42px;
+    height: 60px;
+    background: #FFFFFF;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    .label {
+      font-size: 14px;
+      color: @darkGray;
+      font-family: Roboto-Regular, sans-serif;
+      &::after {
+        content: ': ';
+        padding-right: 8px;
+      }
+    }
+    .ant-select {
+      width: 230px;
+      .ant-select-selector {
+        background: @lightBlue;
+        border-radius: 3px;
+        border: none;
+      }
+      .ant-select-selection-item {
+        color: @darkBlue;
+      }
+      .ant-select-arrow {
+        color: @darkBlue;
+      }
+    }
+    .icon-instruction {
+      margin-left: 15px;
+      svg {
+        width: 22px;
+        height: 22px;
+        fill: @darkGray;
+      }
+    }
+  }
+  .console-panel {
+    margin-top: 25px;
+    background: #FFFFFF;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    padding: 14px 30px;
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      .title {
+        font-family: Roboto-Regular, sans-serif;
+        font-weight: 500;
+        font-size: 18px;
+        color: @lightBlack;
+      }
+      .operations {
+        display: flex;
+        align-items: center;
+        .btn-operations {
+          margin: 0 16px;
+          svg {
+            width: 24px;
+            height: 24px;
+          }
+        }
+        .ant-btn {
+          margin-left: 10px;
+        }
+      }
+    }
+    .code-input {
+      position: relative;
+      border: 1px solid @gray;
+      border-radius: 3px;
+      .btn-open-param {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 25px;
+        position: absolute;
+        z-index: 90;
+        right: 12px;
+        top: 0;
+        background: #FFFFFF;
+        border: 1px solid @gray;
+        border-top: none;
+        cursor: pointer;
+        svg {
+          fill: @darkBlue;
+        }
+      }
+      .param-container {
+        min-height: 44px;
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid @gray;
+        .param-box {
+          padding-top: 8px;
+          .param-item {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            min-width: 34px;
+            height: 28px;
+            background: @gray;
+            border-radius: 3px;
+            color: @darkBlue;
+            padding: 0 8px;
+            cursor: pointer;
+            margin-bottom: 8px;
+          }
+        }
+        .btn-close-box {
+          cursor: pointer;
+          color: @darkBlue;
+          flex-shrink: 0;
+          margin-right: 10px;
+          svg {
+            fill: @darkBlue;
+            margin-right: 10px;
+          }
+        }
+      }
+    }
+    .CodeMirror {
+      .CodeMirror-gutters {
+        background: @lightBlue;
+      }
+      .CodeMirror-linenumber {
+        display: flex;
+        justify-content: center;
+        color: @darkGray;
+      }
+      .CodeMirror-scroll {
+        padding-bottom: 0;
+      }
+    }
+  }
+}
+
+.historyList, .favoriteList {
+	height: 80%;
+	overflow: hidden;
+	position: relative;
+
+	.ant-modal-content {
+		position: relative;
+    height: 100%;
+    overflow: auto;
+	}
+
+	.ant-modal-body {
+		padding-top: 0px;
+	}
+
+	.ant-modal-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 20px;
+	}
+
+	.ant-modal-close {
+		top: 8px;
+	}
+}
