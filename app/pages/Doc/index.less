@@ -1,0 +1,105 @@
+.studio-doc {
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .welcome-label {
+    font-family: Roboto-Light, sans-serif;
+    font-weight: 300;
+    font-size: 64px;
+
+    color: #000000;
+    > span {
+      font-family: Roboto-Bold, sans-serif;
+    }
+  }
+  .doc-box {
+    width: 100%;
+    margin-bottom: 36px;
+    .header {
+      font-family: Roboto-Regular, sans-serif;
+      font-size: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #D5DDEB;
+    }
+    .module-intro {
+      padding: 14px;
+      display: flex;
+      .module-item {
+        padding: 27px 30px;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        font-family: Roboto-Regular, sans-serif;
+        .anticon > svg {
+          width: 50px;
+          height: 50px;
+          fill: #0091FF;
+        }
+        .title {
+          color: #0091FF;
+          font-weight: 500;
+          font-size: 24px;
+          margin: 20px 0 15px;
+        }
+        .tip {
+          font-weight: 300;
+          font-size: 14px;
+          color: #4F4F4F;
+          padding-right: 5px;
+        }
+      }
+    }
+    .doc-carousel {
+      width: 100%;
+      padding: 20px;
+      .doc-group {
+        display: flex !important;
+      }
+      .doc-item {
+        height: 295px;
+        background: #FFFFFF;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+        padding: 30px 20px 15px 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        font-family: Roboto-Regular, sans-serif;
+        .doc-title {
+          font-weight: 500;
+          font-size: 24px;
+          height: 72px;
+        } 
+        .doc-tip {
+          font-weight: 300;
+          font-size: 14px;
+          color: #4F4F4F;
+        }
+        .ant-btn {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .ant-carousel .slick-dots-bottom {
+    bottom: -30px;
+    margin: 0;
+  
+    li {
+      width: 24px;
+    }
+  
+    li button {
+      width: 10px;
+      height: 10px;
+      border-radius: 10px;
+      background-color: #E0E0E0;
+    }
+  
+    li.slick-active button {
+      width: 10px;
+      background-color: #0091FF;
+    }
+  }
+}

@@ -29,17 +29,16 @@ const PageHeader = (props: IProps) => {
   const { menus } = props;
   const [activeKey, setActiveKey] = useState<string>('');
   const { global: { username, host } } = useStore();
-  const location = useLocation();
+  const { pathname } = useLocation();
   const handleMenuClick = async({ key }) => {
     setActiveKey(key);
   };
 
 
   useEffect(() => {
-    const { pathname } = location;
     const activeKey = pathname.split('/')[1];
     setActiveKey(activeKey);
-  }, []);
+  }, [pathname]);
 
   return <Header className="studio-header">
     <div className="nebula-logo">
