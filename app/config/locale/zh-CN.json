@@ -81,6 +81,21 @@
     "statistics": "统计",
     "download": "下载"
   },
+  "doc": {
+    "welcome": "欢迎使用",
+    "functionIntro": "功能介绍",
+    "schemaIntro": "您可以在 schema 模块对 Nebula Graph 图空间进行管理。",
+    "importIntro": "您可以使用导入模块将数据批量导入 Nebula Graph。",
+    "consoleIntro": "您可以使用控制台模块对 Nebula Graph 内的数据进行查询操作。",
+    "learningDoc": "学习文档",
+    "getStarted": "认识 Nebula Studio",
+    "getStartedTip": "什么是 Nebula Studio。",
+    "useGuide": "Nebula Studio 使用手册",
+    "useGuideTip": "学习如何使用 Nebula Studio。",
+    "ngqlIntro": "Nebula Graph 查询语言 (nGQL)",
+    "ngqlIntroTip": "nGQL 是 Nebula Graph 使用的的声明式图查询语言，是为开发和运维人员设计的类 SQL 查询语言，易于学习。",
+    "start": "快速开始"
+  },
   "warning": {
     "configServer": "请先配置服务器",
     "connectError": "数据库连接有误，请重新配置"
@@ -394,7 +409,6 @@
   "link": {
     "nGQLHref": "https://docs.nebula-graph.com.cn/3.0.0/3.ngql-guide/1.nGQL-overview/1.overview/",
     "mannualHref": "https://docs.nebula-graph.com.cn/3.0.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/",
-    "versionLogHref": "https://docs.nebula-graph.com.cn/3.0.0/nebula-studio/about-studio/st-ug-release-note/",
-    "forumLink": "https://discuss.nebula-graph.com.cn/"
+    "startStudioHref": "https://docs.nebula-graph.com.cn/3.0.0/nebula-studio/quick-start/st-ug-plan-schema/"
   }
 }

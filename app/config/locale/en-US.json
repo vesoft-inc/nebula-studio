@@ -82,6 +82,21 @@
     "statistics": "Statistics",
     "download": "Download"
   },
+  "doc": {
+    "welcome": "Welcome to",
+    "functionIntro": "Functions introduction",
+    "schemaIntro": "You can use the Schema page to operate graph spaces in Nebula Graph",
+    "importIntro": "You can use the Import page to batch import vertex and edge data into Nebula Graph for graph exploration and data analysis.",
+    "consoleIntro": "When data is imported, you can use the Console page to query graph data.",
+    "learningDoc": "Learning Docs",
+    "getStarted": "Getting started with Nebula Studio",
+    "getStartedTip": "What's Nebula Studio",
+    "useGuide": "Documents of Nebula Studio",
+    "useGuideTip": "Learn how to use Nebula Studio",
+    "ngqlIntro": "Nebula Graph Query Language (nGQL)",
+    "ngqlIntroTip": "nGQL is a declarative graph query language for Nebula Graph. It allows expressive and efficient graph patterns. ",
+    "start": "Get Started"
+  },
   "NGQLOutput": {
     "success": "Execution successful!"
   },
@@ -398,7 +413,6 @@
   "link": {
     "nGQLHref": "https://docs.nebula-graph.io/3.0.0/3.ngql-guide/1.nGQL-overview/1.overview/",
     "mannualHref": "https://docs.nebula-graph.io/3.0.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/",
-    "versionLogHref": "https://docs.nebula-graph.io/3.0.0/nebula-studio/about-studio/st-ug-release-note/",
-    "forumLink": "https://discuss.nebula-graph.io/"
+    "startStudioHref": "https://docs.nebula-graph.io/3.0.0/nebula-studio/quick-start/st-ug-plan-schema/"
   }
 }
