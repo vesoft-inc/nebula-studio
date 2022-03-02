@@ -78,7 +78,8 @@
     "comment": "描述",
     "space": "图空间",
     "version": "版本",
-    "statistics": "统计"
+    "statistics": "统计",
+    "download": "下载"
   },
   "warning": {
     "configServer": "请先配置服务器",
@@ -122,7 +123,12 @@
     "exportEdge": "请选择结果中分别代表边的起点（src_vid）、终点（dst_vid）和权重（rank）的列",
     "showSubgraphs": "查看子图",
     "deleteHistory": "清除历史",
-    "parameterDisplay": "自定义参数 展示"
+    "cypherParam": "自定义参数",
+    "favorites": "收藏夹",
+    "addToFavorites": "添加到收藏夹",
+    "unfavorite": "取消收藏",
+    "clearFavorites": "清空收藏夹",
+    "graphviz": "Graphviz"
   },
   "explore": {
     "clear": "清除",

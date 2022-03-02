@@ -24,7 +24,7 @@ const LanguageSelect: React.FC = () => {
           value={INTL_LOCALE_SELECT[locale].NAME}
           label={
             <div className="select-label">
-              <Icon type="icon-login-Language" />
+              <Icon type="icon-studio-nav-language" />
               {INTL_LOCALE_SELECT[locale].TEXT}
             </div>
           }

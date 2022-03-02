@@ -47,6 +47,13 @@ export class SchemaStore {
     });
   }
 
+  resetModel = () => {
+    this.update({
+      currentSpace: '',
+      spaces: [],
+    });
+  }
+
   update = (payload: Record<string, any>) =>
     Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
 

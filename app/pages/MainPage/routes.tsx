@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 
 const Schema = lazy(() => import('@app/pages/Schema'));
+const Console = lazy(() => import('@app/pages/Console'));
 const SpaceCreate = lazy(() => import('@app/pages/Schema/SpaceCreate'));
 const SchemaConfig = lazy(() => import('@app/pages/Schema/SchemaConfig'));
 const Import = lazy(() => import('@app/pages/Import'));
@@ -11,6 +12,11 @@ export const RoutesList = [
   {
     path: '/schema',
     component: Schema,
+    exact: true,
+  },
+  {
+    path: '/console',
+    component: Console,
     exact: true,
   },
   {
@@ -42,7 +48,7 @@ export const MENU_LIST = [
       action: 'view_schema',
       label: 'from_navigation'
     },
-    icon: 'icon-nav-schema',
+    icon: 'icon-studio-nav-schema',
     intlKey: 'common.schema'
   },
   {
@@ -53,7 +59,7 @@ export const MENU_LIST = [
       action: 'view_import',
       label: 'from_navigation'
     },
-    icon: 'icon-btn-download',
+    icon: 'icon-studio-btn-download',
     intlKey: 'common.import'
   },
   {
@@ -64,7 +70,7 @@ export const MENU_LIST = [
       action: 'view_console',
       label: 'from_navigation'
     },
-    icon: 'icon-nav-console',
+    icon: 'icon-studio-nav-console',
     intlKey: 'common.console'
   },
 ];
