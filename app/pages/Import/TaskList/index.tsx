@@ -60,7 +60,7 @@ const TaskList = () => {
           type="primary"
           onClick={() => history.push('/import/create')}
         >
-          <Icon className="studio-add-btn-icon" type="icon-btn-add" />{intl.get('import.createTask')}
+          <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />{intl.get('import.createTask')}
         </Button>
         <Button className="upload-btn" type="default">
           {intl.get('import.uploadTemp')}

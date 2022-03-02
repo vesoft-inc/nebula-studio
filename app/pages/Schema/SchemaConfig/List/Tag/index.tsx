@@ -92,7 +92,7 @@ const TagList = () => {
                 data-track-action="view_tag_edit"
                 data-track-label="from_tag_list"
               >
-                <Icon type="icon-btn-edit" />
+                <Icon type="icon-studio-btn-edit" />
               </Link>
             </Button>
             <Popconfirm
@@ -104,7 +104,7 @@ const TagList = () => {
               cancelText={intl.get('common.cancel')}
             >
               <Button className="warning-btn" onClick={e => e.stopPropagation()}>
-                <Icon type="icon-btn-delete" />
+                <Icon type="icon-studio-btn-delete" />
               </Button>
             </Popconfirm>
           </div>

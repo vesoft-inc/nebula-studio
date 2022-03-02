@@ -26,14 +26,14 @@ const HelpMenu = () => {
         data-track-category="navigation"
         data-track-action="star_nebula"
         data-track-label="from_navigation" rel="noreferrer">
-        <Icon className="nav-icon" type="icon-nav-github" />
+        <Icon className="nav-icon" type="icon-studio-nav-github" />
       </a>
     </Menu.Item>
     <Menu.SubMenu 
       key="language"
       popupClassName="lang-menu"
       popupOffset={[-35, 20]} 
-      title={<Icon className="nav-icon" type="icon-nav-language" />}> 
+      title={<Icon className="nav-icon" type="icon-studio-nav-language" />}> 
       {Object.keys(INTL_LOCALE_SELECT).map(locale => {
         return (
           <Menu.Item key={`language-${locale}`} onClick={() => toggleLanguage(INTL_LOCALE_SELECT[locale].NAME)}>
@@ -44,7 +44,7 @@ const HelpMenu = () => {
     </Menu.SubMenu>
     <Menu.Item key="doc">
       <Link className="nebula-link" to="/doc">
-        <Icon className="nav-icon" type="icon-nav-help" />
+        <Icon className="nav-icon" type="icon-studio-nav-help" />
       </Link>
     </Menu.Item>
     <Menu.SubMenu 
@@ -62,13 +62,13 @@ const HelpMenu = () => {
           href={intl.get('link.versionLogHref')}
           target="_blank" rel="noreferrer"
         >
-          <Icon className="menu-icon" type="icon-nav-version" />
+          <Icon className="menu-icon" type="icon-studio-nav-version" />
           {intl.get('menu.release')}
         </a>
       </Menu.Item>
       <Menu.Item key="user-logout">
         <span className="nebula-link" onClick={logout}>
-          <Icon className="menu-icon" type="icon-nav-clear" />
+          <Icon className="menu-icon" type="icon-studio-nav-clear" />
           {intl.get('configServer.clear')}
         </span>
       </Menu.Item>

@@ -64,7 +64,7 @@ const FileUpload = () => {
           return (
             <div className="operation">
               <CSVPreviewLink file={file} btnType="default">
-                <Icon type="icon-btn-detail" />
+                <Icon type="icon-studio-btn-detail" />
               </CSVPreviewLink>
               <Popconfirm
                 onConfirm={() => asyncDeleteFile(index)}
@@ -73,7 +73,7 @@ const FileUpload = () => {
                 cancelText={intl.get('common.cancel')}
               >
                 <Button className="warning-btn">
-                  <Icon type="icon-btn-delete" />
+                  <Icon type="icon-studio-btn-delete" />
                 </Button>
               </Popconfirm>
             </div>
@@ -97,7 +97,7 @@ const FileUpload = () => {
         beforeUpload={transformFile as any}
       >
         <Button className="studio-add-btn upload-btn" type="primary">
-          <Icon className="studio-add-btn-icon" type="icon-btn-add" />{intl.get('import.uploadFile')}
+          <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />{intl.get('import.uploadFile')}
         </Button>
       </Upload>
       <div className="file-list">

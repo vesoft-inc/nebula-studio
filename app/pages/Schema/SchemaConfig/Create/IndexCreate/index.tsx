@@ -187,7 +187,7 @@ const IndexCreate = () => {
               type="primary" 
               className="studio-add-btn btn-field-add" 
               onClick={() => setVisible(true)}>
-              <Icon className="studio-add-btn-icon" type="icon-btn-add" />
+              <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />
               {intl.get('common.addProperty')}
             </Button>
           </Form.Item>

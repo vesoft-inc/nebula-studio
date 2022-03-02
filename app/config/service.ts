@@ -2,6 +2,8 @@ import { _delete, get, post, put } from '../utils/http';
 
 const execNGQL = post('/api-nebula/db/exec');
 
+const batchExecNGQL = post('/api-nebula/db/batchExec');
+
 const connectDB = post('/api-nebula/db/connect');
 
 const disconnectDB = post('/api-nebula/db/disconnect');
@@ -31,6 +33,7 @@ const uploadFiles = (params?, config?) =>
   });
 export default {
   execNGQL,
+  batchExecNGQL,
   connectDB,
   disconnectDB,
   importData,

@@ -74,7 +74,7 @@ const SchemaConfig = (props: IProps) => {
           {type === 'edge' && <EdgeConfig configIndex={configIndex} edge={data} />}
           {type === 'vertices' && <div className="btns">
             <Button className="primary-btn studio-add-btn" onClick={() => addTag(configIndex)}>
-              <Icon className="studio-add-btn-icon" type="icon-btn-add" />
+              <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />
               {intl.get('import.addTag')}
             </Button>
           </div>}

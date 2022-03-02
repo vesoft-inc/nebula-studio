@@ -4,7 +4,7 @@
   .space-select {
     color: @darkGray;
     font-size: 14px;
-    font-family: Roboto;
+    font-family: Roboto-Regular, sans-serif;
     .label::after {
       content: ': '
     }
@@ -14,6 +14,9 @@
         background: @lightBlue;
         border-radius: 3px;
         border: none;
+      }
+      .ant-select-selection-item {
+        color: @darkBlue;
       }
       .ant-select-arrow {
         color: @darkBlue;

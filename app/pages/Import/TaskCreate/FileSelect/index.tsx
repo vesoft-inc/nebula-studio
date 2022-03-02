@@ -71,7 +71,7 @@ const FileSelect = (props: IProps) => {
       title={intl.get('import.selectFile')}
     >
       <Button type="primary" className="studio-add-btn-icon btn-bind-source" onClick={() => setVisible(true)}>
-        <Icon className="studio-add-btn-icon" type="icon-btn-add" />
+        <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />
         {intl.get('import.bindDatasource')}
       </Button>
     </Popover>

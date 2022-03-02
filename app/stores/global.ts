@@ -5,7 +5,7 @@ import intl from 'react-intl-universal';
 import service from '@app/config/service';
 import { BrowserHistory } from 'history';
 import { NebulaVersion } from './types';
-import { getRootStore } from '.';
+import { getRootStore, resetStore } from '.';
 
 export class GlobalStore {
   history: BrowserHistory;
@@ -21,9 +21,16 @@ export class GlobalStore {
     });
   }
 
-
   get rootStore() {
     return getRootStore();
+  }
+
+  resetModel = () => {
+    this.update({
+      username: '',
+      host: '',
+      paramsMap: null
+    });
   }
 
   logout = async() => {
@@ -36,11 +43,7 @@ export class GlobalStore {
         },
       },
     );
-    this.update({
-      host: '',
-      username: '',
-      currentSpace: '',
-    });
+    resetStore();
     cookies.remove('nh');
     cookies.remove('nu');
   };

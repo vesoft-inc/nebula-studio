@@ -22,7 +22,7 @@ const itemRender = (route, _params, routes, _paths) => {
     <Link to={route.path}>
       {first ? (
         <>
-          <Icon className="arrow-icon" type="icon-btn-return" />
+          <Icon className="arrow-icon" type="icon-studio-btn-return" />
           {route.breadcrumbName}
         </>
       ) : (
