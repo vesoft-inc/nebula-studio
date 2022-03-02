@@ -17,6 +17,7 @@ const HelpMenu = () => {
     className="help-menu"
     mode="horizontal"
     theme="dark"
+    selectedKeys={[]}
   >
     <Menu.Item key="star">
       <a
