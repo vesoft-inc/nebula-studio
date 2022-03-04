@@ -3,6 +3,7 @@ import { message } from 'antd';
 import intl from 'react-intl-universal';
 
 import service from '#app/config/service';
+import { handleKeyword } from '#app/utils/function';
 import { configToJson, getGQLByConfig } from '#app/utils/import';
 
 interface ITag {
@@ -406,11 +407,11 @@ export const importData = createModel({
         nebula: { spaceVidType },
       } = rootState;
       const { code, data } = (await service.execNGQL({
-        gql: 'DESCRIBE EDGE' + '`' + edgeType + '`;',
+        gql: `DESCRIBE EDGE ${handleKeyword(edgeType)}`,
       })) as any;
       const createTag = (await service.execNGQL({
         // HACK: Process the default value fields
-        gql: 'show create EDGE' + ' `' + edgeType + '`;',
+        gql: `show create EDGE ${handleKeyword(edgeType)}`,
       })) as any;
       const defaultValueFields: any[] = [];
       if (!!createTag) {
@@ -469,11 +470,11 @@ export const importData = createModel({
       const { tag, tagIndex } = payload;
       const { code, data } = (await service.execNGQL({
         // HACK: Processing keyword
-        gql: 'DESCRIBE TAG' + ' `' + tag + '`;',
+        gql: `DESCRIBE TAG ${handleKeyword(tag)}`,
       })) as any;
       const createTag = (await service.execNGQL({
         // HACK: Process the default value fields
-        gql: 'show create tag' + ' `' + tag + '`;',
+        gql: `show create tag ${handleKeyword(tag)}`,
       })) as any;
       const defaultValueFields: any[] = [];
       if (!!createTag) {

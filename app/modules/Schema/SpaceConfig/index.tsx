@@ -38,7 +38,6 @@ interface IProps
     ReturnType<typeof mapDispatch>,
     RouteComponentProps {
   match: match<{
-    space: string;
     type: string;
     action: string;
   }>;
@@ -55,22 +54,13 @@ class SpaceConfig extends React.Component<IProps, IState> {
     };
   }
 
-  componentDidMount() {
-    if (!this.props.currentSpace) {
-      const {
-        params: { space },
-      } = this.props.match;
-      this.props.asyncSwitchSpace(space);
-    }
-  }
-
   asyncUpdateEditStatus = (val: boolean) => {
     this.setState({ isEditing: val });
   };
 
   handleChangeTab = (key: string) => {
     const {
-      params: { space, action },
+      params: { action },
     } = this.props.match;
     const { history } = this.props;
     if (action === 'create' || (action === 'edit' && this.state.isEditing)) {
@@ -80,22 +70,18 @@ class SpaceConfig extends React.Component<IProps, IState> {
         okText: intl.get('common.confirm'),
         cancelText: intl.get('common.cancel'),
         onOk() {
-          history.push(`/space/${space}/${key}/list`);
+          history.push(`/space/${key}/list`);
           trackEvent('navigation', `view_${key}_list`, 'from_navigation');
         },
       });
     } else {
-      history.push(`/space/${space}/${key}/list`);
+      history.push(`/space/${key}/list`);
       trackEvent('navigation', `view_${key}_list`, 'from_navigation');
     }
   };
 
   handleChangeSpace = async value => {
     await this.props.asyncSwitchSpace(value);
-    const {
-      params: { type, action },
-    } = this.props.match;
-    this.props.history.replace(`/space/${value}/${type}/${action}`);
   };
 
   goBack = () => {
@@ -162,17 +148,17 @@ class SpaceConfig extends React.Component<IProps, IState> {
           </Tabs>
           <div className="space-content">
             <PrivateRoute
-              path={`/space/:space/tag/list`}
+              path={`/space/tag/list`}
               exact={true}
               component={TagList}
             />
             <PrivateRoute
-              path={`/space/:space/tag/create`}
+              path={`/space/tag/create`}
               exact={true}
               component={CreateTag}
             />
             <PrivateRoute
-              path={`/space/:space/tag/edit/:tag?`}
+              path={`/space/tag/edit`}
               exact={true}
               render={props => (
                 <EditTag
@@ -182,17 +168,17 @@ class SpaceConfig extends React.Component<IProps, IState> {
               )}
             />
             <PrivateRoute
-              path="/space/:space/edge/list"
+              path="/space/edge/list"
               exact={true}
               component={EdgeList}
             />
             <PrivateRoute
-              path={`/space/:space/edge/create`}
+              path={`/space/edge/create`}
               exact={true}
               component={CreateEdge}
             />
             <PrivateRoute
-              path={`/space/:space/edge/edit/:edge?`}
+              path={`/space/edge/edit`}
               exact={true}
               render={props => (
                 <EditEdge
@@ -202,12 +188,12 @@ class SpaceConfig extends React.Component<IProps, IState> {
               )}
             />
             <PrivateRoute
-              path="/space/:space/index/list"
+              path="/space/index/list"
               exact={true}
               component={IndexList}
             />
             <PrivateRoute
-              path={`/space/:space/index/create`}
+              path={`/space/index/create`}
               exact={true}
               component={CreateIndex}
             />

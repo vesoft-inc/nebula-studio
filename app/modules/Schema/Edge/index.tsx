@@ -2,7 +2,7 @@ import { Breadcrumb, Button, Icon, message, Popconfirm, Table } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
-import { Link, match, RouteComponentProps, withRouter } from 'react-router-dom';
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { IDispatch, IRootState } from '#app/store';
 import { sortByFieldAndFilter } from '#app/utils/function';
@@ -14,6 +14,7 @@ import './index.less';
 const mapState = (state: IRootState) => ({
   loading: state.loading.effects.nebula.asyncGetEdgeList,
   edgeList: state.nebula.edgeList,
+  currentSpace: state.nebula.currentSpace,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -24,9 +25,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
 interface IProps
   extends ReturnType<typeof mapState>,
     ReturnType<typeof mapDispatch>,
-    RouteComponentProps {
-  match: match<{ space: string }>;
-}
+    RouteComponentProps {}
 
 interface IEdgeInfo {
   name: string;
@@ -85,7 +84,10 @@ class EdgeList extends React.Component<IProps, IState> {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.match.params.space !== this.props.match.params.space) {
+    if (
+      prevProps.currentSpace &&
+      prevProps.currentSpace !== this.props.currentSpace
+    ) {
       this.props.asyncGetEdgeList();
     }
   }
@@ -116,10 +118,6 @@ class EdgeList extends React.Component<IProps, IState> {
 
   renderEdgeList = () => {
     const { loading, edgeList } = this.props;
-    const { match } = this.props;
-    const {
-      params: { space },
-    } = match;
     const { expandedRowKeys, searchVal } = this.state;
     const data = sortByFieldAndFilter({
       field: 'name',
@@ -143,7 +141,10 @@ class EdgeList extends React.Component<IProps, IState> {
                 <div>
                   <Button shape="circle">
                     <Link
-                      to={`/space/${space}/edge/edit/${edge.name}`}
+                      to={{
+                        pathname: '/space/edge/edit',
+                        state: { edge: edge.name },
+                      }}
                       data-track-category="navigation"
                       data-track-action="view_edge_edit"
                       data-track-label="from_edge_list"
@@ -195,10 +196,6 @@ class EdgeList extends React.Component<IProps, IState> {
   };
 
   render() {
-    const { match } = this.props;
-    const {
-      params: { space },
-    } = match;
     return (
       <div className="nebula-edge">
         <header>
@@ -210,7 +207,7 @@ class EdgeList extends React.Component<IProps, IState> {
         <div className="btns">
           <Button type="primary">
             <Link
-              to={`/space/${space}/edge/create`}
+              to={`/space/edge/create`}
               data-track-category="navigation"
               data-track-action="view_edge_create"
               data-track-label="from_edge_list"

@@ -171,7 +171,8 @@ export const downloadCSVFiles = ({ headers, tables, title }) => {
       // Non-Internet Explorer
       // Use the download property of the A tag to implement the download function
       const link = document.createElement('a');
-      link.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(result);
+      link.href =
+        'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(result);
       link.download = `${title}.csv`;
       document.body.appendChild(link);
       link.click();

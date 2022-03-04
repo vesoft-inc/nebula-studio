@@ -1,4 +1,8 @@
-import { handleKeyword, handleVidStringName } from '#app/utils/function';
+import {
+  handleEscape,
+  handleKeyword,
+  handleVidStringName,
+} from '#app/utils/function';
 interface IField {
   name: string;
   type: string;
@@ -73,7 +77,7 @@ export const getExploreGQLWithIndex = (params: {
   quantityLimit: number | null;
 }) => {
   const { tag, filters, quantityLimit } = params;
-  const tagName = '`' + tag + '`';
+  const tagName = handleKeyword(tag);
   const wheres = filters
     .filter(
       filter =>
@@ -174,7 +178,7 @@ export const getTagOrEdgeCreateGQL = (params: {
     : '';
   const ttlStr = ttlConfig
     ? `TTL_DURATION = ${ttlConfig.ttl_duration ||
-        ''}, TTL_COL = "${ttlConfig.ttl_col || ''}"`
+        ''}, TTL_COL = "${handleEscape(ttlConfig.ttl_col) || ''}"`
     : '';
   const gql = `CREATE ${type} ${handleKeyword(name)} ${
     fieldsStr.length > 0 ? `(${fieldsStr})` : '()'
@@ -194,10 +198,12 @@ export const getAlterGQL = (params: {
   const { type, name, action, config } = params;
   if (action === 'TTL' && config.ttl) {
     const { ttl } = config;
-    content = `TTL_DURATION = ${ttl.duration || 0}, TTL_COL = "${ttl.col}"`;
-  } else if (action === 'COMMENT' && config.comment) {
+    content = `TTL_DURATION = ${ttl.duration || 0}, TTL_COL = "${
+      ttl.col ? handleEscape(ttl.col) : ''
+    }"`;
+  } else if (action === 'COMMENT') {
     content = `COMMENT="${config.comment}"`;
-  } else if (action !== 'TTL' && action !== 'COMMENT' && config.fields) {
+  } else if (config.fields) {
     const date = config.fields
       .map(item => {
         const { name, type, value, fixedLength, allowNull, comment } = item;
@@ -250,7 +256,7 @@ export const getIndexCreateGQL = (params: {
     ? `on ${handleKeyword(associate)}(${fields.join(', ')})`
     : '';
   const gql = `CREATE ${type} INDEX ${handleKeyword(name)} ${combine} ${
-    comment ? `COMMENT = "${comment}"` : ''
+    comment ? `COMMENT "${comment}"` : ''
   }`;
   return gql;
 };

@@ -17,7 +17,7 @@ import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
-import { match, RouteComponentProps, withRouter } from 'react-router-dom';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import GQLCodeMirror from '#app/components/GQLCodeMirror';
 import { nameRulesFn, numberRulesFn } from '#app/config/rules';
@@ -36,6 +36,7 @@ let id = 1;
 
 const mapState = (state: IRootState) => ({
   loading: state.loading.effects.nebula.asyncCreateTag,
+  currentSpace: state.nebula.currentSpace,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -46,9 +47,7 @@ interface IProps
   extends ReturnType<typeof mapState>,
     ReturnType<typeof mapDispatch>,
     FormComponentProps,
-    RouteComponentProps {
-  match: match<{ space: string }>;
-}
+    RouteComponentProps {}
 
 interface IState {
   fieldRequired: boolean;
@@ -327,10 +326,6 @@ class CreateTag extends React.Component<IProps, IState> {
 
   handleCreate = () => {
     const { getFieldsValue } = this.props.form;
-    const { match } = this.props;
-    const {
-      params: { space },
-    } = match;
     this.props.form.validateFields(err => {
       const form = getFieldsValue();
       if (!err) {
@@ -349,7 +344,10 @@ class CreateTag extends React.Component<IProps, IState> {
             .then(res => {
               if (res.code === 0) {
                 message.success(intl.get('schema.createSuccess'));
-                this.props.history.push(`/space/${space}/tag/edit/${name}`);
+                this.props.history.push({
+                  pathname: '/space/tag/edit',
+                  state: { tag: name },
+                });
               } else {
                 message.warning(res.message);
               }
@@ -361,17 +359,14 @@ class CreateTag extends React.Component<IProps, IState> {
 
   goBack = e => {
     e.preventDefault();
-    const { match, history } = this.props;
-    const {
-      params: { space },
-    } = match;
+    const { history } = this.props;
     confirm({
       title: intl.get('schema.leavePage'),
       content: intl.get('schema.leavePagePrompt'),
       okText: intl.get('common.confirm'),
       cancelText: intl.get('common.cancel'),
       onOk() {
-        history.push(`/space/${space}/tag/list`);
+        history.push(`/space/tag/list`);
         trackEvent('navigation', 'view_tag_list', 'from_tag_create');
       },
     });

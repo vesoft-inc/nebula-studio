@@ -18,14 +18,13 @@ import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
-import { match, RouteComponentProps, withRouter } from 'react-router-dom';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import GQLCodeMirror from '#app/components/GQLCodeMirror';
 import { IDispatch, IRootState } from '#app/store';
 import {
   DATA_TYPE,
   EXPLAIN_DATA_TYPE,
-  NAME_REGEX,
   POSITIVE_INTEGER_REGEX,
 } from '#app/utils/constant';
 import { convertBigNumberToString } from '#app/utils/function';
@@ -41,6 +40,7 @@ const confirm = Modal.confirm;
 const mapState = (state: IRootState) => ({
   loading: state.loading.effects.nebula.asyncGetEdgeDetail,
   editLoading: state.loading.effects.nebula.asyncAlterField,
+  currentSpace: state.nebula.currentSpace,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -54,10 +54,6 @@ interface IProps
   extends ReturnType<typeof mapState>,
     ReturnType<typeof mapDispatch>,
     RouteComponentProps {
-  match: match<{
-    space: string;
-    edge: string;
-  }>;
   asyncUpdateEditStatus: (status: boolean) => void;
 }
 
@@ -88,6 +84,7 @@ interface IState extends IRequired {
   editTtlConfig: ITtl | null;
   comment: string;
   temporaryComment: string;
+  edge: string;
 }
 
 type AlterType = 'ADD' | 'DROP' | 'CHANGE' | 'TTL';
@@ -120,6 +117,7 @@ class EditEdge extends React.Component<IProps, IState> {
       editTtlConfig: null,
       comment: '',
       temporaryComment: '',
+      edge: '',
     };
   }
 
@@ -128,11 +126,26 @@ class EditEdge extends React.Component<IProps, IState> {
     this.getDetails();
   }
 
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.currentSpace &&
+      prevProps.currentSpace !== this.props.currentSpace
+    ) {
+      this.props.history.push('/space/edge/list');
+    }
+  }
+
   getDetails = async () => {
-    const { match } = this.props;
     const {
-      params: { edge },
-    } = match;
+      location: { state },
+      history,
+    } = this.props;
+    if (!(state as any).edge) {
+      history.push('/space/edge/list');
+      return;
+    }
+    const edge = (state as any).edge;
+    this.setState({ edge });
     const { code, data } = await this.props.asyncGetEdgeDetail(edge);
     const {
       code: propCode,
@@ -146,7 +159,7 @@ class EditEdge extends React.Component<IProps, IState> {
   };
 
   handleData = (data: string, fieldInfo: IEdgeFeild[]) => {
-    const reg = /CREATE EDGE\s`\w+`\s\((.*)\)\s+(ttl_duration = \d+),\s+(ttl_col = "\w*")(, comment = ".*")?/gm;
+    const reg = /CREATE EDGE\s`.+`\s\((.*)\)\s+(ttl_duration = \d+),\s+(ttl_col = ".*?")(, comment = ".*")?$/gm;
     const str = data.replace(/[\r\n]/g, ' ');
     const infoList = reg.exec(str) || [];
     const fieldList: IField[] = fieldInfo.map(i => ({
@@ -204,10 +217,7 @@ class EditEdge extends React.Component<IProps, IState> {
   };
 
   handleDeleteField = async (fields: IField[]) => {
-    const { match } = this.props;
-    const {
-      params: { edge },
-    } = match;
+    const { edge } = this.state;
     const res = await this.props.asyncAlterField({
       type: 'EDGE',
       name: edge,
@@ -296,18 +306,11 @@ class EditEdge extends React.Component<IProps, IState> {
   };
 
   handleUpdateField = async () => {
-    const { match } = this.props;
-    const {
-      params: { edge },
-    } = match;
-    const { editField } = this.state;
+    const { editField, edge } = this.state;
     if (editField) {
       const { name, type, alterType, fixedLength } = editField;
       if (name === '' || type === '') {
         return message.warning(intl.get('schema.fieldRequired'));
-      }
-      if (name !== '' && !NAME_REGEX.test(name)) {
-        return message.warning(intl.get('formRules.nameValidate'));
       }
       if (
         type === 'fixed_string' &&
@@ -338,11 +341,7 @@ class EditEdge extends React.Component<IProps, IState> {
   };
 
   handleUpdateTtl = async () => {
-    const { match } = this.props;
-    const {
-      params: { edge },
-    } = match;
-    const { editTtlConfig } = this.state;
+    const { editTtlConfig, edge } = this.state;
     if (editTtlConfig) {
       const { col, duration } = editTtlConfig;
       if (col === '' || duration === '') {
@@ -375,10 +374,7 @@ class EditEdge extends React.Component<IProps, IState> {
   };
 
   handleTogglePanels = async (e: string | string[], type: string) => {
-    const { match } = this.props;
-    const {
-      params: { edge },
-    } = match;
+    const { edge } = this.state;
     if (e.length > 0) {
       if (type === 'field') {
         this.handleAddField();
@@ -423,10 +419,7 @@ class EditEdge extends React.Component<IProps, IState> {
   };
 
   handleDeleteTtl = async () => {
-    const { match } = this.props;
-    const {
-      params: { edge },
-    } = match;
+    const { edge } = this.state;
     const res = await this.props.asyncAlterField({
       type: 'EDGE',
       name: edge,
@@ -463,7 +456,7 @@ class EditEdge extends React.Component<IProps, IState> {
               />
             );
           } else {
-            return <span>{record}</span>;
+            return <span>{record.toString()}</span>;
           }
         },
       },
@@ -737,12 +730,9 @@ class EditEdge extends React.Component<IProps, IState> {
       editTtlConfig,
       editComment,
       temporaryComment,
+      edge,
     } = this.state;
     if (editField || editTtlConfig || editComment) {
-      const { match } = this.props;
-      const {
-        params: { edge },
-      } = match;
       let action;
       let config = {};
       if (editField) {
@@ -775,11 +765,8 @@ class EditEdge extends React.Component<IProps, IState> {
 
   goBack = e => {
     e.preventDefault();
-    const { match, history } = this.props;
+    const { history } = this.props;
     const { editRow, editTtl } = this.state;
-    const {
-      params: { space },
-    } = match;
     if (editRow !== null || editTtl) {
       confirm({
         title: intl.get('schema.leavePage'),
@@ -787,12 +774,12 @@ class EditEdge extends React.Component<IProps, IState> {
         okText: intl.get('common.confirm'),
         cancelText: intl.get('common.cancel'),
         onOk() {
-          history.push(`/space/${space}/edge/list`);
+          history.push(`/space/edge/list`);
           trackEvent('navigation', 'view_edge_list', 'from_edge_edit');
         },
       });
     } else {
-      history.push(`/space/${space}/edge/list`);
+      history.push(`/space/edge/list`);
       trackEvent('navigation', 'view_edge_list', 'from_edge_edit');
     }
   };
@@ -806,11 +793,7 @@ class EditEdge extends React.Component<IProps, IState> {
   };
 
   handleCommentUpdate = async () => {
-    const { match } = this.props;
-    const {
-      params: { edge },
-    } = match;
-    const { temporaryComment } = this.state;
+    const { temporaryComment, edge } = this.state;
     const res = await this.props.asyncAlterField({
       type: 'EDGE',
       name: edge,
@@ -847,11 +830,14 @@ class EditEdge extends React.Component<IProps, IState> {
   };
 
   render() {
-    const { match, editLoading } = this.props;
-    const { fieldRequired, ttlRequired, comment, editComment } = this.state;
+    const { editLoading } = this.props;
     const {
-      params: { edge },
-    } = match;
+      fieldRequired,
+      ttlRequired,
+      comment,
+      editComment,
+      edge,
+    } = this.state;
     const outItemLayout = {
       labelCol: {
         span: 2,
