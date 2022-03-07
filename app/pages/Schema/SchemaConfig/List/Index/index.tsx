@@ -39,8 +39,8 @@ function renderIndexInfo(index: IIndexList) {
 }
 
 const IndexList = () => {
-  const { space, module } = useParams() as {space :string, module: string};
-  const { schema: { indexList, deleteIndex, getIndexList, rebuildIndex, getRebuildIndexes } } = useStore();
+  const { module } = useParams() as { module: string };
+  const { schema: { indexList, deleteIndex, getIndexList, rebuildIndex, getRebuildIndexes, currentSpace } } = useStore();
   const [searchVal, setSearchVal] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
@@ -142,7 +142,7 @@ const IndexList = () => {
     rebuildTimer.current && clearTimeout(rebuildTimer.current);
     setIndexType(e.target.value);
     setRebuildList([]);
-    history.replace(`/schema/${space}/index/list/${e.target.value}`);
+    history.replace(`/schema/index/list/${e.target.value}`);
   };
   useEffect(() => {
     rebuildTimer.current && clearTimeout(rebuildTimer.current);
@@ -151,7 +151,7 @@ const IndexList = () => {
     return () => {
       rebuildTimer.current && clearTimeout(rebuildTimer.current);
     };
-  }, [module, space]);
+  }, [module, currentSpace]);
   useEffect(() => {
     setData(sortByFieldAndFilter({
       field: 'name',

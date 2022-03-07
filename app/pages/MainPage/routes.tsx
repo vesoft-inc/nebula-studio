@@ -26,7 +26,7 @@ export const RoutesList = [
     exact: true,
   },
   {
-    path: '/schema/:space/:type?/:action?/:module?',
+    path: '/schema/:type?/:action?/:module?',
     component: SchemaConfig,
   },
   {

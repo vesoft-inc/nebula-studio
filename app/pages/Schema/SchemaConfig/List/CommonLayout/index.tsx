@@ -1,7 +1,7 @@
 import { Button, Table } from 'antd';
 import React, { useState } from 'react';
 import intl from 'react-intl-universal';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import Search from '../Search';
 import Icon from '@app/components/Icon';
@@ -18,7 +18,6 @@ interface IProps {
 }
 const CommonLayout = (props: IProps) => {
   const { onSearch, data, columns, loading, renderExpandInfo, children, type } = props;
-  const { space } = useParams() as { space :string, module?: string };
   const [expandKeys, setExpandKeys] = useState<any[]>([]);
   const handleRowClick = row => {
     const { name: key } = row;
@@ -30,7 +29,7 @@ const CommonLayout = (props: IProps) => {
       <div className="header">
         <Button type="primary" className="studio-add-btn">
           <Link
-            to={`/schema/${space}/${type}/create`}
+            to={`/schema/${type}/create`}
             data-track-category="navigation"
             data-track-action={`view_${type}_create`}
             data-track-label={`from_${type}_list`}

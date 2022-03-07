@@ -4,6 +4,7 @@ import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { IField } from '@app/interfaces/schema';
 import { POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
+import { handleKeyword } from '@app/utils/function';
 import Instruction from '@app/components/Instruction';
 const Option = Select.Option;
 
@@ -29,8 +30,8 @@ const FieldSelectModal = (props: IProps) => {
     }
     const newField =
       selectedField?.Type === 'string'
-        ? selectedField.Field + `(${indexLength})`
-        : selectedField!.Field;
+        ? handleKeyword(selectedField.Field) + `(${indexLength})`
+        : handleKeyword(selectedField!.Field);
     onAddField(newField);
     handleClose();
   };

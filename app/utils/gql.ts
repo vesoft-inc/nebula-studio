@@ -1,4 +1,4 @@
-import { handleKeyword, handleVidStringName } from '@app/utils/function';
+import { handleEscape, handleKeyword, handleVidStringName } from '@app/utils/function';
 import { IAlterForm, IProperty, ISchemaType, IndexType } from '@app/interfaces/schema';
 
 export const getExploreMatchGQL = (params: {
@@ -55,7 +55,7 @@ export const getExploreGQLWithIndex = (params: {
   quantityLimit: number | null;
 }) => {
   const { tag, filters, quantityLimit } = params;
-  const tagName = '`' + tag + '`';
+  const tagName = handleKeyword(tag);
   const wheres = filters
     .filter(
       filter =>
@@ -154,7 +154,7 @@ export const getTagOrEdgeCreateGQL = (params: {
     : '';
   const ttlStr = ttl_col
     ? `TTL_DURATION = ${ttl_duration ||
-        ''}, TTL_COL = "${ttl_col || ''}"`
+        ''}, TTL_COL = "${handleEscape(ttl_col)}"`
     : '';
   const gql = `CREATE ${type} ${handleKeyword(name)} ${
     propertiesStr.length > 0 ? `(${propertiesStr})` : '()'
@@ -169,10 +169,12 @@ export const getAlterGQL = (params: IAlterForm) => {
   const { type, name, action, config } = params;
   if (action === 'TTL' && config.ttl) {
     const { ttl } = config;
-    content = `TTL_DURATION = ${ttl.duration || 0}, TTL_COL = "${ttl.col}"`;
-  } else if (action === 'COMMENT' && config.comment) {
+    content = `TTL_DURATION = ${ttl.duration || 0}, TTL_COL = "${
+      ttl.col ? handleEscape(ttl.col) : ''
+    }"`;
+  } else if (action === 'COMMENT') {
     content = `COMMENT="${config.comment}"`;
-  } else if (action !== 'TTL' && action !== 'COMMENT' && config.fields) {
+  } else if (config.fields) {
     const date = config.fields
       .map(item => {
         const { name, type, value, fixedLength, allowNull, comment } = item;
@@ -225,7 +227,7 @@ export const getIndexCreateGQL = (params: {
     ? `on ${handleKeyword(associate)}(${fields?.join(', ')})`
     : '';
   const gql = `CREATE ${type.toUpperCase()} INDEX ${handleKeyword(name)} ${combine} ${
-    comment ? `COMMENT = "${comment}"` : ''
+    comment ? `COMMENT "${comment}"` : ''
   }`;
   return gql;
 };

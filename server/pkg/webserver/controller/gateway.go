@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/base64"
 	"fmt"
 	"strings"
 
@@ -30,10 +31,8 @@ type gqlData struct {
 	data    map[string]interface{}
 }
 type connectDBParams struct {
-	Address  string `json:"address"`
-	Port     int    `json:"port"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Address string `json:"address"`
+	Port    int    `json:"port"`
 }
 
 type disConnectDBParams struct {
@@ -124,8 +123,27 @@ func ExecNGQL(ctx iris.Context) base.Result {
 }
 
 func ConnectDB(ctx iris.Context) base.Result {
+	token := ctx.GetHeader("Authorization")
+	tokenSlice := strings.Split(token, " ")
+	if len(tokenSlice) != 2 {
+		return base.Response{
+			Code:    base.AuthorizationError,
+			Message: "Not get token",
+		}
+	}
+
+	decode, err := base64.StdEncoding.DecodeString(tokenSlice[1])
+	if err != nil {
+		return base.Response{
+			Code:    base.AuthorizationError,
+			Message: err.Error(),
+		}
+	}
+	account := strings.Split(string(decode), ":")
+	username, password := account[0], account[1]
+
 	params := new(connectDBParams)
-	err := ctx.ReadJSON(params)
+	err = ctx.ReadJSON(params)
 	if err != nil {
 		zap.L().Warn("connectDBParams get fail", zap.Error(err))
 		return base.Response{
@@ -133,7 +151,7 @@ func ConnectDB(ctx iris.Context) base.Result {
 			Message: err.Error(),
 		}
 	}
-	clientInfo, err := dao.Connect(params.Address, params.Port, params.Username, params.Password)
+	clientInfo, err := dao.Connect(params.Address, params.Port, username, password)
 	if err != nil {
 		return nil
 	}

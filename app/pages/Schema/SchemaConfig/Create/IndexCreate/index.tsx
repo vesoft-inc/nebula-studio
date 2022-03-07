@@ -3,14 +3,14 @@ import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { nameRulesFn } from '@app/config/rules';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import GQLCodeMirror from '@app/components/GQLCodeMirror';
 import { getIndexCreateGQL } from '@app/utils/gql';
 import { useStore } from '@app/stores';
 import { IField, IndexType } from '@app/interfaces/schema';
 import Icon from '@app/components/Icon';
 import { trackPageView } from '@app/utils/stat';
-
+import { handleKeyword } from '@app/utils/function';
 import FieldSelectModal from './FieldSelectModal';
 import DraggableTags from './DraggableTags';
 const Option = Select.Option;
@@ -29,7 +29,6 @@ const formItemLayout = {
 
 const IndexCreate = () => {
   const history = useHistory();
-  const { space } = useParams() as {space :string };
   const [loading, setLoading] = useState(false);
   const { schema: { createIndex, getTags, getEdges, getTagOrEdgeInfo } } = useStore();
   const [gql, setGql] = useState('');
@@ -61,7 +60,7 @@ const IndexCreate = () => {
     setLoading(false);
     if (res.code === 0) {
       message.success(intl.get('schema.createSuccess'));
-      history.push(`/schema/${space}/index/list/${type}`);
+      history.push(`/schema/index/list/${type}`);
     }
   };
 
@@ -195,7 +194,7 @@ const IndexCreate = () => {
             {({ getFieldValue }) => {
               const fields = getFieldValue('fields') || [];
               const filterList = fieldList.filter(
-                item => !fields.some(field => field.startsWith(item.Field)),
+                item => !fields.some(field => field.startsWith(handleKeyword(item.Field))),
               );
               return <>
                 <DraggableTags
@@ -220,7 +219,7 @@ const IndexCreate = () => {
         </Form.Item>
         <Form.Item noStyle={true}>
           <div className="studio-form-footer">
-            <Button onClick={() => history.push(`/schema/${space}/index/list`)}>{intl.get('common.cancel')}</Button>
+            <Button onClick={() => history.push(`/schema/index/list`)}>{intl.get('common.cancel')}</Button>
             <Button type="primary" loading={loading} htmlType="submit">{intl.get('common.create')}</Button>
           </div>
         </Form.Item>

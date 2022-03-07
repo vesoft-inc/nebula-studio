@@ -1,6 +1,7 @@
 import { action, makeObservable, observable } from 'mobx';
 import cookies from 'js-cookie';
 import { message } from 'antd';
+import { Base64 } from 'js-base64';
 import intl from 'react-intl-universal';
 import service from '@app/config/service';
 import { BrowserHistory } from 'history';
@@ -59,13 +60,14 @@ export class GlobalStore {
       {
         address,
         port: +port,
-        username,
-        password,
       },
       {
         trackEventConfig: {
           category: 'user',
           action: 'sign_in',
+        },
+        headers: {
+          Authorization: `Bearer ${Base64.encode(`${username}:${password}`)}`,
         },
       },
     )) as any;

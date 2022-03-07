@@ -67,7 +67,7 @@ export class SchemaStore {
   switchSpace = async(space: string) => {
     const { code, message } = (await service.execNGQL({
       // HACK: Processing keyword
-      gql: 'use' + '`' + space + '`;',
+      gql: `use ${handleKeyword(space)};`,
     })) as any;
 
     if (code === 0) {
@@ -374,7 +374,7 @@ export class SchemaStore {
   }
 
   getTagOrEdgeInfo = async(type: ISchemaType, name: string) => {
-    const gql = `desc ${type} ` + '`' + name + '`;';
+    const gql = `desc ${type}  ${handleKeyword(name)}`;
     const { code, data } = (await service.execNGQL({
       gql,
     })) as any;
