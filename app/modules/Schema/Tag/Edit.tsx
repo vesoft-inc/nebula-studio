@@ -18,14 +18,13 @@ import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
-import { match, RouteComponentProps, withRouter } from 'react-router-dom';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import GQLCodeMirror from '#app/components/GQLCodeMirror';
 import { IDispatch, IRootState } from '#app/store';
 import {
   DATA_TYPE,
   EXPLAIN_DATA_TYPE,
-  NAME_REGEX,
   POSITIVE_INTEGER_REGEX,
 } from '#app/utils/constant';
 import { convertBigNumberToString } from '#app/utils/function';
@@ -41,6 +40,7 @@ const confirm = Modal.confirm;
 const mapState = (state: IRootState) => ({
   loading: state.loading.effects.nebula.asyncGetTagDetail,
   editLoading: state.loading.effects.nebula.asyncAlterField,
+  currentSpace: state.nebula.currentSpace,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -54,10 +54,6 @@ interface IProps
   extends ReturnType<typeof mapState>,
     ReturnType<typeof mapDispatch>,
     RouteComponentProps {
-  match: match<{
-    space: string;
-    tag: string;
-  }>;
   asyncUpdateEditStatus: (status: boolean) => void;
 }
 
@@ -88,6 +84,7 @@ interface IState extends IRequired {
   editTtlConfig: ITtl | null;
   comment: string;
   temporaryComment: string;
+  tag: string;
 }
 
 type AlterType = 'ADD' | 'DROP' | 'CHANGE' | 'TTL';
@@ -120,7 +117,17 @@ class EditTag extends React.Component<IProps, IState> {
       editTtlConfig: null,
       comment: '',
       temporaryComment: '',
+      tag: '',
     };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.currentSpace &&
+      prevProps.currentSpace !== this.props.currentSpace
+    ) {
+      this.props.history.push('/space/tag/list');
+    }
   }
 
   componentDidMount() {
@@ -129,10 +136,16 @@ class EditTag extends React.Component<IProps, IState> {
   }
 
   getDetails = async () => {
-    const { match } = this.props;
     const {
-      params: { tag },
-    } = match;
+      location: { state },
+      history,
+    } = this.props;
+    if (!(state as any).tag) {
+      history.push('/space/tag/list');
+      return;
+    }
+    const tag = (state as any).tag;
+    this.setState({ tag });
     const { code, data } = await this.props.asyncGetTagDetail(tag);
     const { code: propCode, data: propData } = await this.props.asyncGetTagInfo(
       tag,
@@ -145,7 +158,7 @@ class EditTag extends React.Component<IProps, IState> {
   };
 
   handleData = (data: string, fieldInfo: ITagFeild[]) => {
-    const reg = /CREATE TAG\s`\w+`\s\((.*)\)\s+(ttl_duration = \d+),\s+(ttl_col = "\w*")(, comment = ".*")?/gm;
+    const reg = /CREATE TAG\s`.+`\s\((.*)\)\s+(ttl_duration = \d+),\s+(ttl_col = ".*?")(, comment = ".*")?$/gm;
     const str = data.replace(/[\r\n]/g, ' ');
     const infoList = reg.exec(str) || [];
     const fieldList: IField[] = fieldInfo.map(i => ({
@@ -203,10 +216,7 @@ class EditTag extends React.Component<IProps, IState> {
   };
 
   handleDeleteField = async (fields: IField[]) => {
-    const { match } = this.props;
-    const {
-      params: { tag },
-    } = match;
+    const { tag } = this.state;
     const res = await this.props.asyncAlterField({
       type: 'TAG',
       name: tag,
@@ -295,18 +305,11 @@ class EditTag extends React.Component<IProps, IState> {
   };
 
   handleUpdateField = async () => {
-    const { match } = this.props;
-    const {
-      params: { tag },
-    } = match;
-    const { editField } = this.state;
+    const { editField, tag } = this.state;
     if (editField) {
       const { name, type, alterType, fixedLength } = editField;
       if (name === '' || type === '') {
         return message.warning(intl.get('schema.fieldRequired'));
-      }
-      if (name !== '' && !NAME_REGEX.test(name)) {
-        return message.warning(intl.get('formRules.nameValidate'));
       }
       if (
         type === 'fixed_string' &&
@@ -337,11 +340,7 @@ class EditTag extends React.Component<IProps, IState> {
   };
 
   handleUpdateTtl = async () => {
-    const { match } = this.props;
-    const {
-      params: { tag },
-    } = match;
-    const { editTtlConfig } = this.state;
+    const { editTtlConfig, tag } = this.state;
     if (editTtlConfig) {
       const { col, duration } = editTtlConfig;
       if (col === '' || duration === '') {
@@ -374,10 +373,7 @@ class EditTag extends React.Component<IProps, IState> {
   };
 
   handleTogglePanels = async (e: string | string[], type: string) => {
-    const { match } = this.props;
-    const {
-      params: { tag },
-    } = match;
+    const { tag } = this.state;
     if (e.length > 0) {
       if (type === 'field') {
         this.handleAddField();
@@ -422,10 +418,7 @@ class EditTag extends React.Component<IProps, IState> {
   };
 
   handleDeleteTtl = async () => {
-    const { match } = this.props;
-    const {
-      params: { tag },
-    } = match;
+    const { tag } = this.state;
     const res = await this.props.asyncAlterField({
       type: 'TAG',
       name: tag,
@@ -551,7 +544,7 @@ class EditTag extends React.Component<IProps, IState> {
               />
             );
           } else {
-            return <span>{record}</span>;
+            return <span>{record.toString()}</span>;
           }
         },
       },
@@ -736,12 +729,9 @@ class EditTag extends React.Component<IProps, IState> {
       editTtlConfig,
       editComment,
       temporaryComment,
+      tag,
     } = this.state;
     if (editField || editTtlConfig || editComment) {
-      const { match } = this.props;
-      const {
-        params: { tag },
-      } = match;
       let action;
       let config = {};
       if (editField) {
@@ -774,11 +764,8 @@ class EditTag extends React.Component<IProps, IState> {
 
   goBack = e => {
     e.preventDefault();
-    const { match, history } = this.props;
+    const { history } = this.props;
     const { editRow, editTtl } = this.state;
-    const {
-      params: { space },
-    } = match;
     if (editRow !== null || editTtl) {
       confirm({
         title: intl.get('schema.leavePage'),
@@ -786,12 +773,12 @@ class EditTag extends React.Component<IProps, IState> {
         okText: intl.get('common.confirm'),
         cancelText: intl.get('common.cancel'),
         onOk() {
-          history.push(`/space/${space}/tag/list`);
+          history.push(`/space/tag/list`);
           trackEvent('navigation', 'view_tag_list', 'from_tag_edit');
         },
       });
     } else {
-      history.push(`/space/${space}/tag/list`);
+      history.push(`/space/tag/list`);
       trackEvent('navigation', 'view_tag_list', 'from_tag_edit');
     }
   };
@@ -805,11 +792,7 @@ class EditTag extends React.Component<IProps, IState> {
   };
 
   handleCommentUpdate = async () => {
-    const { match } = this.props;
-    const {
-      params: { tag },
-    } = match;
-    const { temporaryComment } = this.state;
+    const { temporaryComment, tag } = this.state;
     const res = await this.props.asyncAlterField({
       type: 'TAG',
       name: tag,
@@ -845,11 +828,14 @@ class EditTag extends React.Component<IProps, IState> {
     });
   };
   render() {
-    const { match, editLoading } = this.props;
-    const { fieldRequired, ttlRequired, comment, editComment } = this.state;
+    const { editLoading } = this.props;
     const {
-      params: { tag },
-    } = match;
+      fieldRequired,
+      ttlRequired,
+      comment,
+      editComment,
+      tag,
+    } = this.state;
     const outItemLayout = {
       labelCol: {
         span: 2,

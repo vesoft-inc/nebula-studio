@@ -65,7 +65,7 @@ class Schema extends React.Component<IProps> {
     const err = await asyncSwitchSpace(space);
     if (!err) {
       await asyncClearExplore();
-      history.push(`/space/${space}/tag/list`);
+      history.push(`/space/tag/list`);
     } else if (err && err.toLowerCase().includes('spacenotfound')) {
       message.warning(intl.get('schema.useSpaceErrTip'));
     }

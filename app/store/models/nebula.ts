@@ -315,7 +315,7 @@ export const nebula = createModel({
     async asyncSwitchSpace(space: string) {
       const { code, message } = (await service.execNGQL({
         // HACK: Processing keyword
-        gql: 'use' + '`' + space + '`;',
+        gql: `use ${handleKeyword(space)};`,
       })) as any;
 
       if (code === 0) {
@@ -355,7 +355,7 @@ export const nebula = createModel({
 
     async asyncGetTagInfo(tag: string) {
       const { code, data } = (await service.execNGQL({
-        gql: 'desc tag ' + '`' + tag + '`;',
+        gql: `desc tag ${handleKeyword(tag)}`,
       })) as any;
       return { code, data };
     },
@@ -485,7 +485,7 @@ export const nebula = createModel({
 
     async asyncGetEdgeInfo(edge: string) {
       const { code, data } = (await service.execNGQL({
-        gql: 'desc edge' + '`' + edge + '`;',
+        gql: `desc edge ${handleKeyword(edge)}`,
       })) as any;
       return { code, data };
     },

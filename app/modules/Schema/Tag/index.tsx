@@ -2,7 +2,7 @@ import { Breadcrumb, Button, Icon, message, Popconfirm, Table } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
-import { Link, match, RouteComponentProps, withRouter } from 'react-router-dom';
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { IDispatch, IRootState } from '#app/store';
 import { sortByFieldAndFilter } from '#app/utils/function';
@@ -14,6 +14,7 @@ import './index.less';
 const mapState = (state: IRootState) => ({
   loading: state.loading.effects.nebula.asyncGetTagList,
   tagList: state.nebula.tagList,
+  currentSpace: state.nebula.currentSpace,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -24,9 +25,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
 interface IProps
   extends ReturnType<typeof mapState>,
     ReturnType<typeof mapDispatch>,
-    RouteComponentProps {
-  match: match<{ space: string }>;
-}
+    RouteComponentProps {}
 
 interface ITag {
   name: string;
@@ -85,7 +84,10 @@ class TagList extends React.Component<IProps, IState> {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.match.params.space !== this.props.match.params.space) {
+    if (
+      prevProps.currentSpace &&
+      prevProps.currentSpace !== this.props.currentSpace
+    ) {
       this.props.asyncGetTagList();
     }
   }
@@ -116,10 +118,6 @@ class TagList extends React.Component<IProps, IState> {
 
   renderTagList = () => {
     const { loading, tagList } = this.props;
-    const { match } = this.props;
-    const {
-      params: { space },
-    } = match;
     const tagColumns = [
       {
         title: intl.get('common.name'),
@@ -139,7 +137,10 @@ class TagList extends React.Component<IProps, IState> {
                 <div>
                   <Button shape="circle">
                     <Link
-                      to={`/space/${space}/tag/edit/${tag.name}`}
+                      to={{
+                        pathname: '/space/tag/edit',
+                        state: { tag: tag.name },
+                      }}
                       data-track-category="navigation"
                       data-track-action="view_tag_edit"
                       data-track-label="from_tag_list"
@@ -196,10 +197,6 @@ class TagList extends React.Component<IProps, IState> {
     );
   };
   render() {
-    const { match } = this.props;
-    const {
-      params: { space },
-    } = match;
     return (
       <div className="nebula-tag">
         <header>
@@ -211,7 +208,7 @@ class TagList extends React.Component<IProps, IState> {
         <div className="btns">
           <Button type="primary">
             <Link
-              to={`/space/${space}/tag/create`}
+              to={`/space/tag/create`}
               data-track-category="navigation"
               data-track-action="view_tag_create"
               data-track-label="from_tag_list"

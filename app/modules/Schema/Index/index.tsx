@@ -10,7 +10,7 @@ import {
 import React from 'react';
 import intl from 'react-intl-universal';
 import { connect } from 'react-redux';
-import { Link, match, RouteComponentProps, withRouter } from 'react-router-dom';
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { IDispatch, IRootState } from '#app/store';
 import { sortByFieldAndFilter } from '#app/utils/function';
@@ -23,6 +23,7 @@ const { Option } = Select;
 const mapState = (state: IRootState) => ({
   loading: state.loading.effects.nebula.asyncGetIndexList,
   indexList: state.nebula.indexList,
+  currentSpace: state.nebula.currentSpace,
 });
 
 const mapDispatch = (dispatch: IDispatch) => ({
@@ -33,9 +34,7 @@ const mapDispatch = (dispatch: IDispatch) => ({
 interface IProps
   extends ReturnType<typeof mapState>,
     ReturnType<typeof mapDispatch>,
-    RouteComponentProps {
-  match: match<{ space: string }>;
-}
+    RouteComponentProps {}
 
 interface IState {
   indexType: IndexType;
@@ -104,7 +103,10 @@ class IndexList extends React.Component<IProps, IState> {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.match.params.space !== this.props.match.params.space) {
+    if (
+      prevProps.currentSpace &&
+      prevProps.currentSpace !== this.props.currentSpace
+    ) {
       const { indexType } = this.state;
       this.props.asyncGetIndexList(indexType);
     }
@@ -113,6 +115,10 @@ class IndexList extends React.Component<IProps, IState> {
   handleChangeType = value => {
     const self = this;
     this.setState({ indexType: value }, () => {
+      self.props.history.replace({
+        pathname: '/space/index/list',
+        state: { indexType: value },
+      });
       self.props.asyncGetIndexList(value);
     });
   };
@@ -223,10 +229,7 @@ class IndexList extends React.Component<IProps, IState> {
 
   render() {
     const { indexType } = this.state;
-    const { match, history } = this.props;
-    const {
-      params: { space },
-    } = match;
+    const { history } = this.props;
     const {
       location: { state },
     }: any = history;
@@ -242,7 +245,7 @@ class IndexList extends React.Component<IProps, IState> {
         <div className="btns">
           <Button type="primary">
             <Link
-              to={`/space/${space}/index/create`}
+              to={`/space/index/create`}
               data-track-category="navigation"
               data-track-action="view_index_create"
               data-track-label="from_index_list"
