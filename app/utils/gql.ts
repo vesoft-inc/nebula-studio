@@ -177,8 +177,9 @@ export const getTagOrEdgeCreateGQL = (params: {
         .join(', ')
     : '';
   const ttlStr = ttlConfig
-    ? `TTL_DURATION = ${ttlConfig.ttl_duration ||
-        ''}, TTL_COL = "${handleEscape(ttlConfig.ttl_col) || ''}"`
+    ? `TTL_DURATION = ${ttlConfig.ttl_duration || ''}, TTL_COL = "${
+        ttlConfig.ttl_col ? handleEscape(ttlConfig.ttl_col) : ''
+      }"`
     : '';
   const gql = `CREATE ${type} ${handleKeyword(name)} ${
     fieldsStr.length > 0 ? `(${fieldsStr})` : '()'

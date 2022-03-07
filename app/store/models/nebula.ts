@@ -1,5 +1,6 @@
 import { createModel } from '@rematch/core';
 import { message } from 'antd';
+import { Base64 } from 'js-base64';
 import cookies from 'js-cookie';
 import _ from 'lodash';
 import intl from 'react-intl-universal';
@@ -182,13 +183,14 @@ export const nebula = createModel({
         {
           address,
           port,
-          username,
-          password,
         },
         {
           trackEventConfig: {
             category: 'user',
             action: 'sign_in',
+          },
+          headers: {
+            Authorization: `Bearer ${Base64.encode(`${username}:${password}`)}`,
           },
         },
       )) as any;

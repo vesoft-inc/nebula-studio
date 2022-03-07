@@ -22,7 +22,6 @@ const deteleFile = params => {
   return _delete(`/api/files/${filename}`)();
 };
 const getFiles = get('/api/files');
-const getAppInfo = get('/api/app');
 const uploadFiles = (params?, config?) =>
   put('/api/files')(params, {
     ...config,
@@ -42,6 +41,5 @@ export default {
   getImportWokingDir,
   deteleFile,
   getFiles,
-  getAppInfo,
   uploadFiles,
 };
