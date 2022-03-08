@@ -1,6 +1,6 @@
 {
   "name": "nebula-graph-studio",
-  "version": "3.2.1",
+  "version": "3.3.0-beta",
   "description": "nebula-graph-studio",
   "private": true,
   "scripts": {
@@ -25,6 +25,7 @@
     "file-saver": "^2.0.5",
     "history": "^5.1.0",
     "http-proxy-middleware": "^0.20.0",
+    "js-base64": "^3.7.2",
     "js-cookie": "^2.2.1",
     "json-bigint": "^1.0.0",
     "json2csv": "^5.0.6",

@@ -20,9 +20,9 @@ const Option = Select.Option;
 const SchemaConfig = () => {
   const history = useHistory();
   const [tab, setTab] = useState('tag');
-  const { space, type, action } = useParams() as {space :string, type: string, action: string };
+  const { type, action } = useParams() as { type: string, action: string };
   const { schema } = useStore();
-  const { spaces, getSpaces, switchSpace } = schema;
+  const { spaces, getSpaces, switchSpace, currentSpace } = schema;
   const routes = useMemo(() => {
     if(action === 'list') {
       return [
@@ -32,7 +32,7 @@ const SchemaConfig = () => {
         },
         {
           path: '#',
-          breadcrumbName: space,
+          breadcrumbName: currentSpace,
         },
       ];
     } else {
@@ -42,8 +42,8 @@ const SchemaConfig = () => {
           breadcrumbName: intl.get('schema.spaceList'),
         },
         {
-          path: `/schema/${space}/${type}/list`,
-          breadcrumbName: intl.get('schema.configTypeList', { space, type: intl.get(`common.${type}`) }),
+          path: `/schema/${type}/list`,
+          breadcrumbName: intl.get('schema.configTypeList', { space: currentSpace, type: intl.get(`common.${type}`) }),
         },
         {
           path: '#',
@@ -53,7 +53,7 @@ const SchemaConfig = () => {
         },
       ];
     }
-  }, [space, action, Cookie.get('lang')]);
+  }, [currentSpace, action, Cookie.get('lang')]);
   useEffect(() => {
     setTab(type);
     if(spaces.length === 0) {
@@ -61,28 +61,28 @@ const SchemaConfig = () => {
     }
   }, []);
   useEffect(() => {
-    trackPageView(space ? `/schema/config/${type}/list` : `/schema`);
-  }, [space, type]);
+    trackPageView(currentSpace ? `/schema/config/${type}/list` : `/schema`);
+  }, [currentSpace, type]);
 
   const handleUpdateSpace = (value: string) => {
     switchSpace(value);
-    history.push(`/schema/${value}/${type}/list`);
+    history.push(`/schema/${type}/list`);
   };
   const handleTabChange = e => {
     setTab(e.target.value);
-    history.push(`/schema/${space}/${e.target.value}/list`);
+    history.push(`/schema/${e.target.value}/list`);
   };
   return (
     <div className="nebula-schema-page">
       <Breadcrumb routes={routes} extraNode={<div className="space-select">
         <span className="label">{intl.get('common.currentSpace')}</span>
-        {action !== 'edit' ? <Select value={space} onChange={value => handleUpdateSpace(value)}>
+        {action !== 'edit' ? <Select value={currentSpace} onChange={value => handleUpdateSpace(value)}>
           {spaces.map(space => (
             <Option value={space} key={space}>
               {space}
             </Option>
           ))}
-        </Select> : <span>{space}</span>}
+        </Select> : <span>{currentSpace}</span>}
       </div>} />
       <div className="list-container center-layout">
         {action === 'list' && <div className="studio-tab-header">
@@ -100,48 +100,48 @@ const SchemaConfig = () => {
         </div>}
         <>
           <Route
-            path={`/schema/:space/tag/list`}
+            path={`/schema/tag/list`}
             exact={true}
             component={TagList}
           />
           <Route
-            path="/schema/:space/edge/list"
+            path="/schema/edge/list"
             exact={true}
             component={EdgeList}
           />
           <Route
-            path="/schema/:space/index/list/:module?"
+            path="/schema/index/list/:module?"
             exact={true}
             component={IndexList}
           />
           <Route
-            path="/schema/:space/statistic/list"
+            path="/schema/statistic/list"
             exact={true}
             component={SpaceStats}
           />
           <Route
-            path={`/schema/:space/tag/create`}
+            path={`/schema/tag/create`}
             exact={true}
             render={() => <CommonCreate createType="tag" />}
           />
           <Route
-            path={`/schema/:space/edge/create`}
+            path={`/schema/edge/create`}
             exact={true}
             render={() => <CommonCreate createType="edge" />}
           />
           <Route
-            path={`/schema/:space/tag/edit/:name?`}
+            path={`/schema/tag/edit`}
             exact={true}
             render={() => <CommonEdit editType="tag" />}
           />
           <Route
-            path={`/schema/:space/edge/edit/:name?`}
+            path={`/schema/edge/edit`}
             exact={true}
             render={() => <CommonEdit editType="edge" />}
           />
           
           <Route
-            path={`/schema/:space/index/create`}
+            path={`/schema/index/create`}
             exact={true}
             component={IndexCreate}
           />

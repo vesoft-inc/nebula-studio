@@ -2,7 +2,7 @@ import { message } from 'antd';
 import _ from 'lodash';
 import intl from 'react-intl-universal';
 
-import { handleVidStringName } from './function';
+import { handleEscape, handleKeyword, handleVidStringName } from './function';
 
 export function configToJson(payload) {
   const {
@@ -36,7 +36,7 @@ export function configToJson(payload) {
       retry: 3,
       concurrency: 10,
       channelBufferSize: 128,
-      space,
+      space: handleEscape(space),
       connection: {
         user: username,
         password,
@@ -83,7 +83,7 @@ export function edgeDataToJSON(
             break;
           }
           const _prop = {
-            name: prop.name,
+            name: handleEscape(prop.name),
             type: prop.type,
             index: indexJudge(prop.mapping, prop.name),
           };
@@ -103,7 +103,7 @@ export function edgeDataToJSON(
       schema: {
         type: 'edge',
         edge: {
-          name: edge.type,
+          name: handleEscape(edge.type),
           srcVID: edge.srcVID,
           dstVID: edge.dstVID,
           rank: edge.rank,
@@ -132,13 +132,13 @@ export function vertexDataToJSON(
             return null;
           }
           return {
-            name: prop.name,
+            name: handleEscape(prop.name),
             type: prop.type,
             index: indexJudge(prop.mapping, prop.name),
           };
         });
       const _tag = {
-        name: tag.name,
+        name: handleEscape(tag.name),
         props: props.filter(prop => prop),
       };
       return _tag;
@@ -219,7 +219,7 @@ export function getGQLByConfig(payload) {
           }
           if (prop.mapping !== null) {
             // HACK: Processing keyword
-            tagField.push(`\`${prop.name}\``);
+            tagField.push(handleKeyword(prop.name));
             const value =
               prop.type === 'string'
                 ? `"${columns[prop.mapping]}"`
@@ -228,7 +228,7 @@ export function getGQLByConfig(payload) {
           }
         });
         NGQL.push(
-          `${'INSERT VERTEX ' + '`'}${tag.name}\`` +
+          `INSERT VERTEX ${handleKeyword(tag.name)}` +
             `(${tagField}) VALUES ${handleVidStringName(
               columns[vertexConfig.idMapping],
               spaceVidType,
@@ -258,7 +258,7 @@ export function getGQLByConfig(payload) {
           prop.mapping !== null
         ) {
           // HACK: Processing keyword
-          edgeField.push(`\`${prop.name}\``);
+          edgeField.push(handleKeyword(prop.name));
           const value =
             prop.type === 'string'
               ? `"${columns[prop.mapping]}"`
@@ -271,7 +271,7 @@ export function getGQLByConfig(payload) {
           ? ''
           : `@${columns[edgeConfig.props[2].mapping]}`;
       NGQL.push(
-        `${'INSERT EDGE ' + '`'}${edgeConfig.type}\`` +
+        `INSERT EDGE ${handleKeyword(edgeConfig.type)}` +
           `(${edgeField.join(',')}) VALUES ${handleVidStringName(
             columns[edgeConfig.props[0].mapping],
             spaceVidType,

@@ -1,7 +1,7 @@
 import { Button, Popconfirm, Table, message } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import intl from 'react-intl-universal';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Icon from '@app/components/Icon';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
@@ -45,8 +45,7 @@ function renderTagInfo(tag: ITag) {
 }
 
 const TagList = () => {
-  const { space } = useParams() as {space :string};
-  const { schema: { tagList, deleteTag, getTagList } } = useStore();
+  const { schema: { tagList, deleteTag, getTagList, currentSpace } } = useStore();
   const [searchVal, setSearchVal] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
@@ -87,7 +86,10 @@ const TagList = () => {
           <div className="operation">
             <Button className="primary-btn">
               <Link
-                to={`/schema/${space}/tag/edit/${tag.name}`}
+                to={{
+                  pathname: '/schema/tag/edit',
+                  state: { tag: tag.name },
+                }}
                 data-track-category="navigation"
                 data-track-action="view_tag_edit"
                 data-track-label="from_tag_list"
@@ -115,7 +117,7 @@ const TagList = () => {
 
   useEffect(() => {
     getData();
-  }, [space]);
+  }, [currentSpace]);
   useEffect(() => {
     setData(sortByFieldAndFilter({
       field: 'name',

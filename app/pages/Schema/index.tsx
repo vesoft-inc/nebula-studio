@@ -35,7 +35,7 @@ const Schema = () => {
   const handleSwitchSpace = async(space: string) => {
     const err = await switchSpace(space);
     if (!err) {
-      history.push(`/schema/${space}/tag/list`);
+      history.push(`/schema/tag/list`);
     } else if (err && err.toLowerCase().includes('spacenotfound')) {
       message.warning(intl.get('schema.useSpaceErrTip'));
     }

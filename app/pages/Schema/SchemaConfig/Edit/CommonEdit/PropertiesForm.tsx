@@ -140,6 +140,10 @@ const PropertiesForm = (props: IProps) => {
       },
     });
   };
+
+  const handleResetValue = () => {
+    form.setFieldsValue({ value: '' });
+  };
   return (
     <Form 
       form={form} 
@@ -174,7 +178,7 @@ const PropertiesForm = (props: IProps) => {
           </Form.Item>
           {list.map((item, index) => {
             return editRow === index 
-              ? <EditRow key={index} data={editField} onEditCancel={handleEditCancel} /> 
+              ? <EditRow key={index} data={editField} onUpdateType={handleResetValue} onEditCancel={handleEditCancel} /> 
               : <DisplayRow
                 key={index}
                 data={item}

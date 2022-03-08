@@ -17,15 +17,17 @@ const innerItemLayout = {
 };
 
 interface IProps {
-  formRef: FormInstance
+  formRef: FormInstance;
+  onUpdate: () => void;
 }
 
 const formRef = ((props: IProps) => {
-  const { formRef } = props;
+  const { formRef, onUpdate } = props;
   const handleClearTtl = e => {
     if(!e.target.checked) {
       formRef.resetFields(['ttl_col', '']);
       formRef.resetFields(['ttl_duration', '']);
+      setTimeout(onUpdate, 300);
     }
   };
   return (
