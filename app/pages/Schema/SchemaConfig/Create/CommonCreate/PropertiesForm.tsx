@@ -9,6 +9,7 @@ import { DATA_TYPE, EXPLAIN_DATA_TYPE } from '@app/utils/constant';
 
 const Option = Select.Option;
 import './index.less';
+import { cloneDeep } from 'lodash';
 
 
 const itemLayout = {
@@ -18,14 +19,16 @@ const itemLayout = {
 };
 
 interface IProps {
-  formRef: FormInstance
+  formRef: FormInstance;
+  onUpdate: () => void;
 }
 
 const PropertiesForm = (props: IProps) => {
-  const { formRef } = props;
+  const { formRef, onUpdate } = props;
   const handleClearProperties = e => {
     if(!e.target.checked) {
       formRef.resetFields(['properties', []]);
+      setTimeout(onUpdate, 300);
     }
   };
   const handlePropertyAdd = callback => {
@@ -59,6 +62,13 @@ const PropertiesForm = (props: IProps) => {
       formRef.resetFields(['ttl_col', '']);
     }
     callback(rowIndex);
+  };
+
+  const handleResetValue = (index) => {
+    const properties = formRef.getFieldValue('properties');
+    const _properties = [...properties];
+    _properties[index].value = '';
+    formRef.setFieldsValue({ 'properties': _properties });
   };
   return (
     <Form.Item noStyle={true}>
@@ -121,7 +131,7 @@ const PropertiesForm = (props: IProps) => {
                                       message: intl.get('formRules.dataTypeRequired'),
                                     },
                                   ]}>
-                                  <Select className="select-type" showSearch={true} dropdownMatchSelectWidth={false}>
+                                  <Select className="select-type" showSearch={true} onChange={() => handleResetValue(index)} dropdownMatchSelectWidth={false}>
                                     {DATA_TYPE.map(item => {
                                       return (
                                         <Option value={item.value} key={item.value}>

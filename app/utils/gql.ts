@@ -1,4 +1,4 @@
-import { handleKeyword, handleVidStringName } from '@app/utils/function';
+import { handleEscape, handleKeyword, handleVidStringName } from '@app/utils/function';
 import { IAlterForm, IProperty, ISchemaType, IndexType } from '@app/interfaces/schema';
 
 export const getExploreMatchGQL = (params: {
@@ -154,7 +154,7 @@ export const getTagOrEdgeCreateGQL = (params: {
     : '';
   const ttlStr = ttl_col
     ? `TTL_DURATION = ${ttl_duration ||
-        ''}, TTL_COL = "${ttl_col || ''}"`
+        ''}, TTL_COL = "${handleEscape(ttl_col)}"`
     : '';
   const gql = `CREATE ${type} ${handleKeyword(name)} ${
     propertiesStr.length > 0 ? `(${propertiesStr})` : '()'
@@ -226,7 +226,7 @@ export const getIndexCreateGQL = (params: {
   const combine = associate
     ? `on ${handleKeyword(associate)}(${fields?.join(', ')})`
     : '';
-  const gql = `CREATE ${type} INDEX ${handleKeyword(name)} ${combine} ${
+  const gql = `CREATE ${type.toUpperCase()} INDEX ${handleKeyword(name)} ${combine} ${
     comment ? `COMMENT "${comment}"` : ''
   }`;
   return gql;

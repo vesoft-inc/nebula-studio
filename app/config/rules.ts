@@ -1,4 +1,4 @@
-import { POSITIVE_INTEGER_REGEX } from '#app/utils/constant';
+import { POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
 
 export const hostRulesFn = intl => [
   {

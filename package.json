@@ -1,6 +1,6 @@
 {
   "name": "nebula-graph-studio",
-  "version": "3.2.3",
+  "version": "3.3.0-beta",
   "description": "nebula-graph-studio",
   "private": true,
   "scripts": {

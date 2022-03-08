@@ -1,7 +1,7 @@
 import { Button, Popconfirm, Table, message } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import intl from 'react-intl-universal';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Icon from '@app/components/Icon';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
@@ -45,8 +45,7 @@ function renderEdgeInfo(edge: IEdge) {
 }
 
 const EdgeList = () => {
-  const { space } = useParams() as { space :string };
-  const { schema: { edgeList, deleteEdge, getEdgeList } } = useStore();
+  const { schema: { edgeList, deleteEdge, getEdgeList, currentSpace } } = useStore();
   const [searchVal, setSearchVal] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
@@ -84,7 +83,10 @@ const EdgeList = () => {
             <div className="operation">
               <Button className="primary-btn">
                 <Link
-                  to={`/schema/${space}/edge/edit/${edge.name}`}
+                  to={{
+                    pathname: '/schema/edge/edit',
+                    state: { edge: edge.name },
+                  }}
                   data-track-category="navigation"
                   data-track-action="view_edge_edit"
                   data-track-label="from_edge_list"
@@ -112,7 +114,7 @@ const EdgeList = () => {
   ], [edgeList, Cookie.get('lang')]);
   useEffect(() => {
     getData();
-  }, [space]);
+  }, [currentSpace]);
   useEffect(() => {
     setData(sortByFieldAndFilter({
       field: 'name',

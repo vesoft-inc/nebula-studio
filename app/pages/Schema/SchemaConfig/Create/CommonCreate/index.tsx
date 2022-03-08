@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { nameRulesFn } from '@app/config/rules';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { uniqBy } from 'lodash';
 import GQLCodeMirror from '@app/components/GQLCodeMirror';
 import { getTagOrEdgeCreateGQL } from '@app/utils/gql';
@@ -28,7 +28,6 @@ interface IProps {
 const ConfigCreate = (props: IProps) => {
   const { createType } = props;
   const history = useHistory();
-  const { space } = useParams() as {space :string };
   const [loading, setLoading] = useState(false);
   const { schema: { createTagOrEdge } } = useStore();
   const [gql, setGql] = useState('');
@@ -62,7 +61,10 @@ const ConfigCreate = (props: IProps) => {
     setLoading(false);
     if (res.code === 0) {
       message.success(intl.get('schema.createSuccess'));
-      history.push(`/schema/${space}/${createType}/edit/${name}`);
+      history.push({
+        pathname: `/schema/${createType}/edit`,
+        state: { [createType]: name },
+      });
     }
   };
   return (
@@ -86,14 +88,14 @@ const ConfigCreate = (props: IProps) => {
             </Form.Item>
           </Col>
         </Row>
-        <PropertiesForm formRef={basicForm} />
-        <TTLForm formRef={basicForm} />
+        <PropertiesForm formRef={basicForm} onUpdate={updateGql} />
+        <TTLForm formRef={basicForm} onUpdate={updateGql} />
         <Form.Item noStyle={true}>
           <GQLCodeMirror currentGQL={gql} />
         </Form.Item>
         <Form.Item noStyle={true}>
           <div className="studio-form-footer">
-            <Button onClick={() => history.push(`/schema/${space}/${createType}/list`)}>{intl.get('common.cancel')}</Button>
+            <Button onClick={() => history.push(`/schema/${createType}/list`)}>{intl.get('common.cancel')}</Button>
             <Button type="primary" loading={loading} htmlType="submit">{intl.get('common.create')}</Button>
           </div>
         </Form.Item>

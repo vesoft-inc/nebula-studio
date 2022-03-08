@@ -21,6 +21,7 @@ interface IProps {
 interface IEditProps {
   data: IEditProperty | null;
   onEditCancel: () => void;
+  onUpdateType: () => void;
 }
 
 export const DisplayRow = (props: IProps) => {
@@ -69,7 +70,7 @@ export const DisplayRow = (props: IProps) => {
 };
 
 export const EditRow = (props: IEditProps) => {
-  const { data, onEditCancel } = props;
+  const { data, onEditCancel, onUpdateType } = props;
   if(!data) {
     return null;
   }
@@ -99,7 +100,7 @@ export const EditRow = (props: IEditProps) => {
                     message: intl.get('formRules.dataTypeRequired'),
                   },
                 ]}>
-                <Select className="select-type" showSearch={true} dropdownMatchSelectWidth={false}>
+                <Select className="select-type" showSearch={true} onChange={onUpdateType} dropdownMatchSelectWidth={false}>
                   {DATA_TYPE.map(item => {
                     return (
                       <Option value={item.value} key={item.value}>

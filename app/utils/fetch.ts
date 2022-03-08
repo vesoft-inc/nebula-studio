@@ -1,6 +1,6 @@
-import service from '#app/config/service';
-import { handleKeyword, handleVidStringName } from '#app/utils/function';
-import { getExploreGQLWithIndex } from '#app/utils/gql';
+import service from '@app/config/service';
+import { handleKeyword, handleVidStringName } from '@app/utils/function';
+import { getExploreGQLWithIndex } from '@app/utils/gql';
 
 interface IMatchVertex {
   vid?: string;

@@ -1,8 +1,8 @@
-import { Button, Col, Form, Input, Row, message } from 'antd';
+import { Button, Col, Form, Input, Row, Spin, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
-import { useParams } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import PropertiesForm from './PropertiesForm';
 import TTLForm from './TTLForm';
 import './index.less';
@@ -42,10 +42,13 @@ interface IProps {
 }
 const ConfigEdit = (props: IProps) => {
   const { editType } = props;
-  const { name: editName } = useParams() as {name: string };
+  const { state } = useLocation();
+  const history = useHistory();
+  const [editName, setEditName] = useState('');
   const [editKey, setEditKey] = useState<string | null>(null);
   const { schema: { getTagOrEdgeDetail, getTagOrEdgeInfo, alterField, getIndexTree } } = useStore();
   const [tempComment, setTempComment] = useState('');
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState<IData>({
     name: '',
     comment: '',
@@ -62,21 +65,28 @@ const ConfigEdit = (props: IProps) => {
     getDetails();
   }, []);
   const getDetails = async() => {
-    const { code, data } = await getTagOrEdgeDetail(editType, editName);
+    const _editName = state[editType];
+    if(!_editName) {
+      history.push(`/schema/${editType}/list`);
+    }
+    setEditName(_editName);
+    setLoading(true);
+    const { code, data } = await getTagOrEdgeDetail(editType, _editName);
     const { code: propCode, data: propData } = await getTagOrEdgeInfo(
       editType,
-      editName,
+      _editName,
     );
+    setLoading(false);
     if (code === 0) {
       const key = editType === 'tag' ? 'Create Tag' : 'Create Edge';
       const info = data.tables[0][key];
       const fieldInfo = propCode === 0 ? propData.tables : [];
-      handleData(info, fieldInfo);
+      handleData(_editName, info, fieldInfo);
     }
   };
 
-  const handleData = (data: string, fieldInfo: IPropertyItem[]) => {
-    const reg = /CREATE (?:TAG|EDGE)\s`\w+`\s\((.*)\)\s+(ttl_duration = \d+),\s+(ttl_col = "\w*")(, comment = ".*")?/gm;
+  const handleData = (name: string, data: string, fieldInfo: IPropertyItem[]) => {
+    const reg = /CREATE (?:TAG|EDGE)\s`.+`\s\((.*)\)\s+(ttl_duration = \d+),\s+(ttl_col = ".*?")(, comment = ".*")?/gm;
     const str = data.replace(/[\r\n]/g, ' ');
     const infoList = reg.exec(str) || [];
     const properties: IProperty[] = fieldInfo.map(i => ({
@@ -98,7 +108,7 @@ const ConfigEdit = (props: IProps) => {
     setPropertiesRequired(propertiesRequired);
     setTtlRequired(ttlRequired);
     setData({
-      name: editName,
+      name,
       comment,
       properties,
       ttlConfig: {
@@ -114,7 +124,9 @@ const ConfigEdit = (props: IProps) => {
   };
 
   const handleAlter = async(config: IAlterForm) => {
+    setLoading(true);
     const res = await alterField(config);
+    setLoading(false);
     if (res.code === 0) {
       message.success(intl.get('common.updateSuccess'));
       await getDetails();
@@ -122,7 +134,8 @@ const ConfigEdit = (props: IProps) => {
     }
   };
   const handleCommentUpdate = async() => {
-    handleAlter({
+    setLoading(true);
+    await handleAlter({
       type: editType,
       name: editName,
       action: 'COMMENT',
@@ -130,82 +143,87 @@ const ConfigEdit = (props: IProps) => {
         comment: tempComment,
       },
     });
+    setLoading(false);
   };
 
   const checkIndex = async() => {
+    setLoading(true);
     const res = (await getIndexTree(editType)) || [];
+    setLoading(false);
     const hasIndex = res.some(i => i.name === editName);
     return hasIndex;
   };
   return (
     <div className="config-edit-group">
-      <Form
-        className="basic-config" 
-        layout="vertical" 
-        {...formItemLayout}>
-        <Form.Item noStyle={true} shouldUpdate={true}>
-          <Row className="form-item">
-            <Col span={12}>
-              <Form.Item label={intl.get('common.name')}>
-                {editName}
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label={intl.get('common.comment')}>
-                {editKey !== 'comment' ? (
-                  <>
-                    <span>{data.comment}</span>
-                    <Button
-                      disabled={editKey !== null}
-                      type="link"
-                      onClick={handleCommentEditStart}
-                    >
-                      {intl.get('common.edit')}
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Input
-                      className="input-comment"
-                      defaultValue={data.comment}
-                      onChange={e => setTempComment(e.target.value)}
-                    />
-                    <Button
-                      type="link"
-                      onClick={handleCommentUpdate}
-                    >
-                      {intl.get('common.ok')}
-                    </Button>
-                    <Button
-                      type="link"
-                      onClick={() => setEditKey(null)}
-                    >
-                      {intl.get('common.cancel')}
-                    </Button>
-                  </>
-                )}
-                
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form.Item>
-      </Form>
-      <PropertiesForm
-        editType={editType}
-        editDisabled={editKey !== null}
-        onBeforeEdit={(index) => setEditKey(index !== null ? `properties[${index}]` : null)}
-        initialRequired={propertiesRequired}
-        onEdit={handleAlter} 
-        data={data} />
-      <TTLForm 
-        editType={editType}
-        editDisabled={editKey !== null}
-        initialRequired={ttlRequired} 
-        data={data}
-        onEdit={handleAlter}
-        checkIndex={checkIndex} 
-        onBeforeEdit={(type?: null) => setEditKey(type === null ? null : 'ttl')}
-      />
+      <Spin delay={400} spinning={loading}>
+        <Form
+          className="basic-config" 
+          layout="vertical" 
+          {...formItemLayout}>
+          <Form.Item noStyle={true} shouldUpdate={true}>
+            <Row className="form-item">
+              <Col span={12}>
+                <Form.Item label={intl.get('common.name')}>
+                  {editName}
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label={intl.get('common.comment')}>
+                  {editKey !== 'comment' ? (
+                    <>
+                      <span>{data.comment}</span>
+                      <Button
+                        disabled={editKey !== null}
+                        type="link"
+                        onClick={handleCommentEditStart}
+                      >
+                        {intl.get('common.edit')}
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Input
+                        className="input-comment"
+                        defaultValue={data.comment}
+                        onChange={e => setTempComment(e.target.value)}
+                      />
+                      <Button
+                        type="link"
+                        onClick={handleCommentUpdate}
+                      >
+                        {intl.get('common.ok')}
+                      </Button>
+                      <Button
+                        type="link"
+                        onClick={() => setEditKey(null)}
+                      >
+                        {intl.get('common.cancel')}
+                      </Button>
+                    </>
+                  )}
+                  
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form.Item>
+        </Form>
+        <PropertiesForm
+          editType={editType}
+          editDisabled={editKey !== null}
+          onBeforeEdit={(index) => setEditKey(index !== null ? `properties[${index}]` : null)}
+          initialRequired={propertiesRequired}
+          onEdit={handleAlter} 
+          data={data} />
+        <TTLForm 
+          editType={editType}
+          editDisabled={editKey !== null}
+          initialRequired={ttlRequired} 
+          data={data}
+          onEdit={handleAlter}
+          checkIndex={checkIndex} 
+          onBeforeEdit={(type?: null) => setEditKey(type === null ? null : 'ttl')}
+        />
+      </Spin>
     </div>
   );
 };
