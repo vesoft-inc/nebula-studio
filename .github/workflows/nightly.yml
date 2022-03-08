@@ -2,10 +2,10 @@ name: Studio nightly Package
 on:
   push:
     branches:
-      - master
+      - v3.3.0-dev
 jobs:
   call-workflow:
-    uses: vesoft-inc/nebula-studio/.github/workflows/build.yml@master
+    uses: vesoft-inc/nebula-studio/.github/workflows/build.yml@v3.3.0-dev
     secrets:
       oss_endpoint: ${{ secrets.OSS_ENDPOINT }}
       oss_id: ${{ secrets.OSS_ID }}
