@@ -622,7 +622,7 @@ export const nebula = createModel({
         const _type = type === 'TAG' ? 'Tag' : 'Edge';
         const res =
           (data.tables && data.tables[0][`Create ${_type} Index`]) || '';
-        const reg = /comment = "(.+)"/g;
+        const reg = /comment "(.+)"/g;
         const result = reg.exec(res);
         const comment = result ? result[1] : null;
         return comment;
