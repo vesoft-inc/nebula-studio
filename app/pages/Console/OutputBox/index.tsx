@@ -1,4 +1,4 @@
-import { Table, Tabs, Tooltip } from 'antd';
+import { Button, Table, Tabs, Tooltip } from 'antd';
 import { BigNumber } from 'bignumber.js';
 import React, { useCallback, useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
@@ -8,6 +8,7 @@ import { trackEvent } from '@app/utils/stat';
 import { v4 as uuidv4 } from 'uuid';
 import Icon from '@app/components/Icon';
 import Graphviz from './Graphviz';
+import { parseSubGraph } from '@app/utils/parseData';
 
 import './index.less';
 import classNames from 'classnames';
@@ -17,14 +18,21 @@ interface IProps {
   gql: string;
   result: any;
   onHistoryItem: (gql: string) => void;
+  onExplorer?: (params: {
+    space: string;
+    vertexes: any[], 
+    edges: any[]
+  }) => void;
+  onResultConfig?: (data: any) => void
 }
 
 const OutputBox = (props: IProps) => {
-  const { gql, result: { code, data, message }, onHistoryItem, index } = props;
-  const { global, console } = useStore();
+  const { gql, result: { code, data, message }, onHistoryItem, index, onExplorer, onResultConfig } = props;
+  const { global, console, schema } = useStore();
   const [visible, setVisible] = useState(true);
   const { username, host } = global;
   const { results, update, favorites, updateFavorites } = console;
+  const { spaceVidType, currentSpace } = schema;
   const [columns, setColumns] = useState<any>([]);
   const [dataSource, setDataSource] = useState<any>([]);
   const [isFavorited, setIsFavorited] = useState(false);
@@ -165,6 +173,31 @@ const OutputBox = (props: IProps) => {
     link.click();
     document.body.removeChild(link);
   };
+
+  const handleExplore = () => {
+    if (
+      data.tables.filter(
+        item =>
+          item._verticesParsedList ||
+          item._edgesParsedList ||
+          item._pathsParsedList,
+      ).length > 0
+    ) {
+      parseToGraph();
+    } else {
+      onResultConfig!(data);
+    }
+  };
+
+  const parseToGraph = () => {
+    const { vertexes, edges } = parseSubGraph(data.tables, spaceVidType);
+    onExplorer!({
+      space: currentSpace,
+      vertexes, 
+      edges
+    });
+  };
+
   return <div className="output-box">
     <div className="output-header">
       <p className={classNames('gql', { 'error-info': code !== 0 })} onClick={() => onHistoryItem(gql)}>
@@ -266,6 +299,7 @@ const OutputBox = (props: IProps) => {
             {`${intl.get('console.execTime')} ${data.timeCost /
               1000000} (s)`}
           </span>
+          {onExplorer && <Button className="primary-btn" type="text" onClick={handleExplore}>{intl.get('common.openInExplore')}</Button>}
         </div>
       )}
     </>}

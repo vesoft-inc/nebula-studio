@@ -2,7 +2,7 @@ import { Button, Select, Tooltip, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
-import { trackPageView } from '@app/utils/stat';
+import { trackPageView, trackEvent } from '@app/utils/stat';
 import { useStore } from '@app/stores';
 import Instruction from '@app/components/Instruction';
 import Icon from '@app/components/Icon';
@@ -12,6 +12,7 @@ import { maxLineNum } from '@app/config/nebulaQL';
 import HistoryBtn from './HistoryBtn';
 import FavoriteBtn from './FavoriteBtn';
 import CypherParameterBox from './CypherParameterBox';
+import ExportModal from './ExportModal';
 import './index.less';
 const Option = Select.Option;
 
@@ -26,12 +27,22 @@ const getHistory = () => {
   return [];
 };
 
-const Console = () => {
+interface IProps {
+  onExplorer?: (params: {
+    space: string;
+    vertexes: any[], 
+    edges: any[]
+  }) => void
+}
+const Console = (props: IProps) => {
   const { schema, console, global } = useStore();
+  const { onExplorer } = props;
   const { spaces, getSpaces, switchSpace, currentSpace } = schema;
   const { runGQL, currentGQL, results, runGQLLoading, getParams, update, paramsMap } = console;
   const { username, host } = global;
   const [isUpDown, setUpDown] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalData, setModalData] = useState<any>(null);
   const editor = useRef<any>(null);
   useEffect(() => {
     trackPageView('/console');
@@ -93,6 +104,20 @@ const Console = () => {
   const addParam = (param: string) => {
     update({ currentGQL: currentGQL + ` $${param}` });
   };
+
+  const handleResultConfig = (data: any) => {
+    setModalData(data);
+    setModalVisible(true);
+  };
+
+  const handleExplorer = (data) => {
+    if(!onExplorer) {
+      return;
+    }
+    onExplorer!(data);
+    !modalVisible && setModalVisible(false);
+    trackEvent('navigation', 'view_explore', 'from_console_btn');
+  };
   return (
     <div className="nebula-console">
       <div className="space-select">
@@ -146,7 +171,9 @@ const Console = () => {
               index={index}
               result={item}
               gql={item.gql}
+              onExplorer={onExplorer ? handleExplorer : undefined}
               onHistoryItem={gql => updateGql(gql)}
+              onResultConfig={handleResultConfig}
             />
           )) : <OutputBox
             key="empty"
@@ -157,6 +184,11 @@ const Console = () => {
           />}
         </div>
       </div>
+      {modalVisible && <ExportModal 
+        visible={modalVisible} 
+        data={modalData} 
+        onClose={() => setModalVisible(false)}
+        onExplorer={handleExplorer} />}
     </div>
   );
 };
