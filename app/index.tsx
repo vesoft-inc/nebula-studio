@@ -4,14 +4,14 @@ import React, { Suspense, lazy, useState } from 'react';
 import ReactDom from 'react-dom';
 import { Route, BrowserRouter as Router, Switch, useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
-import rootStore, { StoreProvider } from './stores';
 import dayjs from 'dayjs';
 import intl from 'react-intl-universal';
 import duration from 'dayjs/plugin/duration';
-import AuthorizedRoute from './AuthorizedRoute';
 import Cookie from 'js-cookie';
 import { INTL_LOCALES } from '@app/config/constants';
 import { LanguageContext } from '@app/context';
+import AuthorizedRoute from './AuthorizedRoute';
+import rootStore, { StoreProvider } from './stores';
 const Login = lazy(() => import('@app/pages/Login'));
 const MainPage = lazy(() => import('@app/pages/MainPage'));
 
@@ -73,4 +73,4 @@ const App = () => {
 
 const HotPageRoot = hot(PageRoot);
 
-ReactDom.render(<HotPageRoot />, document.getElementById('app'));
+ReactDom.render(<HotPageRoot />, document.getElementById('studio-app'));

@@ -25,7 +25,7 @@ const LoginPage: React.FC = () => {
   const history = useHistory();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const onConfig = async(values: any) => {
+  const onConfig = async (values: any) => {
     setLoading(true);
     const ok = await global.login(values);
     setLoading(false);

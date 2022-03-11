@@ -21,7 +21,7 @@ const FileUpload = () => {
     return file;
   };
 
-  const handleUpdate = async(options: any) => {
+  const handleUpdate = async (options: any) => {
     setLoading(true);
     const data = new FormData();
     data.append('file', options.file);

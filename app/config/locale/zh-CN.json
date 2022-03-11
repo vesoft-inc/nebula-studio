@@ -169,7 +169,7 @@
     "showTags": "显示点",
     "showEdges": "显示边",
     "confirm": "确定",
-    "vertexStyle": "节点颜色/图标",
+    "vertexStyle": "节点颜色",
     "quantityLimit": "结果数量限制",
     "colorGroupByTag": "按标签类型分类",
     "noVertexPrompt": "当前画板没有点数据，请",

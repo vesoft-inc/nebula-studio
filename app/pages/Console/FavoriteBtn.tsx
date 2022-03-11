@@ -21,7 +21,7 @@ const FavoriteBtn = (props: IProps) => {
 
   useEffect(() => {
     if (favorites[username] && favorites[username][host]) {
-      setData(favorites[username][host].reverse());
+      setData(favorites[username][host]);
     }
   }, [favorites]);
 

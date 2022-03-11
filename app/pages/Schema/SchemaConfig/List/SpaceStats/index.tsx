@@ -46,14 +46,14 @@ const SpaceStats = () => {
     setData([]);
   };
 
-  const getData = async() => {
+  const getData = async () => {
     const { code, data } = await getStats();
     if (code === 0) {
       setData(data.tables);
     }
   };
 
-  const getJobs = async() => {
+  const getJobs = async () => {
     const { code, data } = await getJobStatus();
     if (code === 0) {
       const stat = data.tables.filter(item => item.Command === 'STATS')[0];
@@ -85,7 +85,7 @@ const SpaceStats = () => {
       }
     }
   };
-  const handleSubmitStats = async() => {
+  const handleSubmitStats = async () => {
     setLoading(true);
     const { code, data } = await submitStats();
     setLoading(false);

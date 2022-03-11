@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { useHistory, useLocation } from 'react-router-dom';
-import PropertiesForm from './PropertiesForm';
-import TTLForm from './TTLForm';
 import './index.less';
 import { useStore } from '@app/stores';
 import { convertBigNumberToString } from '@app/utils/function';
 import { IAlterForm, IProperty, ISchemaType } from '@app/interfaces/schema';
 import { trackPageView } from '@app/utils/stat';
+import TTLForm from './TTLForm';
+import PropertiesForm from './PropertiesForm';
 
 const formItemLayout = {
   labelCol: {
@@ -64,7 +64,7 @@ const ConfigEdit = (props: IProps) => {
     trackPageView(`/schema/config/${editType}/edit`);
     getDetails();
   }, []);
-  const getDetails = async() => {
+  const getDetails = async () => {
     const _editName = state[editType];
     if(!_editName) {
       history.push(`/schema/${editType}/list`);
@@ -123,7 +123,7 @@ const ConfigEdit = (props: IProps) => {
     setTempComment(data.comment);
   };
 
-  const handleAlter = async(config: IAlterForm) => {
+  const handleAlter = async (config: IAlterForm) => {
     setLoading(true);
     const res = await alterField(config);
     setLoading(false);
@@ -133,7 +133,7 @@ const ConfigEdit = (props: IProps) => {
       setEditKey(null);
     }
   };
-  const handleCommentUpdate = async() => {
+  const handleCommentUpdate = async () => {
     setLoading(true);
     await handleAlter({
       type: editType,
@@ -146,7 +146,7 @@ const ConfigEdit = (props: IProps) => {
     setLoading(false);
   };
 
-  const checkIndex = async() => {
+  const checkIndex = async () => {
     setLoading(true);
     const res = (await getIndexTree(editType)) || [];
     setLoading(false);

@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import intl from 'react-intl-universal';
 import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
-import Search from '../Search';
 import Icon from '@app/components/Icon';
+import Search from '../Search';
 import './index.less';
 
 interface IProps {

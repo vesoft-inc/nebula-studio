@@ -37,7 +37,7 @@ const LogModal = (props: IProps) => {
     setCurrentLog(logs.filter(item => item.name === key)[0]);
   };
 
-  const getAllLogs = async() => {
+  const getAllLogs = async () => {
     const { code, data } = await getLogs(id);
     if(code === 0) {
       setLogs(data);
@@ -51,7 +51,7 @@ const LogModal = (props: IProps) => {
     }
   };
 
-  const readLog = async() => {
+  const readLog = async () => {
     const getLogDetail = currentLog!.name === 'import.log' ? getImportLogDetail : getErrLogDetail;
     const res = await getLogDetail({
       offset: offset.current,
