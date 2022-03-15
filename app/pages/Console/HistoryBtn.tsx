@@ -14,14 +14,14 @@ const HistoryBtn = (props: IProps) => {
   const [data, setData] = useState([]);
   const handleView = () => {
     const data = getHistory();
-    setData(data.reverse());
+    setData(data);
     setVisible(true);
   };
 
   const getHistory = () => {
     const value: string | null = localStorage.getItem('history');
     if (value && value !== 'undefined' && value !== 'null') {
-      return JSON.parse(value).slice(-15);
+      return JSON.parse(value).slice(0, 15);
     }
     return [];
   };

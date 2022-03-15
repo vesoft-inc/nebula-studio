@@ -16,8 +16,7 @@ module.exports = {
     ],
     parser: '@typescript-eslint/parser',
     parserOptions: {
-        'project': ['./tsconfig.json'],
-        'tsconfigRootDir': __dirname,
+        'project': 'tsconfig.json',
         'sourceType': 'module'
     },
     plugins: [
@@ -34,7 +33,7 @@ module.exports = {
         }
     },
     rules: {
-        'arrow-spacing':[
+        'arrow-spacing': [
             'error',
             {
                 before: true,
@@ -49,6 +48,7 @@ module.exports = {
                 default: 'array'
             }
         ],
+        'react/display-name': 'off',
         '@typescript-eslint/ban-types': [
             'error',
             {
@@ -108,29 +108,14 @@ module.exports = {
                 }
             }
         ],
-        '@typescript-eslint/member-ordering': 'error',
-        '@typescript-eslint/naming-convention': [
-            'error',
-            { selector: 'typeLike', format: ['PascalCase', 'UPPER_CASE'], filter: { 'regex': '^(__String|[A-Za-z]+_[A-Za-z]+)$', match: false } },
-            { selector: 'interface', format: ['PascalCase'], 'custom': { 'regex': '^I[A-Z][a-zA-Z0-9]*', match: true }, filter: { 'regex': '^I(Arguments|TextWriter|O([A-Z][a-z]+[A-Za-z]*)?)$', match: false } },
-            { selector: 'variable', format: ['camelCase', 'PascalCase', 'UPPER_CASE'], 'leadingUnderscore': 'allow', filter: { 'regex': '^(_{1,2}filename|_{1,2}dirname|_+|[A-Za-z]+_[A-Za-z]+)$', match: false } },
-            { selector: 'function', format: ['camelCase', 'PascalCase'], 'leadingUnderscore': 'allow', filter: { 'regex': '^[A-Za-z]+_[A-Za-z]+$', match: false } },
-            { selector: 'parameter', format: ['camelCase', 'PascalCase'], 'leadingUnderscore': 'allow', filter: { 'regex': '^(_+|[A-Za-z]+_[A-Z][a-z]+)$', match: false } },
-            { selector: 'method', format: ['camelCase', 'PascalCase'], 'leadingUnderscore': 'allow', filter: { 'regex': '^[A-Za-z]+_[A-Za-z]+$', match: false } },
-            { selector: 'memberLike', format: ['camelCase'], 'leadingUnderscore': 'allow', filter: { 'regex': '^[A-Za-z]+_[A-Za-z]+$', match: false } },
-            { selector: 'enumMember', format: ['camelCase', 'PascalCase', 'UPPER_CASE'], 'leadingUnderscore': 'allow', filter: { 'regex': '^[A-Za-z]+_[A-Za-z]+$', match: false } },
-            { selector: 'property', format: null }
-        ],
-        '@typescript-eslint/no-empty-function': 'error',
+        '@typescript-eslint/no-empty-function': 'off',
         '@typescript-eslint/no-empty-interface': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/no-misused-new': 'error',
         '@typescript-eslint/no-namespace': 'error',
         '@typescript-eslint/no-parameter-properties': 'off',
-        '@typescript-eslint/no-unused-expressions': ['error', { "allowTernary": true, "allowShortCircuit": true }],
+        '@typescript-eslint/no-this-alias': 'error',
         '@typescript-eslint/no-use-before-define': 'off',
-        '@typescript-eslint/no-var-requires': 'error',
-        '@typescript-eslint/prefer-for-of': 'error',
         '@typescript-eslint/prefer-function-type': 'error',
         '@typescript-eslint/prefer-namespace-keyword': 'error',
         '@typescript-eslint/quotes': [
@@ -165,13 +150,12 @@ module.exports = {
             'error',
             'smart'
         ],
-        'guard-for-in': 'error',
         'id-blacklist': 'error',
         'id-match': 'error',
+        'import/no-extraneous-dependencies': 'error',
         'import/no-internal-modules': 'off',
-        'sort-imports': 'error',
+        'import/order': 'error',
         'jsdoc/check-alignment': 'error',
-        'jsdoc/check-indentation': 'error',
         'jsdoc/newline-after-description': 'error',
         'max-classes-per-file': [
             'error',
@@ -220,7 +204,7 @@ module.exports = {
         'no-new-wrappers': 'error',
         'no-redeclare': 'error',
         'no-return-await': 'error',
-        'no-sequences': 'error',
+        'no-sequences': 'off',
         'no-shadow': [
             'off',
             {
@@ -239,16 +223,11 @@ module.exports = {
             'error',
             'never'
         ],
-        "no-multi-spaces": ["error", { ignoreEOLComments: true }],
-        "comma-spacing": ["error"],
+        'no-multi-spaces': ['error', { ignoreEOLComments: true }],
+        'comma-spacing': ['error'],
         'prefer-const': 'error',
         'prefer-object-spread': 'error',
-        'radix': 'error',
         'react/display-name': 'error',
-        'react/jsx-boolean-value': [
-            'error', 
-            'always'
-        ],
         'react/jsx-curly-spacing': 'off',
         'react/jsx-equals-spacing': 'off',
         'react/jsx-key': 'error',
@@ -265,7 +244,7 @@ module.exports = {
         'react/jsx-uses-react': 'error',
         'react/jsx-uses-vars': 'error',
         'react/jsx-wrap-multilines': 'off',
-        'react/no-children-prop': 'off',
+        'react/no-children-prop': 'error',
         'react/no-danger-with-children': 'error',
         'react/no-deprecated': 'error',
         'react/no-direct-mutation-state': 'error',
@@ -276,10 +255,14 @@ module.exports = {
         'react/no-unescaped-entities': 'error',
         'react/no-unknown-property': 'error',
         'react/no-unsafe': 'off',
-        'react/prop-types': 'error',
+        'react/prop-types': 'off',
         'react/react-in-jsx-scope': 'error',
         'react/require-render-return': 'error',
         'react/self-closing-comp': ['error'],
+        'key-spacing': ['error', {
+            'beforeColon': false,
+            'afterColon': true
+        }],
         'space-in-parens': [
             'error',
             'never'
@@ -293,25 +276,18 @@ module.exports = {
                 ]
             }
         ],
-        'key-spacing': ["error", { 
-            "beforeColon": false,
-            "afterColon": true
-        }],
-        'object-property-newline': ["error", { "allowAllPropertiesOnSameLine": true }],
-        "space-infix-ops": "error",
+        'space-infix-ops': 'error',
         semi: 1,
-        'block-spacing': "error",
-        'space-before-blocks': "error",
-        'space-before-function-paren':  ["error", "never"],
-        'object-curly-spacing': ['error','always'],
+        'block-spacing': 'error',
+        'space-before-blocks': 'error',
+        'space-before-function-paren': ['error', {
+            'anonymous': 'never',
+            'named': 'never',
+            'asyncArrow': 'always'
+        }],
+        'object-curly-spacing': ['error', 'always'],
         'use-isnan': 'error',
         'valid-typeof': 'off',
-        'jsx-quotes': ['error', 'prefer-double'],
-        'sort-imports': ['error', {
-            ignoreCase: false,
-            ignoreDeclarationSort: true,
-            ignoreMemberSort: false,
-            memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single']
-        }]
+        'jsx-quotes': ['error', 'prefer-double']
     }
 };

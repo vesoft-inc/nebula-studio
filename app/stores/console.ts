@@ -54,7 +54,7 @@ export class ConsoleStore {
     Object.keys(param).forEach(key => (this[key] = param[key]));
   };
 
-  runGQL = async(gql: string) => {
+  runGQL = async (gql: string) => {
     this.update({ runGQLLoading: true });
     try {
       const { gqlList, paramList } = splitQuery(gql);
@@ -87,7 +87,7 @@ export class ConsoleStore {
     }
   };
 
-  getParams = async() => {
+  getParams = async () => {
     const results = (await service.execNGQL(
       {
         gql: '',

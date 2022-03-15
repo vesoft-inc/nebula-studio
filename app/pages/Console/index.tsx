@@ -6,9 +6,9 @@ import { trackEvent, trackPageView } from '@app/utils/stat';
 import { useStore } from '@app/stores';
 import Instruction from '@app/components/Instruction';
 import Icon from '@app/components/Icon';
-import OutputBox from './OutputBox';
 import CodeMirror from '@app/components/CodeMirror';
 import { maxLineNum } from '@app/config/nebulaQL';
+import OutputBox from './OutputBox';
 import HistoryBtn from './HistoryBtn';
 import FavoriteBtn from './FavoriteBtn';
 import CypherParameterBox from './CypherParameterBox';
@@ -49,7 +49,12 @@ const Console = (props: IProps) => {
     getSpaces();
     getParams();
   }, []);
-
+  const handleSpaceSwitch = (space: string) => {
+    switchSpace(space);
+    update({
+      results: []
+    });
+  };
   
   const checkSwitchSpaceGql = (query: string) => {
     const queryList = query.split(SEMICOLON_REG).filter(Boolean);
@@ -77,12 +82,12 @@ const Console = (props: IProps) => {
   const handleSaveQuery = (query: string) => {
     if (query !== '') {
       const history = getHistory();
-      history.push(query);
+      history.unshift(query);
       localStorage.setItem('history', JSON.stringify(history));
     }
   };
 
-  const handleRun = async() => {
+  const handleRun = async () => {
     if(editor.current) {
       const query = editor.current!.editor.getValue();
       if (!query) {
@@ -122,7 +127,7 @@ const Console = (props: IProps) => {
     <div className="nebula-console">
       <div className="space-select">
         <span className="label">{intl.get('common.currentSpace')}</span>
-        <Select value={currentSpace} onChange={value => switchSpace(value)}>
+        <Select value={currentSpace} onChange={handleSpaceSwitch}>
           {spaces.map(space => (
             <Option value={space} key={space}>
               {space}

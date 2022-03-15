@@ -32,7 +32,7 @@ export class ImportStore {
     Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
   };
 
-  getTaskList = async() => {
+  getTaskList = async () => {
     const { code, data } = await service.handleImportAction({
       taskAction: 'actionQueryAll',
     });
@@ -43,7 +43,7 @@ export class ImportStore {
     }
   };
 
-  getTaskDir = async() => {
+  getTaskDir = async () => {
     const { code, data } = (await service.getTaskDir()) as any;
     if (code === 0) {
       const { taskDir } = data;
@@ -53,12 +53,12 @@ export class ImportStore {
     }
   };
 
-  getLogs = async(id: number) => {
+  getLogs = async (id: number) => {
     const { code, data } = (await service.getTaskLogs({ id })) as any;
     return { code, data };
   }
   
-  importTask = async(config, name) => {
+  importTask = async (config, name) => {
     const { code, data } = (await service.importData({
       configBody: config,
       configPath: '',
@@ -72,7 +72,7 @@ export class ImportStore {
     return code;
   }
 
-  stopTask = async(taskID: number) => {
+  stopTask = async (taskID: number) => {
     const res = await service.handleImportAction({
       taskID: taskID.toString(),
       taskAction: 'actionStop',
@@ -80,7 +80,7 @@ export class ImportStore {
     return res;
   }
 
-  deleteTask = async(taskID: number) => {
+  deleteTask = async (taskID: number) => {
     const res = await service.handleImportAction({
       taskID: taskID.toString(),
       taskAction: 'actionDel',
@@ -88,21 +88,21 @@ export class ImportStore {
     return res;
   }
 
-  downloadTaskConfig = async(taskID: number) => {
+  downloadTaskConfig = async (taskID: number) => {
     const link = document.createElement('a');
     link.href = service.getTaskConfigUrl(taskID);
     link.download = `config.yml`;
     link.click();
   }
 
-  downloadTaskLog = async(path: string) => {
+  downloadTaskLog = async (path: string) => {
     const link = document.createElement('a');
     link.href = service.getTaskLogUrl(path);
     link.download = `log.yml`;
     link.click();
   }
 
-  getImportLogDetail = async(params: {
+  getImportLogDetail = async (params: {
     offset: number;
     limit?: number;
     taskId: string | number;
@@ -112,7 +112,7 @@ export class ImportStore {
     return res;
   }
 
-  getErrLogDetail = async(params: {
+  getErrLogDetail = async (params: {
     offset: number;
     limit?: number;
     taskId: string | number;
@@ -122,7 +122,7 @@ export class ImportStore {
     return res;
   }
 
-  updateTagConfig = async(payload: { 
+  updateTagConfig = async (payload: { 
     tag: string; 
     tagIndex: number;
     configIndex: number;
@@ -171,7 +171,7 @@ export class ImportStore {
     this.basicConfig[key] = value;
   }
 
-  updateEdgeConfig = async(payload: { edgeType?: string, index: number; }) => {
+  updateEdgeConfig = async (payload: { edgeType?: string, index: number; }) => {
     const { edgeType, index } = payload;
     if(!edgeType) {
       this.edgesConfig = this.edgesConfig.splice(index, 1);

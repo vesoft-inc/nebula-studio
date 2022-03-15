@@ -7,11 +7,12 @@ import { useStore } from '@app/stores';
 import { trackEvent } from '@app/utils/stat';
 import { v4 as uuidv4 } from 'uuid';
 import Icon from '@app/components/Icon';
-import Graphviz from './Graphviz';
 import { parseSubGraph } from '@app/utils/parseData';
+import classNames from 'classnames';
+import Graphviz from './Graphviz';
+import ForceGraph from './ForceGraph';
 
 import './index.less';
-import classNames from 'classnames';
 
 interface IProps {
   index: number;
@@ -36,6 +37,7 @@ const OutputBox = (props: IProps) => {
   const [columns, setColumns] = useState<any>([]);
   const [dataSource, setDataSource] = useState<any>([]);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [showGraph, setShowGraph] = useState(false);
   const initData = () => {
     let _columns = [] as any;
     let _dataSource = [] as any;
@@ -45,6 +47,10 @@ const OutputBox = (props: IProps) => {
     const { headers, tables, localParams } = data;
     if (tables.length > 0) {
       _dataSource = data.tables;
+      setShowGraph(_dataSource.filter(item => 
+        item._verticesParsedList ||
+        item._edgesParsedList ||
+        item._pathsParsedList).length > 0);
     } 
     if(headers.length > 0) {
       _columns = data.headers.map(column => {
@@ -113,7 +119,7 @@ const OutputBox = (props: IProps) => {
     }
     const _favorites = { ...favorites };
     if (_favorites[username] && _favorites[username][host]) {
-      _favorites[username][host].push(gql);
+      _favorites[username][host].unshift(gql);
     } else {
       _favorites[username] = {
         [host]: [gql],
@@ -236,6 +242,7 @@ const OutputBox = (props: IProps) => {
     {visible && <> 
       <div className="tab-container">
         <Tabs
+          className="output-tab"
           defaultActiveKey={'log'}
           size={'large'}
           tabPosition={'left'}
@@ -274,6 +281,19 @@ const OutputBox = (props: IProps) => {
               key="graph"
             >
               {<Graphviz graph={dataSource[0]?.format} />}
+            </Tabs.TabPane>
+          )}
+          {showGraph && (
+            <Tabs.TabPane
+              tab={
+                <>
+                  <Icon type="icon-studio-console-graph" />
+                  {intl.get('common.graph')}
+                </>
+              }
+              key="graph"
+            >
+              <ForceGraph data={dataSource} spaceVidType={spaceVidType} />
             </Tabs.TabPane>
           )}
           {code !== 0 && (

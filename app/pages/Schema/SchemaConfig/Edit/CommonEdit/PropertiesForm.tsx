@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
+import { AlterType, IAlterForm, IProperty, ISchemaType } from '@app/interfaces/schema';
 import { DisplayRow, EditRow } from './PropertiesRow';
 import './index.less';
-import { AlterType, IAlterForm, IProperty, ISchemaType } from '@app/interfaces/schema';
 const confirm = Modal.confirm;
 
 interface IProps {
@@ -88,7 +88,7 @@ const PropertiesForm = (props: IProps) => {
   };
 
 
-  const handlePropertyDelete = async(fields: IProperty[]) => {
+  const handlePropertyDelete = async (fields: IProperty[]) => {
     onEdit({
       type: editType,
       name,

@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Layout, Menu } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import intl from 'react-intl-universal';
-import HelpMenu from './HelpMenu';
 import Icon from '@app/components/Icon';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
+import HelpMenu from './HelpMenu';
 import './index.less';
 const { Header } = Layout;
 
@@ -30,7 +30,7 @@ const PageHeader = (props: IProps) => {
   const [activeKey, setActiveKey] = useState<string>('');
   const { global: { username, host } } = useStore();
   const { pathname } = useLocation();
-  const handleMenuClick = async({ key }) => {
+  const handleMenuClick = async ({ key }) => {
     setActiveKey(key);
   };
 
