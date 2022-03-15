@@ -49,13 +49,13 @@ const TagList = () => {
   const [searchVal, setSearchVal] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
-  const getData = async() => {
+  const getData = async () => {
     setLoading(true);
     await getTagList();
     setSearchVal('');
     setLoading(false);
   };
-  const handleDeleteTag = async(name: string) => {
+  const handleDeleteTag = async (name: string) => {
     const res = await deleteTag(name);
     if (res.code === 0) {
       message.success(intl.get('common.deleteSuccess'));

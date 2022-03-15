@@ -54,7 +54,7 @@ const SpaceCreate = () => {
 
   const handleCreate = () => {
     setLoading(true);
-    form.validateFields().then(async() => {
+    form.validateFields().then(async () => {
       const { code } = await createSpace(gql);
       setLoading(false);
       if (code === 0) {

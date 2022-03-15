@@ -19,7 +19,7 @@ export class FilesStore {
     Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
   };
 
-  asyncGetFiles = async() => {
+  asyncGetFiles = async () => {
     const { code, data } = (await service.getFiles()) as any;
     if (code === 0 && data) {
       this.update({
@@ -27,13 +27,13 @@ export class FilesStore {
       });
     }
   };
-  asyncUploadFile = async(payload: Record<string, unknown>) => {
+  asyncUploadFile = async (payload: Record<string, unknown>) => {
     const { data, config } = payload;
     const res = (await service.uploadFiles(data, config)) as any;
     return res;
   };
 
-  asyncDeleteFile = async(index: number) => {
+  asyncDeleteFile = async (index: number) => {
     const res: any = await service.deteleFile({
       filename: this.fileList[index].name,
     });
@@ -46,7 +46,7 @@ export class FilesStore {
   };
 
 
-  asyncGetUploadDir = async() => {
+  asyncGetUploadDir = async () => {
     const { code, data } = (await service.getUploadDir()) as any;
     if (code === 0) {
       const { uploadDir } = data;

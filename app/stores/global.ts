@@ -34,7 +34,7 @@ export class GlobalStore {
     });
   }
 
-  logout = async() => {
+  logout = async () => {
     await service.disconnectDB(
       {},
       {
@@ -53,7 +53,7 @@ export class GlobalStore {
     Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
   };
 
-  login = async(payload: { host: string; username: string; password: string }) => {
+  login = async (payload: { host: string; username: string; password: string }) => {
     const { host, username, password } = payload;
     const [address, port] = host.replace(/^https?:\/\//, '').split(':');
     const { code, data } = (await service.connectDB(

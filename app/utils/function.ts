@@ -38,3 +38,7 @@ export const sortByFieldAndFilter = (payload: {
     return _.orderBy(list, [field], ['asc']);
   }
 };
+
+export const removeNullCharacters = (data: string) => {
+  return data.replace(/\u0000+$/, '');
+};

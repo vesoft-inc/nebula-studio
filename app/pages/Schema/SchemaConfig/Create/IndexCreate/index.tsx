@@ -47,7 +47,7 @@ const IndexCreate = () => {
     }) : '';
     setGql(currentGQL);
   };
-  const handleCreate = async(values) => {
+  const handleCreate = async (values) => {
     const { name, type, associate, fields, comment } = values;
     setLoading(true);
     const res = await createIndex({
@@ -64,7 +64,7 @@ const IndexCreate = () => {
     }
   };
 
-  const getAssociatedList = async(type?: IndexType) => {
+  const getAssociatedList = async (type?: IndexType) => {
     const associatedType = type ? type : form.getFieldValue('type');
     const data =
       associatedType === 'tag'

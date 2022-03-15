@@ -7,11 +7,11 @@ import { useHistory } from 'react-router-dom';
 import { uniqBy } from 'lodash';
 import GQLCodeMirror from '@app/components/GQLCodeMirror';
 import { getTagOrEdgeCreateGQL } from '@app/utils/gql';
+import { useStore } from '@app/stores';
+import { ISchemaType } from '@app/interfaces/schema';
 import PropertiesForm from './PropertiesForm';
 import TTLForm from './TTLForm';
 import './index.less';
-import { useStore } from '@app/stores';
-import { ISchemaType } from '@app/interfaces/schema';
 
 const formItemLayout = {
   labelCol: {
@@ -47,7 +47,7 @@ const ConfigCreate = (props: IProps) => {
       : '';
     setGql(currentGQL);
   };
-  const handleCreate = async(values) => {
+  const handleCreate = async (values) => {
     const { name, properties } = values;
     const uniqProperties = uniqBy(properties, 'name');
     if (properties && properties.length !== uniqProperties.length) {

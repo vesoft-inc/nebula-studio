@@ -5,14 +5,14 @@ import Breadcrumb from '@app/components/Breadcrumb';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
-import FileSelect from './FileSelect';
-import SchemaConfig from './SchemaConfig';
-import PasswordInputModal from './PasswordInputModal';
 import { configToJson } from '@app/utils/import';
 import intl from 'react-intl-universal';
 import './index.less';
 import { useHistory } from 'react-router-dom';
 import { POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
+import PasswordInputModal from './PasswordInputModal';
+import SchemaConfig from './SchemaConfig';
+import FileSelect from './FileSelect';
 const Option = Select.Option;
 const formItemLayout = {
   labelCol: {
@@ -49,7 +49,7 @@ const TaskCreate = () => {
       console.log('err', err);
     }
   };
-  const handleStartImport = async(password?: string) => {
+  const handleStartImport = async (password?: string) => {
     setVisible(false);
     if(password) {
       const config: any = configToJson({ 

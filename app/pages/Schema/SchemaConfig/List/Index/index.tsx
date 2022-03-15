@@ -7,8 +7,8 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { sortByFieldAndFilter } from '@app/utils/function';
 import { IIndexList, IndexType } from '@app/interfaces/schema';
-import CommonLayout from '../CommonLayout';
 import Cookie from 'js-cookie';
+import CommonLayout from '../CommonLayout';
 
 import './index.less';
 
@@ -48,14 +48,14 @@ const IndexList = () => {
   const [rebuildList, setRebuildList] = useState<IIndexList[] | null>(null);
   const rebuildTimer = useRef<NodeJS.Timeout | null>(null);
   const history = useHistory();
-  const getData = async() => {
+  const getData = async () => {
     setLoading(true);
     await getIndexList(indexType);
     await getRebuildData(indexType);
     setSearchVal('');
     setLoading(false);
   };
-  const handleDeleteIndex = async(event, type: IndexType, name: string) => {
+  const handleDeleteIndex = async (event, type: IndexType, name: string) => {
     event.stopPropagation();
     const res = await deleteIndex({ type, name });
     if (res.code === 0) {
@@ -64,7 +64,7 @@ const IndexList = () => {
     }
   };
 
-  const getRebuildData = async(type: IndexType) => {
+  const getRebuildData = async (type: IndexType) => {
     rebuildTimer.current && clearTimeout(rebuildTimer.current);
     const data = await getRebuildIndexes(type);
     if (data && data.length > 0) {
@@ -78,7 +78,7 @@ const IndexList = () => {
     }
   };
 
-  const handleRebuild = async(event, type: IndexType, name: string) => {
+  const handleRebuild = async (event, type: IndexType, name: string) => {
     event.stopPropagation();
     const res = await rebuildIndex({
       type,

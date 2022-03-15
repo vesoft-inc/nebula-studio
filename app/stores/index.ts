@@ -4,8 +4,9 @@ import files from './files';
 import console from './console';
 import dataImport from './import';
 import schema from './schema';
+import graphInstances from './graphInstances';
 
-const rootStore = { global, files, console, dataImport, schema };
+const rootStore = { global, files, console, dataImport, schema, graphInstances };
 const rootStoreRef = { current: rootStore };
 // @ts-ignore
 window.studioStore = rootStore;

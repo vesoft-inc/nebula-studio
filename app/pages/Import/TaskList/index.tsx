@@ -1,18 +1,18 @@
 import { Button, message } from 'antd';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import TaskItem from './TaskItem';
 import { useHistory } from 'react-router-dom';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
+import { ITaskStatus } from '@app/interfaces/import';
 import LogModal from './TaskItem/LogModal';
 import TemplateModal from './TemplateModal';
 
 import './index.less';
-import { ITaskStatus } from '@app/interfaces/import';
+import TaskItem from './TaskItem';
 
 let isMounted = true;
 
@@ -29,7 +29,7 @@ const TaskList = () => {
   const [modalVisible, setVisible] = useState(false);
   const [importModalVisible, setImportModalVisible] = useState(false);
   const [logDimension, setLogDimension] = useState<ILogDimension>({} as ILogDimension);
-  const handleTaskStop = useCallback(async(id: number) => {
+  const handleTaskStop = useCallback(async (id: number) => {
     clearTimeout(timer.current);
     const { code } = await stopTask(id);
     if(code === 0) {
@@ -37,7 +37,7 @@ const TaskList = () => {
       getTaskList();
     }
   }, []);
-  const handleTaskDelete = useCallback(async(id: number) => {
+  const handleTaskDelete = useCallback(async (id: number) => {
     clearTimeout(timer.current);
     const { code } = await deleteTask(id);
     if(code === 0) {

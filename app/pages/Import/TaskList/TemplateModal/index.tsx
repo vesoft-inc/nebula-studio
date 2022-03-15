@@ -29,7 +29,7 @@ const TemplateModal = (props: IProps) => {
     }
     getTaskDir();
   }, []);
-  const handleFileImport = async({ file }) => {
+  const handleFileImport = async ({ file }) => {
     await setLoading(true);
     const content = await readFileContent(file);
     const parseContent = yaml.load(content);
@@ -51,7 +51,7 @@ const TemplateModal = (props: IProps) => {
     await setLoading(false);
   };
 
-  const handleImport = async(values) => {
+  const handleImport = async (values) => {
     const code = await importTask(JSON.parse(values.content), values.name);
     if(code === 0) {
       message.success(intl.get('import.startImporting'));

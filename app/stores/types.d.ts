@@ -3,3 +3,9 @@ export enum NebulaVersion {
   V2_6 = 'v2.6',
   V3_0 = 'v3.0',
 }
+
+export interface ITransform {
+  x: number;
+  y: number;
+  k: number;
+}

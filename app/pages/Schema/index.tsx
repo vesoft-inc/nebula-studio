@@ -18,7 +18,7 @@ const Schema = () => {
     getSpaces();
   }, []);
 
-  const handleDeleteSpace = async(name: string) => {
+  const handleDeleteSpace = async (name: string) => {
     setLoading(true);
     const res = await deleteSpace(name);
     if (res.code === 0) {
@@ -32,7 +32,7 @@ const Schema = () => {
     }
   };
 
-  const handleSwitchSpace = async(space: string) => {
+  const handleSwitchSpace = async (space: string) => {
     const err = await switchSpace(space);
     if (!err) {
       history.push(`/schema/tag/list`);
@@ -40,7 +40,7 @@ const Schema = () => {
       message.warning(intl.get('schema.useSpaceErrTip'));
     }
   };
-  const getSpaces = async() => {
+  const getSpaces = async () => {
     setLoading(true);
     await getSpacesList();
     setLoading(false);

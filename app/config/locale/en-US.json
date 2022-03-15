@@ -170,7 +170,7 @@
     "showTags": "Show Tags",
     "showEdges": "Show Edges",
     "confirm": "Confirm",
-    "vertexStyle": "Vertex Color/Icon",
+    "vertexStyle": "Vertex Color",
     "quantityLimit": "Query Limit",
     "colorGroupByTag": "Group by vertex tag",
     "noVertexPrompt": "No vertices on the board. ",

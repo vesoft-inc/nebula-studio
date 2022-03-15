@@ -5,11 +5,11 @@ import { CloseOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import CSVPreviewLink from '@app/components/CSVPreviewLink';
-import TagConfig from './TagConfig';
 import intl from 'react-intl-universal';
+import Icon from '@app/components/Icon';
+import TagConfig from './TagConfig';
 import EdgeConfig from './EdgeConfig';
 const { Panel } = Collapse;
-import Icon from '@app/components/Icon';
 
 import './index.less';
 

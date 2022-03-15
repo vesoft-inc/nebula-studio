@@ -49,13 +49,13 @@ const EdgeList = () => {
   const [searchVal, setSearchVal] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
-  const getData = async() => {
+  const getData = async () => {
     setLoading(true);
     await getEdgeList();
     setSearchVal('');
     setLoading(false);
   };
-  const handleDeleteEdge = async(name: string) => {
+  const handleDeleteEdge = async (name: string) => {
     const res = await deleteEdge(name);
     if (res.code === 0) {
       message.success(intl.get('common.deleteSuccess'));

@@ -1,57 +1,13 @@
+import { NodeObject } from '@app/components/ForceGraph';
 import BigNumber from 'bignumber.js';
 import JSONBigint from 'json-bigint';
 import json2csv from 'json2csv';
+import { remove } from 'lodash';
+export const LINE_LENGTH = 150;
+export const FONT_SIZE = 10;
+export const NODE_SIZE = 18;
+export const NODE_AREA = NODE_SIZE * NODE_SIZE;
 
-import { INode, IPath } from '#app/utils/interface';
-
-export const MIN_SCALE = 0.3;
-export const MAX_SCALE = 1;
-
-export const HOT_KEYS = intl => [
-  {
-    operation: `Shift + 'Enter'`,
-    desc: intl.get('explore.expand'),
-  },
-  {
-    operation: `Shift + '-'`,
-    desc: intl.get('common.zoomOut'),
-  },
-  {
-    operation: `Shift + '+'`,
-    desc: intl.get('common.zoomIn'),
-  },
-  {
-    operation: `Shift + 'l'`,
-    desc: intl.get('common.show'),
-  },
-  {
-    operation: `Shift + 'z'`,
-    desc: intl.get('common.rollback'),
-  },
-  {
-    operation: intl.get('common.selected') + ` + Shift + 'del'`,
-    desc: intl.get('common.delete'),
-  },
-];
-
-export const GRAPH_ALOGORITHM = intl => [
-  {
-    label: intl.get('explore.allPath'),
-    value: 'ALL',
-  },
-  {
-    label: intl.get('explore.shortestPath'),
-    value: 'SHORTEST',
-  },
-  {
-    label: intl.get('explore.noLoopPath'),
-    value: 'NOLOOP',
-  },
-];
-
-export const DEFAULT_COLOR_PICKER = '#5CDBD3';
-export const DEFAULT_COLOR_MIX =
-  'linear-gradient(225deg, #32C5FF 0%, #B620E0 51%, #F7B500 100%)';
 export const COLOR_PICK_LIST = [
   '#B93431',
   '#B95C31',
@@ -167,7 +123,7 @@ export const downloadCSVFiles = ({ headers, tables, title }) => {
       const BOM = '\uFEFF';
       const csvData = new Blob([BOM + result], { type: 'text/csv' });
       // @ts-ignore
-      navigator.msSaveBlob(csvData, `test.csv`);
+      navigator.msSaveBlob?.(csvData, `test.csv`);
     } else {
       // Non-Internet Explorer
       // Use the download property of the A tag to implement the download function
@@ -184,7 +140,7 @@ export const downloadCSVFiles = ({ headers, tables, title }) => {
   }
 };
 
-export const parseData = (data: INode[] | IPath[], type: 'vertex' | 'edge') => {
+export const parseData = (data, type: 'vertex' | 'edge') => {
   const fields =
     type === 'vertex'
       ? ['vid', 'attributes']
@@ -192,17 +148,16 @@ export const parseData = (data: INode[] | IPath[], type: 'vertex' | 'edge') => {
   const tables: any = [];
   data.forEach((item: any) => {
     const _result = {} as any;
-    const properties =
-      type === 'vertex' ? item.nodeProp.properties : item.edgeProp.properties;
+    const properties = item.properties;
     const { result } = flattenData(properties) as any;
     if (type === 'vertex') {
-      _result.vid = item.name;
+      _result.vid = item.id;
       _result.attributes = JSONBigint.stringify(result);
       tables.push(_result);
     } else if (type === 'edge') {
-      _result.type = item.type;
-      _result.srcId = item.source.name;
-      _result.dstId = item.target.name;
+      _result.type = item.edgeType;
+      _result.srcId = item.source;
+      _result.dstId = item.target;
       _result.rank = item.rank;
       _result.attributes = JSONBigint.stringify(result);
       tables.push(_result);
@@ -212,17 +167,85 @@ export const parseData = (data: INode[] | IPath[], type: 'vertex' | 'edge') => {
 };
 
 export const exportDataToCSV = (
-  data: INode[] | IPath[],
+  data,
   type: 'vertex' | 'edge',
 ) => {
   const { headers, tables } = parseData(data, type);
   downloadCSVFiles({ headers, tables, title: type });
 };
-export const DEFAULT_EXPLORE_RULES = {
-  edgeTypes: [],
-  edgeDirection: 'outgoing',
-  stepsType: 'single',
-  step: 1,
-  vertexStyle: 'colorGroupByTag',
-  quantityLimit: 100,
+
+export const updateTagMap = (tagMap, vertexes) => {
+  Object.keys(tagMap).forEach(tag => {
+    const colorGroup = tagMap[tag];
+    colorGroup.forEach(colorMap => {
+      colorMap.countIds = [];
+    });
+  });
+  vertexes.forEach(vertex => {
+    const { color, tags = [], id } = vertex;
+    const group = tags.sort().join('-');
+    const colorMap = tagMap[group];
+    if (colorMap) {
+      const hasColor = colorMap.some(item => {
+        if (item.color === color && !item.countIds.includes(id)) {
+          item.countIds.push(String(id));
+          return true;
+        }
+      });
+      if (!hasColor) {
+        colorMap.push({
+          color,
+          countIds: [String(id)]
+        });
+      }
+    } else {
+      tagMap[group] = [{
+        color,
+        countIds: [String(id)]
+      }];
+    }
+  });
+  // remove color without data, but need to remain one
+  Object.keys(tagMap).forEach(tag => {
+    const colorGroup = tagMap[tag];
+    const noDataList = colorGroup.filter(item => item.countIds.length === 0).map(item => item.color);
+    const removeList = colorGroup.length === noDataList.length ? noDataList.slice(1) : noDataList;
+    remove(tagMap[tag], (item: any) => removeList.includes(item.color));
+  });
+  return { ...tagMap };
 };
+
+export const updateEdgeMap = (edgeMap, edges) => {
+  Object.keys(edgeMap).forEach(item => {
+    edgeMap[item] = {
+      countIds: []
+    };
+  });
+  edges.forEach(edge => {
+    const { edgeType, id } = edge;
+    edgeMap[edgeType].countIds = [...edgeMap[edgeType].countIds, id];
+  });
+  return { ...edgeMap };
+};
+export const makeRoundPosition = (data: NodeObject[] | Set<NodeObject>, center: { x: number; y: number }) => {
+  const nodes = [...data];
+  const length = nodes.length;
+  const radius = Math.min(Math.max((length * NODE_SIZE) / 2, LINE_LENGTH), window.innerHeight / 2);
+  // when nodes.length>50 use sphere layout
+  if (nodes.length < 50) {
+    nodes.forEach((node, index) => {
+      const angle = (index / length) * Math.PI * 2;
+      node.x = radius * Math.sin(angle) + center.x;
+      node.y = radius * Math.cos(angle) + center.y;
+    });
+  } else {
+    nodes.forEach((node) => {
+      const angle = Math.random() * Math.PI * 2;
+      const r = radius * Math.random();
+      node.x = r * Math.sin(angle) + center.x;
+      node.y = r * Math.cos(angle) + center.y;
+    });
+  }
+    
+};
+export const CANVAS_HIDE_LABEL_SCALE = 1.0;
