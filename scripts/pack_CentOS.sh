@@ -35,3 +35,7 @@ cp -r $STUDIO/server/server $TAR_TARGET/
 
 cd $DIR
 tar -czf nebula-graph-studio-$VERSION.x86_64.tar.gz nebula-graph-studio
+
+# build docker-compose dir
+cd $DIR
+tar -czf nebula-graph-studio-$VERSION.tar.gz -C $STUDIO/deployment/docker .

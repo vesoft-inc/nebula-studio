@@ -4,10 +4,11 @@
   "description": "nebula-graph-studio",
   "private": true,
   "scripts": {
-    "dev": "webpack-dev-server --config ./config/webpack.dev.ts --mode development --color --progress --hot",
+    "dev": "webpack-dev-server --config ./config/webpack.dev.js --mode development --color --progress --hot",
     "lint": "eslint 'app/**/*.{ts,tsx}' && stylelint **/*.{html,less}",
     "lint-fix": "eslint 'app/**/*.{ts,tsx}' --fix && stylelint **/*.{html,less} --fix",
-    "build": "webpack --config config/webpack.prod.ts"
+    "build": "webpack --config config/webpack.prod.js",
+    "dev-all": "node ./config/server.js"
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
@@ -104,6 +105,7 @@
     "less-loader": "^10.2.0",
     "mini-css-extract-plugin": "^2.5.0",
     "prettier": "^2.3.2",
+    "react-dev-utils": "^12.0.0",
     "style-loader": "^2.0.0",
     "stylelint": "^13.13.1",
     "stylelint-config-recommended": "^5.0.0",

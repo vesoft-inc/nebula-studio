@@ -9,8 +9,6 @@ node_modules/
 *.map
 .github/workflows/nodejs.yml
 
-app/**/*.js
-config/**/*.js
 app/**/*.map
 config/**/*.map
 dist/

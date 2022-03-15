@@ -7,12 +7,18 @@ Nebula Graph Studio (Studio for short) is a web-based visualization tool for Neb
 
 ## Development Quick Start
 
-### Set up nebula-graph-studio
+### set up studio and server at the same time
+```
+$ npm install
+$ npm run dev-all
+```
+
+### Set up nebula-graph-studio only
 ```
 $ npm install
 $ npm run dev
 ```
-### Set up go-server
+### Set up go-server only
 ```
 $ cd server
 $ go build -o server
@@ -25,18 +31,18 @@ $ nohup ./server &
 ```
 $ npm run install
 $ npm run build
+$ mv dist server/assets
 ```
 
-### 1. Build Web
+### 2. Build Server
 ```
-// remove default port 7001 in config/example-config.yaml first
 $ cd server
+// update default port 9000 to 7001 in config/example-config.yaml first
 $ go build -o server
 ```
 
 ### 3. Start
 ```
-$ mv dist server/assets
 $ nohup ./server &
 ```
 
