@@ -17,11 +17,11 @@ interface IProps {
 const VerticesConfig = (props: IProps) => {
   const { tag, tagIndex, configIndex, file } = props;
   const { dataImport, schema } = useStore();
-  const { asyncUpdateTagConfig, updateTagPropMapping } = dataImport;
+  const { updateTagConfig, updateTagPropMapping } = dataImport;
   const { tags } = schema;
 
   const handleTagChange = (configIndex: number, tagIndex: number, value: string) => {
-    asyncUpdateTagConfig({ configIndex, tagIndex, tag: value });
+    updateTagConfig({ configIndex, tagIndex, tag: value });
   };
 
   const handlePropChange = (index, field, value) => {

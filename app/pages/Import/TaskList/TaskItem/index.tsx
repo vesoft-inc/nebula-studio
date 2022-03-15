@@ -6,12 +6,14 @@ import './index.less';
 import { ITaskItem, ITaskStatus } from '@app/interfaces/import';
 import dayjs from 'dayjs';
 import { floor } from 'lodash';
+import { getFileSize } from '@app/utils/file';
 import Icon from '@app/components/Icon';
 interface IProps {
   data: ITaskItem;
   handleStop: (id: number) => void;
   handleDelete: (id: number) => void;
   handleDownload: (id: number) => void;
+  onViewLog: (id: number, space: string, taskStatus: ITaskStatus) => void;
 }
 
 
@@ -39,30 +41,35 @@ const TaskItem = (props: IProps) => {
       space,
       taskID, 
       name, 
-      statsQuery: { totalCount, totalLine, numFailed, numReadFailed }, 
+      stats: { totalImportedBytes, totalBytes, numFailed, numReadFailed }, 
       taskStatus, 
       taskMessage,
       updatedTime, 
       createdTime 
     }, 
+    onViewLog,
     handleDownload,
     handleStop, 
     handleDelete } = props;
   const [status, setStatus] = useState<'success' | 'active' | 'normal' | 'exception' | undefined>(undefined);
   const [extraMsg, setExtraMsg] = useState('');
+  const addMsg = () => {
+    const info: string[] = [];
+    if(numFailed > 0) {
+      info.push(intl.get('import.notImported', { total: getFileSize(numFailed) }));
+    }
+    if(numReadFailed > 0) {
+      info.push(intl.get('import.readFailed', { total: getFileSize(numReadFailed) }));
+    }
+    info.length > 0 && setExtraMsg(info.join(', '));
+  };
   useEffect(() => {
     if(taskStatus === ITaskStatus.StatusFinished) {
       setStatus('success');
+      addMsg();
     } else if(taskStatus === ITaskStatus.StatusProcessing) {
       setStatus('active');
-      const info: string[] = [];
-      if(numFailed > 0) {
-        info.push(intl.get('import.notImported', { numFailed }));
-      }
-      if(numReadFailed > 0) {
-        info.push(intl.get('import.readFailed', { numReadFailed }));
-      }
-      info.length > 0 && setExtraMsg(info.join(', '));
+      addMsg();
     } else {
       setStatus('exception');
       if(taskMessage) {
@@ -87,7 +94,7 @@ const TaskItem = (props: IProps) => {
               {taskStatus === ITaskStatus.StatusFinished && <span className="complete-info">
                 <CheckCircleFilled />
                 {intl.get('import.importCompleted')}
-                {extraMsg && ` (${extraMsg})`}
+                <span className="red">{extraMsg && ` (${extraMsg})`}</span>
               </span>}
               {taskStatus === ITaskStatus.StatusAborted && <span className="error-info">
                 {intl.get('import.importFailed')}
@@ -99,20 +106,21 @@ const TaskItem = (props: IProps) => {
             </span>
             <div className="more-info">
               <span>
-                {taskStatus !== ITaskStatus.StatusFinished && `${totalCount} ${intl.get('import.lines')} / `}
-                {totalLine}{' '}{intl.get('import.lines')}
+                {taskStatus !== ITaskStatus.StatusFinished && `${getFileSize(totalImportedBytes)} / `}
+                {getFileSize(totalBytes)}{' '}
               </span>
               <span>{dayjs.duration(dayjs.unix(updatedTime).diff(dayjs.unix(createdTime))).format('HH:mm:ss')}</span>
             </div>
           </div>
           <Progress 
+            format={percent => `${percent}%`}
             status={status} 
-            percent={taskStatus !== ITaskStatus.StatusFinished ? floor(totalCount / totalLine * 100, 2) : 100} 
+            percent={taskStatus !== ITaskStatus.StatusFinished ? floor(totalImportedBytes / totalBytes * 100, 2) : 100} 
             strokeColor={status && COLOR_MAP[status]} />
         </div>
         <div className="operations">
-          <Button className="primary-btn">{intl.get('import.details')}</Button>
-          <Button className="primary-btn">{intl.get('import.viewLogs')}</Button>
+          {/* <Button className="primary-btn">{intl.get('import.details')}</Button> */}
+          <Button className="primary-btn" onClick={() => onViewLog(taskID, space, taskStatus)}>{intl.get('import.viewLogs')}</Button>
           {taskStatus === ITaskStatus.StatusProcessing && 
           <Popconfirm
             placement="left"

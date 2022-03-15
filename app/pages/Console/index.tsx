@@ -2,7 +2,7 @@ import { Button, Select, Tooltip, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
-import { trackPageView, trackEvent } from '@app/utils/stat';
+import { trackEvent, trackPageView } from '@app/utils/stat';
 import { useStore } from '@app/stores';
 import Instruction from '@app/components/Instruction';
 import Icon from '@app/components/Icon';

@@ -32,7 +32,7 @@ export class ImportStore {
     Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
   };
 
-  asyncGetTaskList = async() => {
+  getTaskList = async() => {
     const { code, data } = await service.handleImportAction({
       taskAction: 'actionQueryAll',
     });
@@ -43,7 +43,7 @@ export class ImportStore {
     }
   };
 
-  asyncGetTaskDir = async() => {
+  getTaskDir = async() => {
     const { code, data } = (await service.getTaskDir()) as any;
     if (code === 0) {
       const { taskDir } = data;
@@ -52,6 +52,11 @@ export class ImportStore {
       });
     }
   };
+
+  getLogs = async(id: number) => {
+    const { code, data } = (await service.getTaskLogs({ id })) as any;
+    return { code, data };
+  }
   
   importTask = async(config, name) => {
     const { code, data } = (await service.importData({
@@ -85,14 +90,39 @@ export class ImportStore {
 
   downloadTaskConfig = async(taskID: number) => {
     const link = document.createElement('a');
-    link.href = `/api-nebula/task/import/config/${taskID}`;
+    link.href = service.getTaskConfigUrl(taskID);
     link.download = `config.yml`;
-    document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
   }
 
-  asyncUpdateTagConfig = async(payload: { 
+  downloadTaskLog = async(path: string) => {
+    const link = document.createElement('a');
+    link.href = service.getTaskLogUrl(path);
+    link.download = `log.yml`;
+    link.click();
+  }
+
+  getImportLogDetail = async(params: {
+    offset: number;
+    limit?: number;
+    taskId: string | number;
+    path: string;
+  }) => {
+    const res = await service.getLog(params);
+    return res;
+  }
+
+  getErrLogDetail = async(params: {
+    offset: number;
+    limit?: number;
+    taskId: string | number;
+    path: string;
+  }) => {
+    const res = await service.getErrLog(params);
+    return res;
+  }
+
+  updateTagConfig = async(payload: { 
     tag: string; 
     tagIndex: number;
     configIndex: number;
