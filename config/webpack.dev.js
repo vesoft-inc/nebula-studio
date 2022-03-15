@@ -1,8 +1,9 @@
-import path from 'path';
-import { mergeWithCustomize } from 'webpack-merge';
-import commonConfig from './webpack.base';
+const path = require('path');
+const merge = require('webpack-merge');
+const commonConfig = require('./webpack.base');
 
 const devConfig = {
+  mode: 'development',
   devtool: 'inline-source-map',
   entry: {
     app: [
@@ -27,6 +28,7 @@ const devConfig = {
 
   devServer: {
     port: 7001,
+    open: true,
     headers: { 'Access-Control-Allow-Origin': '*' },
     historyApiFallback: true,
     host: 'localhost',
@@ -61,7 +63,7 @@ const devConfig = {
   },
 };
 
-module.exports = mergeWithCustomize({
+module.exports = merge.mergeWithCustomize({
   customizeArray(_, b, key) {
     if (key === 'entry.app') {
       return b;

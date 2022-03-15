@@ -1,10 +1,9 @@
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import path, { resolve } from 'path';
-import webpack, { Configuration } from 'webpack';
-import Package from '../package.json';
-import AntdDayjsWebpackPlugin from 'antd-dayjs-webpack-plugin';
-
-const commonConfig: Configuration = {
+const path = require('path');
+const webpack = require('webpack');
+const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const Package = require('../package.json')
+const commonConfig = {
   entry: {
     app: [path.join(__dirname, '../app/index.tsx')],
   },
@@ -89,7 +88,7 @@ const commonConfig: Configuration = {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: path.join(__dirname, '../app/index.html'),
-      favicon: resolve(__dirname, '../favicon.ico'),
+      favicon: path.resolve(__dirname, '../favicon.ico'),
       minify: {
         collapseWhitespace: true,
         removeComments: true,
@@ -121,4 +120,4 @@ const commonConfig: Configuration = {
   },
 };
 
-export default commonConfig;
+module.exports = commonConfig;
