@@ -8,8 +8,11 @@ export enum ITaskStatus {
 }
 
 export interface ITaskStats {
-  totalLine: number;
-  totalCount: number;
+  totalBatches: number;
+  totalBytes: number;
+  totalImportedBytes: number;
+  totalLatency: number;
+  totalReqTime: number;
   numFailed: number;
   numReadFailed: number;
 }
@@ -23,7 +26,7 @@ export interface ITaskItem {
   user: string;
   taskStatus: ITaskStatus;
   taskMessage: string;
-  statsQuery: ITaskStats;
+  stats: ITaskStats;
 }
 
 export interface IVerticesConfig {

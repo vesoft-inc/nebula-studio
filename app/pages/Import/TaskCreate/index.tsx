@@ -24,7 +24,7 @@ const formItemLayout = {
 };
 const TaskCreate = () => {
   const { dataImport, schema, global } = useStore();
-  const { taskDir, asyncGetTaskDir, basicConfig, verticesConfig, edgesConfig, updateBasicConfig, importTask } = dataImport;
+  const { taskDir, getTaskDir, basicConfig, verticesConfig, edgesConfig, updateBasicConfig, importTask } = dataImport;
   const { spaces, spaceVidType, getSpaces, updateSpaceInfo, currentSpace } = schema;
   const { host, username } = global;
   const { batchSize } = basicConfig;
@@ -125,7 +125,7 @@ const TaskCreate = () => {
   };
 
   useEffect(() => {
-    asyncGetTaskDir();
+    getTaskDir();
     getSpaces();
     if(currentSpace) {
       updateSpaceInfo(currentSpace);
