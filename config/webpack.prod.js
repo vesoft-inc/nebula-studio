@@ -1,12 +1,12 @@
-import { CleanWebpackPlugin } from 'clean-webpack-plugin';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import path from 'path';
-import webpack, { Configuration } from 'webpack';
-import merge from 'webpack-merge';
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const path = require('path');
+const webpack = require('webpack');
+const { merge } = require('webpack-merge');
 
-import commonConfig from './webpack.base';
+const commonConfig = require('./webpack.base');
 
-const publicConfig: Configuration = {
+const publicConfig = {
   mode: 'production',
   output: {
     path: path.join(__dirname, '../dist/'),
@@ -33,8 +33,8 @@ const publicConfig: Configuration = {
     new CleanWebpackPlugin(),
 
     new MiniCssExtractPlugin({
-      filename: '[name].[hash].css',
-      chunkFilename: '[id].[hash].css',
+      filename: '[name].[fullhash].css',
+      chunkFilename: '[id].[fullhash].css',
     }),
   ],
 };

@@ -1,0 +1,14 @@
+version: '3.4'
+services:
+  web:
+    image: vesoft/nebula-graph-studio:v3.3.0-beta
+    environment:
+      USER: root
+      UPLOAD_DIR: ${MAPPING_DOCKER_DIR}
+    ports:
+      - 7001:7001
+    networks:
+      - nebula-web
+
+networks:
+  nebula-web:
