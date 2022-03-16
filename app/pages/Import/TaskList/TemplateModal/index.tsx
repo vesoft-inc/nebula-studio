@@ -39,7 +39,7 @@ const TemplateModal = (props: IProps) => {
       parseContent.logPath = _taskDir + parseContent.logPath;
       parseContent.files.forEach(file => {
         file.path = _uploadDir + file.path;
-        file.failDataPath = _taskDir + `err\${file.failDataPath}`;
+        file.failDataPath = _taskDir + `err/${file.failDataPath}`;
       });
       setConfig(JSON.stringify(parseContent, null, 2));
       form.setFieldsValue({
@@ -91,7 +91,7 @@ const TemplateModal = (props: IProps) => {
           <Input />
         </Form.Item>
         <Form.Item label={intl.get('import.config')} name="content" rules={[{ required: true }]}>
-          <TextArea autoSize={true} disabled={true} placeholder={intl.get('explore.importPlaceholder')} />
+          <TextArea autoSize={true} disabled={true} />
         </Form.Item>
       </Form>}
     </Modal>

@@ -21,16 +21,6 @@ export const passwordRulesFn = intl => [
   },
 ];
 
-export const nodeIdRulesFn = intl => [
-  {
-    required: true,
-    message: intl.get('formRules.idRequired'),
-  },
-  {
-    pattern: /^(.+)*(\n.+)*(\n)*$/,
-    message: intl.get('formRules.nodeIdError'),
-  },
-];
 
 export const nameRulesFn = intl => [
   {

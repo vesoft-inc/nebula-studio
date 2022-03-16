@@ -113,7 +113,6 @@ const commonConfig = {
       'ttf',
     ],
     alias: {
-      '#app': path.join(__dirname, '../app/'),
       '@app': path.join(__dirname, '../app/'),
       'react-dom': '@hot-loader/react-dom',
     },
