@@ -1,4 +1,4 @@
-import { NAME_REGEX, POSITIVE_INTEGER_REGEX } from '#app/utils/constant';
+import { POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
 
 export const hostRulesFn = intl => [
   {
@@ -36,10 +36,6 @@ export const nameRulesFn = intl => [
   {
     required: true,
     message: intl.get('formRules.nameRequired'),
-  },
-  {
-    pattern: NAME_REGEX,
-    message: intl.get('formRules.nameValidate'),
   },
 ];
 

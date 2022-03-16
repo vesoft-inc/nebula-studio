@@ -1,0 +1,176 @@
+@import './common.less';
+
+@font-face {
+	font-family: 'Roboto-Black';
+	src: url(~@app/static/fonts/Roboto-Black.ttf);
+}
+
+@font-face {
+	font-family: 'Roboto-Bold';
+	src: url(~@app/static/fonts/Roboto-Bold.ttf);
+}
+
+@font-face {
+	font-family: 'Roboto-Light';
+	src: url(~@app/static/fonts/Roboto-Light.ttf);
+}
+
+@font-face {
+	font-family: 'Roboto-Medium';
+	src: url(~@app/static/fonts/Roboto-Medium.ttf);
+}
+
+@font-face {
+	font-family: 'Roboto-Regular';
+	src: url(~@app/static/fonts/Roboto-Regular.ttf);
+}
+
+#studio-app {
+	font-family: Roboto-Regular, sans-serif;
+}
+
+.center-layout {
+	width: @containerWidth;
+	margin: 0 auto;
+}
+
+.studio-tab-header {
+	display: flex;
+	justify-content: center;
+	padding-bottom: 16px;
+	border-bottom: 1px solid @gray;
+}
+
+.ant-radio-group.nebula-tab-group {
+	background: @lightGray;
+	border-radius: 20px;
+	padding: 4px;
+	min-width: 400px;
+	display: flex;
+	justify-content: center;
+
+	.ant-radio-button-wrapper {
+		border-radius: 20px;
+		flex: 1;
+		text-align: center;
+		border: none;
+		white-space: nowrap;
+		color: @darkBlue;
+
+		&.ant-radio-button-wrapper-checked {
+			color: #fff;
+		}
+
+		&:not(.ant-radio-button-wrapper-checked) {
+			background: none;
+		}
+
+		&::before {
+			width: 0;
+		}
+	}
+}
+
+.ant-btn.warning-btn {
+	color: @red;
+	border-color: @red;
+	display: inline-flex;
+	justify-content: center;
+
+	svg {
+		width: 20px;
+		height: 20px;
+	}
+
+	&:hover {
+		color: @red;
+		border-color: @red;
+	}
+}
+
+.ant-btn.primary-btn {
+	color: @blue;
+	border-color: @blue;
+	display: inline-flex;
+	justify-content: center;
+
+	svg {
+		width: 20px;
+		height: 20px;
+	}
+
+	&:hover {
+		color: @blue;
+		border-color: @blue;
+	}
+}
+
+.ant-btn.cancel-btn {
+	color: @darkGray;
+	border-color: @darkGray;
+	display: inline-flex;
+	justify-content: center;
+
+	svg {
+		width: 20px;
+		height: 20px;
+	}
+
+	&:hover {
+		color: @darkGray;
+		border-color: @darkGray;
+	}
+}
+
+.ant-btn.studio-add-btn {
+	border-radius: 3px;
+	display: inline-flex;
+	align-items: center;
+	padding: 0 29px;
+
+	a {
+		display: flex;
+		align-items: center;
+	}
+
+	.studio-add-btn-icon {
+		display: inline-flex;
+		margin-right: 10px;
+		height: 22px;
+
+		> svg {
+			width: 22px;
+			height: 22px;
+		}
+
+		& ~ span {
+			margin-left: 0;
+		}
+	}
+}
+
+.studio-form-footer {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	z-index: 10;
+	width: 100%;
+	height: 98px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #fff;
+	box-shadow: 0 -4px 4px rgba(0, 0, 0, 0.1);
+
+	button {
+		width: 236px;
+
+		&:not(:last-child) {
+			margin-right: 50px;
+		}
+	}
+}
+
+.ant-form-item-label label {
+	font-family: Roboto-Bold, sans-serif;
+}

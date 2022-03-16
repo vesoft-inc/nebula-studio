@@ -1,11 +1,12 @@
 import { BigNumber } from 'bignumber.js';
 import _ from 'lodash';
 
-import { keyWords } from '#app/config/nebulaQL';
-
 export const handleKeyword = (name: string) => {
-  return keyWords.includes(name.toLowerCase()) ? `\`${name}\`` : name;
+  return `\`${handleEscape(name)}\``;
 };
+
+export const handleEscape = (name: string) =>
+  name.replaceAll(/\\/gm, '\\\\').replaceAll('`', '\\`');
 
 export const handleVidStringName = (name: string, spaceVidType?: string) => {
   if (spaceVidType && spaceVidType === 'INT64') {
@@ -36,4 +37,8 @@ export const sortByFieldAndFilter = (payload: {
   } else {
     return _.orderBy(list, [field], ['asc']);
   }
+};
+
+export const removeNullCharacters = (data: string) => {
+  return data.replace(/\u0000+$/, '');
 };

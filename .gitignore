@@ -6,12 +6,9 @@ node_modules/
 .vscode
 *.swp
 *.lock
-*.js
 *.map
 .github/workflows/nodejs.yml
 
-app/**/*.js
-config/**/*.js
 app/**/*.map
 config/**/*.map
 dist/

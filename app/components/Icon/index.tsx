@@ -1,14 +1,7 @@
-import React, { HTMLProps } from 'react';
-
-interface IIconFontProps extends HTMLProps<HTMLElement> {
-  type: string;
-}
-
-const IconFont = (props: IIconFontProps) => {
-  const { type, className, ...others } = props;
-  return (
-    <span className={`nebula-cloud-icon ${type} ${className}`} {...others} />
-  );
-};
+import { createFromIconfontCN } from '@ant-design/icons';
+import icon from '@app/static/fonts/iconfont.js';
+const IconFont = createFromIconfontCN({
+  scriptUrl: icon,
+});
 
 export default IconFont;

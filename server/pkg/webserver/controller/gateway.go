@@ -16,7 +16,16 @@ type execNGQLParams struct {
 	Gql       string              `json:"gql"`
 	ParamList types.ParameterList `json:"paramList"`
 }
+type batchExecNGQLParams struct {
+	Gqls      []string            `json:"gqls"`
+	ParamList types.ParameterList `json:"paramList"`
+}
 
+type gqlData struct {
+	gql     string
+	message string
+	data    map[string]interface{}
+}
 type connectDBParams struct {
 	Address string `json:"address"`
 	Port    int    `json:"port"`

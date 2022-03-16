@@ -1,27 +1,18 @@
-.panel-btn-item,
-.menu-color {
-	display: inline-flex;
+@import '@app/common.less';
+
+svg.btn-icon {
+	fill: #262626;
 	cursor: pointer;
 }
 
-.panel-menu-icon {
-	svg {
-		width: 30px;
-		height: 30px;
-	}
-
-	margin-right: 10px;
+svg.btn-actived {
+	fill: @blue;
 }
 
-.panel-disabled {
+svg.btn-disabled {
 	cursor: not-allowed;
-	color: #d9d9d9;
-
-	svg {
-		fill: #d9d9d9;
-	}
 }
 
-.panel-actived {
-	color: #0091ff;
+svg.rotate-btn {
+	transform: rotate(180deg);
 }

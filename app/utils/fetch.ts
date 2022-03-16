@@ -1,11 +1,11 @@
-import service from '#app/config/service';
-import { handleVidStringName } from '#app/utils/function';
-import { getExploreGQLWithIndex } from '#app/utils/gql';
+import service from '@app/config/service';
+import { handleKeyword, handleVidStringName } from '@app/utils/function';
+import { getExploreGQLWithIndex } from '@app/utils/gql';
 
 interface IMatchVertex {
   vid?: string;
   tags?: string[];
-  properties?: {};
+  properties?: Record<string, unknown>;
 }
 
 export async function fetchEdgeProps(payload: {
@@ -14,7 +14,7 @@ export async function fetchEdgeProps(payload: {
   edgeFields?: any;
 }) {
   const { idRoutes, edgeFields, type } = payload;
-  const edgeType = '`' + type + '`';
+  const edgeType = handleKeyword(type);
   let gql = `fetch prop on ${edgeType} ${idRoutes.join(', ')}`;
   if (edgeFields) {
     gql += ` yield ${edgeType}._src, ${edgeType}._dst `;

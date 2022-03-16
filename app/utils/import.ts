@@ -2,31 +2,31 @@ import { message } from 'antd';
 import _ from 'lodash';
 import intl from 'react-intl-universal';
 
-import { handleVidStringName } from './function';
+import { handleEscape, handleKeyword, handleVidStringName } from './function';
 
 export function configToJson(payload) {
   const {
-    currentSpace,
+    space,
     username,
     password,
     host,
-    vertexesConfig,
+    verticesConfig,
     edgesConfig,
     taskDir,
-    activeStep,
     spaceVidType,
+    batchSize
   } = payload;
   const vertexToJSON = vertexDataToJSON(
-    vertexesConfig,
-    activeStep,
+    verticesConfig,
     taskDir,
     spaceVidType,
+    batchSize
   );
   const edgeToJSON = edgeDataToJSON(
     edgesConfig,
-    activeStep,
     taskDir,
     spaceVidType,
+    batchSize
   );
   const files: any[] = [...vertexToJSON, ...edgeToJSON];
   const configJson = {
@@ -36,7 +36,7 @@ export function configToJson(payload) {
       retry: 3,
       concurrency: 10,
       channelBufferSize: 128,
-      space: currentSpace,
+      space: handleEscape(space),
       connection: {
         user: username,
         password,
@@ -51,11 +51,10 @@ export function configToJson(payload) {
 
 export function edgeDataToJSON(
   config: any,
-  activeStep: number,
   taskDir: string,
   spaceVidType: string,
+  batchSize?: string,
 ) {
-  const limit = activeStep === 2 || activeStep === 3 ? 10 : undefined;
   const files = config.map(edge => {
     const edgePorps: any[] = [];
     _.sortBy(edge.props, t => t.mapping).forEach(prop => {
@@ -84,18 +83,18 @@ export function edgeDataToJSON(
             break;
           }
           const _prop = {
-            name: prop.name,
+            name: handleEscape(prop.name),
             type: prop.type,
             index: indexJudge(prop.mapping, prop.name),
           };
           edgePorps.push(_prop);
       }
     });
+    const fileName = edge.file.name.replace('.csv', '');
     const edgeConfig = {
       path: edge.file.path,
-      failDataPath: `${taskDir}/err/${edge.name}Fail.csv`,
-      batchSize: 60,
-      limit,
+      failDataPath: `${taskDir}/err/${fileName}Fail.csv`,
+      batchSize: Number(batchSize) || 60,
       type: 'csv',
       csv: {
         withHeader: false,
@@ -104,7 +103,7 @@ export function edgeDataToJSON(
       schema: {
         type: 'edge',
         edge: {
-          name: edge.type,
+          name: handleEscape(edge.type),
           srcVID: edge.srcVID,
           dstVID: edge.dstVID,
           rank: edge.rank,
@@ -120,11 +119,10 @@ export function edgeDataToJSON(
 
 export function vertexDataToJSON(
   config: any,
-  activeStep: number,
   taskDir: string,
   spaceVidType: string,
+  batchSize?: string
 ) {
-  const limit = activeStep === 2 || activeStep === 3 ? 10 : undefined;
   const files = config.map(vertex => {
     const tags = vertex.tags.map(tag => {
       const props = tag.props
@@ -134,22 +132,22 @@ export function vertexDataToJSON(
             return null;
           }
           return {
-            name: prop.name,
+            name: handleEscape(prop.name),
             type: prop.type,
             index: indexJudge(prop.mapping, prop.name),
           };
         });
       const _tag = {
-        name: tag.name,
+        name: handleEscape(tag.name),
         props: props.filter(prop => prop),
       };
       return _tag;
     });
+    const fileName = vertex.file.name.replace('.csv', '');
     const vertexConfig: any = {
       path: vertex.file.path,
-      failDataPath: `${taskDir}/err/${vertex.name}Fail.csv`,
-      batchSize: 60,
-      limit,
+      failDataPath: `${taskDir}/err/${fileName}Fail.csv`,
+      batchSize: Number(batchSize) || 60,
       type: 'csv',
       csv: {
         withHeader: false,
@@ -198,9 +196,9 @@ export function createTaskID(instanceId: string) {
 }
 
 export function getGQLByConfig(payload) {
-  const { vertexesConfig, edgesConfig, spaceVidType } = payload;
+  const { verticesConfig, edgesConfig, spaceVidType } = payload;
   const NGQL: string[] = [];
-  vertexesConfig.forEach(vertexConfig => {
+  verticesConfig.forEach(vertexConfig => {
     if (vertexConfig.idMapping === null) {
       message.error(`vertexId ${intl.get('import.indexNotEmpty')}`);
       throw new Error();
@@ -221,7 +219,7 @@ export function getGQLByConfig(payload) {
           }
           if (prop.mapping !== null) {
             // HACK: Processing keyword
-            tagField.push(`\`${prop.name}\``);
+            tagField.push(handleKeyword(prop.name));
             const value =
               prop.type === 'string'
                 ? `"${columns[prop.mapping]}"`
@@ -230,7 +228,7 @@ export function getGQLByConfig(payload) {
           }
         });
         NGQL.push(
-          `${'INSERT VERTEX ' + '`'}${tag.name}\`` +
+          `INSERT VERTEX ${handleKeyword(tag.name)}` +
             `(${tagField}) VALUES ${handleVidStringName(
               columns[vertexConfig.idMapping],
               spaceVidType,
@@ -260,7 +258,7 @@ export function getGQLByConfig(payload) {
           prop.mapping !== null
         ) {
           // HACK: Processing keyword
-          edgeField.push(`\`${prop.name}\``);
+          edgeField.push(handleKeyword(prop.name));
           const value =
             prop.type === 'string'
               ? `"${columns[prop.mapping]}"`
@@ -273,7 +271,7 @@ export function getGQLByConfig(payload) {
           ? ''
           : `@${columns[edgeConfig.props[2].mapping]}`;
       NGQL.push(
-        `${'INSERT EDGE ' + '`'}${edgeConfig.type}\`` +
+        `INSERT EDGE ${handleKeyword(edgeConfig.type)}` +
           `(${edgeField.join(',')}) VALUES ${handleVidStringName(
             columns[edgeConfig.props[0].mapping],
             spaceVidType,

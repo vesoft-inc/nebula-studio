@@ -2,12 +2,12 @@ import { Collapse } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 
-import { CodeMirror } from '#app/components';
+import CodeMirror from '@app/components/CodeMirror';
 
 import './index.less';
 const Panel = Collapse.Panel;
 interface IOptions {
-  [propName: string]: string;
+  [propName: string]: any;
 }
 const GQLCodeMirror = (props: { currentGQL: string; option?: IOptions }) => {
   const options = {
@@ -20,7 +20,7 @@ const GQLCodeMirror = (props: { currentGQL: string; option?: IOptions }) => {
   return (
     <Collapse className="export-gql">
       <Panel header={intl.get('common.exportNGQL')} key="ngql">
-        <CodeMirror value={props.currentGQL} options={options} />
+        <CodeMirror value={props.currentGQL} options={options} height="80px" />
       </Panel>
     </Collapse>
   );

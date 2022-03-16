@@ -14,6 +14,10 @@ var GatewayRoute = base.Route{
 			POST: controller.ExecNGQL,
 		},
 		{
+			Path: "db/batchExec",
+			POST: controller.BatchExecNGQL,
+		},
+		{
 			Path: "db/connect",
 			POST: controller.ConnectDB,
 		},
