@@ -25,13 +25,5 @@ var GatewayRoute = base.Route{
 			Path: "db/disconnect",
 			POST: controller.DisconnectDB,
 		},
-		{
-			Path: "task/import",
-			POST: controller.ImportData,
-		},
-		{
-			Path: "task/import/action",
-			POST: controller.HandleImportAction,
-		},
 	},
 }

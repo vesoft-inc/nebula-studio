@@ -36,7 +36,9 @@ func WrapHandler(handler Handler) iris.Handler {
 	return func(ctx iris.Context) {
 		result := handler(ctx)
 		ctx.StatusCode(iris.StatusOK)
-		_, _ = ctx.JSON(&result)
+		if result != nil {
+			_, _ = ctx.JSON(&result)
+		}
 	}
 }
 
