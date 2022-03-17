@@ -35,6 +35,54 @@ type disConnectDBParams struct {
 	Nsid string `json:"nsid"`
 }
 
+func BatchExecNGQL(ctx iris.Context) base.Result {
+	params := new(batchExecNGQLParams)
+	err := ctx.ReadJSON(params)
+	if err != nil {
+		zap.L().Warn("execNGQLParams get fail", zap.Error(err))
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	nsid := ctx.GetCookie("nsid")
+	data := make([]map[string]interface{}, 0)
+
+	for i := 0; i < len(params.Gqls); i++ {
+		gql := params.Gqls[i]
+		execute, _, err := dao.Execute(nsid, gql, make([]string, 0))
+		gqlRes := make(map[string]interface{})
+		gqlRes["gql"] = gql
+		if err != nil {
+			gqlRes["message"] = err.Error()
+			gqlRes["code"] = base.Error
+		} else {
+			gqlRes["code"] = base.Success
+		}
+		gqlRes["data"] = execute
+		data = append(data, gqlRes)
+	}
+
+	if len(params.ParamList) > 0 {
+		execute, _, err := dao.Execute(nsid, "", params.ParamList)
+		gqlRes := make(map[string]interface{})
+		gqlRes["gql"] = strings.Join(params.ParamList, "; ")
+		if err != nil {
+			gqlRes["message"] = err.Error()
+			gqlRes["code"] = base.Error
+		} else {
+			gqlRes["code"] = base.Success
+		}
+		gqlRes["data"] = execute
+		data = append(data, gqlRes)
+	}
+
+	return base.Response{
+		Code: base.Success,
+		Data: data,
+	}
+}
+
 func ExecNGQL(ctx iris.Context) base.Result {
 	params := new(execNGQLParams)
 	if err := ctx.ReadJSON(params); err != nil {
