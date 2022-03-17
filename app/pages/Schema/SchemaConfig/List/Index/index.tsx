@@ -127,7 +127,7 @@ const IndexList = () => {
                 okText={intl.get('common.ok')}
                 cancelText={intl.get('common.cancel')}
               >
-                <Button className="warning-btn" onClick={e => e.stopPropagation()}>
+                <Button type="link" className="warning-btn" onClick={e => e.stopPropagation()}>
                   <Icon type="icon-studio-btn-delete" />
                 </Button>
               </Popconfirm>

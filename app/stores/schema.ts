@@ -594,7 +594,7 @@ export class SchemaStore {
     })) as any;
     if (code === 0) {
       return data.tables
-        .filter(item => item['Index Status'] !== IJobStatus.Finished)
+        .filter(item => [IJobStatus.Queue, IJobStatus.Running].includes(item['Index Status']))
         .map(item => item.Name);
     }
     return null;

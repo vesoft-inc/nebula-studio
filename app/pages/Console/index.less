@@ -1,41 +1,34 @@
 @import '~@app/common.less';
 .nebula-console {
   .space-select {
-    display: flex;
-    align-items: center;
     padding: 10px 42px;
     height: 60px;
     background: #FFFFFF;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-    .label {
-      font-size: 14px;
-      color: @darkGray;
-      font-family: Roboto-Regular, sans-serif;
-      &::after {
-        content: ': ';
-        padding-right: 8px;
+    > div {
+      display: flex;
+      align-items: center;
+      .ant-select {
+        width: 320px;
+        .ant-select-selector {
+          background: @lightBlue;
+          border-radius: 3px;
+          border: none;
+        }
+        .ant-select-selection-item {
+          color: @darkBlue;
+        }
+        .ant-select-arrow {
+          color: @darkBlue;
+        }
       }
-    }
-    .ant-select {
-      width: 230px;
-      .ant-select-selector {
-        background: @lightBlue;
-        border-radius: 3px;
-        border: none;
-      }
-      .ant-select-selection-item {
-        color: @darkBlue;
-      }
-      .ant-select-arrow {
-        color: @darkBlue;
-      }
-    }
-    .icon-instruction {
-      margin-left: 15px;
-      svg {
-        width: 22px;
-        height: 22px;
-        fill: @darkGray;
+      .icon-instruction {
+        margin-left: 15px;
+        svg {
+          width: 22px;
+          height: 22px;
+          fill: @darkGray;
+        }
       }
     }
   }
@@ -140,6 +133,7 @@
       }
       .CodeMirror-scroll {
         padding-bottom: 0;
+        overflow: auto !important;
       }
     }
   }

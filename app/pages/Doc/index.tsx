@@ -7,22 +7,26 @@ import Icon from '@app/components/Icon';
 import { chunk } from 'lodash';
 
 import './index.less';
+import { useHistory } from 'react-router-dom';
 
 const MODULES = [
   {
     icon: 'icon-studio-nav-schema',
     title: 'common.schema',
-    tip: 'doc.schemaIntro'
+    tip: 'doc.schemaIntro',
+    link: '/schema'
   },
   {
     icon: 'icon-studio-nav-import',
     title: 'import.importData',
-    tip: 'doc.importIntro'
+    tip: 'doc.importIntro',
+    link: '/import'
   },
   {
     icon: 'icon-studio-nav-console',
     title: 'common.console',
-    tip: 'doc.consoleIntro'
+    tip: 'doc.consoleIntro',
+    link: '/console'
   },
 ];
 
@@ -45,6 +49,7 @@ const DOCS = [
 ];
 
 const DocPage = () => {
+  const history = useHistory();
   const docGroup = chunk(DOCS, 3);
   useEffect(() => {
     trackPageView('/doc');
@@ -57,7 +62,7 @@ const DocPage = () => {
         <div className="header">{intl.get('doc.functionIntro')}</div>
         <div className="module-intro">
           {MODULES.map(module => <Col span={8} key={module.title}>
-            <div className="module-item">
+            <div className="module-item" onClick={() => history.push(module.link)}>
               <Icon type={module.icon} />
               <span className="title">{intl.get(module.title)}</span>
               <span className="tip">{intl.get(module.tip)}</span>

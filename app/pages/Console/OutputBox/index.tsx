@@ -222,7 +222,7 @@ const OutputBox = (props: IProps) => {
         </Tooltip>}
         <Tooltip title={intl.get('common.output')} placement="top">
           <Icon
-            type="icon-studio-btn-download"
+            type="icon-studio-btn-output"
             onClick={downloadData}
           />
         </Tooltip>
