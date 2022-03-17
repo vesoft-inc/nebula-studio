@@ -101,7 +101,8 @@
     "addToFavorites": "Add to favorites",
     "unfavorite": "Unfavorite",
     "clearFavorites": "Clear Favorites",
-    "graphviz": "Graphviz"
+    "graphviz": "Graphviz",
+    "selectSpace": "Please select Graph Space"
   },
   "explore": {
     "vertexStyle": "Vertex Color",
@@ -212,7 +213,9 @@
     "statError": "Update Failed, Please try again.",
     "statFinished": "Statistics end",
     "deleteSpace": "Delete Graph Space",
-    "cloneSpace": "Clone Graph Space"
+    "cloneSpace": "Clone Graph Space",
+    "length": "Length",
+    "selectVidTypeTip": "Please select the type"
   },
   "menu": {
     "use": "Use Manual",

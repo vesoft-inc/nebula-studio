@@ -23,7 +23,7 @@ const Operations = (props: IOperations) => {
     setVisible(false);
   };
   return <Menu className="operations-space">
-    <Menu.Item>
+    <Menu.Item key="delete">
       <Popconfirm
         onConfirm={() => onDelete(space)}
         title={intl.get('common.ask')}
@@ -35,7 +35,7 @@ const Operations = (props: IOperations) => {
         </Button>
       </Popconfirm>
     </Menu.Item>
-    <Menu.Item>
+    <Menu.Item key="clone">
       <Popover
         destroyTooltipOnHide={true}
         placement="leftTop"
@@ -74,6 +74,7 @@ const Schema = () => {
   const handleDeleteSpace = async (name: string) => {
     setLoading(true);
     const res = await deleteSpace(name);
+    setLoading(false);
     if (res.code === 0) {
       message.success(intl.get('common.deleteSuccess'));
       await getSpaces();
@@ -81,6 +82,7 @@ const Schema = () => {
         schema.update({
           currentSpace: ''
         });
+        sessionStorage.removeItem('currentSpace');
       }
     }
   };
@@ -178,7 +180,7 @@ const Schema = () => {
                 {intl.get('common.schema')}
               </Button>
               <Dropdown overlay={<Operations space={space.Name} onDelete={handleDeleteSpace} onClone={handleCloneSpace} />} placement="bottomLeft">
-                <Button className="primary-btn">。。。</Button>
+                <Icon className="btn-more" type="icon-studio-more" />
               </Dropdown>
             </div>
           );

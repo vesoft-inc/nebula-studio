@@ -101,7 +101,8 @@
     "addToFavorites": "添加到收藏夹",
     "unfavorite": "取消收藏",
     "clearFavorites": "清空收藏夹",
-    "graphviz": "Graphviz"
+    "graphviz": "Graphviz",
+    "selectSpace": "请选择图空间"
   },
   "explore": {
     "vertexStyle": "节点颜色",
@@ -212,7 +213,9 @@
     "statError": "统计失败，请重试",
     "statFinished": "统计结束",
     "deleteSpace": "删除图空间",
-    "cloneSpace": "克隆图空间"
+    "cloneSpace": "克隆图空间",
+    "length": "长度",
+    "selectVidTypeTip": "选择 Vid 类型"
   },
   "menu": {
     "use": "使用手册",

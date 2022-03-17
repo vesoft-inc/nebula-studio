@@ -72,7 +72,7 @@ const FileUpload = () => {
                 okText={intl.get('common.ok')}
                 cancelText={intl.get('common.cancel')}
               >
-                <Button className="warning-btn">
+                <Button className="warning-btn" type="link">
                   <Icon type="icon-studio-btn-delete" />
                 </Button>
               </Popconfirm>

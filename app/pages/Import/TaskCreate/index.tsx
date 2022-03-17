@@ -141,7 +141,7 @@ const TaskCreate = () => {
           <Row>
             <Col span={12}>
               <Form.Item label={intl.get('common.space')} required={true}>
-                <Select value={currentSpace} onChange={value => handleSpaceChange(value)}>
+                <Select value={currentSpace || null} placeholder={intl.get('console.selectSpace')} onChange={value => handleSpaceChange(value)}>
                   {spaces.map(space => (
                     <Option value={space} key={space}>
                       {space}

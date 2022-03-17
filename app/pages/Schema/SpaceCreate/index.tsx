@@ -112,7 +112,7 @@ const SpaceCreate = () => {
                 name="vidType"
                 rules={[{ required: true }]}
               >
-                <Select placeholder="FIXED_STRING" className="select-vid-type">
+                <Select placeholder={intl.get('schema.selectVidTypeTip')} className="select-vid-type">
                   <Option value="FIXED_STRING">FIXED_STRING</Option>
                   <Option value="INT64">INT64</Option>
                 </Select>
@@ -121,7 +121,7 @@ const SpaceCreate = () => {
                 {({ getFieldValue }) => {
                   const vidType = getFieldValue('vidType');
                   return vidType === 'FIXED_STRING' ? <Col offset={11} className="item-string-length">
-                    <Form.Item name="stringLength" rules={[
+                    <Form.Item label={intl.get('schema.length')} name="stringLength" rules={[
                       {
                         required: true,
                         message: 'fix string length limit is required',

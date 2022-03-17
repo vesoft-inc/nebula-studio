@@ -1,7 +1,6 @@
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
-const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 
 const commonConfig = require('./webpack.base');
@@ -24,12 +23,6 @@ const publicConfig = {
   },
 
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify('production'),
-      },
-    }),
-
     new CleanWebpackPlugin(),
 
     new MiniCssExtractPlugin({

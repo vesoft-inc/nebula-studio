@@ -81,7 +81,7 @@ const EdgeList = () => {
         if (edge.name) {
           return (
             <div className="operation">
-              <Button className="primary-btn">
+              <Button type="link" className="primary-btn">
                 <Link
                   to={{
                     pathname: '/schema/edge/edit',
@@ -102,7 +102,7 @@ const EdgeList = () => {
                 okText={intl.get('common.ok')}
                 cancelText={intl.get('common.cancel')}
               >
-                <Button className="warning-btn" onClick={e => e.stopPropagation()}>
+                <Button type="link" className="warning-btn" onClick={e => e.stopPropagation()}>
                   <Icon type="icon-studio-btn-delete" />
                 </Button>
               </Popconfirm>

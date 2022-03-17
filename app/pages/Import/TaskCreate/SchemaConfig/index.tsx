@@ -50,7 +50,7 @@ const SchemaConfig = (props: IProps) => {
     >
       <Panel header={<>
         <span className="config-count">{type} {configIndex + 1}</span>
-        <CSVPreviewLink file={data.file}>
+        <CSVPreviewLink file={data.file} selected={true}>
           {data.file.name}
         </CSVPreviewLink>
       </>} key="default" extra={<CloseOutlined className="btn-close" onClick={(e) => handleRemove(e, configIndex)} />}>
