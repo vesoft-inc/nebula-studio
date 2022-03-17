@@ -58,7 +58,7 @@ const Console = (props: IProps) => {
   
   const checkSwitchSpaceGql = (query: string) => {
     const queryList = query.split(SEMICOLON_REG).filter(Boolean);
-    const reg = /^USE `?[0-9a-zA-Z_]+`?(?=[\s*;?]?)/gim;
+    const reg = /^USE `?.+`?(?=[\s*;?]?)/gim;
     if (queryList.some(sentence => sentence.trim().match(reg))) {
       return intl.get('common.disablesUseToSwitchSpace');
     }
@@ -126,15 +126,16 @@ const Console = (props: IProps) => {
   return (
     <div className="nebula-console">
       <div className="space-select">
-        <span className="label">{intl.get('common.currentSpace')}</span>
-        <Select value={currentSpace} onChange={handleSpaceSwitch}>
-          {spaces.map(space => (
-            <Option value={space} key={space}>
-              {space}
-            </Option>
-          ))}
-        </Select>
-        <Instruction description={intl.get('common.spaceTip')} />
+        <div className="center-layout">
+          <Select value={currentSpace || null} placeholder={intl.get('console.selectSpace')} onChange={handleSpaceSwitch}>
+            {spaces.map(space => (
+              <Option value={space} key={space}>
+                {space}
+              </Option>
+            ))}
+          </Select>
+          <Instruction description={intl.get('common.spaceTip')} />
+        </div>
       </div>
       <div className="center-layout">
         <div className="console-panel">
