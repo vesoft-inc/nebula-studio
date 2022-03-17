@@ -17,7 +17,6 @@ interface ILogDimension {
 
 interface ILog {
   name: string;
-  path: string;
 }
 interface IProps {
   logDimension: ILogDimension;
@@ -47,7 +46,12 @@ const LogModal = (props: IProps) => {
 
   const handleLogDownload = () => {
     if(currentLog) {
-      downloadTaskLog(currentLog.path);
+      const type = currentLog!.name === 'import.log' ? 'import' : 'err';
+      downloadTaskLog({
+        id,
+        type,
+        name: currentLog.name
+      });
     }
   };
 
@@ -55,8 +59,8 @@ const LogModal = (props: IProps) => {
     const getLogDetail = currentLog!.name === 'import.log' ? getImportLogDetail : getErrLogDetail;
     const res = await getLogDetail({
       offset: offset.current,
-      taskId: id,
-      path: currentLog!.path
+      id,
+      name: currentLog!.name
     });
     handleLogData(res);
   };

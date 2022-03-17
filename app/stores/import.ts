@@ -95,9 +95,14 @@ export class ImportStore {
     link.click();
   }
 
-  downloadTaskLog = async (path: string) => {
+  downloadTaskLog = async (params: {
+    id: string | number,
+    type: 'import' | 'err', 
+    name?: string,
+  }) => {
+    const { id, type, name } = params;
     const link = document.createElement('a');
-    link.href = service.getTaskLogUrl(path);
+    link.href = type === 'import' ? service.getTaskLogUrl(id) : service.getTaskErrLogUrl(id) + `?name=${name}`;
     link.download = `log.yml`;
     link.click();
   }
@@ -105,8 +110,7 @@ export class ImportStore {
   getImportLogDetail = async (params: {
     offset: number;
     limit?: number;
-    taskId: string | number;
-    path: string;
+    id: string | number;
   }) => {
     const res = await service.getLog(params);
     return res;
@@ -115,8 +119,8 @@ export class ImportStore {
   getErrLogDetail = async (params: {
     offset: number;
     limit?: number;
-    taskId: string | number;
-    path: string;
+    id: string | number;
+    name: string;
   }) => {
     const res = await service.getErrLog(params);
     return res;
@@ -174,7 +178,7 @@ export class ImportStore {
   updateEdgeConfig = async (payload: { edgeType?: string, index: number; }) => {
     const { edgeType, index } = payload;
     if(!edgeType) {
-      this.edgesConfig = this.edgesConfig.splice(index, 1);
+      this.edgesConfig.splice(index, 1);
     } else {
       const { schema } = this.rootStore;
       const { getTagOrEdgeInfo, getTagOrEdgeDetail, spaceVidType } = schema;

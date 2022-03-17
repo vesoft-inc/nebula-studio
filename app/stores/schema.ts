@@ -147,6 +147,21 @@ export class SchemaStore {
     return { code, data };
   }
 
+  cloneSpace = async (name: string, space: string) => {
+    const { code, data } = (await service.execNGQL(
+      {
+        gql: `CREATE SPACE IF NOT EXISTS ${handleKeyword(name)} as ${handleKeyword(space)}`,
+      },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: 'clone_space',
+        },
+      },
+    )) as any;
+    return { code, data };
+  }
+
   createSpace = async (gql: string) => {
     const { code, data, message } = (await service.execNGQL(
       {

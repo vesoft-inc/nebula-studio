@@ -8,17 +8,16 @@ const connectDB = post('/api-nebula/db/connect');
 
 const disconnectDB = post('/api-nebula/db/disconnect');
 
-const importData = post('/api-nebula/task/import');
+const importData = post('/api/import-tasks/import');
 
-const handleImportAction = post('/api-nebula/task/import/action');
+const handleImportAction = post('/api/import-tasks/action');
 
-const getLog = get('/api/import/log');
-const getErrLog = get('/api/import/err_log');
+const getLog = get('/api/import-tasks/logs');
+const getErrLog = get('/api/import-tasks/err-logs');
 const finishImport = post('/api/import/finish');
 
-const getImportWokingDir = get('/api/import/working_dir');
-const getUploadDir = get('/api/import/working_dir');
-const getTaskDir = get('/api/import/task_dir');
+const getUploadDir = get('/api/import-tasks/working-dir');
+const getTaskDir = get('/api/import-tasks/task-dir');
 
 const deteleFile = params => {
   const { filename } = params;
@@ -36,11 +35,12 @@ const uploadFiles = (params?, config?) =>
 
 const getTaskLogs = (params?, config?) => {
   const { id, ...others } = params;
-  return get(`/api/import/task_log_paths/${id}`)(others, config);
+  return get(`/api/import-tasks/${id}/task-log-names`)(others, config);
 };
 
-const getTaskConfigUrl = (id: number) => `/api-nebula/task/import/config/${id}`;
-const getTaskLogUrl = (path: string) => `/api-nebula/task/import/log?pathName=${encodeURI(path)}`;
+const getTaskConfigUrl = (id: string | number) => `/api/import-tasks/config/${id}`;
+const getTaskLogUrl = (id: string | number) => `/api/import-tasks/${id}/log`;
+const getTaskErrLogUrl = (id: string | number) => `/api/import-tasks/${id}/err-logs`;
 export default {
   execNGQL,
   batchExecNGQL,
@@ -51,7 +51,6 @@ export default {
   handleImportAction,
   getLog,
   getErrLog,
-  getImportWokingDir,
   getUploadDir,
   getTaskDir,
   deteleFile,
@@ -59,5 +58,6 @@ export default {
   uploadFiles,
   getTaskConfigUrl,
   getTaskLogs,
-  getTaskLogUrl
+  getTaskLogUrl,
+  getTaskErrLogUrl
 };
