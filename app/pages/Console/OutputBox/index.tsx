@@ -220,7 +220,7 @@ const OutputBox = (props: IProps) => {
             onClick={removeFavorite}
           />
         </Tooltip>}
-        <Tooltip title={intl.get('common.download')} placement="top">
+        <Tooltip title={intl.get('common.output')} placement="top">
           <Icon
             type="icon-studio-btn-download"
             onClick={downloadData}

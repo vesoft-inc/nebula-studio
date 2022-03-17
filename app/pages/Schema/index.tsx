@@ -1,4 +1,4 @@
-import { Button, Popconfirm, Table, message } from 'antd';
+import { Button, Popconfirm, Table, message, Popover, Form, Input, Dropdown, Menu } from 'antd';
 import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';
@@ -8,11 +8,64 @@ import { useStore } from '@app/stores';
 import './index.less';
 import { Link, useHistory } from 'react-router-dom';
 
+interface IOperations {
+  space: string;
+  onClone: (name: string, oldSpace: string) => void
+  onDelete: (name: string) => void
+}
+
+const Operations = (props: IOperations) => {
+  const { space, onClone, onDelete } = props;
+  const [visible, setVisible] = useState(false);
+  const handleClone = (values) => {
+    const { name } = values;
+    onClone(name, space);
+    setVisible(false);
+  };
+  return <Menu className="operations-space">
+    <Menu.Item>
+      <Popconfirm
+        onConfirm={() => onDelete(space)}
+        title={intl.get('common.ask')}
+        okText={intl.get('common.ok')}
+        cancelText={intl.get('common.cancel')}
+      >
+        <Button type="link" danger>
+          {intl.get('schema.deleteSpace')}
+        </Button>
+      </Popconfirm>
+    </Menu.Item>
+    <Menu.Item>
+      <Popover
+        destroyTooltipOnHide={true}
+        placement="leftTop"
+        visible={visible}
+        trigger="click"
+        onVisibleChange={visible => setVisible(visible)}
+        content={<Form onFinish={handleClone} layout="inline">
+          <Form.Item label={intl.get('schema.spaceName')} name="name" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item>
+            <Button htmlType="submit" type="primary">
+              {intl.get('import.confirm')}
+            </Button>
+          </Form.Item>
+        </Form>}
+      >
+        <Button type="link" onClick={() => setVisible(true)}>
+          {intl.get('schema.cloneSpace')}
+        </Button>
+      </Popover>
+    </Menu.Item>
+  </Menu>;
+};
+
 const Schema = () => {
   const { schema } = useStore();
   const [loading, setLoading] = useState(false);
   const history = useHistory();
-  const { currentSpace, switchSpace, getSpacesList, deleteSpace, spaceList } = schema;
+  const { currentSpace, switchSpace, getSpacesList, deleteSpace, spaceList, cloneSpace } = schema;
   useEffect(() => {
     trackPageView('/schema');
     getSpaces();
@@ -44,6 +97,14 @@ const Schema = () => {
     setLoading(true);
     await getSpacesList();
     setLoading(false);
+  };
+
+  const handleCloneSpace = async (name: string, oldSpace: string) => {
+    const { code } = await cloneSpace(name, oldSpace);
+    if(code === 0) {
+      message.success(intl.get('schema.createSuccess'));
+      getSpaces();
+    }
   };
   const columns = [
     {
@@ -116,16 +177,9 @@ const Schema = () => {
               >
                 {intl.get('common.schema')}
               </Button>
-              <Popconfirm
-                onConfirm={() => handleDeleteSpace(space.Name)}
-                title={intl.get('common.ask')}
-                okText={intl.get('common.ok')}
-                cancelText={intl.get('common.cancel')}
-              >
-                <Button className="warning-btn">
-                  <Icon type="icon-studio-btn-delete" />
-                </Button>
-              </Popconfirm>
+              <Dropdown overlay={<Operations space={space.Name} onDelete={handleDeleteSpace} onClone={handleCloneSpace} />} placement="bottomLeft">
+                <Button className="primary-btn">。。。</Button>
+              </Dropdown>
             </div>
           );
         }

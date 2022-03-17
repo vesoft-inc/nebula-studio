@@ -1,5 +1,5 @@
 import { hot } from 'react-hot-loader/root';
-import { Spin } from 'antd';
+import { Spin, message } from 'antd';
 import React, { Suspense, lazy, useState } from 'react';
 import ReactDom from 'react-dom';
 import { Route, BrowserRouter as Router, Switch, useHistory } from 'react-router-dom';
@@ -18,7 +18,9 @@ const MainPage = lazy(() => import('@app/pages/MainPage'));
 import './common.less';
 import './app.less';
 dayjs.extend(duration);
-
+message.config({
+  maxCount: 1,
+});
 const defaultLanguage = Cookie.get('lang') || document.documentElement.getAttribute('lang');
 intl.init({
   currentLocale: defaultLanguage || 'EN_US',
