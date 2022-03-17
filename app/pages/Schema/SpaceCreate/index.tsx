@@ -102,7 +102,7 @@ const SpaceCreate = () => {
         <Form className="space-form" form={form} layout="vertical" onFieldsChange={updateGql} {...formItemLayout}>
           <Row>
             <Col span={12}>
-              <Form.Item label={intl.get('common.name')} name="name" rules={nameRulesFn(intl)}>
+              <Form.Item label={intl.get('common.name')} name="name" rules={nameRulesFn()}>
                 <Input placeholder={intl.get('schema.spaceNameEnter')} />
               </Form.Item>
             </Col>
@@ -126,7 +126,7 @@ const SpaceCreate = () => {
                         required: true,
                         message: 'fix string length limit is required',
                       },
-                      ...numberRulesFn(intl),
+                      ...numberRulesFn(),
                     ]}>
                       <Input />
                     </Form.Item>
@@ -152,7 +152,7 @@ const SpaceCreate = () => {
                   <span className="optional-item">({intl.get('common.optional')})</span>
                 </span>}
                 name="partitionNum"
-                rules={numberRulesFn(intl)}
+                rules={numberRulesFn()}
               >
                 <Input placeholder="100" />
               </Form.Item>
@@ -165,7 +165,7 @@ const SpaceCreate = () => {
                   <span className="optional-item">({intl.get('common.optional')})</span>
                 </span>}
                 name="replicaFactor"
-                rules={replicaRulesFn(intl, activeMachineNum)}
+                rules={replicaRulesFn(activeMachineNum)}
               >
                 <Input placeholder="1" />
               </Form.Item>

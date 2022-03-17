@@ -9,7 +9,6 @@ import { DATA_TYPE, EXPLAIN_DATA_TYPE } from '@app/utils/constant';
 
 const Option = Select.Option;
 import './index.less';
-import { cloneDeep } from 'lodash';
 
 
 const itemLayout = {
@@ -115,7 +114,7 @@ const PropertiesForm = (props: IProps) => {
                                   name={[name, 'name']} 
                                   {...restField} 
                                   {...itemLayout} 
-                                  rules={nameRulesFn(intl)}>
+                                  rules={nameRulesFn()}>
                                   <Input />
                                 </Form.Item>
                               </Col>
@@ -147,7 +146,7 @@ const PropertiesForm = (props: IProps) => {
                                       className="item-string-length" 
                                       name={[name, 'fixedLength']} 
                                       rules={[
-                                        ...numberRulesFn(intl),
+                                        ...numberRulesFn(),
                                         {
                                           required: true,
                                           message: intl.get('formRules.numberRequired'),

@@ -49,13 +49,13 @@ const LoginPage: React.FC = () => {
           <FormItem noStyle={true}>
             <span className="form-title">{intl.get('configServer.title')}</span>
           </FormItem>
-          <FormItem name="host" rules={hostRulesFn(intl)}>
+          <FormItem name="host" rules={hostRulesFn()}>
             <Input placeholder={intl.get('configServer.host')} bordered={false} />
           </FormItem>
-          <FormItem name="username" rules={usernameRulesFn(intl)}>
+          <FormItem name="username" rules={usernameRulesFn()}>
             <Input placeholder={intl.get('configServer.username')} bordered={false} />
           </FormItem>
-          <FormItem name="password" rules={passwordRulesFn(intl)}>
+          <FormItem name="password" rules={passwordRulesFn()}>
             <Input.Password placeholder={intl.get('configServer.password')} bordered={false} />
           </FormItem>
           <Button className="btn-submit" type="primary" htmlType="submit" loading={loading}>
