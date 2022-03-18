@@ -78,7 +78,7 @@ const ConfigCreate = (props: IProps) => {
         {...formItemLayout}>
         <Row className="form-item">
           <Col span={12}>
-            <Form.Item label={intl.get('common.name')} name="name" rules={nameRulesFn(intl)}>
+            <Form.Item label={intl.get('common.name')} name="name" rules={nameRulesFn()}>
               <Input />
             </Form.Item>
           </Col>

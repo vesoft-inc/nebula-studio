@@ -165,7 +165,7 @@ const IndexCreate = () => {
         </Row>
         <Row>
           <Col span={12}>
-            <Form.Item label={intl.get('schema.indexName')} name="name" rules={nameRulesFn(intl)}>
+            <Form.Item label={intl.get('schema.indexName')} name="name" rules={nameRulesFn()}>
               <Input />
             </Form.Item>
           </Col>
