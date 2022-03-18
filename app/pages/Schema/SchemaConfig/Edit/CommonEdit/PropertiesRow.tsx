@@ -85,7 +85,7 @@ export const EditRow = (props: IEditProps) => {
               <Form.Item 
                 name="name"
                 initialValue={name} 
-                rules={nameRulesFn(intl)}>
+                rules={nameRulesFn()}>
                 <Input disabled={alterType !== 'ADD'} />
               </Form.Item>
             </Col>
@@ -116,7 +116,7 @@ export const EditRow = (props: IEditProps) => {
                   name="fixedLength"
                   initialValue={fixedLength}
                   rules={[
-                    ...numberRulesFn(intl),
+                    ...numberRulesFn(),
                     {
                       required: true,
                       message: intl.get('formRules.numberRequired'),
