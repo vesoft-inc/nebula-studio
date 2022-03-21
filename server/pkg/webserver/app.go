@@ -3,6 +3,7 @@ package webserver
 import (
 	"github.com/vesoft-inc/nebula-studio/server/pkg/api/routes"
 	"github.com/vesoft-inc/nebula-studio/server/pkg/webserver/base"
+	"github.com/vesoft-inc/nebula-studio/server/pkg/webserver/middleware"
 
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/logger"
@@ -16,6 +17,9 @@ func InitApp() *iris.Application {
 
 	APIRoute := &base.Route{
 		Path: "",
+		Middlewares: []base.Hook{
+			middleware.AuthenticatedLoginHandler,
+		},
 		SubRoutes: []base.Route{
 			routes.FilesRoute,
 			routes.GatewayRoute,

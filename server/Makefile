@@ -9,7 +9,7 @@ build:
 	go build -o nebula-studio-server main.go
 
 run:
-	go run main.go
+	go run main.go -studio-config="./config/example-config.yaml"
 
 fmt:
 	go fmt ./...

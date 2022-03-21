@@ -156,7 +156,9 @@ func HandleImportAction(ctx iris.Context) base.Result {
 			Message: err.Error(),
 		}
 	}
-	data, err := importer.ImportAction(params.TaskId, importer.NewTaskAction(params.TaskAction))
+	nebulaAddress := ctx.Values().GetString("nebulaAddress")
+	username := ctx.Values().GetString("username")
+	data, err := importer.ImportAction(params.TaskId, nebulaAddress, username, importer.NewTaskAction(params.TaskAction))
 	if err != nil {
 		zap.L().Warn("importAction fail", zap.Error(err))
 		return base.Response{
@@ -423,71 +425,6 @@ func readFile(path string, offset int64, limit int64) ([]string, error) {
 		}
 	}
 	return res, nil
-}
-
-func Callback(ctx iris.Context) base.Result {
-	type Params struct {
-		TaskId string `json:"taskId"`
-	}
-	params := new(Params)
-	err := ctx.ReadJSON(params)
-	if err != nil {
-		zap.L().Warn("taskId get fail", zap.Error(err))
-		return base.Response{
-			Code:    base.Error,
-			Message: err.Error(),
-		}
-	}
-	taskId := params.TaskId
-
-	muTaskId.RLock()
-	taskIdBytes, err := ioutil.ReadFile(config.Cfg.Web.TaskIdPath)
-	muTaskId.RUnlock()
-	if err != nil {
-		zap.L().Warn("read taskId file error", zap.Error(err))
-		return base.Response{
-			Code:    base.Error,
-			Message: err.Error(),
-		}
-	}
-	taskIdJSON := make(map[string]bool)
-	if len(taskIdBytes) != 0 {
-		err := json.Unmarshal(taskIdBytes, &taskIdJSON)
-		if err != nil {
-			zap.L().Warn("parse taskId file error", zap.Error(err))
-			return base.Response{
-				Code:    base.Error,
-				Message: err.Error(),
-			}
-		}
-	}
-
-	taskIdJSON[taskId] = true
-	jsonStr, err := json.Marshal(taskIdJSON)
-	if err != nil {
-		zap.L().Warn("map to json error", zap.Error(err))
-		return base.Response{
-			Code:    base.Error,
-			Message: err.Error(),
-		}
-	}
-
-	muTaskId.Lock()
-	err = os.WriteFile(config.Cfg.Web.TaskIdPath, jsonStr, 0644)
-	muTaskId.Unlock()
-	if err != nil {
-		zap.L().Warn("write jsonId file error", zap.Error(err))
-		return base.Response{
-			Code:    base.Error,
-			Message: err.Error(),
-		}
-	}
-
-	return base.Response{
-		Code:    base.Success,
-		Data:    "",
-		Message: "",
-	}
 }
 
 func GetWorkingDir(ctx iris.Context) base.Result {

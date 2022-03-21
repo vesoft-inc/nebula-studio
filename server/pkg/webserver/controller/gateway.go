@@ -2,11 +2,13 @@ package controller
 
 import (
 	"encoding/base64"
+	"fmt"
 	"strings"
 
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/types"
 	"github.com/vesoft-inc/nebula-studio/server/pkg/webserver/base"
+	"github.com/vesoft-inc/nebula-studio/server/pkg/webserver/middleware"
 
 	"github.com/kataras/iris/v12"
 	"go.uber.org/zap"
@@ -149,10 +151,19 @@ func ConnectDB(ctx iris.Context) base.Result {
 			Message: err.Error(),
 		}
 	}
+	nebulaAddress := fmt.Sprintf("%s:%d", params.Address, params.Port)
+	loginToken, err := middleware.GetLoginToken(nebulaAddress, username)
+	if err != nil {
+		zap.L().Warn("connect DB fail", zap.Error(err))
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
 	data := make(map[string]string)
-	data["nsid"] = clientInfo.ClientID
 	data["version"] = string(clientInfo.NebulaVersion)
 	ctx.SetCookieKV("nsid", data["nsid"])
+	ctx.SetCookieKV("token", loginToken)
 	return base.Response{
 		Code: base.Success,
 		Data: data,
