@@ -76,7 +76,7 @@ export const EditRow = (props: IEditProps) => {
   }
   const { alterType, name, type, fixedLength, allowNull, value, comment } = data;
   return (
-    <Form.Item noStyle={true} shouldUpdate={true}>
+    <Form.Item noStyle shouldUpdate={true}>
       {({ getFieldValue }) => {
         const currentType = getFieldValue('type');
         return (
@@ -135,7 +135,7 @@ export const EditRow = (props: IEditProps) => {
               </Form.Item>
             </Col>
             <Col span={5}>
-              <Form.Item noStyle={true}>
+              <Form.Item noStyle>
                 {EXPLAIN_DATA_TYPE.includes(type) ? (
                   <Popover
                     trigger="focus"
@@ -159,7 +159,7 @@ export const EditRow = (props: IEditProps) => {
               </Form.Item>
             </Col>
             <Col span={3} className="operations">
-              <Form.Item noStyle={true}>
+              <Form.Item noStyle>
                 <Button
                   type="link"
                   htmlType="submit"

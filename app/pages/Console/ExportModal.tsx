@@ -84,7 +84,7 @@ const ExportModal = (props: IProps) => {
             </Radio.Button>
           </Radio.Group>
         </Form.Item>
-        <Form.Item noStyle={true} dependencies={['type']}>
+        <Form.Item noStyle dependencies={['type']}>
           {({ getFieldValue }) => {
             const type = getFieldValue('type');
             return type === 'vertex' ? <>
@@ -133,7 +133,7 @@ const ExportModal = (props: IProps) => {
             </>;
           }}
         </Form.Item>
-        <Form.Item noStyle={true}>
+        <Form.Item noStyle>
           <Button
             htmlType="submit"
             type="primary"

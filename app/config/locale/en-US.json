@@ -19,7 +19,6 @@
     "confirm": "Confirm",
     "import": "Import",
     "ask": "Are you sure to proceed?",
-    "output": "Export CSV File",
     "openInExplore": "Open In Explorer",
     "schema": "Schema",
     "create": "Create",
@@ -77,7 +76,7 @@
     "username": "Username",
     "password": "Password",
     "success": "succeed",
-    "clear": "Clear Connection",
+    "clear": "Log out",
     "title": "Connect to Nebula Graph"
   },
   "formRules": {
@@ -85,6 +84,7 @@
     "usernameRequired": "Username Required",
     "passwordRequired": "Password Required",
     "positiveIntegerRequired": "Please enter a non-negative integer",
+    "nameValidate": "The name must start with a letter, and it only supports English letters, numbers and underscores",
     "nameRequired": "Please enter the name",
     "numberRequired": "Please enter a positive integer",
     "replicaLimit": "Replica factor must not exceed the number of your current online machines({number})",
@@ -130,7 +130,6 @@
     "fileSize": "Size",
     "fileTitle": "Select Files",
     "bindDatasource": "Bind Datasource",
-    "confirm": "Confirm",
     "endImport": "Stop Import",
     "prop": "Prop",
     "mapping": "CSV Index",
@@ -154,10 +153,15 @@
     "addTag": "Add Tag",
     "config": "Task Config",
     "parseFailed": "File parsing failed",
-    "uploadTemplate": "Click or drag the yaml configuration file to this area to upload",
-    "uploadTemplateTip": "Please keep only the file name (retain the file extension) for all file paths in the template, such as logPath: config.csv",
-    "fileUploadRequired": "Make sure all csv data files are uploaded before uploading the configuration",
-    "reUpload": "Re-upload"
+    "uploadTemplate": "Drag & drop the YAML configuration file to this area",
+    "uploadBoxTip": "The YAML configuration file is used to describe information about the files to be imported, the Nebula Graph server, and more. ",
+    "fileUploadRequired": "1. Please make sure all CSV data files are uploaded before import the YAML file. If not, please go to ",
+    "fileUploadRequired2": " first.",
+    "exampleDownload": "2. An example for the configuration file: ",
+    "uploadTemplateTip": "3. 3. Configure the Yaml file: please keep only the file name (retain the file extension) for all file paths (path, failDataPath, logPath) in the template, e.g. logPath: config.csv",
+    "reUpload": "Re-upload",
+    "fileNotExist": "{name} file does not exist！",
+    "importYaml": "Import the YAML file"
   },
   "schema": {
     "spaceList": "Graph Space List",
@@ -215,11 +219,13 @@
     "deleteSpace": "Delete Graph Space",
     "cloneSpace": "Clone Graph Space",
     "length": "Length",
-    "selectVidTypeTip": "Please select the type"
+    "selectVidTypeTip": "Please select the type",
+    "csvDownload": "Export CSV File",
+    "pngDownload": "Export PNG File"
   },
   "menu": {
     "use": "Use Manual",
-    "release": "New Version",
+    "release": "Release Note",
     "forum": "Help Forum",
     "nGql": "nGQL"
   },

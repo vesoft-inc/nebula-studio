@@ -1,25 +1,63 @@
 @import '~@app/common.less';
 .config-import-modal {
   .ant-modal-body {
-    width: 100%;
-    padding-top: 50px;
+    width:750px;
+    margin: 0 auto;
     .tip {
-      background: @lightBlue;
-      font-size: 16px;
-      padding: 10px;
+      font-size: 14px;
+      color: #828282;
+    }
+    .btn-example-download {
+      padding-left: 0;
     }
   }
   .dragger-template {
     margin-top: 30px;
-    .btn-add-file svg{
-      width: 30px;
-      height: 30px;
+    background: #FFFFFF;
+    border: 1px dashed #000000;
+    .ant-upload-btn {
+      padding: 27px 30px;
+      & > .ant-upload-drag-container {
+        display: flex;
+      }
+      .btn-add-file svg{
+        width: 95px;
+        height: 95px;
+        fill: @darkBlue;
+      }
+      .drag-tip {
+        display: flex;
+        flex-direction: column;
+        margin-left: 28px;
+        align-items: flex-start;
+        text-align: left;
+      }
+      .ant-upload-text {
+        font-weight: 400;
+        font-size: 18px;
+      }
+      .ant-upload-hint {
+        font-weight: 400;
+        font-size: 14px;
+        color: #828282;
+      }
     }
   }
   .ant-form {
-    text-align: right;
-    button:not(:last-child) {
-      margin-right: 10px;
+    text-align: center;
+    .config-area {
+      color: @darkBlue;
+      max-height: 360px !important;
+      overflow: auto;
+      &[disabled] {
+        background-color: #fff;
+      }
+    }
+    button {
+      width: 140px;
+      &:not(:last-child) {
+        margin-right: 10px;
+      }
     }
   }
 }

@@ -39,7 +39,7 @@ const Console = (props: IProps) => {
   const { onExplorer } = props;
   const { spaces, getSpaces, switchSpace, currentSpace } = schema;
   const { runGQL, currentGQL, results, runGQLLoading, getParams, update, paramsMap } = console;
-  const { username, host } = global;
+  const { username, host, nebulaVersion } = global;
   const [isUpDown, setUpDown] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState<any>(null);
@@ -154,7 +154,7 @@ const Console = (props: IProps) => {
             </div>
           </div>
           <div className="code-input">
-            <CypherParameterBox onSelect={addParam} data={paramsMap} />
+            {nebulaVersion?.startsWith('v3') && <CypherParameterBox onSelect={addParam} data={paramsMap} />}
             <CodeMirror
               value={currentGQL}
               onBlur={value => update({ currentGQL: value })}

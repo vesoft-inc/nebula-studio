@@ -5,17 +5,19 @@ import Icon from '@app/components/Icon';
 import { trackPageView } from '@app/utils/stat';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
+import { NebulaVersion } from '@app/stores/types.d.ts';
 import './index.less';
 import { Link, useHistory } from 'react-router-dom';
 
 interface IOperations {
   space: string;
   onClone: (name: string, oldSpace: string) => void
-  onDelete: (name: string) => void
+  onDelete: (name: string) => void;
+  version: NebulaVersion
 }
 
 const Operations = (props: IOperations) => {
-  const { space, onClone, onDelete } = props;
+  const { space, onClone, onDelete, version } = props;
   const [visible, setVisible] = useState(false);
   const handleClone = (values) => {
     const { name } = values;
@@ -35,7 +37,7 @@ const Operations = (props: IOperations) => {
         </Button>
       </Popconfirm>
     </Menu.Item>
-    <Menu.Item key="clone">
+    {version !== NebulaVersion.V2_5 && <Menu.Item key="clone">
       <Popover
         destroyTooltipOnHide={true}
         placement="leftTop"
@@ -48,7 +50,7 @@ const Operations = (props: IOperations) => {
           </Form.Item>
           <Form.Item>
             <Button htmlType="submit" type="primary">
-              {intl.get('import.confirm')}
+              {intl.get('common.confirm')}
             </Button>
           </Form.Item>
         </Form>}
@@ -57,14 +59,15 @@ const Operations = (props: IOperations) => {
           {intl.get('schema.cloneSpace')}
         </Button>
       </Popover>
-    </Menu.Item>
+    </Menu.Item>}
   </Menu>;
 };
 
 const Schema = () => {
-  const { schema } = useStore();
+  const { schema, global } = useStore();
   const [loading, setLoading] = useState(false);
   const history = useHistory();
+  const { nebulaVersion } = global;
   const { currentSpace, switchSpace, getSpacesList, deleteSpace, spaceList, cloneSpace } = schema;
   useEffect(() => {
     trackPageView('/schema');
@@ -179,7 +182,7 @@ const Schema = () => {
               >
                 {intl.get('common.schema')}
               </Button>
-              <Dropdown overlay={<Operations space={space.Name} onDelete={handleDeleteSpace} onClone={handleCloneSpace} />} placement="bottomLeft">
+              <Dropdown overlay={<Operations version={nebulaVersion} space={space.Name} onDelete={handleDeleteSpace} onClone={handleCloneSpace} />} placement="bottomLeft">
                 <Icon className="btn-more" type="icon-studio-more" />
               </Dropdown>
             </div>

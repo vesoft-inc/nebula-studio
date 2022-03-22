@@ -1,4 +1,4 @@
-import { Button, Table, Tabs, Tooltip } from 'antd';
+import { Button, Table, Tabs, Tooltip, Popover } from 'antd';
 import { BigNumber } from 'bignumber.js';
 import React, { useCallback, useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Icon from '@app/components/Icon';
 import { parseSubGraph } from '@app/utils/parseData';
 import classNames from 'classnames';
+import { GraphStore } from '@app/stores/graph';
 import Graphviz from './Graphviz';
 import ForceGraph from './ForceGraph';
 
@@ -38,6 +39,8 @@ const OutputBox = (props: IProps) => {
   const [dataSource, setDataSource] = useState<any>([]);
   const [isFavorited, setIsFavorited] = useState(false);
   const [showGraph, setShowGraph] = useState(false);
+  const [graph, setGraph] = useState<GraphStore | null>(null);
+  const [tab, setTab] = useState('');
   const initData = () => {
     let _columns = [] as any;
     let _dataSource = [] as any;
@@ -110,6 +113,7 @@ const OutputBox = (props: IProps) => {
   }, []);
 
   const handleTabChange = useCallback(key => {
+    setTab(key);
     trackEvent('console', `change_tab_${key}`);
   }, []);
 
@@ -145,7 +149,7 @@ const OutputBox = (props: IProps) => {
     });
   };
 
-  const downloadData = () => {
+  const downloadCsv = () => {
     if (!data) {
       return ;
     }
@@ -176,6 +180,31 @@ const OutputBox = (props: IProps) => {
     link.href = url;
     link.download = `result.csv`;
     link.click();
+  };
+
+  const downloadPng = () => {
+    if(graph) {
+      let canvas = graph.twoGraph.canvas;
+      const shadowCanvas = document.createElement('canvas');
+      shadowCanvas.width = canvas.width;
+      shadowCanvas.height = canvas.height;
+      const ctx = shadowCanvas.getContext('2d');
+      ctx.fillStyle = '#F3F6F9';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(canvas, 0, 0);
+      canvas = shadowCanvas;
+      setTimeout(() => {
+        canvas.toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = canvas.toDataURL('image/png');
+          a.download = 'Image.png';
+          a.click();
+          window.URL.revokeObjectURL(url);
+        });
+      }, 0);
+    }
+    trackEvent('console', 'export_graph_png');
   };
 
   const handleExplore = () => {
@@ -220,12 +249,20 @@ const OutputBox = (props: IProps) => {
             onClick={removeFavorite}
           />
         </Tooltip>}
-        <Tooltip title={intl.get('common.output')} placement="top">
-          <Icon
-            type="icon-studio-btn-output"
-            onClick={downloadData}
-          />
-        </Tooltip>
+        <Popover
+          overlayClassName="export-popover"
+          placement="bottom"
+          content={<>
+            <Button type="link" className="download-item" onClick={downloadCsv}>
+              {intl.get('schema.csvDownload')}
+            </Button>
+            <Button disabled={!graph || tab !== 'graph'} type="link" className="download-item" onClick={downloadPng}>
+              {intl.get('schema.pngDownload')}
+            </Button>
+          </>}
+        >
+          <Icon className="btn-export" type="icon-studio-btn-output" />
+        </Popover>
         {visible ? <Icon
           type="icon-studio-btn-up"
           onClick={() => setVisible(false)}
@@ -293,7 +330,7 @@ const OutputBox = (props: IProps) => {
               }
               key="graph"
             >
-              <ForceGraph data={dataSource} spaceVidType={spaceVidType} />
+              <ForceGraph data={dataSource} spaceVidType={spaceVidType} onGraphInit={setGraph} />
             </Tabs.TabPane>
           )}
           {code !== 0 && (

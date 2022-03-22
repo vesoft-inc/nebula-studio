@@ -13,7 +13,7 @@ import './index.less';
 
 const FileUpload = () => {
   const { files } = useStore();
-  const { fileList, uploadDir, asyncDeleteFile, asyncGetFiles, asyncUploadFile, asyncGetUploadDir } = files;
+  const { fileList, uploadDir, deleteFile, getFiles, uploadFile, getUploadDir } = files;
   const [loading, setLoading] = useState(false);
   const transformFile = async file => {
     file.path = `${uploadDir}/${file.name}`;
@@ -30,14 +30,14 @@ const FileUpload = () => {
         'content-type': 'multipart/form-data',
       },
     };
-    await asyncUploadFile({ data, config }).then(_ => {
-      asyncGetFiles();
+    await uploadFile({ data, config }).then(_ => {
+      getFiles();
     });
     setLoading(false);
   };
   useEffect(() => {
-    asyncGetFiles();
-    asyncGetUploadDir();
+    getFiles();
+    getUploadDir();
     trackPageView('/import/files');
   }, []);
   const columns = [
@@ -67,7 +67,7 @@ const FileUpload = () => {
                 <Icon type="icon-studio-btn-detail" />
               </CSVPreviewLink>
               <Popconfirm
-                onConfirm={() => asyncDeleteFile(index)}
+                onConfirm={() => deleteFile(index)}
                 title={intl.get('common.ask')}
                 okText={intl.get('common.ok')}
                 cancelText={intl.get('common.cancel')}

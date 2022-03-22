@@ -13,10 +13,12 @@ const NewImport = () => {
   const location = useLocation();
   const [tab, setTab] = useState('files');
   useEffect(() => {
-    const path = location.pathname;
-    setTab(path.includes('files') ? 'files' : 'tasks');
     trackPageView('/import');
   }, []);
+  useEffect(() => {
+    const path = location.pathname;
+    setTab(path.includes('files') ? 'files' : 'tasks');
+  }, [location.pathname]);
   const handleTabChange = e => {
     setTab(e.target.value);
     history.push(`/import/${e.target.value}`);

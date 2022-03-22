@@ -1,4 +1,4 @@
-import { POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
+import { NAME_REGEX, POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
 import intl from 'react-intl-universal';
 
 export const hostRulesFn = () => [
@@ -22,12 +22,22 @@ export const passwordRulesFn = () => [
   },
 ];
 
-export const nameRulesFn = () => [
-  {
-    required: true,
-    message: intl.get('formRules.nameRequired'),
-  },
-];
+export const nameRulesFn = () => {
+  const version = sessionStorage.getItem('nebulaVersion');
+  const nameRequired = [
+    {
+      required: true,
+      message: intl.get('formRules.nameRequired'),
+    },
+  ];
+  const nameValidate = [
+    {
+      pattern: NAME_REGEX,
+      message: intl.get('formRules.nameValidate'),
+    },
+  ];
+  return version?.startsWith('v2') ? [...nameRequired, ...nameValidate] : nameRequired;
+};
 
 export const numberRulesFn = () => [
   {

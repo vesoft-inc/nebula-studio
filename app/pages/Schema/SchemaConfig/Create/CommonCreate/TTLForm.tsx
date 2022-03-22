@@ -31,14 +31,14 @@ const formRef = ((props: IProps) => {
     }
   };
   return (
-    <Form.Item noStyle={true}>
+    <Form.Item noStyle>
       <div className="form-item">
         <Form.Item name="ttlRequired" valuePropName="checked" initialValue={false}>
           <Checkbox onChange={handleClearTtl}>
             <span className="label">{intl.get('schema.setTTL')}</span>
           </Checkbox>
         </Form.Item>
-        <Form.Item noStyle={true} shouldUpdate={true}>
+        <Form.Item noStyle shouldUpdate={true}>
           {({ getFieldValue }) => {
             const properties = getFieldValue('properties') || [];
             const ttlRequired = getFieldValue('ttlRequired');

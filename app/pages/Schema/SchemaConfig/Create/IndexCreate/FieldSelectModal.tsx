@@ -66,7 +66,7 @@ const FieldSelectModal = (props: IProps) => {
             disabled={selectedField === null}
             onClick={handleFieldAdd}
           >
-            {intl.get('explore.confirm')}
+            {intl.get('common.confirm')}
           </Button>
           <Button onClick={handleClose}>
             {intl.get('common.cancel')}

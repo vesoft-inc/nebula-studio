@@ -20,7 +20,7 @@ const MODULES = [
     icon: 'icon-studio-nav-import',
     title: 'import.importData',
     tip: 'doc.importIntro',
-    link: '/import'
+    link: '/import/files'
   },
   {
     icon: 'icon-studio-nav-console',
