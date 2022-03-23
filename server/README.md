@@ -36,7 +36,6 @@ $ ./nebula-studio-server -studio-config="./config/example-config.yaml"
 | DownloadErrLog | /api/import-tasks/{id:string}/err-logs       | GET |
 | ReadLog            | /api/import-tasks/logs                       | GET      |
 | ReadErrLog | /api/import-tasks/err-logs                   | GET |
-| Callback           | /api/import-tasks/finish                     | POST     |
 | GetWorkingDir      | /api/import-tasks/working-dir                | GET      |
 | GetTaskDir    | /api/import-tasks/task-dir                   | GET |
 | GetTaskLogNames | /api/import-tasks/{id:string}/task-log-names | GET    |
@@ -69,6 +68,10 @@ Response:
 
 #### ConnectDB  API
 
+Header:
+
+Authorization Basic cm9vdDoxMjM=
+
 The request json body:
 
 ```json
@@ -82,8 +85,7 @@ Response:
     "code": 0,
     "message": "",
     "data": {
-        "nsid": "e870674d-6ebc-4d9d-a1f7-bf59fdca24e8",
-        "version": "v2.6"
+        "version": "v3.0"
     }
 }
 ```
@@ -302,26 +304,6 @@ Response:
         "2022/03/16 15:23:00 [INFO] clientmgr.go:28: Create 10 Nebula Graph clients",
         "2022/03/16 15:23:00 [INFO] reader.go:65: Start to read file(0): E:\\NebulaProject\\player.csv, schema: < :VID(string),player.name:string,player.age:int >"
     ]
-}
-```
-
-#### Callback API
-
-The request json body:
-
-```json
-{
-  "task_id": "123456"
-}
-```
-
-Response:
-
-```json
-{
-    "code": 0,
-    "message": "",
-    "data": ""
 }
 ```
 

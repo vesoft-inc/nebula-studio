@@ -179,9 +179,9 @@ func (mgr *TaskMgr) StopTask(taskID string) bool {
 /*
 	`GetAllTaskIDs` will return all task ids in map
 */
-func (mgr *TaskMgr) GetAllTaskIDs() ([]string, error) {
+func (mgr *TaskMgr) GetAllTaskIDs(nebulaAddress, username string) ([]string, error) {
 	ids := make([]string, 0)
-	allIds, err := mgr.db.SelectAllIds()
+	allIds, err := mgr.db.SelectAllIds(nebulaAddress, username)
 	if err != nil {
 		return nil, err
 	}
