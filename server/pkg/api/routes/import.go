@@ -42,10 +42,6 @@ var ImportRoute = base.Route{
 			GET:  controller.ReadErrLog,
 		},
 		{
-			Path: "finish",
-			POST: controller.Callback,
-		},
-		{
 			Path: "working-dir",
 			GET:  controller.GetWorkingDir,
 		},

@@ -37,6 +37,16 @@ func InitDB() {
 	}
 }
 
+// FindTaskInfoByIdAndAddresssAndUser used to check whether the task belongs to the user
+func (t *TaskDb) FindTaskInfoByIdAndAddresssAndUser(id int, nebulaAddress, user string) (*TaskInfo, error) {
+	taskInfo := new(TaskInfo)
+	if err := t.Model(&TaskInfo{}).Where("id = ? AND nebula_address = ? And user = ?", id, nebulaAddress,
+		user).First(&taskInfo).Error; err != nil {
+		return nil, err
+	}
+	return taskInfo, nil
+}
+
 func (t *TaskDb) InsertTaskInfo(info *TaskInfo) error {
 	return t.Create(info).Error
 }
@@ -60,10 +70,10 @@ func (t *TaskDb) LastId() (int, error) {
 	return id, nil
 }
 
-func (t *TaskDb) SelectAllIds() ([]int, error) {
+func (t *TaskDb) SelectAllIds(nebulaAddress, user string) ([]int, error) {
 	var taskInfos []TaskInfo
 	ids := make([]int, 0)
-	if err := t.Select("id").Find(&taskInfos).Error; err != nil {
+	if err := t.Select("id").Where("nebula_address = ? And user = ?", nebulaAddress, user).Find(&taskInfos).Error; err != nil {
 		return nil, err
 	}
 	for _, taskInfo := range taskInfos {
