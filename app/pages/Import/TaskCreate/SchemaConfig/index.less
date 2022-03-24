@@ -12,6 +12,7 @@
     color: @darkBlue;
   }
   .btn-preview {
+    font-family: Roboto-Regular, sans-serif;
     font-weight: bold;
     color: @blue;
     &.actived {
@@ -47,6 +48,15 @@
         align-items: center;
         .tag-select {
           min-width: 60px;
+          .ant-select-selection-item {
+            font-family: Roboto-Bold, sans-serif;
+          }
+          .ant-select-selection-placeholder {
+            color: @blue;
+          }
+          &.no-value .ant-select-arrow svg {
+            fill: @blue;
+          }
         }
       }
     }

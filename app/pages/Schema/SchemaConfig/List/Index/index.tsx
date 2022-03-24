@@ -51,7 +51,7 @@ const IndexList = () => {
   const getData = async () => {
     setLoading(true);
     await getIndexList(indexType);
-    await getRebuildData(indexType);
+    await getRebuildData(indexType, rebuildList);
     setSearchVal('');
     setLoading(false);
   };
@@ -64,15 +64,23 @@ const IndexList = () => {
     }
   };
 
-  const getRebuildData = async (type: IndexType) => {
+  const checkIsFinished = (data, raw) => {
+    const finished = raw?.filter(i => !data.includes(i));
+    if(finished?.length > 0) {
+      message.success(intl.get('schema.rebuildSuccess', { names: finished.join(', ') }));
+    }
+  };
+  const getRebuildData = async (type: IndexType, raw) => {
     rebuildTimer.current && clearTimeout(rebuildTimer.current);
     const data = await getRebuildIndexes(type);
     if (data && data.length > 0) {
+      checkIsFinished(data, raw);
       setRebuildList(data);
       rebuildTimer.current = setTimeout(() => {
-        getRebuildData(type);
+        getRebuildData(type, data);
       }, 2000);
     } else {
+      checkIsFinished([], raw);
       setRebuildList([]);
       rebuildTimer.current && clearTimeout(rebuildTimer.current);
     }
@@ -85,7 +93,7 @@ const IndexList = () => {
       name,
     });
     if (res.code === 0) {
-      getRebuildData(type);
+      getRebuildData(type, rebuildList);
     }
   };
   const columns = useMemo(() => [

@@ -22,7 +22,7 @@ const SEMICOLON_REG = /((?:[^;'"]*(?:"(?:\\.|[^"])*"|'(?:\\.|[^'])*')[^;'"]*)+)|
 const getHistory = () => {
   const value: string | null = localStorage.getItem('history');
   if (value && value !== 'undefined' && value !== 'null') {
-    return JSON.parse(value).slice(-15);
+    return JSON.parse(value).slice(0, 15);
   }
   return [];
 };

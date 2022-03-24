@@ -42,7 +42,7 @@ const TemplateModal = (props: IProps) => {
       if(typeof parseContent === 'object') {
         const _taskDir = taskDir.endsWith('/') ? taskDir : taskDir + '/';
         const _uploadDir = uploadDir.endsWith('/') ? uploadDir : uploadDir + '/';
-        parseContent.logPath = `${_taskDir}/import.log`;
+        parseContent.logPath = `${_taskDir}import.log`;
         parseContent.files?.forEach(file => {
           if(!files.includes(file.path)) {
             message.error(intl.get('import.fileNotExist', { name: file.path }));
@@ -52,7 +52,9 @@ const TemplateModal = (props: IProps) => {
           file.failDataPath = _taskDir + `err/${file.failDataPath || 'err.log'}`;
         });
         setConfig(JSON.stringify(parseContent, null, 2));
+        const count = taskDir.split('/').pop();
         form.setFieldsValue({
+          name: `task-${count}`,
           content: JSON.stringify(parseContent, null, 2),
         });
       } else {
