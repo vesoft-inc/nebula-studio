@@ -18,7 +18,7 @@ const DisplayPanel = (props: IProps) => {
   const [visible, setVisible] = useState(false);
   const { data, spaceVidType } = props;
   return (
-    <div className="display-panel">
+    <div className="output-display-panel">
       <div className="btn-toggle-panel" onClick={() => setVisible(!visible)}>
         <Icon type="icon-studio-btn-back" />
       </div>

@@ -140,7 +140,7 @@ const formRef = ((props: IProps) => {
           <span className="label">{intl.get('schema.setTTL')}</span>
         </Checkbox>
       </Form.Item>
-      {!isEdit && <Form.Item noStyle={true}>
+      {!isEdit && <Form.Item noStyle>
         <div className="box-container">
           <Row>
             <Col span={12}>
@@ -154,7 +154,7 @@ const formRef = ((props: IProps) => {
               </Form.Item>
             </Col>
             {col !== '' && <Col span={3} className="operations">
-              <Form.Item noStyle={true}>
+              <Form.Item noStyle>
                 <Button
                   type="link"
                   onClick={handleEditBefore}
@@ -181,7 +181,7 @@ const formRef = ((props: IProps) => {
         </div>
       </Form.Item>}
 
-      {isEdit && <Form.Item noStyle={true} shouldUpdate={true}>
+      {isEdit && <Form.Item noStyle shouldUpdate={true}>
         <div className="box-container">
           <Row>
             <Col span={12}>
@@ -233,7 +233,7 @@ const formRef = ((props: IProps) => {
               </Form.Item>
             </Col>
             <Col span={3} className="operations">
-              <Form.Item noStyle={true}>
+              <Form.Item noStyle>
                 <Button
                   type="link"
                   htmlType="submit"

@@ -138,7 +138,7 @@ const IndexCreate = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item noStyle={true} dependencies={['type']}>
+            <Form.Item noStyle dependencies={['type']}>
               {({ getFieldValue }) => {
                 const type = getFieldValue('type');
                 return (
@@ -181,7 +181,7 @@ const IndexCreate = () => {
             {intl.get('schema.dragSorting')}
           </span>
         </>}>
-          <Form.Item noStyle={true} name="fields">
+          <Form.Item noStyle name="fields">
             <Button 
               type="primary" 
               className="studio-add-btn btn-field-add" 
@@ -190,7 +190,7 @@ const IndexCreate = () => {
               {intl.get('common.addProperty')}
             </Button>
           </Form.Item>
-          <Form.Item noStyle={true} dependencies={['fields']}>
+          <Form.Item noStyle dependencies={['fields']}>
             {({ getFieldValue }) => {
               const fields = getFieldValue('fields') || [];
               const filterList = fieldList.filter(
@@ -212,12 +212,12 @@ const IndexCreate = () => {
             }}
           </Form.Item>
         </Form.Item>
-        <Form.Item noStyle={true}>
+        <Form.Item noStyle>
           <div className="view-row">
             <GQLCodeMirror currentGQL={gql} />
           </div>
         </Form.Item>
-        <Form.Item noStyle={true}>
+        <Form.Item noStyle>
           <div className="studio-form-footer">
             <Button onClick={() => history.push(`/schema/index/list`)}>{intl.get('common.cancel')}</Button>
             <Button type="primary" loading={loading} htmlType="submit">{intl.get('common.create')}</Button>
