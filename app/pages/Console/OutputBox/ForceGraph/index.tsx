@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { parseSubGraph } from '@app/utils/parseData';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@app/stores';
+import { GraphStore } from '@app/stores/graph';
 import { initTooltip } from './Tootip';
 import DisplayPanel from './DisplayPanel';
 import OperationPanel from './OperationPanel';
@@ -14,12 +15,13 @@ import './index.less';
 interface IProps {
   data: any;
   spaceVidType: string;
+  onGraphInit: (graph: GraphStore) => void;
 }
 const ForceGraphBox = (props: IProps) => {
   const [uuid ] = useState(uuidv4());
   const { graphInstances: { graphs, initGraph, clearGraph } } = useStore();
   const grapfDomRef = useRef<any>();
-  const { data, spaceVidType } = props;
+  const { data, spaceVidType, onGraphInit } = props;
   const [loading, setLoading] = useState(false);
   const init = async () => {
     const { vertexes, edges } = parseSubGraph(data, spaceVidType);
@@ -29,6 +31,7 @@ const ForceGraphBox = (props: IProps) => {
       id: uuid,
       data: { vertexes, edges }
     });
+    onGraphInit(graphs[uuid]);
     initTooltip({ container: grapfDomRef.current, id: uuid });
     initBrushSelect({ container: grapfDomRef.current, id: uuid });
     setLoading(false);

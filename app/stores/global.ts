@@ -13,7 +13,7 @@ export class GlobalStore {
   username = cookies.get('nu');
   host = cookies.get('nh');
   version = process.env.VERSION;
-  nebulaVersion?: NebulaVersion = cookies.get('NebulaVersion');
+  nebulaVersion?: NebulaVersion = sessionStorage.getItem('nebulaVersion') as NebulaVersion;
   constructor() {
     makeObservable(this, {
       username: observable,
@@ -47,6 +47,7 @@ export class GlobalStore {
     resetStore();
     cookies.remove('nh');
     cookies.remove('nu');
+    sessionStorage.removeItem('nebulaVersion');
   };
 
   update = (payload: Record<string, any>) => {
@@ -75,6 +76,7 @@ export class GlobalStore {
       message.success(intl.get('configServer.success'));
       cookies.set('nh', host);
       cookies.set('nu', username);
+      sessionStorage.setItem('nebulaVersion', data.version);
       this.update({ host, username, nebulaVersion: data.version });
       return true;
     }
@@ -82,6 +84,7 @@ export class GlobalStore {
     this.update({ host: '', username: '' });
     cookies.remove('nh');
     cookies.remove('nu');
+    sessionStorage.removeItem('nebulaVersion');
     return false;
   };
 }

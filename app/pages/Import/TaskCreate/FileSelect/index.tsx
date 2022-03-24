@@ -17,7 +17,7 @@ const FormItem = Form.Item;
 const FileSelect = (props: IProps) => {
   const { type } = props;
   const { files, dataImport: { update, verticesConfig, edgesConfig } } = useStore();
-  const { fileList, asyncGetFiles } = files;
+  const { fileList, getFiles } = files;
   const [visible, setVisible] = useState(false);
   const onFinish = (value) => {
     const file = fileList.filter(item => item.name === value.name)[0];
@@ -43,7 +43,7 @@ const FileSelect = (props: IProps) => {
     setVisible(false);
   };
   useEffect(() => {
-    asyncGetFiles();
+    getFiles();
   }, []);
   return (
     <Popover
@@ -64,7 +64,7 @@ const FileSelect = (props: IProps) => {
         </FormItem>
         <FormItem>
           <Button htmlType="submit" type="primary">
-            {intl.get('import.confirm')}
+            {intl.get('common.confirm')}
           </Button>
         </FormItem>
       </Form>}

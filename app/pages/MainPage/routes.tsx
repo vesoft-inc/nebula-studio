@@ -35,7 +35,7 @@ export const RoutesList = [
     exact: true,
   },
   {
-    path: '/import/:type',
+    path: '/import/:type?',
     component: Import,
   },
   {

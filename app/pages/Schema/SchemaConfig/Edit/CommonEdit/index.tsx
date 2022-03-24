@@ -160,7 +160,7 @@ const ConfigEdit = (props: IProps) => {
           className="basic-config" 
           layout="vertical" 
           {...formItemLayout}>
-          <Form.Item noStyle={true} shouldUpdate={true}>
+          <Form.Item noStyle shouldUpdate={true}>
             <Row className="form-item">
               <Col span={12}>
                 <Form.Item label={intl.get('common.name')}>

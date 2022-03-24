@@ -90,10 +90,10 @@ const ConfigCreate = (props: IProps) => {
         </Row>
         <PropertiesForm formRef={basicForm} onUpdate={updateGql} />
         <TTLForm formRef={basicForm} onUpdate={updateGql} />
-        <Form.Item noStyle={true}>
+        <Form.Item noStyle>
           <GQLCodeMirror currentGQL={gql} />
         </Form.Item>
-        <Form.Item noStyle={true}>
+        <Form.Item noStyle>
           <div className="studio-form-footer">
             <Button onClick={() => history.push(`/schema/${createType}/list`)}>{intl.get('common.cancel')}</Button>
             <Button type="primary" loading={loading} htmlType="submit">{intl.get('common.create')}</Button>

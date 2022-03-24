@@ -31,7 +31,7 @@ const LoginPage: React.FC = () => {
     setLoading(false);
     setTimeout(() => {
       ok && history.replace(`/console${location.search}`);
-    }, 300);
+    }, 400);
   };
 
   useEffect(() => {
@@ -46,7 +46,7 @@ const LoginPage: React.FC = () => {
           <span className="title">Nebula Studio</span>
         </div>
         <Form className="login-form" layout="horizontal" {...fomrItemLayout} onFinish={onConfig}>
-          <FormItem noStyle={true}>
+          <FormItem noStyle>
             <span className="form-title">{intl.get('configServer.title')}</span>
           </FormItem>
           <FormItem name="host" rules={hostRulesFn()}>

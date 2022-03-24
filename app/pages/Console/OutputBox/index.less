@@ -1,6 +1,7 @@
 @import '~@app/common.less';
 .output-box {
 	overflow: hidden;
+	max-height: 850px;
 	background: #fff;
 	position: relative;
 	display: flex;
@@ -48,6 +49,9 @@
 			}
 			span.btn-yellow svg{
 				fill: #F2C94C;
+			}
+			.btn-export {
+				cursor: pointer;
 			}
 		}
 	}
@@ -124,5 +128,24 @@
 		font-size: 16px;
 		color: @darkBlue;
 		letter-spacing: 1.48px;
+	}
+}
+
+.export-popover {
+	.ant-popover-inner-content {
+		padding: 0;
+		border-radius: 3px;
+	}
+	.download-item {
+		padding: 10px 20px;
+		display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    font-weight: 400;
+		font-size: 12px;
+		&[disabled] {
+			color: rgba(0, 0, 0, 0.25);
+		}
 	}
 }

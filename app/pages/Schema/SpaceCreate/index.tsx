@@ -117,7 +117,7 @@ const SpaceCreate = () => {
                   <Option value="INT64">INT64</Option>
                 </Select>
               </Form.Item>
-              <FormItem noStyle={true} dependencies={['vidType']}>
+              <FormItem noStyle dependencies={['vidType']}>
                 {({ getFieldValue }) => {
                   const vidType = getFieldValue('vidType');
                   return vidType === 'FIXED_STRING' ? <Col offset={11} className="item-string-length">

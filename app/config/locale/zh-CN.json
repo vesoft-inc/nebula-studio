@@ -19,7 +19,6 @@
     "confirm": "确认",
     "import": "导入",
     "ask": "确定进行当前操作？",
-    "output":"导出CSV文件",
     "openInExplore": "导入图探索",
     "schema": "Schema",
     "create": "创建",
@@ -77,7 +76,7 @@
     "username": "用户名",
     "password": "密码",
     "success": "配置成功",
-    "clear": "清除连接",
+    "clear": "登出",
     "title": "配置数据库"
   },
   "formRules": {
@@ -85,6 +84,7 @@
     "usernameRequired": "请填写用户名",
     "passwordRequired": "请填写密码",
     "positiveIntegerRequired": "请输入一个非负整数",
+    "nameValidate": "命名必须以字母开头，且只支持输入英文字母、数字以及下划线_",
     "nameRequired": "请输入名称",
     "numberRequired": "请输入正整数",
     "replicaLimit": "副本数量不得超过你当前 online 机器数量({number})",
@@ -130,7 +130,6 @@
     "fileSize": "大小",
     "fileTitle": "文件列表",
     "bindDatasource": "绑定数据源",
-    "confirm": "确认",
     "endImport": "终止导入",
     "prop": "属性",
     "mapping": "对应列标",
@@ -154,10 +153,15 @@
     "addTag": "添加 Tag",
     "config": "任务配置",
     "parseFailed": "文件解析失败",
-    "uploadTemplate": "点击或拖动yaml配置文件到该区域上传",
-    "uploadTemplateTip": "模板中所有文件路径请仅保留文件名(保留文件扩展名），比如 logPath: config.csv",
-    "fileUploadRequired": "上传配置前请确保所有 csv 数据文件已上传",
-    "reUpload": "重新上传"
+    "uploadTemplate": "将 YAML 配置文件拖放到该区域",
+    "uploadBoxTip": "The YAML configuration file is used to describe information about the files to be imported, the Nebula Graph server, and more. ",
+    "fileUploadRequired": "1. 请确保在导入 YAML 文件之前上传所有 CSV 数据文件。 如果没有，请先前往",
+    "fileUploadRequired2": "数据文件",
+    "exampleDownload": "2. 配置文件示例:",
+    "uploadTemplateTip": "3.配置Yaml文件：模板中所有文件路径（path、failDataPath、logPath）请只保留文件名（保留文件扩展名），例如： 日志路径：config.csv",
+    "reUpload": "重新上传",
+    "fileNotExist": "文件 {name} 不存在",
+    "importYaml": "导入 YAML 文件"
   },
   "schema": {
     "spaceList": "图空间列表",
@@ -215,11 +219,13 @@
     "deleteSpace": "删除图空间",
     "cloneSpace": "克隆图空间",
     "length": "长度",
-    "selectVidTypeTip": "选择 Vid 类型"
+    "selectVidTypeTip": "选择 Vid 类型",
+    "csvDownload": "导出 CSV",
+    "pngDownload": " 导出 PNG"
   },
   "menu": {
     "use": "使用手册",
-    "release": "新发布",
+    "release": "更新日志",
     "forum": "求助论坛",
     "nGql": "nGQL"
   },

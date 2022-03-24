@@ -155,9 +155,9 @@ const PropertiesForm = (props: IProps) => {
           <span className="label">{intl.get('schema.defineFields')}</span>
         </Checkbox>
       </Form.Item>
-      <Form.Item noStyle={true} shouldUpdate={true}>
+      <Form.Item noStyle shouldUpdate={true}>
         <div className="box-container">
-          <Form.Item noStyle={true}>
+          <Form.Item noStyle>
             <Button 
               type="primary" 
               className="studio-add-btn" 
@@ -167,7 +167,7 @@ const PropertiesForm = (props: IProps) => {
               {intl.get('common.addProperty')}
             </Button>
           </Form.Item>
-          <Form.Item noStyle={true}>
+          <Form.Item noStyle>
             <Row className="form-header">
               <Col span={4} className="required-item">{intl.get('common.propertyName')}</Col>
               <Col span={6} className="required-item">{intl.get('common.dataType')}</Col>

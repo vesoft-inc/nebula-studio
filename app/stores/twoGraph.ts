@@ -1,4 +1,4 @@
-import { autorun, makeObservable, observable, reaction } from 'mobx';
+import { autorun, makeObservable, observable, reaction, IReactionDisposer } from 'mobx';
 import { FONT_SIZE, LINE_LENGTH, NODE_AREA, NODE_SIZE } from '@app/config/explore';
 import ForceGraph, { ForceGraphInstance, LinkObject, NodeObject } from '@app/components/ForceGraph';
 import { Bezier } from 'bezier-js';
@@ -18,6 +18,8 @@ class TwoGraph {
   progressValue: number = 0;
   transform: ITransform = { k: 1, x: 0, y: 0 };
   instance: ForceGraphInstance;
+  autorunDisposer: IReactionDisposer;
+  reactionDisposer: IReactionDisposer;
 
   constructor(graph: GraphStore, container: HTMLElement) {
     this.graph = graph;
@@ -26,6 +28,7 @@ class TwoGraph {
       transform: observable,
       instance: false,
       graph: false,
+      autorunDisposer: false,
     });
     this.init();
   }
@@ -177,7 +180,7 @@ class TwoGraph {
         // cuclate link's curvature by graphIndex
         let curvature = 0;
         if (link.source === link.target) {
-          curvature = 1;
+          curvature = link.graphIndex as number;
         } else {
           const { graphIndex = 0 } = <any>link;
           // the seem direction links will be the seem side
@@ -210,7 +213,7 @@ class TwoGraph {
         const controlPoints = link.__controlPoints as [number, number, number, number];
         if (link.curvature !== 0 && controlPoints) {
           // sometimes controlpoints not exist
-          if (link.curvature === 1) {
+          if (link.source === link.target) {
             relLink.x = controlPoints[2] - controlPoints[0];
             relLink.y = controlPoints[3] - controlPoints[1];
           }
@@ -267,7 +270,7 @@ class TwoGraph {
 
     this.instance = Graph;
     // rerender when data change
-    autorun(() => {
+    this.autorunDisposer = autorun(() => {
       graph.makeLineSort();
       // reset node's v
       graph.nodes.forEach((node) => {
@@ -279,7 +282,7 @@ class TwoGraph {
     });
 
     // rerender
-    reaction(
+    this.reactionDisposer = reaction(
       () => [
         graph.nodeHovering,
         graph.linksSelected.toJSON(),
@@ -330,6 +333,8 @@ class TwoGraph {
    * soft destroy
    */
   destroy() {
+    this.autorunDisposer();
+    this.reactionDisposer();
     this.instance._destructor();
     this.canvas?.remove();
   }

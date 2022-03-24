@@ -70,14 +70,14 @@ const PropertiesForm = (props: IProps) => {
     formRef.setFieldsValue({ 'properties': _properties });
   };
   return (
-    <Form.Item noStyle={true}>
+    <Form.Item noStyle>
       <div className="form-item">
         <Form.Item name="propertiesRequired" valuePropName="checked" initialValue={true}>
           <Checkbox onChange={handleClearProperties}>
             <span className="label">{intl.get('schema.defineFields')}</span>
           </Checkbox>
         </Form.Item>
-        <Form.Item noStyle={true} shouldUpdate={true}>
+        <Form.Item noStyle shouldUpdate={true}>
           {({ getFieldValue }) => {
             const propertiesRequired = getFieldValue('propertiesRequired');
             const properties = getFieldValue('properties') || [];
@@ -86,8 +86,8 @@ const PropertiesForm = (props: IProps) => {
                 <Form.List name="properties">
                   {(fields, { add, remove }) => {
                     return (
-                      <Form.Item noStyle={true}>
-                        <Form.Item noStyle={true}>
+                      <Form.Item noStyle>
+                        <Form.Item noStyle>
                           <Button 
                             type="primary" 
                             className="studio-add-btn" 
@@ -97,7 +97,7 @@ const PropertiesForm = (props: IProps) => {
                             {intl.get('common.addProperty')}
                           </Button>
                         </Form.Item>
-                        <Form.Item noStyle={true}>
+                        <Form.Item noStyle>
                           <Row className="form-header">
                             <Col span={4} className="required-item">{intl.get('common.propertyName')}</Col>
                             <Col span={6} className="required-item">{intl.get('common.dataType')}</Col>
@@ -166,7 +166,7 @@ const PropertiesForm = (props: IProps) => {
                                 </Form.Item>
                               </Col>
                               <Col span={5}>
-                                <Form.Item noStyle={true}>
+                                <Form.Item noStyle>
                                   {fields &&
                                   fields[index] &&
                                   EXPLAIN_DATA_TYPE.includes(properties[index].type) ? (
@@ -192,7 +192,7 @@ const PropertiesForm = (props: IProps) => {
                                 </Form.Item>
                               </Col>
                               <Col span={2}>
-                                <Form.Item noStyle={true}>
+                                <Form.Item noStyle>
                                   <Button type="link" danger={true} onClick={() => handlePropertyDelete(name, remove)}>{intl.get('common.delete')}</Button>
                                 </Form.Item>
                               </Col>
