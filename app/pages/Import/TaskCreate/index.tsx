@@ -124,8 +124,15 @@ const TaskCreate = () => {
     updateSpaceInfo(space);
   };
 
+  const initTaskDir = async () => {
+    const dir = await getTaskDir();
+    if(dir) {
+      const count = dir.split('/').pop();
+      updateBasicConfig('taskName', `task-${count}`);
+    }
+  };
   useEffect(() => {
-    getTaskDir();
+    initTaskDir();
     getSpaces();
     if(currentSpace) {
       updateSpaceInfo(currentSpace);
