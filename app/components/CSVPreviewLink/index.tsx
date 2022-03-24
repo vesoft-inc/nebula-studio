@@ -17,7 +17,6 @@ interface IProps {
 const CSVPreviewLink = (props: IProps) => {
   const { onMapping, file: { content }, children, btnType, selected } = props;
   const [visible, setVisible] = useState(false);
-  const [actived, setActived] = useState(selected || false);
   const handleLinkClick = e => {
     e.stopPropagation();
     setVisible(true);
@@ -26,7 +25,6 @@ const CSVPreviewLink = (props: IProps) => {
   const handleMapping = index => {
     onMapping && onMapping(index);
     setVisible(false);
-    setActived(true);
   };
   const columns = content.length
     ? content[0].map((_, index) => {
@@ -69,7 +67,7 @@ const CSVPreviewLink = (props: IProps) => {
         </div>
       </div>}
     >
-      <Button type="link" className={classNames('btn-preview', { 'primary-btn': btnType === 'default', actived })} onClick={handleLinkClick}>
+      <Button type="link" className={classNames('btn-preview', { 'primary-btn': btnType === 'default', 'actived': selected })} onClick={handleLinkClick}>
         {children}
       </Button>
     </Popover>

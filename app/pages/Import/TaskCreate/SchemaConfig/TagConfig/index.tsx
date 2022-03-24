@@ -6,6 +6,7 @@ import { CloseOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import CSVPreviewLink from '@app/components/CSVPreviewLink';
+import classNames from 'classnames';
 const Option = Select.Option;
 
 interface IProps {
@@ -72,8 +73,9 @@ const VerticesConfig = (props: IProps) => {
           <span className="label">Tag</span>
           <Select
             bordered={false}
-            className="tag-select"
-            value={tag.name}
+            className={classNames('tag-select', { 'no-value': !tag.name })}
+            placeholder={intl.get('import.selectTag')}
+            value={tag.name || null}
             dropdownMatchSelectWidth={false}
             onChange={value => handleTagChange(configIndex, tagIndex, value)}
           >

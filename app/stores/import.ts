@@ -50,6 +50,7 @@ export class ImportStore {
       this.update({
         taskDir,
       });
+      return taskDir;
     }
   };
 

@@ -151,6 +151,8 @@
     "readFailed": "{total}读取失败",
     "selectFile": "选择绑定文件",
     "addTag": "添加 Tag",
+    "selectTag": "选择 Tag",
+    "selectEdge": "选择 Edge 类型",
     "config": "任务配置",
     "parseFailed": "文件解析失败",
     "uploadTemplate": "将 YAML 配置文件拖放到该区域",
@@ -221,7 +223,8 @@
     "length": "长度",
     "selectVidTypeTip": "选择 Vid 类型",
     "csvDownload": "导出 CSV",
-    "pngDownload": " 导出 PNG"
+    "pngDownload": " 导出 PNG",
+    "rebuildSuccess": "{names}重建完成"
   },
   "menu": {
     "use": "使用手册",

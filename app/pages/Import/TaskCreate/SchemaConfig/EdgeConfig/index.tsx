@@ -6,6 +6,7 @@ import { CloseOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import CSVPreviewLink from '@app/components/CSVPreviewLink';
+import classNames from 'classnames';
 const Option = Select.Option;
 
 interface IProps {
@@ -71,8 +72,9 @@ const EdgeConfig = (configProps: IProps) => {
           <span className="label">Edge Type</span>
           <Select
             bordered={false}
-            className="tag-select"
-            value={type}
+            className={classNames('tag-select', { 'no-value': !type })}
+            placeholder={intl.get('import.selectEdge')}
+            value={type || null}
             dropdownMatchSelectWidth={false}
             onChange={value => handleEdgeChange(configIndex, value)}
           >
