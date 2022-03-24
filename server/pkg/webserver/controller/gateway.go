@@ -162,7 +162,7 @@ func ConnectDB(ctx iris.Context) base.Result {
 	}
 	data := make(map[string]string)
 	data["version"] = string(clientInfo.NebulaVersion)
-	ctx.SetCookieKV("nsid", data["nsid"])
+	ctx.SetCookieKV("nsid", clientInfo.ClientID)
 	ctx.SetCookieKV("token", loginToken)
 	return base.Response{
 		Code: base.Success,

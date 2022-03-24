@@ -3,10 +3,14 @@ package routes
 import (
 	"github.com/vesoft-inc/nebula-studio/server/pkg/webserver/base"
 	"github.com/vesoft-inc/nebula-studio/server/pkg/webserver/controller"
+	"github.com/vesoft-inc/nebula-studio/server/pkg/webserver/middleware"
 )
 
 var ImportRoute = base.Route{
 	Path: "/api/import-tasks",
+	Middlewares: []base.Hook{
+		middleware.AuthenticatedLoginHandler,
+	},
 	Desc: "import",
 	SubRoutes: []base.Route{
 		{
