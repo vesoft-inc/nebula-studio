@@ -33,7 +33,7 @@
     "dagre": "^0.8.5",
     "dayjs": "^1.10.7",
     "file-saver": "^2.0.5",
-    "force-graph": "^1.42.4",
+    "@vesoft-inc/force-graph": "^2.0.0",
     "history": "^5.1.0",
     "http-proxy-middleware": "^0.20.0",
     "index-array-by": "^1.3.2",

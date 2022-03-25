@@ -1,4 +1,4 @@
-import { LinkObject, NodeObject } from '@app/components/ForceGraph';
+import { LinkObject, NodeObject } from '@vesoft-inc/force-graph';
 
 export interface IDataMap {
   [key: string]: NodeObject | LinkObject;
