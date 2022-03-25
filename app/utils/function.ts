@@ -6,7 +6,7 @@ export const handleKeyword = (name: string) => {
 };
 
 export const handleEscape = (name: string) =>
-  name.replaceAll(/\\/gm, '\\\\').replaceAll('`', '\\`');
+  name.replace(/\\/gm, '\\\\').replace(/`/gm, '\\`');
 
 export const handleVidStringName = (name: string, spaceVidType?: string) => {
   if (spaceVidType && spaceVidType === 'INT64') {
