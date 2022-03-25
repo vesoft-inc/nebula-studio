@@ -189,7 +189,7 @@ class TwoGraph {
             const direction = graphIndex % 2 === 0; // link's rank direction
             // (graphIndex / Math.abs(graphIndex)) means different source's direction
             curvature =
-              (direction ? 1 : -1) * (graphIndex>0?1:-1) * (Math.ceil(Math.abs(graphIndex) / 2) * 0.1);
+              (direction ? 1 : -1) * (graphIndex > 0 ? 1 : -1) * (Math.ceil(Math.abs(graphIndex) / 2) * 0.1);
           }
         }
         link.curvature = curvature;

@@ -16,6 +16,15 @@
 				background-color: @lightBlue;
 			}
 		}
+		.limit-width {
+			max-width: 180px;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			white-space: pre-wrap;
+			display: -webkit-box;
+			-webkit-line-clamp: 3;
+			-webkit-box-orient: vertical;
+		}
 	}
 	.noBackground {
 		.ant-table-thead > tr > th {

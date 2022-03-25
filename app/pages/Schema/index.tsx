@@ -1,4 +1,4 @@
-import { Button, Popconfirm, Table, message, Popover, Form, Input, Dropdown, Menu } from 'antd';
+import { Button, Popconfirm, Table, message, Popover, Form, Input, Dropdown, Menu, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';
@@ -165,10 +165,19 @@ const Schema = () => {
     {
       title: intl.get('schema.comment'),
       dataIndex: 'Comment',
+      ellipsis: {
+        showTitle: false,
+      },
+      render: data => (
+        <Tooltip placement="topLeft" title={data}>
+          {data}
+        </Tooltip>
+      ),
     },
     {
       title: intl.get('schema.operations'),
       dataIndex: 'operation',
+      width: 180,
       render: (_, space) => {
         if (space.ID) {
           return (

@@ -40,6 +40,7 @@ const CSVPreviewLink = (props: IProps) => {
           `Column ${textIndex}`
         ),
         dataIndex: index,
+        render: value => <span className="limit-width">{value}</span>,
       };
     })
     : [];
