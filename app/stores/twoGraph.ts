@@ -1,6 +1,6 @@
 import { autorun, makeObservable, observable, reaction, IReactionDisposer } from 'mobx';
 import { FONT_SIZE, LINE_LENGTH, NODE_AREA, NODE_SIZE } from '@app/config/explore';
-import ForceGraph, { ForceGraphInstance, LinkObject, NodeObject } from '@app/components/ForceGraph';
+import ForceGraph, { ForceGraphInstance, LinkObject, NodeObject } from '@vesoft-inc/force-graph';
 import { Bezier } from 'bezier-js';
 import { GraphStore } from './graph';
 import { ITransform } from './types';
@@ -44,6 +44,7 @@ class TwoGraph {
     Graph.d3Force('link')!.distance((d) => {
       return d.lineLength || LINE_LENGTH;
     });
+    Graph.width(1060).height(400);
     Graph.onZoom((v) => {
       this.setTransform(v);
       graph.setPointer({
@@ -188,7 +189,7 @@ class TwoGraph {
             const direction = graphIndex % 2 === 0; // link's rank direction
             // (graphIndex / Math.abs(graphIndex)) means different source's direction
             curvature =
-              (direction ? 1 : -1) * (graphIndex / Math.abs(graphIndex)) * (Math.ceil(Math.abs(graphIndex) / 2) * 0.1);
+              (direction ? 1 : -1) * (graphIndex>0?1:-1) * (Math.ceil(Math.abs(graphIndex) / 2) * 0.1);
           }
         }
         link.curvature = curvature;

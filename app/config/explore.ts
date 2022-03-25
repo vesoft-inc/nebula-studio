@@ -1,4 +1,4 @@
-import { NodeObject } from '@app/components/ForceGraph';
+import { NodeObject } from '@vesoft-inc/force-graph';
 import BigNumber from 'bignumber.js';
 import JSONBigint from 'json-bigint';
 import json2csv from 'json2csv';

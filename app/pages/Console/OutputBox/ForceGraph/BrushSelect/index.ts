@@ -1,6 +1,6 @@
 import { GraphStore } from '@app/stores/graph';
 import graphInstancesStore from '@app/stores/graphInstances';
-import { NodeObject } from '@app/components/ForceGraph';
+import { NodeObject } from '@vesoft-inc/force-graph';
 import { trackEvent } from '@app/utils/stat';
 const brushCss = {
   position: 'absolute',

@@ -1,7 +1,7 @@
 import { Tabs } from 'antd';
 import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
-import { LinkObject, NodeObject } from '@app/components/ForceGraph';
+import { LinkObject, NodeObject } from '@vesoft-inc/force-graph';
 import ExpandItem from '../ExpandItem';
 import './index.less';
 const TabPane = Tabs.TabPane;

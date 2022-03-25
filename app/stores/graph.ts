@@ -1,4 +1,4 @@
-import { LinkObject, NodeObject } from '@app/components/ForceGraph';
+import { LinkObject, NodeObject } from '@vesoft-inc/force-graph';
 import { action, isObservableSet, makeAutoObservable, observable } from 'mobx';
 import { message } from 'antd';
 import intl from 'react-intl-universal';
