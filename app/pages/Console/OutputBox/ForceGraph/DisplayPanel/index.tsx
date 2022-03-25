@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
 import Icon from '@app/components/Icon';
-import { LinkObject, NodeObject } from '@app/components/ForceGraph';
+import { LinkObject, NodeObject } from '@vesoft-inc/force-graph';
 import Expand from './ExpandForm';
 import './index.less';
 
