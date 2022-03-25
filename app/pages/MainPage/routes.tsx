@@ -65,7 +65,7 @@ export const MENU_LIST = [
       action: 'view_import',
       label: 'from_navigation'
     },
-    icon: 'icon-studio-btn-download',
+    icon: 'icon-studio-nav-import',
     intlKey: 'common.import'
   },
   {

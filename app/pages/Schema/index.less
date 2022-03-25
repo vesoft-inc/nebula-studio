@@ -33,6 +33,15 @@
       }
       .cell-btn {
         padding-left: 0;
+        span {
+          max-width: 80px;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: pre-wrap;
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+        }
       }
     }
     .operation {
