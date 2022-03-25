@@ -179,6 +179,8 @@ func DisconnectDB(ctx iris.Context) base.Result {
 			Message: err.Error(),
 		}
 	}
+	ctx.RemoveCookie("nsid")
+	ctx.RemoveCookie("token")
 	dao.Disconnect(params.Nsid)
 	return base.Response{
 		Code: base.Success,
