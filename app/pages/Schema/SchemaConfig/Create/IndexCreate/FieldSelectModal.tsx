@@ -55,11 +55,16 @@ const FieldSelectModal = (props: IProps) => {
     <Modal
       className="modal-field-add"
       maskClosable={false}
-      closable={false}
       destroyOnClose={true}
       visible={visible}
+      width="640px"
+      onCancel={handleClose}
+      title={intl.get('common.addProperty')}
       footer={
         <>
+          <Button onClick={handleClose}>
+            {intl.get('common.cancel')}
+          </Button>
           <Button
             key="confirm"
             type="primary"
@@ -68,15 +73,12 @@ const FieldSelectModal = (props: IProps) => {
           >
             {intl.get('common.confirm')}
           </Button>
-          <Button onClick={handleClose}>
-            {intl.get('common.cancel')}
-          </Button>
         </>
       }
     >
       <div className="modal-item">
-        <span>{intl.get('schema.selectFields')}:</span>
         <Select
+          placeholder={intl.get('schema.selectFields')}
           onChange={handleFieldSelect}
           className="select-field"
         >
@@ -90,10 +92,9 @@ const FieldSelectModal = (props: IProps) => {
       {/* string & fixed string should supply length parameter */}
       {selectedField?.Type.includes('string') && (
         <div className="modal-item">
-          <span>{intl.get('schema.indexedLength')}:</span>
           <Input
             disabled={selectedField?.Type.startsWith('fixed_string')}
-            placeholder={indexLength}
+            placeholder={indexLength || intl.get('schema.indexedLength')}
             className="input-index-length"
             onChange={e => setIndexLength(e.target.value)}
           />

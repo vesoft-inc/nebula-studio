@@ -43,7 +43,7 @@ const SchemaConfig = () => {
         },
         {
           path: `/schema/${type}/list`,
-          breadcrumbName: intl.get('schema.configTypeList', { space: currentSpace, type: intl.get(`common.${type}`) }),
+          breadcrumbName: intl.get('schema.configTypeList', { type: intl.get(`common.${type}`) }),
         },
         {
           path: '#',

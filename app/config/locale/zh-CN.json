@@ -89,7 +89,8 @@
     "numberRequired": "请输入正整数",
     "replicaLimit": "副本数量不得超过你当前 online 机器数量({number})",
     "ttlRequired": "请选择TTL指定的属性, 且属性的数据类型需为integer或timestamp",
-    "ttlDurationRequired": "请输入时间(s)"
+    "ttlDurationRequired": "请输入时间(s)",
+    "dataTypeRequired": "请选择数据类型"
   },
   "console": {
     "execTime": "执行时间消耗",
@@ -180,8 +181,8 @@
     "indexFields": "索引属性",
     "associateName": "关联 {type} 名称",
     "dragSorting": "(可拖拽排序)",
-    "selectFields": "选择关联的属性",
-    "indexedLength": "索引长度",
+    "selectFields": "请选择关联的属性",
+    "indexedLength": "请输入索引长度",
     "indexedLengthDescription": "设置索引字符串的长度。如果索引定长字符串，则索引长度无法修改。",
     "indexedLengthRequired": "索引长度应为正整数",
     "rebuild": "重建索引",
@@ -199,7 +200,7 @@
     "operations": "操作",
     "spaceNameEnter": "请输入图空间名称",
     "propertyCount": "属性数量",
-    "configTypeList": "{space} {type}列表",
+    "configTypeList": "{type}列表",
     "configTypeAction": "{action}{type}",
     "timestampFormat": "时间类型支持插入方式: <br />1. 调用函数 now()  <br />2. 调用函数 timestamp()，例如：timestamp('2021-07-05T06:18:43.984000')  <br />3. 直接输入时间戳，即从 1970-01-01 00:00:00 开始的秒数",
     "dateFormat": "日期类型支持插入方式: <br /> 调用函数 date()，例如：date('2021-03-17')",
@@ -224,7 +225,9 @@
     "selectVidTypeTip": "选择 Vid 类型",
     "csvDownload": "导出 CSV",
     "pngDownload": " 导出 PNG",
-    "rebuildSuccess": "{names}重建完成"
+    "rebuildSuccess": "{names}重建完成",
+    "rebuildFailed": "{names}重建失败",
+    "startRebuildIndex": "开始重建索引{name}"
   },
   "menu": {
     "use": "使用手册",
