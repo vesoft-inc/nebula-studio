@@ -23,7 +23,7 @@ $ nohup ./server &
 
 ### 1. Build Web
 ```
-$ npm run install
+$ npm install
 $ npm run build
 ```
 
