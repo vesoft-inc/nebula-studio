@@ -54,6 +54,7 @@ const PropertiesForm = (props: IProps) => {
   const handleClearProperties = e => {
     const clear = e.target.checked;
     if(clear) {
+      setPropertyRequired(clear);
       handlePropertyAdd();
     } else {
       confirm({
@@ -62,13 +63,13 @@ const PropertiesForm = (props: IProps) => {
         okText: intl.get('common.yes'),
         cancelText: intl.get('common.no'),
         onOk: () => {
+          setPropertyRequired(clear);
           if (properties.length > 0) {
             handlePropertyDelete(properties);
           }
         },
       });
     }
-    setPropertyRequired(clear);
   };
 
   const handlePropertyAdd = () => {
@@ -118,6 +119,9 @@ const PropertiesForm = (props: IProps) => {
     onBeforeEdit(null);
     if (editField?.alterType === 'ADD') {
       setList(list.slice(0, -1));
+      if(list.length === 1) {
+        setPropertyRequired(false);
+      }
     }
   };
   

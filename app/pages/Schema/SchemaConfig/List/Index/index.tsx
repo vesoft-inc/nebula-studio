@@ -6,7 +6,8 @@ import Icon from '@app/components/Icon';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { sortByFieldAndFilter } from '@app/utils/function';
-import { IIndexList, IndexType } from '@app/interfaces/schema';
+import { IIndexList, IndexType, IJobStatus } from '@app/interfaces/schema';
+import { partition, groupBy } from 'lodash';
 import Cookie from 'js-cookie';
 import CommonLayout from '../CommonLayout';
 
@@ -40,18 +41,18 @@ function renderIndexInfo(index: IIndexList) {
 
 const IndexList = () => {
   const { module } = useParams() as { module: string };
-  const { schema: { indexList, deleteIndex, getIndexList, rebuildIndex, getRebuildIndexes, currentSpace } } = useStore();
+  const { schema: { indexList, deleteIndex, getIndexList, rebuildIndex, getIndexesStatus, currentSpace } } = useStore();
   const [searchVal, setSearchVal] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [indexType, setIndexType] = useState<any>(module as any || 'tag');
-  const [rebuildList, setRebuildList] = useState<IIndexList[] | null>(null);
-  const rebuildTimer = useRef<NodeJS.Timeout | null>(null);
+  const [rebuildList, setRebuildList] = useState<string[] | null>(null);
+  const rebuildTimer = useRef<number>();
   const history = useHistory();
   const getData = async () => {
     setLoading(true);
     await getIndexList(indexType);
-    await getRebuildData(indexType, rebuildList);
+    await getRebuildStatus(indexType, rebuildList);
     setSearchVal('');
     setLoading(false);
   };
@@ -64,23 +65,32 @@ const IndexList = () => {
     }
   };
 
-  const checkIsFinished = (data, raw) => {
-    const finished = raw?.filter(i => !data.includes(i));
-    if(finished?.length > 0) {
-      message.success(intl.get('schema.rebuildSuccess', { names: finished.join(', ') }));
+  const checkIsFinished = (data, prev) => {
+    if(prev?.length > 0) {
+      const finished = prev?.filter(i => data[IJobStatus.Finished]?.some(item => item.Name === i));
+      const failed = prev?.filter(i => data[IJobStatus.Failed]?.some(item => item.Name === i));
+      if(finished?.length > 0) {
+        message.success(intl.get('schema.rebuildSuccess', { names: finished.join(', ') }));
+      }
+      if(failed?.length > 0) {
+        message.error(intl.get('schema.rebuildFailed', { names: failed.join(', ') }));
+      }
     }
   };
-  const getRebuildData = async (type: IndexType, raw) => {
+  const getRebuildStatus = async (type: IndexType, prev) => {
     rebuildTimer.current && clearTimeout(rebuildTimer.current);
-    const data = await getRebuildIndexes(type);
+    const data = await getIndexesStatus(type);
     if (data && data.length > 0) {
-      checkIsFinished(data, raw);
-      setRebuildList(data);
-      rebuildTimer.current = setTimeout(() => {
-        getRebuildData(type, data);
-      }, 2000);
+      const result = groupBy(data, item => item['Index Status']);
+      const loading = [...result[IJobStatus.Queue] || [], ...result[IJobStatus.Running] || []].map(item => item.Name);
+      checkIsFinished(result, prev);
+      setRebuildList(loading);
+      if(loading.length > 0) {
+        rebuildTimer.current = window.setTimeout(() => {
+          getRebuildStatus(type, loading);
+        }, 2000);
+      }
     } else {
-      checkIsFinished([], raw);
       setRebuildList([]);
       rebuildTimer.current && clearTimeout(rebuildTimer.current);
     }
@@ -93,7 +103,10 @@ const IndexList = () => {
       name,
     });
     if (res.code === 0) {
-      getRebuildData(type, rebuildList);
+      message.success(intl.get('schema.startRebuildIndex', { name }));
+      const _list = [...rebuildList, name];
+      await setRebuildList(_list);
+      getRebuildStatus(type, _list);
     }
   };
   const columns = useMemo(() => [

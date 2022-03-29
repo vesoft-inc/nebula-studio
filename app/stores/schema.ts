@@ -1,6 +1,6 @@
 import { action, makeAutoObservable, observable } from 'mobx';
 import service from '@app/config/service';
-import { IAlterForm, IEdge, IIndexList, IJobStatus, ISchemaType, ISpace, ITag, ITree, IndexType } from '@app/interfaces/schema';
+import { IAlterForm, IEdge, IIndexList, ISchemaType, ISpace, ITag, ITree, IndexType } from '@app/interfaces/schema';
 import { handleKeyword } from '@app/utils/function';
 import { findIndex } from 'lodash';
 import {
@@ -586,16 +586,14 @@ export class SchemaStore {
     return { code, data };
   }
 
-  getRebuildIndexes = async (type: IndexType) => {
+  getIndexesStatus = async (type: IndexType) => {
     const { code, data } = (await service.execNGQL({
       gql: `
         SHOW ${type} INDEX STATUS
       `,
     })) as any;
     if (code === 0) {
-      return data.tables
-        .filter(item => [IJobStatus.Queue, IJobStatus.Running].includes(item['Index Status']))
-        .map(item => item.Name);
+      return data.tables;
     }
     return null;
   }

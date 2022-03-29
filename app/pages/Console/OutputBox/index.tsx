@@ -263,13 +263,11 @@ const OutputBox = (props: IProps) => {
         >
           <Icon className="btn-export" type="icon-studio-btn-output" />
         </Popover>
-        {visible ? <Icon
-          type="icon-studio-btn-up"
-          onClick={() => setVisible(false)}
-        /> : <Icon
-          type="icon-studio-btn-down"
-          onClick={() => setVisible(true)}
-        />}
+        <Icon
+          className="icon-toggle"
+          type={visible ? 'icon-studio-btn-up' : 'icon-studio-btn-down'}
+          onClick={() => setVisible(!visible)}
+        />
         <Icon
           type="icon-studio-btn-close"
           onClick={handleItemRemove}
@@ -343,7 +341,7 @@ const OutputBox = (props: IProps) => {
               }
               key="log"
             >
-              {message}
+              <div className="err-container">{message}</div>
             </Tabs.TabPane>
           )}
         </Tabs>

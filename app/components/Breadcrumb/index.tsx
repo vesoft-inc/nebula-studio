@@ -14,20 +14,16 @@ interface IProps {
 }
 
 const itemRender = (route, _params, routes, _paths) => {
-  const last = routes.indexOf(route) === routes.length - 1;
+  const final = routes.indexOf(route) === routes.length - 1;
   const first = routes.indexOf(route) === 0;
-  return last ? (
+  return final ? (
     <span>{route.breadcrumbName}</span>
-  ) : (
+  ) : first ? <> 
+    <Link to={routes[routes.length - 2].path}><Icon className="arrow-icon" type="icon-studio-btn-return" /></Link>
+    <Link to={route.path}>{route.breadcrumbName}</Link>
+  </> : (
     <Link to={route.path}>
-      {first ? (
-        <>
-          <Icon className="arrow-icon" type="icon-studio-btn-return" />
-          {route.breadcrumbName}
-        </>
-      ) : (
-        route.breadcrumbName
-      )}
+      {route.breadcrumbName}
     </Link>
   );
 };
