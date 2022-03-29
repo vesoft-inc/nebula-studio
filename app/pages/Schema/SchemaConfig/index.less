@@ -2,9 +2,18 @@
 
 .nebula-schema-page {
   .space-select {
+    flex: 1;
+    text-align: right;
     color: @darkGray;
     font-size: 14px;
     font-family: Roboto-Regular, sans-serif;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: pre-wrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     .label::after {
       content: ': '
     }

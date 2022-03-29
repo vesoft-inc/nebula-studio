@@ -120,17 +120,22 @@ const Schema = () => {
     {
       title: intl.get('schema.spaceName'),
       dataIndex: 'Name',
-      render: value => (
-        <Button
-          className="cell-btn"
-          type="link"
-          onClick={() => handleSwitchSpace(value)}
-          data-track-category="navigation"
-          data-track-action="view_space_list"
-          data-track-label="from_space_list"
-        >
-          {value}
-        </Button>
+      ellipsis: {
+        showTitle: false,
+      },
+      render: data => (
+        <Tooltip placement="topLeft" title={data}>
+          <Button
+            className="cell-btn"
+            type="link"
+            onClick={() => handleSwitchSpace(data)}
+            data-track-category="navigation"
+            data-track-action="view_space_list"
+            data-track-label="from_space_list"
+          >
+            {data}
+          </Button>
+        </Tooltip>
       ),
     },
     {
