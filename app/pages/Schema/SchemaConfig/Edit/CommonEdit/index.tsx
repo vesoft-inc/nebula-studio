@@ -61,9 +61,10 @@ const ConfigEdit = (props: IProps) => {
   const [ttlRequired, setTtlRequired] = useState(false);
   const [propertiesRequired, setPropertiesRequired] = useState(false);
   useEffect(() => {
-    trackPageView(`/schema/config/${editType}/edit`);
+    trackPageView(`/schema/${editType}/edit`);
     getDetails();
   }, []);
+
   const getDetails = async () => {
     const _editName = state[editType];
     if(!_editName) {
