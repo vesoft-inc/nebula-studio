@@ -1,12 +1,12 @@
 import { Radio, Select } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Route, useHistory, useParams } from 'react-router-dom';
 import intl from 'react-intl-universal';
 import { trackPageView } from '@app/utils/stat';
 import Breadcrumb from '@app/components/Breadcrumb';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
-import Cookie from 'js-cookie';
+import { LanguageContext } from '@app/context';
 import TagList from './List/Tag';
 import EdgeList from './List/Edge';
 import IndexList from './List/Index/index';
@@ -23,6 +23,7 @@ const SchemaConfig = () => {
   const { type, action } = useParams() as { type: string, action: string };
   const { schema } = useStore();
   const { spaces, getSpaces, switchSpace, currentSpace } = schema;
+  const { currentLocale } = useContext(LanguageContext);
   const routes = useMemo(() => {
     if(action === 'list') {
       return [
@@ -53,7 +54,7 @@ const SchemaConfig = () => {
         },
       ];
     }
-  }, [currentSpace, action, Cookie.get('lang')]);
+  }, [currentSpace, action, currentLocale]);
   useEffect(() => {
     setTab(type);
     if(spaces.length === 0) {
@@ -122,12 +123,12 @@ const SchemaConfig = () => {
           <Route
             path={`/schema/tag/create`}
             exact={true}
-            render={() => <CommonCreate createType="tag" />}
+            render={() => <CommonCreate createType="tag" locale={currentLocale} />}
           />
           <Route
             path={`/schema/edge/create`}
             exact={true}
-            render={() => <CommonCreate createType="edge" />}
+            render={() => <CommonCreate createType="edge" locale={currentLocale} />}
           />
           <Route
             path={`/schema/tag/edit`}
