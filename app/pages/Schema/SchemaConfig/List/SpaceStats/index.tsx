@@ -63,12 +63,12 @@ const SpaceStats = () => {
       } else if (stat) {
         const jobId = stat['Job Id'];
         setJobId(jobId);
-        getStatStatus(jobId);
+        getStatStatus(jobId, true);
       }
     }
   };
 
-  const getStatStatus = async id => {
+  const getStatStatus = async (id, isInit?: boolean) => {
     const { code, data } = await getJobStatus(id);
     if (code === 0) {
       const job = data.tables[0];
@@ -76,11 +76,11 @@ const SpaceStats = () => {
         getData();
         setUpdateTime(job['Stop Time']);
         setJobId(null);
-        message.success(intl.get('schema.statFinished'));
+        !isInit && message.success(intl.get('schema.statFinished'));
       } else if ([IJobStatus.Running, IJobStatus.Queue].includes(job.Status)) {
         timer.current = setTimeout(() => getStatStatus(id), 2000);
       } else if (job.Status === 'FAILED') {
-        message.warning(intl.get('schema.statError'));
+        !isInit && message.warning(intl.get('schema.statError'));
         setJobId(null);
       }
     }

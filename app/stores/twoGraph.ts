@@ -44,7 +44,7 @@ class TwoGraph {
     Graph.d3Force('link')!.distance((d) => {
       return d.lineLength || LINE_LENGTH;
     });
-    Graph.width(1060).height(400);
+    Graph.width(1100).height(400);
     Graph.onZoom((v) => {
       this.setTransform(v);
       graph.setPointer({
