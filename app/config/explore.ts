@@ -1,7 +1,6 @@
 import { NodeObject } from '@vesoft-inc/force-graph';
 import BigNumber from 'bignumber.js';
 import JSONBigint from 'json-bigint';
-import json2csv from 'json2csv';
 import { remove } from 'lodash';
 export const LINE_LENGTH = 150;
 export const FONT_SIZE = 10;
@@ -108,37 +107,6 @@ export const flattenData = data => {
   return { result, fieldData };
 };
 
-export const downloadCSVFiles = ({ headers, tables, title }) => {
-  try {
-    const result = json2csv.parse(tables, {
-      fields: headers,
-    });
-    // Determine browser type
-    if (
-      (navigator.userAgent.indexOf('compatible') > -1 &&
-        navigator.userAgent.indexOf('MSIE') > -1) ||
-      navigator.userAgent.indexOf('Edge') > -1
-    ) {
-      // IE10 or Edge browsers
-      const BOM = '\uFEFF';
-      const csvData = new Blob([BOM + result], { type: 'text/csv' });
-      // @ts-ignore
-      navigator.msSaveBlob?.(csvData, `test.csv`);
-    } else {
-      // Non-Internet Explorer
-      // Use the download property of the A tag to implement the download function
-      const link = document.createElement('a');
-      link.href =
-        'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(result);
-      link.download = `${title}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  } catch (err) {
-    alert(err);
-  }
-};
 
 export const parseData = (data, type: 'vertex' | 'edge') => {
   const fields =
@@ -166,13 +134,6 @@ export const parseData = (data, type: 'vertex' | 'edge') => {
   return { tables, headers: fields };
 };
 
-export const exportDataToCSV = (
-  data,
-  type: 'vertex' | 'edge',
-) => {
-  const { headers, tables } = parseData(data, type);
-  downloadCSVFiles({ headers, tables, title: type });
-};
 
 export const updateTagMap = (tagMap, vertexes) => {
   Object.keys(tagMap).forEach(tag => {
@@ -248,4 +209,3 @@ export const makeRoundPosition = (data: NodeObject[] | Set<NodeObject>, center: 
   }
     
 };
-export const CANVAS_HIDE_LABEL_SCALE = 1.0;

@@ -41,7 +41,6 @@
     "js-cookie": "^2.2.1",
     "js-yaml": "^4.1.0",
     "json-bigint": "^1.0.0",
-    "json2csv": "^5.0.6",
     "json2yaml": "^1.1.0",
     "lodash": "^4.17.15",
     "lodash.debounce": "^4.0.8",
