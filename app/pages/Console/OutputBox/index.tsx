@@ -314,7 +314,7 @@ const OutputBox = (props: IProps) => {
               }
               key="graph"
             >
-              {<Graphviz graph={dataSource[0]?.format} />}
+              {<Graphviz graph={dataSource[0]?.format} index={index} />}
             </Tabs.TabPane>
           )}
           {showGraph && (

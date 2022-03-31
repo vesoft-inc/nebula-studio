@@ -5,18 +5,18 @@ import './index.less';
 
 interface IProps {
   graph: string;
+  index: number;
 }
 
 const Graphviz = (props: IProps) => { 
   const domRef = useRef(null);
-  const { graph } = props;
+  const { graph, index } = props;
   const renderFlowChart = () => {
     const defaultOptions: GraphvizOptions = {
-      fit: true,
       width: '100%',
-      zoom: false,
+      zoom: true,
     };
-    graphviz('#graph')
+    graphviz(`.box-${index}`)
       .options({
         ...defaultOptions,
       })
@@ -25,7 +25,7 @@ const Graphviz = (props: IProps) => {
   useEffect(() => {
     renderFlowChart();
   }, [graph]);
-  return <div id="graph" ref={domRef} />;
+  return <div className={`graphviz-box box-${index}`} ref={domRef} />;
 };
 
 export default Graphviz;
