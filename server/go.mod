@@ -9,7 +9,7 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca
 	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220329020324-f599adfab640
-	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220314055243-ece1a79d37e5
+	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220331072417-e7281ccc8a1a
 	go.uber.org/zap v1.17.0
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/sqlite v1.2.6

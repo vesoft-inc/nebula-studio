@@ -11,6 +11,7 @@ import (
 
 	importconfig "github.com/vesoft-inc/nebula-importer/pkg/config"
 	importerErrors "github.com/vesoft-inc/nebula-importer/pkg/errors"
+	"github.com/vesoft-inc/nebula-importer/pkg/logger"
 	"github.com/vesoft-inc/nebula-studio/server/pkg/config"
 	"github.com/vesoft-inc/nebula-studio/server/pkg/utils"
 
@@ -95,10 +96,9 @@ func Import(taskID string, configPath string, configBody *importconfig.YAMLConfi
 	zap.L().Debug(fmt.Sprintf("Start a import task: `%s`", taskID))
 
 	var conf *importconfig.YAMLConfig
+	runnerLogger := logger.NewRunnerLogger("")
 	if configPath != "" {
-		conf, err = importconfig.Parse(
-			configPath,
-		)
+		conf, err = importconfig.Parse(configPath, runnerLogger)
 
 		if err != nil {
 			return err.(importerErrors.ImporterError)
@@ -106,7 +106,7 @@ func Import(taskID string, configPath string, configBody *importconfig.YAMLConfi
 	} else {
 		conf = configBody
 	}
-	if err := conf.ValidateAndReset(""); err != nil {
+	if err := conf.ValidateAndReset("", runnerLogger); err != nil {
 		return err
 	}
 
