@@ -264,7 +264,6 @@ const OutputBox = (props: IProps) => {
           <Icon className="btn-export" type="icon-studio-btn-output" />
         </Popover>
         <Icon
-          className="icon-toggle"
           type={visible ? 'icon-studio-btn-up' : 'icon-studio-btn-down'}
           onClick={() => setVisible(!visible)}
         />

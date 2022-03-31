@@ -29,7 +29,7 @@
     height: 91%;
   }
   .log-container {
-    width: 100%;
+    width: calc(100% - 200px);
     height: 100%;
     overflow: auto;
     padding: 10px 20px 120px;
@@ -41,12 +41,18 @@
   }
 }
 .log-tab {
-  max-height: 65vh;
+  height: 100%;
   .ant-tabs-nav {
     width: 200px;
     .ant-tabs-tab {
       background-color: @lightGray;
       color: @darkBlue;
+      .ant-tabs-tab-btn {
+        word-break: break-all;
+        width: 100%;
+        white-space: initial;
+        text-align: left;
+      }
     }
     .ant-tabs-tab-active {
       background-color: #0091FF;

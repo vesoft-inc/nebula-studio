@@ -7,7 +7,7 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { sortByFieldAndFilter } from '@app/utils/function';
 import { IIndexList, IndexType, IJobStatus } from '@app/interfaces/schema';
-import { partition, groupBy } from 'lodash';
+import { groupBy } from 'lodash';
 import Cookie from 'js-cookie';
 import CommonLayout from '../CommonLayout';
 
