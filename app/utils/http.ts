@@ -40,10 +40,11 @@ service.interceptors.request.use(config => {
 service.interceptors.response.use(
   (response: any) => {
     const { code, message: errMsg } = response.data;
+    const isConnectReq = /api-nebula\/db\/connect$/.test(response.config?.url);
     // if connection refused, login again
     if (code === -1 && new RegExp(subErrMsgStr.join('|')).test(errMsg)) {
-      message.warning(intl.get('warning.connectError'));
-      getRootStore().global.logout();
+      message.warning(errMsg);
+      !isConnectReq && getRootStore().global.logout();
     } else if (code === -1 && errMsg) {
       message.warning(errMsg);
     }

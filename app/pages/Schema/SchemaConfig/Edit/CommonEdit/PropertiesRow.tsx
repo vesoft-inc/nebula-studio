@@ -59,6 +59,7 @@ export const DisplayRow = (props: IProps) => {
         cancelText={intl.get('common.cancel')}
       >
         <Button
+          danger
           type="link"
           disabled={disabled}
         >
@@ -168,6 +169,7 @@ export const EditRow = (props: IEditProps) => {
                 </Button>
                 <Button
                   type="link"
+                  danger
                   onClick={onEditCancel}
                 >
                   {intl.get('common.cancel')}

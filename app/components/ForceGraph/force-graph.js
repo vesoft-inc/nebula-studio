@@ -115,7 +115,7 @@ function clearCanvas(ctx, width, height) {
 
 export default Kapsule({
   props: {
-    width: { default: 1060, onChange: (_, state) => adjustCanvasSize(state), triggerUpdate: false },
+    width: { default: 1100, onChange: (_, state) => adjustCanvasSize(state), triggerUpdate: false },
     height: { default: 400, onChange: (_, state) => adjustCanvasSize(state), triggerUpdate: false },
     graphData: {
       default: { nodes: [], links: [] },

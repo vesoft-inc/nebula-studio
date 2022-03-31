@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment } from 'react';
 import './index.less';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
@@ -13,26 +13,15 @@ const Menu = (props: IProps) => {
   const {
     pointer: { left: x, top: y, showContextMenu },
   } = graph;
+  if(!showContextMenu) {
+    return null;
+  } 
   const hide = () => {
     graph.setPointer({
       showContextMenu: false,
     });
   };
-  useEffect(() => {
-    const close = e => {
-      const path = e.path || (e.composedPath && e.composedPath());  // safari has no e.path
-      const isMenu = path.find(each => each.className === 'context-menu');
-      if (isMenu) return;
-      hide();
-    };
-    const container = document.getElementById(id);
-    container?.addEventListener('click', close);
-    container?.addEventListener('contextmenu', close);
-    return () => {
-      container?.removeEventListener('click', close);
-      container?.removeEventListener('contextmenu', close);
-    };
-  }, []);
+  
   const menuConfig = [
     {
       component: <ColorChangeBtn graph={graph} onClose={hide} />,
@@ -43,8 +32,8 @@ const Menu = (props: IProps) => {
   const width = document.getElementById(id)!.clientWidth;
   const height = document.getElementById(id)!.clientHeight;
   const style = { left: 0, top: 0, display: 'block' };
-  style.left = width - x - 30 > containerWidth ? x + 30 : x - containerWidth;
-  style.top = height - y - 30 > containerHeight ? y + 30 : y - containerHeight;
+  style.left = width - x > containerWidth ? x : x - containerWidth;
+  style.top = height - y > containerHeight ? y : y - containerHeight;
   if (!showContextMenu) {
     style.display = 'none';
   }
