@@ -19,16 +19,24 @@
 		align-items: center;
 	}
 	.ant-breadcrumb {
+		flex: 1;
 		display: inline-flex;
 		align-items: center;
 		font-size: 18px;
+		margin-right: 15px;
 		& > span {
 			display: inline-flex;
 			align-items: center;
-			a, span {
-				font-weight: 300;
+			.ant-breadcrumb-link, a {
 				display: inline-flex;
 				align-items: center;
+			}
+			a, .ant-breadcrumb-link span {
+				word-break: break-all;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+    		max-width: 500px;
 			}
 		}
 		& > span:last-child {

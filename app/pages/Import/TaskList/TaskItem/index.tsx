@@ -56,10 +56,10 @@ const TaskItem = (props: IProps) => {
   const addMsg = () => {
     const info: string[] = [];
     if(numFailed > 0) {
-      info.push(intl.get('import.notImported', { total: getFileSize(numFailed) }));
+      info.push(intl.get('import.notImported', { total: numFailed }));
     }
     if(numReadFailed > 0) {
-      info.push(intl.get('import.readFailed', { total: getFileSize(numReadFailed) }));
+      info.push(intl.get('import.readFailed', { total: numReadFailed }));
     }
     info.length > 0 && setExtraMsg(info.join(', '));
   };

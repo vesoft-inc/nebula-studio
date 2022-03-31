@@ -1,3 +1,4 @@
+@import '~@app/common.less';
 .studio-doc {
   margin-top: 50px;
   display: flex;
@@ -20,7 +21,7 @@
       font-family: Roboto-Regular, sans-serif;
       font-size: 18px;
       padding-bottom: 12px;
-      border-bottom: 1px solid #D5DDEB;
+      border-bottom: 1px solid @gray;
     }
     .module-intro {
       padding: 14px;
@@ -56,6 +57,7 @@
       padding: 20px;
       .doc-group {
         display: flex !important;
+        margin-bottom: 30px
       }
       .doc-item {
         height: 295px;

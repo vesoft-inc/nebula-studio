@@ -50,6 +50,7 @@ const CSVPreviewLink = (props: IProps) => {
       overlayClassName="popover-preview"
       visible={visible}
       trigger="click"
+      arrowPointAtCenter
       onVisibleChange={visible => setVisible(visible)}
       content={<div className="csv-preview">
         <Table

@@ -16,7 +16,7 @@ const formItemLayout = {
     span: 6,
   },
   wrapperCol: {
-    span: 11,
+    span: 16,
   },
 };
 
@@ -61,9 +61,10 @@ const ConfigEdit = (props: IProps) => {
   const [ttlRequired, setTtlRequired] = useState(false);
   const [propertiesRequired, setPropertiesRequired] = useState(false);
   useEffect(() => {
-    trackPageView(`/schema/config/${editType}/edit`);
+    trackPageView(`/schema/${editType}/edit`);
     getDetails();
   }, []);
+
   const getDetails = async () => {
     const _editName = state[editType];
     if(!_editName) {
@@ -116,6 +117,7 @@ const ConfigEdit = (props: IProps) => {
         duration
       }
     });
+    setTempComment(comment);
   };
 
   const handleCommentEditStart = () => {
@@ -146,6 +148,10 @@ const ConfigEdit = (props: IProps) => {
     setLoading(false);
   };
 
+  const handleCommentCancel = () => {
+    setEditKey(null);
+    setTempComment(data.comment);
+  };
   const checkIndex = async () => {
     setLoading(true);
     const res = (await getIndexTree(editType)) || [];
@@ -164,14 +170,20 @@ const ConfigEdit = (props: IProps) => {
             <Row className="form-item">
               <Col span={12}>
                 <Form.Item label={intl.get('common.name')}>
-                  {editName}
+                  <Input value={editName} disabled />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label={intl.get('common.comment')}>
+                  <Input
+                    disabled={editKey !== 'comment'}
+                    className="input-comment"
+                    defaultValue={data.comment}
+                    value={tempComment}
+                    onChange={e => setTempComment(e.target.value)}
+                  />
                   {editKey !== 'comment' ? (
                     <>
-                      <span>{data.comment}</span>
                       <Button
                         disabled={editKey !== null}
                         type="link"
@@ -182,11 +194,6 @@ const ConfigEdit = (props: IProps) => {
                     </>
                   ) : (
                     <>
-                      <Input
-                        className="input-comment"
-                        defaultValue={data.comment}
-                        onChange={e => setTempComment(e.target.value)}
-                      />
                       <Button
                         type="link"
                         onClick={handleCommentUpdate}
@@ -195,7 +202,8 @@ const ConfigEdit = (props: IProps) => {
                       </Button>
                       <Button
                         type="link"
-                        onClick={() => setEditKey(null)}
+                        danger
+                        onClick={handleCommentCancel}
                       >
                         {intl.get('common.cancel')}
                       </Button>

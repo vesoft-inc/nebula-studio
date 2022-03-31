@@ -1,5 +1,5 @@
 import { Button, Col, Form, Input, Row, message } from 'antd';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { nameRulesFn } from '@app/config/rules';
@@ -9,6 +9,7 @@ import GQLCodeMirror from '@app/components/GQLCodeMirror';
 import { getTagOrEdgeCreateGQL } from '@app/utils/gql';
 import { useStore } from '@app/stores';
 import { ISchemaType } from '@app/interfaces/schema';
+import { trackPageView } from '@app/utils/stat';
 import PropertiesForm from './PropertiesForm';
 import TTLForm from './TTLForm';
 import './index.less';
@@ -23,7 +24,8 @@ const formItemLayout = {
 };
 
 interface IProps {
-  createType: ISchemaType
+  createType: ISchemaType,
+  locale: string
 }
 const ConfigCreate = (props: IProps) => {
   const { createType } = props;
@@ -32,6 +34,9 @@ const ConfigCreate = (props: IProps) => {
   const { schema: { createTagOrEdge } } = useStore();
   const [gql, setGql] = useState('');
   const [basicForm] = Form.useForm();
+  useEffect(() => {
+    trackPageView(`/schema/${createType}/create`);
+  }, []);
 
   const updateGql = () => {
     const { name, properties, ttl_col, ttl_duration, comment } = basicForm.getFieldsValue();

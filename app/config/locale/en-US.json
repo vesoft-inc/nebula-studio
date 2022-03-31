@@ -89,7 +89,8 @@
     "numberRequired": "Please enter a positive integer",
     "replicaLimit": "Replica factor must not exceed the number of your current online machines({number})",
     "ttlRequired": "Please select the corresponding property, and the data type of the property must be integer or timestamp",
-    "ttlDurationRequired": "Please enter the time (in seconds)"
+    "ttlDurationRequired": "Please enter the time (in seconds)",
+    "dataTypeRequired": "Please select the data type"
   },
   "console": {
     "execTime": "Execution Time",
@@ -147,8 +148,8 @@
     "importCompleted": "Import completed",
     "importStopped": "Import stopped",
     "importFailed": "Failed",
-    "notImported": "{total} not imported",
-    "readFailed": "{total} read failed",
+    "notImported": "{total} lines not imported",
+    "readFailed": "{total} lines read failed",
     "selectFile": "Select bind source file",
     "addTag": "Add Tag",
     "selectTag": "Select Tag",
@@ -160,7 +161,7 @@
     "fileUploadRequired": "1. Please make sure all CSV data files are uploaded before import the YAML file. If not, please go to ",
     "fileUploadRequired2": " first.",
     "exampleDownload": "2. An example for the configuration file: ",
-    "uploadTemplateTip": "3. 3. Configure the Yaml file: please keep only the file name (retain the file extension) for all file paths (path, failDataPath, logPath) in the template, e.g. logPath: config.csv",
+    "uploadTemplateTip": "3. Configure the Yaml file: please keep only the file name (retain the file extension) for all file paths (path, failDataPath, logPath) in the template, e.g. logPath: config.csv",
     "reUpload": "Re-upload",
     "fileNotExist": "{name} file does not exist！",
     "importYaml": "Import the YAML file"
@@ -180,8 +181,8 @@
     "indexFields": "Indexed Properties",
     "associateName": "Associated {type} name",
     "dragSorting": "(Drag to Sort)",
-    "selectFields": "Choose Property",
-    "indexedLength": "Indexed length",
+    "selectFields": "Please choose a property",
+    "indexedLength": "Please enter indexed length",
     "indexedLengthDescription": "Set the indexed string length. If you are indexing fixed strings, you must not set this option.",
     "indexedLengthRequired": "Indexed length must be a positive integer",
     "rebuild": "Rebuild",
@@ -199,7 +200,7 @@
     "operations": "Operations",
     "spaceNameEnter": "Please enter the space name",
     "propertyCount": "Property Num",
-    "configTypeList": "{space} {type} List",
+    "configTypeList": "{type} List",
     "configTypeAction": "{action} {type}",
     "timestampFormat": "Supported data inserting methods: <br />1. call function now()  <br />2. call function timestamp(), for example: timestamp('2021-07-05T06:18:43.984000')  <br />3. Input the timestamp directly, namely the number of seconds from 1970-01-01 00:00:00",
     "dateFormat": "Supported data inserting methods: <br />Call function date(), for example: date('2021-03-17')",
@@ -224,7 +225,9 @@
     "selectVidTypeTip": "Please select the type",
     "csvDownload": "Export CSV File",
     "pngDownload": "Export PNG File",
-    "rebuildSuccess": "{names} rebuild successfully"
+    "rebuildSuccess": "{names} rebuild successfully",
+    "rebuildFailed": "{names} rebuild failed",
+    "startRebuildIndex": "Start rebuilding the index {name}"
   },
   "menu": {
     "use": "Use Manual",

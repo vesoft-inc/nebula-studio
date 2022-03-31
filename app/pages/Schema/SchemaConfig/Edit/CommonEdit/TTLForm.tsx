@@ -242,6 +242,7 @@ const formRef = ((props: IProps) => {
                 </Button>
                 <Button
                   type="link"
+                  danger
                   onClick={handleEditCancel}
                 >
                   {intl.get('common.cancel')}
