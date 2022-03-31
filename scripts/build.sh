@@ -14,6 +14,7 @@ npm run build
 cp -r ./dist/. ./server/assets
 
 # build server
+sed -i "s/9000/7001/g" ./server/config/example-config.yaml
 cd ./server
 go build -o server
 

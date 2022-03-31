@@ -228,4 +228,4 @@ const nebulaWordsLowercase = nebulaWordsUppercase.map(w => w.toLowerCase());
 
 export const keyWords = [...nebulaWordsUppercase, ...nebulaWordsLowercase];
 
-export const maxLineNum = 20;
+export const maxLineNum = 5;

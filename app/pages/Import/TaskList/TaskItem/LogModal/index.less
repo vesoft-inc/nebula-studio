@@ -1,0 +1,71 @@
+@import '~@app/common.less';
+.log-modal {
+  height: 100vh;
+  .ant-modal {
+    height: 80%;
+    .ant-modal-content {
+      height: 100%;
+    }
+  }
+  .import-modal-title {
+    display: flex;
+    align-items: center;
+  }
+  .ant-modal-header {
+    border-bottom: none;
+    padding-right: 80px;
+    padding-top: 15px;
+    .ant-modal-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .ant-modal-close {
+      top: 5px;
+    }
+  }
+  .ant-modal-body {
+    display: flex;
+    height: 91%;
+  }
+  .log-container {
+    width: calc(100% - 200px);
+    height: 100%;
+    overflow: auto;
+    padding: 10px 20px 120px;
+    font-size: 12px;
+    text-align: left;
+    background: #333;
+    color: #fff;
+    word-break: break-all;
+  }
+}
+.log-tab {
+  height: 100%;
+  .ant-tabs-nav {
+    width: 200px;
+    .ant-tabs-tab {
+      background-color: @lightGray;
+      color: @darkBlue;
+      .ant-tabs-tab-btn {
+        word-break: break-all;
+        width: 100%;
+        white-space: initial;
+        text-align: left;
+      }
+    }
+    .ant-tabs-tab-active {
+      background-color: #0091FF;
+      color: #fff;
+      .ant-tabs-tab-btn {
+        color: #fff;
+      }
+    }
+    .ant-tabs-nav-list {
+      background-color: @lightGray;
+    }
+  }
+  .ant-tabs-content-holder > .ant-tabs-content {
+    display: none
+  }
+}

@@ -1,52 +1,52 @@
-import { POSITIVE_INTEGER_REGEX } from '#app/utils/constant';
+import { NAME_REGEX, POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
+import intl from 'react-intl-universal';
 
-export const hostRulesFn = intl => [
+export const hostRulesFn = () => [
   {
     required: true,
     message: intl.get('formRules.hostRequired'),
   },
 ];
 
-export const usernameRulesFn = intl => [
+export const usernameRulesFn = () => [
   {
     required: true,
     message: intl.get('formRules.usernameRequired'),
   },
 ];
 
-export const passwordRulesFn = intl => [
+export const passwordRulesFn = () => [
   {
     required: true,
     message: intl.get('formRules.passwordRequired'),
   },
 ];
 
-export const nodeIdRulesFn = intl => [
-  {
-    required: true,
-    message: intl.get('formRules.idRequired'),
-  },
-  {
-    pattern: /^(.+)*(\n.+)*(\n)*$/,
-    message: intl.get('formRules.nodeIdError'),
-  },
-];
+export const nameRulesFn = () => {
+  const version = sessionStorage.getItem('nebulaVersion');
+  const nameRequired = [
+    {
+      required: true,
+      message: intl.get('formRules.nameRequired'),
+    },
+  ];
+  const nameValidate = [
+    {
+      pattern: NAME_REGEX,
+      message: intl.get('formRules.nameValidate'),
+    },
+  ];
+  return version?.startsWith('v2') ? [...nameRequired, ...nameValidate] : nameRequired;
+};
 
-export const nameRulesFn = intl => [
-  {
-    required: true,
-    message: intl.get('formRules.nameRequired'),
-  },
-];
-
-export const numberRulesFn = intl => [
+export const numberRulesFn = () => [
   {
     pattern: POSITIVE_INTEGER_REGEX,
     message: intl.get('formRules.numberRequired'),
   },
 ];
 
-export const replicaRulesFn = (intl, activeMachineNum) => [
+export const replicaRulesFn = (activeMachineNum) => [
   {
     pattern: POSITIVE_INTEGER_REGEX,
     message: intl.get('formRules.numberRequired'),

@@ -1,27 +1,5 @@
-import {
-  handleEscape,
-  handleKeyword,
-  handleVidStringName,
-} from '#app/utils/function';
-interface IField {
-  name: string;
-  type: string;
-  value?: string;
-  allowNull?: boolean;
-  fixedLength?: string;
-  comment?: string;
-}
-
-type IndexType = 'TAG' | 'EDGE';
-type AlterType = 'ADD' | 'DROP' | 'CHANGE' | 'TTL' | 'COMMENT';
-interface IAlterConfig {
-  fields?: IField[];
-  comment?: string;
-  ttl?: {
-    col?: string;
-    duration?: string;
-  };
-}
+import { handleEscape, handleKeyword, handleVidStringName } from '@app/utils/function';
+import { IAlterForm, IProperty, ISchemaType, IndexType } from '@app/interfaces/schema';
 
 export const getExploreMatchGQL = (params: {
   selectVertexes: any[];
@@ -55,8 +33,8 @@ export const getExploreMatchGQL = (params: {
   }
   const _filters = filters
     ? filters
-        .map(filter => `${filter.relation || ''} l.${filter.expression}`)
-        .join(`\n`)
+      .map(filter => `${filter.relation || ''} l.${filter.expression}`)
+      .join(`\n`)
     : '';
   const wheres = _filters ? `AND ALL(l IN e WHERE ${_filters})` : '';
   const gql = `MATCH p=(v)${
@@ -129,72 +107,64 @@ export const getSpaceCreateGQL = (params: {
 };
 
 export const getTagOrEdgeCreateGQL = (params: {
-  type: 'TAG' | 'EDGE';
+  type: ISchemaType;
   name: string;
   comment?: string;
-  fields?: IField[];
-  ttlConfig?: {
-    ttl_col: string;
-    ttl_duration: number;
-  };
+  properties?: IProperty[];
+  ttl_col?: string;
+  ttl_duration?: number;
 }) => {
-  const { type, name, fields, ttlConfig, comment } = params;
-  const fieldsStr = fields
-    ? fields
-        .map(item => {
-          let valueStr = '';
-          if (item.value) {
-            switch (item.type) {
-              case 'string':
-              case 'fixed_string':
-                valueStr = `DEFAULT "${item.value}"`;
-                break;
-              case 'timestamp':
-                const timestampReg = /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})$/;
-                valueStr = timestampReg.test(item.value)
-                  ? `DEFAULT "${item.value}"`
-                  : `DEFAULT ${item.value}`;
-                break;
-              default:
-                valueStr = `DEFAULT ${item.value}`;
-            }
+  const { type, name, properties, ttl_col, ttl_duration, comment } = params;
+  const propertiesStr = properties
+    ? properties
+      .map(item => {
+        let valueStr = '';
+        if (item.value) {
+          switch (item.type) {
+            case 'string':
+            case 'fixed_string':
+              valueStr = `DEFAULT "${item.value}"`;
+              break;
+            case 'timestamp':
+              const timestampReg = /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})$/;
+              valueStr = timestampReg.test(item.value)
+                ? `DEFAULT "${item.value}"`
+                : `DEFAULT ${item.value}`;
+              break;
+            default:
+              valueStr = `DEFAULT ${item.value}`;
           }
-          const _type =
+        }
+        const _type =
             item.type !== 'fixed_string'
               ? item.type
               : item.type + `(${item.fixedLength ? item.fixedLength : ''})`;
-          const _null = item.allowNull ? 'NULL' : 'NOT NULL';
-          const _comment = item.comment ? `COMMENT "${item.comment}"` : '';
-          const conbine = [
-            handleKeyword(item.name),
-            _type,
-            _null,
-            valueStr,
-            _comment,
-          ];
-          return conbine.join(' ');
-        })
-        .join(', ')
+        const _null = item.allowNull ? 'NULL' : 'NOT NULL';
+        const _comment = item.comment ? `COMMENT "${item.comment}"` : '';
+        const conbine = [
+          handleKeyword(item.name),
+          _type,
+          _null,
+          valueStr,
+          _comment,
+        ];
+        return conbine.join(' ');
+      })
+      .join(', ')
     : '';
-  const ttlStr = ttlConfig
-    ? `TTL_DURATION = ${ttlConfig.ttl_duration || ''}, TTL_COL = "${
-        ttlConfig.ttl_col ? handleEscape(ttlConfig.ttl_col) : ''
-      }"`
+  const ttlStr = ttl_col
+    ? `TTL_DURATION = ${ttl_duration ||
+        ''}, TTL_COL = "${handleEscape(ttl_col)}"`
     : '';
   const gql = `CREATE ${type} ${handleKeyword(name)} ${
-    fieldsStr.length > 0 ? `(${fieldsStr})` : '()'
+    propertiesStr.length > 0 ? `(${propertiesStr})` : '()'
   } ${ttlStr} ${
     comment ? `${ttlStr.length > 0 ? ', ' : ''}COMMENT = "${comment}"` : ''
   }`;
   return gql;
 };
 
-export const getAlterGQL = (params: {
-  type: IndexType;
-  name: string;
-  action: AlterType;
-  config: IAlterConfig;
-}) => {
+export const getAlterGQL = (params: IAlterForm) => {
   let content;
   const { type, name, action, config } = params;
   if (action === 'TTL' && config.ttl) {
@@ -250,13 +220,13 @@ export const getIndexCreateGQL = (params: {
   name: string;
   associate: string;
   comment?: string;
-  fields: string[];
+  fields?: string[];
 }) => {
   const { type, name, associate, fields, comment } = params;
   const combine = associate
-    ? `on ${handleKeyword(associate)}(${fields.join(', ')})`
+    ? `on ${handleKeyword(associate)}(${fields?.join(', ')})`
     : '';
-  const gql = `CREATE ${type} INDEX ${handleKeyword(name)} ${combine} ${
+  const gql = `CREATE ${type.toUpperCase()} INDEX ${handleKeyword(name)} ${combine} ${
     comment ? `COMMENT "${comment}"` : ''
   }`;
   return gql;

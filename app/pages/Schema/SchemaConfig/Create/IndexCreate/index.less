@@ -1,0 +1,83 @@
+@import '~@app/common.less';
+.index-create-page {
+  .btn-field-add {
+    margin-bottom: 20px;
+  }
+  .view-row {
+    padding-top: 24px;
+    border-top: 1px solid @gray;
+  }
+  .drag-item {
+    display: flex;
+    align-items: center;
+    border: none;
+    border-radius: 3px;
+    background: @gray;
+    height: 38px;
+    font-family: Robote-Reqular, sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 12px 12px 12px 16px;
+    .ant-tag-close-icon {
+      margin-left: 10px;
+      color: @darkBlue;
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+}
+
+.modal-field-add {
+  .ant-modal-header {
+    border-bottom: none;
+  }
+  .ant-modal-body {
+    text-align: center;
+  }
+
+  .modal-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    .icon-instruction {
+      svg {
+        width: 23px;
+        height: 23px;
+        fill: @darkGray;
+      }
+    }
+  }
+
+  .select-field {
+    width: 330px;
+    border: 1px solid @gray;
+    border-radius: 3px;
+    .ant-select-selector {
+      border: none;
+    }
+    .ant-select-arrow svg {
+      fill: @darkBlue;
+    }
+  }
+
+  .input-index-length {
+    width: 330px;
+    margin-left: 28px;
+  }
+
+  .ant-modal-footer {
+    border-top: none;
+    text-align: center;
+    .ant-btn {
+      width: 140px;
+    }
+    .ant-btn-default {
+      border: 1px solid @darkBlue;
+      border-radius: 3px;
+      color: @darkBlue;
+    }
+  }
+}

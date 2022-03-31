@@ -1,21 +1,25 @@
 package controller
 
 import (
+	"bufio"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"sync"
 
 	importconfig "github.com/vesoft-inc/nebula-importer/pkg/config"
+	importerErrors "github.com/vesoft-inc/nebula-importer/pkg/errors"
 	"github.com/vesoft-inc/nebula-studio/server/pkg/config"
+	"github.com/vesoft-inc/nebula-studio/server/pkg/utils"
 	"github.com/vesoft-inc/nebula-studio/server/pkg/webserver/base"
+	"github.com/vesoft-inc/nebula-studio/server/pkg/webserver/service/importer"
 
 	"github.com/kataras/iris/v12"
 	"go.uber.org/zap"
-	"gopkg.in/yaml.v2"
 )
 
 type dirResponse struct {
@@ -23,16 +27,252 @@ type dirResponse struct {
 	UploadDir string `json:"uploadDir,omitempty"`
 }
 
+type log struct {
+	Name string `json:"name"`
+}
+
+type importDataParams struct {
+	ConfigPath string                   `json:"configPath"`
+	ConfigBody *importconfig.YAMLConfig `json:"configBody"`
+	Name       string                   `json:"name"`
+}
+
+type handleImportActionParams struct {
+	TaskId     string `json:"taskId"`
+	TaskAction string `json:"taskAction"`
+}
+
+const (
+	importLogName = "import.log"
+	errContentDir = "err"
+)
+
 var muTaskId sync.RWMutex
 
-func ReadLog(ctx iris.Context) base.Result {
-	startByte, _ := strconv.ParseInt(ctx.URLParam("startByte"), 10, 64)
-	endByte, _ := strconv.ParseInt(ctx.URLParam("endByte"), 10, 64)
-	dir := ctx.URLParam("dir")
-	taskId := ctx.URLParam("ReadJSON")
+func ImportData(ctx iris.Context) base.Result {
+	params := new(importDataParams)
+	err := ctx.ReadJSON(params)
+	if err != nil {
+		zap.L().Warn("importDataParams get fail", zap.Error(err))
+		err = importerErrors.Wrap(importerErrors.InvalidConfigPathOrFormat, err)
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	if err = validImportDataParams(params); err != nil {
+		zap.L().Warn("importDataParams get fail", zap.Error(err))
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	// create config file
+	taskDir, err := importer.GetNewTaskDir()
+	if err != nil {
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	if err := importer.CreateConfigFile(taskDir, *params.ConfigBody); err != nil {
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	// create err dir
+	taskErrDir := filepath.Join(taskDir, "err")
+	if err = utils.CreateDir(taskErrDir); err != nil {
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	// import
+	nebulaAddress := *params.ConfigBody.NebulaClientSettings.Connection.Address
+	user := *params.ConfigBody.NebulaClientSettings.Connection.User
+	name := params.Name
+	space := *params.ConfigBody.NebulaClientSettings.Space
+	task, taskID, err := importer.GetTaskMgr().NewTask(nebulaAddress, user, name, space)
+	if err != nil {
+		zap.L().Warn("init task fail", zap.Error(err))
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	if err = importer.Import(taskID, params.ConfigPath, params.ConfigBody); err != nil {
+		// task err: import task not start err handle
+		task.TaskInfo.TaskStatus = importer.StatusAborted.String()
+		err1 := importer.GetTaskMgr().FinishTask(taskID)
+		if err1 != nil {
+			zap.L().Warn("finish task fail", zap.Error(err1))
+		}
+		zap.L().Error(fmt.Sprintf("Failed to start a import task: `%s`, task result: `%v`", taskID, err))
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	return base.Response{
+		Code:    base.Success,
+		Data:    []string{taskID},
+		Message: fmt.Sprintf("Import task %s submit successfully", taskID),
+	}
+}
 
-	path := filepath.Join(dir, "import.log")
-	bytes, err := readFile(path, startByte, endByte)
+func QueryImportStats(ctx iris.Context) base.Result {
+	id := ctx.Params().GetString("id")
+	if id == "" {
+		zap.L().Warn("queryImportStats id get fail")
+		return base.Response{
+			Code:    base.Error,
+			Message: "queryImportStats id get fail",
+		}
+	}
+	taskInfo, err := importer.ImportStatus(id)
+	if err != nil {
+		zap.L().Warn("queryImportStats fail", zap.Error(err))
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	return base.Response{
+		Code:    base.Success,
+		Message: "Processing a task action successfully",
+		Data:    taskInfo,
+	}
+}
+
+func HandleImportAction(ctx iris.Context) base.Result {
+	params := new(handleImportActionParams)
+	err := ctx.ReadJSON(params)
+	if err != nil {
+		zap.L().Warn("handleImportActionParams get fail", zap.Error(err))
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	nebulaAddress := ctx.Values().GetString("nebulaAddress")
+	username := ctx.Values().GetString("username")
+	data, err := importer.ImportAction(params.TaskId, nebulaAddress, username, importer.NewTaskAction(params.TaskAction))
+	if err != nil {
+		zap.L().Warn("importAction fail", zap.Error(err))
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	return base.Response{
+		Code:    base.Success,
+		Message: "Processing a task action successfully",
+		Data:    data,
+	}
+}
+
+func DownloadConfigFile(ctx iris.Context) base.Result {
+	id := ctx.Params().GetString("id")
+	if id == "" {
+		return base.Response{
+			Code:    base.Error,
+			Message: "id parse failed",
+		}
+	}
+	configPath := filepath.Join(config.Cfg.Web.TasksDir, id, "config.yaml")
+	if err := ctx.SendFile(configPath, "config.yaml"); err != nil {
+		return base.Response{
+			Code:    base.Error,
+			Message: "id parse failed",
+		}
+	}
+	return nil
+}
+
+func DownloadImportLog(ctx iris.Context) base.Result {
+	id := ctx.Params().GetString("id")
+	if id == "" {
+		return base.Response{
+			Code:    base.Error,
+			Message: "id parse failed",
+		}
+	}
+	path := filepath.Join(config.Cfg.Web.TasksDir, id, importLogName)
+	if err := ctx.SendFile(path, importLogName); err != nil {
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	return nil
+}
+
+func DownloadErrLog(ctx iris.Context) base.Result {
+	id := ctx.Params().GetString("id")
+	if id == "" {
+		return base.Response{
+			Code:    base.Error,
+			Message: "id parse failed",
+		}
+	}
+	name := ctx.URLParam("name")
+	if name == "" {
+		return base.Response{
+			Code:    base.Error,
+			Message: "name parse failed",
+		}
+	}
+	path := filepath.Join(config.Cfg.Web.TasksDir, id, errContentDir, name)
+	if err := ctx.SendFile(path, name); err != nil {
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	return nil
+}
+
+func validImportDataParams(params *importDataParams) error {
+	if params.ConfigBody.NebulaClientSettings.Connection.Address == nil || params.ConfigBody.NebulaClientSettings.
+		Connection.User == nil || params.ConfigBody.NebulaClientSettings.Space == nil {
+		return errors.New("importDataParams is wrong")
+	}
+	return nil
+}
+
+func ReadImportLog(ctx iris.Context) base.Result {
+	offset, err := strconv.ParseInt(ctx.URLParam("offset"), 10, 64)
+	if err != nil {
+		zap.L().Warn("offset parse error", zap.Error(err))
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	limitStr := ctx.URLParam("limit")
+	var limit int64 = -1
+	if limitStr != "" {
+		l, err := strconv.ParseInt(limitStr, 10, 64)
+		if err != nil {
+			zap.L().Warn("limit parse error", zap.Error(err))
+			return base.Response{
+				Code:    base.Error,
+				Message: err.Error(),
+			}
+		}
+		limit = l
+	}
+	taskId := ctx.URLParam("id")
+	if taskId == "" {
+		return base.Response{
+			Code:    base.Error,
+			Message: "parse id fail",
+		}
+	}
+	path := filepath.Join(config.Cfg.Web.TasksDir, taskId, importLogName)
+	lines, err := readFile(path, offset, limit)
 	if err != nil {
 		return base.Response{
 			Code:    base.Error,
@@ -62,106 +302,67 @@ func ReadLog(ctx iris.Context) base.Result {
 			}
 		}
 	}
-	if len(bytes) == 0 && taskIdJSON[taskId]{
+	if len(lines) == 0 && taskIdJSON[taskId] {
 		return base.Response{
 			Code: base.Success,
 			Data: "",
 		}
 	}
-	if len(bytes) == 0 {
+	if len(lines) == 0 {
 		return base.Response{
 			Code: base.Error,
 		}
 	}
-
-	log := string(bytes)
-	log = strings.Replace(log, "\n", "<br />", -1)
 	return base.Response{
 		Code: base.Success,
-		Data: log,
+		Data: lines,
 	}
 }
 
-func readFile(path string, startByte, endByte int64) ([]byte, error) {
-	file, err := os.Open(path)
-	defer file.Close()
+func ReadErrLog(ctx iris.Context) base.Result {
+	offset, err := strconv.ParseInt(ctx.URLParam("offset"), 10, 64)
 	if err != nil {
-		zap.L().Warn("open file error", zap.Error(err))
-		return nil, err
-	}
-	_, err = file.Seek(startByte, 0)
-	if err != nil {
-		zap.L().Warn("file seek error", zap.Error(err))
-		return nil, err
-	}
-	stat, _ := file.Stat()
-	if stat.Size() < endByte {
-		endByte = stat.Size()
-	}
-	if endByte < startByte {
-		bytes := make([]byte, 0)
-		return bytes, nil
-	}
-	bytes := make([]byte, endByte-startByte)
-	_, err = file.Read(bytes)
-	if err != nil {
-		zap.L().Warn("read file error", zap.Error(err))
-		return nil, err
-	}
-	return bytes, nil
-}
-
-func CreateConfigFile(ctx iris.Context) base.Result {
-	type Params struct {
-		MountPath string                  `json:"mountPath"`
-		Config    importconfig.YAMLConfig `json:"config"`
-	}
-	params := new(Params)
-	err := ctx.ReadJSON(params)
-	if err != nil {
-		zap.L().Warn("config change to json wrong", zap.Error(err))
+		zap.L().Warn("offset parse error", zap.Error(err))
 		return base.Response{
 			Code:    base.Error,
 			Message: err.Error(),
 		}
 	}
-
-	fileName := "config.yaml"
-	dir := params.MountPath
-	_, err = os.Stat(dir)
-	if os.IsNotExist(err) {
-		os.MkdirAll(dir, os.ModePerm)
+	limitStr := ctx.URLParam("limit")
+	var limit int64 = -1
+	if limitStr != "" {
+		l, err := strconv.ParseInt(limitStr, 10, 64)
+		if err != nil {
+			zap.L().Warn("limit parse error", zap.Error(err))
+			return base.Response{
+				Code:    base.Error,
+				Message: err.Error(),
+			}
+		}
+		limit = l
 	}
-	path := filepath.Join(dir, fileName)
-	outYaml, err := yaml.Marshal(params.Config)
-	err = os.WriteFile(path, outYaml, 0644)
+	name := ctx.URLParam("name")
+	if name == "" {
+		return base.Response{
+			Code:    base.Error,
+			Message: "parse name fail",
+		}
+	}
+	taskId := ctx.URLParam("id")
+	if taskId == "" {
+		return base.Response{
+			Code:    base.Error,
+			Message: "parse id fail",
+		}
+	}
+	path := filepath.Join(config.Cfg.Web.TasksDir, taskId, errContentDir, name)
+	lines, err := readFile(path, offset, limit)
 	if err != nil {
-		zap.L().Warn("write"+path+"file error", zap.Error(err))
 		return base.Response{
 			Code:    base.Error,
 			Message: err.Error(),
 		}
 	}
-
-	return base.Response{
-		Code: base.Success,
-	}
-}
-
-func Callback(ctx iris.Context) base.Result {
-	type Params struct {
-		TaskId string `json:"taskId"`
-	}
-	params := new(Params)
-	err := ctx.ReadJSON(params)
-	if err != nil {
-		zap.L().Warn("taskId get fail", zap.Error(err))
-		return base.Response{
-			Code:    base.Error,
-			Message: err.Error(),
-		}
-	}
-	taskId := params.TaskId
 
 	muTaskId.RLock()
 	taskIdBytes, err := ioutil.ReadFile(config.Cfg.Web.TaskIdPath)
@@ -175,7 +376,7 @@ func Callback(ctx iris.Context) base.Result {
 	}
 	taskIdJSON := make(map[string]bool)
 	if len(taskIdBytes) != 0 {
-		err := json.Unmarshal(taskIdBytes, &taskIdJSON)
+		err = json.Unmarshal(taskIdBytes, &taskIdJSON)
 		if err != nil {
 			zap.L().Warn("parse taskId file error", zap.Error(err))
 			return base.Response{
@@ -184,42 +385,98 @@ func Callback(ctx iris.Context) base.Result {
 			}
 		}
 	}
-
-	taskIdJSON[taskId] = true
-	jsonStr, err := json.Marshal(taskIdJSON)
-	if err != nil {
-		zap.L().Warn("map to json error", zap.Error(err))
+	if len(lines) == 0 && taskIdJSON[taskId] {
 		return base.Response{
-			Code:    base.Error,
-			Message: err.Error(),
+			Code: base.Success,
+			Data: "",
 		}
 	}
-
-	muTaskId.Lock()
-	err = os.WriteFile(config.Cfg.Web.TaskIdPath, jsonStr, 0644)
-	muTaskId.Unlock()
-	if err != nil {
-		zap.L().Warn("write jsonId file error", zap.Error(err))
+	if len(lines) == 0 {
 		return base.Response{
-			Code:    base.Error,
-			Message: err.Error(),
+			Code: base.Error,
 		}
 	}
-
 	return base.Response{
-		Code:    base.Success,
-		Data:    "",
-		Message: "",
+		Code: base.Success,
+		Data: lines,
 	}
+}
+
+func readFile(path string, offset int64, limit int64) ([]string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		zap.L().Warn("open file error", zap.Error(err))
+		return nil, err
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	res := make([]string, 0)
+	if limit != -1 {
+		for lineIndex := int64(0); scanner.Scan() && lineIndex < offset+limit; lineIndex++ {
+			if lineIndex >= offset {
+				res = append(res, scanner.Text())
+			}
+		}
+	} else {
+		for lineIndex := int64(0); scanner.Scan(); lineIndex++ {
+			if lineIndex >= offset {
+				res = append(res, scanner.Text())
+			}
+		}
+	}
+	return res, nil
 }
 
 func GetWorkingDir(ctx iris.Context) base.Result {
 	data := dirResponse{
-		TaskDir:   config.Cfg.Web.TasksDir,
 		UploadDir: config.Cfg.Web.UploadDir,
 	}
 	return base.Response{
 		Code: base.Success,
 		Data: data,
+	}
+}
+
+func GetTaskDir(ctx iris.Context) base.Result {
+	taskDir, err := importer.GetNewTaskDir()
+	if err != nil {
+		return base.Response{
+			Code: base.Error,
+		}
+	}
+	data := dirResponse{
+		TaskDir: taskDir,
+	}
+	return base.Response{
+		Code: base.Success,
+		Data: data,
+	}
+}
+
+func GetTaskLogNames(ctx iris.Context) base.Result {
+	id := ctx.Params().GetString("id")
+	errLogDir := filepath.Join(config.Cfg.Web.TasksDir, id, "err")
+	fileInfos, err := ioutil.ReadDir(errLogDir)
+	if err != nil {
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	logs := make([]log, 0)
+	importLog := log{
+		Name: "import.log",
+	}
+	logs = append(logs, importLog)
+	for _, fileInfo := range fileInfos {
+		name := fileInfo.Name()
+		l := log{
+			Name: name,
+		}
+		logs = append(logs, l)
+	}
+	return base.Response{
+		Code: base.Success,
+		Data: logs,
 	}
 }

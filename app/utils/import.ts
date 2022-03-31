@@ -2,31 +2,31 @@ import { message } from 'antd';
 import _ from 'lodash';
 import intl from 'react-intl-universal';
 
-import { handleEscape, handleKeyword, handleVidStringName } from './function';
+import { handleEscape } from './function';
 
 export function configToJson(payload) {
   const {
-    currentSpace,
+    space,
     username,
     password,
     host,
-    vertexesConfig,
+    verticesConfig,
     edgesConfig,
     taskDir,
-    activeStep,
     spaceVidType,
+    batchSize
   } = payload;
   const vertexToJSON = vertexDataToJSON(
-    vertexesConfig,
-    activeStep,
+    verticesConfig,
     taskDir,
     spaceVidType,
+    batchSize
   );
   const edgeToJSON = edgeDataToJSON(
     edgesConfig,
-    activeStep,
     taskDir,
     spaceVidType,
+    batchSize
   );
   const files: any[] = [...vertexToJSON, ...edgeToJSON];
   const configJson = {
@@ -36,7 +36,7 @@ export function configToJson(payload) {
       retry: 3,
       concurrency: 10,
       channelBufferSize: 128,
-      space: handleEscape(currentSpace),
+      space: handleEscape(space),
       connection: {
         user: username,
         password,
@@ -51,11 +51,10 @@ export function configToJson(payload) {
 
 export function edgeDataToJSON(
   config: any,
-  activeStep: number,
   taskDir: string,
   spaceVidType: string,
+  batchSize?: string,
 ) {
-  const limit = activeStep === 2 || activeStep === 3 ? 10 : undefined;
   const files = config.map(edge => {
     const edgePorps: any[] = [];
     _.sortBy(edge.props, t => t.mapping).forEach(prop => {
@@ -91,11 +90,11 @@ export function edgeDataToJSON(
           edgePorps.push(_prop);
       }
     });
+    const fileName = edge.file.name.replace('.csv', '');
     const edgeConfig = {
       path: edge.file.path,
-      failDataPath: `${taskDir}/err/${edge.name}Fail.csv`,
-      batchSize: 60,
-      limit,
+      failDataPath: `${taskDir}/err/${fileName}Fail.csv`,
+      batchSize: Number(batchSize) || 60,
       type: 'csv',
       csv: {
         withHeader: false,
@@ -120,11 +119,10 @@ export function edgeDataToJSON(
 
 export function vertexDataToJSON(
   config: any,
-  activeStep: number,
   taskDir: string,
   spaceVidType: string,
+  batchSize?: string
 ) {
-  const limit = activeStep === 2 || activeStep === 3 ? 10 : undefined;
   const files = config.map(vertex => {
     const tags = vertex.tags.map(tag => {
       const props = tag.props
@@ -145,11 +143,11 @@ export function vertexDataToJSON(
       };
       return _tag;
     });
+    const fileName = vertex.file.name.replace('.csv', '');
     const vertexConfig: any = {
       path: vertex.file.path,
-      failDataPath: `${taskDir}/err/${vertex.name}Fail.csv`,
-      batchSize: 60,
-      limit,
+      failDataPath: `${taskDir}/err/${fileName}Fail.csv`,
+      batchSize: Number(batchSize) || 60,
       type: 'csv',
       csv: {
         withHeader: false,
@@ -179,110 +177,147 @@ export function indexJudge(index: number | null, name: string) {
   return index;
 }
 
-export function getStringByteLength(str: string) {
-  let bytesCount = 0;
-  const len = str.length;
-  for (let i = 0, n = len; i < n; i++) {
-    const c = str.charCodeAt(i);
-    if ((c >= 0x0001 && c <= 0x007e) || (c >= 0xff60 && c <= 0xff9f)) {
-      bytesCount += 1;
-    } else {
-      bytesCount += 2;
-    }
-  }
-  return bytesCount;
-}
-
-export function createTaskID(instanceId: string) {
-  return `${instanceId}.${new Date().getTime()}`;
-}
-
-export function getGQLByConfig(payload) {
-  const { vertexesConfig, edgesConfig, spaceVidType } = payload;
-  const NGQL: string[] = [];
-  vertexesConfig.forEach(vertexConfig => {
-    if (vertexConfig.idMapping === null) {
-      message.error(`vertexId ${intl.get('import.indexNotEmpty')}`);
-      throw new Error();
-    }
-    const csvTable = vertexConfig.file.content;
-    vertexConfig.tags.forEach(tag => {
-      csvTable.forEach(columns => {
-        const tagField: string[] = [];
-        const values: any[] = [];
-        if (!tag.name) {
-          message.error(`Tag ${intl.get('import.notEmpty')}`);
-          throw new Error();
+export const exampleJson = {
+  'version': 'v2',
+  'description': 'web console import',
+  'removeTempFiles': null,
+  'clientSettings': {
+    'retry': 3,
+    'concurrency': 10,
+    'channelBufferSize': 128,
+    'space': 'sales',
+    'connection': {
+      'user': '',
+      'password': '',
+      'address': ''
+    },
+    'postStart': null,
+    'preStop': null
+  },
+  'logPath': 'import.log',
+  'files': [
+    {
+      'path': 'item.csv',
+      'failDataPath': 'itemFail.csv',
+      'batchSize': 60,
+      'limit': null,
+      'inOrder': null,
+      'type': 'csv',
+      'csv': {
+        'withHeader': false,
+        'withLabel': false,
+        'delimiter': null
+      },
+      'schema': {
+        'type': 'vertex',
+        'edge': null,
+        'vertex': {
+          'vid': {
+            'index': 0,
+            'function': null,
+            'type': 'string',
+            'prefix': null
+          },
+          'tags': [
+            {
+              'name': 'item',
+              'props': [
+                {
+                  'name': 'id_single_item',
+                  'type': 'string',
+                  'index': 0
+                },
+                {
+                  'name': 'region',
+                  'type': 'string',
+                  'index': 1
+                },
+                {
+                  'name': 'country',
+                  'type': 'string',
+                  'index': 2
+                },
+                {
+                  'name': 'item_type',
+                  'type': 'string',
+                  'index': 3
+                },
+                {
+                  'name': 'sales_channel',
+                  'type': 'string',
+                  'index': 4
+                }
+              ]
+            }
+          ]
         }
-        tag.props.forEach(prop => {
-          if (prop.mapping === null && !prop.isDefault) {
-            message.error(`${prop.name} ${intl.get('import.indexNotEmpty')}`);
-            throw new Error();
-          }
-          if (prop.mapping !== null) {
-            // HACK: Processing keyword
-            tagField.push(handleKeyword(prop.name));
-            const value =
-              prop.type === 'string'
-                ? `"${columns[prop.mapping]}"`
-                : columns[prop.mapping];
-            values.push(value);
-          }
-        });
-        NGQL.push(
-          `INSERT VERTEX ${handleKeyword(tag.name)}` +
-            `(${tagField}) VALUES ${handleVidStringName(
-              columns[vertexConfig.idMapping],
-              spaceVidType,
-            )}:(${values})`,
-        );
-      });
-    });
-  });
-  edgesConfig.forEach(edgeConfig => {
-    const csvTable = edgeConfig.file.content;
-    csvTable.forEach(columns => {
-      const edgeField: string[] = [];
-      const values: any[] = [];
-      if (!edgeConfig.type) {
-        message.error(`edgeType ${intl.get('import.notEmpty')}`);
-        throw new Error();
       }
-      edgeConfig.props.forEach(prop => {
-        if (prop.mapping === null && prop.name !== 'rank' && !prop.isDefault) {
-          message.error(`${prop.name} ${intl.get('import.indexNotEmpty')}`);
-          throw new Error();
-        }
-        if (
-          prop.name !== 'srcId' &&
-          prop.name !== 'dstId' &&
-          prop.name !== 'rank' &&
-          prop.mapping !== null
-        ) {
-          // HACK: Processing keyword
-          edgeField.push(handleKeyword(prop.name));
-          const value =
-            prop.type === 'string'
-              ? `"${columns[prop.mapping]}"`
-              : columns[prop.mapping];
-          values.push(value);
-        }
-      });
-      const rank =
-        edgeConfig.props[2].mapping === null
-          ? ''
-          : `@${columns[edgeConfig.props[2].mapping]}`;
-      NGQL.push(
-        `INSERT EDGE ${handleKeyword(edgeConfig.type)}` +
-          `(${edgeField.join(',')}) VALUES ${handleVidStringName(
-            columns[edgeConfig.props[0].mapping],
-            spaceVidType,
-          )} -> ${handleVidStringName(
-            columns[edgeConfig.props[1].mapping],
-            spaceVidType,
-          )} ${rank}:(${values})`,
-      );
-    });
-  });
-  return NGQL;
-}
+    },
+    {
+      'path': 'orderr.csv',
+      'failDataPath': 'orderrFail.csv',
+      'batchSize': 60,
+      'limit': null,
+      'inOrder': null,
+      'type': 'csv',
+      'csv': {
+        'withHeader': false,
+        'withLabel': false,
+        'delimiter': null
+      },
+      'schema': {
+        'type': 'edge',
+        'edge': {
+          'name': 'order',
+          'withRanking': false,
+          'props': [
+            {
+              'name': 'order_id',
+              'type': 'string',
+              'index': 0
+            },
+            {
+              'name': 'id_item',
+              'type': 'string',
+              'index': 0
+            },
+            {
+              'name': 'unit_sold',
+              'type': 'string',
+              'index': 2
+            },
+            {
+              'name': 'unit_price',
+              'type': 'string',
+              'index': 3
+            },
+            {
+              'name': 'unit_cost',
+              'type': 'string',
+              'index': 4
+            },
+            {
+              'name': 'total_profit',
+              'type': 'string',
+              'index': 5
+            }
+          ],
+          'srcVID': {
+            'index': 1,
+            'function': null,
+            'type': 'string',
+            'prefix': null
+          },
+          'dstVID': {
+            'index': 1,
+            'function': null,
+            'type': 'string',
+            'prefix': null
+          },
+          'rank': null
+        },
+        'vertex': null
+      }
+    }
+  ]
+};

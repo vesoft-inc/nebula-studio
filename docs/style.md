@@ -2,12 +2,11 @@
 This is a full stack project including front and back end.
 ## Scaffold (mainly)
 - app ------------------------------------------------- js source code for business
-  - assets ---------------------------------------- static source for front end
     - components ---------------------------- components can be reused
     - config ---------------------------------- front end common config
     - context --------------------------------- React context
-    - modules -------------------------------- React page component with model
-    - models --------------------------------- page models inspired by rematch(redux)
+    - pages -------------------------------- React page component with model
+    - store --------------------------------- page models
     - utils ------------------------------------ front end utils
     - index.html ----------------------------- entry template index.html
     - index.tsx ------------------------------- entry to all js* files

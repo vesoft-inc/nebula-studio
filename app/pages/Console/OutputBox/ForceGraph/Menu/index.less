@@ -1,0 +1,73 @@
+@import '@app/common.less';
+
+.context-menu {
+	position: absolute;
+	z-index: 1001;
+	background: #fff;
+	border: 1px solid #d7d7d7;
+	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+
+	.btn-disabled {
+		cursor: not-allowed;
+		color: #9490904d;
+
+		svg {
+			fill: #9490904d;
+			cursor: not-allowed;
+		}
+	}
+
+	> div {
+		display: flex;
+		width: 200px;
+		height: 43px;
+		padding: 8px 9px;
+		align-items: center;
+		cursor: pointer;
+
+		.btn-icon {
+			position: absolute;
+
+			svg {
+				width: 27px;
+				height: 27px;
+			}
+		}
+
+		> span {
+			width: 100%;
+			text-align: left;
+			font-size: 14px;
+			text-indent: 40px;
+			letter-spacing: 0;
+			font-weight: 400;
+		}
+	}
+
+	.menu-color > span {
+		text-indent: 15px;
+	}
+
+	> div:not(:first-child) {
+		border-top: none;
+	}
+
+	> div:not(:last-child) {
+		border-bottom: none;
+	}
+
+	> div:hover {
+		border-color: initial;
+	}
+
+
+	> div:not(.btn-disabled):hover,
+	.menu-color:not(.btn-disabled):hover {
+		background: @blue;
+		color: #fff;
+
+		svg {
+			fill: #fff;
+		}
+	}
+}

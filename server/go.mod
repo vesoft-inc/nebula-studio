@@ -3,12 +3,17 @@ module github.com/vesoft-inc/nebula-studio/server
 go 1.17
 
 require (
+	github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394
+	github.com/iris-contrib/middleware/jwt v0.0.0-20210110101738-6d0a4d799b5d
 	github.com/kataras/iris/v12 v12.2.0-alpha4
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
-	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220124093655-f7f5b4c63e6a
-	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220214094549-1dd8e730a586
+	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca
+	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220329020324-f599adfab640
+	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220331072417-e7281ccc8a1a
 	go.uber.org/zap v1.17.0
 	gopkg.in/yaml.v2 v2.4.0
+	gorm.io/driver/sqlite v1.2.6
+	gorm.io/gorm v1.22.5
 )
 
 require (
@@ -20,6 +25,7 @@ require (
 	github.com/andybalholm/brotli v1.0.3 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/aymerick/raymond v2.0.3-0.20180322193309-b565731e1464+incompatible // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385 // indirect
 	github.com/facebook/fbthrift v0.31.1-0.20211129061412-801ed7f9f295 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
@@ -29,6 +35,8 @@ require (
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/iris-contrib/jade v1.1.4 // indirect
 	github.com/iris-contrib/schema v0.0.6 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.4 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kataras/blocks v0.0.4 // indirect
 	github.com/kataras/golog v0.1.7 // indirect

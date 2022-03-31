@@ -1,0 +1,20 @@
+@import '~@app/common.less';
+.nebula-stats {
+  .operations {
+    margin: 20px 0 17px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    .ant-btn {
+      width: 110px;
+    }
+    .label {
+      margin-left: 30px;
+      color: @darkGray;
+    }
+    .label::after {
+      content: ": ";
+      padding-right: 5px;
+    }
+  }
+}

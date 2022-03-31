@@ -3,9 +3,16 @@ import axios from 'axios';
 import JSONBigint from 'json-bigint';
 import intl from 'react-intl-universal';
 
-import { store } from '#app/store';
-
+import { getRootStore } from '@app/stores';
 import { trackEvent } from './stat';
+
+const subErrMsgStr = [
+  'session expired',
+  'connection refused',
+  'broken pipe',
+  'an existing connection was forcibly closed',
+  'Token is expired',
+];
 
 const service = axios.create({
   transformResponse: [
@@ -33,19 +40,11 @@ service.interceptors.request.use(config => {
 service.interceptors.response.use(
   (response: any) => {
     const { code, message: errMsg } = response.data;
+    const isConnectReq = /api-nebula\/db\/connect$/.test(response.config?.url);
     // if connection refused, login again
-    if (
-      code === -1 &&
-      errMsg &&
-      (errMsg.includes('connection refused') ||
-        errMsg.includes('broken pipe') ||
-        errMsg.includes('session expired') ||
-        errMsg.includes('an existing connection was forcibly closed'))
-    ) {
-      message.warning(intl.get('warning.connectError'));
-      store.dispatch({
-        type: 'nebula/asyncClearConfigServer',
-      });
+    if (code === -1 && new RegExp(subErrMsgStr.join('|')).test(errMsg)) {
+      message.warning(errMsg);
+      !isConnectReq && getRootStore().global.logout();
     } else if (code === -1 && errMsg) {
       message.warning(errMsg);
     }

@@ -20,6 +20,7 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "sourceMap": true,
+    "strictNullChecks": false,
     "importHelpers": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
@@ -27,7 +28,8 @@
     "module": "esnext",
     "baseUrl": ".",
     "paths": {
-      "#app/*": ["app/*"]
+      "@public/*": ["public/*"],
+      "@app/*": ["app/*"]
     }
   },
   "ts-node": {

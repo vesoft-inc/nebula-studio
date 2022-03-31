@@ -1,0 +1,68 @@
+@import '~@app/common.less';
+.config-collapse {
+  background: @lightBlue;
+  border: 1px solid @gray;
+  box-sizing: border-box;
+  border-radius: 6px;
+  margin-top: 20px;
+  .ant-collapse-item > .ant-collapse-header {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: @darkBlue;
+  }
+  .btn-preview {
+    font-family: Roboto-Regular, sans-serif;
+    font-weight: bold;
+    color: @blue;
+    &.actived {
+      color: @lightBlack;
+    }
+  }
+  .config-item {
+    .id-row {
+      padding: 10px 15px;
+      background: #FFFFFF;
+      border: 1px solid @gray;
+      box-sizing: border-box;
+      border-radius: 3px;
+      margin-bottom: 10px;
+    }
+    .btns {
+      text-align: center;
+    }
+  }
+  .config-container {
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    background: #FFFFFF;
+    border: 1px solid @gray;
+    box-sizing: border-box;
+    border-radius: 3px;
+    .tag-select-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .left {
+        display: flex;
+        align-items: center;
+        .tag-select {
+          min-width: 60px;
+          .ant-select-selection-item {
+            font-family: Roboto-Bold, sans-serif;
+          }
+          .ant-select-selection-placeholder {
+            color: @blue;
+          }
+          &.no-value .ant-select-arrow svg {
+            fill: @blue;
+          }
+        }
+      }
+    }
+  
+  }
+  .btn-close {
+    cursor: pointer;
+  }
+}
