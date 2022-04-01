@@ -263,8 +263,10 @@ export class ImportStore {
       const tags = this.verticesConfig[configIndex].tags;
       tags.splice(tagIndex, 1);
     } else {
-      const tag = this.verticesConfig[configIndex].tags[tagIndex];
-      tag.props[propIndex][field!] = value;
+      const tags = this.verticesConfig[configIndex].tags;
+      const _tag = { ...tags[tagIndex] };
+      _tag.props[propIndex][field!] = value;
+      tags.splice(tagIndex, 1, _tag);
     }
   }
 
@@ -279,7 +281,9 @@ export class ImportStore {
       this.edgesConfig[configIndex].type = '';
       this.edgesConfig[configIndex].props = [];
     } else {
-      this.edgesConfig[configIndex].props[propIndex][field] = value;
+      const _edge = { ...this.edgesConfig[configIndex] };
+      _edge.props[propIndex][field] = value;
+      this.edgesConfig[configIndex] = _edge;
     }
   }
 }
