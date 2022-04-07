@@ -5,9 +5,9 @@ import { observer } from 'mobx-react-lite';
 import { trackPageView } from '@app/utils/stat';
 import Icon from '@app/components/Icon';
 import { chunk } from 'lodash';
-
-import './index.less';
+import cls from 'classnames';
 import { useHistory } from 'react-router-dom';
+import styles from './index.module.less';
 
 const MODULES = [
   {
@@ -56,31 +56,31 @@ const DocPage = () => {
   }, []);
   
   return (
-    <div className="studio-doc center-layout">
-      <h1 className="welcome-label">{intl.get('doc.welcome')} <span>Nebula Studio</span></h1>
-      <div className="doc-box">
-        <div className="header">{intl.get('doc.functionIntro')}</div>
-        <div className="module-intro">
+    <div className={cls(styles.studioDoc, 'studioCenterLayout')}>
+      <h1 className={styles.welcomeLabel}>{intl.get('doc.welcome')} <span>Nebula Studio</span></h1>
+      <div className={styles.docBox}>
+        <div className={styles.header}>{intl.get('doc.functionIntro')}</div>
+        <div className={styles.moduleIntro}>
           {MODULES.map(module => <Col span={8} key={module.title}>
-            <div className="module-item" onClick={() => history.push(module.link)}>
+            <div className={styles.moduleItem} onClick={() => history.push(module.link)}>
               <Icon type={module.icon} />
-              <span className="title">{intl.get(module.title)}</span>
-              <span className="tip">{intl.get(module.tip)}</span>
+              <span className={styles.title}>{intl.get(module.title)}</span>
+              <span className={styles.tip}>{intl.get(module.tip)}</span>
             </div>
           </Col>)}
         </div>
       </div>
-      <div className="doc-box">
-        <div className="header">{intl.get('doc.learningDoc')}</div>
-        <div className="doc-carousel">
+      <div className={styles.docBox}>
+        <div className={styles.header}>{intl.get('doc.learningDoc')}</div>
+        <div className={styles.docCarousel}>
           <Carousel dotPosition="bottom" lazyLoad="progressive" dots={{ className: 'btn-carousel' }}>
             {docGroup.map((group, index) => (
-              <Row className="doc-group" gutter={26} key={index}>
+              <Row className={styles.docGroup} gutter={26} key={index}>
                 {group.map(doc => <Col span={8} key={doc.title}>
-                  <div className="doc-item">
-                    <div className="doc-desc">
-                      <p className="doc-title">{intl.get(doc.title)}</p>
-                      <p className="doc-tip">{intl.get(doc.tip)}</p>
+                  <div className={styles.docItem}>
+                    <div className={styles.docDesc}>
+                      <p className={styles.docTitle}>{intl.get(doc.title)}</p>
+                      <p className={styles.docTip}>{intl.get(doc.tip)}</p>
                     </div>
                     <Button type="primary">
                       <a href={intl.get(doc.link)} target="_blank" rel="noreferrer">

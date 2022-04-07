@@ -4,7 +4,7 @@ import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { IAlterForm, IProperty, ISchemaType } from '@app/interfaces/schema';
 
-import './index.less';
+import styles from './index.module.less';
 
 const confirm = Modal.confirm;
 const Option = Select.Option;
@@ -131,29 +131,29 @@ const formRef = ((props: IProps) => {
   return (
     <Form 
       form={form}
-      className="form-item" 
+      className={styles.formItem} 
       onFinish={handleTtlUpdate} 
       {...innerItemLayout} 
       layout="vertical">
       <Form.Item>
         <Checkbox disabled={editDisabled} checked={ttlRequired} onChange={handleClearTtl}>
-          <span className="label">{intl.get('schema.setTTL')}</span>
+          <span className={styles.label}>{intl.get('schema.setTTL')}</span>
         </Checkbox>
       </Form.Item>
       {!isEdit && <Form.Item noStyle>
-        <div className="box-container">
+        <div className={styles.boxContainer}>
           <Row>
             <Col span={12}>
-              <Form.Item className="inline-item" label="TTL_COL">
+              <Form.Item className={styles.inlineItem} label="TTL_COL">
                 {col}
               </Form.Item>
             </Col>
             <Col span={9}>
-              <Form.Item className="inline-item" label="TTL_DURATION">
+              <Form.Item className={styles.inlineItem} label="TTL_DURATION">
                 {duration === '0' && col === '' ? '' : duration }
               </Form.Item>
             </Col>
-            {col !== '' && <Col span={3} className="operations">
+            {col !== '' && <Col span={3} className={styles.operations}>
               <Form.Item noStyle>
                 <Button
                   type="link"
@@ -182,11 +182,11 @@ const formRef = ((props: IProps) => {
       </Form.Item>}
 
       {isEdit && <Form.Item noStyle shouldUpdate={true}>
-        <div className="box-container">
+        <div className={styles.boxContainer}>
           <Row>
             <Col span={12}>
               <Form.Item
-                className="inline-item" 
+                className={styles.inlineItem} 
                 label="TTL_COL" 
                 name="col" 
                 initialValue={editConfig.col} 
@@ -207,7 +207,7 @@ const formRef = ((props: IProps) => {
             </Col>
             <Col span={9}>
               <Form.Item
-                className="inline-item" 
+                className={styles.inlineItem} 
                 label="TTL_DURATION"  
                 name="duration"
                 initialValue={editConfig.duration} 
@@ -232,7 +232,7 @@ const formRef = ((props: IProps) => {
                 />
               </Form.Item>
             </Col>
-            <Col span={3} className="operations">
+            <Col span={3} className={styles.operations}>
               <Form.Item noStyle>
                 <Button
                   type="link"

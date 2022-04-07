@@ -7,6 +7,8 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import CSVPreviewLink from '@app/components/CSVPreviewLink';
 import classNames from 'classnames';
+import styles from '../index.module.less';
+
 const Option = Select.Option;
 
 interface IProps {
@@ -66,13 +68,13 @@ const EdgeConfig = (configProps: IProps) => {
   ];
 
   return (
-    <div className="config-container">
-      <div className="tag-select-row">
-        <div className="left">
-          <span className="label">Edge Type</span>
+    <div className={styles.configContainer}>
+      <div className={styles.tagSelectRow}>
+        <div className={styles.left}>
+          <span className={styles.label}>Edge Type</span>
           <Select
             bordered={false}
-            className={classNames('tag-select', { 'no-value': !type })}
+            className={classNames(styles.tagSelect, { [styles.noValue]: !type })}
             placeholder={intl.get('import.selectEdge')}
             value={type || null}
             dropdownMatchSelectWidth={false}
@@ -85,10 +87,9 @@ const EdgeConfig = (configProps: IProps) => {
             ))}
           </Select>
         </div>
-        <CloseOutlined className="btn-close" onClick={handleRemoveEdge} />
+        <CloseOutlined className={styles.btnClose} onClick={handleRemoveEdge} />
       </div>
       {type && <Table
-        className="props-table"
         dataSource={props}
         columns={columns}
         rowKey="name"

@@ -9,7 +9,7 @@ const Instruction = (props: { description: string; onClick?: () => void }) => {
     <Tooltip title={props.description} placement="right">
       <Icon
         type="icon-studio-nav-help"
-        className="icon-instruction"
+        className="studioIconInstruction"
         onClick={props.onClick}
       />
     </Tooltip>

@@ -75,4 +75,4 @@ const App = () => {
 
 const HotPageRoot = hot(PageRoot);
 
-ReactDom.render(<HotPageRoot />, document.getElementById('studio-app'));
+ReactDom.render(<HotPageRoot />, document.getElementById('studioApp'));

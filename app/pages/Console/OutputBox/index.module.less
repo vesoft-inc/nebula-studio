@@ -1,0 +1,166 @@
+@import '~@app/common.less';
+.outputBox {
+	overflow: hidden;
+	max-height: 850px;
+	background: #fff;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	margin: 20px 0;
+	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+	border-radius: 6px;
+	.outputHeader {
+		padding: 12px 30px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		.gql {
+			flex: 1;
+			display: inline-block;
+			margin: 0;
+			background-color: #DFFFDA;
+			border-radius: 6px;
+			padding: 11px 14px;
+			cursor: pointer;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			font-family: Roboto-Regular, sans-serif;
+			font-weight: 500;
+			font-size: 18px;
+			color: #27AE60;
+		}
+		.errorInfo {
+			background-color: #fff2f0;
+			color: #ff4d4f;
+		}
+		.outputOperations {
+			display: flex;
+    	align-items: center;
+			margin-left: 22px;
+			> :global(span.anticon) {
+				svg {
+					fill: @darkBlue;
+					width: 22px;
+					height: 22px;
+				}
+				&:not(:last-child) {
+					margin-right: 22px;
+				}
+				&.btnYellow svg {
+					fill: #F2C94C;
+				}
+			}
+			.btnExport {
+				cursor: pointer;
+			}
+		}
+	}
+
+	:global(.ant-table) {
+		overflow: auto;
+	}
+
+	.tabContainer {
+		position: relative;
+		border-top: 1px solid #E0E0E0;
+		flex: 1;
+		overflow: auto;
+		.outputTab {
+			min-height: 300px;
+			& > :global(.ant-tabs-nav) {
+				width: 80px;
+				:global {
+					.ant-tabs-tab {
+						padding: 0;
+						height: 80px;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						margin-top: 0;
+						.ant-tabs-tab-btn {
+							display: flex;
+							flex-direction: column;
+							align-items: center;
+							justify-content: center;
+							color: @darkGray;
+							.anticon {
+								margin-right: 0;
+								svg {
+									width: 22px;
+									height: 22px;
+								}
+							}
+						}
+						&.ant-tabs-tab-active {
+							background: @lightBlue;
+							.ant-tabs-tab-btn { 
+								color: @blue;
+							}
+						}
+					}
+				}
+				
+			}
+			& > :global(.ant-tabs-content-holder) {
+				position: relative;
+				background-color: @lightBlue;
+				:global {
+					.ant-tabs-content {
+						.ant-table, .ant-pagination {
+							margin: 20px;
+						}
+						.ant-tabs-tabpane {
+							padding-left: 0;
+						}
+					}
+				}
+			}
+		
+			.errContainer {
+				padding: 20px;
+			}
+		}
+		table {
+			background: #f8f8fa;
+			width: 100%;
+
+			thead > tr > th {
+				background:@lightGray;
+				font-weight: 500;
+			}
+		}
+	}
+
+	.outputFooter {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 15px 18px;
+		width: 100%;
+		height: 65px;
+		border-top: 1px solid #E0E0E0;
+		font-family: Roboto-Regular, sans-serif;
+		font-size: 16px;
+		color: @darkBlue;
+		letter-spacing: 1.48px;
+	}
+}
+
+.exportPopover {
+	:global(.ant-popover-inner-content) {
+		padding: 0;
+		border-radius: 3px;
+	}
+	.downloadItem {
+		padding: 10px 20px;
+		display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    font-weight: 400;
+		font-size: 12px;
+		&[disabled] {
+			color: rgba(0, 0, 0, 0.25);
+		}
+	}
+}

@@ -8,7 +8,7 @@ import { handleKeyword } from '@app/utils/function';
 import Instruction from '@app/components/Instruction';
 const Option = Select.Option;
 
-import './index.less';
+import styles from './index.module.less';
 
 interface IProps {
   visible: boolean;
@@ -53,7 +53,7 @@ const FieldSelectModal = (props: IProps) => {
   };
   return (
     <Modal
-      className="modal-field-add"
+      className={styles.modalFieldAdd}
       maskClosable={false}
       destroyOnClose={true}
       visible={visible}
@@ -76,11 +76,11 @@ const FieldSelectModal = (props: IProps) => {
         </>
       }
     >
-      <div className="modal-item">
+      <div className={styles.modalItem}>
         <Select
           placeholder={intl.get('schema.selectFields')}
           onChange={handleFieldSelect}
-          className="select-field"
+          className={styles.selectField}
         >
           {source.map(item => (
             <Option value={item.Field} key={item.Field}>
@@ -91,11 +91,11 @@ const FieldSelectModal = (props: IProps) => {
       </div>
       {/* string & fixed string should supply length parameter */}
       {selectedField?.Type.includes('string') && (
-        <div className="modal-item">
+        <div className={styles.modalItem}>
           <Input
             disabled={selectedField?.Type.startsWith('fixed_string')}
             placeholder={indexLength || intl.get('schema.indexedLength')}
-            className="input-index-length"
+            className={styles.inputIndexLength}
             onChange={e => setIndexLength(e.target.value)}
           />
           <Instruction

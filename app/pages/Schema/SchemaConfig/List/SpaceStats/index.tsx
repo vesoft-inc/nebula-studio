@@ -8,7 +8,7 @@ import { IJobStatus } from '@app/interfaces/schema';
 import { trackPageView } from '@app/utils/stat';
 import Cookie from 'js-cookie';
 
-import './index.less';
+import styles from './index.module.less';
 
 const SpaceStats = () => {
   const timer = useRef<NodeJS.Timeout | null>(null);
@@ -96,8 +96,8 @@ const SpaceStats = () => {
     }
   };
   return (
-    <div className="nebula-stats">
-      <div className="operations">
+    <div className={styles.nebulaStats}>
+      <div className={styles.operations}>
         <Button
           type="primary"
           onClick={handleSubmitStats}
@@ -105,13 +105,12 @@ const SpaceStats = () => {
         >
           {intl.get('schema.refresh')}
         </Button>
-        <span className="label">{intl.get('schema.lastRefreshTime')}</span>
+        <span className={styles.label}>{intl.get('schema.lastRefreshTime')}</span>
         <span>
           {updateTime ? dayjs(updateTime).format('YYYY-MM-DD HH:mm:ss') : null}
         </span>
       </div>
       <Table
-        className="expanded-table"
         dataSource={data}
         columns={columns}
         rowKey="Name"

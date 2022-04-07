@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import React from 'react';
 
 import Icon from '@app/components/Icon';
-import './index.less';
+import styles from './index.module.less';
 interface IBtnProps {
   disabled?: boolean;
   action?: () => void;
@@ -28,8 +28,8 @@ const MenuButton: React.FC<IMenuButton> = (props: IMenuButton) => {
   return <div
     className={classnames(
       {
-        'btn-disabled': disabled,
-        'btn-actived': actived,
+        [styles.btnDisabled]: disabled,
+        [styles.btnActived]: actived,
       },
       className,
     )}
@@ -49,7 +49,7 @@ const MenuButton: React.FC<IMenuButton> = (props: IMenuButton) => {
         data-track-category={trackCategory}
         data-track-action={trackAction}
         data-track-label={trackLabel}
-        className="btn-icon"
+        className={styles.btnIcon}
       />
     )}
     {component}

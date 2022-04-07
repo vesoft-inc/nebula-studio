@@ -4,7 +4,9 @@ const path = require('path');
 const { merge } = require('webpack-merge');
 
 const commonConfig = require('./webpack.base');
+const { setEnv } = require('./env');
 
+setEnv('production');
 const publicConfig = {
   mode: 'production',
   output: {

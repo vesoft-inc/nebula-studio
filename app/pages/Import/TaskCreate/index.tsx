@@ -7,9 +7,10 @@ import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
 import { configToJson } from '@app/utils/import';
 import intl from 'react-intl-universal';
-import './index.less';
+import cls from 'classnames';
 import { useHistory } from 'react-router-dom';
 import { POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
+import styles from './index.module.less';
 import PasswordInputModal from './PasswordInputModal';
 import SchemaConfig from './SchemaConfig';
 import FileSelect from './FileSelect';
@@ -141,10 +142,10 @@ const TaskCreate = () => {
     return () => clearConfig();
   }, []);
   return (
-    <div className="nebula-import-create">
+    <div className={styles.importCreate}>
       <Breadcrumb routes={routes} />
-      <div className="create-form center-layout">
-        <Form className="basic-config" layout="vertical" {...formItemLayout}>
+      <div className={cls(styles.createForm, 'studioCenterLayout')}>
+        <Form className={styles.basicConfig} layout="vertical" {...formItemLayout}>
           <Row>
             <Col span={12}>
               <Form.Item label={intl.get('common.space')} required={true}>
@@ -174,18 +175,18 @@ const TaskCreate = () => {
             </Col>
           </Row>
         </Form>
-        <div className="map-config">
-          <Form className="config-column" layout="vertical">
+        <div className={styles.mapConfig}>
+          <Form className={styles.configColumn} layout="vertical">
             <Form.Item label={intl.get('import.vertices')} required={true}>
-              <div className="container">
+              <div className={styles.container}>
                 <FileSelect type="vertices" />
                 {verticesConfig.map((item, index) => <SchemaConfig type="vertices" key={item.name} data={item} configIndex={index} />)}
               </div>
             </Form.Item>
           </Form>
-          <Form className="config-column" layout="vertical">
+          <Form className={styles.configColumn} layout="vertical">
             <Form.Item label={intl.get('import.edge')} required={true}>
-              <div className="container">
+              <div className={styles.container}>
                 <FileSelect type="edge" />
                 {edgesConfig.map((item, index) => <SchemaConfig type="edge" key={item.name} data={item} configIndex={index} />)}
               </div>
@@ -193,7 +194,7 @@ const TaskCreate = () => {
           </Form>
         </div>
       </div>
-      <div className="studio-form-footer">
+      <div className="studioFormFooter">
         <Button onClick={() => history.push('/import/tasks')}>{intl.get('common.cancel')}</Button>
         <Button type="primary" disabled={
           basicConfig.taskName === ''

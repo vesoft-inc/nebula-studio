@@ -13,7 +13,7 @@ const { Content } = Layout;
 
 
 const MainPage = () => {
-  return <Layout className="nebula-studio">
+  return <Layout className="nebulaStudioLayout">
     <Header menus={MENU_LIST} />
     <Switch>
       {RoutesList.map(route => <Route path={route.path} render={() => <>

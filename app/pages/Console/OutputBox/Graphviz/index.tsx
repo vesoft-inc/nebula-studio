@@ -1,7 +1,7 @@
 import { GraphvizOptions, graphviz } from 'd3-graphviz';
 import React, { useEffect, useRef } from 'react';
-
-import './index.less';
+import cls from 'classnames';
+import styles from './index.module.less';
 
 interface IProps {
   graph: string;
@@ -25,7 +25,7 @@ const Graphviz = (props: IProps) => {
   useEffect(() => {
     renderFlowChart();
   }, [graph]);
-  return <div className={`graphviz-box box-${index}`} ref={domRef} />;
+  return <div className={cls(styles.graphvizBox, `box-${index}`)} ref={domRef} />;
 };
 
 export default Graphviz;

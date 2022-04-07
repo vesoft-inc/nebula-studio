@@ -3,8 +3,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '@app/components/Icon';
 
-import './index.less';
-
+import cls from 'classnames';
+import styles from './index.module.less';
 interface IProps {
   routes: {
     path: string;
@@ -19,7 +19,7 @@ const itemRender = (route, _params, routes, _paths) => {
   return final ? (
     <span>{route.breadcrumbName}</span>
   ) : first ? <> 
-    <Link to={routes[routes.length - 2].path}><Icon className="arrow-icon" type="icon-studio-btn-return" /></Link>
+    <Link to={routes[routes.length - 2].path}><Icon className={styles.arrowIcon} type="icon-studio-btn-return" /></Link>
     <Link to={route.path}>{route.breadcrumbName}</Link>
   </> : (
     <Link to={route.path}>
@@ -33,10 +33,11 @@ const NebulaBreadcrumb: React.FC<IProps> = (props: IProps) => {
   return (
     <PageHeader
       title={null}
-      className="nebula-breadcrumb"
+      className={styles.studioBreadcrumb}
       breadcrumbRender={() => {
-        return <div className="breadcrumb-container center-layout">
-          <Breadcrumb 
+        return <div className={cls(styles.breadcrumbContainer, 'studioCenterLayout')}>
+          <Breadcrumb
+            className={styles.breadcrumb}
             routes={routes} 
             itemRender={itemRender} 
           />

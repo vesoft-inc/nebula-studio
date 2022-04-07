@@ -8,33 +8,33 @@ import { LanguageContext } from '@app/context';
 import { INTL_LOCALE_SELECT } from '@app/config';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
-import './index.less';
+import styles from './index.module.less';
 
 const HelpMenu = () => {
   const { toggleLanguage } = useContext(LanguageContext);
   const { global: { username, logout, version } } = useStore();
   return <Menu
-    className="help-menu"
+    className={styles.helpMenu}
     mode="horizontal"
     theme="dark"
     selectedKeys={[]}
   >
     <Menu.Item key="star">
       <a
-        className="nebula-link"
+        className={styles.nebulaLink}
         href="https://github.com/vesoft-inc/nebula"
         target="_blank"
         data-track-category="navigation"
         data-track-action="star_nebula"
         data-track-label="from_navigation" rel="noreferrer">
-        <Icon className="nav-icon" type="icon-studio-nav-github" />
+        <Icon className={styles.navIcon} type="icon-studio-nav-github" />
       </a>
     </Menu.Item>
     <Menu.SubMenu 
       key="language"
-      popupClassName="lang-menu"
+      popupClassName={styles.langMenu}
       popupOffset={[-35, 20]} 
-      title={<Icon className="nav-icon" type="icon-studio-nav-language" />}> 
+      title={<Icon className={styles.navIcon} type="icon-studio-nav-language" />}> 
       {Object.keys(INTL_LOCALE_SELECT).map(locale => {
         return (
           <Menu.Item key={`language-${locale}`} onClick={() => toggleLanguage(INTL_LOCALE_SELECT[locale].NAME)}>
@@ -44,32 +44,32 @@ const HelpMenu = () => {
       })}
     </Menu.SubMenu>
     <Menu.Item key="doc">
-      <Link className="nebula-link" to="/doc">
-        <Icon className="nav-icon" type="icon-studio-nav-help" />
+      <Link className={styles.nebulaLink} to="/doc">
+        <Icon className={styles.navIcon} type="icon-studio-nav-help" />
       </Link>
     </Menu.Item>
     <Menu.SubMenu 
       key="user"
-      popupClassName="account-menu" 
+      popupClassName={styles.accountMenu}
       popupOffset={[-35, 20]}
       title={<div>
         <Avatar size="small" username={username}/>
       </div>}>
       <Menu.Item key="version-log">
         <a
-          className="nebula-link"
+          className={styles.nebulaLink}
           data-track-category="navigation"
           data-track-action="view_changelog"
           href={intl.get('link.versionLogHref')}
           target="_blank" rel="noreferrer"
         >
-          <Icon className="menu-icon" type="icon-studio-nav-version" />
+          <Icon className={styles.menuIcon} type="icon-studio-nav-version" />
           {intl.get('menu.release')}
         </a>
       </Menu.Item>
       <Menu.Item key="user-logout">
-        <span className="nebula-link" onClick={logout}>
-          <Icon className="menu-icon" type="icon-studio-nav-clear" />
+        <span className={styles.nebulaLink} onClick={logout}>
+          <Icon className={styles.menuIcon} type="icon-studio-nav-clear" />
           {intl.get('configServer.clear')}
         </span>
       </Menu.Item>

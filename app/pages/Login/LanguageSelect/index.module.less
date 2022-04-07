@@ -1,0 +1,30 @@
+.selectLabel {
+	display: flex;
+	font-size: 12px;
+	align-items: center;
+	position: relative;
+	svg {
+		margin-right: 4px;
+	}
+}
+
+.selectLang :global(.ant-select-arrow) {
+	display: flex;
+	align-items: center;
+	color: #2F3436;
+}
+
+.dark:global(.ant-select-single) {
+	width: fit-content;
+
+	.ant-select-selector {
+		background: #2f3436;
+		border-color: #2f3436;
+		color: white;
+	}
+
+	svg {
+		fill: #fff;
+	}
+}
+

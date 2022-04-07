@@ -11,7 +11,7 @@ import TagConfig from './TagConfig';
 import EdgeConfig from './EdgeConfig';
 const { Panel } = Collapse;
 
-import './index.less';
+import styles from './index.module.less';
 
 interface IProps {
   type: 'vertices' | 'edge'
@@ -46,17 +46,17 @@ const SchemaConfig = (props: IProps) => {
     <Collapse
       bordered={false}
       defaultActiveKey={['default']}
-      className="config-collapse"
+      className={styles.configCollapse}
     >
       <Panel header={<>
-        <span className="config-count">{type} {configIndex + 1}</span>
+        <span>{type} {configIndex + 1}</span>
         <CSVPreviewLink file={data.file} selected={true}>
           {data.file.name}
         </CSVPreviewLink>
-      </>} key="default" extra={<CloseOutlined className="btn-close" onClick={(e) => handleRemove(e, configIndex)} />}>
-        <div className="config-item">
-          {type === 'vertices' && <div className="id-row">
-            <span className="label">vertexID</span>
+      </>} key="default" extra={<CloseOutlined className={styles.btnClose} onClick={(e) => handleRemove(e, configIndex)} />}>
+        <div className={styles.configItem}>
+          {type === 'vertices' && <div className={styles.idRow}>
+            <span className={styles.label}>vertexID</span>
             <CSVPreviewLink
               onMapping={columnIndex =>
                 updateVerticesConfig({
@@ -72,9 +72,9 @@ const SchemaConfig = (props: IProps) => {
           </div>}
           {type === 'vertices' && data.tags.map((tag, tagIndex) => <TagConfig key={tagIndex} file={data.file} tag={tag} tagIndex={tagIndex} configIndex={configIndex} />)}
           {type === 'edge' && <EdgeConfig configIndex={configIndex} edge={data} />}
-          {type === 'vertices' && <div className="btns">
-            <Button className="primary-btn studio-add-btn" onClick={() => addTag(configIndex)}>
-              <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />
+          {type === 'vertices' && <div className={styles.btns}>
+            <Button className="primaryBtn studioAddBtn" onClick={() => addTag(configIndex)}>
+              <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
               {intl.get('import.addTag')}
             </Button>
           </div>}

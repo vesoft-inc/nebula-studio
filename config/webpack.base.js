@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const Package = require('../package.json')
+
 const commonConfig = {
   entry: {
     app: [path.join(__dirname, '../app/index.tsx')],
@@ -16,7 +17,7 @@ const commonConfig = {
         use: 'babel-loader',
       },
       {
-        test: /\.less/,
+        test: /(?<!module)\.less$/,
         use: [
           'style-loader',
           'css-loader',
@@ -38,6 +39,26 @@ const commonConfig = {
               },
             },
           },
+        ],
+      },
+      {
+        test: /\.module\.less$/,
+        exclude: /node_modules/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                mode: 'local',
+                exportGlobals: true,
+                localIdentName: '[local]__[hash:base64:5]',
+                localIdentContext: path.resolve(__dirname, '..', 'src'),
+              },
+            },
+          },
+          'postcss-loader',
+          { loader: 'less-loader', options: { lessOptions: { javascriptEnabled: true } } },
         ],
       },
       {

@@ -9,7 +9,7 @@ import { useStore } from '@app/stores';
 import nebulaLogo from '@app/static/images/nebula_logo.png';
 import LanguageSelect from './LanguageSelect';
 
-import './index.less';
+import styles from './index.module.less';
 
 const FormItem = Form.Item;
 
@@ -39,15 +39,15 @@ const LoginPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="studio-login">
-      <div className="content">
-        <div className="header">
-          <img className="logo" src={nebulaLogo} />
-          <span className="title">Nebula Studio</span>
+    <div className={styles.studioLogin}>
+      <div className={styles.content}>
+        <div className={styles.header}>
+          <img className={styles.logo} src={nebulaLogo} />
+          <span className={styles.title}>Nebula Studio</span>
         </div>
-        <Form className="login-form" layout="horizontal" {...fomrItemLayout} onFinish={onConfig}>
+        <Form className={styles.loginForm} layout="horizontal" {...fomrItemLayout} onFinish={onConfig}>
           <FormItem noStyle>
-            <span className="form-title">{intl.get('configServer.title')}</span>
+            <span className={styles.formTitle}>{intl.get('configServer.title')}</span>
           </FormItem>
           <FormItem name="host" rules={hostRulesFn()}>
             <Input placeholder={intl.get('configServer.host')} bordered={false} />
@@ -58,13 +58,13 @@ const LoginPage: React.FC = () => {
           <FormItem name="password" rules={passwordRulesFn()}>
             <Input.Password placeholder={intl.get('configServer.password')} bordered={false} />
           </FormItem>
-          <Button className="btn-submit" type="primary" htmlType="submit" loading={loading}>
+          <Button className={styles.btnSubmit} type="primary" htmlType="submit" loading={loading}>
             {intl.get('configServer.connect')}
           </Button>
         </Form>
-        <div className="footer">
-          <div className="info">
-            <span className="version">
+        <div className={styles.footer}>
+          <div className={styles.info}>
+            <span className={styles.version}>
               {intl.get('common.version')}：v{version}
             </span>
             <LanguageSelect />

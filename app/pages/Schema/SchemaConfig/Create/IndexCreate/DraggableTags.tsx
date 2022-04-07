@@ -1,6 +1,7 @@
 import { Tag } from 'antd';
 import React, { Component } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import styles from './index.module.less';
 
 const reorder = (list: string[], startIndex: number, endIndex: number) => {
   const result = Array.from(list);
@@ -44,7 +45,7 @@ export default class DraggableTags extends Component<IProps> {
     const list = this.props.data.map(item => ({
       id: `field-${item}`,
       content: (
-        <Tag className="drag-item" closable={true} onClose={() => this.props.removeData(item)}>
+        <Tag className={styles.dragItem} closable={true} onClose={() => this.props.removeData(item)}>
           {item}
         </Tag>
       ),

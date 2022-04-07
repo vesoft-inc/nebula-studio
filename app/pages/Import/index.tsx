@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { Route, useHistory, useLocation } from 'react-router-dom';
 import intl from 'react-intl-universal';
 import { trackPageView } from '@app/utils/stat';
-
+import cls from 'classnames';
 import FileUpload from './FileUpload';
-import './index.less';
+import styles from './index.module.less';
 import TaskList from './TaskList';
 
 const NewImport = () => {
@@ -24,10 +24,10 @@ const NewImport = () => {
     history.push(`/import/${e.target.value}`);
   };
   return (
-    <div className="nebua-import-page center-layout">
-      <div className="studio-tab-header">
+    <div className={cls(styles.nebuaImportPage, 'studioCenterLayout')}>
+      <div className="studioTabHeader">
         <Radio.Group
-          className="nebula-tab-group"
+          className="studioTabGroup"
           value={tab}
           buttonStyle="solid"
           onChange={handleTabChange}

@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
-import './index.less';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
+import styles from './index.module.less';
 import ColorChangeBtn from './ColorChangeBtn';
 interface IProps {
   id: string;
@@ -39,7 +39,7 @@ const Menu = (props: IProps) => {
   }
 
   return (
-    <div className="context-menu" style={style}>
+    <div className={styles.contextMenu} style={style}>
       {menuConfig.map((item, index) => (
         <Fragment key={index}>{item.component}</Fragment>
       ))}

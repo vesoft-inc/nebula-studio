@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
 import Search from '../Search';
-import './index.less';
+import styles from './index.module.less';
 
 interface IProps {
   onSearch: (value) => void;
@@ -25,16 +25,16 @@ const CommonLayout = (props: IProps) => {
     setExpandKeys(keys);
   };
   return (
-    <div className="nebula-schema-config-list">
-      <div className="header">
-        <Button type="primary" className="studio-add-btn">
+    <div className={styles.schemaConfigList}>
+      <div className={styles.header}>
+        <Button type="primary" className="studioAddBtn">
           <Link
             to={`/schema/${type}/create`}
             data-track-category="navigation"
             data-track-action={`view_${type}_create`}
             data-track-label={`from_${type}_list`}
           >
-            <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />{intl.get('common.create')}
+            <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('common.create')}
           </Link>
         </Button>
         <Search onSearch={onSearch} type={intl.get('common.edge').toLowerCase()} />

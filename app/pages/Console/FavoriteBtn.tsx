@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
 import { useStore } from '@app/stores';
 
-import './index.less';
+import styles from './index.module.less';
 
 
 interface IProps {
@@ -51,7 +51,7 @@ const FavoriteBtn = (props: IProps) => {
   return (
     <>
       <Tooltip title={intl.get('console.favorites')} placement="top">
-        <Icon className="btn-operations" type="icon-studio-btn-save" onClick={() => setVisible(true)} />
+        <Icon className={styles.btnOperations} type="icon-studio-btn-save" onClick={() => setVisible(true)} />
       </Tooltip>
       <Modal
         title={
@@ -65,7 +65,7 @@ const FavoriteBtn = (props: IProps) => {
           </>
         }
         visible={visible}
-        className="favoriteList"
+        className={styles.favoriteList}
         footer={null}
         onCancel={() => setVisible(false)}
       >

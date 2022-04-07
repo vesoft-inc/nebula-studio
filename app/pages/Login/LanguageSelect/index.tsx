@@ -4,14 +4,14 @@ import { INTL_LOCALE_SELECT } from '@app/config';
 import Icon from '@app/components/Icon';
 import { LanguageContext } from '@app/context';
 
-import './index.less';
+import styles from './index.module.less';
 const Option = Select.Option;
 
 const LanguageSelect: React.FC = () => {
   const { currentLocale, toggleLanguage } = useContext(LanguageContext);
   return (
     <Select
-      className="select-lang"
+      className={styles.selectLang}
       size="small"
       value={currentLocale}
       onChange={toggleLanguage}
@@ -19,11 +19,11 @@ const LanguageSelect: React.FC = () => {
     >
       {Object.keys(INTL_LOCALE_SELECT).map(locale => (
         <Option
-          className="dark"
+          className={styles.dark}
           key={locale}
           value={INTL_LOCALE_SELECT[locale].NAME}
           label={
-            <div className="select-label">
+            <div className={styles.selectLabel}>
               <Icon type="icon-studio-nav-language" />
               {INTL_LOCALE_SELECT[locale].TEXT}
             </div>

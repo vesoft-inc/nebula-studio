@@ -1,0 +1,29 @@
+.schemaConfigList {
+  .header {
+		padding-top: 20px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 20px;
+		:global(.ant-btn) {
+			display: flex;
+			align-items: center;
+			a {
+				color: white;
+				line-height: 24px;
+				padding-right: 15px;
+				font-weight: 500;
+				font-size: 14px;
+			}
+		}
+	}
+  .operation {
+		display: flex;
+		button {
+			min-width: 70px;
+		}
+		button:not(:last-child) {
+			margin-right: 15px;
+		}
+	}
+}

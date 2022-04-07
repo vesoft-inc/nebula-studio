@@ -2,12 +2,12 @@ import { Button, Popconfirm, Progress } from 'antd';
 import { CheckCircleFilled } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
-import './index.less';
 import { ITaskItem, ITaskStatus } from '@app/interfaces/import';
 import dayjs from 'dayjs';
 import { floor } from 'lodash';
 import { getFileSize } from '@app/utils/file';
 import Icon from '@app/components/Icon';
+import styles from './index.module.less';
 interface IProps {
   data: ITaskItem;
   handleStop: (id: number) => void;
@@ -78,33 +78,33 @@ const TaskItem = (props: IProps) => {
     }
   }, [taskStatus]);
   return (
-    <div className="task-item">
-      <div className="row">
+    <div className={styles.taskItem}>
+      <div className={styles.row}>
         <span>{intl.get('common.space')}: {space}</span>
         <Button type="link" size="small" onClick={() => handleDownload(taskID)}>
           <Icon type="icon-studio-btn-download" />
           {intl.get('import.downloadConfig')}
         </Button>
       </div>
-      <div className="row">
-        <div className="progress">
-          <div className="progress-info">
-            <span className="task-name">
+      <div className={styles.row}>
+        <div className={styles.progress}>
+          <div className={styles.progressInfo}>
+            <span className={styles.taskName}>
               {name}
-              {taskStatus === ITaskStatus.StatusFinished && <span className="complete-info">
+              {taskStatus === ITaskStatus.StatusFinished && <span className={styles.completeInfo}>
                 <CheckCircleFilled />
                 {intl.get('import.importCompleted')}
-                <span className="red">{extraMsg && ` (${extraMsg})`}</span>
+                <span className={styles.red}>{extraMsg && ` (${extraMsg})`}</span>
               </span>}
-              {taskStatus === ITaskStatus.StatusAborted && <span className="error-info">
+              {taskStatus === ITaskStatus.StatusAborted && <span className={styles.errInfo}>
                 {intl.get('import.importFailed')}
                 {extraMsg && ` (${extraMsg})`}
               </span>}
-              {taskStatus === ITaskStatus.StatusStoped && <span className="error-info">
+              {taskStatus === ITaskStatus.StatusStoped && <span className={styles.errInfo}>
                 {intl.get('import.importStopped')}
               </span>}
             </span>
-            <div className="more-info">
+            <div className={styles.moreInfo}>
               <span>
                 {taskStatus !== ITaskStatus.StatusFinished && `${getFileSize(totalImportedBytes)} / `}
                 {getFileSize(totalBytes)}{' '}
@@ -118,9 +118,8 @@ const TaskItem = (props: IProps) => {
             percent={taskStatus !== ITaskStatus.StatusFinished ? floor(totalImportedBytes / totalBytes * 100, 2) : 100} 
             strokeColor={status && COLOR_MAP[status]} />
         </div>
-        <div className="operations">
-          {/* <Button className="primary-btn">{intl.get('import.details')}</Button> */}
-          <Button className="primary-btn" onClick={() => onViewLog(taskID, space, taskStatus)}>{intl.get('import.viewLogs')}</Button>
+        <div className={styles.operations}>
+          <Button className="primaryBtn" onClick={() => onViewLog(taskID, space, taskStatus)}>{intl.get('import.viewLogs')}</Button>
           {taskStatus === ITaskStatus.StatusProcessing && 
           <Popconfirm
             placement="left"
@@ -129,7 +128,7 @@ const TaskItem = (props: IProps) => {
             okText={intl.get('common.confirm')}
             cancelText={intl.get('common.cancel')}
           >
-            <Button className="cancel-btn">{intl.get('import.endImport')}</Button>
+            <Button className="cancelBtn">{intl.get('import.endImport')}</Button>
           </Popconfirm>}
           {taskStatus !== ITaskStatus.StatusProcessing && 
           <Popconfirm

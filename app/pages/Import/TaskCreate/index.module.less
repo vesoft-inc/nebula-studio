@@ -1,0 +1,28 @@
+@import '~@app/common.less';
+.importCreate {
+  .createForm {
+    padding: 32px 0 100px;
+    label {
+      font-family: Roboto-Bold;
+    }
+    .basicConfig {
+      border-bottom: 1px solid @gray;
+    }
+    .container {
+      background: #FFFFFF;
+      box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 6px;
+      padding: 25px 30px;
+    }
+  }
+  .mapConfig {
+    display: flex;
+    margin-top: 25px;
+    .configColumn {
+      flex: 1;
+    }
+    .configColumn:not(:last-child) {
+      margin-right: 20px;
+    }
+  }
+}

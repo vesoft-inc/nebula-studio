@@ -8,7 +8,7 @@ import Icon from '@app/components/Icon';
 import { DATA_TYPE, EXPLAIN_DATA_TYPE } from '@app/utils/constant';
 
 const Option = Select.Option;
-import './index.less';
+import styles from './index.module.less';
 
 
 const itemLayout = {
@@ -71,10 +71,10 @@ const PropertiesForm = (props: IProps) => {
   };
   return (
     <Form.Item noStyle>
-      <div className="form-item">
+      <div className={styles.formItem}>
         <Form.Item name="propertiesRequired" valuePropName="checked" initialValue={true}>
           <Checkbox onChange={handleClearProperties}>
-            <span className="label">{intl.get('schema.defineFields')}</span>
+            <span className={styles.label}>{intl.get('schema.defineFields')}</span>
           </Checkbox>
         </Form.Item>
         <Form.Item noStyle shouldUpdate={true}>
@@ -82,7 +82,7 @@ const PropertiesForm = (props: IProps) => {
             const propertiesRequired = getFieldValue('propertiesRequired');
             const properties = getFieldValue('properties') || [];
             return (
-              <div className="box-container">
+              <div className={styles.boxContainer}>
                 <Form.List name="properties">
                   {(fields, { add, remove }) => {
                     return (
@@ -90,17 +90,17 @@ const PropertiesForm = (props: IProps) => {
                         <Form.Item noStyle>
                           <Button 
                             type="primary" 
-                            className="studio-add-btn" 
+                            className="studioAddBtn" 
                             disabled={!propertiesRequired}
                             onClick={() => handlePropertyAdd(add)}>
-                            <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />
+                            <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
                             {intl.get('common.addProperty')}
                           </Button>
                         </Form.Item>
                         <Form.Item noStyle>
-                          <Row className="form-header">
-                            <Col span={4} className="required-item">{intl.get('common.propertyName')}</Col>
-                            <Col span={6} className="required-item">{intl.get('common.dataType')}</Col>
+                          <Row className={styles.formHeader}>
+                            <Col span={4} className={styles.requiredItem}>{intl.get('common.propertyName')}</Col>
+                            <Col span={6} className={styles.requiredItem}>{intl.get('common.dataType')}</Col>
                             <Col span={3}>{intl.get('common.allowNull')}</Col>
                             <Col span={5}>{intl.get('common.defaults')}</Col>
                             <Col span={4}>{intl.get('common.comment')}</Col>
@@ -108,7 +108,7 @@ const PropertiesForm = (props: IProps) => {
                         </Form.Item>
                         {fields.map(({ key, name, ...restField }, index) => (
                           <React.Fragment key={key}>
-                            <Row className="fields-item">
+                            <Row className={styles.fieldsItem}>
                               <Col span={4}>
                                 <Form.Item 
                                   name={[name, 'name']} 
@@ -130,7 +130,7 @@ const PropertiesForm = (props: IProps) => {
                                       message: intl.get('formRules.dataTypeRequired'),
                                     },
                                   ]}>
-                                  <Select className="select-type" showSearch={true} onChange={() => handleResetValue(index)} dropdownMatchSelectWidth={false}>
+                                  <Select showSearch={true} onChange={() => handleResetValue(index)} dropdownMatchSelectWidth={false}>
                                     {DATA_TYPE.map(item => {
                                       return (
                                         <Option value={item.value} key={item.value}>
@@ -141,9 +141,9 @@ const PropertiesForm = (props: IProps) => {
                                   </Select>
                                 </Form.Item>
                                 {fields && fields[index] && properties[index].type === 'fixed_string' && (
-                                  <Col offset={14} className="item-string-length">
+                                  <Col offset={14} className={styles.itemStringLength}>
                                     <Form.Item {...restField} 
-                                      className="item-string-length" 
+                                      className={styles.itemStringLength} 
                                       name={[name, 'fixedLength']} 
                                       rules={[
                                         ...numberRulesFn(),
@@ -152,7 +152,7 @@ const PropertiesForm = (props: IProps) => {
                                           message: intl.get('formRules.numberRequired'),
                                         },
                                       ]}>
-                                      <Input className="input-string-length" />
+                                      <Input className={styles.inputStringLength} />
                                     </Form.Item>
                                   </Col>
                                 )}

@@ -2,7 +2,7 @@ import { Button, List, Modal, Tooltip } from 'antd';
 import React, { useState } from 'react';
 import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';
-import './index.less';
+import styles from './index.module.less';
 
 
 interface IProps {
@@ -50,7 +50,7 @@ const HistoryBtn = (props: IProps) => {
         placement="top"
       >
         <Icon
-          className="btn-operations"
+          className={styles.btnOperations}
           type="icon-studio-btn-history"
           onClick={handleView}
         />
@@ -67,7 +67,7 @@ const HistoryBtn = (props: IProps) => {
           </>
         }
         visible={visible}
-        className="historyList"
+        className={styles.historyList}
         footer={null}
         onCancel={() => setVisible(false)}
       >
