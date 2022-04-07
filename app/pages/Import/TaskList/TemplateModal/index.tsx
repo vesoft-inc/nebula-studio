@@ -4,13 +4,13 @@ import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';
 import { Link } from 'react-router-dom';
-import './index.less';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { readFileContent } from '@app/utils/file';
 import yaml from 'js-yaml';
 import json2yaml from 'json2yaml';
 import { exampleJson } from '@app/utils/import';
+import styles from './index.module.less';
 const { Dragger } = Upload;
 const { TextArea } = Input;
 
@@ -89,31 +89,31 @@ const TemplateModal = (props: IProps) => {
       width="820px"
       visible={visible}
       onCancel={onClose}
-      className="config-import-modal"
+      className={styles.configImportModal}
       destroyOnClose={true}
       footer={false}
       title={intl.get('import.importYaml')}
     >
       {!config ? <Spin spinning={loading}>
-        <p className="tip">
+        <p className={styles.tip}>
           {intl.get('import.fileUploadRequired')} 
           <Link to="/import/files">{intl.get('import.uploadFile')}</Link>
           {intl.get('import.fileUploadRequired2')} 
         </p>
-        <p className="tip">
+        <p className={styles.tip}>
           {intl.get('import.exampleDownload')} 
-          <Button type="link" className="btn-example-download" onClick={handleTemplateDownload}>example.yaml</Button>
+          <Button type="link" className={styles.btnExampleDownload} onClick={handleTemplateDownload}>example.yaml</Button>
         </p>
-        <p className="tip">
+        <p className={styles.tip}>
           {intl.get('import.uploadTemplateTip')} 
         </p>
-        <Dragger className="dragger-template" beforeUpload={() => false} onChange={handleFileImport} showUploadList={false} accept=".yaml, .yml">
+        <Dragger className={styles.draggerTemplate} beforeUpload={() => false} onChange={handleFileImport} showUploadList={false} accept=".yaml, .yml">
           <div>
-            <Icon className="btn-add-file" type="icon-studio-btn-add" />
+            <Icon className={styles.btnAddFile} type="icon-studio-btn-add" />
           </div>
-          <div className="drag-tip">
-            <p className="ant-upload-text">{intl.get('import.uploadTemplate')}</p>
-            <p className="ant-upload-hint">
+          <div className={styles.dragTip}>
+            <p className={styles.uploadText}>{intl.get('import.uploadTemplate')}</p>
+            <p className={styles.uploadHint}>
               {intl.get('import.uploadBoxTip')}
             </p>
           </div>
@@ -126,7 +126,7 @@ const TemplateModal = (props: IProps) => {
           <Input />
         </Form.Item>
         <Form.Item label={intl.get('import.config')} name="content" rules={[{ required: true }]}>
-          <TextArea className="config-area" autoSize={true} disabled={true} />
+          <TextArea className={styles.configArea} autoSize={true} disabled={true} />
         </Form.Item>
         <Form.Item noStyle>
           <Button onClick={() => setConfig('')}>{intl.get('import.reUpload')}</Button>

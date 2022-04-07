@@ -6,8 +6,9 @@ import { trackPageView } from '@app/utils/stat';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { NebulaVersion } from '@app/stores/types.d.ts';
-import './index.less';
+import cls from 'classnames';
 import { Link, useHistory } from 'react-router-dom';
+import styles from './index.module.less';
 
 interface IOperations {
   space: string;
@@ -24,7 +25,7 @@ const Operations = (props: IOperations) => {
     onClone(name, space);
     setVisible(false);
   };
-  return <Menu className="operations-space">
+  return <Menu className={styles.operationsSpace}>
     <Menu.Item key="delete">
       <Popconfirm
         onConfirm={() => onDelete(space)}
@@ -126,7 +127,7 @@ const Schema = () => {
       render: data => (
         <Tooltip placement="topLeft" title={data}>
           <Button
-            className="cell-btn"
+            className={styles.cellBtn}
             type="link"
             onClick={() => handleSwitchSpace(data)}
             data-track-category="navigation"
@@ -186,9 +187,9 @@ const Schema = () => {
       render: (_, space) => {
         if (space.ID) {
           return (
-            <div className="operation">
+            <div className={styles.operation}>
               <Button
-                className="primary-btn"
+                className="primaryBtn"
                 onClick={() => handleSwitchSpace(space.Name)}
                 data-track-category="navigation"
                 data-track-action="view_space_list"
@@ -197,7 +198,7 @@ const Schema = () => {
                 {intl.get('common.schema')}
               </Button>
               <Dropdown overlay={<Operations version={nebulaVersion} space={space.Name} onDelete={handleDeleteSpace} onClone={handleCloneSpace} />} placement="bottomLeft">
-                <Icon className="btn-more" type="icon-studio-more" />
+                <Icon className={styles.btnMore} type="icon-studio-more" />
               </Dropdown>
             </div>
           );
@@ -205,23 +206,23 @@ const Schema = () => {
       },
     },
   ];
-  return <div className="schema-page center-layout">
-    <div className="schema-header">
+  return <div className={cls(styles.schemaPage, 'studioCenterLayout')}>
+    <div className={styles.schemaHeader}>
       {intl.get('schema.spaceList')}
     </div>
-    <div className="schema-container">
-      <Button className="studio-add-btn btn-create" type="primary">
+    <div className={styles.schemaContainer}>
+      <Button className={cls(styles.btnCreate, 'studioAddBtn')} type="primary">
         <Link
           to="/schema/space/create"
           data-track-category="navigation"
           data-track-action="view_space_create"
           data-track-label="from_space_list"
         >
-          <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />{intl.get('schema.createSpace')}
+          <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('schema.createSpace')}
         </Link>
       </Button>
       <Table
-        className="table-space-list"
+        className={styles.tableSpaceList}
         dataSource={spaceList}
         columns={columns}
         loading={!!loading}

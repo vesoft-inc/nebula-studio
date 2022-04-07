@@ -3,7 +3,7 @@ import { TwitterPicker } from 'react-color';
 
 import { COLOR_PICK_LIST } from '@app/config/explore';
 
-import './index.less';
+import styles from './index.module.less';
 
 interface IProps {
   onChangeComplete?: (color: string) => void;
@@ -27,7 +27,7 @@ const ColorPicker: React.FC<IProps> = (props: IProps) => {
   return (
     <TwitterPicker
       width="240px"
-      className="custom-picker"
+      className={styles.customPicker}
       onChange={handleChange}
       onChangeComplete={handleChangeComplete}
       colors={COLOR_PICK_LIST}

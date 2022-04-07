@@ -1,0 +1,65 @@
+@import '~@app/common.less';
+.configImportModal {
+  :global(.ant-modal-body) {
+    width:750px;
+    margin: 0 auto;
+    .tip {
+      font-size: 14px;
+      color: #828282;
+    }
+    .btnExampleDownload {
+      padding-left: 0;
+    }
+  }
+  .draggerTemplate {
+    margin-top: 30px;
+    background: #FFFFFF;
+    border: 1px dashed #000000;
+    :global(.ant-upload-btn) {
+      padding: 27px 30px;
+      & > :global(.ant-upload-drag-container) {
+        display: flex;
+      }
+      .btnAddFile svg{
+        width: 95px;
+        height: 95px;
+        padding: 24px;
+        fill: @darkBlue;
+      }
+      .dragTip {
+        display: flex;
+        flex-direction: column;
+        margin-left: 28px;
+        align-items: flex-start;
+        justify-content: space-evenly;
+        text-align: left;
+      }
+      .uploadText {
+        font-weight: 400;
+        font-size: 18px;
+      }
+      .uploadHint {
+        font-weight: 400;
+        font-size: 14px;
+        color: #828282;
+      }
+    }
+  }
+  :global(.ant-form) {
+    text-align: center;
+    .configArea {
+      color: @darkBlue;
+      max-height: 360px !important;
+      overflow: auto;
+      &[disabled] {
+        background-color: #fff;
+      }
+    }
+    button {
+      width: 140px;
+      &:not(:last-child) {
+        margin-right: 10px;
+      }
+    }
+  }
+}

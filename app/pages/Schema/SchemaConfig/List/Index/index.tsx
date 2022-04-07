@@ -11,7 +11,8 @@ import { groupBy } from 'lodash';
 import Cookie from 'js-cookie';
 import CommonLayout from '../CommonLayout';
 
-import './index.less';
+import commonStyles from '../CommonLayout/index.module.less';
+import styles from './index.module.less';
 
 function renderIndexInfo(index: IIndexList) {
   const fieldsColumn = [
@@ -26,7 +27,7 @@ function renderIndexInfo(index: IIndexList) {
   ];
   return (
     <div>
-      <p className="table-inner-title">
+      <p>
         {index.name} {intl.get('common.relatedProperties')}:
       </p>
       <Table
@@ -133,11 +134,11 @@ const IndexList = () => {
         const isRebuild = rebuildList?.some(i => i === index.name);
         if (index.name) {
           return (
-            <div className="operation">
+            <div className={commonStyles.operation}>
               <Button 
                 loading={isRebuild} 
                 onClick={(e) => handleRebuild(e, indexType, index.name)}
-                className="primary-btn">
+                className="primaryBtn">
                 {intl.get('schema.rebuild')}
               </Button>
               <Popconfirm
@@ -148,7 +149,7 @@ const IndexList = () => {
                 okText={intl.get('common.ok')}
                 cancelText={intl.get('common.cancel')}
               >
-                <Button type="link" className="warning-btn" onClick={e => e.stopPropagation()}>
+                <Button type="link" className="warningBtn" onClick={e => e.stopPropagation()}>
                   <Icon type="icon-studio-btn-delete" />
                 </Button>
               </Popconfirm>
@@ -187,9 +188,9 @@ const IndexList = () => {
     columns={columns}
     renderExpandInfo={renderIndexInfo}
     onSearch={setSearchVal} >
-    <div className="index-tab-header">
+    <div className={styles.indexTabHeader}>
       <Radio.Group
-        className="nebula-tab-group"
+        className="studioTabGroup"
         value={indexType}
         buttonStyle="solid"
         onChange={handleTabChange}

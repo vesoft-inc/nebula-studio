@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 import { LinkObject, NodeObject } from '@vesoft-inc/force-graph';
 import ExpandItem from '../ExpandItem';
-import './index.less';
+import styles from './index.module.less';
 const TabPane = Tabs.TabPane;
 
 interface IProps {
@@ -81,8 +81,8 @@ const DisplayComponent = (props: IProps) => {
     });
   };
   return (
-    <div className="display-expand">
-      <Tabs className="header-tab" onChange={setTab} defaultActiveKey={tab}>
+    <div className={styles.displayExpand}>
+      <Tabs className={styles.headerTab} onChange={setTab} defaultActiveKey={tab}>
         <TabPane
           tab={intl.get('import.vertexText') + `(${nodes.length})`}
           key="nodes"
@@ -92,7 +92,7 @@ const DisplayComponent = (props: IProps) => {
           key="links"
         />
       </Tabs>
-      <div className="content">
+      <div className={styles.content}>
         {list[tab].length > 0 && list[tab].map((item: NodeObject | LinkObject, index) => (
           <ExpandItem
             key={index}

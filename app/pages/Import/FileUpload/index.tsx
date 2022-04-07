@@ -8,8 +8,8 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { getFileSize } from '@app/utils/file';
 import { trackPageView } from '@app/utils/stat';
-
-import './index.less';
+import cls from 'classnames';
+import styles from './index.module.less';
 
 const FileUpload = () => {
   const { files } = useStore();
@@ -62,7 +62,7 @@ const FileUpload = () => {
       render: (_, file, index) => {
         if (file.content) {
           return (
-            <div className="operation">
+            <div className={styles.operation}>
               <CSVPreviewLink file={file} btnType="default">
                 <Icon type="icon-studio-btn-detail" />
               </CSVPreviewLink>
@@ -72,7 +72,7 @@ const FileUpload = () => {
                 okText={intl.get('common.ok')}
                 cancelText={intl.get('common.cancel')}
               >
-                <Button className="warning-btn" type="link">
+                <Button className="warningBtn" type="link">
                   <Icon type="icon-studio-btn-delete" />
                 </Button>
               </Popconfirm>
@@ -83,7 +83,7 @@ const FileUpload = () => {
     },
   ];
   return (
-    <div className="nebula-file-upload">
+    <div className={styles.fileUpload}>
       <Upload
         multiple={true}
         accept=".csv"
@@ -96,11 +96,11 @@ const FileUpload = () => {
         customRequest={handleUpdate}
         beforeUpload={transformFile as any}
       >
-        <Button className="studio-add-btn upload-btn" type="primary">
-          <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />{intl.get('import.uploadFile')}
+        <Button className={cls('studioAddBtn', styles.uploadBtn)} type="primary">
+          <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('import.uploadFile')}
         </Button>
       </Upload>
-      <div className="file-list">
+      <div className={styles.fileList}>
         <h3>{intl.get('import.fileTitle')}</h3>
         <Table
           loading={!!loading}

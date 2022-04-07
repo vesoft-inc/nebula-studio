@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
 import { AlterType, IAlterForm, IProperty, ISchemaType } from '@app/interfaces/schema';
 import { DisplayRow, EditRow } from './PropertiesRow';
-import './index.less';
+import styles from './index.module.less';
 const confirm = Modal.confirm;
 
 interface IProps {
@@ -151,30 +151,30 @@ const PropertiesForm = (props: IProps) => {
   return (
     <Form 
       form={form} 
-      className="form-item"
+      className={styles.formItem}
       {...itemLayout}
       onFinish={handlePropertyUpdate}>
       <Form.Item>
         <Checkbox disabled={editDisabled} checked={propertyRequired} onChange={handleClearProperties}>
-          <span className="label">{intl.get('schema.defineFields')}</span>
+          <span className={styles.label}>{intl.get('schema.defineFields')}</span>
         </Checkbox>
       </Form.Item>
       <Form.Item noStyle shouldUpdate={true}>
-        <div className="box-container">
+        <div className={styles.boxContainer}>
           <Form.Item noStyle>
             <Button 
               type="primary" 
-              className="studio-add-btn" 
+              className="studioAddBtn" 
               disabled={!propertyRequired || editDisabled || editField !== null}
               onClick={handlePropertyAdd}>
-              <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />
+              <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
               {intl.get('common.addProperty')}
             </Button>
           </Form.Item>
           <Form.Item noStyle>
-            <Row className="form-header">
-              <Col span={4} className="required-item">{intl.get('common.propertyName')}</Col>
-              <Col span={6} className="required-item">{intl.get('common.dataType')}</Col>
+            <Row className={styles.formHeader}>
+              <Col span={4} className={styles.requiredItem}>{intl.get('common.propertyName')}</Col>
+              <Col span={6} className={styles.requiredItem}>{intl.get('common.dataType')}</Col>
               <Col span={2}>{intl.get('common.allowNull')}</Col>
               <Col span={5}>{intl.get('common.defaults')}</Col>
               <Col span={4}>{intl.get('common.comment')}</Col>

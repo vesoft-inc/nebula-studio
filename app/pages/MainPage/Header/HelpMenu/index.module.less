@@ -1,0 +1,40 @@
+.helpMenu {
+  :global {
+    .ant-menu-submenu, .ant-menu-item, .ant-menu-title-content {
+      display: flex;
+      align-items: center;
+    }
+    .ant-menu-title-content > div {
+      display: flex;
+    }
+  }
+  .nebulaLink {
+    display: inline-flex;
+  }
+  .navIcon > svg {
+    fill: #fff;
+    width: 24px;
+    height: 24px;
+  }
+}
+.accountMenu {
+  :global(.ant-menu-title-content) {
+    color: #fff;
+  }
+  .nebulaLink {
+    color: #fff !important;
+    display: flex;
+    align-items: center;
+  }
+  .menuIcon > svg {
+    fill: #fff;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+  }
+}
+.langMenu {
+  :global(.ant-menu-title-content) {
+    color: #fff;
+  }
+}

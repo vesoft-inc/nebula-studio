@@ -13,7 +13,7 @@ import HistoryBtn from './HistoryBtn';
 import FavoriteBtn from './FavoriteBtn';
 import CypherParameterBox from './CypherParameterBox';
 import ExportModal from './ExportModal';
-import './index.less';
+import styles from './index.module.less';
 const Option = Select.Option;
 
 // split from semicolon out of quotation marks
@@ -124,9 +124,9 @@ const Console = (props: IProps) => {
     trackEvent('navigation', 'view_explore', 'from_console_btn');
   };
   return (
-    <div className="nebula-console">
-      <div className="space-select">
-        <div className="center-layout">
+    <div className={styles.nebulaConsole}>
+      <div className={styles.spaceSelect}>
+        <div className="studioCenterLayout">
           <Select value={currentSpace || null} placeholder={intl.get('console.selectSpace')} onChange={handleSpaceSwitch}>
             {spaces.map(space => (
               <Option value={space} key={space}>
@@ -137,15 +137,15 @@ const Console = (props: IProps) => {
           <Instruction description={intl.get('common.spaceTip')} />
         </div>
       </div>
-      <div className="center-layout">
-        <div className="console-panel">
-          <div className="panel-header">
-            <span className="title">Nebula Console</span>
-            <div className="operations">
+      <div className="studioCenterLayout">
+        <div className={styles.consolePanel}>
+          <div className={styles.panelHeader}>
+            <span className={styles.title}>Nebula Console</span>
+            <div className={styles.operations}>
               <FavoriteBtn onGqlSelect={updateGql} username={username} host={host} />
               <HistoryBtn onGqlSelect={updateGql} />
               <Tooltip title={intl.get('common.empty')} placement="top">
-                <Icon className="btn-operations" type="icon-studio-btn-clear" onClick={() => update({ currentGQL: '' })} />
+                <Icon className={styles.btnOperations} type="icon-studio-btn-clear" onClick={() => update({ currentGQL: '' })} />
               </Tooltip>
               <Button type="primary" onClick={handleRun} loading={runGQLLoading}>
                 <Icon type="icon-studio-btn-play" />
@@ -153,7 +153,7 @@ const Console = (props: IProps) => {
               </Button>
             </div>
           </div>
-          <div className="code-input">
+          <div className={styles.codeInput}>
             {nebulaVersion?.startsWith('v3') && <CypherParameterBox onSelect={addParam} data={paramsMap} />}
             <CodeMirror
               value={currentGQL}

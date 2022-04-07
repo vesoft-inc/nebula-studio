@@ -4,8 +4,8 @@ import { observer } from 'mobx-react-lite';
 import { LinkObject, NodeObject } from '@vesoft-inc/force-graph';
 import { onPointerMove } from '@app/utils';
 import { convertBigNumberToString, removeNullCharacters } from '@app/utils/function';
-import './index.less';
 import rootStore, { useStore } from '@app/stores';
+import styles from './index.module.less';
 
 function NodeTooltip({ node, style, show }: { node: NodeObject; style: React.CSSProperties, show: boolean }) {
   if(!show) {
@@ -33,9 +33,9 @@ function NodeTooltip({ node, style, show }: { node: NodeObject; style: React.CSS
   }, [] as JSX.Element[]);
 
   return (
-    <div className="tooltip" style={style}>
+    <div className={styles.tooltip} style={style}>
       <h4>Vertex Details</h4>
-      <span className="tag" style={{ backgroundColor: (nodeStyle as any)?.fill || '#ff7875' }}>
+      <span className={styles.tag} style={{ backgroundColor: (nodeStyle as any)?.fill || '#ff7875' }}>
         {(tags as string[])?.join(' | ')}
       </span>
       <div>
@@ -63,12 +63,12 @@ function LinkTooltipo({ link, style, show }: { link: LinkObject; style: React.CS
   ));
 
   return (
-    <div className="tooltip" style={style}>
+    <div className={styles.tooltip} style={style}>
       <h4>Edge Details</h4>
-      <div className="edgeType">
-        <span className="line" />
-        <span className="edge">{edgeType}</span>
-        <span className="line" />
+      <div className={styles.edgeType}>
+        <span className={styles.line} />
+        <span className={styles.edge}>{edgeType}</span>
+        <span className={styles.line} />
       </div>
       <div>
         <span>id: </span>

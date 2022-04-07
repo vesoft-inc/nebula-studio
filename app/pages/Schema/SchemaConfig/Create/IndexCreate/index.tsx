@@ -11,11 +11,12 @@ import { IField, IndexType } from '@app/interfaces/schema';
 import Icon from '@app/components/Icon';
 import { trackPageView } from '@app/utils/stat';
 import { handleKeyword } from '@app/utils/function';
+import cls from 'classnames';
 import FieldSelectModal from './FieldSelectModal';
 import DraggableTags from './DraggableTags';
 const Option = Select.Option;
 
-import './index.less';
+import styles from './index.module.less';
 
 
 const formItemLayout = {
@@ -109,11 +110,10 @@ const IndexCreate = () => {
     getAssociatedList('tag');
   }, []);
   return (
-    <div className="index-create-page">
+    <div className={styles.indexCreatePage}>
       <Form form={form} 
         onFieldsChange={updateGql}
         name="form" 
-        className="index-config" 
         layout="vertical" 
         onFinish={handleCreate}
         initialValues={{
@@ -177,16 +177,16 @@ const IndexCreate = () => {
         </Row>
         <Form.Item label={<>
           {intl.get('schema.indexFields')}
-          <span className="tip-draggable">
+          <span>
             {intl.get('schema.dragSorting')}
           </span>
         </>}>
           <Form.Item noStyle name="fields">
             <Button 
               type="primary" 
-              className="studio-add-btn btn-field-add" 
+              className={cls('studioAddBtn', styles.btnFieldAdd)} 
               onClick={() => setVisible(true)}>
-              <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />
+              <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
               {intl.get('common.addProperty')}
             </Button>
           </Form.Item>
@@ -213,12 +213,12 @@ const IndexCreate = () => {
           </Form.Item>
         </Form.Item>
         <Form.Item noStyle>
-          <div className="view-row">
+          <div className={styles.viewRow}>
             <GQLCodeMirror currentGQL={gql} />
           </div>
         </Form.Item>
         <Form.Item noStyle>
-          <div className="studio-form-footer">
+          <div className="studioFormFooter">
             <Button onClick={() => history.push(`/schema/index/list`)}>{intl.get('common.cancel')}</Button>
             <Button type="primary" loading={loading} htmlType="submit">{intl.get('common.create')}</Button>
           </div>

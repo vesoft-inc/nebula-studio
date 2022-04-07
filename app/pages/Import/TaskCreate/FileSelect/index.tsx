@@ -4,8 +4,8 @@ import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { v4 as uuidv4 } from 'uuid';
-import './index.less';
 import Icon from '@app/components/Icon';
+import styles from './index.module.less';
 
 const Option = Select.Option;
 
@@ -48,13 +48,13 @@ const FileSelect = (props: IProps) => {
   return (
     <Popover
       destroyTooltipOnHide={true}
-      overlayClassName="popover-file-select"
+      overlayClassName={styles.popoverFileSelect}
       visible={visible}
       trigger="click"
       onVisibleChange={visible => setVisible(visible)}
-      content={<Form className="file-select-form" onFinish={onFinish} layout="inline">
+      content={<Form className={styles.fileSelectForm} onFinish={onFinish} layout="inline">
         <FormItem name="name" rules={[{ required: true }]}>
-          <Select className="file-select" showSearch={true} dropdownMatchSelectWidth={false}>
+          <Select className={styles.fileSelect} showSearch={true} dropdownMatchSelectWidth={false}>
             {fileList.map((file: any) => (
               <Option value={file.name} key={file.name}>
                 {file.name}
@@ -70,8 +70,8 @@ const FileSelect = (props: IProps) => {
       </Form>}
       title={intl.get('import.selectFile')}
     >
-      <Button type="primary" className="studio-add-btn-icon btn-bind-source" onClick={() => setVisible(true)}>
-        <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />
+      <Button type="primary" className="studioAddBtnIcon" onClick={() => setVisible(true)}>
+        <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
         {intl.get('import.bindDatasource')}
       </Button>
     </Popover>

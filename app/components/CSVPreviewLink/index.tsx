@@ -3,8 +3,8 @@ import { } from 'antd/lib/button';
 import React, { useState } from 'react';
 import intl from 'react-intl-universal';
 import { v4 as uuidv4 } from 'uuid';
-import './index.less';
-import classNames from 'classnames';
+import cls from 'classnames';
+import styles from './index.module.less';
 
 interface IProps {
   file: any;
@@ -33,34 +33,34 @@ const CSVPreviewLink = (props: IProps) => {
         title: onMapping ? (
           <Button
             type="primary"
-            className="csv-select-index"
+            className={styles.csvSelectIndex}
             onClick={() => handleMapping(textIndex)}
           >{`column ${textIndex}`}</Button>
         ) : (
           `Column ${textIndex}`
         ),
         dataIndex: index,
-        render: value => <span className="limit-width">{value}</span>,
+        render: value => <span className={styles.limitWidth}>{value}</span>,
       };
     })
     : [];
   return (
     <Popover
       destroyTooltipOnHide={true}
-      overlayClassName="popover-preview"
+      overlayClassName={styles.popoverPreview}
       visible={visible}
       trigger="click"
       arrowPointAtCenter
       onVisibleChange={visible => setVisible(visible)}
-      content={<div className="csv-preview">
+      content={<div className={styles.csvPreview}>
         <Table
-          className={classNames({ 'noBackground': !!onMapping })}
+          className={cls({ [styles.noBackground]: !!onMapping })}
           dataSource={content}
           columns={columns}
           pagination={false}
           rowKey={() => uuidv4()}
         />
-        <div className="operation">
+        <div className={styles.operation}>
           {onMapping && (
             <Button onClick={() => handleMapping(null)}>
               {intl.get('import.ignore')}
@@ -69,7 +69,7 @@ const CSVPreviewLink = (props: IProps) => {
         </div>
       </div>}
     >
-      <Button type="link" className={classNames('btn-preview', { 'primary-btn': btnType === 'default', 'actived': selected })} onClick={handleLinkClick}>
+      <Button type="link" className={cls(styles.btnPreview, { 'primaryBtn': btnType === 'default', [styles.btnActived]: selected })} onClick={handleLinkClick}>
         {children}
       </Button>
     </Popover>

@@ -12,7 +12,7 @@ import { ISchemaType } from '@app/interfaces/schema';
 import { trackPageView } from '@app/utils/stat';
 import PropertiesForm from './PropertiesForm';
 import TTLForm from './TTLForm';
-import './index.less';
+import styles from './index.module.less';
 
 const formItemLayout = {
   labelCol: {
@@ -73,15 +73,14 @@ const ConfigCreate = (props: IProps) => {
     }
   };
   return (
-    <div className="config-form-group">
+    <div className={styles.configFormGroup}>
       <Form form={basicForm} 
         onFieldsChange={updateGql}
         name="basicForm" 
-        className="basic-config" 
         layout="vertical" 
         onFinish={handleCreate}
         {...formItemLayout}>
-        <Row className="form-item">
+        <Row className={styles.formItem}>
           <Col span={12}>
             <Form.Item label={intl.get('common.name')} name="name" rules={nameRulesFn()}>
               <Input />
@@ -99,7 +98,7 @@ const ConfigCreate = (props: IProps) => {
           <GQLCodeMirror currentGQL={gql} />
         </Form.Item>
         <Form.Item noStyle>
-          <div className="studio-form-footer">
+          <div className="studioFormFooter">
             <Button onClick={() => history.push(`/schema/${createType}/list`)}>{intl.get('common.cancel')}</Button>
             <Button type="primary" loading={loading} htmlType="submit">{intl.get('common.create')}</Button>
           </div>

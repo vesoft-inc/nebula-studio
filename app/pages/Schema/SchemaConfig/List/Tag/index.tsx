@@ -9,6 +9,7 @@ import { sortByFieldAndFilter } from '@app/utils/function';
 import { ITag } from '@app/interfaces/schema';
 import Cookie from 'js-cookie';
 import CommonLayout from '../CommonLayout';
+import styles from '../CommonLayout/index.module.less';
 
 function renderTagInfo(tag: ITag) {
   const fieldsColumn = [
@@ -31,7 +32,7 @@ function renderTagInfo(tag: ITag) {
   ];
   return (
     <div>
-      <p className="table-inner-title">
+      <p>
         {tag.name} {intl.get('common.relatedProperties')}:
       </p>
       <Table
@@ -83,8 +84,8 @@ const TagList = () => {
           return null;
         }
         return (
-          <div className="operation">
-            <Button type="link" className="primary-btn">
+          <div className={styles.operation}>
+            <Button type="link" className="primaryBtn">
               <Link
                 to={{
                   pathname: '/schema/tag/edit',
@@ -105,7 +106,7 @@ const TagList = () => {
               okText={intl.get('common.ok')}
               cancelText={intl.get('common.cancel')}
             >
-              <Button type="link" className="warning-btn" onClick={e => e.stopPropagation()}>
+              <Button type="link" className="warningBtn" onClick={e => e.stopPropagation()}>
                 <Icon type="icon-studio-btn-delete" />
               </Button>
             </Popconfirm>

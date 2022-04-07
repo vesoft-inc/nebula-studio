@@ -4,7 +4,7 @@ import intl from 'react-intl-universal';
 
 import CodeMirror from '@app/components/CodeMirror';
 
-import './index.less';
+import styles from './index.module.less';
 const Panel = Collapse.Panel;
 interface IOptions {
   [propName: string]: any;
@@ -18,7 +18,7 @@ const GQLCodeMirror = (props: { currentGQL: string; option?: IOptions }) => {
     ...props.option,
   };
   return (
-    <Collapse className="export-gql">
+    <Collapse className={styles.exportGql}>
       <Panel header={intl.get('common.exportNGQL')} key="ngql">
         <CodeMirror value={props.currentGQL} options={options} height="80px" />
       </Panel>

@@ -3,11 +3,11 @@ import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { useHistory, useLocation } from 'react-router-dom';
-import './index.less';
 import { useStore } from '@app/stores';
 import { convertBigNumberToString } from '@app/utils/function';
 import { IAlterForm, IProperty, ISchemaType } from '@app/interfaces/schema';
 import { trackPageView } from '@app/utils/stat';
+import styles from './index.module.less';
 import TTLForm from './TTLForm';
 import PropertiesForm from './PropertiesForm';
 
@@ -160,14 +160,13 @@ const ConfigEdit = (props: IProps) => {
     return hasIndex;
   };
   return (
-    <div className="config-edit-group">
+    <div className={styles.configEditGroup}>
       <Spin delay={400} spinning={loading}>
         <Form
-          className="basic-config" 
           layout="vertical" 
           {...formItemLayout}>
           <Form.Item noStyle shouldUpdate={true}>
-            <Row className="form-item">
+            <Row className={styles.formItem}>
               <Col span={12}>
                 <Form.Item label={intl.get('common.name')}>
                   <Input value={editName} disabled />
@@ -177,7 +176,7 @@ const ConfigEdit = (props: IProps) => {
                 <Form.Item label={intl.get('common.comment')}>
                   <Input
                     disabled={editKey !== 'comment'}
-                    className="input-comment"
+                    className={styles.inputComment}
                     defaultValue={data.comment}
                     value={tempComment}
                     onChange={e => setTempComment(e.target.value)}

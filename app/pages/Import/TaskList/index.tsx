@@ -11,7 +11,7 @@ import { ITaskStatus } from '@app/interfaces/import';
 import LogModal from './TaskItem/LogModal';
 import TemplateModal from './TemplateModal';
 
-import './index.less';
+import styles from './index.module.less';
 import TaskItem from './TaskItem';
 
 let isMounted = true;
@@ -88,20 +88,20 @@ const TaskList = () => {
     }
   }, [modalVisible]);
   return (
-    <div className="nebula-data-import">
-      <div className="task-btns">
+    <div className={styles.nebulaDataImport}>
+      <div className={styles.taskBtns}>
         <Button
-          className="studio-add-btn upload-btn"
+          className="studioAddBtn"
           type="primary"
           onClick={() => history.push('/import/create')}
         >
-          <Icon className="studio-add-btn-icon" type="icon-studio-btn-add" />{intl.get('import.createTask')}
+          <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('import.createTask')}
         </Button>
-        <Button className="upload-btn" type="default" onClick={() => setImportModalVisible(true)}>
+        <Button type="default" onClick={() => setImportModalVisible(true)}>
           {intl.get('import.uploadTemp')}
         </Button>
       </div>
-      <h3 className="task-header">{intl.get('import.taskList')} ({taskList.length})</h3>
+      <h3 className={styles.taskHeader}>{intl.get('import.taskList')} ({taskList.length})</h3>
       {taskList.map(item => (
         <TaskItem key={item.taskID} 
           data={item}

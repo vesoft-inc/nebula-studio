@@ -8,12 +8,12 @@ import { trackEvent } from '@app/utils/stat';
 import { v4 as uuidv4 } from 'uuid';
 import Icon from '@app/components/Icon';
 import { parseSubGraph } from '@app/utils/parseData';
-import classNames from 'classnames';
+import cls from 'classnames';
 import { GraphStore } from '@app/stores/graph';
 import Graphviz from './Graphviz';
 import ForceGraph from './ForceGraph';
 
-import './index.less';
+import styles from './index.module.less';
 
 interface IProps {
   index: number;
@@ -231,12 +231,12 @@ const OutputBox = (props: IProps) => {
     });
   };
 
-  return <div className="output-box">
-    <div className="output-header">
-      <p className={classNames('gql', { 'error-info': code !== 0 })} onClick={() => onHistoryItem(gql)}>
+  return <div className={styles.outputBox}>
+    <div className={styles.outputHeader}>
+      <p className={cls(styles.gql, { [styles.errorInfo]: code !== 0 })} onClick={() => onHistoryItem(gql)}>
         $ {gql}
       </p>
-      <div className="output-operations">
+      <div className={styles.outputOperations}>
         {!isFavorited ? <Tooltip title={intl.get('console.addToFavorites')} placement="top">
           <Icon
             type="icon-studio-btn-save"
@@ -244,24 +244,24 @@ const OutputBox = (props: IProps) => {
           />
         </Tooltip> : <Tooltip title={intl.get('console.unfavorite')} placement="top">
           <Icon
-            className="btn-yellow"
+            className={styles.btnYellow}
             type="icon-studio-btn-save-fill"
             onClick={removeFavorite}
           />
         </Tooltip>}
         <Popover
-          overlayClassName="export-popover"
+          overlayClassName={styles.exportPopover}
           placement="bottom"
           content={<>
-            <Button type="link" className="download-item" onClick={downloadCsv}>
+            <Button type="link" className={styles.downloadItem} onClick={downloadCsv}>
               {intl.get('schema.csvDownload')}
             </Button>
-            <Button disabled={!graph || tab !== 'graph'} type="link" className="download-item" onClick={downloadPng}>
+            <Button disabled={!graph || tab !== 'graph'} type="link" className={styles.downloadItem} onClick={downloadPng}>
               {intl.get('schema.pngDownload')}
             </Button>
           </>}
         >
-          <Icon className="btn-export" type="icon-studio-btn-output" />
+          <Icon className={styles.btnExport} type="icon-studio-btn-output" />
         </Popover>
         <Icon
           type={visible ? 'icon-studio-btn-up' : 'icon-studio-btn-down'}
@@ -274,9 +274,9 @@ const OutputBox = (props: IProps) => {
       </div>
     </div>
     {visible && <> 
-      <div className="tab-container">
+      <div className={styles.tabContainer}>
         <Tabs
-          className="output-tab"
+          className={styles.outputTab}
           defaultActiveKey={'log'}
           size={'large'}
           tabPosition={'left'}
@@ -340,18 +340,18 @@ const OutputBox = (props: IProps) => {
               }
               key="log"
             >
-              <div className="err-container">{message}</div>
+              <div className={styles.errContainer}>{message}</div>
             </Tabs.TabPane>
           )}
         </Tabs>
       </div>
       {code === 0 && data.timeCost !== undefined && (
-        <div className="output-footer">
+        <div className={styles.outputFooter}>
           <span>
             {`${intl.get('console.execTime')} ${data.timeCost /
               1000000} (s)`}
           </span>
-          {onExplorer && <Button className="primary-btn" type="text" onClick={handleExplore}>{intl.get('common.openInExplore')}</Button>}
+          {onExplorer && <Button className="primaryBtn" type="text" onClick={handleExplore}>{intl.get('common.openInExplore')}</Button>}
         </div>
       )}
     </>}

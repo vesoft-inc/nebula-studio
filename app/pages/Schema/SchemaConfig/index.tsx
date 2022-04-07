@@ -7,6 +7,7 @@ import Breadcrumb from '@app/components/Breadcrumb';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { LanguageContext } from '@app/context';
+import cls from 'classnames';
 import TagList from './List/Tag';
 import EdgeList from './List/Edge';
 import IndexList from './List/Index/index';
@@ -14,7 +15,7 @@ import SpaceStats from './List/SpaceStats';
 import CommonCreate from './Create/CommonCreate';
 import IndexCreate from './Create/IndexCreate';
 import CommonEdit from './Edit/CommonEdit';
-import './index.less';
+import styles from './index.module.less';
 const Option = Select.Option;
 
 const SchemaConfig = () => {
@@ -74,9 +75,9 @@ const SchemaConfig = () => {
     history.push(`/schema/${e.target.value}/list`);
   };
   return (
-    <div className="nebula-schema-page">
-      <Breadcrumb routes={routes} extraNode={<div className="space-select">
-        <span className="label">{intl.get('common.currentSpace')}</span>
+    <div className={styles.schemaPage}>
+      <Breadcrumb routes={routes} extraNode={<div className={styles.spaceSelect}>
+        <span className={styles.label}>{intl.get('common.currentSpace')}</span>
         {action !== 'edit' ? <Select value={currentSpace} onChange={value => handleUpdateSpace(value)}>
           {spaces.map(space => (
             <Option value={space} key={space}>
@@ -85,10 +86,10 @@ const SchemaConfig = () => {
           ))}
         </Select> : <span>{currentSpace}</span>}
       </div>} />
-      <div className="list-container center-layout">
-        {action === 'list' && <div className="studio-tab-header">
+      <div className={cls(styles.listContainer, 'studioCenterLayout')}>
+        {action === 'list' && <div className="studioTabHeader">
           <Radio.Group
-            className="nebula-tab-group"
+            className="studioTabGroup"
             value={tab}
             buttonStyle="solid"
             onChange={handleTabChange}

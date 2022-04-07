@@ -5,7 +5,7 @@ import { AlterType, IProperty } from '@app/interfaces/schema';
 import { nameRulesFn, numberRulesFn } from '@app/config/rules';
 import { DATA_TYPE, EXPLAIN_DATA_TYPE } from '@app/utils/constant';
 
-import './index.less';
+import styles from './index.module.less';
 const Option = Select.Option;
 
 interface IEditProperty extends IProperty {
@@ -26,7 +26,7 @@ interface IEditProps {
 
 export const DisplayRow = (props: IProps) => {
   const { data, onEditBefore, onDelete, disabled } = props;
-  return <Row className="fields-item">
+  return <Row className={styles.fieldsItem}>
     <Col span={4}>
       {data.name}
     </Col>
@@ -42,7 +42,7 @@ export const DisplayRow = (props: IProps) => {
     <Col span={4}>
       {data.comment}
     </Col>
-    <Col span={3} className="operations">
+    <Col span={3} className={styles.operations}>
       <Button
         type="link"
         onClick={() => onEditBefore(data)}
@@ -81,7 +81,7 @@ export const EditRow = (props: IEditProps) => {
       {({ getFieldValue }) => {
         const currentType = getFieldValue('type');
         return (
-          <Row className="fields-item">
+          <Row className={styles.fieldsItem}>
             <Col span={4}>
               <Form.Item 
                 name="name"
@@ -101,7 +101,7 @@ export const EditRow = (props: IEditProps) => {
                     message: intl.get('formRules.dataTypeRequired'),
                   },
                 ]}>
-                <Select className="select-type" showSearch={true} onChange={onUpdateType} dropdownMatchSelectWidth={false}>
+                <Select showSearch={true} onChange={onUpdateType} dropdownMatchSelectWidth={false}>
                   {DATA_TYPE.map(item => {
                     return (
                       <Option value={item.value} key={item.value}>
@@ -111,9 +111,9 @@ export const EditRow = (props: IEditProps) => {
                   })}
                 </Select>
               </Form.Item>
-              <Col offset={14} className="item-string-length">
+              <Col offset={14} className={styles.itemStringLength}>
                 {currentType === 'fixed_string' && <Form.Item  
-                  className="item-string-length" 
+                  className={styles.itemStringLength} 
                   name="fixedLength"
                   initialValue={fixedLength}
                   rules={[
@@ -123,7 +123,7 @@ export const EditRow = (props: IEditProps) => {
                       message: intl.get('formRules.numberRequired'),
                     },
                   ]}>
-                  <Input className="input-string-length" />
+                  <Input className={styles.inputStringLength} />
                 </Form.Item>}
               </Col>
             </Col>
@@ -159,7 +159,7 @@ export const EditRow = (props: IEditProps) => {
                 <Input />
               </Form.Item>
             </Col>
-            <Col span={3} className="operations">
+            <Col span={3} className={styles.operations}>
               <Form.Item noStyle>
                 <Button
                   type="link"

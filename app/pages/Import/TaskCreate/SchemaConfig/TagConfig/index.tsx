@@ -7,6 +7,8 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import CSVPreviewLink from '@app/components/CSVPreviewLink';
 import classNames from 'classnames';
+import styles from '../index.module.less';
+
 const Option = Select.Option;
 
 interface IProps {
@@ -67,13 +69,13 @@ const VerticesConfig = (props: IProps) => {
     updateTagPropMapping({ configIndex, tagIndex });
   };
   return (
-    <div className="config-container">
-      <div className="tag-select-row">
-        <div className="left">
-          <span className="label">Tag</span>
+    <div className={styles.configContainer}>
+      <div className={styles.tagSelectRow}>
+        <div className={styles.left}>
+          <span className={styles.label}>Tag</span>
           <Select
             bordered={false}
-            className={classNames('tag-select', { 'no-value': !tag.name })}
+            className={classNames(styles.tagSelect, { [styles.noValue]: !tag.name })}
             placeholder={intl.get('import.selectTag')}
             value={tag.name || null}
             dropdownMatchSelectWidth={false}
@@ -86,10 +88,9 @@ const VerticesConfig = (props: IProps) => {
             ))}
           </Select>
         </div>
-        <CloseOutlined className="btn-close" onClick={handleRemoveTag} />
+        <CloseOutlined className={styles.btnClose} onClick={handleRemoveTag} />
       </div>
       {tag.name && <Table
-        className="props-table"
         dataSource={tag.props}
         columns={columns}
         rowKey="name"

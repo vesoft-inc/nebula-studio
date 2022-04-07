@@ -6,7 +6,6 @@ import { uniq } from 'lodash';
 import { GraphStore } from '@app/stores/graph';
 import NodeStyleSetBtn from '../NodeStyleSetBtn';
 
-import './index.less';
 interface IProps {
   graph: GraphStore;
   onClose?: () => void;
@@ -40,7 +39,6 @@ const ColorChangeBtn: React.FC<IProps> = (props: IProps) => {
   }
   return (
     <MenuButton
-      className="menu-color"
       component={
         <NodeStyleSetBtn
           disabled={nodesSelected.size === 0}

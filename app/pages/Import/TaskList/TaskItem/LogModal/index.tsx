@@ -3,9 +3,9 @@ import _ from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';
-import './index.less';
 import { useStore } from '@app/stores';
 import { ITaskStatus } from '@app/interfaces/import';
+import styles from './index.module.less';
 
 const { TabPane } = Tabs;
 
@@ -60,6 +60,7 @@ const LogModal = (props: IProps) => {
     const res = await getLogDetail({
       offset: offset.current,
       id,
+      limit: 500,
       name: currentLog!.name
     });
     handleLogData(res);
@@ -106,11 +107,11 @@ const LogModal = (props: IProps) => {
   return (
     <Modal
       title={<>
-        <div className="import-modal-title">
+        <div className={styles.importModalTitle}>
           <span>{`${space} ${intl.get('import.task')} - ${intl.get('common.log')}`}</span>
           {status === ITaskStatus.StatusProcessing && <Button type="text" loading={true} />}
         </div>
-        <Button className="studio-add-btn primary-btn" onClick={handleLogDownload}>
+        <Button className="studioAddBtn primaryBtn" onClick={handleLogDownload}>
           <Icon type="icon-studio-btn-download" />
           {intl.get('import.downloadLog')}
         </Button>
@@ -118,16 +119,16 @@ const LogModal = (props: IProps) => {
       width="80%"
       visible={visible}
       onCancel={onCancel}
-      wrapClassName="log-modal"
+      wrapClassName={styles.logModal}
       destroyOnClose={true}
       footer={false}
     >
-      <Tabs className="log-tab" tabBarGutter={0} tabPosition="left" onChange={handleTabChange}>
+      <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange}>
         {logs.map(log => (
           <TabPane tab={`${log.name}`} key={log.name} />
         ))}
       </Tabs>
-      <div className="log-container" ref={logRef}/>
+      <div className={styles.logContainer} ref={logRef}/>
     </Modal>
   );
 };

@@ -4,7 +4,7 @@ import React from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 
-import './index.less';
+import styles from './index.module.less';
 const Option = Select.Option;
 
 const innerItemLayout = {
@@ -32,10 +32,10 @@ const formRef = ((props: IProps) => {
   };
   return (
     <Form.Item noStyle>
-      <div className="form-item">
+      <div className={styles.formItem}>
         <Form.Item name="ttlRequired" valuePropName="checked" initialValue={false}>
           <Checkbox onChange={handleClearTtl}>
-            <span className="label">{intl.get('schema.setTTL')}</span>
+            <span className={styles.label}>{intl.get('schema.setTTL')}</span>
           </Checkbox>
         </Form.Item>
         <Form.Item noStyle shouldUpdate={true}>
@@ -46,10 +46,10 @@ const formRef = ((props: IProps) => {
               ['int', 'int64', 'timestamp'].includes(i.type),
             );
             return (
-              <div className="box-container">
+              <div className={styles.boxContainer}>
                 <Row>
                   <Col span={12}>
-                    <Form.Item className="inline-item" label="TTL_COL" {...innerItemLayout} name="ttl_col" rules={[
+                    <Form.Item className={styles.inlineItem} label="TTL_COL" {...innerItemLayout} name="ttl_col" rules={[
                       {
                         required: ttlRequired,
                         message: intl.get('formRules.ttlRequired'),
@@ -65,7 +65,7 @@ const formRef = ((props: IProps) => {
                     </Form.Item>
                   </Col>
                   <Col span={12}>
-                    <Form.Item className="inline-item" label="TTL_DURATION" {...innerItemLayout} name="ttl_duration" rules={[
+                    <Form.Item className={styles.inlineItem} label="TTL_DURATION" {...innerItemLayout} name="ttl_duration" rules={[
                       {
                         required: ttlRequired,
                         message: intl.get('formRules.ttlDurationRequired'),

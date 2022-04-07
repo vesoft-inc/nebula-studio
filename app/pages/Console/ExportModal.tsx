@@ -4,7 +4,7 @@ import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 
-import './index.less';
+import styles from './index.module.less';
 const Option = Select.Option;
 
 const layout = {
@@ -65,7 +65,7 @@ const ExportModal = (props: IProps) => {
   }
   return (
     <Modal
-      className="export-node-modal"
+      className={styles.exportNodeModal}
       footer={null}
       width="650px"
       visible={visible}
@@ -74,8 +74,8 @@ const ExportModal = (props: IProps) => {
       <Form {...layout} onFinish={handleExport} initialValues={{
         type: 'vertex'
       }}>
-        <Form.Item name="type" className="select-type">
-          <Radio.Group className="nebula-tab-group" buttonStyle="solid">
+        <Form.Item name="type" className={styles.selectType}>
+          <Radio.Group className="studioTabGroup" buttonStyle="solid">
             <Radio.Button value="vertex">
               {intl.get('import.vertexText')}
             </Radio.Button>
@@ -89,7 +89,7 @@ const ExportModal = (props: IProps) => {
             const type = getFieldValue('type');
             return type === 'vertex' ? <>
               <p>{intl.get('console.exportVertex')}</p>
-              <Form.Item className="select-component" label="vid" name="vertexId" rules={[{ required: true }]}>
+              <Form.Item label="vid" name="vertexId" rules={[{ required: true }]}>
                 <Select>
                   {headers.map(i => (
                     <Option value={i} key={i}>
@@ -100,10 +100,10 @@ const ExportModal = (props: IProps) => {
               </Form.Item>
             </> : <> 
               <p>{intl.get('console.exportEdge')}</p>
-              <Form.Item className="select-component" label="Edge Type" name="edgeType" rules={[{ required: true }]}>
+              <Form.Item label="Edge Type" name="edgeType" rules={[{ required: true }]}>
                 <Input />
               </Form.Item>
-              <Form.Item className="select-component" label="Src ID" name="srcId" rules={[{ required: true }]}>
+              <Form.Item label="Src ID" name="srcId" rules={[{ required: true }]}>
                 <Select>
                   {headers.map(i => (
                     <Option value={i} key={i}>
@@ -112,7 +112,7 @@ const ExportModal = (props: IProps) => {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item className="select-component" label="Dst ID" name="dstId" rules={[{ required: true }]}>
+              <Form.Item label="Dst ID" name="dstId" rules={[{ required: true }]}>
                 <Select>
                   {headers.map(i => (
                     <Option value={i} key={i}>
@@ -121,7 +121,7 @@ const ExportModal = (props: IProps) => {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item className="select-component" label="Rank" name="rank">
+              <Form.Item label="Rank" name="rank">
                 <Select allowClear={true}>
                   {headers.map(i => (
                     <Option value={i} key={i}>

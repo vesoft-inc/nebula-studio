@@ -6,7 +6,7 @@ import Icon from '@app/components/Icon';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import HelpMenu from './HelpMenu';
-import './index.less';
+import styles from './index.module.less';
 const { Header } = Layout;
 
 interface IMenuItem {
@@ -40,13 +40,13 @@ const PageHeader = (props: IProps) => {
     setActiveKey(activeKey);
   }, [pathname]);
 
-  return <Header className="studio-header">
-    <div className="nebula-logo">
+  return <Header className={styles.studioHeader}>
+    <div className={styles.nebulaLogo}>
       Nebula Studio
     </div>
     {host && username ? <>
       <Menu
-        className="main-menu"
+        className={styles.mainMenu}
         mode="horizontal"
         theme="dark"
         selectedKeys={[activeKey]}
@@ -54,13 +54,13 @@ const PageHeader = (props: IProps) => {
       >
         {menus.map(item => <Menu.Item key={item.key}>
           <Link
-            className="nav-link"
+            className={styles.navLink}
             to={item.path}
             data-track-category={item.track.category}
             data-track-action={item.track.action}
             data-track-label={item.track.label}
           >
-            <Icon className="nav-icon" type={item.icon} />
+            <Icon className={styles.navIcon} type={item.icon} />
             {intl.get(item.intlKey)}
           </Link>
         </Menu.Item>)}

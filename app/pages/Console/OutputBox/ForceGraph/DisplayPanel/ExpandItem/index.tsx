@@ -3,8 +3,8 @@ import intl from 'react-intl-universal';
 
 import Icon from '@app/components/Icon';
 import { convertBigNumberToString, removeNullCharacters } from '@app/utils/function';
-
-import './index.less';
+import cls from 'classnames';
+import styles from './index.module.less';
 
 interface IProps {
   data: any;
@@ -42,9 +42,9 @@ const Property: React.FC<IProperty> = (props: IProperty) => {
       return convertBigNumberToString(value); 
     }
   };
-  return <div className="item-content">
-    <span className="item-key">{data.key} : </span>
-    <span className="item-value">{handleValueShow(data)}</span>
+  return <div className={styles.itemContent}>
+    <span className={styles.itemKey}>{data.key} : </span>
+    <span className={styles.itemValue}>{handleValueShow(data)}</span>
   </div>;
 };
 
@@ -57,13 +57,13 @@ const RowItem = (props: IProps) => {
   const [dataUnfolded, setDataUnfoldedStatus] = useState(index === 0);
   const needUnfoldMore = data.length > EXPAND_NUM;
   const [hasUnfoldAll, setUnfoldAllStatus] = useState(false);
-  return <div className="display-row-item">
+  return <div className={styles.displayRowItem}>
     <div
-      className="item-header row"
+      className={cls(styles.itemHeader, styles.row)}
       onClick={() => setDataUnfoldedStatus(!dataUnfolded)}
     >
       {dataUnfolded ? <Icon type="icon-studio-btn-down" /> : <Icon type="icon-studio-btn-up" />}
-      <span className="display-header-title">{title}</span>
+      <span className={styles.displayHeaderTitle}>{title}</span>
     </div>
     {dataUnfolded && (
       <>
@@ -72,13 +72,13 @@ const RowItem = (props: IProps) => {
           <>
             {hasUnfoldAll && data.slice(EXPAND_NUM).map(item => <Property key={item.key} data={item} />)}
             <div
-              className="item-operation row"
+              className={cls(styles.itemOperation, styles.row)}
               onClick={() => setUnfoldAllStatus(!hasUnfoldAll)}
             >
-              {hasUnfoldAll ? <div className="btn-toggle">
+              {hasUnfoldAll ? <div className={styles.btnToggle}>
                 <Icon type="icon-studio-btn-up" />
                 <span>{intl.get('explore.collapseItem')}</span>
-              </div> : <div className="btn-toggle">
+              </div> : <div className={styles.btnToggle}>
                 <Icon type="icon-studio-btn-down" />
                 <span>{intl.get('explore.expandItem')}</span>
               </div>}

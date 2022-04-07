@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { GraphStore } from '@app/stores/graph';
 import Icon from '@app/components/Icon';
 
-import './index.less';
+import styles from './index.module.less';
 
 interface IProps {
   graph: GraphStore
@@ -24,7 +24,7 @@ const OperationPanel = (props: IProps) => {
   };
 
   return (
-    <div className="canvas-operations">
+    <div className={styles.canvasOperations}>
       <Icon onMouseDown={() => handleZoom('in')} onMouseUp={endZoom} type="icon-studio-console-zoomin" />
       <Icon onMouseDown={() => handleZoom('out')} onMouseUp={endZoom} type="icon-studio-console-zoomout" />
     </div>

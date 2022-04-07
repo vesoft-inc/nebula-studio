@@ -9,6 +9,7 @@ import { sortByFieldAndFilter } from '@app/utils/function';
 import { IEdge } from '@app/interfaces/schema';
 import Cookie from 'js-cookie';
 import CommonLayout from '../CommonLayout';
+import styles from '../CommonLayout/index.module.less';
 
 function renderEdgeInfo(edge: IEdge) {
   const fieldsColumn = [
@@ -31,7 +32,7 @@ function renderEdgeInfo(edge: IEdge) {
   ];
   return (
     <div>
-      <p className="table-inner-title">
+      <p>
         {edge.name} {intl.get('common.relatedProperties')}:
       </p>
       <Table
@@ -80,8 +81,8 @@ const EdgeList = () => {
       render: (_, edge) => {
         if (edge.name) {
           return (
-            <div className="operation">
-              <Button type="link" className="primary-btn">
+            <div className={styles.operation}>
+              <Button type="link" className="primaryBtn">
                 <Link
                   to={{
                     pathname: '/schema/edge/edit',
@@ -102,7 +103,7 @@ const EdgeList = () => {
                 okText={intl.get('common.ok')}
                 cancelText={intl.get('common.cancel')}
               >
-                <Button type="link" className="warning-btn" onClick={e => e.stopPropagation()}>
+                <Button type="link" className="warningBtn" onClick={e => e.stopPropagation()}>
                   <Icon type="icon-studio-btn-delete" />
                 </Button>
               </Popconfirm>

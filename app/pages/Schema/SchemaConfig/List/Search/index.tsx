@@ -4,7 +4,7 @@ import intl from 'react-intl-universal';
 import { SearchOutlined } from '@ant-design/icons';
 import { useLocation } from 'react-router-dom';
 
-import './index.less';
+import styles from './index.module.less';
 
 interface IProps {
   onSearch: (value) => void;
@@ -19,10 +19,10 @@ const Search = (props: IProps) => {
     setValue('');
   }, [location.pathname]);
   return (
-    <div className="schema-list-search">
+    <div className={styles.schemaSearch}>
       <Input
         value={value}
-        prefix={<SearchOutlined className="input-search" onClick={() => onSearch(value)} />}
+        prefix={<SearchOutlined className={styles.inputSearch} onClick={() => onSearch(value)} />}
         allowClear={true}
         placeholder={intl.get('common.namePlaceholder', { name: type })}
         onChange={e => setValue(e.target.value)}

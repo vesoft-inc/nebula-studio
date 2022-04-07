@@ -1,0 +1,52 @@
+@import '~@app/common.less';
+.studioBreadcrumb {
+	height: 60px;
+	background-color: #fff;
+	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+	font-size: 18px;
+	align-items: center;
+	display: flex;
+	padding-left: 0;
+	padding-right: 0;
+	.arrowIcon > svg {
+		width: 23px;
+		height: 23px;
+		margin-right: 15px;
+	}
+	.breadcrumbContainer {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+	.breadcrumb {
+		flex: 1;
+		display: inline-flex;
+		align-items: center;
+		font-size: 18px;
+		margin-right: 15px;
+		& > span {
+			display: inline-flex;
+			align-items: center;
+			:global(.ant-breadcrumb-link), a {
+				display: inline-flex;
+				align-items: center;
+			}
+			a, :global(.ant-breadcrumb-link span) {
+				word-break: break-all;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+    		max-width: 500px;
+			}
+		}
+		& > span:last-child {
+			a, span {
+				color: @darkBlue;
+				font-weight: 600;
+			}
+		}
+	}
+	&:global(.has-breadcrumb) {
+		padding: 0;
+	}
+}

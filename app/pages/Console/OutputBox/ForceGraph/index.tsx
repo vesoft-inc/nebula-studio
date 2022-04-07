@@ -10,7 +10,7 @@ import DisplayPanel from './DisplayPanel';
 import OperationPanel from './OperationPanel';
 import Menu from './Menu';
 import { initBrushSelect } from './BrushSelect';
-import './index.less';
+import styles from './index.module.less';
 
 interface IProps {
   data: any;
@@ -49,8 +49,8 @@ const ForceGraphBox = (props: IProps) => {
   const selected = nodesSelected && (nodesSelected.size > 0 || linksSelected.size > 0);
   return (
     <div className="explore-main-canvas">
-      {loading && <Spin className="graph-loading" />}
-      <div id={uuid} className="force-graph" ref={grapfDomRef} />
+      {loading && <Spin className={styles.graphLoading} />}
+      <div id={uuid} className={styles.forceGraph} ref={grapfDomRef} />
       {currentGraph && <>
         <OperationPanel graph={currentGraph} />
         <Menu id={uuid} />

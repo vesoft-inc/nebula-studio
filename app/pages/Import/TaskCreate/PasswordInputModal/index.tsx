@@ -3,7 +3,7 @@ import _ from 'lodash';
 import React, { useState } from 'react';
 import intl from 'react-intl-universal';
 
-import './index.less';
+import styles from './index.module.less';
 interface IProps {
   visible: boolean;
   onConfirm: (password?: string) => void
@@ -20,14 +20,14 @@ const PasswordInputModal = (props: IProps) => {
       title={intl.get('import.enterPassword')}
       visible={visible}
       onCancel={() => onConfirm()}
-      className="password-modal"
+      className={styles.passwordModal}
       footer={false}
     >
       <Input.Password
         value={password}
         onChange={e => setPassword(e.target.value)}
       />
-      <div className="btns">
+      <div className={styles.btns}>
         <Button onClick={() => handleConfirm()}>
           {intl.get('common.cancel')}
         </Button>

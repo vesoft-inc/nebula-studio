@@ -3,7 +3,7 @@ import intl from 'react-intl-universal';
 import { Popover, Tabs } from 'antd';
 import ColorPicker from '@app/components/ColorPicker';
 
-import './index.less';
+import styles from './index.module.less';
 
 const TabPane = Tabs.TabPane;
 
@@ -24,7 +24,7 @@ const SetContent: React.FC<ISetProps> = (props: ISetProps) => {
 
   return (
     <div>
-      <Tabs onChange={setTagType} defaultActiveKey={tagType} className="tab-type-set">
+      <Tabs onChange={setTagType} defaultActiveKey={tagType} className={styles.tabTypeSet}>
         <TabPane tab={intl.get('common.color')} key="color">
           <ColorPicker onChangeComplete={onColorChange} />
         </TabPane>
@@ -46,23 +46,23 @@ const NodeStyleSetBtn: React.FC<IProps> = (props: IProps) => {
   if (disabled === true) {
     return (
       <>
-        <div className="color-group">
+        <div className={styles.colorGroup}>
           {colorList
             .filter(Boolean)
             .slice(0, 3)
             .map((item) => (
-              <span className="circle" key={item} style={{ backgroundColor: item }} />
+              <span className={styles.circle} key={item} style={{ backgroundColor: item }} />
             ))}
         </div>
-        {title && <span className="btn-title">{title}</span>}
+        {title && <span className={styles.btnTitle}>{title}</span>}
       </>
     );
   }
 
   return (
-    <div className="btn-nodeStyle-set">
+    <div className={styles.btnNodeStyleSet}>
       <Popover
-        overlayClassName="nodeStyle-popover"
+        overlayClassName={styles.nodeStylePopover}
         content={
           <SetContent
             onColorChange={handleColorUpdate}
@@ -72,12 +72,12 @@ const NodeStyleSetBtn: React.FC<IProps> = (props: IProps) => {
         visible={visible}
         onVisibleChange={setVisible}
       >
-        <div className="color-group">
+        <div className={styles.colorGroup}>
           {colorList.slice(0, 3).map((item) => (
-            <span className="circle" key={item} style={{ backgroundColor: item }} />
+            <span className={styles.circle} key={item} style={{ backgroundColor: item }} />
           ))}
         </div>
-        {title && <span className="btn-title">{title}</span>}
+        {title && <span className={styles.btnTitle}>{title}</span>}
       </Popover>
     </div>
   );

@@ -9,10 +9,11 @@ import { nameRulesFn, numberRulesFn, replicaRulesFn } from '@app/config/rules';
 import { getSpaceCreateGQL } from '@app/utils/gql';
 import GQLCodeMirror from '@app/components/GQLCodeMirror';
 import intl from 'react-intl-universal';
-import './index.less';
+import cls from 'classnames';
 import { useHistory } from 'react-router-dom';
 import FormItem from 'antd/lib/form/FormItem';
 import Cookie from 'js-cookie';
+import styles from './index.module.less';
 const Option = Select.Option;
 
 function getVidType(type: string, length?: string) {
@@ -96,10 +97,10 @@ const SpaceCreate = () => {
     getMachineNumber();
   }, []);
   return (
-    <div className="nebula-space-page">
+    <div className={styles.spaceCreate}>
       <Breadcrumb routes={routes} />
-      <div className="config-container center-layout">
-        <Form className="space-form" form={form} layout="vertical" onFieldsChange={updateGql} {...formItemLayout}>
+      <div className={cls(styles.configContainer, 'studioCenterLayout')}>
+        <Form className={styles.spaceForm} form={form} layout="vertical" onFieldsChange={updateGql} {...formItemLayout}>
           <Row>
             <Col span={12}>
               <Form.Item label={intl.get('common.name')} name="name" rules={nameRulesFn()}>
@@ -112,7 +113,7 @@ const SpaceCreate = () => {
                 name="vidType"
                 rules={[{ required: true }]}
               >
-                <Select placeholder={intl.get('schema.selectVidTypeTip')} className="select-vid-type">
+                <Select placeholder={intl.get('schema.selectVidTypeTip')}>
                   <Option value="FIXED_STRING">FIXED_STRING</Option>
                   <Option value="INT64">INT64</Option>
                 </Select>
@@ -120,7 +121,7 @@ const SpaceCreate = () => {
               <FormItem noStyle dependencies={['vidType']}>
                 {({ getFieldValue }) => {
                   const vidType = getFieldValue('vidType');
-                  return vidType === 'FIXED_STRING' ? <Col offset={11} className="item-string-length">
+                  return vidType === 'FIXED_STRING' ? <Col offset={11} className={styles.stringLength}>
                     <Form.Item label={intl.get('schema.length')} name="stringLength" rules={[
                       {
                         required: true,
@@ -147,9 +148,9 @@ const SpaceCreate = () => {
             <Col span={12}>
               <Form.Item
                 colon={false}
-                label={<span className="form-label">
+                label={<span>
                   Partition_num:
-                  <span className="optional-item">({intl.get('common.optional')})</span>
+                  <span className={styles.optionalItem}>({intl.get('common.optional')})</span>
                 </span>}
                 name="partitionNum"
                 rules={numberRulesFn()}
@@ -160,9 +161,9 @@ const SpaceCreate = () => {
             <Col span={12}>
               <Form.Item
                 colon={false}
-                label={<span className="form-label">
+                label={<span>
                   Replica_factor:
-                  <span className="optional-item">({intl.get('common.optional')})</span>
+                  <span className={styles.optionalItem}>({intl.get('common.optional')})</span>
                 </span>}
                 name="replicaFactor"
                 rules={replicaRulesFn(activeMachineNum)}
@@ -174,7 +175,7 @@ const SpaceCreate = () => {
         </Form>
         <GQLCodeMirror currentGQL={gql} />
       </div>
-      <div className="studio-form-footer">
+      <div className="studioFormFooter">
         <Button onClick={() => history.push('/schema')}>{intl.get('common.cancel')}</Button>
         <Button type="primary" loading={loading} onClick={handleCreate}>{intl.get('common.create')}</Button>
       </div>
