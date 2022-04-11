@@ -37,7 +37,7 @@ const CommonLayout = (props: IProps) => {
             <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('common.create')}
           </Link>
         </Button>
-        <Search onSearch={onSearch} type={intl.get('common.edge').toLowerCase()} />
+        <Search onSearch={onSearch} type={type.toLowerCase()} />
       </div>
       {children}
       <Table

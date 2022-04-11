@@ -22,12 +22,18 @@
 			border-radius: 6px;
 			padding: 11px 14px;
 			cursor: pointer;
-			overflow: hidden;
-			text-overflow: ellipsis;
 			font-family: Roboto-Regular, sans-serif;
 			font-weight: 500;
 			font-size: 18px;
 			color: #27AE60;
+		}
+		.gqlValue {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: pre-wrap;
+			display: -webkit-box;
+			-webkit-line-clamp: 3;
+			-webkit-box-orient: vertical;
 		}
 		.errorInfo {
 			background-color: #fff2f0;
