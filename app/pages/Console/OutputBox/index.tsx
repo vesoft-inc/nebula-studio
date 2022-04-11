@@ -234,7 +234,7 @@ const OutputBox = (props: IProps) => {
   return <div className={styles.outputBox}>
     <div className={styles.outputHeader}>
       <p className={cls(styles.gql, { [styles.errorInfo]: code !== 0 })} onClick={() => onHistoryItem(gql)}>
-        $ {gql}
+        <span className={styles.gqlValue}>$ {gql}</span>
       </p>
       <div className={styles.outputOperations}>
         {!isFavorited ? <Tooltip title={intl.get('console.addToFavorites')} placement="top">

@@ -121,12 +121,13 @@ const Schema = () => {
     {
       title: intl.get('schema.spaceName'),
       dataIndex: 'Name',
+      width: 150,
       ellipsis: {
         showTitle: false,
       },
       render: data => (
         <Tooltip placement="topLeft" title={data}>
-          <Button
+          <a
             className={styles.cellBtn}
             type="link"
             onClick={() => handleSwitchSpace(data)}
@@ -135,7 +136,7 @@ const Schema = () => {
             data-track-label="from_space_list"
           >
             {data}
-          </Button>
+          </a>
         </Tooltip>
       ),
     },
