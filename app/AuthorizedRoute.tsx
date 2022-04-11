@@ -10,8 +10,8 @@ interface IProps {
 
 const AuthorizedRoute = (props: IProps) => {
   const { component: Component, render, ...rest } = props;
-  const { global: { host, username } } = useStore();
-  if (host && username) {
+  const { global: { _host, _username } } = useStore();
+  if (_host && _username) {
     return Component ? (
       <Route {...rest} render={props => <Component {...props} />} />
     ) : (
