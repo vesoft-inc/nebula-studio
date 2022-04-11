@@ -10,14 +10,14 @@ import { getRootStore, resetStore } from '.';
 
 export class GlobalStore {
   history: BrowserHistory;
-  username = cookies.get('nu');
-  host = cookies.get('nh');
+  _username = cookies.get('nu');
+  _host = cookies.get('nh');
   version = process.env.VERSION;
   nebulaVersion?: NebulaVersion = sessionStorage.getItem('nebulaVersion') as NebulaVersion;
   constructor() {
     makeObservable(this, {
-      username: observable,
-      host: observable,
+      _username: observable,
+      _host: observable,
       update: action,
     });
   }
@@ -26,11 +26,17 @@ export class GlobalStore {
     return getRootStore();
   }
 
+  get username() {
+    return this._username || cookies.get('nu');
+  }
+  get host() {
+    return this._host || cookies.get('nh');
+  }
+
   resetModel = () => {
     this.update({
-      username: '',
-      host: '',
-      paramsMap: null
+      _username: '',
+      _host: '',
     });
   }
 
@@ -77,11 +83,11 @@ export class GlobalStore {
       cookies.set('nh', host);
       cookies.set('nu', username);
       sessionStorage.setItem('nebulaVersion', data.version);
-      this.update({ host, username, nebulaVersion: data.version });
+      this.update({ _host: host, _username: username, nebulaVersion: data.version });
       return true;
     }
 
-    this.update({ host: '', username: '' });
+    this.update({ _host: '', _username: '' });
     cookies.remove('nh');
     cookies.remove('nu');
     sessionStorage.removeItem('nebulaVersion');
