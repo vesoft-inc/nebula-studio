@@ -1,5 +1,4 @@
 import { Button, message } from 'antd';
-import _ from 'lodash';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import intl from 'react-intl-universal';

@@ -77,7 +77,7 @@ const HistoryBtn = (props: IProps) => {
             dataSource={data}
             renderItem={(item: string) => (
               <List.Item
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', wordBreak: 'break-all' }}
                 onClick={() => handleSelect(item)}
               >
                 {renderStr(item)}

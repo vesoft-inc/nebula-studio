@@ -1,5 +1,4 @@
 import { Select, Table } from 'antd';
-import _ from 'lodash';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { CloseOutlined } from '@ant-design/icons';

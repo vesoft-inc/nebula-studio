@@ -20,6 +20,7 @@ module.exports = {
         'sourceType': 'module'
     },
     plugins: [
+        "unused-imports",
         'eslint-plugin-react',
         'eslint-plugin-import',
         'eslint-plugin-jsdoc',
@@ -33,6 +34,12 @@ module.exports = {
         }
     },
     rules: {
+        "no-unused-vars": "off",
+		"unused-imports/no-unused-imports": "error",
+		"unused-imports/no-unused-vars": [
+			"warn",
+			{ "vars": "all", "varsIgnorePattern": "^_", "args": "after-used", "argsIgnorePattern": "^_" }
+		],
         'arrow-spacing': [
             'error',
             {
