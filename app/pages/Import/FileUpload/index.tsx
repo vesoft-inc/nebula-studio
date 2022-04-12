@@ -1,5 +1,4 @@
 import { Button, Checkbox, Popconfirm, Table, Upload } from 'antd';
-import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';

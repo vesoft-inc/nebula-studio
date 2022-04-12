@@ -1,5 +1,4 @@
 import { Button, Modal, Tabs } from 'antd';
-import _ from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';

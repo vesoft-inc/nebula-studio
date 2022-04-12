@@ -1,5 +1,4 @@
 import { Button, Input, Modal } from 'antd';
-import _ from 'lodash';
 import React, { useState } from 'react';
 import intl from 'react-intl-universal';
 

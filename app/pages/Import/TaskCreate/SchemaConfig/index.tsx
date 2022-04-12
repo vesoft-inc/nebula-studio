@@ -1,5 +1,4 @@
 import { Button, Collapse } from 'antd';
-import _ from 'lodash';
 import React from 'react';
 import { CloseOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
