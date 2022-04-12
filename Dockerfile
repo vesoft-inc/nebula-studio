@@ -20,7 +20,6 @@ LABEL stage=gobuilder
 
 ENV CGO_ENABLED 1
 ENV GOOS linux
-ENV GOPROXY https://goproxy.cn,direct
 
 WORKDIR /server
 
