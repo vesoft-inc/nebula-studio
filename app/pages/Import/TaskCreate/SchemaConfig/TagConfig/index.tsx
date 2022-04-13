@@ -1,4 +1,4 @@
-import { Select, Table } from 'antd';
+import { Select, Table, Tooltip } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { CloseOutlined } from '@ant-design/icons';
@@ -40,6 +40,14 @@ const VerticesConfig = (props: IProps) => {
     {
       title: intl.get('import.prop'),
       dataIndex: 'name',
+      ellipsis: {
+        showTitle: false,
+      },
+      render: data => (
+        <Tooltip placement="topLeft" title={data}>
+          {data}
+        </Tooltip>
+      ),
     },
     {
       title: intl.get('import.mapping'),
