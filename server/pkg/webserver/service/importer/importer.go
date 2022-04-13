@@ -92,20 +92,10 @@ func CreateConfigFile(dir string, config importconfig.YAMLConfig) error {
 	return nil
 }
 
-func Import(taskID string, configPath string, configBody *importconfig.YAMLConfig) (err error) {
+func Import(taskID string, conf *importconfig.YAMLConfig) (err error) {
 	zap.L().Debug(fmt.Sprintf("Start a import task: `%s`", taskID))
 
-	var conf *importconfig.YAMLConfig
 	runnerLogger := logger.NewRunnerLogger("")
-	if configPath != "" {
-		conf, err = importconfig.Parse(configPath, runnerLogger)
-
-		if err != nil {
-			return err.(importerErrors.ImporterError)
-		}
-	} else {
-		conf = configBody
-	}
 	if err := conf.ValidateAndReset("", runnerLogger); err != nil {
 		return err
 	}

@@ -13,6 +13,7 @@ import (
 
 	importconfig "github.com/vesoft-inc/nebula-importer/pkg/config"
 	importerErrors "github.com/vesoft-inc/nebula-importer/pkg/errors"
+	"github.com/vesoft-inc/nebula-importer/pkg/logger"
 	"github.com/vesoft-inc/nebula-studio/server/pkg/config"
 	"github.com/vesoft-inc/nebula-studio/server/pkg/utils"
 	"github.com/vesoft-inc/nebula-studio/server/pkg/webserver/base"
@@ -60,8 +61,21 @@ func ImportData(ctx iris.Context) base.Result {
 			Message: err.Error(),
 		}
 	}
-	if err = validImportDataParams(params); err != nil {
-		zap.L().Warn("importDataParams get fail", zap.Error(err))
+
+	runnerLogger := logger.NewRunnerLogger("")
+	if params.ConfigPath != "" {
+		params.ConfigBody, err = importconfig.Parse(params.ConfigPath, runnerLogger)
+		if err != nil {
+			return base.Response{
+				Code:    base.Error,
+				Message: err.(importerErrors.ImporterError).Error(),
+			}
+		}
+	}
+
+	if err = validClientParams(params); err != nil {
+		err = importerErrors.Wrap(importerErrors.InvalidConfigPathOrFormat, err)
+		zap.L().Warn("client params is wrong", zap.Error(err))
 		return base.Response{
 			Code:    base.Error,
 			Message: err.Error(),
@@ -102,7 +116,7 @@ func ImportData(ctx iris.Context) base.Result {
 			Message: err.Error(),
 		}
 	}
-	if err = importer.Import(taskID, params.ConfigPath, params.ConfigBody); err != nil {
+	if err = importer.Import(taskID, params.ConfigBody); err != nil {
 		// task err: import task not start err handle
 		task.TaskInfo.TaskStatus = importer.StatusAborted.String()
 		err1 := importer.GetTaskMgr().FinishTask(taskID)
@@ -234,10 +248,12 @@ func DownloadErrLog(ctx iris.Context) base.Result {
 	return nil
 }
 
-func validImportDataParams(params *importDataParams) error {
-	if params.ConfigBody.NebulaClientSettings.Connection.Address == nil || params.ConfigBody.NebulaClientSettings.
-		Connection.User == nil || params.ConfigBody.NebulaClientSettings.Space == nil {
-		return errors.New("importDataParams is wrong")
+func validClientParams(params *importDataParams) error {
+	if params.ConfigBody.NebulaClientSettings.Connection == nil ||
+		*params.ConfigBody.NebulaClientSettings.Connection.Address == "" ||
+		*params.ConfigBody.NebulaClientSettings.
+		Connection.User == "" || *params.ConfigBody.NebulaClientSettings.Space == "" {
+		return errors.New("client params is wrong")
 	}
 	return nil
 }
