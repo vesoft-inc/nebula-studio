@@ -164,7 +164,8 @@
     "uploadTemplateTip": "3. Configure the Yaml file: please keep only the file name (retain the file extension) for all file paths (path, failDataPath, logPath) in the template, e.g. logPath: config.csv",
     "reUpload": "Re-upload",
     "fileNotExist": "{name} file does not exist！",
-    "importYaml": "Import the YAML file"
+    "importYaml": "Import the YAML file",
+    "templateMatchError": "The {type} in the configuration does not match the current login account/host"
   },
   "schema": {
     "spaceList": "Graph Space List",

@@ -22,9 +22,10 @@ interface ILogDimension {
 }
 const TaskList = () => {
   const timer = useRef<any>(null);
-  const { dataImport } = useStore();
+  const { dataImport, global } = useStore();
   const history = useHistory();
   const { taskList, getTaskList, stopTask, deleteTask, downloadTaskConfig } = dataImport;
+  const { username, host } = global;
   const [modalVisible, setVisible] = useState(false);
   const [importModalVisible, setImportModalVisible] = useState(false);
   const [logDimension, setLogDimension] = useState<ILogDimension>({} as ILogDimension);
@@ -116,6 +117,8 @@ const TaskList = () => {
         visible={modalVisible} />}
       {importModalVisible && <TemplateModal
         onClose={() => setImportModalVisible(false)}
+        username={username}
+        host={host}
         onImport={getTaskList}
         visible={importModalVisible} />}
     </div>

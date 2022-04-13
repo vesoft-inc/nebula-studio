@@ -164,7 +164,8 @@
     "uploadTemplateTip": "3. 配置Yaml文件：模板中所有文件路径（path、failDataPath、logPath）请只保留文件名（保留文件扩展名），例如： 日志路径：config.csv",
     "reUpload": "重新上传",
     "fileNotExist": "文件 {name} 不存在",
-    "importYaml": "导入 YAML 文件"
+    "importYaml": "导入 YAML 文件",
+    "templateMatchError": "配置中的{type}与当前登录账号/地址不匹配"
   },
   "schema": {
     "spaceList": "图空间列表",

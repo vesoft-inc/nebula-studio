@@ -15,7 +15,7 @@ on:
 jobs:
   package:
     name: build package
-    runs-on: self-hosted
+    runs-on: [self-hosted, nebula-fast]
     strategy:
       matrix:
         os:

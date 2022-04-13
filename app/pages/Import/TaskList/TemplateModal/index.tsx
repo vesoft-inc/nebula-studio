@@ -15,12 +15,14 @@ const { TextArea } = Input;
 
 interface IProps {
   visible: boolean;
+  username: string;
+  host: string;
   onClose: () => void;
   onImport: () => void;
 }
 
 const TemplateModal = (props: IProps) => {
-  const { visible, onClose, onImport } = props;
+  const { visible, onClose, onImport, username, host } = props;
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [config, setConfig] = useState('');
@@ -42,6 +44,15 @@ const TemplateModal = (props: IProps) => {
         const _taskDir = taskDir.endsWith('/') ? taskDir : taskDir + '/';
         const _uploadDir = uploadDir.endsWith('/') ? uploadDir : uploadDir + '/';
         parseContent.logPath = `${_taskDir}import.log`;
+        const connection = parseContent.clientSettings?.connection || {}
+        if(connection.address !== host) {
+          message.error(intl.get('import.templateMatchError', { type: 'address' }));
+          throw new Error();
+        }
+        if(connection.username !== username) {
+          message.error(intl.get('import.templateMatchError', { type: 'username' }));
+          throw new Error();
+        }
         parseContent.files?.forEach(file => {
           if(!files.includes(file.path)) {
             message.error(intl.get('import.fileNotExist', { name: file.path }));
