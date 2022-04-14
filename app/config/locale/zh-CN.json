@@ -195,7 +195,6 @@
     "charset": "Charset",
     "collate": "Collate",
     "vidType": "Vid Type",
-    "atomicEdge": "Atomic Edge",
     "group": "Group",
     "comment": "Comment",
     "operations": "操作",

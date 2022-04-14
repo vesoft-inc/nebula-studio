@@ -161,11 +161,6 @@ const Schema = () => {
       dataIndex: 'Vid Type',
     },
     {
-      title: intl.get('schema.atomicEdge'),
-      dataIndex: 'Atomic Edge',
-      render: value => String(value),
-    },
-    {
       title: intl.get('schema.group'),
       dataIndex: 'Group',
     },
