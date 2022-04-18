@@ -250,9 +250,12 @@ func DownloadErrLog(ctx iris.Context) base.Result {
 
 func validClientParams(params *importDataParams) error {
 	if params.ConfigBody.NebulaClientSettings.Connection == nil ||
+		params.ConfigBody.NebulaClientSettings.Connection.Address == nil ||
 		*params.ConfigBody.NebulaClientSettings.Connection.Address == "" ||
-		*params.ConfigBody.NebulaClientSettings.
-		Connection.User == "" || *params.ConfigBody.NebulaClientSettings.Space == "" {
+		params.ConfigBody.NebulaClientSettings.Connection.User == nil ||
+		*params.ConfigBody.NebulaClientSettings.Connection.User == "" ||
+		params.ConfigBody.NebulaClientSettings.Space == nil ||
+		*params.ConfigBody.NebulaClientSettings.Space == "" {
 		return errors.New("client params is wrong")
 	}
 	return nil
