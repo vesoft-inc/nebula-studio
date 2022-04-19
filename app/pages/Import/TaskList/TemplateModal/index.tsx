@@ -44,12 +44,12 @@ const TemplateModal = (props: IProps) => {
         const _taskDir = taskDir.endsWith('/') ? taskDir : taskDir + '/';
         const _uploadDir = uploadDir.endsWith('/') ? uploadDir : uploadDir + '/';
         parseContent.logPath = `${_taskDir}import.log`;
-        const connection = parseContent.clientSettings?.connection || {}
+        const connection = parseContent.clientSettings?.connection || {};
         if(connection.address !== host) {
           message.error(intl.get('import.templateMatchError', { type: 'address' }));
           throw new Error();
         }
-        if(connection.username !== username) {
+        if(connection.user !== username) {
           message.error(intl.get('import.templateMatchError', { type: 'username' }));
           throw new Error();
         }

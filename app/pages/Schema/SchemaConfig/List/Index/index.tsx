@@ -168,8 +168,10 @@ const IndexList = () => {
   };
   useEffect(() => {
     rebuildTimer.current && clearTimeout(rebuildTimer.current);
-    module && setIndexType(module as IndexType);
-    getData();
+    if(currentSpace) {
+      module && setIndexType(module as IndexType);
+      getData();
+    }
     return () => {
       rebuildTimer.current && clearTimeout(rebuildTimer.current);
     };

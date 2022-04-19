@@ -25,8 +25,8 @@ const OperationPanel = (props: IProps) => {
 
   return (
     <div className={styles.canvasOperations}>
-      <Icon onMouseDown={() => handleZoom('in')} onMouseUp={endZoom} type="icon-studio-console-zoomin" />
-      <Icon onMouseDown={() => handleZoom('out')} onMouseUp={endZoom} type="icon-studio-console-zoomout" />
+      <Icon onMouseDown={() => handleZoom('in')} onMouseUp={endZoom} onMouseOut={endZoom} type="icon-studio-console-zoomin" />
+      <Icon onMouseDown={() => handleZoom('out')} onMouseUp={endZoom} onMouseOut={endZoom} type="icon-studio-console-zoomout" />
     </div>
   );
 };
