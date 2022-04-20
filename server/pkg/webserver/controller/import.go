@@ -136,30 +136,6 @@ func ImportData(ctx iris.Context) base.Result {
 	}
 }
 
-func QueryImportStats(ctx iris.Context) base.Result {
-	id := ctx.Params().GetString("id")
-	if id == "" {
-		zap.L().Warn("queryImportStats id get fail")
-		return base.Response{
-			Code:    base.Error,
-			Message: "queryImportStats id get fail",
-		}
-	}
-	taskInfo, err := importer.ImportStatus(id)
-	if err != nil {
-		zap.L().Warn("queryImportStats fail", zap.Error(err))
-		return base.Response{
-			Code:    base.Error,
-			Message: err.Error(),
-		}
-	}
-	return base.Response{
-		Code:    base.Success,
-		Message: "Processing a task action successfully",
-		Data:    taskInfo,
-	}
-}
-
 func HandleImportAction(ctx iris.Context) base.Result {
 	params := new(handleImportActionParams)
 	err := ctx.ReadJSON(params)
