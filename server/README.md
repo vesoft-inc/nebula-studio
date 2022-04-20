@@ -26,11 +26,11 @@ $ ./nebula-studio-server -studio-config="./config/example-config.yaml"
 | Name               | Path                      | Method   |
 | ------------------ | ------------------------- | -------- |
 | ExecNGQL           | /api-nebula/db/exec | POST     |
+| BatchExecNGQL | /api-nebula/db/batchExec | POST |
 | ConnectDB          | /api-nebula/db/connect | POST     |
 | DisconnectDB       | /api-nebula/db/disconnect | POST     |
 | ImportData         | /api/import-tasks/import | POST     |
 | HandleImportAction | /api/import-tasks/action | POST     |
-| QueryImportStats | /api/import-tasks/stats/{id:string} | GET |
 | DownloadConfig | /api/import-tasks/config/{id:string} | GET    |
 | DownloadImportLog | /api/import-tasks/{id:string}/log | GET |
 | DownloadErrLog | /api/import-tasks/{id:string}/err-logs       | GET |
@@ -49,6 +49,29 @@ The request json body:
 
 ```json
 {gql: "", paramList: [":params"]}
+```
+
+Response:
+
+```json
+{
+  "code": 0,
+  "message": "",
+  "data": {
+    "headers": [],
+    "tables": [],
+    "timeCost": 0,
+    "localParams": null
+  }
+}
+```
+
+#### BatchExecNGQL
+
+The request json body:
+
+```json
+{gql: [""], paramList: [":params"]}
 ```
 
 Response:
@@ -161,40 +184,6 @@ Response:
             }
         ],
         "msg": "Task query successfully"
-    }
-}
-```
-
-#### QueryImportStats API
-
-  /api/import-tasks/stats/3
-
-Response:
-
-```json
-{
-    "code": 0,
-    "message": "Processing a task action successfully",
-    "data": {
-        "taskID": 3,
-        "name": "task1",
-        "space": "test",
-        "nebulaAddress": "192.168.8.233:9669",
-        "createdTime": 1646989643,
-        "updatedTime": 1646989646,
-        "user": "root",
-        "taskStatus": "statusFinished",
-        "taskMessage": "",
-        "stats": {
-            "numFailed": 0,
-            "numReadFailed": 0,
-            "totalCount": 52,
-            "totalBatches": 10,
-            "totalLatency": 30089,
-            "totalReqTime": 532718,
-            "totalBytes": 1583,
-            "totalImportedBytes": 1583
-        }
     }
 }
 ```
@@ -350,6 +339,7 @@ Response:
     "data": [
         {
             "name": "import.log"
+        }
         {
             "name": "err 1.log"
         },

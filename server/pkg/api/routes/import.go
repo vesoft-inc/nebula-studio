@@ -22,10 +22,6 @@ var ImportRoute = base.Route{
 			POST: controller.HandleImportAction,
 		},
 		{
-			Path: "stats/{id:string}",
-			GET:  controller.QueryImportStats,
-		},
-		{
 			Path: "config/{id:string}",
 			GET:  controller.DownloadConfigFile,
 		},
