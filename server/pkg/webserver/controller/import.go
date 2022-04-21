@@ -62,7 +62,7 @@ func ImportData(ctx iris.Context) base.Result {
 		}
 	}
 
-	runnerLogger := logger.NewRunnerLogger("")
+	runnerLogger := logger.NewRunnerLogger(*params.ConfigBody.LogPath)
 	if params.ConfigPath != "" {
 		params.ConfigBody, err = importconfig.Parse(params.ConfigPath, runnerLogger)
 		if err != nil {
@@ -129,6 +129,44 @@ func ImportData(ctx iris.Context) base.Result {
 			Message: err.Error(),
 		}
 	}
+	// write taskId to file
+	muTaskId.Lock()
+	taskIdBytes, err := ioutil.ReadFile(config.Cfg.Web.TaskIdPath)
+	if err != nil {
+		zap.L().Warn("read taskId file error", zap.Error(err))
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	taskIdJSON := make(map[string]bool)
+	if len(taskIdBytes) != 0 {
+		if err := json.Unmarshal(taskIdBytes, &taskIdJSON); err != nil {
+			zap.L().Warn("read taskId file error", zap.Error(err))
+			return base.Response{
+				Code:    base.Error,
+				Message: err.Error(),
+			}
+		}
+	}
+	taskIdJSON[taskID] = true
+	bytes, err := json.Marshal(taskIdJSON)
+	if err != nil {
+		zap.L().Warn("read taskId file error", zap.Error(err))
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	err = ioutil.WriteFile(config.Cfg.Web.TaskIdPath, bytes, 777)
+	if err != nil {
+		zap.L().Warn("write taskId file error", zap.Error(err))
+		return base.Response{
+			Code:    base.Error,
+			Message: err.Error(),
+		}
+	}
+	defer muTaskId.Unlock()
 	return base.Response{
 		Code:    base.Success,
 		Data:    []string{taskID},

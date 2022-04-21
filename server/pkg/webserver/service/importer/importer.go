@@ -95,7 +95,7 @@ func CreateConfigFile(dir string, config importconfig.YAMLConfig) error {
 func Import(taskID string, conf *importconfig.YAMLConfig) (err error) {
 	zap.L().Debug(fmt.Sprintf("Start a import task: `%s`", taskID))
 
-	runnerLogger := logger.NewRunnerLogger("")
+	runnerLogger := logger.NewRunnerLogger(*conf.LogPath)
 	if err := conf.ValidateAndReset("", runnerLogger); err != nil {
 		return err
 	}
