@@ -34,6 +34,7 @@ FROM alpine
 WORKDIR /app
 COPY --from=gobuilder /server/server /app/server
 COPY --from=gobuilder /server/config /app/config/
+RUN sed -i "s/9000/7001/g" /app/config/example-config.yaml
 
 EXPOSE 7001
 

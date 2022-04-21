@@ -60,6 +60,7 @@ export default class DraggableTags extends Component<IProps> {
               style={{
                 display: 'flex',
                 overflow: 'auto',
+                flexWrap: 'wrap',
               }}
             >
               {list.map((item, index) => (

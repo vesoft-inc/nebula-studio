@@ -180,7 +180,7 @@ const IndexCreate = () => {
           <span>
             {intl.get('schema.dragSorting')}
           </span>
-        </>}>
+        </>} wrapperCol={{ span: 24 }}>
           <Form.Item noStyle name="fields">
             <Button 
               type="primary" 

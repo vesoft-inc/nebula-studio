@@ -38,25 +38,22 @@ const TemplateModal = (props: IProps) => {
     await setLoading(true);
     const files = fileList.map(item => item.name);
     const content = await readFileContent(file);
-    const parseContent = yaml.load(content);
     try {
+      const parseContent = yaml.load(content);
       if(typeof parseContent === 'object') {
         const _taskDir = taskDir.endsWith('/') ? taskDir : taskDir + '/';
         const _uploadDir = uploadDir.endsWith('/') ? uploadDir : uploadDir + '/';
         parseContent.logPath = `${_taskDir}import.log`;
         const connection = parseContent.clientSettings?.connection || {};
         if(connection.address !== host) {
-          message.error(intl.get('import.templateMatchError', { type: 'address' }));
-          throw new Error();
+          throw new Error(intl.get('import.templateMatchError', { type: 'address' }));
         }
         if(connection.user !== username) {
-          message.error(intl.get('import.templateMatchError', { type: 'username' }));
-          throw new Error();
+          throw new Error(intl.get('import.templateMatchError', { type: 'username' }));
         }
         parseContent.files?.forEach(file => {
           if(!files.includes(file.path)) {
-            message.error(intl.get('import.fileNotExist', { name: file.path }));
-            throw new Error();
+            throw new Error(intl.get('import.fileNotExist', { name: file.path }));
           }
           file.path = _uploadDir + file.path;
           file.failDataPath = _taskDir + `err/${file.failDataPath || 'err.log'}`;
@@ -70,8 +67,11 @@ const TemplateModal = (props: IProps) => {
       } else {
         return message.warning(intl.get('import.parseFailed'));
       }
-    } catch (err) {
-      console.log('err', err);
+    } catch (err: any) {
+      if(typeof err === 'object' && err.name) {
+        return message.warning(`${err.name}: ${err.message}`);
+      } 
+      return message.warning(err.toString());
     } finally {
       setLoading(false);
     }
