@@ -161,19 +161,22 @@ func (mgr *TaskMgr) UpdateTaskInfo(taskID string) error {
 	StopTask will change the task status to `StatusStoped`,
 	and then call FinishTask
 */
-func (mgr *TaskMgr) StopTask(taskID string) bool {
+func (mgr *TaskMgr) StopTask(taskID string) error {
 	if task, ok := mgr.getTaskFromMap(taskID); ok {
+		if task.GetRunner().Readers == nil {
+			return errors.New("task is not initialized")
+		}
 		for _, r := range task.GetRunner().Readers {
 			r.Stop()
 		}
 		task.TaskInfo.TaskStatus = StatusStoped.String()
 		if err := mgr.FinishTask(taskID); err != nil {
 			zap.L().Warn("finish task fail", zap.Error(err))
-			return false
+			return err
 		}
-		return true
+		return nil
 	}
-	return false
+	return errors.New("task is finished or not exist")
 }
 
 /*

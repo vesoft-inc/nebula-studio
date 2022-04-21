@@ -35,6 +35,10 @@ func InitDB() {
 	GetTaskMgr().db = &TaskDb{
 		DB: db,
 	}
+	if err := GetTaskMgr().db.UpdateProcessingTasks2Aborted(); err != nil {
+		zap.L().Fatal(fmt.Sprintf("update processing tasks to aborted failed: %s", err))
+		panic(err)
+	}
 }
 
 // FindTaskInfoByIdAndAddresssAndUser used to check whether the task belongs to the user
@@ -80,4 +84,11 @@ func (t *TaskDb) SelectAllIds(nebulaAddress, user string) ([]int, error) {
 		ids = append(ids, taskInfo.ID)
 	}
 	return ids, nil
+}
+
+func (t *TaskDb) UpdateProcessingTasks2Aborted() error {
+	if err := t.Model(&TaskInfo{}).Where("task_status = ?", StatusProcessing.String()).Update("task_status", StatusAborted.String()).Error; err != nil {
+		return err
+	}
+	return nil
 }

@@ -275,12 +275,14 @@ func actionStop(taskID string, address string, username string, result *ActionRe
 		}
 	}
 
-	ok := GetTaskMgr().StopTask(taskID)
+	err := GetTaskMgr().StopTask(taskID)
 	actionQuery(taskID, address, username, result, skipCheck)
-	if !ok {
-		result.Msg = "Task has stopped or finished"
+	if err != nil {
+		zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
+		result.Msg = "Task stop failed"
+	} else {
+		result.Msg = "Task stop successfully"
 	}
-	result.Msg = "Task stop successfully"
 }
 
 /*
