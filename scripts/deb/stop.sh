@@ -1,3 +1,3 @@
 #!/bin/bash
-systemctl stop nebula-graph-studio.service
+sudo systemctl stop nebula-graph-studio.service
 
