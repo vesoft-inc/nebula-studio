@@ -124,6 +124,21 @@ func (mgr *TaskMgr) FinishTask(taskID string) (err error) {
 	return
 }
 
+func (mgr *TaskMgr) AbortTask(taskID string) (err error) {
+	task, ok := mgr.getTaskFromMap(taskID)
+	if !ok {
+		return
+	}
+	timeUnix := time.Now().Unix()
+	task.TaskInfo.UpdatedTime = timeUnix
+	err = mgr.db.UpdateTaskInfo(task.TaskInfo)
+	if err != nil {
+		return err
+	}
+	mgr.tasks.Delete(taskID)
+	return
+}
+
 func (mgr *TaskMgr) DelTask(taskID string) error {
 	_, ok := mgr.getTaskFromMap(taskID)
 	if ok {
