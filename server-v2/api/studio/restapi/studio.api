@@ -1,0 +1,11 @@
+syntax = "v1"
+
+info(
+	title: "Nebula Cloud InitTemplate API"
+	desc: "Nebula Cloud InitTemplate API"
+)
+
+import (
+	"health.api"
+	"gateway.api"
+)
