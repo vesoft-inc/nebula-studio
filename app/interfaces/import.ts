@@ -18,15 +18,15 @@ export interface ITaskStats {
   numReadFailed: number;
 }
 export interface ITaskItem {
-  taskID: number;
-  nebulaAddress: string;
+  id: number;
+  address: string;
   space: string;
   name: string;
-  createdTime: number;
-  updatedTime: number;
+  createTime: number;
+  updateTime: number;
   user: string;
-  taskStatus: ITaskStatus;
-  taskMessage: string;
+  status: ITaskStatus;
+  message: string;
   stats: ITaskStats;
 }
 

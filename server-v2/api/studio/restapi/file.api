@@ -1,0 +1,35 @@
+syntax = "v1"
+
+type (
+	FileDestroyRequest {
+		Name string `path:"name" validate:"required"`
+	}
+
+	FileStat {
+		Content    [][]string `json:"content"`
+		WithHeader bool       `json:"withHeader"`
+		DataType   string     `json:"dataType"`
+		Name       string     `json:"name"`
+		Size       int64      `json:"size"`
+	}
+
+	FilesIndexData {
+		List []FileStat `json:"data"`
+	}
+)
+
+@server(
+	group: file
+)
+
+service studio-api {
+	@doc "Upload File"
+	@handler FileUpload
+	put /api/files
+	@doc "delete file"
+	@handler FileDestroy
+	delete /api/files/:name(FileDestroyRequest)
+	@doc "preview file"
+	@handler FilesIndex
+	get /api/files returns(FilesIndexData)
+}

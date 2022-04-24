@@ -26,12 +26,8 @@ const TemplateModal = (props: IProps) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [config, setConfig] = useState('');
-  const { dataImport: { getTaskDir, taskDir, importTask }, files: { uploadDir, getUploadDir, getFiles, fileList } } = useStore();
+  const { dataImport: { importTask }, files: { getFiles, fileList } } = useStore();
   useEffect(() => {
-    if(!uploadDir) {
-      getUploadDir();
-    }
-    getTaskDir();
     getFiles();
   }, []);
   const handleFileImport = async ({ file }) => {
@@ -41,9 +37,6 @@ const TemplateModal = (props: IProps) => {
     try {
       const parseContent = yaml.load(content);
       if(typeof parseContent === 'object') {
-        const _taskDir = taskDir.endsWith('/') ? taskDir : taskDir + '/';
-        const _uploadDir = uploadDir.endsWith('/') ? uploadDir : uploadDir + '/';
-        parseContent.logPath = `${_taskDir}import.log`;
         const connection = parseContent.clientSettings?.connection || {};
         if(connection.address !== host) {
           throw new Error(intl.get('import.templateMatchError', { type: 'address' }));
@@ -55,13 +48,10 @@ const TemplateModal = (props: IProps) => {
           if(!files.includes(file.path)) {
             throw new Error(intl.get('import.fileNotExist', { name: file.path }));
           }
-          file.path = _uploadDir + file.path;
-          file.failDataPath = _taskDir + `err/${file.failDataPath || 'err.log'}`;
         });
         setConfig(JSON.stringify(parseContent, null, 2));
-        const count = taskDir.split('/').pop();
         form.setFieldsValue({
-          name: `task-${count}`,
+          name: `task-${Date.now()}`,
           content: JSON.stringify(parseContent, null, 2),
         });
       } else {

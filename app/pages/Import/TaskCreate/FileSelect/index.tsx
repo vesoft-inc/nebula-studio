@@ -1,5 +1,5 @@
 import { Button, Form, Popover, Select } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
@@ -42,9 +42,13 @@ const FileSelect = (props: IProps) => {
     }
     setVisible(false);
   };
-  useEffect(() => {
-    getFiles();
-  }, []);
+
+  const handleGetFiles = () => {
+    if(fileList.length === 0) {
+      getFiles();
+    }
+  };
+  
   return (
     <Popover
       destroyTooltipOnHide={true}
@@ -54,7 +58,7 @@ const FileSelect = (props: IProps) => {
       onVisibleChange={visible => setVisible(visible)}
       content={<Form className={styles.fileSelectForm} onFinish={onFinish} layout="inline">
         <FormItem name="name" rules={[{ required: true }]}>
-          <Select className={styles.fileSelect} showSearch={true} dropdownMatchSelectWidth={false}>
+          <Select className={styles.fileSelect} showSearch={true} onDropdownVisibleChange={handleGetFiles} dropdownMatchSelectWidth={false}>
             {fileList.map((file: any) => (
               <Option value={file.name} key={file.name}>
                 {file.name}

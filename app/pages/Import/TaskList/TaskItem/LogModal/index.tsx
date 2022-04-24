@@ -14,9 +14,6 @@ interface ILogDimension {
   status: ITaskStatus;
 }
 
-interface ILog {
-  name: string;
-}
 interface IProps {
   logDimension: ILogDimension;
   visible: boolean;
@@ -25,15 +22,15 @@ interface IProps {
 }
 const LogModal = (props: IProps) => {
   const { visible, onCancel, showLogDownload, logDimension: { space, id, status } } = props;
-  const { dataImport: { getLogs, downloadTaskLog, getImportLogDetail, getErrLogDetail } } = useStore();
+  const { dataImport: { getLogs, downloadTaskLog, getLogDetail } } = useStore();
   const logRef = useRef<HTMLDivElement>(null);
   const timer = useRef<any>(null);
   const offset = useRef(0);
   const _status = useRef(status);
-  const [logs, setLogs] = useState<ILog[]>([]);
-  const [currentLog, setCurrentLog] = useState<ILog | null>(null);
+  const [logs, setLogs] = useState<string[]>([]);
+  const [currentLog, setCurrentLog] = useState<string | null>(null);
   const handleTabChange = (key: string) => {
-    setCurrentLog(logs.filter(item => item.name === key)[0]);
+    setCurrentLog(logs.filter(item => item === key)[0]);
   };
 
   const getAllLogs = async () => {
@@ -46,22 +43,19 @@ const LogModal = (props: IProps) => {
 
   const handleLogDownload = () => {
     if(currentLog) {
-      const type = currentLog!.name === 'import.log' ? 'import' : 'err';
       downloadTaskLog({
         id,
-        type,
-        name: currentLog.name
+        name: currentLog
       });
     }
   };
 
   const readLog = async () => {
-    const getLogDetail = currentLog!.name === 'import.log' ? getImportLogDetail : getErrLogDetail;
     const res = await getLogDetail({
       offset: offset.current,
       id,
       limit: 500,
-      name: currentLog!.name
+      file: currentLog
     });
     handleLogData(res);
   };
@@ -125,7 +119,7 @@ const LogModal = (props: IProps) => {
     >
       <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange}>
         {logs.map(log => (
-          <TabPane tab={`${log.name}`} key={log.name} />
+          <TabPane tab={log} key={log} />
         ))}
       </Tabs>
       <div className={styles.logContainer} ref={logRef}/>

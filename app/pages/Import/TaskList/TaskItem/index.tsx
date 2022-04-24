@@ -13,7 +13,7 @@ interface IProps {
   onTaskStop: (id: number) => void;
   onTaskDelete: (id: number) => void;
   onConfigDownload: (id: number) => void;
-  onViewLog: (id: number, space: string, taskStatus: ITaskStatus) => void;
+  onViewLog: (id: number, space: string, status: ITaskStatus) => void;
   showConfigDownload: boolean;
 }
 
@@ -40,20 +40,20 @@ const TaskItem = (props: IProps) => {
   const { 
     data: { 
       space,
-      taskID, 
+      id, 
       name, 
       stats: { totalImportedBytes, totalBytes, numFailed, numReadFailed }, 
-      taskStatus, 
-      taskMessage,
-      updatedTime, 
-      createdTime 
+      status, 
+      message,
+      updateTime, 
+      createTime 
     }, 
     showConfigDownload,
     onViewLog,
     onConfigDownload,
     onTaskStop, 
     onTaskDelete } = props;
-  const [status, setStatus] = useState<'success' | 'active' | 'normal' | 'exception' | undefined>(undefined);
+  const [progressStatus, setStatus] = useState<'success' | 'active' | 'normal' | 'exception' | undefined>(undefined);
   const [extraMsg, setExtraMsg] = useState('');
   const addMsg = () => {
     const info: string[] = [];
@@ -66,24 +66,24 @@ const TaskItem = (props: IProps) => {
     info.length > 0 && setExtraMsg(info.join(', '));
   };
   useEffect(() => {
-    if(taskStatus === ITaskStatus.StatusFinished) {
+    if(status === ITaskStatus.StatusFinished) {
       setStatus('success');
       addMsg();
-    } else if(taskStatus === ITaskStatus.StatusProcessing) {
+    } else if(status === ITaskStatus.StatusProcessing) {
       setStatus('active');
       addMsg();
     } else {
       setStatus('exception');
-      if(taskMessage) {
-        setExtraMsg(taskMessage);
+      if(message) {
+        setExtraMsg(message);
       }
     }
-  }, [taskStatus]);
+  }, [status]);
   return (
     <div className={styles.taskItem}>
       <div className={styles.row}>
         <span>{intl.get('common.space')}: {space}</span>
-        {showConfigDownload && <Button type="link" size="small" onClick={() => onConfigDownload(taskID)}>
+        {showConfigDownload && <Button type="link" size="small" onClick={() => onConfigDownload(id)}>
           <Icon type="icon-studio-btn-download" />
           {intl.get('import.downloadConfig')}
         </Button>}
@@ -93,50 +93,50 @@ const TaskItem = (props: IProps) => {
           <div className={styles.progressInfo}>
             <span className={styles.taskName}>
               {name}
-              {taskStatus === ITaskStatus.StatusFinished && <span className={styles.completeInfo}>
+              {status === ITaskStatus.StatusFinished && <span className={styles.completeInfo}>
                 <CheckCircleFilled />
                 {intl.get('import.importCompleted')}
                 <span className={styles.red}>{extraMsg && ` (${extraMsg})`}</span>
               </span>}
-              {taskStatus === ITaskStatus.StatusAborted && <span className={styles.errInfo}>
+              {status === ITaskStatus.StatusAborted && <span className={styles.errInfo}>
                 {intl.get('import.importFailed')}
                 {extraMsg && ` (${extraMsg})`}
               </span>}
-              {taskStatus === ITaskStatus.StatusStoped && <span className={styles.errInfo}>
+              {status === ITaskStatus.StatusStoped && <span className={styles.errInfo}>
                 {intl.get('import.importStopped')}
               </span>}
             </span>
             <div className={styles.moreInfo}>
               <span>
-                {taskStatus !== ITaskStatus.StatusFinished && `${getFileSize(totalImportedBytes)} / `}
+                {status !== ITaskStatus.StatusFinished && `${getFileSize(totalImportedBytes)} / `}
                 {getFileSize(totalBytes)}{' '}
               </span>
-              <span>{dayjs.duration(dayjs.unix(updatedTime).diff(dayjs.unix(createdTime))).format('HH:mm:ss')}</span>
+              <span>{dayjs.duration(dayjs.unix(updateTime).diff(dayjs.unix(createTime))).format('HH:mm:ss')}</span>
             </div>
           </div>
           <Progress 
             format={percent => `${percent}%`}
-            status={status} 
-            percent={taskStatus !== ITaskStatus.StatusFinished ? floor(totalImportedBytes / totalBytes * 100, 2) : 100} 
-            strokeColor={status && COLOR_MAP[status]} />
+            status={progressStatus} 
+            percent={status !== ITaskStatus.StatusFinished ? floor(totalImportedBytes / totalBytes * 100, 2) : 100} 
+            strokeColor={progressStatus && COLOR_MAP[progressStatus]} />
         </div>
         <div className={styles.operations}>
-          <Button className="primaryBtn" onClick={() => onViewLog(taskID, space, taskStatus)}>{intl.get('import.viewLogs')}</Button>
-          {taskStatus === ITaskStatus.StatusProcessing && 
+          <Button className="primaryBtn" onClick={() => onViewLog(id, space, status)}>{intl.get('import.viewLogs')}</Button>
+          {status === ITaskStatus.StatusProcessing && 
           <Popconfirm
             placement="left"
             title={intl.get('import.endImport')}
-            onConfirm={() => onTaskStop(taskID)}
+            onConfirm={() => onTaskStop(id)}
             okText={intl.get('common.confirm')}
             cancelText={intl.get('common.cancel')}
           >
             <Button className="cancelBtn">{intl.get('import.endImport')}</Button>
           </Popconfirm>}
-          {taskStatus !== ITaskStatus.StatusProcessing && 
+          {status !== ITaskStatus.StatusProcessing && 
           <Popconfirm
             placement="left"
             title={intl.get('common.ask')}
-            onConfirm={() => onTaskDelete(taskID)}
+            onConfirm={() => onTaskDelete(id)}
             okText={intl.get('common.confirm')}
             cancelText={intl.get('common.cancel')}
           >

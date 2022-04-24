@@ -18,7 +18,7 @@ const PasswordInputModal = (props: IProps) => {
   const handleCancel = () => {
     setPassword('');
     onCancel();
-  }
+  };
   return (
     <Modal
       title={intl.get('import.enterPassword')}

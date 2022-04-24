@@ -12,14 +12,13 @@ interface IProps {
   showConfigDownload?: boolean;
   showLogDownload?: boolean;
   showTemplateModal?: boolean;
-  needFileDir?: boolean;
 }
 
 const Import = (props: IProps) => {
   const history = useHistory();
   const location = useLocation();
   const [tab, setTab] = useState('files');
-  const { needFileDir, showConfigDownload, showLogDownload, showTemplateModal } = props;
+  const { showConfigDownload, showLogDownload, showTemplateModal } = props;
   useEffect(() => {
     trackPageView('/import');
   }, []);
@@ -49,7 +48,7 @@ const Import = (props: IProps) => {
           path={`/import/files`}
           exact={true}
         >
-          <FileUpload needFileDir={needFileDir} />
+          <FileUpload />
         </Route>
 
         <Route

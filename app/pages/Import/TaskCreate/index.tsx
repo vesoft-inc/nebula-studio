@@ -24,16 +24,16 @@ const formItemLayout = {
 
 interface IProps {
   needPwdConfirm?: boolean;
-  mode?: string
 }
 const TaskCreate = (props: IProps) => {
-  const { dataImport, schema } = useStore();
-  const { getTaskDir, basicConfig, verticesConfig, edgesConfig, updateBasicConfig, importTask } = dataImport;
+  const { dataImport, schema, files } = useStore();
+  const { basicConfig, verticesConfig, edgesConfig, updateBasicConfig, importTask } = dataImport;
   const { spaces, getSpaces, updateSpaceInfo, currentSpace } = schema;
+  const { getFiles } = files;
   const { batchSize } = basicConfig;
   const [modalVisible, setVisible] = useState(false);
   const history = useHistory();
-  const { needPwdConfirm = true, mode = 'local' } = props;
+  const { needPwdConfirm = true } = props;
   const routes = [
     {
       path: '/import/tasks',
@@ -107,12 +107,15 @@ const TaskCreate = (props: IProps) => {
     }
   };
 
-  const clearConfig = () => {
-    dataImport.update({
-      basicConfig: { taskName: '' },
+  const clearConfig = (type?: string) => {
+    const params = {
       verticesConfig: [],
       edgesConfig: []
-    });
+    } as any;
+    if(type === 'all') {
+      params.basicConfig = { taskName: '' };
+    }
+    dataImport.update(params);
   };
   const handleSpaceChange = (space: string) => {
     clearConfig();
@@ -120,20 +123,17 @@ const TaskCreate = (props: IProps) => {
   };
 
   const initTaskDir = async () => {
-    const dir = await getTaskDir();
-    if(dir) {
-      const count = dir.split('/').pop();
-      updateBasicConfig('taskName', `task-${count}`);
-    }
+    updateBasicConfig('taskName', `task-${Date.now()}`);
   };
   useEffect(() => {
-    mode === 'local' && initTaskDir();
+    initTaskDir();
     getSpaces();
+    getFiles();
     if(currentSpace) {
       updateSpaceInfo(currentSpace);
     }
     trackPageView('/import/create');
-    return () => clearConfig();
+    return () => clearConfig('all');
   }, []);
   return (
     <div className={styles.importCreate}>

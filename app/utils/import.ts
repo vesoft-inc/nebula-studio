@@ -12,19 +12,16 @@ export function configToJson(payload) {
     host,
     verticesConfig,
     edgesConfig,
-    taskDir,
     spaceVidType,
     batchSize
   } = payload;
   const vertexToJSON = vertexDataToJSON(
     verticesConfig,
-    taskDir,
     spaceVidType,
     batchSize
   );
   const edgeToJSON = edgeDataToJSON(
     edgesConfig,
-    taskDir,
     spaceVidType,
     batchSize
   );
@@ -43,7 +40,6 @@ export function configToJson(payload) {
         address: host,
       },
     },
-    logPath: `${taskDir}/import.log`,
     files,
   };
   return configJson;
@@ -51,7 +47,6 @@ export function configToJson(payload) {
 
 export function edgeDataToJSON(
   config: any,
-  taskDir: string,
   spaceVidType: string,
   batchSize?: string,
 ) {
@@ -92,8 +87,8 @@ export function edgeDataToJSON(
     });
     const fileName = edge.file.name.replace('.csv', '');
     const edgeConfig = {
-      path: edge.file.path,
-      failDataPath: `${taskDir}/err/${fileName}Fail.csv`,
+      path: edge.file.name,
+      failDataPath: `${fileName}Fail.csv`,
       batchSize: Number(batchSize) || 60,
       type: 'csv',
       csv: {
@@ -119,7 +114,6 @@ export function edgeDataToJSON(
 
 export function vertexDataToJSON(
   config: any,
-  taskDir: string,
   spaceVidType: string,
   batchSize?: string
 ) {
@@ -145,8 +139,8 @@ export function vertexDataToJSON(
     });
     const fileName = vertex.file.name.replace('.csv', '');
     const vertexConfig: any = {
-      path: vertex.file.path,
-      failDataPath: `${taskDir}/err/${fileName}Fail.csv`,
+      path: vertex.file.name,
+      failDataPath: `${fileName}Fail.csv`,
       batchSize: Number(batchSize) || 60,
       type: 'csv',
       csv: {
