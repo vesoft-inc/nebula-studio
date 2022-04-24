@@ -133,7 +133,7 @@ func Import(taskID string, conf *importconfig.YAMLConfig) (err error) {
 			result.ErrorResult.ErrorCode = err.ErrCode
 			result.ErrorResult.ErrorMsg = err.ErrMsg.Error()
 			task.TaskInfo.TaskMessage = err.ErrMsg.Error()
-			err1 := GetTaskMgr().FinishTask(taskID)
+			err1 := GetTaskMgr().AbortTask(taskID)
 			if err1 != nil {
 				zap.L().Warn("finish task fail", zap.Error(err1))
 			}

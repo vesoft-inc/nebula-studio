@@ -119,7 +119,7 @@ func ImportData(ctx iris.Context) base.Result {
 	if err = importer.Import(taskID, params.ConfigBody); err != nil {
 		// task err: import task not start err handle
 		task.TaskInfo.TaskStatus = importer.StatusAborted.String()
-		err1 := importer.GetTaskMgr().FinishTask(taskID)
+		err1 := importer.GetTaskMgr().AbortTask(taskID)
 		if err1 != nil {
 			zap.L().Warn("finish task fail", zap.Error(err1))
 		}
