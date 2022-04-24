@@ -7,4 +7,8 @@ type Config struct {
 	Debug struct {
 		Enable bool
 	}
+	Auth struct {
+		AccessSecret string
+		AccessExpire int64
+	}
 }

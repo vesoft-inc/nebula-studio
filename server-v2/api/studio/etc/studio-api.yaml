@@ -3,3 +3,6 @@ Host: 0.0.0.0
 Port: 7002
 Debug:
   Enable: false
+Auth:
+  AccessSecret: "login_secret"
+  AccessExpire: 28800
