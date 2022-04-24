@@ -1,0 +1,22 @@
+syntax = "v1"
+
+type (
+	AnyResponse {
+		Data interface{} `json:"data"`
+	}
+	ExecNGQLParams {
+		Gql       string   `json:"gql"`
+		ParamList []string `json:"paramList"`
+	}
+)
+
+@server(
+	group: gateway
+	prefix: api-nebula/db
+)
+
+service studio-api {
+	@doc "Exec NGQL"
+	@handler ExecNGQL
+	post /exec(ExecNGQLParams) returns (AnyResponse)
+}

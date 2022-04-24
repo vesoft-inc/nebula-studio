@@ -1,0 +1,5 @@
+Name: studio-api
+Host: 0.0.0.0
+Port: 7002
+Debug:
+  Enable: false

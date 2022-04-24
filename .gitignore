@@ -5,9 +5,13 @@ node_modules/
 .DS_Store
 .vscode
 *.swp
+*.swo
+*.out
+*.log
 *.lock
 *.map
 .github/workflows/nodejs.yml
+
 
 app/**/*.map
 config/**/*.map
