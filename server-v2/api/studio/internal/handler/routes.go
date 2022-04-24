@@ -32,4 +32,15 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		},
 		rest.WithPrefix("/api-nebula/db"),
 	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/connect",
+				Handler: gateway.ConnectHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/api-nebula/db"),
+	)
 }

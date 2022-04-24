@@ -5,11 +5,21 @@ type GetHealth struct {
 	Status string `json:"status"`
 }
 
-type AnyResponse struct {
-	Data interface{} `json:"data"`
-}
-
 type ExecNGQLParams struct {
 	Gql       string   `json:"gql"`
 	ParamList []string `json:"paramList"`
+}
+
+type ConnectDBParams struct {
+	Address       string `json:"address"`
+	Port          int    `json:"port"`
+	Authorization string `header:"Authorization"`
+}
+
+type ConnectDBResult struct {
+	Version string `json:"version"`
+}
+
+type AnyResponse struct {
+	Data interface{} `json:"data"`
 }
