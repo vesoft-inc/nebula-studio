@@ -3,6 +3,7 @@ package controller
 import (
 	"bufio"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"mime/multipart"
@@ -16,6 +17,10 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/saintfish/chardet"
 	"go.uber.org/zap"
+)
+
+var (
+	noCharsetErr = errors.New("this charset can not be changed")
 )
 
 type fileStat struct {
@@ -165,6 +170,10 @@ func changeFileCharset2UTF8(filePath string, charSet string) error {
 		defer file.Close()
 		reader := bufio.NewReader(file)
 		decoder := mahonia.NewDecoder(charSet)
+		// this charset can not be changed
+		if decoder == nil {
+			return noCharsetErr
+		}
 		decodeReader := decoder.NewReader(reader)
 		fileUTF8, err := os.OpenFile(fileUTF8Path, os.O_RDONLY|os.O_CREATE|os.O_WRONLY, 0666)
 		if err != nil {
@@ -178,6 +187,16 @@ func changeFileCharset2UTF8(filePath string, charSet string) error {
 		return nil
 	}()
 	if err != nil {
+		_, statErr := os.Stat(fileUTF8Path)
+		if statErr == nil || os.IsExist(statErr) {
+			removeErr := os.Remove(fileUTF8Path)
+			if removeErr != nil {
+				zap.L().Warn(fmt.Sprintf("remove file %s fail", fileUTF8Path), zap.Error(removeErr))
+			}
+		}
+		if err == noCharsetErr {
+			return nil
+		}
 		return err
 	}
 	if err = os.Rename(fileUTF8Path, filePath); err != nil {
