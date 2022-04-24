@@ -11,15 +11,15 @@ const (
 
 // Define you error code here
 var (
-	ErrBadRequest     = newErrCode(CCBadRequest, PlatformCode, 0, "ErrBadRequest")         // 4000000
-	ErrParam          = newErrCode(CCBadRequest, PlatformCode, 1, "ErrParam")              // 4000001
-	ErrUnauthorized   = newErrCode(CCUnauthorized, PlatformCode, 0, "ErrUnauthorized")     // 4010000
-	ErrSession        = newErrCode(CCUnauthorized, PlatformCode, 1, "ErrSession")          // 4010001
-	ErrForbidden      = newErrCode(CCForbidden, PlatformCode, 0, "ErrForbidden")           // 4030000
-	ErrNotFound       = newErrCode(CCNotFound, PlatformCode, 0, "ErrNotFound")             // 4040000
-	ErrInternalServer = newErrCode(CCInternalServer, PlatformCode, 0, "ErrInternalServer") // 5000000
-	ErrNotImplemented = newErrCode(CCNotImplemented, PlatformCode, 0, "ErrNotImplemented") // 5010000
-	ErrUnknown        = newErrCode(CCUnknown, PlatformCode, 0, "ErrUnknown")               // 9000000
+	ErrBadRequest     = newErrCode(CCBadRequest, PlatformCode, 0, "ErrBadRequest")         // 40004000
+	ErrParam          = newErrCode(CCBadRequest, PlatformCode, 1, "ErrParam")              // 40004001
+	ErrUnauthorized   = newErrCode(CCUnauthorized, PlatformCode, 0, "ErrUnauthorized")     // 40104000
+	ErrSession        = newErrCode(CCUnauthorized, PlatformCode, 1, "ErrSession")          // 40104001
+	ErrForbidden      = newErrCode(CCForbidden, PlatformCode, 0, "ErrForbidden")           // 40304000
+	ErrNotFound       = newErrCode(CCNotFound, PlatformCode, 0, "ErrNotFound")             // 40404000
+	ErrInternalServer = newErrCode(CCInternalServer, PlatformCode, 0, "ErrInternalServer") // 50004000
+	ErrNotImplemented = newErrCode(CCNotImplemented, PlatformCode, 0, "ErrNotImplemented") // 50104000
+	ErrUnknown        = newErrCode(CCUnknown, PlatformCode, 0, "ErrUnknown")               // 90004000
 )
 
 var statusCodeErrorMapping = map[int]*ErrCode{

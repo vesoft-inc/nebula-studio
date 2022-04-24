@@ -1,12 +1,21 @@
 syntax = "v1"
 
 type (
-	AnyResponse {
-		Data interface{} `json:"data"`
-	}
 	ExecNGQLParams {
 		Gql       string   `json:"gql"`
 		ParamList []string `json:"paramList"`
+	}
+	ConnectDBParams {
+		Address       string `json:"address"`
+		Port          int    `json:"port"`
+		Authorization string `header:"Authorization"`
+	}
+	ConnectDBResult {
+		Version string `json:"version"`
+	}
+
+	AnyResponse {
+		Data interface{} `json:"data"`
 	}
 )
 
@@ -19,4 +28,15 @@ service studio-api {
 	@doc "Exec NGQL"
 	@handler ExecNGQL
 	post /exec(ExecNGQLParams) returns (AnyResponse)
+}
+
+@server(
+	group: gateway
+	prefix: api-nebula/db
+)
+
+service studio-api {
+	@doc "Connect DB"
+	@handler Connect
+	post /connect(ConnectDBParams) returns (ConnectDBResult)
 }
