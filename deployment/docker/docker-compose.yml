@@ -1,7 +1,7 @@
 version: '3.4'
 services:
   web:
-    image: vesoft/nebula-graph-studio:v3.3.0-beta
+    image: vesoft/nebula-graph-studio:v3.3.0
     environment:
       USER: root
     ports:
