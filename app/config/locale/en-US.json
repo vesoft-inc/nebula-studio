@@ -236,9 +236,9 @@
     "nGql": "nGQL"
   },
   "link": {
-    "nGQLHref": "https://docs.nebula-graph.io/3.0.0/3.ngql-guide/1.nGQL-overview/1.overview/",
-    "mannualHref": "https://docs.nebula-graph.io/3.0.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/",
-    "startStudioHref": "https://docs.nebula-graph.io/3.0.0/nebula-studio/quick-start/st-ug-plan-schema/",
-    "versionLogHref": "https://docs.nebula-graph.io/3.0.0/nebula-studio/about-studio/st-ug-release-note/"
+    "nGQLHref": "https://docs.nebula-graph.io/3.1.0/3.ngql-guide/1.nGQL-overview/1.overview/",
+    "mannualHref": "https://docs.nebula-graph.io/3.1.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/",
+    "startStudioHref": "https://docs.nebula-graph.io/3.1.0/nebula-studio/quick-start/st-ug-plan-schema/",
+    "versionLogHref": "https://docs.nebula-graph.io/3.1.0/nebula-studio/about-studio/st-ug-release-note/"
   }
 }
