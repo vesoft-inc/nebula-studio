@@ -9,7 +9,7 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca
 	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220413113447-a3f4c56287d8
-	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220331072417-e7281ccc8a1a
+	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220426040009-20ff1284d0e5
 	go.uber.org/zap v1.17.0
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/sqlite v1.2.6
@@ -55,7 +55,7 @@ require (
 	github.com/tdewolff/minify/v2 v2.9.22 // indirect
 	github.com/tdewolff/parse/v2 v2.5.21 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/vesoft-inc/nebula-go/v3 v3.0.0-20220214062853-d0c59964d0af // indirect
+	github.com/vesoft-inc/nebula-go/v3 v3.1.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.4 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/yosssi/ace v0.0.5 // indirect
