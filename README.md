@@ -1,5 +1,5 @@
 # Nebula Graph Studio
-Nebula Graph Studio (Studio for short) is a web-based visualization tool for Nebula Graph. With Studio, you can create a graph schema, import data, edit nGQL statements for data queries, and explore graphs.
+Nebula Graph Studio (Studio for short) is a web-based visualization tool for Nebula Graph. With Studio, you can create a graph schema, import data and edit nGQL statements for data queries.
 ![](./introduction.png)
 
 ## Architecture
@@ -53,8 +53,8 @@ kill -9 $(lsof -t -i :7001)
 ```
 
 ## Documentation 
-[中文](https://docs.nebula-graph.com.cn/2.5.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/)
-[ENGLISH](https://https://docs.nebula-graph.io/2.5.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/)
+[中文](https://docs.nebula-graph.com.cn/3.1.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/)
+[ENGLISH](https://https://docs.nebula-graph.io/3.1.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/)
 
 ## Contributing
-Contributions are warmly welcomed and greatly appreciated. Please see [Guide Docs](https://github.com/vesoft-inc-private/nebula-graph-studio/blob/master/CONTRIBUTING.md) 
+Contributions are warmly welcomed and greatly appreciated. Please see [Guide Docs](https://github.com/vesoft-inc/nebula-studio/blob/master/CONTRIBUTING.md) 

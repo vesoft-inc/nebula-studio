@@ -5,7 +5,6 @@ A high level overview of tools used:
 
 - TypeScript as the development language
 - Webpack for bundling
-- Egg.js for api proxy
 - Prettier and styleLint for code formating
 
 Commit information must contain one item in list below:
