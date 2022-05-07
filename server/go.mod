@@ -8,8 +8,8 @@ require (
 	github.com/kataras/iris/v12 v12.2.0-alpha4
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca
-	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220505125038-4cab57802c58
-	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220426040009-20ff1284d0e5
+	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220507025253-cb342db9786d
+	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220505095506-93febd41c2be
 	go.uber.org/zap v1.17.0
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/sqlite v1.2.6
