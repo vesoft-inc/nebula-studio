@@ -3,11 +3,13 @@ package service
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 	"strings"
 
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -45,6 +47,7 @@ func (s *gatewayService) GetExec(request *types.ExecNGQLParams) (*types.AnyRespo
 }
 
 func (s *gatewayService) ConnectDB(request *types.ConnectDBParams) (*types.ConnectDBResult, error) {
+	fmt.Println("======request999", request)
 	tokenSplit := strings.Split(request.Authorization, " ")
 	if len(tokenSplit) != 2 {
 		return nil, ecode.WithCode(ecode.ErrParam, nil, "invalid authorization")
@@ -62,6 +65,18 @@ func (s *gatewayService) ConnectDB(request *types.ConnectDBParams) (*types.Conne
 
 	username, password := loginInfo[0], loginInfo[1]
 	clientInfo, err := dao.Connect(request.Address, request.Port, username, password)
+
+	tokenString, err := auth.CreateToken(
+		&auth.AuthData{
+			NebulaAddress: request.Address,
+			Username:      username,
+			ClientID:      clientInfo.ClientID,
+		},
+		&s.svcCtx.Config,
+	)
+
+	fmt.Println("=====tokenString", tokenString)
+
 	if err != nil {
 		return nil, ecode.WithInternalServer(err, "connect db failed")
 	}

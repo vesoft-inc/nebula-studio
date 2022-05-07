@@ -5,4 +5,4 @@ Debug:
   Enable: false
 Auth:
   AccessSecret: "login_secret"
-  AccessExpire: 28800
+  AccessExpire: 7200

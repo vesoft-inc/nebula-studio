@@ -4,15 +4,14 @@ import (
 	"embed"
 	"flag"
 	"fmt"
-	"net/http"
 
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 
 	"github.com/zeromicro/go-zero/core/conf"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
@@ -32,12 +31,8 @@ func main() {
 	defer server.Stop()
 
 	// global middleware
-	server.Use(func(next http.HandlerFunc) http.HandlerFunc {
-		return func(w http.ResponseWriter, r *http.Request) {
-			logx.Info("global middleware", r.URL.Path)
-			next(w, r)
-		}
-	})
+	// server.Use(auth.AuthMiddleware)
+	server.Use(auth.AuthMiddlewareWithConfig(&c))
 
 	// static assets handlers
 	utils.RegisterHandlers(server, svcCtx, embedAssets)
