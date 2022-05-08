@@ -4,6 +4,7 @@ package handler
 import (
 	"net/http"
 
+	file "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/file"
 	gateway "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/gateway"
 	health "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/health"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
@@ -42,5 +43,25 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 		},
 		rest.WithPrefix("/api-nebula/db"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/file",
+				Handler: file.FileUploadHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/api/file/:name",
+				Handler: file.FileDestroyHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/file",
+				Handler: file.FilesIndexHandler(serverCtx),
+			},
+		},
 	)
 }

@@ -8,4 +8,5 @@ info(
 import (
 	"health.api"
 	"gateway.api"
+	"file.api"
 )
