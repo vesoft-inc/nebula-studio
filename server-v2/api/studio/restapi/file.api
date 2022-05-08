@@ -28,7 +28,7 @@ service studio-api {
 	post /api/file
 	@doc "delete file"
 	@handler FileDestroy
-	delete /api/file/:name returns(FileDestroyRequest)
+	delete /api/file/:name(FileDestroyRequest)
 	@doc "preview file"
 	@handler FilesIndex
 	get /api/file returns(FilesIndexData)
