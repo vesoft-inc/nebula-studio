@@ -1,8 +1,11 @@
 Name: studio-api
 Host: 0.0.0.0
 Port: 7002
+MaxBytes: 1073741824
 Debug:
   Enable: false
 Auth:
   AccessSecret: "login_secret"
   AccessExpire: 7200
+File:
+  UploadDir: "./upload/"

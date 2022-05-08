@@ -23,3 +23,19 @@ type ConnectDBResult struct {
 type AnyResponse struct {
 	Data interface{} `json:"data"`
 }
+
+type FileDestroyRequest struct {
+	Name string `path:"name" validate:"required"`
+}
+
+type FileStat struct {
+	Content    [][]string `json:"content"`
+	WithHeader bool       `json:"withHeader"`
+	DataType   string     `json:"dataType"`
+	Name       string     `json:"name"`
+	Size       int64      `json:"size"`
+}
+
+type FilesIndexData struct {
+	List []FileStat `json:"list"`
+}
