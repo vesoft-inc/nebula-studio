@@ -7,6 +7,7 @@ import (
 	file "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/file"
 	gateway "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/gateway"
 	health "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/health"
+	importtask "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/importtask"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -61,6 +62,51 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/api/file",
 				Handler: file.FilesIndexHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/import-tasks",
+				Handler: importtask.CreateImportTaskHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/import-tasks/:id",
+				Handler: importtask.GetImportTaskHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/import-tasks",
+				Handler: importtask.GetManyImportTaskHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/import-tasks/:id/logs",
+				Handler: importtask.GetManyImportTaskLogHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/api/import-tasks/:id",
+				Handler: importtask.DeleteImportTaskHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/import-tasks/stop/:id",
+				Handler: importtask.StopImportTaskHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/import-tasks/:id/logs",
+				Handler: importtask.DownloadLogsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/import-tasks/config/:id",
+				Handler: importtask.DownloadConfigHandler(serverCtx),
 			},
 		},
 	)

@@ -1,0 +1,181 @@
+syntax = "v1"
+
+type (
+	Connection {
+		User     string `json:"user" validate:"required"`
+		Password string `json:"password" validate:"required"`
+		Address  string `json:"address" validate:"required"`
+	}
+
+	ClientSettings {
+		Space             string     `json:"space" validate:"required"`
+		Connection        Connection `json:"connection" validate:"required"`
+		Retry             int64      `json:"retry,optional"`
+		Concurrency       int64      `json:"concurrency,optional"`
+		ChannelBufferSize int64      `json:"channelBufferSize,optional"`
+	}
+
+	CSV {
+		WithHeader bool   `json:"withHeader,optional"`
+		WithLabel  bool   `json:"withLabel,optional"`
+		Delimiter  string `json:"delimiter,optional"`
+	}
+
+	VID {
+		Index    int64  `json:"index" validate:"required"`
+		Type     string `json:"type" validate:"required"`
+		Function string `json:"function,optional"`
+		Prefix   string `json:"prefix,optional"`
+	}
+
+	TagProp {
+		Name  string `json:"name" validate:"required"`
+		Type  string `json:"type" validate:"required"`
+		Index int64  `json:"index" validate:"required"`
+	}
+
+	Tag {
+		Name  string    `json:"name" validate:"required"`
+		Props []TagProp `json:"props" validate:"required"`
+	}
+
+	Vertex {
+		VID  VID   `json:"vid" validate:"required"`
+		Tags []Tag `json:"tags" validate:"required"`
+	}
+
+	EdgeID {
+		Index    int64  `json:"index" validate:"required"`
+		Function string `json:"function,optional"`
+	}
+
+	EdgeRank {
+		Index int64 `json:"index" validate:"required"`
+	}
+
+	EdgeProp {
+		Name  string `json:"name" validate:"required"`
+		Type  string `json:"type" validate:"required"`
+		Index int64  `json:"index" validate:"required"`
+	}
+
+	Edge {
+		Name   string   `json:"name" validate:"required"`
+		SrcVID EdgeID   `json:"srcVID" validate:"required"`
+		DstVID EdgeID   `json:"dstVID" validate:"required"`
+		Rank   EdgeRank `json:"rank" validate:"required"`
+		Props  EdgeProp `json:"props" validate:"required"`
+	}
+
+	Schema {
+		Type   string `json:"type" validate:"required"`
+		Edge   Edge   `json:"edge" validate:"required"`
+		Vertex Vertex `json:"vertex" validate:"required"`
+	}
+
+	File {
+		Path   string `json:"path" validate:"required"`
+		Type   string `json:"type" validate:"required"`
+		CSV    CSV    `json:"csv" validate:"required"`
+		Schema Schema `json:"schema" validate:"required"`
+	}
+
+	ImportConfig {
+		Version         string         `json:"version" validate:"required"`
+		Description     string         `json:"description,optional"`
+		RemoveTempFiles string         `json:"removeTempFiles,optional"`
+		ClientSettings  ClientSettings `json:"clientSettings" validate:"required"`
+		Files           []File         `json:"files" validate:"required"`
+	}
+
+	CreateImportTaskRequest {
+		Name   string       `path:"name" validate:"required"`
+		Config ImportConfig `json:"config" validate:"required"`
+	}
+
+	CreateImportTaskData {
+		Id string `json:"id"`
+	}
+
+	GetImportTaskRequest {
+		Id string `path:"id" validate:"required"`
+	}
+
+	GetImportTaskData {
+		Id         string `json:"id"`
+		SolutionId string `json:"solutionId"`
+		Config     string `json:"config"`
+		Status     string `json:"status"`
+		ImportCode int64  `json:"importCode"`
+		CreateTime int64  `json:"createTime"`
+		UpdateTime int64  `json:"updateTime"`
+	}
+
+	GetManyImportTaskRequest {
+		Page     int `form:"page,default=1"`
+		PageSize int `form:"pageSize,default=100"`
+	}
+
+	GetManyImportTaskData {
+		Total int64               `json:"total"`
+		List  []GetImportTaskData `json:"list"`
+	}
+
+	GetManyImportTaskLogRequest {
+		Id     string `path:"id" validate:"required"`
+		Offset int64  `form:"offset" validate:"min=0"`
+		Limit  int64  `form:"limit" validate:"min=1"`
+	}
+
+	GetManyImportTaskLogData {
+		Logs []string `json:"logs"`
+	}
+
+	DeleteImportTaskRequest {
+		Id string `path:"id" validate:"required"`
+	}
+
+	StopImportTaskRequest {
+		Id string `path:"id" validate:"required"`
+	}
+
+	DownloadLogsRequest {
+		Id   string `json:"id" validate:"required"`
+		Name string `json:"name" validate:"required"`
+	}
+
+	DownloadConfigsRequest {
+		Id string `path:"id" validate:"required"`
+	}
+)
+
+@server(
+	group: importtask
+)
+
+service studio-api {
+	@doc "Create Import Task"
+	@handler CreateImportTask
+	post /api/import-tasks(CreateImportTaskRequest) returns(CreateImportTaskData)
+	@doc "Get Import Task"
+	@handler GetImportTask
+	get /api/import-tasks/:id(GetImportTaskRequest) returns(GetImportTaskData)
+	@doc "Get Many Import Task"
+	@handler GetManyImportTask
+	get /api/import-tasks(GetManyImportTaskRequest) returns(GetManyImportTaskData)
+	@doc "Get Many Import Task Log"
+	@handler GetManyImportTaskLog
+	get /api/import-tasks/:id/logs(GetManyImportTaskLogRequest) returns(GetManyImportTaskLogData)
+	@doc "Delete Import Task"
+	@handler DeleteImportTask
+	delete /api/import-tasks/:id(DeleteImportTaskRequest)
+	@doc "Stop Import Task"
+	@handler StopImportTask
+	get /api/import-tasks/stop/:id(StopImportTaskRequest)
+	@doc "Download logs"
+	@handler DownloadLogs
+	post /api/import-tasks/:id/logs(DownloadLogsRequest)
+	@doc "Download Config"
+	@handler DownloadConfig
+	get /api/import-tasks/config/:id(DownloadConfigsRequest)
+}

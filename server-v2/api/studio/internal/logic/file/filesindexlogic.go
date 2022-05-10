@@ -1,8 +1,8 @@
 package file
 
 import (
-	"context"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service"
+	"net/http"
 
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
@@ -12,18 +12,18 @@ import (
 
 type FilesIndexLogic struct {
 	logx.Logger
-	ctx    context.Context
+	r      *http.Request
 	svcCtx *svc.ServiceContext
 }
 
-func NewFilesIndexLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FilesIndexLogic {
+func NewFilesIndexLogic(r *http.Request, svcCtx *svc.ServiceContext) *FilesIndexLogic {
 	return &FilesIndexLogic{
-		Logger: logx.WithContext(ctx),
-		ctx:    ctx,
+		Logger: logx.WithContext(r.Context()),
+		r:      r,
 		svcCtx: svcCtx,
 	}
 }
 
 func (l *FilesIndexLogic) FilesIndex() (resp *types.FilesIndexData, err error) {
-	return service.NewFileService(nil, l.ctx, l.svcCtx).FilesIndex()
+	return service.NewFileService(l.r, l.r.Context(), l.svcCtx).FilesIndex()
 }

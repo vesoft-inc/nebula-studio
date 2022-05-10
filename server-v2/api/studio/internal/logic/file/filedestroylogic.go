@@ -1,8 +1,8 @@
 package file
 
 import (
-	"context"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service"
+	"net/http"
 
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
@@ -12,18 +12,18 @@ import (
 
 type FileDestroyLogic struct {
 	logx.Logger
-	ctx    context.Context
+	r      *http.Request
 	svcCtx *svc.ServiceContext
 }
 
-func NewFileDestroyLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FileDestroyLogic {
+func NewFileDestroyLogic(r *http.Request, svcCtx *svc.ServiceContext) *FileDestroyLogic {
 	return &FileDestroyLogic{
-		Logger: logx.WithContext(ctx),
-		ctx:    ctx,
+		Logger: logx.WithContext(r.Context()),
+		r:      r,
 		svcCtx: svcCtx,
 	}
 }
 
 func (l *FileDestroyLogic) FileDestroy(req types.FileDestroyRequest) error {
-	return service.NewFileService(nil, l.ctx, l.svcCtx).FileDestroy(req.Name)
+	return service.NewFileService(l.r, l.r.Context(), l.svcCtx).FileDestroy(req.Name)
 }

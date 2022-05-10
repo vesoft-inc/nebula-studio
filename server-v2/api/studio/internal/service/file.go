@@ -10,6 +10,7 @@ import (
 	"github.com/saintfish/chardet"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
+	Config "github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/config"
 	"github.com/zeromicro/go-zero/core/logx"
 	"go.uber.org/zap"
 	"io"
@@ -46,23 +47,16 @@ type (
 )
 
 func NewFileService(r *http.Request, ctx context.Context, svcCtx *svc.ServiceContext) FileService {
-	if r != nil {
-		return &fileService{
-			Logger: logx.WithContext(r.Context()),
-			r:      r,
-			svcCtx: svcCtx,
-		}
-	} else {
-		return &fileService{
-			Logger: logx.WithContext(ctx),
-			ctx:    ctx,
-			svcCtx: svcCtx,
-		}
+	return &fileService{
+		Logger: logx.WithContext(ctx),
+		ctx:    ctx,
+		svcCtx: svcCtx,
+		r:      r,
 	}
 }
 
 func (f *fileService) FileDestroy(name string) error {
-	dir := f.svcCtx.Config.File.UploadDir
+	dir := Config.Cfg.Web.UploadDir
 	target := filepath.Join(dir, name)
 	if _, err := os.Stat(target); err != nil {
 		logx.Infof("del file error %v", err)
@@ -82,7 +76,7 @@ func (f *fileService) FilesIndex() (data *types.FilesIndexData, err error) {
 	data = &types.FilesIndexData{
 		List: []types.FileStat{},
 	}
-	dir := f.svcCtx.Config.File.UploadDir
+	dir := Config.Cfg.Web.UploadDir
 	filesInfo, err := ioutil.ReadDir(dir)
 	if err != nil {
 		logx.Infof("open files error %v", err)
@@ -122,7 +116,7 @@ func (f *fileService) FilesIndex() (data *types.FilesIndexData, err error) {
 }
 
 func (f *fileService) FileUpload() error {
-	dir := f.svcCtx.Config.File.UploadDir
+	dir := Config.Cfg.Web.UploadDir
 	_, err := os.Stat(dir)
 	if err != nil {
 		if os.IsNotExist(err) {

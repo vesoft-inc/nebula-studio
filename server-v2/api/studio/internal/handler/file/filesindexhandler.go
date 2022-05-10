@@ -10,7 +10,7 @@ import (
 
 func FilesIndexHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		l := file.NewFilesIndexLogic(r.Context(), svcCtx)
+		l := file.NewFilesIndexLogic(r, svcCtx)
 		data, err := l.FilesIndex()
 		svcCtx.ResponseHandler.Handle(w, r, data, err)
 	}

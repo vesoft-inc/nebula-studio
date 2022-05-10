@@ -4,12 +4,15 @@ import (
 	"embed"
 	"flag"
 	"fmt"
-
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service/importer"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
+	Config "github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/config"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/logging"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
+	"go.uber.org/zap"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
@@ -25,6 +28,18 @@ func main() {
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c, conf.UseEnv())
+
+	// init logger
+	loggingOptions := logging.NewOptions()
+	if err := loggingOptions.InitGlobals(); err != nil {
+		panic(err)
+	}
+
+	if err := Config.InitConfig(*configFile); err != nil {
+		zap.L().Fatal("init config failed", zap.Error(err))
+	}
+
+	importer.InitDB()
 
 	svcCtx := svc.NewServiceContext(c)
 	server := rest.MustNewServer(c.RestConf)

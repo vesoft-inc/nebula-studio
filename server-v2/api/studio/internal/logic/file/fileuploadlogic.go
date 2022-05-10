@@ -23,5 +23,5 @@ func NewFileUploadLogic(r *http.Request, svcCtx *svc.ServiceContext) *FileUpload
 }
 
 func (l *FileUploadLogic) FileUpload() error {
-	return service.NewFileService(l.r, nil, l.svcCtx).FileUpload()
+	return service.NewFileService(l.r, l.r.Context(), l.svcCtx).FileUpload()
 }

@@ -1,4 +1,4 @@
-package config
+package Config
 
 import (
 	"io/ioutil"
@@ -21,8 +21,6 @@ type (
 		UploadDir        string `yaml:"upload_dir"`
 		TasksDir         string `yaml:"tasks_dir"`
 		SqlitedbFilePath string `yaml:"sqlitedb_file_path"`
-		Address          string `yaml:"address"`
-		Port             int    `yaml:"port"`
 	}
 )
 
@@ -32,8 +30,6 @@ const (
 	DefaultUploadDir        = "data/upload"
 	DefaultTasksDir         = "data/tasks"
 	DefaultSqlitedbFilePath = "data/tasks.db"
-	DefaultAddress          = "0.0.0.0"
-	DefaultPort             = 9000
 )
 
 func (c *Config) Validate() error {
@@ -91,12 +87,6 @@ func (w *Web) Complete() {
 		}
 		abs, _ := filepath.Abs(DefaultSqlitedbFilePath)
 		w.SqlitedbFilePath = abs
-	}
-	if w.Address == "" {
-		w.Address = DefaultAddress
-	}
-	if w.Port == 0 {
-		w.Port = DefaultPort
 	}
 }
 
