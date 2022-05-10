@@ -30,9 +30,8 @@ interface IProps {
 
 const OutputBox = (props: IProps) => {
   const { gql, result: { code, data, message }, onHistoryItem, index, onExplorer, onResultConfig } = props;
-  const { global, console, schema } = useStore();
+  const { console, schema } = useStore();
   const [visible, setVisible] = useState(true);
-  const { username, host } = global;
   const { results, update, favorites, updateFavorites } = console;
   const { spaceVidType, currentSpace } = schema;
   const [columns, setColumns] = useState<any>([]);
@@ -41,6 +40,7 @@ const OutputBox = (props: IProps) => {
   const [showGraph, setShowGraph] = useState(false);
   const [graph, setGraph] = useState<GraphStore | null>(null);
   const [tab, setTab] = useState('');
+  const [curAccount] = useState(sessionStorage.getItem('curAccount'));
   const initData = () => {
     let _columns = [] as any;
     let _dataSource = [] as any;
@@ -122,24 +122,22 @@ const OutputBox = (props: IProps) => {
       return;
     }
     const _favorites = { ...favorites };
-    if (_favorites[username] && _favorites[username][host]) {
-      _favorites[username][host].unshift(gql);
+    if (_favorites[curAccount]) {
+      _favorites[curAccount].unshift(gql);
     } else {
-      _favorites[username] = {
-        [host]: [gql],
-      };
+      _favorites[curAccount] = [gql];
     }
     updateFavorites(_favorites);
   };
   const removeFavorite = () => {
     const _favorites = { ...favorites };
-    _favorites[username][host].splice(index, 1);
+    _favorites[curAccount].splice(index, 1);
     updateFavorites(_favorites);
   };
 
   useEffect(() => { 
-    if(gql && favorites[username] && favorites[username][host]) {
-      setIsFavorited(favorites[username][host].includes(gql));
+    if(gql && favorites[curAccount]) {
+      setIsFavorited(favorites[curAccount].includes(gql));
     }
   }, [favorites, gql]);
 

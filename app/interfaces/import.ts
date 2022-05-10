@@ -46,3 +46,9 @@ export interface IBasicConfig {
   taskName: string;
   batchSize?: string;
 }
+
+export interface ILogDimension {
+  space: string;
+  id: number;
+  status: ITaskStatus;
+}

@@ -10,10 +10,11 @@ import Icon from '@app/components/Icon';
 import styles from './index.module.less';
 interface IProps {
   data: ITaskItem;
-  handleStop: (id: number) => void;
-  handleDelete: (id: number) => void;
-  handleDownload: (id: number) => void;
+  onTaskStop: (id: number) => void;
+  onTaskDelete: (id: number) => void;
+  onConfigDownload: (id: number) => void;
   onViewLog: (id: number, space: string, taskStatus: ITaskStatus) => void;
+  showConfigDownload: boolean;
 }
 
 
@@ -47,10 +48,11 @@ const TaskItem = (props: IProps) => {
       updatedTime, 
       createdTime 
     }, 
+    showConfigDownload,
     onViewLog,
-    handleDownload,
-    handleStop, 
-    handleDelete } = props;
+    onConfigDownload,
+    onTaskStop, 
+    onTaskDelete } = props;
   const [status, setStatus] = useState<'success' | 'active' | 'normal' | 'exception' | undefined>(undefined);
   const [extraMsg, setExtraMsg] = useState('');
   const addMsg = () => {
@@ -81,10 +83,10 @@ const TaskItem = (props: IProps) => {
     <div className={styles.taskItem}>
       <div className={styles.row}>
         <span>{intl.get('common.space')}: {space}</span>
-        <Button type="link" size="small" onClick={() => handleDownload(taskID)}>
+        {showConfigDownload && <Button type="link" size="small" onClick={() => onConfigDownload(taskID)}>
           <Icon type="icon-studio-btn-download" />
           {intl.get('import.downloadConfig')}
-        </Button>
+        </Button>}
       </div>
       <div className={styles.row}>
         <div className={styles.progress}>
@@ -124,7 +126,7 @@ const TaskItem = (props: IProps) => {
           <Popconfirm
             placement="left"
             title={intl.get('import.endImport')}
-            onConfirm={() => handleStop(taskID)}
+            onConfirm={() => onTaskStop(taskID)}
             okText={intl.get('common.confirm')}
             cancelText={intl.get('common.cancel')}
           >
@@ -134,7 +136,7 @@ const TaskItem = (props: IProps) => {
           <Popconfirm
             placement="left"
             title={intl.get('common.ask')}
-            onConfirm={() => handleDelete(taskID)}
+            onConfirm={() => onTaskDelete(taskID)}
             okText={intl.get('common.confirm')}
             cancelText={intl.get('common.cancel')}
           >
