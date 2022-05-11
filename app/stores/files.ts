@@ -2,6 +2,7 @@ import { action, makeObservable, observable, runInAction } from 'mobx';
 import service from '@app/config/service';
 import { message } from 'antd';
 import intl from 'react-intl-universal';
+import { StudioFile } from '@app/interfaces/import';
 
 export class FilesStore {
   uploadDir: string = '';
@@ -27,7 +28,7 @@ export class FilesStore {
       });
     }
   };
-  uploadFile = async (files: any) => {
+  uploadFile = async (files: StudioFile[]) => {
     const config = {
       headers: {
         'content-type': 'multipart/form-data',

@@ -6,11 +6,11 @@ import CSVPreviewLink from '@app/components/CSVPreviewLink';
 import { getFileSize } from '@app/utils/file';
 import cls from 'classnames';
 import styles from './index.module.less';
-
+import { StudioFile } from '@app/interfaces/import';
 interface IProps {
   fileList: any[];
   onDelete: (index: number) => void;
-  onUpload: (file: any, fileList: any) => void;
+  onUpload: (file: StudioFile, fileList: StudioFile[]) => void;
   loading: boolean;
 }
 const FileList = (props: IProps) => {
@@ -35,25 +35,26 @@ const FileList = (props: IProps) => {
       title: intl.get('common.operation'),
       key: 'operation',
       render: (_, file, index) => {
-        if (file.content) {
-          return (
-            <div className={styles.operation}>
-              <CSVPreviewLink file={file} btnType="default">
-                <Icon type="icon-studio-btn-detail" />
-              </CSVPreviewLink>
-              <Popconfirm
-                onConfirm={() => onDelete(index)}
-                title={intl.get('common.ask')}
-                okText={intl.get('common.ok')}
-                cancelText={intl.get('common.cancel')}
-              >
-                <Button className="warningBtn" type="link">
-                  <Icon type="icon-studio-btn-delete" />
-                </Button>
-              </Popconfirm>
-            </div>
-          );
+        if(!file.content) {
+          return null
         }
+        return (
+          <div className={styles.operation}>
+            <CSVPreviewLink file={file} btnType="default">
+              <Icon type="icon-studio-btn-detail" />
+            </CSVPreviewLink>
+            <Popconfirm
+              onConfirm={() => onDelete(index)}
+              title={intl.get('common.ask')}
+              okText={intl.get('common.ok')}
+              cancelText={intl.get('common.cancel')}
+            >
+              <Button className="warningBtn" type="link">
+                <Icon type="icon-studio-btn-delete" />
+              </Button>
+            </Popconfirm>
+          </div>
+        );
       },
     },
   ];
@@ -65,7 +66,7 @@ const FileList = (props: IProps) => {
         showUploadList={false}
         fileList={fileList}
         customRequest={() => {}}
-        beforeUpload={onUpload as any}
+        beforeUpload={onUpload}
       >
         <Button className={cls('studioAddBtn', styles.uploadBtn)} type="primary">
           <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('import.uploadFile')}

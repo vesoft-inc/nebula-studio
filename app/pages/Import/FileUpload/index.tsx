@@ -6,6 +6,7 @@ import FileList from './FileList';
 import { debounce } from 'lodash';
 import { message } from 'antd';
 import intl from 'react-intl-universal';
+import { StudioFile } from '@app/interfaces/import';
 interface IProps {
   needFileDir: boolean
 }
@@ -15,18 +16,19 @@ const FileUpload = (props: IProps) => {
   const { fileList, uploadDir, deleteFile, getFiles, uploadFile, getUploadDir } = files;
   const [loading, setLoading] = useState(false);
   const { needFileDir = true } = props;
-  const transformFile = async (_file, fileList) => {
+  const transformFile = async (_file: StudioFile, fileList: StudioFile[]) => {
     fileList.forEach(file => {
       if(needFileDir) {
         file.path = `${uploadDir}/${file.name}`;
       }
       file.withHeader = false;
     })
+
     await handleUpdate(fileList)
     return false
   };
 
-  const handleUpdate = async (fileList: any) => {
+  const handleUpdate = async (fileList: StudioFile[]) => {
     setLoading(true);
     await uploadFile(fileList).then(_ => {
       setTimeout(() => {
@@ -38,9 +40,9 @@ const FileUpload = (props: IProps) => {
     });
   };
 
-  const handleDelete = async (index: number) => {
+  const handleDelete = (index: number) => {
     const file = fileList[index].name;
-    await deleteFile(file)
+    deleteFile(file)
   }
 
   const getFileList = async () => {
