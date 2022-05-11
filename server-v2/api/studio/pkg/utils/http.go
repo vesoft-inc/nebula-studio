@@ -45,3 +45,12 @@ func DisabledCookie(name string) *http.Cookie {
 		MaxAge:   -1,
 	}
 }
+
+// dynamicly add query params to the request
+func AddQueryParams(r *http.Request, params map[string]string) {
+	query := r.URL.Query()
+	for k, v := range params {
+		query.Set(k, v)
+	}
+	r.URL, _ = r.URL.Parse(r.URL.Path + "?" + query.Encode())
+}

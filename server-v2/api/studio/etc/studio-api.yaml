@@ -6,6 +6,6 @@ Debug:
   Enable: false
 Auth:
   AccessSecret: "login_secret"
-  AccessExpire: 7200
+  AccessExpire: 1800
 File:
   UploadDir: "./upload/"

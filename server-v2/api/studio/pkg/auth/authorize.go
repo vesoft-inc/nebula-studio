@@ -116,9 +116,7 @@ func AuthMiddlewareWithConfig(config *config.Config) rest.Middleware {
 					MaxAge:   1800,
 				}
 
-				query := r.URL.Query()
-				query.Set("nebulaVersion", string(clientInfo.NebulaVersion))
-				r.URL, _ = r.URL.Parse(r.URL.Path + "?" + query.Encode())
+				utils.AddQueryParams(r, map[string]string{"nebulaVersion": string(clientInfo.NebulaVersion)})
 
 				// w.Header().Set("Access-Control-Allow-Origin", "*")
 				w.Header().Set("Set-Cookie", token.String())
@@ -127,9 +125,7 @@ func AuthMiddlewareWithConfig(config *config.Config) rest.Middleware {
 				nsidCookie, err := r.Cookie("nsid")
 
 				if err == nil {
-					query := r.URL.Query()
-					query.Set("nsid", nsidCookie.Value)
-					r.URL, _ = r.URL.Parse(r.URL.Path + "?" + query.Encode())
+					utils.AddQueryParams(r, map[string]string{"nsid": nsidCookie.Value})
 				}
 
 				w.Header().Set("Set-Cookie", utils.DisabledCookie("token").String())

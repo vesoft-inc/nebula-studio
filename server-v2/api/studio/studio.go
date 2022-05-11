@@ -37,7 +37,6 @@ func main() {
 	defer server.Stop()
 
 	// global middleware
-	// server.Use(auth.AuthMiddleware)
 	server.Use(auth.AuthMiddlewareWithConfig(&c))
 
 	// api handlers
