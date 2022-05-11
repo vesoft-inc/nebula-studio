@@ -41,6 +41,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/connect",
 				Handler: gateway.ConnectHandler(serverCtx),
 			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/disconnect",
+				Handler: gateway.DisonnectHandler(serverCtx),
+			},
 		},
 		rest.WithPrefix("/api-nebula/db"),
 	)

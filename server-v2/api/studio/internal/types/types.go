@@ -13,11 +13,16 @@ type ExecNGQLParams struct {
 type ConnectDBParams struct {
 	Address       string `json:"address"`
 	Port          int    `json:"port"`
+	NebulaVersion string `form:"nebulaVersion,optional"`
 	Authorization string `header:"Authorization"`
 }
 
 type ConnectDBResult struct {
 	Version string `json:"version"`
+}
+
+type DisconnectDBParams struct {
+	Nsid string `form:"nsid,optional"`
 }
 
 type AnyResponse struct {

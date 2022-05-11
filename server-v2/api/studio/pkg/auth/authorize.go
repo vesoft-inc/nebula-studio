@@ -9,8 +9,11 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
+	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/pool"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
@@ -32,6 +35,38 @@ type (
 
 var globalConfig = new(config.Config)
 
+func parseConnectDBParams(params *types.ConnectDBParams, config *config.Config) (string, *pool.ClientInfo, error) {
+	tokenSplit := strings.Split(params.Authorization, " ")
+	if len(tokenSplit) != 2 {
+		return "", nil, ecode.WithCode(ecode.ErrParam, nil, "invalid authorization")
+	}
+
+	decode, err := base64.StdEncoding.DecodeString(tokenSplit[1])
+	if err != nil {
+		return "", nil, ecode.WithCode(ecode.ErrParam, err)
+	}
+
+	loginInfo := strings.Split(string(decode), ":")
+	if len(loginInfo) < 2 {
+		return "", nil, ecode.WithCode(ecode.ErrParam, nil, "len of account is less than two")
+	}
+
+	username, password := loginInfo[0], loginInfo[1]
+	clientInfo, err := dao.Connect(params.Address, params.Port, username, password)
+	if err != nil {
+		return "", nil, ecode.WithCode(ecode.ErrInternalServer, err)
+	}
+
+	tokenString, err := CreateToken(
+		&AuthData{
+			NebulaAddress: params.Address,
+			Username:      username,
+		},
+		config,
+	)
+	return tokenString, clientInfo, err
+}
+
 func CreateToken(authData *AuthData, config *config.Config) (string, error) {
 	now := time.Now()
 	expiresAt := now.Add(time.Duration(config.Auth.AccessExpire) * time.Second).Unix()
@@ -52,52 +87,57 @@ func AuthMiddlewareWithConfig(config *config.Config) rest.Middleware {
 		return func(w http.ResponseWriter, r *http.Request) {
 			// login handler
 			if strings.HasSuffix(r.URL.Path, "/connect") {
-				fmt.Println("=====global middleware", r.URL.Path)
 				var req types.ConnectDBParams
-				err := httpx.Parse(r, &req)
+				rClone := utils.CopyHttpRequest(r)
+				err := httpx.Parse(rClone, &req)
 				if err != nil {
-					fmt.Println("=====req3333", req)
+					http.Error(w, err.Error(), http.StatusBadRequest)
+					return
 				}
-				fmt.Println("=====err", err)
-				fmt.Println("=====req.Address", req.Address)
-				fmt.Println("=====req.Port", req.Port)
-				fmt.Println("=====req.Authorization", req.Authorization)
-			}
-			c1 := http.Cookie{
-				Name:     "access_token",
-				Value:    "12333",
-				Path:     "/",
-				HttpOnly: true,
-				MaxAge:   3600,
-			}
 
-			var req1 types.ConnectDBParams
-			err1 := httpx.Parse(r, &req1)
-			fmt.Println("=====err1=====", err1)
+				tokenString, clientInfo, err := parseConnectDBParams(&req, config)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusBadRequest)
+					return
+				}
 
-			w.Header().Set("Access-Control-Allow-Origin", "*")
-			w.Header().Set("Set-Cookie", c1.String())
+				token := http.Cookie{
+					Name:     "token",
+					Value:    tokenString,
+					Path:     "/",
+					HttpOnly: true,
+					MaxAge:   1800,
+				}
+				nsid := http.Cookie{
+					Name:     "nsid",
+					Value:    clientInfo.ClientID,
+					Path:     "/",
+					HttpOnly: true,
+					MaxAge:   1800,
+				}
+
+				query := r.URL.Query()
+				query.Set("nebulaVersion", string(clientInfo.NebulaVersion))
+				r.URL, _ = r.URL.Parse(r.URL.Path + "?" + query.Encode())
+
+				// w.Header().Set("Access-Control-Allow-Origin", "*")
+				w.Header().Set("Set-Cookie", token.String())
+				w.Header().Add("Set-Cookie", nsid.String())
+			} else if strings.HasSuffix(r.URL.Path, "/disconnect") {
+				nsidCookie, err := r.Cookie("nsid")
+
+				if err == nil {
+					query := r.URL.Query()
+					query.Set("nsid", nsidCookie.Value)
+					r.URL, _ = r.URL.Parse(r.URL.Path + "?" + query.Encode())
+				}
+
+				w.Header().Set("Set-Cookie", utils.DisabledCookie("token").String())
+				w.Header().Add("Set-Cookie", utils.DisabledCookie("nsid").String())
+			} else {
+			}
 			next(w, r)
 		}
-	}
-}
-
-func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// login handler
-		if strings.HasSuffix(r.URL.Path, "/connect") {
-			fmt.Println("=====global middleware", r.URL.Path)
-		}
-		c1 := http.Cookie{
-			Name:     "access_token",
-			Value:    "12333",
-			Path:     "/",
-			HttpOnly: true,
-			MaxAge:   3600,
-		}
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Set-Cookie", c1.String())
-		next(w, r)
 	}
 }
 

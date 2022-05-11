@@ -8,10 +8,14 @@ type (
 	ConnectDBParams {
 		Address       string `json:"address"`
 		Port          int    `json:"port"`
+		NebulaVersion string `form:"nebulaVersion,optional"`
 		Authorization string `header:"Authorization"`
 	}
 	ConnectDBResult {
 		Version string `json:"version"`
+	}
+	DisconnectDBParams {
+		Nsid string `form:"nsid,optional"`
 	}
 
 	AnyResponse {
@@ -39,4 +43,8 @@ service studio-api {
 	@doc "Connect DB"
 	@handler Connect
 	post /connect(ConnectDBParams) returns (ConnectDBResult)
+	
+	@doc "Disonnect DB"
+	@handler Disonnect
+	post /disconnect(DisconnectDBParams) returns (AnyResponse)
 }
