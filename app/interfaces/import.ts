@@ -1,3 +1,4 @@
+import { RcFile } from 'antd/lib/upload';
 
 export enum ITaskStatus {
   'StatusFinished' = 'statusFinished',
@@ -51,4 +52,9 @@ export interface ILogDimension {
   space: string;
   id: number;
   status: ITaskStatus;
+}
+
+export interface StudioFile extends RcFile {
+  path?: string;
+  withHeader?: boolean
 }
