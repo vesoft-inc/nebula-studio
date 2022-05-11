@@ -1,4 +1,4 @@
-import { action, makeAutoObservable, observable, runInAction } from 'mobx';
+import { action, makeObservable, observable, runInAction } from 'mobx';
 import service from '@app/config/service';
 import { message } from 'antd';
 import intl from 'react-intl-universal';
@@ -7,7 +7,7 @@ export class FilesStore {
   uploadDir: string = '';
   fileList: any[] = [];
   constructor() {
-    makeAutoObservable(this, {
+    makeObservable(this, {
       uploadDir: observable,
       fileList: observable,
 
@@ -27,20 +27,28 @@ export class FilesStore {
       });
     }
   };
-  uploadFile = async (payload: Record<string, unknown>) => {
-    const { data, config } = payload;
+  uploadFile = async (files: any) => {
+    const config = {
+      headers: {
+        'content-type': 'multipart/form-data',
+      },
+    };
+    const data = new FormData();
+    files.forEach(file => {
+      data.append('file', file);
+    })
     const res = (await service.uploadFiles(data, config)) as any;
     return res;
   };
 
-  deleteFile = async (index: number) => {
+  deleteFile = async (name: string) => {
     const res: any = await service.deteleFile({
-      filename: this.fileList[index].name,
+      filename: name,
     });
     if (res.code === 0) {
       message.success(intl.get('common.deleteSuccess'));
       runInAction(() => {
-        this.fileList = this.fileList.filter((_, i) => i !== index);
+        this.fileList = this.fileList.filter((item) => item.name !== name);
       });
     }
   };

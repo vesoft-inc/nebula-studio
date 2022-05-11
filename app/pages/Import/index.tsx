@@ -8,10 +8,18 @@ import FileUpload from './FileUpload';
 import styles from './index.module.less';
 import TaskList from './TaskList';
 
-const NewImport = () => {
+interface IProps {
+  showConfigDownload?: boolean;
+  showLogDownload?: boolean;
+  showTemplateModal?: boolean;
+  needFileDir?: boolean;
+}
+
+const Import = (props: IProps) => {
   const history = useHistory();
   const location = useLocation();
   const [tab, setTab] = useState('files');
+  const { needFileDir, showConfigDownload, showLogDownload, showTemplateModal } = props;
   useEffect(() => {
     trackPageView('/import');
   }, []);
@@ -40,16 +48,22 @@ const NewImport = () => {
         <Route
           path={`/import/files`}
           exact={true}
-          component={FileUpload}
-        />
+        >
+          <FileUpload needFileDir={needFileDir} />
+        </Route>
+
         <Route
           path={`/import/tasks`}
           exact={true}
-          component={TaskList}
-        />
+        >
+          <TaskList 
+            showConfigDownload={showConfigDownload} 
+            showLogDownload={showLogDownload} 
+            showTemplateModal={showTemplateModal} />
+        </Route>
       </div>
     </div>
   );
 };
 
-export default NewImport;
+export default Import;

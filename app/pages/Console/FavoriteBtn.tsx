@@ -10,18 +10,18 @@ import styles from './index.module.less';
 
 interface IProps {
   onGqlSelect: (gql: string) => void;
-  username: string;
-  host: string;
 }
 const FavoriteBtn = (props: IProps) => {
-  const { onGqlSelect, username, host } = props;
+  const { onGqlSelect } = props;
   const { console: { favorites, updateFavorites } } = useStore();
   const [visible, setVisible] = useState(false);
   const [data, setData] = useState([]);
+  const [curAccount] = useState(sessionStorage.getItem('curAccount'));
 
   useEffect(() => {
-    if (favorites[username] && favorites[username][host]) {
-      setData(favorites[username][host]);
+    const curAccount = sessionStorage.getItem('curAccount');
+    if (favorites[curAccount]) {
+      setData(favorites[curAccount]);
     }
   }, [favorites]);
 
@@ -31,7 +31,7 @@ const FavoriteBtn = (props: IProps) => {
       return; 
     }
     const _favorites = { ...favorites };
-    _favorites[username][host] = [];
+    _favorites[curAccount] = [];
     updateFavorites(_favorites);
     setVisible(false);
   };

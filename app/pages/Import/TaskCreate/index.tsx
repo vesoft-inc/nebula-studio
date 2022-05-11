@@ -4,7 +4,6 @@ import Breadcrumb from '@app/components/Breadcrumb';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
-import { configToJson } from '@app/utils/import';
 import intl from 'react-intl-universal';
 import cls from 'classnames';
 import { useHistory } from 'react-router-dom';
@@ -22,14 +21,19 @@ const formItemLayout = {
     span: 11,
   },
 };
-const TaskCreate = () => {
-  const { dataImport, schema, global } = useStore();
-  const { taskDir, getTaskDir, basicConfig, verticesConfig, edgesConfig, updateBasicConfig, importTask } = dataImport;
-  const { spaces, spaceVidType, getSpaces, updateSpaceInfo, currentSpace } = schema;
-  const { host, username } = global;
+
+interface IProps {
+  needPwdConfirm?: boolean;
+  mode?: string
+}
+const TaskCreate = (props: IProps) => {
+  const { dataImport, schema } = useStore();
+  const { getTaskDir, basicConfig, verticesConfig, edgesConfig, updateBasicConfig, importTask } = dataImport;
+  const { spaces, getSpaces, updateSpaceInfo, currentSpace } = schema;
   const { batchSize } = basicConfig;
   const [modalVisible, setVisible] = useState(false);
   const history = useHistory();
+  const { needPwdConfirm = true, mode = 'local' } = props;
   const routes = [
     {
       path: '/import/tasks',
@@ -41,32 +45,23 @@ const TaskCreate = () => {
     },
   ];
 
-  const openPasswordModal = () => {
+  const checkConfig = () => {
     try {
       check();
-      setVisible(true);
+      needPwdConfirm ? setVisible(true) : handleStartImport();
     } catch (err) {
       console.log('err', err);
     }
   };
   const handleStartImport = async (password?: string) => {
     setVisible(false);
-    if(password) {
-      const config: any = configToJson({ 
-        ...basicConfig,
-        space: currentSpace,
-        taskDir,
-        verticesConfig, 
-        edgesConfig, 
-        host, 
-        username,
-        password,
-        spaceVidType });
-      const code = await importTask(config, basicConfig.taskName);
-      if(code === 0) {
-        message.success(intl.get('import.startImporting'));
-        history.push('/import/tasks');
-      }
+    const code = await importTask({
+      name: basicConfig.taskName, 
+      password
+    });
+    if(code === 0) {
+      message.success(intl.get('import.startImporting'));
+      history.push('/import/tasks');
     }
   };
 
@@ -132,7 +127,7 @@ const TaskCreate = () => {
     }
   };
   useEffect(() => {
-    initTaskDir();
+    mode === 'local' && initTaskDir();
     getSpaces();
     if(currentSpace) {
       updateSpaceInfo(currentSpace);
@@ -198,9 +193,13 @@ const TaskCreate = () => {
         <Button type="primary" disabled={
           basicConfig.taskName === ''
           || (!verticesConfig.length && !edgesConfig.length)
-        } onClick={openPasswordModal}>{intl.get('import.runImport')}</Button>
+        } onClick={checkConfig}>{intl.get('import.runImport')}</Button>
       </div>
-      <PasswordInputModal visible={modalVisible} onConfirm={handleStartImport} />
+      {needPwdConfirm && <PasswordInputModal 
+        visible={modalVisible} 
+        onConfirm={handleStartImport} 
+        onCancel={() => setVisible(false)}
+      />}
     </div>
   );
 };

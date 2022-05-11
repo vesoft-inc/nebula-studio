@@ -5,20 +5,25 @@ import intl from 'react-intl-universal';
 import styles from './index.module.less';
 interface IProps {
   visible: boolean;
-  onConfirm: (password?: string) => void
+  onConfirm: (password: string) => void
+  onCancel: () => void
 }
 const PasswordInputModal = (props: IProps) => {
   const [password, setPassword] = useState('');
-  const { visible, onConfirm } = props;
+  const { visible, onConfirm, onCancel } = props;
   const handleConfirm = (password?: string) => {
     onConfirm(password);
     setPassword('');
   };
+  const handleCancel = () => {
+    setPassword('');
+    onCancel();
+  }
   return (
     <Modal
       title={intl.get('import.enterPassword')}
       visible={visible}
-      onCancel={() => onConfirm()}
+      onCancel={() => handleCancel()}
       className={styles.passwordModal}
       footer={false}
     >

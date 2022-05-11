@@ -39,7 +39,7 @@ const Console = (props: IProps) => {
   const { onExplorer } = props;
   const { spaces, getSpaces, switchSpace, currentSpace } = schema;
   const { runGQL, currentGQL, results, runGQLLoading, getParams, update, paramsMap } = console;
-  const { username, host, nebulaVersion } = global;
+  const { nebulaVersion } = global;
   const [isUpDown, setUpDown] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState<any>(null);
@@ -142,7 +142,7 @@ const Console = (props: IProps) => {
           <div className={styles.panelHeader}>
             <span className={styles.title}>Nebula Console</span>
             <div className={styles.operations}>
-              <FavoriteBtn onGqlSelect={updateGql} username={username} host={host} />
+              <FavoriteBtn onGqlSelect={updateGql} />
               <HistoryBtn onGqlSelect={updateGql} />
               <Tooltip title={intl.get('common.empty')} placement="top">
                 <Icon className={styles.btnOperations} type="icon-studio-btn-clear" onClick={() => update({ currentGQL: '' })} />
