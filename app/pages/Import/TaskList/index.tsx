@@ -20,7 +20,14 @@ interface ILogDimension {
   id: number;
   status: ITaskStatus;
 }
-const TaskList = () => {
+
+interface IProps {
+  showTemplateModal?: boolean;
+  showConfigDownload?: boolean;
+  showLogDownload?: boolean;
+}
+
+const TaskList = (props: IProps) => {
   const timer = useRef<any>(null);
   const { dataImport, global } = useStore();
   const history = useHistory();
@@ -28,6 +35,7 @@ const TaskList = () => {
   const { username, host } = global;
   const [modalVisible, setVisible] = useState(false);
   const [importModalVisible, setImportModalVisible] = useState(false);
+  const { showTemplateModal = true, showConfigDownload = true, showLogDownload = true } = props;
   const [logDimension, setLogDimension] = useState<ILogDimension>({} as ILogDimension);
   const handleTaskStop = useCallback(async (id: number) => {
     clearTimeout(timer.current);
@@ -97,21 +105,23 @@ const TaskList = () => {
         >
           <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('import.createTask')}
         </Button>
-        <Button type="default" onClick={() => setImportModalVisible(true)}>
+        {showTemplateModal && <Button type="default" onClick={() => setImportModalVisible(true)}>
           {intl.get('import.uploadTemp')}
-        </Button>
+        </Button>}
       </div>
       <h3 className={styles.taskHeader}>{intl.get('import.taskList')} ({taskList.length})</h3>
       {taskList.map(item => (
         <TaskItem key={item.taskID} 
           data={item}
           onViewLog={handleLogView} 
-          handleStop={handleTaskStop} 
-          handleDelete={handleTaskDelete} 
-          handleDownload={downloadTaskConfig} 
+          onTaskStop={handleTaskStop} 
+          onTaskDelete={handleTaskDelete} 
+          onConfigDownload={downloadTaskConfig} 
+          showConfigDownload={showConfigDownload}
         />
       ))}
       {modalVisible && <LogModal
+        showLogDownload={showLogDownload}
         logDimension={logDimension}
         onCancel={() => setVisible(false)}
         visible={modalVisible} />}

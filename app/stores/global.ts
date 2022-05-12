@@ -53,6 +53,7 @@ export class GlobalStore {
     resetStore();
     cookies.remove('nh');
     cookies.remove('nu');
+    cookies.remove('curAccount');
     sessionStorage.removeItem('nebulaVersion');
   };
 
@@ -82,6 +83,7 @@ export class GlobalStore {
       message.success(intl.get('configServer.success'));
       cookies.set('nh', host);
       cookies.set('nu', username);
+      sessionStorage.setItem('curAccount', Base64.encode(`${username}:${host}`));
       sessionStorage.setItem('nebulaVersion', data.version);
       this.update({ _host: host, _username: username, nebulaVersion: data.version });
       return true;
@@ -91,6 +93,7 @@ export class GlobalStore {
     cookies.remove('nh');
     cookies.remove('nu');
     sessionStorage.removeItem('nebulaVersion');
+    sessionStorage.removeItem('curAccount');
     return false;
   };
 }

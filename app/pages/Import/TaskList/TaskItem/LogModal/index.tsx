@@ -21,9 +21,10 @@ interface IProps {
   logDimension: ILogDimension;
   visible: boolean;
   onCancel: () => void;
+  showLogDownload: boolean
 }
 const LogModal = (props: IProps) => {
-  const { visible, onCancel, logDimension: { space, id, status } } = props;
+  const { visible, onCancel, showLogDownload, logDimension: { space, id, status } } = props;
   const { dataImport: { getLogs, downloadTaskLog, getImportLogDetail, getErrLogDetail } } = useStore();
   const logRef = useRef<HTMLDivElement>(null);
   const timer = useRef<any>(null);
@@ -110,10 +111,10 @@ const LogModal = (props: IProps) => {
           <span>{`${space} ${intl.get('import.task')} - ${intl.get('common.log')}`}</span>
           {status === ITaskStatus.StatusProcessing && <Button type="text" loading={true} />}
         </div>
-        <Button className="studioAddBtn primaryBtn" onClick={handleLogDownload}>
+        {showLogDownload && <Button className="studioAddBtn primaryBtn" onClick={handleLogDownload}>
           <Icon type="icon-studio-btn-download" />
           {intl.get('import.downloadLog')}
-        </Button>
+        </Button>}
       </>}
       width="80%"
       visible={visible}

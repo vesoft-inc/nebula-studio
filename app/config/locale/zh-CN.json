@@ -165,7 +165,8 @@
     "reUpload": "重新上传",
     "fileNotExist": "文件 {name} 不存在",
     "importYaml": "导入 YAML 文件",
-    "templateMatchError": "配置中的{type}与当前登录账号/地址不匹配"
+    "templateMatchError": "配置中的{type}与当前登录账号/地址不匹配",
+    "uploadSuccessfully": "上传文件成功"
   },
   "schema": {
     "spaceList": "图空间列表",

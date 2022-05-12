@@ -165,7 +165,8 @@
     "reUpload": "Re-upload",
     "fileNotExist": "{name} file does not exist！",
     "importYaml": "Import the YAML file",
-    "templateMatchError": "The {type} in the configuration does not match the current login account/host"
+    "templateMatchError": "The {type} in the configuration does not match the current login account/host",
+    "uploadSuccessfully": "Upload files successfully."
   },
   "schema": {
     "spaceList": "Graph Space List",
