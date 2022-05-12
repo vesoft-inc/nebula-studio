@@ -7,7 +7,8 @@ type GetHealth struct {
 
 type ExecNGQLParams struct {
 	Gql       string   `json:"gql"`
-	ParamList []string `json:"paramList"`
+	ParamList []string `json:"paramList,optional"`
+	NSID      string   `form:"NSID"`
 }
 
 type ConnectDBParams struct {
@@ -22,7 +23,7 @@ type ConnectDBResult struct {
 }
 
 type DisconnectDBParams struct {
-	Nsid string `form:"nsid,optional"`
+	NSID string `form:"NSID,optional"`
 }
 
 type AnyResponse struct {

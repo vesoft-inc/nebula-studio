@@ -2,7 +2,7 @@ package base
 
 type StatusCode int
 
-type Result any
+type Result interface{}
 
 const (
 	Error   StatusCode = -1

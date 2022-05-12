@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -11,6 +12,7 @@ import (
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/pool"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
@@ -22,18 +24,62 @@ type (
 	CtxKeyUserInfo struct{}
 
 	AuthData struct {
-		NebulaAddress string `json:"nebulaAddress"`
-		Username      string `json:"username"`
-		ClientID      string `json:"clientID"`
+		Address  string `json:"address"`
+		Port     int    `json:"port"`
+		Username string `json:"username"`
 	}
 
 	authClaims struct {
 		*AuthData
-		jwt.StandardClaims
+		jwt.RegisteredClaims
 	}
 )
 
-var globalConfig = new(config.Config)
+func CreateToken(authData *AuthData, config *config.Config) (string, error) {
+	now := time.Now()
+	expiresAt := now.Add(time.Duration(config.Auth.AccessExpire) * time.Second).Unix()
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
+		authClaims{
+			AuthData: authData,
+			RegisteredClaims: jwt.RegisteredClaims{
+				ExpiresAt: &jwt.NumericDate{Time: time.Unix(expiresAt, 0)},
+				// ExpiresAt: expiresAt,
+			},
+		})
+
+	return token.SignedString([]byte(config.Auth.AccessSecret))
+}
+
+func Decode(tokenString, secret string) (*AuthData, error) {
+	auth := authClaims{}
+	token, err := jwt.ParseWithClaims(tokenString, &auth, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(secret), nil
+	})
+
+	if err != nil {
+		if ve, ok := err.(*jwt.ValidationError); ok {
+			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
+				return nil, errors.New("that's not even a token")
+			} else if ve.Errors&jwt.ValidationErrorExpired != 0 {
+				return nil, errors.New("token is expired")
+			} else if ve.Errors&jwt.ValidationErrorNotValidYet != 0 {
+				return nil, errors.New("token not active yet")
+			} else {
+				return nil, errors.New("couldn't handle this token")
+			}
+		}
+	}
+
+	if _, ok := token.Claims.(*authClaims); !ok || !token.Valid {
+		return nil, errors.New("couldn't handle this token")
+	}
+
+	return auth.AuthData, nil
+}
 
 func parseConnectDBParams(params *types.ConnectDBParams, config *config.Config) (string, *pool.ClientInfo, error) {
 	tokenSplit := strings.Split(params.Authorization, " ")
@@ -59,32 +105,20 @@ func parseConnectDBParams(params *types.ConnectDBParams, config *config.Config) 
 
 	tokenString, err := CreateToken(
 		&AuthData{
-			NebulaAddress: params.Address,
-			Username:      username,
+			Address:  params.Address,
+			Port:     params.Port,
+			Username: username,
 		},
 		config,
 	)
 	return tokenString, clientInfo, err
 }
 
-func CreateToken(authData *AuthData, config *config.Config) (string, error) {
-	now := time.Now()
-	expiresAt := now.Add(time.Duration(config.Auth.AccessExpire) * time.Second).Unix()
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
-		authClaims{
-			AuthData: authData,
-			StandardClaims: jwt.StandardClaims{
-				ExpiresAt: expiresAt,
-			},
-		})
-
-	return token.SignedString([]byte(config.Auth.AccessSecret))
-}
-
-func AuthMiddlewareWithConfig(config *config.Config) rest.Middleware {
+func AuthMiddlewareWithCtx(svcCtx *svc.ServiceContext) rest.Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
+			configAuth := svcCtx.Config.Auth
+
 			// login handler
 			if strings.HasSuffix(r.URL.Path, "/connect") {
 				var req types.ConnectDBParams
@@ -95,7 +129,7 @@ func AuthMiddlewareWithConfig(config *config.Config) rest.Middleware {
 					return
 				}
 
-				tokenString, clientInfo, err := parseConnectDBParams(&req, config)
+				tokenString, clientInfo, err := parseConnectDBParams(&req, &svcCtx.Config)
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusBadRequest)
 					return
@@ -106,86 +140,60 @@ func AuthMiddlewareWithConfig(config *config.Config) rest.Middleware {
 					Value:    tokenString,
 					Path:     "/",
 					HttpOnly: true,
-					MaxAge:   1800,
+					MaxAge:   int(configAuth.AccessExpire),
 				}
-				nsid := http.Cookie{
-					Name:     "nsid",
+				NSID := http.Cookie{
+					Name:     "NSID",
 					Value:    clientInfo.ClientID,
 					Path:     "/",
 					HttpOnly: true,
-					MaxAge:   1800,
+					MaxAge:   int(configAuth.AccessExpire),
 				}
 
 				utils.AddQueryParams(r, map[string]string{"nebulaVersion": string(clientInfo.NebulaVersion)})
 
-				// w.Header().Set("Access-Control-Allow-Origin", "*")
 				w.Header().Set("Set-Cookie", token.String())
-				w.Header().Add("Set-Cookie", nsid.String())
-			} else if strings.HasSuffix(r.URL.Path, "/disconnect") {
-				nsidCookie, err := r.Cookie("nsid")
+				w.Header().Add("Set-Cookie", NSID.String())
 
-				if err == nil {
-					utils.AddQueryParams(r, map[string]string{"nsid": nsidCookie.Value})
-				}
-
-				w.Header().Set("Set-Cookie", utils.DisabledCookie("token").String())
-				w.Header().Add("Set-Cookie", utils.DisabledCookie("nsid").String())
-			} else {
+				next(w, r)
+				return
 			}
+
+			NSIDCookie, NSIDErr := r.Cookie("NSID")
+			if NSIDErr == nil {
+				// Add NSID to request query
+				utils.AddQueryParams(r, map[string]string{"NSID": NSIDCookie.Value})
+			}
+
+			if strings.HasSuffix(r.URL.Path, "/disconnect") {
+				w.Header().Set("Set-Cookie", utils.DisabledCookie("token").String())
+				w.Header().Add("Set-Cookie", utils.DisabledCookie("NSID").String())
+				next(w, r)
+				return
+			}
+
+			tokenCookie, tokenErr := r.Cookie("token")
+			if NSIDErr != nil || tokenErr != nil {
+				if NSIDErr != nil {
+					svcCtx.ResponseHandler.Handle(w, r, nil, ecode.WithSessionMessage(NSIDErr))
+					return
+				}
+			}
+
+			auth, authErr := Decode(tokenCookie.Value, configAuth.AccessSecret)
+			if authErr != nil {
+				svcCtx.ResponseHandler.Handle(w, r, nil, ecode.WithSessionMessage(authErr))
+				return
+			}
+
+			// Add address|port|username to request query
+			utils.AddQueryParams(r, map[string]string{
+				"address":  auth.Address,
+				"port":     fmt.Sprintf("%d", auth.Port),
+				"username": auth.Username,
+			})
+
 			next(w, r)
 		}
 	}
-}
-
-func GenerateLoginToken(address string, port int, authorization string, config *config.Config) (string, error) {
-	tokenSplit := strings.Split(authorization, " ")
-	if len(tokenSplit) != 2 {
-		return "", fmt.Errorf("invalid authorization")
-	}
-
-	decode, err := base64.StdEncoding.DecodeString(tokenSplit[1])
-	if err != nil {
-		return "", err
-	}
-
-	loginInfo := strings.Split(string(decode), ":")
-	if len(loginInfo) < 2 {
-		return "", fmt.Errorf("len of account is less than two")
-	}
-
-	username, password := loginInfo[0], loginInfo[1]
-	clientInfo, err := dao.Connect(address, port, username, password)
-
-	if err != nil {
-		return "", err
-	}
-
-	return CreateToken(
-		&AuthData{
-			NebulaAddress: address,
-			Username:      username,
-			ClientID:      clientInfo.ClientID,
-		},
-		config,
-	)
-}
-
-func (d *AuthData) Decode(tokenString, secret string) error {
-	token, err := jwt.ParseWithClaims(tokenString, &authClaims{
-		AuthData: d,
-	}, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return []byte(secret), nil
-	})
-	if err != nil {
-		return err
-	}
-
-	if _, ok := token.Claims.(*authClaims); !ok || !token.Valid {
-		return fmt.Errorf("jwt parse not valid")
-	}
-
-	return nil
 }

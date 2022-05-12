@@ -3,7 +3,8 @@ syntax = "v1"
 type (
 	ExecNGQLParams {
 		Gql       string   `json:"gql"`
-		ParamList []string `json:"paramList"`
+		ParamList []string `json:"paramList,optional"`
+		NSID      string   `form:"NSID"`
 	}
 	ConnectDBParams {
 		Address       string `json:"address"`
@@ -15,7 +16,7 @@ type (
 		Version string `json:"version"`
 	}
 	DisconnectDBParams {
-		Nsid string `form:"nsid,optional"`
+		NSID string `form:"NSID,optional"`
 	}
 
 	AnyResponse {

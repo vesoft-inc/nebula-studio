@@ -391,6 +391,8 @@ github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhV
 github.com/urfave/cli/v2 v2.3.0/go.mod h1:LJmUH05zAU44vOAcrfzZQKsZbVcdbOG8rtL3/XcUArI=
 github.com/vesoft-inc/go-pkg v0.0.0-20220415101753-97328ddf3e40 h1:vBoIYZyRgxHFDaCc/4NfkH/rVjYNnDYqg8cMczWb7vU=
 github.com/vesoft-inc/go-pkg v0.0.0-20220415101753-97328ddf3e40/go.mod h1:HCAXRhF2io+nPLQnl+RQ6XyVcp1Xdv6NgslXRBBCiEU=
+github.com/vesoft-inc/go-pkg v0.0.0-20220511092334-a180a9379d8d h1:Q/eVc0H8CuQNmviD43vAxtJKyB3aFd9R8Z7pOdxokoA=
+github.com/vesoft-inc/go-pkg v0.0.0-20220511092334-a180a9379d8d/go.mod h1:HCAXRhF2io+nPLQnl+RQ6XyVcp1Xdv6NgslXRBBCiEU=
 github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220413113447-a3f4c56287d8 h1:iL92Uk6hAe4vUBK/L99wf5295HYOtnD4plctVA5xek0=
 github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220413113447-a3f4c56287d8/go.mod h1:sFEvE+cY4TgwqWx6H6msOqAUzRhsEHHKaaMgIZENHuQ=
 github.com/xdg-go/pbkdf2 v1.0.0/go.mod h1:jrpuAogTd400dnrH08LKmI/xc1MbPOebTwRqcT5RDeI=
