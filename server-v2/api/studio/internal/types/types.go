@@ -11,6 +11,12 @@ type ExecNGQLParams struct {
 	NSID      string   `form:"NSID"`
 }
 
+type BatchExecNGQLParams struct {
+	Gqls      []string `json:"gqls"`
+	ParamList []string `json:"paramList,optional"`
+	NSID      string   `form:"NSID"`
+}
+
 type ConnectDBParams struct {
 	Address       string `json:"address"`
 	Port          int    `json:"port"`

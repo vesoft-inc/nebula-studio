@@ -35,6 +35,11 @@ type (
 	}
 )
 
+var (
+	tokenName = "explorer_token"
+	nsidName  = "explorer_nsid"
+)
+
 func CreateToken(authData *AuthData, config *config.Config) (string, error) {
 	now := time.Now()
 	expiresAt := now.Add(time.Duration(config.Auth.AccessExpire) * time.Second).Unix()
@@ -136,14 +141,14 @@ func AuthMiddlewareWithCtx(svcCtx *svc.ServiceContext) rest.Middleware {
 				}
 
 				token := http.Cookie{
-					Name:     "token",
+					Name:     tokenName,
 					Value:    tokenString,
 					Path:     "/",
 					HttpOnly: true,
 					MaxAge:   int(configAuth.AccessExpire),
 				}
 				NSID := http.Cookie{
-					Name:     "NSID",
+					Name:     nsidName,
 					Value:    clientInfo.ClientID,
 					Path:     "/",
 					HttpOnly: true,
@@ -159,20 +164,20 @@ func AuthMiddlewareWithCtx(svcCtx *svc.ServiceContext) rest.Middleware {
 				return
 			}
 
-			NSIDCookie, NSIDErr := r.Cookie("NSID")
+			NSIDCookie, NSIDErr := r.Cookie(nsidName)
 			if NSIDErr == nil {
 				// Add NSID to request query
 				utils.AddQueryParams(r, map[string]string{"NSID": NSIDCookie.Value})
 			}
 
 			if strings.HasSuffix(r.URL.Path, "/disconnect") {
-				w.Header().Set("Set-Cookie", utils.DisabledCookie("token").String())
-				w.Header().Add("Set-Cookie", utils.DisabledCookie("NSID").String())
+				w.Header().Set("Set-Cookie", utils.DisabledCookie(tokenName).String())
+				w.Header().Add("Set-Cookie", utils.DisabledCookie(nsidName).String())
 				next(w, r)
 				return
 			}
 
-			tokenCookie, tokenErr := r.Cookie("token")
+			tokenCookie, tokenErr := r.Cookie(tokenName)
 			if NSIDErr != nil || tokenErr != nil {
 				if NSIDErr != nil {
 					svcCtx.ResponseHandler.Handle(w, r, nil, ecode.WithSessionMessage(NSIDErr))
