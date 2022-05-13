@@ -10,20 +10,20 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ExecNGQLLogic struct {
+type BatchExecNGQLLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewExecNGQLLogic(ctx context.Context, svcCtx *svc.ServiceContext) ExecNGQLLogic {
-	return ExecNGQLLogic{
+func NewBatchExecNGQLLogic(ctx context.Context, svcCtx *svc.ServiceContext) BatchExecNGQLLogic {
+	return BatchExecNGQLLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *ExecNGQLLogic) ExecNGQL(req types.ExecNGQLParams) (resp *types.AnyResponse, err error) {
-	return service.NewGatewayService(l.ctx, l.svcCtx).ExecNGQL(&req)
+func (l *BatchExecNGQLLogic) BatchExecNGQL(req types.BatchExecNGQLParams) (*types.AnyResponse, error) {
+	return service.NewGatewayService(l.ctx, l.svcCtx).BatchExecNGQL(&req)
 }

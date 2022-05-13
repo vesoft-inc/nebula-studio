@@ -7,17 +7,29 @@ type GetHealth struct {
 
 type ExecNGQLParams struct {
 	Gql       string   `json:"gql"`
-	ParamList []string `json:"paramList"`
+	ParamList []string `json:"paramList,optional"`
+	NSID      string   `form:"NSID"`
+}
+
+type BatchExecNGQLParams struct {
+	Gqls      []string `json:"gqls"`
+	ParamList []string `json:"paramList,optional"`
+	NSID      string   `form:"NSID"`
 }
 
 type ConnectDBParams struct {
 	Address       string `json:"address"`
 	Port          int    `json:"port"`
+	NebulaVersion string `form:"nebulaVersion,optional"`
 	Authorization string `header:"Authorization"`
 }
 
 type ConnectDBResult struct {
 	Version string `json:"version"`
+}
+
+type DisconnectDBParams struct {
+	NSID string `form:"NSID,optional"`
 }
 
 type AnyResponse struct {
