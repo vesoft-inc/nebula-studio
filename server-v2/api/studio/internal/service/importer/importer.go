@@ -53,6 +53,7 @@ func CreateConfigFile(dir string, config importconfig.YAMLConfig) error {
 	*config.NebulaClientSettings.Connection.Password = ""
 
 	// erase path infomation
+	logPath := *config.LogPath
 	*config.LogPath = "import.log"
 	paths := make([]string, 0)
 	failDataPaths := make([]string, 0)
@@ -74,6 +75,7 @@ func CreateConfigFile(dir string, config importconfig.YAMLConfig) error {
 		return err
 	}
 
+	*config.LogPath = logPath
 	*config.NebulaClientSettings.Connection.Address = address
 	*config.NebulaClientSettings.Connection.User = user
 	*config.NebulaClientSettings.Connection.Password = password
