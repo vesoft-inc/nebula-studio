@@ -2,6 +2,7 @@ package importtask
 
 import (
 	"context"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service"
 
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
@@ -23,8 +24,6 @@ func NewDownloadLogsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Down
 	}
 }
 
-func (l *DownloadLogsLogic) DownloadLogs(req types.DownloadLogsRequest) error {
-	// todo: add your logic here and delete this line
-
-	return nil
+func (l *DownloadLogsLogic) DownloadLogs(req types.DownloadLogsRequest) (*types.DownloadLogsData, error) {
+	return service.NewImportService(l.ctx, l.svcCtx).DownloadLogs(&req)
 }

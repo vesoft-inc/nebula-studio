@@ -8,17 +8,28 @@ type (
 	}
 
 	ClientSettings {
+		Retry             int        `json:"retry,optional"`
+		Concurrency       int        `json:"concurrency,optional"`
+		ChannelBufferSize int        `json:"channelBufferSize,optional"`
 		Space             string     `json:"space" validate:"required"`
 		Connection        Connection `json:"connection" validate:"required"`
-		Retry             int64      `json:"retry,optional"`
-		Concurrency       int64      `json:"concurrency,optional"`
-		ChannelBufferSize int64      `json:"channelBufferSize,optional"`
+		PostStart         PostStart  `json:"postStart,optional"`
+		PreStop           PreStop    `json:"preStop,optional"`
+	}
+
+	PostStart {
+		Commands    string `json:"commands" validate:"required"`
+		AfterPeriod string `json:"afterPeriod" validate:"required"`
+	}
+
+	PreStop {
+		Commands string `json:"commands,optional"`
 	}
 
 	CSV {
 		WithHeader bool   `json:"withHeader,optional"`
 		WithLabel  bool   `json:"withLabel,optional"`
-		Delimiter  string `json:"delimiter,optional"`
+		Delimiter  string `json:"delimiter,optional" default:","`
 	}
 
 	VID {
@@ -47,49 +58,55 @@ type (
 	EdgeID {
 		Index    int64  `json:"index" validate:"required"`
 		Function string `json:"function,optional"`
+		Type     string `json:"type" validate:"required"`
+		Prefix   string `json:"prefix,optional"`
 	}
 
 	EdgeRank {
-		Index int64 `json:"index" validate:"required"`
+		Index int64 `json:"index"`
 	}
 
 	EdgeProp {
-		Name  string `json:"name" validate:"required"`
-		Type  string `json:"type" validate:"required"`
-		Index int64  `json:"index" validate:"required"`
+		Name  string `json:"name"`
+		Type  string `json:"type"`
+		Index int64  `json:"index"`
 	}
 
 	Edge {
-		Name   string   `json:"name" validate:"required"`
-		SrcVID EdgeID   `json:"srcVID" validate:"required"`
-		DstVID EdgeID   `json:"dstVID" validate:"required"`
-		Rank   EdgeRank `json:"rank" validate:"required"`
-		Props  EdgeProp `json:"props" validate:"required"`
+		Name   string     `json:"name" validate:"required"`
+		SrcVID EdgeID     `json:"srcVID" validate:"required"`
+		DstVID EdgeID     `json:"dstVID" validate:"required"`
+		Rank   EdgeRank   `json:"rank, optional"`
+		Props  []EdgeProp `json:"props" validate:"required"`
 	}
 
 	Schema {
 		Type   string `json:"type" validate:"required"`
-		Edge   Edge   `json:"edge" validate:"required"`
-		Vertex Vertex `json:"vertex" validate:"required"`
+		Edge   Edge   `json:"edge,optional"`
+		Vertex Vertex `json:"vertex,optional"`
 	}
 
 	File {
-		Path   string `json:"path" validate:"required"`
-		Type   string `json:"type" validate:"required"`
-		CSV    CSV    `json:"csv" validate:"required"`
-		Schema Schema `json:"schema" validate:"required"`
+		Path         string `json:"path" validate:"required"`
+		FailDataPath string `json:"failDataPath" validate:"required"`
+		BatchSize    int    `json:"batchSize,optional"`
+		Limit        int    `json:"limit, optional"`
+		InOrder      bool   `json:"inOrder, optional"`
+		Type         string `json:"type" validate:"required"`
+		CSV          CSV    `json:"csv" validate:"required"`
+		Schema       Schema `json:"schema" validate:"required"`
 	}
 
 	ImportConfig {
 		Version         string         `json:"version" validate:"required"`
 		Description     string         `json:"description,optional"`
-		RemoveTempFiles string         `json:"removeTempFiles,optional"`
+		RemoveTempFiles bool           `json:"removeTempFiles,optional"`
 		ClientSettings  ClientSettings `json:"clientSettings" validate:"required"`
 		Files           []File         `json:"files" validate:"required"`
 	}
 
 	CreateImportTaskRequest {
-		Name   string       `path:"name" validate:"required"`
+		Name   string       `json:"name" validate:"required"`
 		Config ImportConfig `json:"config" validate:"required"`
 	}
 
@@ -98,22 +115,39 @@ type (
 	}
 
 	GetImportTaskRequest {
-		Id string `path:"id" validate:"required"`
+		Id       string `path:"id" validate:"required"`
+		Address  string `form:"address" validate:"required""`
+		Username string `form:"username" validate:"required"`
 	}
 
 	GetImportTaskData {
 		Id         string `json:"id"`
-		SolutionId string `json:"solutionId"`
-		Config     string `json:"config"`
+		Name       string `json:"name"`
+		User       string `json:"user"`
+		Address    string `json:"address"`
+		Space      string `json:"space"`
 		Status     string `json:"status"`
-		ImportCode int64  `json:"importCode"`
 		CreateTime int64  `json:"createTime"`
 		UpdateTime int64  `json:"updateTime"`
+		Stats      Stats  `json:"stats"`
+	}
+
+	Stats {
+		NumFailed          int64 `json:"numFailed"`
+		NumReadFailed      int64 `json:"numReadFailed"`
+		TotalCount         int64 `json:"totalCount"`
+		TotalBatches       int64 `json:"totalBatches"`
+		TotalLatency       int64 `json:"totalLatency"`
+		TotalReqTime       int64 `json:"totalReqTime"`
+		TotalBytes         int64 `json:"totalBytes"`
+		TotalImportedBytes int64 `json:"totalImportedBytes"`
 	}
 
 	GetManyImportTaskRequest {
-		Page     int `form:"page,default=1"`
-		PageSize int `form:"pageSize,default=100"`
+		Address  string `form:"address" validate:"required""`
+		Username string `form:"username" validate:"required"`
+		Page     int    `form:"page,default=1"`
+		PageSize int    `form:"pageSize,default=100"`
 	}
 
 	GetManyImportTaskData {
@@ -123,6 +157,7 @@ type (
 
 	GetManyImportTaskLogRequest {
 		Id     string `path:"id" validate:"required"`
+		File   string `form:"file" validate:"required"`
 		Offset int64  `form:"offset" validate:"min=0"`
 		Limit  int64  `form:"limit" validate:"min=1"`
 	}
@@ -131,21 +166,41 @@ type (
 		Logs []string `json:"logs"`
 	}
 
+	GetImportTaskLogNamesRequest {
+		Id string `path:"id" validate:"required""`
+	}
+
+	GetImportTaskLogNamesData {
+		Names []string `json:"names"`
+	}
+
 	DeleteImportTaskRequest {
-		Id string `path:"id" validate:"required"`
+		Id       string `path:"id" validate:"required"`
+		Address  string `form:"address" validate:"required""`
+		Username string `form:"username" validate:"required"`
 	}
 
 	StopImportTaskRequest {
-		Id string `path:"id" validate:"required"`
+		Id       string `path:"id" validate:"required"`
+		Address  string `form:"address" validate:"required""`
+		Username string `form:"username" validate:"required"`
 	}
 
 	DownloadLogsRequest {
-		Id   string `json:"id" validate:"required"`
-		Name string `json:"name" validate:"required"`
+		Id   string `path:"id" validate:"required"`
+		Name string `form:"name" validate:"required"`
+	}
+
+	DownloadLogsData {
+		Data string `json:"data"`
 	}
 
 	DownloadConfigsRequest {
 		Id string `path:"id" validate:"required"`
+	}
+
+	DownloadConfigsData {
+		Data string `json:"data"`
 	}
 )
 
@@ -166,6 +221,9 @@ service studio-api {
 	@doc "Get Many Import Task Log"
 	@handler GetManyImportTaskLog
 	get /api/import-tasks/:id/logs(GetManyImportTaskLogRequest) returns(GetManyImportTaskLogData)
+	@doc "Get all logs file name of a Task"
+	@handler GetImportTaskLogNames
+	get /api/import-tasks/:id/task-log-names(GetImportTaskLogNamesRequest) returns(GetImportTaskLogNamesData)
 	@doc "Delete Import Task"
 	@handler DeleteImportTask
 	delete /api/import-tasks/:id(DeleteImportTaskRequest)
@@ -174,8 +232,8 @@ service studio-api {
 	get /api/import-tasks/stop/:id(StopImportTaskRequest)
 	@doc "Download logs"
 	@handler DownloadLogs
-	post /api/import-tasks/:id/logs(DownloadLogsRequest)
+	get /api/import-tasks/download/:id(DownloadLogsRequest) returns(DownloadLogsData)
 	@doc "Download Config"
 	@handler DownloadConfig
-	get /api/import-tasks/config/:id(DownloadConfigsRequest)
+	get /api/import-tasks/config/:id(DownloadConfigsRequest) returns(DownloadConfigsData)
 }

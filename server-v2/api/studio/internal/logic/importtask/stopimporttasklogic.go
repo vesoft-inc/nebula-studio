@@ -2,6 +2,7 @@ package importtask
 
 import (
 	"context"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service"
 
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
@@ -24,7 +25,5 @@ func NewStopImportTaskLogic(ctx context.Context, svcCtx *svc.ServiceContext) *St
 }
 
 func (l *StopImportTaskLogic) StopImportTask(req types.StopImportTaskRequest) error {
-	// todo: add your logic here and delete this line
-
-	return nil
+	return service.NewImportService(l.ctx, l.svcCtx).StopImportTask(&req)
 }

@@ -2,6 +2,7 @@ package importtask
 
 import (
 	"context"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service"
 
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
@@ -24,7 +25,5 @@ func NewGetManyImportTaskLogLogic(ctx context.Context, svcCtx *svc.ServiceContex
 }
 
 func (l *GetManyImportTaskLogLogic) GetManyImportTaskLog(req types.GetManyImportTaskLogRequest) (resp *types.GetManyImportTaskLogData, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	return service.NewImportService(l.ctx, l.svcCtx).GetManyImportTaskLog(&req)
 }

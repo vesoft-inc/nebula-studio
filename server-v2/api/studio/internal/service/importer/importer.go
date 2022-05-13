@@ -6,6 +6,7 @@ import (
 	importconfig "github.com/vesoft-inc/nebula-importer/pkg/config"
 	importerErrors "github.com/vesoft-inc/nebula-importer/pkg/errors"
 	"github.com/vesoft-inc/nebula-importer/pkg/logger"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
 	Config "github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"go.uber.org/zap"
@@ -58,13 +59,12 @@ func CreateConfigFile(dir string, config importconfig.YAMLConfig) error {
 	*config.NebulaClientSettings.Connection.Password = ""
 
 	// erase path infomation
-	logPath := *config.LogPath
 	*config.LogPath = "import.log"
 	paths := make([]string, 0)
 	failDataPaths := make([]string, 0)
 	for _, file := range config.Files {
-		paths = append(paths, *file.Path)
-		failDataPaths = append(failDataPaths, *file.FailDataPath)
+		paths = append(paths, filepath.Join(Config.Cfg.Web.UploadDir, *file.Path))
+		failDataPaths = append(failDataPaths, filepath.Join(dir, "err", *file.FailDataPath))
 		_, fileName := filepath.Split(*file.Path)
 		_, fileDataName := filepath.Split(*file.FailDataPath)
 		*file.Path = fileName
@@ -80,7 +80,6 @@ func CreateConfigFile(dir string, config importconfig.YAMLConfig) error {
 		return err
 	}
 
-	*config.LogPath = logPath
 	*config.NebulaClientSettings.Connection.Address = address
 	*config.NebulaClientSettings.Connection.User = user
 	*config.NebulaClientSettings.Connection.Password = password
@@ -184,6 +183,110 @@ func ImportAction(taskID string, address string, username string, taskAction Tas
 	zap.L().Debug(fmt.Sprintf("The import task action: `%s` for task: `%s` finished, action result: `%v`", taskAction.String(), taskID, result))
 
 	return result, err
+}
+
+func DeleteImportTask(taskID, address, username string) error {
+	if id, err := strconv.Atoi(taskID); err != nil {
+		zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
+		return errors.New("task not existed")
+	} else {
+		_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(id, address, username)
+		if err != nil {
+			zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
+			return errors.New("task not existed")
+		}
+	}
+	err := GetTaskMgr().DelTask(taskID)
+	if err != nil {
+		return fmt.Errorf("task del fail, %s", err.Error())
+	}
+	return nil
+}
+
+func GetImportTask(taskID, address, username string) (*types.GetImportTaskData, error) {
+	task := Task{}
+	result := &types.GetImportTaskData{}
+
+	if id, err := strconv.Atoi(taskID); err != nil {
+		zap.L().Warn(fmt.Sprintf("UpdateTaskInfo fail, id : %s", taskID), zap.Error(err))
+		return nil, errors.New("task not existed")
+	} else {
+		_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(id, address, username)
+		if err != nil {
+			zap.L().Warn(fmt.Sprintf("UpdateTaskInfo fail, id : %s", taskID), zap.Error(err))
+			return nil, errors.New("task not existed")
+		}
+	}
+
+	err := GetTaskMgr().UpdateTaskInfo(taskID)
+	if err != nil {
+		zap.L().Warn(fmt.Sprintf("UpdateTaskInfo fail, id : %s", taskID), zap.Error(err))
+	}
+	if t, ok := GetTaskMgr().GetTask(taskID); ok {
+		task = *t
+		result.Id = fmt.Sprintf("%d", task.TaskInfo.ID)
+		result.Status = task.TaskInfo.TaskStatus
+		result.CreateTime = task.TaskInfo.CreatedTime
+		result.UpdateTime = task.TaskInfo.UpdatedTime
+		result.Address = task.TaskInfo.NebulaAddress
+		result.User = task.TaskInfo.User
+		result.Name = task.TaskInfo.Name
+		result.Space = task.TaskInfo.Space
+		result.Stats = types.Stats(task.TaskInfo.Stats)
+	}
+
+	return result, nil
+}
+
+func GetManyImportTask(address, username string, page, pageSize int) (*types.GetManyImportTaskData, error) {
+	result := &types.GetManyImportTaskData{
+		Total: 0,
+		List:  []types.GetImportTaskData{},
+	}
+
+	taskIDs, err := GetTaskMgr().GetAllTaskIDs(address, username)
+	if err != nil {
+		return nil, err
+	}
+
+	start := (page - 1) * pageSize
+	stop := page * pageSize
+	if len(taskIDs) <= start {
+		return nil, errors.New("invalid parameter")
+	} else {
+		if stop >= len(taskIDs) {
+			stop = len(taskIDs)
+		}
+		result.Total = int64(stop - start)
+
+		for i := start; i < stop; i++ {
+			data, _ := GetImportTask(taskIDs[i], address, username)
+			result.List = append(result.List, *data)
+		}
+	}
+
+	return result, nil
+}
+
+func StopImportTask(taskID, address, username string) error {
+	if id, err := strconv.Atoi(taskID); err != nil {
+		zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
+		return errors.New("task not existed")
+	} else {
+		_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(id, address, username)
+		if err != nil {
+			zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
+			return errors.New("task not existed")
+		}
+	}
+
+	err := GetTaskMgr().StopTask(taskID)
+	if err != nil {
+		zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
+		return err
+	} else {
+		return nil
+	}
 }
 
 func actionDel(taskID string, address string, username string, result *ActionResult) {

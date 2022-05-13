@@ -27,7 +27,7 @@ func DownloadLogsHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		l := importtask.NewDownloadLogsLogic(r.Context(), svcCtx)
-		err := l.DownloadLogs(req)
-		svcCtx.ResponseHandler.Handle(w, r, nil, err)
+		data, err := l.DownloadLogs(req)
+		svcCtx.ResponseHandler.Handle(w, r, data, err)
 	}
 }

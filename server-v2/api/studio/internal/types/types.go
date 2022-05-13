@@ -47,17 +47,28 @@ type Connection struct {
 }
 
 type ClientSettings struct {
+	Retry             int        `json:"retry,optional"`
+	Concurrency       int        `json:"concurrency,optional"`
+	ChannelBufferSize int        `json:"channelBufferSize,optional"`
 	Space             string     `json:"space" validate:"required"`
 	Connection        Connection `json:"connection" validate:"required"`
-	Retry             int64      `json:"retry,optional"`
-	Concurrency       int64      `json:"concurrency,optional"`
-	ChannelBufferSize int64      `json:"channelBufferSize,optional"`
+	PostStart         PostStart  `json:"postStart,optional"`
+	PreStop           PreStop    `json:"preStop,optional"`
+}
+
+type PostStart struct {
+	Commands    string `json:"commands" validate:"required"`
+	AfterPeriod string `json:"afterPeriod" validate:"required"`
+}
+
+type PreStop struct {
+	Commands string `json:"commands,optional"`
 }
 
 type CSV struct {
 	WithHeader bool   `json:"withHeader,optional"`
 	WithLabel  bool   `json:"withLabel,optional"`
-	Delimiter  string `json:"delimiter,optional"`
+	Delimiter  string `json:"delimiter,optional" default:","`
 }
 
 type VID struct {
@@ -86,49 +97,55 @@ type Vertex struct {
 type EdgeID struct {
 	Index    int64  `json:"index" validate:"required"`
 	Function string `json:"function,optional"`
+	Type     string `json:"type" validate:"required"`
+	Prefix   string `json:"prefix,optional"`
 }
 
 type EdgeRank struct {
-	Index int64 `json:"index" validate:"required"`
+	Index int64 `json:"index"`
 }
 
 type EdgeProp struct {
-	Name  string `json:"name" validate:"required"`
-	Type  string `json:"type" validate:"required"`
-	Index int64  `json:"index" validate:"required"`
+	Name  string `json:"name"`
+	Type  string `json:"type"`
+	Index int64  `json:"index"`
 }
 
 type Edge struct {
-	Name   string   `json:"name" validate:"required"`
-	SrcVID EdgeID   `json:"srcVID" validate:"required"`
-	DstVID EdgeID   `json:"dstVID" validate:"required"`
-	Rank   EdgeRank `json:"rank" validate:"required"`
-	Props  EdgeProp `json:"props" validate:"required"`
+	Name   string     `json:"name" validate:"required"`
+	SrcVID EdgeID     `json:"srcVID" validate:"required"`
+	DstVID EdgeID     `json:"dstVID" validate:"required"`
+	Rank   EdgeRank   `json:"rank, optional"`
+	Props  []EdgeProp `json:"props" validate:"required"`
 }
 
 type Schema struct {
 	Type   string `json:"type" validate:"required"`
-	Edge   Edge   `json:"edge" validate:"required"`
-	Vertex Vertex `json:"vertex" validate:"required"`
+	Edge   Edge   `json:"edge,optional"`
+	Vertex Vertex `json:"vertex,optional"`
 }
 
 type File struct {
-	Path   string `json:"path" validate:"required"`
-	Type   string `json:"type" validate:"required"`
-	CSV    CSV    `json:"csv" validate:"required"`
-	Schema Schema `json:"schema" validate:"required"`
+	Path         string `json:"path" validate:"required"`
+	FailDataPath string `json:"failDataPath" validate:"required"`
+	BatchSize    int    `json:"batchSize,optional"`
+	Limit        int    `json:"limit, optional"`
+	InOrder      bool   `json:"inOrder, optional"`
+	Type         string `json:"type" validate:"required"`
+	CSV          CSV    `json:"csv" validate:"required"`
+	Schema       Schema `json:"schema" validate:"required"`
 }
 
 type ImportConfig struct {
 	Version         string         `json:"version" validate:"required"`
 	Description     string         `json:"description,optional"`
-	RemoveTempFiles string         `json:"removeTempFiles,optional"`
+	RemoveTempFiles bool           `json:"removeTempFiles,optional"`
 	ClientSettings  ClientSettings `json:"clientSettings" validate:"required"`
 	Files           []File         `json:"files" validate:"required"`
 }
 
 type CreateImportTaskRequest struct {
-	Name   string       `path:"name" validate:"required"`
+	Name   string       `json:"name" validate:"required"`
 	Config ImportConfig `json:"config" validate:"required"`
 }
 
@@ -137,22 +154,39 @@ type CreateImportTaskData struct {
 }
 
 type GetImportTaskRequest struct {
-	Id string `path:"id" validate:"required"`
+	Id       string `path:"id" validate:"required"`
+	Address  string `form:"address" validate:"required""`
+	Username string `form:"username" validate:"required"`
 }
 
 type GetImportTaskData struct {
 	Id         string `json:"id"`
-	SolutionId string `json:"solutionId"`
-	Config     string `json:"config"`
+	Name       string `json:"name"`
+	User       string `json:"user"`
+	Address    string `json:"address"`
+	Space      string `json:"space"`
 	Status     string `json:"status"`
-	ImportCode int64  `json:"importCode"`
 	CreateTime int64  `json:"createTime"`
 	UpdateTime int64  `json:"updateTime"`
+	Stats      Stats  `json:"stats"`
+}
+
+type Stats struct {
+	NumFailed          int64 `json:"numFailed"`
+	NumReadFailed      int64 `json:"numReadFailed"`
+	TotalCount         int64 `json:"totalCount"`
+	TotalBatches       int64 `json:"totalBatches"`
+	TotalLatency       int64 `json:"totalLatency"`
+	TotalReqTime       int64 `json:"totalReqTime"`
+	TotalBytes         int64 `json:"totalBytes"`
+	TotalImportedBytes int64 `json:"totalImportedBytes"`
 }
 
 type GetManyImportTaskRequest struct {
-	Page     int `form:"page,default=1"`
-	PageSize int `form:"pageSize,default=100"`
+	Address  string `form:"address" validate:"required""`
+	Username string `form:"username" validate:"required"`
+	Page     int    `form:"page,default=1"`
+	PageSize int    `form:"pageSize,default=100"`
 }
 
 type GetManyImportTaskData struct {
@@ -162,6 +196,7 @@ type GetManyImportTaskData struct {
 
 type GetManyImportTaskLogRequest struct {
 	Id     string `path:"id" validate:"required"`
+	File   string `form:"file" validate:"required"`
 	Offset int64  `form:"offset" validate:"min=0"`
 	Limit  int64  `form:"limit" validate:"min=1"`
 }
@@ -170,19 +205,39 @@ type GetManyImportTaskLogData struct {
 	Logs []string `json:"logs"`
 }
 
+type GetImportTaskLogNamesRequest struct {
+	Id string `path:"id" validate:"required""`
+}
+
+type GetImportTaskLogNamesData struct {
+	Names []string `json:"names"`
+}
+
 type DeleteImportTaskRequest struct {
-	Id string `path:"id" validate:"required"`
+	Id       string `path:"id" validate:"required"`
+	Address  string `form:"address" validate:"required""`
+	Username string `form:"username" validate:"required"`
 }
 
 type StopImportTaskRequest struct {
-	Id string `path:"id" validate:"required"`
+	Id       string `path:"id" validate:"required"`
+	Address  string `form:"address" validate:"required""`
+	Username string `form:"username" validate:"required"`
 }
 
 type DownloadLogsRequest struct {
-	Id   string `json:"id" validate:"required"`
-	Name string `json:"name" validate:"required"`
+	Id   string `path:"id" validate:"required"`
+	Name string `form:"name" validate:"required"`
+}
+
+type DownloadLogsData struct {
+	Data string `json:"data"`
 }
 
 type DownloadConfigsRequest struct {
 	Id string `path:"id" validate:"required"`
+}
+
+type DownloadConfigsData struct {
+	Data string `json:"data"`
 }

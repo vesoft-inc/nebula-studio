@@ -13,9 +13,9 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-func DownloadConfigHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func GetImportTaskLogNamesHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.DownloadConfigsRequest
+		var req types.GetImportTaskLogNamesRequest
 		if err := httpx.Parse(r, &req); err != nil {
 			err = ecode.WithCode(ecode.ErrParam, err)
 			svcCtx.ResponseHandler.Handle(w, r, nil, err)
@@ -26,8 +26,8 @@ func DownloadConfigHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := importtask.NewDownloadConfigLogic(r.Context(), svcCtx)
-		data, err := l.DownloadConfig(req)
+		l := importtask.NewGetImportTaskLogNamesLogic(r.Context(), svcCtx)
+		data, err := l.GetImportTaskLogNames(req)
 		svcCtx.ResponseHandler.Handle(w, r, data, err)
 	}
 }

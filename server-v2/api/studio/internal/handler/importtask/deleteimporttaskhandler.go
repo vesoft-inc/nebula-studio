@@ -26,7 +26,7 @@ func DeleteImportTaskHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := importtask.NewDeleteImportTaskLogic(r.Context(), svcCtx, w)
+		l := importtask.NewDeleteImportTaskLogic(r.Context(), svcCtx)
 		err := l.DeleteImportTask(req)
 		svcCtx.ResponseHandler.Handle(w, r, nil, err)
 	}

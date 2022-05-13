@@ -9,20 +9,20 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type CreateImportTaskLogic struct {
+type GetImportTaskLogNamesLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewCreateImportTaskLogic(ctx context.Context, svcCtx *svc.ServiceContext) *CreateImportTaskLogic {
-	return &CreateImportTaskLogic{
+func NewGetImportTaskLogNamesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetImportTaskLogNamesLogic {
+	return &GetImportTaskLogNamesLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *CreateImportTaskLogic) CreateImportTask(req types.CreateImportTaskRequest) (resp *types.CreateImportTaskData, err error) {
-	return service.NewImportService(l.ctx, l.svcCtx).CreateImportTask(&req)
+func (l *GetImportTaskLogNamesLogic) GetImportTaskLogNames(req types.GetImportTaskLogNamesRequest) (resp *types.GetImportTaskLogNamesData, err error) {
+	return service.NewImportService(l.ctx, l.svcCtx).GetImportTaskLogNames(&req)
 }

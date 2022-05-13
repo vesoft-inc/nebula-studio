@@ -89,6 +89,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: importtask.GetManyImportTaskLogHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodGet,
+				Path:    "/api/import-tasks/:id/task-log-names",
+				Handler: importtask.GetImportTaskLogNamesHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodDelete,
 				Path:    "/api/import-tasks/:id",
 				Handler: importtask.DeleteImportTaskHandler(serverCtx),
@@ -99,8 +104,8 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: importtask.StopImportTaskHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/api/import-tasks/:id/logs",
+				Method:  http.MethodGet,
+				Path:    "/api/import-tasks/download/:id",
 				Handler: importtask.DownloadLogsHandler(serverCtx),
 			},
 			{
