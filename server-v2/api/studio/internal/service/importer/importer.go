@@ -12,7 +12,6 @@ import (
 	"go.uber.org/zap"
 	"os"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"time"
 
@@ -27,11 +26,6 @@ type ImportResult struct {
 		ErrorCode int    `json:"errorCode"`
 		ErrorMsg  string `json:"errorMsg"`
 	}
-}
-
-type ActionResult struct {
-	Results []TaskInfo `json:"results"`
-	Msg     string     `json:"msg"`
 }
 
 func GetNewTaskDir() (string, error) {
@@ -160,31 +154,6 @@ func ImportStatus(taskID string) (*TaskInfo, error) {
 	return nil, errors.New("task is not exist")
 }
 
-func ImportAction(taskID string, address string, username string, taskAction TaskAction) (result ActionResult, err error) {
-	zap.L().Debug(fmt.Sprintf("Start a import task action: `%s` for task: `%s`", taskAction.String(), taskID))
-
-	result = ActionResult{}
-
-	switch taskAction {
-	case ActionQuery:
-		actionQuery(taskID, address, username, &result, false)
-	case ActionQueryAll:
-		actionQueryAll(address, username, &result)
-	case ActionStop:
-		actionStop(taskID, address, username, &result, false)
-	case ActionStopAll:
-		actionStopAll(address, username, &result)
-	case ActionDel:
-		actionDel(taskID, address, username, &result)
-	default:
-		err = errors.New("unknown task action")
-	}
-
-	zap.L().Debug(fmt.Sprintf("The import task action: `%s` for task: `%s` finished, action result: `%v`", taskAction.String(), taskID, result))
-
-	return result, err
-}
-
 func DeleteImportTask(taskID, address, username string) error {
 	if id, err := strconv.Atoi(taskID); err != nil {
 		zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
@@ -287,117 +256,4 @@ func StopImportTask(taskID, address, username string) error {
 	} else {
 		return nil
 	}
-}
-
-func actionDel(taskID string, address string, username string, result *ActionResult) {
-	if id, err := strconv.Atoi(taskID); err != nil {
-		zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
-		result.Msg = "Task not existed"
-		return
-	} else {
-		_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(id, address, username)
-		if err != nil {
-			zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
-			result.Msg = "Task not existed"
-			return
-		}
-	}
-	err := GetTaskMgr().DelTask(taskID)
-	if err != nil {
-		result.Msg = fmt.Sprintf("Task del fail, %s", err.Error())
-		return
-	}
-	result.Msg = fmt.Sprintf("Task del successfully, taskID : %s", taskID)
-}
-
-func actionQuery(taskID string, address string, username string, result *ActionResult, skipCheck bool) {
-	// a temp task obj for response
-	task := Task{}
-	if !skipCheck {
-		if id, err := strconv.Atoi(taskID); err != nil {
-			zap.L().Warn(fmt.Sprintf("UpdateTaskInfo fail, id : %s", taskID), zap.Error(err))
-			result.Msg = "Task not existed"
-			return
-		} else {
-			_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(id, address, username)
-			if err != nil {
-				zap.L().Warn(fmt.Sprintf("UpdateTaskInfo fail, id : %s", taskID), zap.Error(err))
-				result.Msg = "Task not existed"
-				return
-			}
-		}
-	}
-
-	err := GetTaskMgr().UpdateTaskInfo(taskID)
-	if err != nil {
-		zap.L().Warn(fmt.Sprintf("UpdateTaskInfo fail, id : %s", taskID), zap.Error(err))
-	}
-	if t, ok := GetTaskMgr().GetTask(taskID); ok {
-		task = *t
-		result.Results = append(result.Results, *task.TaskInfo)
-		result.Msg = "Task query successfully"
-	} else {
-		result.Msg = "Task not existed"
-	}
-}
-
-/*
-	`actionQueryAll` will return all tasks with status Aborted or Processing
-*/
-func actionQueryAll(address string, username string, result *ActionResult) {
-	taskIDs, err := GetTaskMgr().GetAllTaskIDs(address, username)
-	if err != nil {
-		result.Msg = "Tasks query unsuccessfully"
-		return
-	}
-	for _, taskID := range taskIDs {
-		actionQuery(taskID, address, username, result, true)
-	}
-	sort.Slice(result.Results, func(i, j int) bool {
-		return result.Results[i].CreatedTime > result.Results[j].CreatedTime
-	})
-	result.Msg = "Tasks query successfully"
-}
-
-func actionStop(taskID string, address string, username string, result *ActionResult, skipCheck bool) {
-	if !skipCheck {
-		if id, err := strconv.Atoi(taskID); err != nil {
-			zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
-			result.Msg = "Task not existed"
-			return
-		} else {
-			_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(id, address, username)
-			if err != nil {
-				zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
-				result.Msg = "Task not existed"
-				return
-			}
-		}
-	}
-
-	err := GetTaskMgr().StopTask(taskID)
-	actionQuery(taskID, address, username, result, skipCheck)
-	if err != nil {
-		zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
-		result.Msg = "Task stop failed"
-	} else {
-		result.Msg = "Task stop successfully"
-	}
-}
-
-/*
-	`actionStopAll` will stop all tasks with status Processing
-*/
-func actionStopAll(address string, username string, result *ActionResult) {
-	taskIDs, err := GetTaskMgr().GetAllTaskIDs(address, username)
-	if err != nil {
-		result.Msg = "Tasks query unsuccessfully"
-		return
-	}
-	for _, taskID := range taskIDs {
-		if _task, ok := GetTaskMgr().GetTask(taskID); ok && _task.TaskInfo.TaskStatus == StatusProcessing.String() {
-			actionStop(taskID, address, username, result, true)
-		}
-	}
-	result.Msg = "Tasks stop successfully"
 }

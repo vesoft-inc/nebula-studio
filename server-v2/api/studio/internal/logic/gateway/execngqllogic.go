@@ -25,5 +25,5 @@ func NewExecNGQLLogic(ctx context.Context, svcCtx *svc.ServiceContext) ExecNGQLL
 }
 
 func (l *ExecNGQLLogic) ExecNGQL(req types.ExecNGQLParams) (resp *types.AnyResponse, err error) {
-	return service.NewGatewayService(l.ctx, l.svcCtx).GetExec(&req)
+	return service.NewGatewayService(l.ctx, l.svcCtx).ExecNGQL(&req)
 }

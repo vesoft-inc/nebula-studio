@@ -1,0 +1,106 @@
+version: v2
+description: web console import
+removeTempFiles: null
+clientSettings:
+  retry: 3
+  concurrency: 10
+  channelBufferSize: 128
+  space: sales
+  connection:
+    user: ""
+    password: ""
+    address: ""
+  postStart:
+    commands: |
+      DROP SPACE IF EXISTS `sales`;
+      CREATE SPACE IF NOT EXISTS `sales` (partition_num=5, replica_factor=1, vid_type=FIXED_STRING(32)) comment="sales";
+      USE `sales`;
+      CREATE TAG `item` (id_single_item string NOT NULL, region string NOT NULL, country string NOT NULL, item_type string NOT NULL, sales_channel string NOT NULL ) ;
+      CREATE EDGE `order` (order_id string NOT NULL, id_item string NOT NULL, unit_sold string NOT NULL, unit_price string NOT NULL, unit_cost string NOT NULL, total_profit string NOT NULL) ;
+    afterPeriod: 8s
+  preStop: null
+logPath: import.log
+files:
+- path: item.csv
+  failDataPath: itemFail.csv
+  batchSize: 60
+  limit: null
+  inOrder: null
+  type: csv
+  csv:
+    withHeader: false
+    withLabel: false
+    delimiter: null
+  schema:
+    type: vertex
+    edge: null
+    vertex:
+      vid:
+        index: 0
+        function: null
+        type: string
+        prefix: null
+      tags:
+      - name: item
+        props:
+        - name: id_single_item
+          type: string
+          index: 0
+        - name: region
+          type: string
+          index: 1
+        - name: country
+          type: string
+          index: 2
+        - name: item_type
+          type: string
+          index: 3
+        - name: sales_channel
+          type: string
+          index: 4
+- path: orderr.csv
+  failDataPath: orderrFail.csv
+  batchSize: 60
+  limit: null
+  inOrder: null
+  type: csv
+  csv:
+    withHeader: false
+    withLabel: false
+    delimiter: null
+  schema:
+    type: edge
+    edge:
+      name: order
+      withRanking: false
+      props:
+      - name: order_id
+        type: string
+        index: 0
+      - name: id_item
+        type: string
+        index: 0
+      - name: unit_sold
+        type: string
+        index: 2
+      - name: unit_price
+        type: string
+        index: 3
+      - name: unit_cost
+        type: string
+        index: 4
+      - name: total_profit
+        type: string
+        index: 5
+      srcVID:
+        index: 1
+        function: null
+        type: string
+        prefix: null
+      dstVID:
+        index: 1
+        function: null
+        type: string
+        prefix: null
+      rank: null
+    vertex: null

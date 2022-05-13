@@ -7,17 +7,29 @@ type GetHealth struct {
 
 type ExecNGQLParams struct {
 	Gql       string   `json:"gql"`
-	ParamList []string `json:"paramList"`
+	ParamList []string `json:"paramList,optional"`
+	NSID      string   `form:"NSID"`
+}
+
+type BatchExecNGQLParams struct {
+	Gqls      []string `json:"gqls"`
+	ParamList []string `json:"paramList,optional"`
+	NSID      string   `form:"NSID"`
 }
 
 type ConnectDBParams struct {
 	Address       string `json:"address"`
 	Port          int    `json:"port"`
+	NebulaVersion string `form:"nebulaVersion,optional"`
 	Authorization string `header:"Authorization"`
 }
 
 type ConnectDBResult struct {
 	Version string `json:"version"`
+}
+
+type DisconnectDBParams struct {
+	NSID string `form:"NSID,optional"`
 }
 
 type AnyResponse struct {
@@ -155,8 +167,8 @@ type CreateImportTaskData struct {
 
 type GetImportTaskRequest struct {
 	Id       string `path:"id" validate:"required"`
-	Address  string `form:"address" validate:"required""`
-	Username string `form:"username" validate:"required"`
+	Address  string `form:"address"`
+	Username string `form:"username"`
 }
 
 type GetImportTaskData struct {
@@ -183,8 +195,8 @@ type Stats struct {
 }
 
 type GetManyImportTaskRequest struct {
-	Address  string `form:"address" validate:"required""`
-	Username string `form:"username" validate:"required"`
+	Address  string `form:"address"`
+	Username string `form:"username"`
 	Page     int    `form:"page,default=1"`
 	PageSize int    `form:"pageSize,default=100"`
 }
@@ -214,15 +226,15 @@ type GetImportTaskLogNamesData struct {
 }
 
 type DeleteImportTaskRequest struct {
-	Id       string `path:"id" validate:"required"`
-	Address  string `form:"address" validate:"required""`
-	Username string `form:"username" validate:"required"`
+	Id       string `path:"id"`
+	Address  string `form:"address"`
+	Username string `form:"username"`
 }
 
 type StopImportTaskRequest struct {
-	Id       string `path:"id" validate:"required"`
-	Address  string `form:"address" validate:"required""`
-	Username string `form:"username" validate:"required"`
+	Id       string `path:"id"`
+	Address  string `form:"address"`
+	Username string `form:"username"`
 }
 
 type DownloadLogsRequest struct {

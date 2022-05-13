@@ -116,8 +116,8 @@ type (
 
 	GetImportTaskRequest {
 		Id       string `path:"id" validate:"required"`
-		Address  string `form:"address" validate:"required""`
-		Username string `form:"username" validate:"required"`
+		Address  string `form:"address"`
+		Username string `form:"username"`
 	}
 
 	GetImportTaskData {
@@ -144,8 +144,8 @@ type (
 	}
 
 	GetManyImportTaskRequest {
-		Address  string `form:"address" validate:"required""`
-		Username string `form:"username" validate:"required"`
+		Address  string `form:"address"`
+		Username string `form:"username"`
 		Page     int    `form:"page,default=1"`
 		PageSize int    `form:"pageSize,default=100"`
 	}
@@ -175,15 +175,15 @@ type (
 	}
 
 	DeleteImportTaskRequest {
-		Id       string `path:"id" validate:"required"`
-		Address  string `form:"address" validate:"required""`
-		Username string `form:"username" validate:"required"`
+		Id       string `path:"id"`
+		Address  string `form:"address"`
+		Username string `form:"username"`
 	}
 
 	StopImportTaskRequest {
-		Id       string `path:"id" validate:"required"`
-		Address  string `form:"address" validate:"required""`
-		Username string `form:"username" validate:"required"`
+		Id       string `path:"id"`
+		Address  string `form:"address"`
+		Username string `form:"username"`
 	}
 
 	DownloadLogsRequest {

@@ -1,7 +1,8 @@
-import { action, makeAutoObservable, observable, runInAction } from 'mobx';
+import { action, makeObservable, observable, runInAction } from 'mobx';
 import service from '@app/config/service';
 import { IBasicConfig, IEdgeConfig, ITaskItem, IVerticesConfig } from '@app/interfaces/import';
 import { getRootStore } from '.';
+import { configToJson } from '@app/utils/import';
 export class ImportStore {
   taskList: ITaskItem[] = [];
   taskDir: string = '';
@@ -10,7 +11,7 @@ export class ImportStore {
 
   basicConfig: IBasicConfig = { taskName: '' };
   constructor() {
-    makeAutoObservable(this, {
+    makeObservable(this, {
       taskList: observable,
       taskDir: observable,
       verticesConfig: observable,
@@ -59,9 +60,32 @@ export class ImportStore {
     return { code, data };
   }
   
-  importTask = async (config, name) => {
+  importTask = async (params: {
+    config?: any,
+    name: string, 
+    password?: string
+  }) => {
+    let _config
+    const { config, name, password } = params;
+    if(config) {
+      _config = config;
+    } else {
+      const { currentSpace, spaceVidType } = this.rootStore.schema
+      const { username, host } = this.rootStore.global
+      _config = configToJson({
+        ...this.basicConfig,
+        space: currentSpace,
+        taskDir: this.taskDir,
+        verticesConfig: this.verticesConfig,
+        edgesConfig: this.edgesConfig,
+        username,
+        host,
+        password,
+        spaceVidType
+      })
+    }
     const { code, data } = (await service.importData({
-      configBody: config,
+      configBody: _config,
       configPath: '',
       name
     })) as any;

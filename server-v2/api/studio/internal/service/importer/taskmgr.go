@@ -223,47 +223,6 @@ func (mgr *TaskMgr) getTaskFromSQL(taskID string) *Task {
 	return task
 }
 
-type TaskAction int
-
-const (
-	ActionUnknown TaskAction = iota
-	ActionQuery
-	ActionQueryAll
-	ActionStop
-	ActionStopAll
-	ActionDel
-)
-
-var taskActionMap = map[TaskAction]string{
-	ActionQuery:    "actionQuery",
-	ActionQueryAll: "actionQueryAll",
-	ActionStop:     "actionStop",
-	ActionStopAll:  "actionStopAll",
-	ActionDel:      "actionDel",
-}
-
-var taskActionRevMap = map[string]TaskAction{
-	"actionQuery":    ActionQuery,
-	"actionQueryAll": ActionQueryAll,
-	"actionStop":     ActionStop,
-	"actionStopAll":  ActionStopAll,
-	"actionDel":      ActionDel,
-}
-
-func NewTaskAction(action string) TaskAction {
-	if v, ok := taskActionRevMap[action]; ok {
-		return v
-	}
-	return ActionUnknown
-}
-
-func (action TaskAction) String() string {
-	if v, ok := taskActionMap[action]; ok {
-		return v
-	}
-	return "actionUnknown"
-}
-
 type TaskStatus int
 
 /*

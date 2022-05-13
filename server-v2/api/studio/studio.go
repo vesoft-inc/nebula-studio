@@ -4,6 +4,9 @@ import (
 	"embed"
 	"flag"
 	"fmt"
+	"net/http"
+
+	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service/importer"
@@ -11,7 +14,6 @@ import (
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
 	Config "github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/logging"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"go.uber.org/zap"
 
 	"github.com/zeromicro/go-zero/core/conf"
@@ -42,15 +44,16 @@ func main() {
 	importer.InitDB()
 
 	svcCtx := svc.NewServiceContext(c)
-	server := rest.MustNewServer(c.RestConf)
+	server := rest.MustNewServer(c.RestConf, rest.WithNotFoundHandler(middleware.NewAssetsHandler(middleware.AssetsConfig{
+		Root:       "assets",
+		Filesystem: http.FS(embedAssets),
+		SPA:        true,
+	})))
+
 	defer server.Stop()
 
 	// global middleware
-	// server.Use(auth.AuthMiddleware)
-	server.Use(auth.AuthMiddlewareWithConfig(&c))
-
-	// static assets handlers
-	utils.RegisterHandlers(server, svcCtx, embedAssets)
+	server.Use(auth.AuthMiddlewareWithCtx(svcCtx))
 
 	// api handlers
 	handler.RegisterHandlers(server, svcCtx)

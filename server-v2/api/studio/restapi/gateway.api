@@ -3,17 +3,26 @@ syntax = "v1"
 type (
 	ExecNGQLParams {
 		Gql       string   `json:"gql"`
-		ParamList []string `json:"paramList"`
+		ParamList []string `json:"paramList,optional"`
+		NSID      string   `form:"NSID"`
+	}
+	BatchExecNGQLParams {
+		Gqls      []string `json:"gqls"`
+		ParamList []string `json:"paramList,optional"`
+		NSID      string   `form:"NSID"`
 	}
 	ConnectDBParams {
 		Address       string `json:"address"`
 		Port          int    `json:"port"`
+		NebulaVersion string `form:"nebulaVersion,optional"`
 		Authorization string `header:"Authorization"`
 	}
 	ConnectDBResult {
 		Version string `json:"version"`
 	}
-
+	DisconnectDBParams {
+		NSID string `form:"NSID,optional"`
+	}
 	AnyResponse {
 		Data interface{} `json:"data"`
 	}
@@ -28,6 +37,10 @@ service studio-api {
 	@doc "Exec NGQL"
 	@handler ExecNGQL
 	post /exec(ExecNGQLParams) returns (AnyResponse)
+	
+	@doc "BatchExec NGQL"
+	@handler BatchExecNGQL
+	post /batchExec(BatchExecNGQLParams) returns (AnyResponse)
 }
 
 @server(
@@ -39,4 +52,8 @@ service studio-api {
 	@doc "Connect DB"
 	@handler Connect
 	post /connect(ConnectDBParams) returns (ConnectDBResult)
+	
+	@doc "Disonnect DB"
+	@handler Disonnect
+	post /disconnect(DisconnectDBParams) returns (AnyResponse)
 }
