@@ -118,6 +118,7 @@ type (
 		Id       string `path:"id" validate:"required"`
 		Address  string `form:"address"`
 		Username string `form:"username"`
+		Port     string `form:"port"`
 	}
 
 	GetImportTaskData {
@@ -146,6 +147,7 @@ type (
 	GetManyImportTaskRequest {
 		Address  string `form:"address"`
 		Username string `form:"username"`
+		Port     string `form:"port"`
 		Page     int    `form:"page,default=1"`
 		PageSize int    `form:"pageSize,default=100"`
 	}
@@ -178,11 +180,13 @@ type (
 		Id       string `path:"id"`
 		Address  string `form:"address"`
 		Username string `form:"username"`
+		Port     string `form:"port"`
 	}
 
 	StopImportTaskRequest {
 		Id       string `path:"id"`
 		Address  string `form:"address"`
+		Port     string `form:"port"`
 		Username string `form:"username"`
 	}
 

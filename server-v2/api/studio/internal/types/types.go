@@ -169,6 +169,7 @@ type GetImportTaskRequest struct {
 	Id       string `path:"id" validate:"required"`
 	Address  string `form:"address"`
 	Username string `form:"username"`
+	Port     string `form:"port"`
 }
 
 type GetImportTaskData struct {
@@ -197,6 +198,7 @@ type Stats struct {
 type GetManyImportTaskRequest struct {
 	Address  string `form:"address"`
 	Username string `form:"username"`
+	Port     string `form:"port"`
 	Page     int    `form:"page,default=1"`
 	PageSize int    `form:"pageSize,default=100"`
 }
@@ -229,11 +231,13 @@ type DeleteImportTaskRequest struct {
 	Id       string `path:"id"`
 	Address  string `form:"address"`
 	Username string `form:"username"`
+	Port     string `form:"port"`
 }
 
 type StopImportTaskRequest struct {
 	Id       string `path:"id"`
 	Address  string `form:"address"`
+	Port     string `form:"port"`
 	Username string `form:"username"`
 }
 

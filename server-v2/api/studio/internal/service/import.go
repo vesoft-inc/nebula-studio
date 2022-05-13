@@ -147,7 +147,7 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 }
 
 func (i *importService) StopImportTask(req *types.StopImportTaskRequest) error {
-	return importer.StopImportTask(req.Id, req.Address, req.Username)
+	return importer.StopImportTask(req.Id, req.Address+":"+req.Port, req.Username)
 }
 
 func (i *importService) DownloadConfig(req *types.DownloadConfigsRequest) (*types.DownloadConfigsData, error) {
@@ -193,15 +193,15 @@ func (i *importService) DownloadLogs(req *types.DownloadLogsRequest) (*types.Dow
 }
 
 func (i *importService) DeleteImportTask(req *types.DeleteImportTaskRequest) error {
-	return importer.DeleteImportTask(req.Id, req.Address, req.Username)
+	return importer.DeleteImportTask(req.Id, req.Address+":"+req.Port, req.Username)
 }
 
 func (i *importService) GetImportTask(req *types.GetImportTaskRequest) (*types.GetImportTaskData, error) {
-	return importer.GetImportTask(req.Id, req.Address, req.Username)
+	return importer.GetImportTask(req.Id, req.Address+":"+req.Port, req.Username)
 }
 
 func (i *importService) GetManyImportTask(req *types.GetManyImportTaskRequest) (*types.GetManyImportTaskData, error) {
-	return importer.GetManyImportTask(req.Address, req.Username, req.Page, req.PageSize)
+	return importer.GetManyImportTask(req.Address+":"+req.Port, req.Username, req.Page, req.PageSize)
 }
 
 // GetImportTaskLogNames :Get all log file's name of a task
