@@ -30,6 +30,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/exec",
 				Handler: gateway.ExecNGQLHandler(serverCtx),
 			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/batchExec",
+				Handler: gateway.BatchExecNGQLHandler(serverCtx),
+			},
 		},
 		rest.WithPrefix("/api-nebula/db"),
 	)
@@ -40,6 +45,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodPost,
 				Path:    "/connect",
 				Handler: gateway.ConnectHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/disconnect",
+				Handler: gateway.DisonnectHandler(serverCtx),
 			},
 		},
 		rest.WithPrefix("/api-nebula/db"),

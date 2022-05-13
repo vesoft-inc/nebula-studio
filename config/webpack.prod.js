@@ -13,7 +13,7 @@ const publicConfig = {
     path: path.join(__dirname, '../dist/'),
     filename: '[name].[chunkhash].js',
     chunkFilename: '[name].[contenthash].js',
-    publicPath: '/assets/',
+    publicPath: '/',
   },
   module: {
     rules: [

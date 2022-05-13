@@ -10,20 +10,20 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ExecNGQLLogic struct {
+type DisonnectLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewExecNGQLLogic(ctx context.Context, svcCtx *svc.ServiceContext) ExecNGQLLogic {
-	return ExecNGQLLogic{
+func NewDisonnectLogic(ctx context.Context, svcCtx *svc.ServiceContext) DisonnectLogic {
+	return DisonnectLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *ExecNGQLLogic) ExecNGQL(req types.ExecNGQLParams) (resp *types.AnyResponse, err error) {
-	return service.NewGatewayService(l.ctx, l.svcCtx).ExecNGQL(&req)
+func (l *DisonnectLogic) Disonnect(req types.DisconnectDBParams) (*types.AnyResponse, error) {
+	return service.NewGatewayService(l.ctx, l.svcCtx).DisconnectDB(&req)
 }

@@ -4,12 +4,13 @@ import (
 	"embed"
 	"flag"
 	"fmt"
+	"net/http"
 
+	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
@@ -27,15 +28,16 @@ func main() {
 	conf.MustLoad(*configFile, &c, conf.UseEnv())
 
 	svcCtx := svc.NewServiceContext(c)
-	server := rest.MustNewServer(c.RestConf)
+	server := rest.MustNewServer(c.RestConf, rest.WithNotFoundHandler(middleware.NewAssetsHandler(middleware.AssetsConfig{
+		Root:       "assets",
+		Filesystem: http.FS(embedAssets),
+		SPA:        true,
+	})))
+
 	defer server.Stop()
 
 	// global middleware
-	// server.Use(auth.AuthMiddleware)
-	server.Use(auth.AuthMiddlewareWithConfig(&c))
-
-	// static assets handlers
-	utils.RegisterHandlers(server, svcCtx, embedAssets)
+	server.Use(auth.AuthMiddlewareWithCtx(svcCtx))
 
 	// api handlers
 	handler.RegisterHandlers(server, svcCtx)

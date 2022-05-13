@@ -1,6 +1,7 @@
 package ecode
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -44,6 +45,11 @@ func WithBadRequest(err error, formatWithArgs ...interface{}) error {
 
 func WithUnauthorized(err error, formatWithArgs ...interface{}) error {
 	return WithCode(ErrUnauthorized, err, formatWithArgs...)
+}
+
+func WithSessionMessage(err error, formatWithArgs ...interface{}) error {
+	ErrSessionWithMessage := newErrCode(CCUnauthorized, PlatformCode, 1, fmt.Sprintf("ErrSession::%s", err.Error()))
+	return WithCode(ErrSessionWithMessage, err, formatWithArgs...)
 }
 
 func WithForbidden(err error, formatWithArgs ...interface{}) error {
