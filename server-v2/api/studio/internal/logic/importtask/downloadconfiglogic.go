@@ -1,4 +1,4 @@
-package file
+package importtask
 
 import (
 	"context"
@@ -11,20 +11,20 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type FileDestroyLogic struct {
+type DownloadConfigLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewFileDestroyLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FileDestroyLogic {
-	return &FileDestroyLogic{
+func NewDownloadConfigLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DownloadConfigLogic {
+	return &DownloadConfigLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *FileDestroyLogic) FileDestroy(req types.FileDestroyRequest) error {
-	return service.NewFileService(l.ctx, l.svcCtx).FileDestroy(req.Name)
+func (l *DownloadConfigLogic) DownloadConfig(req types.DownloadConfigsRequest) error {
+	return service.NewImportService(l.ctx, l.svcCtx).DownloadConfig(&req)
 }

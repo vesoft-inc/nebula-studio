@@ -25,11 +25,11 @@ type (
 service studio-api {
 	@doc "Upload File"
 	@handler FileUpload
-	post /api/file
+	post /api/files
 	@doc "delete file"
 	@handler FileDestroy
-	delete /api/file/:name returns(FileDestroyRequest)
+	delete /api/files/:name(FileDestroyRequest)
 	@doc "preview file"
 	@handler FilesIndex
-	get /api/file returns(FilesIndexData)
+	get /api/files returns(FilesIndexData)
 }

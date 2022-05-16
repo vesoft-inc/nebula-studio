@@ -1,30 +1,29 @@
-package file
+package importtask
 
 import (
 	"context"
 
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service"
-
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type FileDestroyLogic struct {
+type CreateImportTaskLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewFileDestroyLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FileDestroyLogic {
-	return &FileDestroyLogic{
+func NewCreateImportTaskLogic(ctx context.Context, svcCtx *svc.ServiceContext) *CreateImportTaskLogic {
+	return &CreateImportTaskLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *FileDestroyLogic) FileDestroy(req types.FileDestroyRequest) error {
-	return service.NewFileService(l.ctx, l.svcCtx).FileDestroy(req.Name)
+func (l *CreateImportTaskLogic) CreateImportTask(req types.CreateImportTaskRequest) (resp *types.CreateImportTaskData, err error) {
+	return service.NewImportService(l.ctx, l.svcCtx).CreateImportTask(&req)
 }

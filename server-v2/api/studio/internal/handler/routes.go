@@ -7,6 +7,7 @@ import (
 	file "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/file"
 	gateway "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/gateway"
 	health "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/health"
+	importtask "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/importtask"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -59,18 +60,68 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		[]rest.Route{
 			{
 				Method:  http.MethodPost,
-				Path:    "/api/file",
+				Path:    "/api/files",
 				Handler: file.FileUploadHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodDelete,
-				Path:    "/api/file/:name",
+				Path:    "/api/files/:name",
 				Handler: file.FileDestroyHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,
-				Path:    "/api/file",
+				Path:    "/api/files",
 				Handler: file.FilesIndexHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/import-tasks",
+				Handler: importtask.CreateImportTaskHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/import-tasks/:id",
+				Handler: importtask.GetImportTaskHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/import-tasks",
+				Handler: importtask.GetManyImportTaskHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/import-tasks/:id/logs",
+				Handler: importtask.GetManyImportTaskLogHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/import-tasks/:id/task-log-names",
+				Handler: importtask.GetImportTaskLogNamesHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/api/import-tasks/:id",
+				Handler: importtask.DeleteImportTaskHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/import-tasks/:id/stop",
+				Handler: importtask.StopImportTaskHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/import-tasks/:id/download-logs",
+				Handler: importtask.DownloadLogsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/import-tasks/:id/download-config",
+				Handler: importtask.DownloadConfigHandler(serverCtx),
 			},
 		},
 	)

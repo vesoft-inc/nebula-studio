@@ -1,6 +1,6 @@
 Name: studio-api
 Host: 0.0.0.0
-Port: 9000
+Port: 7002
 MaxBytes: 1073741824
 Debug:
   Enable: false
@@ -8,4 +8,7 @@ Auth:
   AccessSecret: "login_secret"
   AccessExpire: 1800
 File:
-  UploadDir: "./upload/"
+  UploadDir: "./data/upload/"
+  TasksDir: "./data/tasks"
+  SqliteDbFilePath: "./data/tasks.db"
+  TaskIdPath: "./data/taskId.data"

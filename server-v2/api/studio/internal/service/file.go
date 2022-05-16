@@ -6,12 +6,6 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
-	"github.com/axgle/mahonia"
-	"github.com/saintfish/chardet"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
-	"github.com/zeromicro/go-zero/core/logx"
-	"go.uber.org/zap"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -19,6 +13,15 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/axgle/mahonia"
+	"github.com/saintfish/chardet"
+	"github.com/vesoft-inc/go-pkg/middleware"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
+	"github.com/zeromicro/go-zero/core/logx"
+	"go.uber.org/zap"
 )
 
 const (
@@ -45,19 +48,11 @@ type (
 	}
 )
 
-func NewFileService(r *http.Request, ctx context.Context, svcCtx *svc.ServiceContext) FileService {
-	if r != nil {
-		return &fileService{
-			Logger: logx.WithContext(r.Context()),
-			r:      r,
-			svcCtx: svcCtx,
-		}
-	} else {
-		return &fileService{
-			Logger: logx.WithContext(ctx),
-			ctx:    ctx,
-			svcCtx: svcCtx,
-		}
+func NewFileService(ctx context.Context, svcCtx *svc.ServiceContext) FileService {
+	return &fileService{
+		Logger: logx.WithContext(ctx),
+		ctx:    ctx,
+		svcCtx: svcCtx,
 	}
 }
 
@@ -132,8 +127,13 @@ func (f *fileService) FileUpload() error {
 		}
 	}
 
+	httpReq, ok := middleware.GetRequest(f.ctx)
+	if !ok {
+		return ecode.WithInternalServer(fmt.Errorf("unset KeepRequest"))
+	}
+
 	logx.Infof("dir:", dir)
-	files, _, err := f.UploadFormFiles(dir)
+	files, _, err := UploadFormFiles(httpReq, dir)
 	if err != nil {
 		logx.Infof("upload file error:%v", err)
 		return err
@@ -157,20 +157,20 @@ func (f *fileService) FileUpload() error {
 	return nil
 }
 
-func (f *fileService) UploadFormFiles(destDirectory string) (uploaded []*multipart.FileHeader, n int64, err error) {
-	err = f.r.ParseMultipartForm(defaultMulipartMemory)
+func UploadFormFiles(r *http.Request, destDirectory string) (uploaded []*multipart.FileHeader, n int64, err error) {
+	err = r.ParseMultipartForm(defaultMulipartMemory)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	if f.r.MultipartForm != nil {
-		if fhs := f.r.MultipartForm.File; fhs != nil {
+	if r.MultipartForm != nil {
+		if fhs := r.MultipartForm.File; fhs != nil {
 			for _, files := range fhs {
 				for _, file := range files {
 					file.Filename = strings.ReplaceAll(file.Filename, "../", "")
 					file.Filename = strings.ReplaceAll(file.Filename, "..\\", "")
 
-					n0, err0 := f.SaveFormFile(file, filepath.Join(destDirectory, file.Filename))
+					n0, err0 := SaveFormFile(file, filepath.Join(destDirectory, file.Filename))
 					if err0 != nil {
 						return nil, 0, err0
 					}
@@ -185,7 +185,7 @@ func (f *fileService) UploadFormFiles(destDirectory string) (uploaded []*multipa
 	return nil, 0, http.ErrMissingFile
 }
 
-func (f *fileService) SaveFormFile(fh *multipart.FileHeader, dest string) (int64, error) {
+func SaveFormFile(fh *multipart.FileHeader, dest string) (int64, error) {
 	src, err := fh.Open()
 	if err != nil {
 		return 0, err
@@ -222,7 +222,7 @@ func checkCharset(file *multipart.FileHeader) (string, error) {
 func changeFileCharset2UTF8(filePath string, charSet string) error {
 	fileUTF8Path := filePath + "-copy"
 	err := func() error {
-		file, err := os.OpenFile(filePath, os.O_RDONLY, 0666)
+		file, err := os.OpenFile(filePath, os.O_RDONLY, 0o666)
 		if err != nil {
 			zap.L().Warn("open file fail", zap.Error(err))
 			return err
@@ -235,7 +235,7 @@ func changeFileCharset2UTF8(filePath string, charSet string) error {
 			return noCharsetErr
 		}
 		decodeReader := decoder.NewReader(reader)
-		fileUTF8, err := os.OpenFile(fileUTF8Path, os.O_RDONLY|os.O_CREATE|os.O_WRONLY, 0666)
+		fileUTF8, err := os.OpenFile(fileUTF8Path, os.O_RDONLY|os.O_CREATE|os.O_WRONLY, 0o666)
 		if err != nil {
 			return err
 		}

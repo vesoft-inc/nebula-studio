@@ -3,13 +3,14 @@ package svc
 import (
 	"database/sql"
 	"errors"
+	"net/http"
 
 	"github.com/vesoft-inc/go-pkg/httpclient"
 	"github.com/vesoft-inc/go-pkg/response"
 	"github.com/vesoft-inc/go-pkg/validator"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/common"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
-
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -49,5 +50,11 @@ func createResponseHandler(c config.Config) response.Handler { // nolint:gocriti
 		},
 		Errorf:    logx.Errorf,
 		DebugInfo: c.Debug.Enable,
+		CheckBodyType: func(r *http.Request) response.StandardHandlerBodyType {
+			if common.PathMatchPattern(r.URL.Path, common.IgnoreHandlerBodyPatterns) {
+				return response.StandardHandlerBodyNone
+			}
+			return response.StandardHandlerBodyJson
+		},
 	})
 }
