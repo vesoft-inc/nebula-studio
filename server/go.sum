@@ -254,8 +254,8 @@ github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyC
 github.com/vesoft-inc/nebula-go/v3 v3.0.0-20220425030225-cdb52399b40a/go.mod h1:+sXv05jYQBARdTbTcIEsWVXCnF/6ttOlDK35xQ6m54s=
 github.com/vesoft-inc/nebula-go/v3 v3.1.0 h1:Fp99YPk3/kNY1HERagDfty3To+hdi97dCO73FNwkhwE=
 github.com/vesoft-inc/nebula-go/v3 v3.1.0/go.mod h1:+sXv05jYQBARdTbTcIEsWVXCnF/6ttOlDK35xQ6m54s=
-github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220507025253-cb342db9786d h1:XcYk0eLTCrTY9RTAK7raKHqy7VYahH+d9ZFdsNhMIbQ=
-github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220507025253-cb342db9786d/go.mod h1:sFEvE+cY4TgwqWx6H6msOqAUzRhsEHHKaaMgIZENHuQ=
+github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220518092450-316a5f6420ef h1:Hco8JsAXm2ujRpJjo+qGnVyASHXDnopHwA20anmmnV4=
+github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220518092450-316a5f6420ef/go.mod h1:sFEvE+cY4TgwqWx6H6msOqAUzRhsEHHKaaMgIZENHuQ=
 github.com/vesoft-inc/nebula-importer v1.0.1-0.20220505095506-93febd41c2be h1:7YGSREZ6uS1WjCdKTlHEvhSeYURJFY7UXQZ008+EB2Y=
 github.com/vesoft-inc/nebula-importer v1.0.1-0.20220505095506-93febd41c2be/go.mod h1:8xAQi6KI2qe40Dop/GqDXmBEurt7qGp5Pjd1MESAVNA=
 github.com/vmihailenco/msgpack/v5 v5.0.0/go.mod h1:HVxBVPUK/+fZMonk4bi1islLa8V3cfnBug0+4dykPzo=

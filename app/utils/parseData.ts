@@ -2,28 +2,6 @@ import { convertBigNumberToString, handleVidStringName } from '@app/utils/functi
 import { uniq } from 'lodash';
 import { DEFAULT_COLOR_PICK_LIST } from '@app/config/explore';
 
-export function parseEdgeToGraph(data, spaceVidType) {
-  const vertexes: any = [];
-  const edges: any = [];
-  const relationships = data.map((i) => i._edgesParsedList).flat();
-  relationships.forEach((relationship) => {
-    const { srcID: srcId, dstID: dstId, edgeName: edgeType, rank } = relationship;
-    vertexes.push(srcId);
-    vertexes.push(dstId);
-    edges.push({
-      srcId,
-      dstId,
-      edgeType,
-      rank,
-      id: `${edgeType} ${handleVidStringName(srcId, spaceVidType)}->${handleVidStringName(
-        dstId,
-        spaceVidType
-      )}@${rank}}`,
-    });
-  });
-  return { vertexes, edges };
-}
-
 export const whichColor = (() => {
   const colorsTotal = DEFAULT_COLOR_PICK_LIST.length;
   let colorIndex = 0;
@@ -81,36 +59,6 @@ export function getBidrectVertexIds(data) {
   return uniq(vertexIds);
 }
 
-export function parsePathToGraph(data, spaceVidType) {
-  const vertexes: any = [];
-  const edges: any = [];
-  const relationships = data
-    .map(i => i._pathsParsedList)
-    .flat()
-    .map(i => i.relationships)
-    .flat();
-  relationships.forEach(relationship => {
-    const {
-      srcID: srcId,
-      dstID: dstId,
-      edgeName: edgeType,
-      rank,
-    } = relationship;
-    vertexes.push(srcId);
-    vertexes.push(dstId);
-    edges.push({
-      srcId,
-      dstId,
-      edgeType,
-      rank,
-      id: `${edgeType} ${handleVidStringName(
-        srcId,
-        spaceVidType,
-      )}->${handleVidStringName(dstId, spaceVidType)}@${rank}}`,
-    });
-  });
-  return { vertexes, edges };
-}
 
 export function parseSubGraph(data, spaceVidType) {
   const vertexes: any = [];
@@ -142,26 +90,30 @@ export function parseSubGraph(data, spaceVidType) {
     if (_pathsParsedList) {
       _pathsParsedList.forEach(path => {
         const relationships = path.relationships;
-        relationships.forEach(relationship => {
-          const {
-            srcID: srcId,
-            dstID: dstId,
-            edgeName: edgeType,
-            rank,
-          } = relationship;
-          vertexes.push(srcId);
-          vertexes.push(dstId);
-          edges.push({
-            srcId,
-            dstId,
-            edgeType,
-            rank,
-            id: `${edgeType} ${handleVidStringName(
+        if(!relationships && path.srcID) {
+          vertexes.push(path.srcID);
+        } else if (relationships !== null) {
+          relationships.forEach(relationship => {
+            const {
+              srcID: srcId,
+              dstID: dstId,
+              edgeName: edgeType,
+              rank,
+            } = relationship;
+            vertexes.push(srcId);
+            vertexes.push(dstId);
+            edges.push({
               srcId,
-              spaceVidType,
-            )}->${handleVidStringName(dstId, spaceVidType)}@${rank}}`,
+              dstId,
+              edgeType,
+              rank,
+              id: `${edgeType} ${handleVidStringName(
+                srcId,
+                spaceVidType,
+              )}->${handleVidStringName(dstId, spaceVidType)}@${rank}}`,
+            });
           });
-        });
+        }
       });
     }
   });
