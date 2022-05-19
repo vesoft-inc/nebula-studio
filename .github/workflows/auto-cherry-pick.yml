@@ -1,0 +1,21 @@
+name: Auto Cherry Pick
+on: workflow_dispatch
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  auto-cherry-pick:
+    runs-on: [self-hosted, nebula-fast]
+    container:
+      image: reg.vesoft-inc.com/dashboard/dashboard-dev:centos7
+      credentials:
+        username: ${{ secrets.HARBOR_USERNAME }}
+        password: ${{ secrets.HARBOR_PASSWORD }}
+    steps:
+      - name: auto cherry pick
+        uses: xigongdaEricyang/cherry-pick-robot@with-python
+        with:
+          from_repo: vesoft-inc/nebula-studio
+          pr_label: ^v[0-9]*\.[0-9]*-cherry-pick$
