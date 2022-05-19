@@ -10,7 +10,7 @@ import (
 
 func FileUploadHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		l := file.NewFileUploadLogic(r, svcCtx)
+		l := file.NewFileUploadLogic(r.Context(), svcCtx)
 		err := l.FileUpload()
 		svcCtx.ResponseHandler.Handle(w, r, nil, err)
 	}

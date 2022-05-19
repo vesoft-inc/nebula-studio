@@ -64,7 +64,6 @@ func Decode(tokenString, secret string) (*AuthData, error) {
 		}
 		return []byte(secret), nil
 	})
-
 	if err != nil {
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {

@@ -2,6 +2,7 @@ package file
 
 import (
 	"context"
+
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service"
 
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
@@ -25,5 +26,5 @@ func NewFilesIndexLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FilesI
 }
 
 func (l *FilesIndexLogic) FilesIndex() (resp *types.FilesIndexData, err error) {
-	return service.NewFileService(nil, l.ctx, l.svcCtx).FilesIndex()
+	return service.NewFileService(l.ctx, l.svcCtx).FilesIndex()
 }

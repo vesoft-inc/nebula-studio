@@ -7,10 +7,14 @@ import (
 	"net/http"
 
 	"github.com/vesoft-inc/go-pkg/middleware"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/common"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service/importer"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/logging"
+	"go.uber.org/zap"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
@@ -27,6 +31,18 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c, conf.UseEnv())
 
+	// init logger
+	loggingOptions := logging.NewOptions()
+	if err := loggingOptions.InitGlobals(); err != nil {
+		panic(err)
+	}
+
+	if err := c.InitConfig(); err != nil {
+		zap.L().Fatal("init config failed", zap.Error(err))
+	}
+
+	importer.InitDB(c.File.SqliteDbFilePath)
+
 	svcCtx := svc.NewServiceContext(c)
 	server := rest.MustNewServer(c.RestConf, rest.WithNotFoundHandler(middleware.NewAssetsHandler(middleware.AssetsConfig{
 		Root:       "assets",
@@ -38,6 +54,16 @@ func main() {
 
 	// global middleware
 	server.Use(auth.AuthMiddlewareWithCtx(svcCtx))
+	server.Use(rest.ToMiddleware(middleware.ReserveRequest(middleware.ReserveRequestConfig{
+		Skipper: func(r *http.Request) bool {
+			return !common.PathHasPrefix(r.URL.Path, common.ReserveRequestRoutes)
+		},
+	})))
+	server.Use(rest.ToMiddleware(middleware.ReserveResponseWriter(middleware.ReserveResponseWriterConfig{
+		Skipper: func(r *http.Request) bool {
+			return !common.PathHasPrefix(r.URL.Path, common.ReserveResponseRoutes)
+		},
+	})))
 
 	// api handlers
 	handler.RegisterHandlers(server, svcCtx)

@@ -23,5 +23,6 @@ dist/
 !app/**/*.js
 tmp
 server/data
+server-v2/api/*/data
 assets/
 bin/
