@@ -3,8 +3,18 @@ module github.com/vesoft-inc/nebula-studio/server
 go 1.17
 
 require (
-	github.com/vesoft-inc/go-pkg v0.0.0-20220511092334-a180a9379d8d
+	github.com/vesoft-inc/go-pkg v0.0.0-20220516090733-5ce93ad3254b
+	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220505095506-93febd41c2be
 	github.com/zeromicro/go-zero v1.3.3
+)
+
+require github.com/vesoft-inc/nebula-go/v3 v3.0.0-20220425030225-cdb52399b40a // indirect
+
+require (
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/mattn/go-sqlite3 v1.14.12
+	gorm.io/gorm v1.23.4
 )
 
 require (
@@ -53,4 +63,5 @@ require (
 	google.golang.org/grpc v1.46.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0
+	gorm.io/driver/sqlite v1.3.2
 )
