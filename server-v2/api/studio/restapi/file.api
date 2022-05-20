@@ -14,7 +14,7 @@ type (
 	}
 
 	FilesIndexData {
-		List []FileStat `json:"list"`
+		List []FileStat `json:"data"`
 	}
 )
 
@@ -25,7 +25,7 @@ type (
 service studio-api {
 	@doc "Upload File"
 	@handler FileUpload
-	post /api/files
+	put /api/files
 	@doc "delete file"
 	@handler FileDestroy
 	delete /api/files/:name(FileDestroyRequest)

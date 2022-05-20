@@ -49,7 +49,7 @@ type FileStat struct {
 }
 
 type FilesIndexData struct {
-	List []FileStat `json:"list"`
+	List []FileStat `json:"data"`
 }
 
 type ImportTaskConnection struct {
@@ -205,7 +205,7 @@ type GetManyImportTaskRequest struct {
 
 type GetManyImportTaskData struct {
 	Total int64               `json:"total"`
-	List  []GetImportTaskData `json:"list"`
+	List  []GetImportTaskData `json:"data"`
 }
 
 type GetManyImportTaskLogRequest struct {
@@ -216,7 +216,7 @@ type GetManyImportTaskLogRequest struct {
 }
 
 type GetManyImportTaskLogData struct {
-	Logs []string `json:"logs"`
+	Logs []string `json:"data"`
 }
 
 type GetImportTaskLogNamesRequest struct {
@@ -224,7 +224,7 @@ type GetImportTaskLogNamesRequest struct {
 }
 
 type GetImportTaskLogNamesData struct {
-	Names []string `json:"names"`
+	Names []string `json:"data"`
 }
 
 type DeleteImportTaskRequest struct {
@@ -248,4 +248,9 @@ type DownloadLogsRequest struct {
 
 type DownloadConfigsRequest struct {
 	Id string `path:"id" validate:"required"`
+}
+
+type GetWorkingDirResult struct {
+	TaskDir   string `json:"taskDir,omitempty"`
+	UploadDir string `json:"uploadDir,omitempty"`
 }
