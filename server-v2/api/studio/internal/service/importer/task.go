@@ -6,12 +6,12 @@ import (
 )
 
 type Task struct {
-	runner   *cmd.Runner `json:"runner,omitempty"`
+	Runner   *cmd.Runner `json:"runner,omitempty"`
 	TaskInfo *TaskInfo   `json:"task_info,omitempty"`
 }
 
 func (t *Task) UpdateQueryStats() error {
-	stats, err := t.runner.QueryStats()
+	stats, err := t.Runner.QueryStats()
 	if err != nil {
 		logx.Infof("query import stats fail: %s", err)
 		return err

@@ -127,7 +127,7 @@ type ImportTaskEdge struct {
 	Name   string               `json:"name" validate:"required"`
 	SrcVID ImportTaskEdgeID     `json:"srcVID" validate:"required"`
 	DstVID ImportTaskEdgeID     `json:"dstVID" validate:"required"`
-	Rank   ImportTaskEdgeRank   `json:"rank, optional"`
+	Rank   ImportTaskEdgeRank   `json:"rank,optional"`
 	Props  []ImportTaskEdgeProp `json:"props" validate:"required"`
 }
 
@@ -141,8 +141,8 @@ type ImportTaskFile struct {
 	Path         string           `json:"path" validate:"required"`
 	FailDataPath string           `json:"failDataPath" validate:"required"`
 	BatchSize    int              `json:"batchSize,optional"`
-	Limit        int              `json:"limit, optional"`
-	InOrder      bool             `json:"inOrder, optional"`
+	Limit        int              `json:"limit,optional"`
+	InOrder      bool             `json:"inOrder,optional"`
 	Type         string           `json:"type" validate:"required"`
 	CSV          ImportTaskCSV    `json:"csv" validate:"required"`
 	Schema       ImportTaskSchema `json:"schema" validate:"required"`
@@ -220,7 +220,7 @@ type GetManyImportTaskLogData struct {
 }
 
 type GetImportTaskLogNamesRequest struct {
-	Id string `path:"id" validate:"required""`
+	Id string `path:"id" validate:"required"`
 }
 
 type GetImportTaskLogNamesData struct {

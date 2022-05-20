@@ -39,7 +39,7 @@ func GetNewTaskDir(tasksDir string) (string, error) {
 
 func CreateConfigFile(uploadDir, taskdir string, config importconfig.YAMLConfig) error {
 	fileName := "config.yaml"
-	err := utils.CreateDir(taskdir)
+	// err := utils.CreateDir(taskdir)
 	if err := utils.CreateDir(taskdir); err != nil {
 		return err
 	}
