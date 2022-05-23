@@ -5,10 +5,24 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 	"strings"
 )
 
-const MIMEOctetStream = "application/octet-stream"
+var (
+	ReserveRequestRoutes = []string{
+		"/api-nebula/db/",
+		"/api/files",
+		"/api/import-tasks",
+	}
+	ReserveResponseRoutes = []string{
+		"/api-nebula/db/",
+		"/api/import-tasks",
+	}
+	IgnoreHandlerBodyPatterns = []*regexp.Regexp{
+		regexp.MustCompile(`^/api/import-tasks/\d+/download`),
+	}
+)
 
 func CopyHttpRequest(r *http.Request) *http.Request {
 	reqCopy := new(http.Request)
@@ -59,6 +73,15 @@ func AddQueryParams(r *http.Request, params map[string]string) {
 func PathHasPrefix(path string, routes []string) bool {
 	for _, route := range routes {
 		if strings.HasPrefix(path, route) {
+			return true
+		}
+	}
+	return false
+}
+
+func PathMatchPattern(path string, patterns []*regexp.Regexp) bool {
+	for _, pattern := range patterns {
+		if pattern.MatchString(path) {
 			return true
 		}
 	}

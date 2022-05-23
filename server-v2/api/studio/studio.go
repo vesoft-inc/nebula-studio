@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/common"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/handler"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/service/importer"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/logging"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/utils"
 
 	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/zeromicro/go-zero/core/conf"
@@ -56,12 +56,12 @@ func main() {
 	server.Use(auth.AuthMiddlewareWithCtx(svcCtx))
 	server.Use(rest.ToMiddleware(middleware.ReserveRequest(middleware.ReserveRequestConfig{
 		Skipper: func(r *http.Request) bool {
-			return !common.PathHasPrefix(r.URL.Path, common.ReserveRequestRoutes)
+			return !utils.PathHasPrefix(r.URL.Path, utils.ReserveRequestRoutes)
 		},
 	})))
 	server.Use(rest.ToMiddleware(middleware.ReserveResponseWriter(middleware.ReserveResponseWriterConfig{
 		Skipper: func(r *http.Request) bool {
-			return !common.PathHasPrefix(r.URL.Path, common.ReserveResponseRoutes)
+			return !utils.PathHasPrefix(r.URL.Path, utils.ReserveResponseRoutes)
 		},
 	})))
 
