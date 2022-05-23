@@ -43,8 +43,11 @@ service.interceptors.request.use(config => {
 
 service.interceptors.response.use(
   (response: any) => {
-    const isExecReq = /api-nebula\/db\/(exec|batchExec)$/.test(response.config?.url);
-    return isExecReq ? response.data?.data : response.data;
+    // const isExecReq = /api-nebula\/db\/(exec|batchExec)$/.test(response.config?.url);
+    if (response.data?.data?.data) {
+      response.data.data = response.data.data.data;
+    }
+    return response.data;
   },
   (error: any) => {
     if (error.response?.status) {

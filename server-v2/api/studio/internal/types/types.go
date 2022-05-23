@@ -49,7 +49,7 @@ type FileStat struct {
 }
 
 type FilesIndexData struct {
-	List []FileStat `json:"list"`
+	List []FileStat `json:"data"`
 }
 
 type ImportTaskConnection struct {
@@ -127,7 +127,7 @@ type ImportTaskEdge struct {
 	Name   string               `json:"name" validate:"required"`
 	SrcVID ImportTaskEdgeID     `json:"srcVID" validate:"required"`
 	DstVID ImportTaskEdgeID     `json:"dstVID" validate:"required"`
-	Rank   ImportTaskEdgeRank   `json:"rank, optional"`
+	Rank   ImportTaskEdgeRank   `json:"rank,optional"`
 	Props  []ImportTaskEdgeProp `json:"props" validate:"required"`
 }
 
@@ -141,8 +141,8 @@ type ImportTaskFile struct {
 	Path         string           `json:"path" validate:"required"`
 	FailDataPath string           `json:"failDataPath" validate:"required"`
 	BatchSize    int              `json:"batchSize,optional"`
-	Limit        int              `json:"limit, optional"`
-	InOrder      bool             `json:"inOrder, optional"`
+	Limit        int              `json:"limit,optional"`
+	InOrder      bool             `json:"inOrder,optional"`
 	Type         string           `json:"type" validate:"required"`
 	CSV          ImportTaskCSV    `json:"csv" validate:"required"`
 	Schema       ImportTaskSchema `json:"schema" validate:"required"`
@@ -205,7 +205,7 @@ type GetManyImportTaskRequest struct {
 
 type GetManyImportTaskData struct {
 	Total int64               `json:"total"`
-	List  []GetImportTaskData `json:"list"`
+	List  []GetImportTaskData `json:"data"`
 }
 
 type GetManyImportTaskLogRequest struct {
@@ -216,15 +216,15 @@ type GetManyImportTaskLogRequest struct {
 }
 
 type GetManyImportTaskLogData struct {
-	Logs []string `json:"logs"`
+	Logs []string `json:"data"`
 }
 
 type GetImportTaskLogNamesRequest struct {
-	Id string `path:"id" validate:"required""`
+	Id string `path:"id" validate:"required"`
 }
 
 type GetImportTaskLogNamesData struct {
-	Names []string `json:"names"`
+	Names []string `json:"data"`
 }
 
 type DeleteImportTaskRequest struct {
@@ -248,4 +248,9 @@ type DownloadLogsRequest struct {
 
 type DownloadConfigsRequest struct {
 	Id string `path:"id" validate:"required"`
+}
+
+type GetWorkingDirResult struct {
+	TaskDir   string `json:"taskDir,omitempty"`
+	UploadDir string `json:"uploadDir,omitempty"`
 }

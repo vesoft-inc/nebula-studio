@@ -1,4 +1,4 @@
-package gateway
+package importtask
 
 import (
 	"context"
@@ -10,20 +10,20 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type DisonnectLogic struct {
+type GetWorkingDirLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewDisonnectLogic(ctx context.Context, svcCtx *svc.ServiceContext) DisonnectLogic {
-	return DisonnectLogic{
+func NewGetWorkingDirLogic(ctx context.Context, svcCtx *svc.ServiceContext) GetWorkingDirLogic {
+	return GetWorkingDirLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *DisonnectLogic) Disonnect(req types.DisconnectDBParams) (*types.AnyResponse, error) {
-	return service.NewGatewayService(l.ctx, l.svcCtx).DisconnectDB(&req)
+func (l *GetWorkingDirLogic) GetWorkingDir() (resp *types.GetWorkingDirResult, err error) {
+	return service.NewImportService(l.ctx, l.svcCtx).GetWorkingDir()
 }

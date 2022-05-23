@@ -67,7 +67,7 @@ $(GOBIN)/goctl:
 	$(call go-get-tool,$(GOBIN)/goctl,github.com/zeromicro/go-zero/tools/goctl@v1.3.2)
 
 $(GOBIN)/modelconst-gen:
-	$(call go-get-tool,$(GOBIN)/modelconst-gen,github.com/vesoft-inc/nebula-studio/server/tools/modelconst-gen)
+	$(call go-get-tool,$(GOBIN)/modelconst-gen,github.com/vesoft-inc/nebula-studio/server-v2/tools/modelconst-gen)
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
 define go-get-tool

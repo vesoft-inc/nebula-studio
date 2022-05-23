@@ -2,13 +2,17 @@ package service
 
 import (
 	"context"
+	"net/http"
 	"strings"
 
+	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/base"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/auth"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/base"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -39,15 +43,49 @@ func NewGatewayService(ctx context.Context, svcCtx *svc.ServiceContext) GatewayS
 }
 
 func (s *gatewayService) ConnectDB(request *types.ConnectDBParams) (*types.ConnectDBResult, error) {
+	httpRes, _ := middleware.GetResponseWriter(s.ctx)
+
+	tokenString, clientInfo, err := auth.ParseConnectDBParams(request, &s.svcCtx.Config)
+	if err != nil {
+		return nil, ecode.WithCode(ecode.ErrBadRequest, err, "parse request failed")
+	}
+
+	configAuth := s.svcCtx.Config.Auth
+	tokenCookie := http.Cookie{
+		Name:     auth.TokenName,
+		Value:    tokenString,
+		Path:     "/",
+		HttpOnly: true,
+		MaxAge:   int(configAuth.AccessExpire),
+	}
+	NSIDCookie := http.Cookie{
+		Name:     auth.NSIDName,
+		Value:    clientInfo.ClientID,
+		Path:     "/",
+		HttpOnly: true,
+		MaxAge:   int(configAuth.AccessExpire),
+	}
+
+	httpRes.Header().Add("Set-Cookie", tokenCookie.String())
+	httpRes.Header().Add("Set-Cookie", NSIDCookie.String())
+
 	return &types.ConnectDBResult{
-		Version: string(request.NebulaVersion),
+		Version: string(clientInfo.NebulaVersion),
 	}, nil
 }
 
 func (s *gatewayService) DisconnectDB(request *types.DisconnectDBParams) (*types.AnyResponse, error) {
-	if request.NSID != "" {
-		dao.Disconnect(request.NSID)
+	httpReq, _ := middleware.GetRequest(s.ctx)
+	httpRes, _ := middleware.GetResponseWriter(s.ctx)
+
+	NSIDCookie, NSIDErr := httpReq.Cookie(auth.NSIDName)
+	if NSIDErr == nil && NSIDCookie.Value != "" {
+		dao.Disconnect(NSIDCookie.Value)
 	}
+
+	httpRes.Header().Set("Set-Cookie", utils.DisabledCookie(auth.TokenName).String())
+	httpRes.Header().Add("Set-Cookie", utils.DisabledCookie(auth.NSIDName).String())
+
 	return nil, nil
 }
 

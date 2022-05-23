@@ -198,6 +198,11 @@ type (
 	DownloadConfigsRequest {
 		Id string `path:"id" validate:"required"`
 	}
+
+	GetWorkingDirResult {
+		TaskDir   string `json:"taskDir,omitempty"`
+		UploadDir string `json:"uploadDir,omitempty"`
+	}
 )
 
 @server(
@@ -208,28 +213,40 @@ service studio-api {
 	@doc "Create Import Task"
 	@handler CreateImportTask
 	post /api/import-tasks(CreateImportTaskRequest) returns(CreateImportTaskData)
+	
 	@doc "Get Import Task"
 	@handler GetImportTask
 	get /api/import-tasks/:id(GetImportTaskRequest) returns(GetImportTaskData)
+	
 	@doc "Get Many Import Task"
 	@handler GetManyImportTask
 	get /api/import-tasks(GetManyImportTaskRequest) returns(GetManyImportTaskData)
+	
 	@doc "Get Many Import Task Log"
 	@handler GetManyImportTaskLog
 	get /api/import-tasks/:id/logs(GetManyImportTaskLogRequest) returns(GetManyImportTaskLogData)
+	
 	@doc "Get all logs file name of a Task"
 	@handler GetImportTaskLogNames
 	get /api/import-tasks/:id/task-log-names(GetImportTaskLogNamesRequest) returns(GetImportTaskLogNamesData)
+	
 	@doc "Delete Import Task"
 	@handler DeleteImportTask
 	delete /api/import-tasks/:id(DeleteImportTaskRequest)
+	
 	@doc "Stop Import Task"
 	@handler StopImportTask
 	get /api/import-tasks/:id/stop(StopImportTaskRequest)
+	
 	@doc "Download logs"
 	@handler DownloadLogs
 	get /api/import-tasks/:id/download-logs(DownloadLogsRequest)
+	
 	@doc "Download Config"
 	@handler DownloadConfig
 	get /api/import-tasks/:id/download-config(DownloadConfigsRequest)
+	
+	@doc "Get Working Dir"
+	@handler GetWorkingDir
+	get /api/import-tasks/working-dir returns(GetWorkingDirResult)
 }

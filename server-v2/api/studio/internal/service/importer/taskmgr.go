@@ -32,7 +32,7 @@ type TaskMgr struct {
 func newTask(nebulaAddress string, user string, name string, space string) *Task {
 	timeUnix := time.Now().Unix()
 	return &Task{
-		runner: &cmd.Runner{},
+		Runner: &cmd.Runner{},
 		TaskInfo: &TaskInfo{
 			Name:          name,
 			Space:         space,
@@ -46,7 +46,7 @@ func newTask(nebulaAddress string, user string, name string, space string) *Task
 }
 
 func (task *Task) GetRunner() *cmd.Runner {
-	return task.runner
+	return task.Runner
 }
 
 func (mgr *TaskMgr) NewTaskID() (string, error) {
