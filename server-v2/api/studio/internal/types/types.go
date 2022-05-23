@@ -8,28 +8,21 @@ type GetHealth struct {
 type ExecNGQLParams struct {
 	Gql       string   `json:"gql"`
 	ParamList []string `json:"paramList,optional"`
-	NSID      string   `form:"NSID"`
 }
 
 type BatchExecNGQLParams struct {
 	Gqls      []string `json:"gqls"`
 	ParamList []string `json:"paramList,optional"`
-	NSID      string   `form:"NSID"`
 }
 
 type ConnectDBParams struct {
 	Address       string `json:"address"`
 	Port          int    `json:"port"`
-	NebulaVersion string `form:"nebulaVersion,optional"`
 	Authorization string `header:"Authorization"`
 }
 
 type ConnectDBResult struct {
 	Version string `json:"version"`
-}
-
-type DisconnectDBParams struct {
-	NSID string `form:"NSID,optional"`
 }
 
 type AnyResponse struct {
@@ -127,7 +120,7 @@ type ImportTaskEdge struct {
 	Name   string               `json:"name" validate:"required"`
 	SrcVID ImportTaskEdgeID     `json:"srcVID" validate:"required"`
 	DstVID ImportTaskEdgeID     `json:"dstVID" validate:"required"`
-	Rank   ImportTaskEdgeRank   `json:"rank,optional"`
+	Rank   ImportTaskEdgeRank   `json:"rank, optional"`
 	Props  []ImportTaskEdgeProp `json:"props" validate:"required"`
 }
 
@@ -141,8 +134,8 @@ type ImportTaskFile struct {
 	Path         string           `json:"path" validate:"required"`
 	FailDataPath string           `json:"failDataPath" validate:"required"`
 	BatchSize    int              `json:"batchSize,optional"`
-	Limit        int              `json:"limit,optional"`
-	InOrder      bool             `json:"inOrder,optional"`
+	Limit        int              `json:"limit, optional"`
+	InOrder      bool             `json:"inOrder, optional"`
 	Type         string           `json:"type" validate:"required"`
 	CSV          ImportTaskCSV    `json:"csv" validate:"required"`
 	Schema       ImportTaskSchema `json:"schema" validate:"required"`
@@ -166,10 +159,7 @@ type CreateImportTaskData struct {
 }
 
 type GetImportTaskRequest struct {
-	Id       string `path:"id" validate:"required"`
-	Address  string `form:"address"`
-	Username string `form:"username"`
-	Port     string `form:"port"`
+	Id string `path:"id" validate:"required"`
 }
 
 type GetImportTaskData struct {
@@ -196,11 +186,8 @@ type ImportTaskStats struct {
 }
 
 type GetManyImportTaskRequest struct {
-	Address  string `form:"address"`
-	Username string `form:"username"`
-	Port     string `form:"port"`
-	Page     int    `form:"page,default=1"`
-	PageSize int    `form:"pageSize,default=100"`
+	Page     int `form:"page,default=1"`
+	PageSize int `form:"pageSize,default=100"`
 }
 
 type GetManyImportTaskData struct {
@@ -220,7 +207,7 @@ type GetManyImportTaskLogData struct {
 }
 
 type GetImportTaskLogNamesRequest struct {
-	Id string `path:"id" validate:"required"`
+	Id string `path:"id" validate:"required""`
 }
 
 type GetImportTaskLogNamesData struct {
@@ -228,17 +215,11 @@ type GetImportTaskLogNamesData struct {
 }
 
 type DeleteImportTaskRequest struct {
-	Id       string `path:"id"`
-	Address  string `form:"address"`
-	Username string `form:"username"`
-	Port     string `form:"port"`
+	Id string `path:"id"`
 }
 
 type StopImportTaskRequest struct {
-	Id       string `path:"id"`
-	Address  string `form:"address"`
-	Port     string `form:"port"`
-	Username string `form:"username"`
+	Id string `path:"id"`
 }
 
 type DownloadLogsRequest struct {

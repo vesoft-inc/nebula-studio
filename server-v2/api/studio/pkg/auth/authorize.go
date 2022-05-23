@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -26,6 +27,7 @@ type (
 		Address  string `json:"address"`
 		Port     int    `json:"port"`
 		Username string `json:"username"`
+		Password string `json:"password"`
 	}
 
 	authClaims struct {
@@ -110,6 +112,7 @@ func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) 
 			Address:  params.Address,
 			Port:     params.Port,
 			Username: username,
+			Password: password,
 		},
 		config,
 	)
@@ -124,17 +127,8 @@ func AuthMiddlewareWithCtx(svcCtx *svc.ServiceContext) rest.Middleware {
 				return
 			}
 
-			NSIDCookie, NSIDErr := r.Cookie(NSIDName)
-			if NSIDErr == nil {
-				// Add NSID to request query
-				utils.AddQueryParams(r, map[string]string{"NSID": NSIDCookie.Value})
-			}
-
 			tokenCookie, tokenErr := r.Cookie(TokenName)
-			if NSIDErr != nil {
-				svcCtx.ResponseHandler.Handle(w, r, nil, ecode.WithSessionMessage(NSIDErr))
-				return
-			} else if tokenErr != nil {
+			if tokenErr != nil {
 				svcCtx.ResponseHandler.Handle(w, r, nil, ecode.WithSessionMessage(tokenErr))
 				return
 			}
@@ -145,12 +139,13 @@ func AuthMiddlewareWithCtx(svcCtx *svc.ServiceContext) rest.Middleware {
 				return
 			}
 
-			// Add address|port|username to request query
-			utils.AddQueryParams(r, map[string]string{
-				"address":  auth.Address,
-				"port":     fmt.Sprintf("%d", auth.Port),
-				"username": auth.Username,
-			})
+			/**
+			 * Add auth to request context
+			 *
+			 * Get auth from context:
+			 * auth := s.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+			 */
+			r = r.WithContext(context.WithValue(r.Context(), CtxKeyUserInfo{}, auth))
 
 			next(w, r)
 		}

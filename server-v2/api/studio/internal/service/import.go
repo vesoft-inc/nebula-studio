@@ -18,6 +18,7 @@ import (
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/service/importer"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/ecode"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -151,7 +152,9 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 }
 
 func (i *importService) StopImportTask(req *types.StopImportTaskRequest) error {
-	return importer.StopImportTask(req.Id, req.Address+":"+req.Port, req.Username)
+	auth := i.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+	host := fmt.Sprintf("%s:%d", auth.Address, auth.Port)
+	return importer.StopImportTask(req.Id, host, auth.Username)
 }
 
 func (i *importService) DownloadConfig(req *types.DownloadConfigsRequest) error {
@@ -201,15 +204,21 @@ func (i *importService) DownloadLogs(req *types.DownloadLogsRequest) error {
 }
 
 func (i *importService) DeleteImportTask(req *types.DeleteImportTaskRequest) error {
-	return importer.DeleteImportTask(i.svcCtx.Config.File.TasksDir, req.Id, req.Address+":"+req.Port, req.Username)
+	auth := i.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+	host := fmt.Sprintf("%s:%d", auth.Address, auth.Port)
+	return importer.DeleteImportTask(i.svcCtx.Config.File.TasksDir, req.Id, host, auth.Username)
 }
 
 func (i *importService) GetImportTask(req *types.GetImportTaskRequest) (*types.GetImportTaskData, error) {
-	return importer.GetImportTask(i.svcCtx.Config.File.TasksDir, req.Id, req.Address+":"+req.Port, req.Username)
+	auth := i.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+	host := fmt.Sprintf("%s:%d", auth.Address, auth.Port)
+	return importer.GetImportTask(i.svcCtx.Config.File.TasksDir, req.Id, host, auth.Username)
 }
 
 func (i *importService) GetManyImportTask(req *types.GetManyImportTaskRequest) (*types.GetManyImportTaskData, error) {
-	return importer.GetManyImportTask(i.svcCtx.Config.File.TasksDir, req.Address+":"+req.Port, req.Username, req.Page, req.PageSize)
+	auth := i.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+	host := fmt.Sprintf("%s:%d", auth.Address, auth.Port)
+	return importer.GetManyImportTask(i.svcCtx.Config.File.TasksDir, host, auth.Username, req.Page, req.PageSize)
 }
 
 // GetImportTaskLogNames :Get all log file's name of a task
