@@ -7,13 +7,12 @@ import (
 
 var (
 	ReserveRequestRoutes = []string{
-		"/api-nebula/db/disconnect",
+		"/api-nebula/db/",
 		"/api/files",
 		"/api/import-tasks",
 	}
 	ReserveResponseRoutes = []string{
-		"/api-nebula/db/connect",
-		"/api-nebula/db/disconnect",
+		"/api-nebula/db/",
 		"/api/import-tasks",
 	}
 	IgnoreHandlerBodyPatterns = []*regexp.Regexp{

@@ -4,24 +4,18 @@ type (
 	ExecNGQLParams {
 		Gql       string   `json:"gql"`
 		ParamList []string `json:"paramList,optional"`
-		NSID      string   `form:"NSID"`
 	}
 	BatchExecNGQLParams {
 		Gqls      []string `json:"gqls"`
 		ParamList []string `json:"paramList,optional"`
-		NSID      string   `form:"NSID"`
 	}
 	ConnectDBParams {
 		Address       string `json:"address"`
 		Port          int    `json:"port"`
-		NebulaVersion string `form:"nebulaVersion,optional"`
 		Authorization string `header:"Authorization"`
 	}
 	ConnectDBResult {
 		Version string `json:"version"`
-	}
-	DisconnectDBParams {
-		NSID string `form:"NSID,optional"`
 	}
 	AnyResponse {
 		Data interface{} `json:"data"`
@@ -55,5 +49,5 @@ service studio-api {
 	
 	@doc "Disonnect DB"
 	@handler Disonnect
-	post /disconnect(DisconnectDBParams) returns (AnyResponse)
+	post /disconnect returns (AnyResponse)
 }

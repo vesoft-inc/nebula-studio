@@ -24,7 +24,7 @@ type (
 		ExecNGQL(request *types.ExecNGQLParams) (*types.AnyResponse, error)
 		BatchExecNGQL(request *types.BatchExecNGQLParams) (*types.AnyResponse, error)
 		ConnectDB(request *types.ConnectDBParams) (*types.ConnectDBResult, error)
-		DisconnectDB(request *types.DisconnectDBParams) (*types.AnyResponse, error)
+		DisconnectDB() (*types.AnyResponse, error)
 	}
 
 	gatewayService struct {
@@ -74,7 +74,7 @@ func (s *gatewayService) ConnectDB(request *types.ConnectDBParams) (*types.Conne
 	}, nil
 }
 
-func (s *gatewayService) DisconnectDB(request *types.DisconnectDBParams) (*types.AnyResponse, error) {
+func (s *gatewayService) DisconnectDB() (*types.AnyResponse, error) {
 	httpReq, _ := middleware.GetRequest(s.ctx)
 	httpRes, _ := middleware.GetResponseWriter(s.ctx)
 
@@ -90,20 +90,45 @@ func (s *gatewayService) DisconnectDB(request *types.DisconnectDBParams) (*types
 }
 
 func (s *gatewayService) ExecNGQL(request *types.ExecNGQLParams) (*types.AnyResponse, error) {
-	execute, _, err := dao.Execute(request.NSID, request.Gql, request.ParamList)
-	if err != nil {
-		return nil, ecode.WithCode(ecode.ErrInternalServer, err, "exec failed")
+	httpReq, _ := middleware.GetRequest(s.ctx)
+	NSIDCookie, NSIDErr := httpReq.Cookie(auth.NSIDName)
+	if NSIDErr != nil {
+		return nil, ecode.WithSessionMessage(NSIDErr)
 	}
+
+	execute, _, err := dao.Execute(NSIDCookie.Value, request.Gql, request.ParamList)
+	if err != nil {
+		// TODO: common middleware should handle this
+		subErrMsgStr := []string{
+			"session expired",
+			"connection refused",
+			"broken pipe",
+			"an existing connection was forcibly closed",
+			"Token is expired",
+		}
+		for _, subErrMsg := range subErrMsgStr {
+			if strings.Contains(err.Error(), subErrMsg) {
+				return nil, ecode.WithSessionMessage(err)
+			}
+		}
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err, "execute failed")
+	}
+
 	return &types.AnyResponse{Data: execute}, nil
 }
 
 func (s *gatewayService) BatchExecNGQL(request *types.BatchExecNGQLParams) (*types.AnyResponse, error) {
-	data := make([]map[string]interface{}, 0)
+	httpReq, _ := middleware.GetRequest(s.ctx)
+	NSIDCookie, NSIDErr := httpReq.Cookie(auth.NSIDName)
+	if NSIDErr != nil {
+		return nil, ecode.WithSessionMessage(NSIDErr)
+	}
 
-	NSID := request.NSID
+	NSID := NSIDCookie.Value
 	gqls := request.Gqls
 	paramList := request.ParamList
 
+	data := make([]map[string]interface{}, 0)
 	for _, gql := range gqls {
 		execute, _, err := dao.Execute(NSID, gql, make([]string, 0))
 		gqlRes := map[string]interface{}{"gql": gql, "data": execute}
