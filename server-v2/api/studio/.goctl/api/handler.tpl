@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	{{if .HasRequest}}"github.com/vesoft-inc/go-pkg/validator"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/ecode"
 
 	{{end}}{{if .HasRequest}}"github.com/zeromicro/go-zero/rest/httpx"{{end}}
 	{{.ImportPackages}}

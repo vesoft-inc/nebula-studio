@@ -1,4 +1,4 @@
-module github.com/vesoft-inc/nebula-studio/server
+module github.com/vesoft-inc/nebula-studio/server-v2
 
 go 1.17
 

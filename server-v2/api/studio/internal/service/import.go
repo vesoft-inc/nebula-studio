@@ -15,11 +15,11 @@ import (
 	"github.com/vesoft-inc/go-pkg/middleware"
 	importconfig "github.com/vesoft-inc/nebula-importer/pkg/config"
 	importererrors "github.com/vesoft-inc/nebula-importer/pkg/errors"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service/importer"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/service/importer"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/core/logx"
 	"go.uber.org/zap"
 )
@@ -45,6 +45,7 @@ type (
 		GetManyImportTask(request *types.GetManyImportTaskRequest) (*types.GetManyImportTaskData, error)
 		GetImportTaskLogNames(request *types.GetImportTaskLogNamesRequest) (*types.GetImportTaskLogNamesData, error)
 		GetManyImportTaskLog(request *types.GetManyImportTaskLogRequest) (*types.GetManyImportTaskLogData, error)
+		GetWorkingDir() (*types.GetWorkingDirResult, error)
 	}
 
 	importService struct {
@@ -272,6 +273,13 @@ func (i *importService) GetManyImportTaskLog(req *types.GetManyImportTaskLogRequ
 	}
 
 	return data, nil
+}
+
+func (i *importService) GetWorkingDir() (*types.GetWorkingDirResult, error) {
+	return &types.GetWorkingDirResult{
+		TaskDir:   i.svcCtx.Config.File.TasksDir,
+		UploadDir: i.svcCtx.Config.File.UploadDir,
+	}, nil
 }
 
 func validClientParams(conf *importconfig.YAMLConfig) error {

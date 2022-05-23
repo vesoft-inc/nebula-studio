@@ -4,11 +4,11 @@ package handler
 import (
 	"net/http"
 
-	file "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/file"
-	gateway "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/gateway"
-	health "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/health"
-	importtask "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/importtask"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
+	file "github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/handler/file"
+	gateway "github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/handler/gateway"
+	health "github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/handler/health"
+	importtask "github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/handler/importtask"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
 )
@@ -59,7 +59,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
-				Method:  http.MethodPost,
+				Method:  http.MethodPut,
 				Path:    "/api/files",
 				Handler: file.FileUploadHandler(serverCtx),
 			},
@@ -122,6 +122,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/api/import-tasks/:id/download-config",
 				Handler: importtask.DownloadConfigHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/import-tasks/working-dir",
+				Handler: importtask.GetWorkingDirHandler(serverCtx),
 			},
 		},
 	)

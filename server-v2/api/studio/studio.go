@@ -6,19 +6,19 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/vesoft-inc/go-pkg/middleware"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/common"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service/importer"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/logging"
-	"go.uber.org/zap"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/common"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/config"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/handler"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/service/importer"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/auth"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/logging"
 
+	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/rest/httpx"
+	"go.uber.org/zap"
 )
 
 //go:embed assets/*

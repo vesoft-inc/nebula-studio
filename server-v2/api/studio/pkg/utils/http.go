@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 const MIMEOctetStream = "application/octet-stream"
@@ -53,4 +54,13 @@ func AddQueryParams(r *http.Request, params map[string]string) {
 		query.Set(k, v)
 	}
 	r.URL, _ = r.URL.Parse(r.URL.Path + "?" + query.Encode())
+}
+
+func PathHasPrefix(path string, routes []string) bool {
+	for _, route := range routes {
+		if strings.HasPrefix(path, route) {
+			return true
+		}
+	}
+	return false
 }

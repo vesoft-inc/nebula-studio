@@ -17,9 +17,9 @@ import (
 	"github.com/axgle/mahonia"
 	"github.com/saintfish/chardet"
 	"github.com/vesoft-inc/go-pkg/middleware"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/ecode"
 	"github.com/zeromicro/go-zero/core/logx"
 	"go.uber.org/zap"
 )
@@ -29,7 +29,7 @@ const (
 )
 
 var (
-	noCharsetErr             = errors.New("this charset can not be changed")
+	errNoCharset             = errors.New("this charset can not be changed")
 	_            FileService = (*fileService)(nil)
 )
 
@@ -132,7 +132,6 @@ func (f *fileService) FileUpload() error {
 		return ecode.WithInternalServer(fmt.Errorf("unset KeepRequest"))
 	}
 
-	logx.Infof("dir:", dir)
 	files, _, err := UploadFormFiles(httpReq, dir)
 	if err != nil {
 		logx.Infof("upload file error:%v", err)
@@ -232,7 +231,7 @@ func changeFileCharset2UTF8(filePath string, charSet string) error {
 		decoder := mahonia.NewDecoder(charSet)
 		// this charset can not be changed
 		if decoder == nil {
-			return noCharsetErr
+			return errNoCharset
 		}
 		decodeReader := decoder.NewReader(reader)
 		fileUTF8, err := os.OpenFile(fileUTF8Path, os.O_RDONLY|os.O_CREATE|os.O_WRONLY, 0o666)
@@ -254,7 +253,7 @@ func changeFileCharset2UTF8(filePath string, charSet string) error {
 				zap.L().Warn(fmt.Sprintf("remove file %s fail", fileUTF8Path), zap.Error(removeErr))
 			}
 		}
-		if err == noCharsetErr {
+		if err == errNoCharset {
 			return nil
 		}
 		return err
