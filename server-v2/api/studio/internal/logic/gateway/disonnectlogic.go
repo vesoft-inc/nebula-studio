@@ -24,6 +24,6 @@ func NewDisonnectLogic(ctx context.Context, svcCtx *svc.ServiceContext) Disonnec
 	}
 }
 
-func (l *DisonnectLogic) Disonnect(req types.DisconnectDBParams) (*types.AnyResponse, error) {
-	return service.NewGatewayService(l.ctx, l.svcCtx).DisconnectDB(&req)
+func (l *DisonnectLogic) Disonnect() (*types.AnyResponse, error) {
+	return service.NewGatewayService(l.ctx, l.svcCtx).DisconnectDB()
 }

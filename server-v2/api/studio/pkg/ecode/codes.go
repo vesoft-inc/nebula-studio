@@ -52,6 +52,11 @@ func WithSessionMessage(err error, formatWithArgs ...interface{}) error {
 	return WithCode(ErrSessionWithMessage, err, formatWithArgs...)
 }
 
+func WithErrorMessage(c *ErrCode, err error, formatWithArgs ...interface{}) error {
+	ErrWithMessage := newErrCode(c.GetCode(), PlatformCode, 1, fmt.Sprintf("%s::%s", c.GetMessage(), err.Error()))
+	return WithCode(ErrWithMessage, err, formatWithArgs...)
+}
+
 func WithForbidden(err error, formatWithArgs ...interface{}) error {
 	return WithCode(ErrForbidden, err, formatWithArgs...)
 }

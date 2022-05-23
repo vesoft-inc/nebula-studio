@@ -4,30 +4,14 @@ package gateway
 import (
 	"net/http"
 
-	"github.com/vesoft-inc/go-pkg/validator"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/ecode"
-
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/logic/gateway"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/types"
-	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 func DisonnectHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.DisconnectDBParams
-		if err := httpx.Parse(r, &req); err != nil {
-			err = ecode.WithCode(ecode.ErrParam, err)
-			svcCtx.ResponseHandler.Handle(w, r, nil, err)
-			return
-		}
-		if err := validator.Struct(req); err != nil {
-			svcCtx.ResponseHandler.Handle(w, r, nil, err)
-			return
-		}
-
 		l := gateway.NewDisonnectLogic(r.Context(), svcCtx)
-		data, err := l.Disonnect(req)
+		data, err := l.Disonnect()
 		svcCtx.ResponseHandler.Handle(w, r, data, err)
 	}
 }
