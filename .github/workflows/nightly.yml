@@ -2,7 +2,7 @@ name: Studio nightly Package
 on:
   push:
     branches:
-      - master
+      - v3.1.1
 jobs:
   tar-package:
     name: build tar package
@@ -21,7 +21,7 @@ jobs:
         with:
           repository: vesoft-inc/nebula-http-gateway
           path: source/nebula-http-gateway
-          ref: v2.1.1
+          ref: v2.1.2
       - uses: actions/setup-go@v2
         with:
           go-version: '^1.13.1'
@@ -49,7 +49,7 @@ jobs:
         with:
           repository: vesoft-inc/nebula-http-gateway
           path: source/nebula-http-gateway
-          ref: v2.1.1
+          ref: v2.1.2
       - uses: actions/setup-go@v2
         with:
           go-version: '^1.13.1'
