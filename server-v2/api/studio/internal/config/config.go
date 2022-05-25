@@ -40,52 +40,69 @@ func (c *Config) Validate() error {
 }
 
 func (c *Config) Complete() {
-	if c.File.TaskIdPath == "" {
-		_, err := os.Stat(DefaultFilesDataDir)
+	taskIdFile := DefaultTaskIdPath
+	if c.File.TaskIdPath != "" {
+		taskIdFile = c.File.TaskIdPath
+	}
+	abs, _ := filepath.Abs(taskIdFile)
+	_, err := ioutil.ReadFile(abs)
+	if err != nil {
 		if os.IsNotExist(err) {
-			os.MkdirAll(DefaultFilesDataDir, 0o766)
-		}
-		abs, _ := filepath.Abs(DefaultTaskIdPath)
-		_, err = ioutil.ReadFile(abs)
-		if err != nil {
+			absDir := filepath.Dir(abs)
+			_, err := os.Stat(absDir)
 			if os.IsNotExist(err) {
-				_, err := os.Create(abs)
-				if err != nil {
-					zap.L().Fatal("DefaultTaskIdPath Init fail", zap.Error(err))
-				} else {
-					zap.L().Fatal("DefaultTaskIdPath Init fail", zap.Error(err))
-				}
+				os.MkdirAll(absDir, 0o776)
+			}
+			_, err = os.Create(abs)
+			if err != nil {
+				zap.L().Fatal("DefaultTaskIdPath Init fail", zap.Error(err))
 			}
 		}
-		c.File.TaskIdPath = abs
+	}
+	c.File.TaskIdPath = abs
+
+	uploadDir := DefaultUploadDir
+	if c.File.UploadDir != "" {
+		uploadDir = c.File.UploadDir
+	}
+	abs, _ = filepath.Abs(uploadDir)
+	c.File.UploadDir = abs
+	_, err = os.Stat(abs)
+	if os.IsNotExist(err) {
+		os.MkdirAll(abs, 0o776)
 	}
 
-	if c.File.UploadDir == "" {
-		abs, _ := filepath.Abs(DefaultUploadDir)
-		c.File.UploadDir = abs
-		_, err := os.Stat(abs)
-		if os.IsNotExist(err) {
-			os.MkdirAll(abs, 0o776)
-		}
+	tasksDir := DefaultTasksDir
+	if c.File.TasksDir != "" {
+		tasksDir = c.File.TasksDir
+	}
+	abs, _ = filepath.Abs(tasksDir)
+	c.File.TasksDir = abs
+	_, err = os.Stat(abs)
+	if os.IsNotExist(err) {
+		os.MkdirAll(abs, 0o776)
 	}
 
-	if c.File.TasksDir == "" {
-		abs, _ := filepath.Abs(DefaultTasksDir)
-		c.File.TasksDir = abs
-		_, err := os.Stat(abs)
+	sqliteDbFilePath := DefaultSqliteDbFilePath
+	if c.File.SqliteDbFilePath != "" {
+		sqliteDbFilePath = c.File.SqliteDbFilePath
+	}
+	abs, _ = filepath.Abs(sqliteDbFilePath)
+	_, err = ioutil.ReadFile(abs)
+	if err != nil {
 		if os.IsNotExist(err) {
-			os.MkdirAll(abs, 0o766)
+			absDir := filepath.Dir(abs)
+			_, err := os.Stat(absDir)
+			if os.IsNotExist(err) {
+				os.MkdirAll(absDir, 0o776)
+			}
+			_, err = os.Create(abs)
+			if err != nil {
+				zap.L().Fatal("SqliteDbFilePath Init fail", zap.Error(err))
+			}
 		}
 	}
-
-	if c.File.SqliteDbFilePath == "" {
-		_, err := os.Stat(DefaultFilesDataDir)
-		if os.IsNotExist(err) {
-			os.MkdirAll(DefaultFilesDataDir, 0o766)
-		}
-		abs, _ := filepath.Abs(DefaultSqliteDbFilePath)
-		c.File.SqliteDbFilePath = abs
-	}
+	c.File.SqliteDbFilePath = abs
 }
 
 func (c *Config) InitConfig() error {
