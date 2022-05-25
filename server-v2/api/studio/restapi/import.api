@@ -2,107 +2,107 @@ syntax = "v1"
 
 type (
 	ImportTaskConnection {
-		User     string `json:"user" validate:"required"`
-		Password string `json:"password" validate:"required"`
-		Address  string `json:"address" validate:"required"`
+		User     *string `json:"user" validate:"required"`
+		Password *string `json:"password" validate:"required"`
+		Address  *string `json:"address" validate:"required"`
 	}
 
 	ImportTaskClientSettings {
-		Retry             int                  `json:"retry,optional"`
-		Concurrency       int                  `json:"concurrency,optional"`
-		ChannelBufferSize int                  `json:"channelBufferSize,optional"`
-		Space             string               `json:"space" validate:"required"`
-		Connection        ImportTaskConnection `json:"connection" validate:"required"`
-		PostStart         ImportTaskPostStart  `json:"postStart,optional"`
-		PreStop           ImportTaskPreStop    `json:"preStop,optional"`
+		Retry             *int                  `json:"retry,optional"`
+		Concurrency       *int                  `json:"concurrency,optional"`
+		ChannelBufferSize *int                  `json:"channelBufferSize,optional"`
+		Space             *string               `json:"space" validate:"required"`
+		Connection        *ImportTaskConnection `json:"connection" validate:"required"`
+		PostStart         *ImportTaskPostStart  `json:"postStart,optional"`
+		PreStop           *ImportTaskPreStop    `json:"preStop,optional"`
 	}
 
 	ImportTaskPostStart {
-		Commands    string `json:"commands" validate:"required"`
-		AfterPeriod string `json:"afterPeriod" validate:"required"`
+		Commands    *string `json:"commands, optional"`
+		AfterPeriod *string `json:"afterPeriod, optional"`
 	}
 
 	ImportTaskPreStop {
-		Commands string `json:"commands,optional"`
+		Commands *string `json:"commands,optional"`
 	}
 
 	ImportTaskCSV {
-		WithHeader bool   `json:"withHeader,optional"`
-		WithLabel  bool   `json:"withLabel,optional"`
-		Delimiter  string `json:"delimiter,optional" default:","`
+		WithHeader *bool   `json:"withHeader,optional"`
+		WithLabel  *bool   `json:"withLabel,optional"`
+		Delimiter  *string `json:"delimiter,optional"`
 	}
 
 	ImportTaskVID {
-		Index    int64  `json:"index" validate:"required"`
-		Type     string `json:"type" validate:"required"`
-		Function string `json:"function,optional"`
-		Prefix   string `json:"prefix,optional"`
+		Index    *int64  `json:"index" validate:"required"`
+		Type     *string `json:"type" validate:"required"`
+		Function *string `json:"function,optional"`
+		Prefix   *string `json:"prefix,optional"`
 	}
 
 	ImportTaskTagProp {
-		Name  string `json:"name" validate:"required"`
-		Type  string `json:"type" validate:"required"`
-		Index int64  `json:"index" validate:"required"`
+		Name  *string `json:"name" validate:"required"`
+		Type  *string `json:"type" validate:"required"`
+		Index *int64  `json:"index" validate:"required"`
 	}
 
 	ImportTaskTag {
-		Name  string              `json:"name" validate:"required"`
-		Props []ImportTaskTagProp `json:"props" validate:"required"`
+		Name  *string              `json:"name" validate:"required"`
+		Props []*ImportTaskTagProp `json:"props" validate:"required"`
 	}
 
 	ImportTaskVertex {
-		VID  ImportTaskVID   `json:"vid" validate:"required"`
-		Tags []ImportTaskTag `json:"tags" validate:"required"`
+		VID  *ImportTaskVID   `json:"vid" validate:"required"`
+		Tags []*ImportTaskTag `json:"tags" validate:"required"`
 	}
 
 	ImportTaskEdgeID {
-		Index    int64  `json:"index" validate:"required"`
-		Function string `json:"function,optional"`
-		Type     string `json:"type" validate:"required"`
-		Prefix   string `json:"prefix,optional"`
+		Index    *int64  `json:"index" validate:"required"`
+		Function *string `json:"function,optional"`
+		Type     *string `json:"type" validate:"required"`
+		Prefix   *string `json:"prefix,optional"`
 	}
 
 	ImportTaskEdgeRank {
-		Index int64 `json:"index"`
+		Index *int64 `json:"index"`
 	}
 
 	ImportTaskEdgeProp {
-		Name  string `json:"name"`
-		Type  string `json:"type"`
-		Index int64  `json:"index"`
+		Name  *string `json:"name"`
+		Type  *string `json:"type"`
+		Index *int64  `json:"index"`
 	}
 
 	ImportTaskEdge {
-		Name   string               `json:"name" validate:"required"`
-		SrcVID ImportTaskEdgeID     `json:"srcVID" validate:"required"`
-		DstVID ImportTaskEdgeID     `json:"dstVID" validate:"required"`
-		Rank   ImportTaskEdgeRank   `json:"rank, optional"`
-		Props  []ImportTaskEdgeProp `json:"props" validate:"required"`
+		Name   *string               `json:"name" validate:"required"`
+		SrcVID *ImportTaskEdgeID     `json:"srcVID" validate:"required"`
+		DstVID *ImportTaskEdgeID     `json:"dstVID" validate:"required"`
+		Rank   *ImportTaskEdgeRank   `json:"rank, optional"`
+		Props  []*ImportTaskEdgeProp `json:"props" validate:"required"`
 	}
 
 	ImportTaskSchema {
-		Type   string           `json:"type" validate:"required"`
-		Edge   ImportTaskEdge   `json:"edge,optional"`
-		Vertex ImportTaskVertex `json:"vertex,optional"`
+		Type   *string           `json:"type" validate:"required"`
+		Edge   *ImportTaskEdge   `json:"edge,optional"`
+		Vertex *ImportTaskVertex `json:"vertex,optional"`
 	}
 
 	ImportTaskFile {
-		Path         string           `json:"path" validate:"required"`
-		FailDataPath string           `json:"failDataPath" validate:"required"`
-		BatchSize    int              `json:"batchSize,optional"`
-		Limit        int              `json:"limit, optional"`
-		InOrder      bool             `json:"inOrder, optional"`
-		Type         string           `json:"type" validate:"required"`
-		CSV          ImportTaskCSV    `json:"csv" validate:"required"`
-		Schema       ImportTaskSchema `json:"schema" validate:"required"`
+		Path         *string           `json:"path" validate:"required"`
+		FailDataPath *string           `json:"failDataPath" validate:"required"`
+		BatchSize    *int              `json:"batchSize,optional"`
+		Limit        *int              `json:"limit, optional"`
+		InOrder      *bool             `json:"inOrder, optional"`
+		Type         *string           `json:"type" validate:"required"`
+		CSV          *ImportTaskCSV    `json:"csv" validate:"required"`
+		Schema       *ImportTaskSchema `json:"schema" validate:"required"`
 	}
 
 	ImportTaskConfig {
-		Version         string                   `json:"version" validate:"required"`
-		Description     string                   `json:"description,optional"`
-		RemoveTempFiles bool                     `json:"removeTempFiles,optional"`
-		ClientSettings  ImportTaskClientSettings `json:"clientSettings" validate:"required"`
-		Files           []ImportTaskFile         `json:"files" validate:"required"`
+		Version         *string                   `json:"version" validate:"required"`
+		Description     *string                   `json:"description,optional"`
+		RemoveTempFiles *bool                     `json:"removeTempFiles,optional"`
+		ClientSettings  *ImportTaskClientSettings `json:"clientSettings" validate:"required"`
+		Files           []*ImportTaskFile         `json:"files" validate:"required"`
 	}
 
 	CreateImportTaskRequest {
@@ -125,6 +125,7 @@ type (
 		Address    string          `json:"address"`
 		Space      string          `json:"space"`
 		Status     string          `json:"status"`
+		Message    string          `json:"message"`
 		CreateTime int64           `json:"createTime"`
 		UpdateTime int64           `json:"updateTime"`
 		Stats      ImportTaskStats `json:"stats"`
