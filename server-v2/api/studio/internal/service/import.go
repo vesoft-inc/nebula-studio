@@ -302,13 +302,6 @@ func validClientParams(conf *importconfig.YAMLConfig) error {
 		return ecode.WithCode(ecode.ErrParam, nil)
 	}
 
-	for _, fn := range conf.Files {
-		if fn.CSV.Delimiter == nil || *fn.CSV.Delimiter == "" {
-			delimiter := ","
-			fn.CSV.Delimiter = &delimiter
-		}
-	}
-
 	return nil
 }
 

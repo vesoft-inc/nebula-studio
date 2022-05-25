@@ -143,19 +143,6 @@ func Import(taskID string, conf *importconfig.YAMLConfig) (err error) {
 	return nil
 }
 
-func ImportStatus(taskID string) (*TaskInfo, error) {
-	if t, ok := GetTaskMgr().GetTask(taskID); ok {
-		if t.GetRunner() != nil {
-			err := GetTaskMgr().UpdateTaskInfo(taskID)
-			if err != nil {
-				return nil, err
-			}
-		}
-		return t.TaskInfo, nil
-	}
-	return nil, errors.New("task is not exist")
-}
-
 func DeleteImportTask(tasksDir, taskID, address, username string) error {
 	if id, err := strconv.Atoi(taskID); err != nil {
 		zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
@@ -197,6 +184,7 @@ func GetImportTask(tasksDir, taskID, address, username string) (*types.GetImport
 		task = *t
 		result.Id = fmt.Sprintf("%d", task.TaskInfo.ID)
 		result.Status = task.TaskInfo.TaskStatus
+		result.Message = task.TaskInfo.TaskMessage
 		result.CreateTime = task.TaskInfo.CreatedTime
 		result.UpdateTime = task.TaskInfo.UpdatedTime
 		result.Address = task.TaskInfo.NebulaAddress
