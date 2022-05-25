@@ -13,9 +13,9 @@ const portal = config.devServer.https ? 'https' : 'http';
 const port = config.devServer.port;
 const ip = config.devServer.host || '127.0.0.1';
 
-const goServerPath = path.resolve(process.cwd(), './server');
+const goServerPath = path.resolve(process.cwd(), './server-v2/api/studio');
 
-const goServerProcess = spawn('go run main.go', { cwd: goServerPath, shell: true });
+const goServerProcess = spawn('make run', { cwd: goServerPath, shell: true });
 goServerProcess.stdout.on('data', (data) => console.log(chalk.blue(`server::${data.toString().slice(0, -1)}`)));
 goServerProcess.on('close', () =>
   console.log(chalk.red('\ngo server 启动失败，服务器将不可用，请切换到 server 目录调试异常\n'))
