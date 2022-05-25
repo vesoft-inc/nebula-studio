@@ -12,15 +12,16 @@ const (
 
 // Define you error code here
 var (
-	ErrBadRequest     = newErrCode(CCBadRequest, PlatformCode, 0, "ErrBadRequest")         // 40004000
-	ErrParam          = newErrCode(CCBadRequest, PlatformCode, 1, "ErrParam")              // 40004001
-	ErrUnauthorized   = newErrCode(CCUnauthorized, PlatformCode, 0, "ErrUnauthorized")     // 40104000
-	ErrSession        = newErrCode(CCUnauthorized, PlatformCode, 1, "ErrSession")          // 40104001
-	ErrForbidden      = newErrCode(CCForbidden, PlatformCode, 0, "ErrForbidden")           // 40304000
-	ErrNotFound       = newErrCode(CCNotFound, PlatformCode, 0, "ErrNotFound")             // 40404000
-	ErrInternalServer = newErrCode(CCInternalServer, PlatformCode, 0, "ErrInternalServer") // 50004000
-	ErrNotImplemented = newErrCode(CCNotImplemented, PlatformCode, 0, "ErrNotImplemented") // 50104000
-	ErrUnknown        = newErrCode(CCUnknown, PlatformCode, 0, "ErrUnknown")               // 90004000
+	ErrBadRequest       = newErrCode(CCBadRequest, PlatformCode, 0, "ErrBadRequest")           // 40004000
+	ErrParam            = newErrCode(CCBadRequest, PlatformCode, 1, "ErrParam")                // 40004001
+	ErrUnauthorized     = newErrCode(CCUnauthorized, PlatformCode, 0, "ErrUnauthorized")       // 40104000
+	ErrSession          = newErrCode(CCUnauthorized, PlatformCode, 1, "ErrSession")            // 40104001
+	ErrForbidden        = newErrCode(CCForbidden, PlatformCode, 0, "ErrForbidden")             // 40304000
+	ErrNotFound         = newErrCode(CCNotFound, PlatformCode, 0, "ErrNotFound")               // 40404000
+	ErrInternalServer   = newErrCode(CCInternalServer, PlatformCode, 0, "ErrInternalServer")   // 50004000
+	ErrInternalDatabase = newErrCode(CCInternalServer, PlatformCode, 1, "ErrInternalDatabase") // 50004001
+	ErrNotImplemented   = newErrCode(CCNotImplemented, PlatformCode, 0, "ErrNotImplemented")   // 50104000
+	ErrUnknown          = newErrCode(CCUnknown, PlatformCode, 0, "ErrUnknown")                 // 90004000
 )
 
 var statusCodeErrorMapping = map[int]*ErrCode{
@@ -48,12 +49,11 @@ func WithUnauthorized(err error, formatWithArgs ...interface{}) error {
 }
 
 func WithSessionMessage(err error, formatWithArgs ...interface{}) error {
-	ErrSessionWithMessage := newErrCode(CCUnauthorized, PlatformCode, 1, fmt.Sprintf("ErrSession::%s", err.Error()))
-	return WithCode(ErrSessionWithMessage, err, formatWithArgs...)
+	return WithErrorMessage(ErrSession, err, formatWithArgs...)
 }
 
 func WithErrorMessage(c *ErrCode, err error, formatWithArgs ...interface{}) error {
-	ErrWithMessage := newErrCode(c.GetCode(), PlatformCode, 1, fmt.Sprintf("%s::%s", c.GetMessage(), err.Error()))
+	ErrWithMessage := newErrCode(c.GetCategoryCode(), c.GetPlatformCode(), c.GetSpecificCode(), fmt.Sprintf("%s::%s", c.GetMessage(), err.Error()))
 	return WithCode(ErrWithMessage, err, formatWithArgs...)
 }
 
