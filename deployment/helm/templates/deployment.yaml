@@ -26,8 +26,6 @@ spec:
         - name: nebula-studio
           command:
             - ./server
-          args:
-            - --studio-config=config/config.yaml
           image: "{{ .Values.image.nebulaStudio.name }}:{{ .Values.image.nebulaStudio.version }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:

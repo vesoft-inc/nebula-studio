@@ -20,9 +20,8 @@ $ npm run dev
 ```
 ### Set up go-server only
 ```
-$ cd server
-$ go build -o server
-$ nohup ./server &
+$ cd ./server/api/studio
+$ make run
 ```
 
 ## Production Deploy
@@ -31,13 +30,13 @@ $ nohup ./server &
 ```
 $ npm install
 $ npm run build
-$ mv dist server/assets
+$ mv dist server/api/studio/assets
 ```
 
 ### 2. Build Server
 ```
-$ cd server
-// update default port 9000 to 7001 in config/example-config.yaml first
+$ cd server/api/studio
+// update default port 9000 to 7001 in etc/studio-api.yaml first
 $ go build -o server
 ```
 

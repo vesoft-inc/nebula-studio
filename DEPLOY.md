@@ -16,7 +16,7 @@ nohup ./server
 ```
 - Service address: http://127.0.0.1:7001
 
-You can modify the port in example-config.yaml in the config directory
+You can modify the port in studio-api.yaml in the config directory
 
 2. Open Nebula Graph Studio in browser
 url: http://{{ip}}:7001

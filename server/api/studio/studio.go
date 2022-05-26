@@ -21,9 +21,11 @@ import (
 	"go.uber.org/zap"
 )
 
-//go:embed assets/*
-var embedAssets embed.FS
-var configFile = flag.String("f", "etc/studio-api.yaml", "the config file")
+var (
+	//go:embed assets/*
+	embedAssets embed.FS
+	configFile  = flag.String("f", "etc/studio-api.yaml", "the config file")
+)
 
 func main() {
 	flag.Parse()

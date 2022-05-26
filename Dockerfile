@@ -24,17 +24,17 @@ ENV GOOS linux
 WORKDIR /server
 
 COPY server .
-COPY --from=nodebuilder /web/dist/ /server/assets
+COPY --from=nodebuilder /web/dist/ /server/api/studio/assets
 RUN go mod download
 RUN apk add build-base
-RUN go build -ldflags="-s -w" -o /server/server /server/main.go
+RUN go build -ldflags="-s -w" -o /server/server /server/api/studio/studio.go
 
 FROM alpine
 
 WORKDIR /app
 COPY --from=gobuilder /server/server /app/server
-COPY --from=gobuilder /server/config /app/config/
-RUN sed -i "s/9000/7001/g" /app/config/example-config.yaml
+COPY --from=gobuilder /server/api/studio/etc /app/etc/
+RUN sed -i "s/9000/7001/g" /app/etc/studio-api.yaml
 
 EXPOSE 7001
 
