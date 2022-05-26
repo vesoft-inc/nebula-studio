@@ -207,17 +207,18 @@ func GetManyImportTask(tasksDir, address, username string, page, pageSize int) (
 	if err != nil {
 		return nil, err
 	}
-
+	if page <= 0 {
+		page = 1
+	}
 	start := (page - 1) * pageSize
 	stop := page * pageSize
-	if len(taskIDs) <= start {
+	if len(taskIDs) < start {
 		return nil, errors.New("invalid parameter")
 	} else {
 		if stop >= len(taskIDs) {
 			stop = len(taskIDs)
 		}
 		result.Total = int64(stop - start)
-
 		for i := start; i < stop; i++ {
 			data, _ := GetImportTask(tasksDir, taskIDs[i], address, username)
 			result.List = append(result.List, *data)

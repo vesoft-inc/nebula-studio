@@ -4,11 +4,9 @@ import { message } from 'antd';
 import intl from 'react-intl-universal';
 
 export class FilesStore {
-  uploadDir: string = '';
   fileList: any[] = [];
   constructor() {
     makeObservable(this, {
-      uploadDir: observable,
       fileList: observable,
 
       update: action,
@@ -36,7 +34,7 @@ export class FilesStore {
     const data = new FormData();
     files.forEach(file => {
       data.append('file', file);
-    })
+    });
     const res = (await service.uploadFiles(data, config)) as any;
     return res;
   };
@@ -49,17 +47,6 @@ export class FilesStore {
       message.success(intl.get('common.deleteSuccess'));
       runInAction(() => {
         this.fileList = this.fileList.filter((item) => item.name !== name);
-      });
-    }
-  };
-
-
-  getUploadDir = async () => {
-    const { code, data } = (await service.getUploadDir()) as any;
-    if (code === 0) {
-      const { uploadDir } = data;
-      this.update({
-        uploadDir,
       });
     }
   };

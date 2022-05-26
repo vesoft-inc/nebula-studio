@@ -8,14 +8,14 @@ import { trackEvent } from './stat';
 
 export enum HttpResCode {
   ErrBadRequest = 40004000,
-	ErrParam = 40004001,
-	ErrUnauthorized = 40104000,
-	ErrSession = 40104001,
-	ErrForbidden = 40304000,
-	ErrNotFound = 40404000,
-	ErrInternalServer = 50004000,
-	ErrNotImplemented = 50104000,
-	ErrUnknown = 90004000,
+  ErrParam = 40004001,
+  ErrUnauthorized = 40104000,
+  ErrSession = 40104001,
+  ErrForbidden = 40304000,
+  ErrNotFound = 40404000,
+  ErrInternalServer = 50004000,
+  ErrNotImplemented = 50104000,
+  ErrUnknown = 90004000,
 }
 
 const service = axios.create({
@@ -45,7 +45,7 @@ service.interceptors.response.use(
   (response: any) => {
     
     // const isExecReq = /api-nebula\/db\/(exec|batchExec)$/.test(response.config?.url);
-    if (response.data?.data?.data) {
+    if (response.data?.data?.data && Object.keys(response.data.data).length === 1) {
       response.data.data = response.data.data.data;
     }
     return response.data;
@@ -61,7 +61,7 @@ service.interceptors.response.use(
       if (error.response.data?.code === HttpResCode.ErrSession) {
         getRootStore().global.logout();
       }
-      return error.response;
+      return error.response.data;
     } else {
       message.error(`${intl.get('common.requestError')}: ${error}`);
       return error;

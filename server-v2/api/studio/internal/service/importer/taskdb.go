@@ -70,7 +70,7 @@ func (t *TaskDb) LastId() (int, error) {
 func (t *TaskDb) SelectAllIds(nebulaAddress, user string) ([]int, error) {
 	var taskInfos []TaskInfo
 	ids := make([]int, 0)
-	if err := t.Select("id").Where("nebula_address = ? And user = ?", nebulaAddress, user).Find(&taskInfos).Error; err != nil {
+	if err := t.Select("id").Where("nebula_address = ? And user = ?", nebulaAddress, user).Order("created_time desc").Find(&taskInfos).Error; err != nil {
 		return nil, err
 	}
 	for _, taskInfo := range taskInfos {
