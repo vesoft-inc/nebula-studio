@@ -54,11 +54,11 @@ const TaskList = (props: IProps) => {
     }
   }, []);
 
-  const handleLogView = (id: number, space: string, taskStatus: ITaskStatus) => {
+  const handleLogView = (id: number, space: string, status: ITaskStatus) => {
     setLogDimension({
       space, 
       id,
-      status: taskStatus
+      status
     });
     setVisible(true);
   };
@@ -72,9 +72,9 @@ const TaskList = (props: IProps) => {
     };
   }, []);
   useEffect(() => {
-    const needRefresh = taskList.filter(item => item.taskStatus === ITaskStatus.StatusProcessing).length > 0;
+    const needRefresh = taskList.filter(item => item.status === ITaskStatus.StatusProcessing).length > 0;
     if(logDimension.id !== undefined && logDimension.status === ITaskStatus.StatusProcessing) {
-      const status = taskList.filter(item => item.taskID === logDimension.id)[0].taskStatus;
+      const status = taskList.filter(item => item.id === logDimension.id)[0].status;
       if(status !== ITaskStatus.StatusProcessing) {
         setLogDimension({
           id: logDimension.id,
@@ -111,7 +111,7 @@ const TaskList = (props: IProps) => {
       </div>
       <h3 className={styles.taskHeader}>{intl.get('import.taskList')} ({taskList.length})</h3>
       {taskList.map(item => (
-        <TaskItem key={item.taskID} 
+        <TaskItem key={item.id} 
           data={item}
           onViewLog={handleLogView} 
           onTaskStop={handleTaskStop} 

@@ -5,9 +5,13 @@ node_modules/
 .DS_Store
 .vscode
 *.swp
+*.swo
+*.out
+*.log
 *.lock
 *.map
 .github/workflows/nodejs.yml
+
 
 app/**/*.map
 config/**/*.map
@@ -19,5 +23,9 @@ dist/
 !app/**/*.js
 tmp
 server/data
-assets/
+server/assets/*
+!server/assets/.gitkeep
+server-v2/api/*/data
+server-v2/api/*/assets/*
+!server-v2/api/*/assets/.gitkeep
 bin/

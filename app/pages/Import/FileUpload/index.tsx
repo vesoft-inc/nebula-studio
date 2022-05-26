@@ -2,30 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
-import FileList from './FileList';
 import { debounce } from 'lodash';
 import { message } from 'antd';
 import intl from 'react-intl-universal';
 import { StudioFile } from '@app/interfaces/import';
-interface IProps {
-  needFileDir: boolean
-}
+import FileList from './FileList';
 
-const FileUpload = (props: IProps) => {
+const FileUpload = () => {
   const { files } = useStore();
-  const { fileList, uploadDir, deleteFile, getFiles, uploadFile, getUploadDir } = files;
+  const { fileList, deleteFile, getFiles, uploadFile } = files;
   const [loading, setLoading] = useState(false);
-  const { needFileDir = true } = props;
   const transformFile = async (_file: StudioFile, fileList: StudioFile[]) => {
     fileList.forEach(file => {
-      if(needFileDir) {
-        file.path = `${uploadDir}/${file.name}`;
-      }
+      file.path = `${file.name}`;
       file.withHeader = false;
-    })
-
-    await handleUpdate(fileList)
-    return false
+    });
+    await handleUpdate(fileList);
+    return false;
   };
 
   const handleUpdate = async (fileList: StudioFile[]) => {
@@ -33,8 +26,8 @@ const FileUpload = (props: IProps) => {
     await uploadFile(fileList).then(_ => {
       setTimeout(() => {
         getFileList();
-        message.success(intl.get('import.uploadSuccessfully'))
-      }, 2000)
+        message.success(intl.get('import.uploadSuccessfully'));
+      }, 2000);
     }).catch(_err => {
       setLoading(false);
     });
@@ -42,17 +35,16 @@ const FileUpload = (props: IProps) => {
 
   const handleDelete = (index: number) => {
     const file = fileList[index].name;
-    deleteFile(file)
-  }
+    deleteFile(file);
+  };
 
   const getFileList = async () => {
     !loading && setLoading(true);
     await getFiles();
     setLoading(false);
-  }
+  };
   useEffect(() => {
     getFileList();
-    needFileDir && getUploadDir();
     trackPageView('/import/files');
   }, []);
   return (

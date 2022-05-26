@@ -6,13 +6,17 @@ import intl from 'react-intl-universal';
 import { getRootStore } from '@app/stores';
 import { trackEvent } from './stat';
 
-const subErrMsgStr = [
-  'session expired',
-  'connection refused',
-  'broken pipe',
-  'an existing connection was forcibly closed',
-  'Token is expired',
-];
+export enum HttpResCode {
+  ErrBadRequest = 40004000,
+  ErrParam = 40004001,
+  ErrUnauthorized = 40104000,
+  ErrSession = 40104001,
+  ErrForbidden = 40304000,
+  ErrNotFound = 40404000,
+  ErrInternalServer = 50004000,
+  ErrNotImplemented = 50104000,
+  ErrUnknown = 90004000,
+}
 
 const service = axios.create({
   transformResponse: [
@@ -39,25 +43,25 @@ service.interceptors.request.use(config => {
 
 service.interceptors.response.use(
   (response: any) => {
-    const { code, message: errMsg } = response.data;
-    const isConnectReq = /api-nebula\/db\/connect$/.test(response.config?.url);
-    // if connection refused, login again
-    if (code === -1 && new RegExp(subErrMsgStr.join('|')).test(errMsg)) {
-      message.warning(errMsg);
-      !isConnectReq && getRootStore().global.logout();
-    } else if (code === -1 && errMsg) {
-      message.warning(errMsg);
+    
+    // const isExecReq = /api-nebula\/db\/(exec|batchExec)$/.test(response.config?.url);
+    if (response.data?.data?.data && Object.keys(response.data.data).length === 1) {
+      response.data.data = response.data.data.data;
     }
     return response.data;
   },
   (error: any) => {
-    if (error.response && error.response.status) {
+    if (error.response?.status) {
       message.error(
         `${intl.get('common.requestError')}: ${error.response.status} ${
           error.response.statusText
         }`,
       );
-      return error.response;
+      // relogin
+      if (error.response.data?.code === HttpResCode.ErrSession) {
+        getRootStore().global.logout();
+      }
+      return error.response.data;
     } else {
       message.error(`${intl.get('common.requestError')}: ${error}`);
       return error;

@@ -1,11 +1,10 @@
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import service from '@app/config/service';
 import { IBasicConfig, IEdgeConfig, ITaskItem, IVerticesConfig } from '@app/interfaces/import';
-import { getRootStore } from '.';
 import { configToJson } from '@app/utils/import';
+import { getRootStore } from '.';
 export class ImportStore {
   taskList: ITaskItem[] = [];
-  taskDir: string = '';
   verticesConfig: IVerticesConfig[] = [];
   edgesConfig: IEdgeConfig[] = [];
 
@@ -13,7 +12,6 @@ export class ImportStore {
   constructor() {
     makeObservable(this, {
       taskList: observable,
-      taskDir: observable,
       verticesConfig: observable,
       edgesConfig: observable,
       basicConfig: observable,
@@ -34,24 +32,11 @@ export class ImportStore {
   };
 
   getTaskList = async () => {
-    const { code, data } = await service.handleImportAction({
-      taskAction: 'actionQueryAll',
-    });
+    const { code, data } = await service.getTaskList();
     if (code === 0 && data) {
       this.update({
-        taskList: data.results || [],
+        taskList: data.data || [],
       });
-    }
-  };
-
-  getTaskDir = async () => {
-    const { code, data } = (await service.getTaskDir()) as any;
-    if (code === 0) {
-      const { taskDir } = data;
-      this.update({
-        taskDir,
-      });
-      return taskDir;
     }
   };
 
@@ -65,89 +50,66 @@ export class ImportStore {
     name: string, 
     password?: string
   }) => {
-    let _config
+    let _config;
     const { config, name, password } = params;
     if(config) {
       _config = config;
     } else {
-      const { currentSpace, spaceVidType } = this.rootStore.schema
-      const { username, host } = this.rootStore.global
+      const { currentSpace, spaceVidType } = this.rootStore.schema;
+      const { username, host } = this.rootStore.global;
       _config = configToJson({
         ...this.basicConfig,
         space: currentSpace,
-        taskDir: this.taskDir,
         verticesConfig: this.verticesConfig,
         edgesConfig: this.edgesConfig,
         username,
         host,
         password,
         spaceVidType
-      })
-    }
-    const { code, data } = (await service.importData({
-      configBody: _config,
-      configPath: '',
-      name
-    })) as any;
-    if (code === 0) {
-      this.update({
-        taskId: data[0],
       });
     }
+    const { code } = (await service.importData({
+      config: _config,
+      name
+    })) as any;
     return code;
   }
 
-  stopTask = async (taskID: number) => {
-    const res = await service.handleImportAction({
-      taskID: taskID.toString(),
-      taskAction: 'actionStop',
-    });
+  stopTask = async (id: number) => {
+    const res = await service.stopImportTask(id);
     return res;
   }
 
-  deleteTask = async (taskID: number) => {
-    const res = await service.handleImportAction({
-      taskID: taskID.toString(),
-      taskAction: 'actionDel',
-    });
+  deleteTask = async (id: number) => {
+    const res = await service.deleteImportTask(id);
     return res;
   }
 
-  downloadTaskConfig = async (taskID: number) => {
+  downloadTaskConfig = async (id: number) => {
     const link = document.createElement('a');
-    link.href = service.getTaskConfigUrl(taskID);
+    link.href = service.getTaskConfig(id);
     link.download = `config.yml`;
     link.click();
   }
 
   downloadTaskLog = async (params: {
     id: string | number,
-    type: 'import' | 'err', 
-    name?: string,
+    name: string,
   }) => {
-    const { id, type, name } = params;
+    const { id, name } = params;
     const link = document.createElement('a');
-    link.href = type === 'import' ? service.getTaskLogUrl(id) : service.getTaskErrLogUrl(id) + `?name=${name}`;
+    link.href = service.getTaskLog(id) + `?name=${name}`;
     link.download = `log.yml`;
     link.click();
   }
 
-  getImportLogDetail = async (params: {
+  getLogDetail = async (params: {
     offset: number;
     limit?: number;
     id: string | number;
+    file: string
   }) => {
-    const res = await service.getLog(params);
-    return res;
-  }
-
-  getErrLogDetail = async (params: {
-    offset: number;
-    limit?: number;
-    id: string | number;
-    name: string;
-  }) => {
-    const res = await service.getErrLog(params);
+    const res = await service.getLogDetail(params);
     return res;
   }
 

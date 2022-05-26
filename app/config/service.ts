@@ -1,61 +1,57 @@
 import { _delete, get, post, put } from '../utils/http';
 
-let service = {
-  execNGQL:  (params, config?) => {
-    return post('/api-nebula/db/exec')(params, config)
+const service = {
+  execNGQL: (params, config?) => {
+    return post('/api-nebula/db/exec')(params, config);
   },
   batchExecNGQL: (params, config?) => {
-    return post('/api-nebula/db/batchExec')(params, config)
+    return post('/api-nebula/db/batchExec')(params, config);
   },
   connectDB: (params, config?) => {
-    return post('/api-nebula/db/connect')(params, config)
+    return post('/api-nebula/db/connect')(params, config);
   },
   disconnectDB: (params, config?) => {
-    return post('/api-nebula/db/disconnect')(params, config)
+    return post('/api-nebula/db/disconnect')(params, config);
   },
+  // import
   importData: (params, config?) => {
-    return post('/api/import-tasks/import')(params, config)
+    return post('/api/import-tasks')(params, config);
   },
-  handleImportAction: (params, config?) => {
-    return post('/api/import-tasks/action')(params, config)
+  stopImportTask: (id: number) => {
+    return post(`/api/import-tasks/${id}/stop`)();
   },
-  getLog: (params, config?) => {
-    return get('/api/import-tasks/logs')(params, config)
+  deleteImportTask: (id: number) => {
+    return post(`/api/import-tasks/${id}/stop`)();
   },
-  getErrLog: (params, config?) => {
-    return get('/api/import-tasks/err-logs')(params, config)
-  },
-  finishImport: (params, config?) => {
-    return post('/api/import/finish')(params, config)
-  },
-  getUploadDir: () => {
-    return get('/api/import-tasks/working-dir')()
-  },
-  getTaskDir: () => {
-    return get('/api/import-tasks/task-dir')()
-  },
-  deteleFile:params => {
-    const { filename } = params;
-    return _delete(`/api/files/${filename}`)();
-  },
-  getFiles: () => {
-    return get('/api/files')()
-  },
-  uploadFiles: (params?, config?) => {
-    put('/api/files')(params, { ...config, headers: { 'Content-Type': 'multipart/form-data' } });
+  getTaskList: (params?, config?) => {
+    return get('/api/import-tasks')(params, config);
   },
   getTaskLogs: (params?, config?) => {
     const { id, ...others } = params;
     return get(`/api/import-tasks/${id}/task-log-names`)(others, config);
   },
-  getTaskConfigUrl: (id: string | number) => `/api/import-tasks/config/${id}`,
-  getTaskLogUrl: (id: string | number) => `/api/import-tasks/${id}/log`,
-  getTaskErrLogUrl: (id: string | number) => `/api/import-tasks/${id}/err-logs`,
-}
+  getLogDetail: (params, config?) => {
+    const { id, ...others } = params;
+    return get(`/api/import-tasks/${id}/logs`)(others, config);
+  },
+  getTaskConfig: (id: string | number) => `/api/import-tasks/${id}/download-config`,
+  getTaskLog: (id: string | number) => `/api/import-tasks/${id}/download-logs`,
+  // files
+  deteleFile: params => {
+    const { filename } = params;
+    return _delete(`/api/files/${filename}`)();
+  },
+  getFiles: () => {
+    return get('/api/files')();
+  },
+  uploadFiles: (params?, config?) => {
+    put('/api/files')(params, { ...config, headers: { 'Content-Type': 'multipart/form-data' } });
+  },
+};
 
 export const updateService = (partService: any) => {
-  Object.assign(service, partService)
-}
+  Object.assign(service, partService);
+};
 
 export default service;
 

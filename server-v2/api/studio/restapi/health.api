@@ -1,0 +1,17 @@
+syntax = "v1"
+
+type (
+	GetHealth {
+		Status string `json:"status"`
+	}
+)
+
+@server(
+	group: health  // is used to put related logic in the same package
+)
+
+service studio-api {
+	@doc "Get health"
+	@handler Get
+	get /health returns (GetHealth);
+}

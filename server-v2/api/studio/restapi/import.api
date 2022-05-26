@@ -1,0 +1,241 @@
+syntax = "v1"
+
+type (
+	ImportTaskConnection {
+		User     *string `json:"user" validate:"required"`
+		Password *string `json:"password" validate:"required"`
+		Address  *string `json:"address" validate:"required"`
+	}
+
+	ImportTaskClientSettings {
+		Retry             *int                  `json:"retry,optional"`
+		Concurrency       *int                  `json:"concurrency,optional"`
+		ChannelBufferSize *int                  `json:"channelBufferSize,optional"`
+		Space             *string               `json:"space" validate:"required"`
+		Connection        *ImportTaskConnection `json:"connection" validate:"required"`
+		PostStart         *ImportTaskPostStart  `json:"postStart,optional"`
+		PreStop           *ImportTaskPreStop    `json:"preStop,optional"`
+	}
+
+	ImportTaskPostStart {
+		Commands    *string `json:"commands, optional"`
+		AfterPeriod *string `json:"afterPeriod, optional"`
+	}
+
+	ImportTaskPreStop {
+		Commands *string `json:"commands,optional"`
+	}
+
+	ImportTaskCSV {
+		WithHeader *bool   `json:"withHeader,optional"`
+		WithLabel  *bool   `json:"withLabel,optional"`
+		Delimiter  *string `json:"delimiter,optional"`
+	}
+
+	ImportTaskVID {
+		Index    *int64  `json:"index" validate:"required"`
+		Type     *string `json:"type" validate:"required"`
+		Function *string `json:"function,optional"`
+		Prefix   *string `json:"prefix,optional"`
+	}
+
+	ImportTaskTagProp {
+		Name  *string `json:"name" validate:"required"`
+		Type  *string `json:"type" validate:"required"`
+		Index *int64  `json:"index" validate:"required"`
+	}
+
+	ImportTaskTag {
+		Name  *string              `json:"name" validate:"required"`
+		Props []*ImportTaskTagProp `json:"props" validate:"required"`
+	}
+
+	ImportTaskVertex {
+		VID  *ImportTaskVID   `json:"vid" validate:"required"`
+		Tags []*ImportTaskTag `json:"tags" validate:"required"`
+	}
+
+	ImportTaskEdgeID {
+		Index    *int64  `json:"index" validate:"required"`
+		Function *string `json:"function,optional"`
+		Type     *string `json:"type" validate:"required"`
+		Prefix   *string `json:"prefix,optional"`
+	}
+
+	ImportTaskEdgeRank {
+		Index *int64 `json:"index"`
+	}
+
+	ImportTaskEdgeProp {
+		Name  *string `json:"name"`
+		Type  *string `json:"type"`
+		Index *int64  `json:"index"`
+	}
+
+	ImportTaskEdge {
+		Name   *string               `json:"name" validate:"required"`
+		SrcVID *ImportTaskEdgeID     `json:"srcVID" validate:"required"`
+		DstVID *ImportTaskEdgeID     `json:"dstVID" validate:"required"`
+		Rank   *ImportTaskEdgeRank   `json:"rank, optional"`
+		Props  []*ImportTaskEdgeProp `json:"props" validate:"required"`
+	}
+
+	ImportTaskSchema {
+		Type   *string           `json:"type" validate:"required"`
+		Edge   *ImportTaskEdge   `json:"edge,optional"`
+		Vertex *ImportTaskVertex `json:"vertex,optional"`
+	}
+
+	ImportTaskFile {
+		Path         *string           `json:"path" validate:"required"`
+		FailDataPath *string           `json:"failDataPath" validate:"required"`
+		BatchSize    *int              `json:"batchSize,optional"`
+		Limit        *int              `json:"limit, optional"`
+		InOrder      *bool             `json:"inOrder, optional"`
+		Type         *string           `json:"type" validate:"required"`
+		CSV          *ImportTaskCSV    `json:"csv" validate:"required"`
+		Schema       *ImportTaskSchema `json:"schema" validate:"required"`
+	}
+
+	ImportTaskConfig {
+		Version         *string                   `json:"version" validate:"required"`
+		Description     *string                   `json:"description,optional"`
+		RemoveTempFiles *bool                     `json:"removeTempFiles,optional"`
+		ClientSettings  *ImportTaskClientSettings `json:"clientSettings" validate:"required"`
+		Files           []*ImportTaskFile         `json:"files" validate:"required"`
+	}
+
+	CreateImportTaskRequest {
+		Name   string           `json:"name" validate:"required"`
+		Config ImportTaskConfig `json:"config" validate:"required"`
+	}
+
+	CreateImportTaskData {
+		Id string `json:"id"`
+	}
+
+	GetImportTaskRequest {
+		Id string `path:"id" validate:"required"`
+	}
+
+	GetImportTaskData {
+		Id         string          `json:"id"`
+		Name       string          `json:"name"`
+		User       string          `json:"user"`
+		Address    string          `json:"address"`
+		Space      string          `json:"space"`
+		Status     string          `json:"status"`
+		Message    string          `json:"message"`
+		CreateTime int64           `json:"createTime"`
+		UpdateTime int64           `json:"updateTime"`
+		Stats      ImportTaskStats `json:"stats"`
+	}
+
+	ImportTaskStats {
+		NumFailed          int64 `json:"numFailed"`
+		NumReadFailed      int64 `json:"numReadFailed"`
+		TotalCount         int64 `json:"totalCount"`
+		TotalBatches       int64 `json:"totalBatches"`
+		TotalLatency       int64 `json:"totalLatency"`
+		TotalReqTime       int64 `json:"totalReqTime"`
+		TotalBytes         int64 `json:"totalBytes"`
+		TotalImportedBytes int64 `json:"totalImportedBytes"`
+	}
+
+	GetManyImportTaskRequest {
+		Page     int `form:"page,default=1"`
+		PageSize int `form:"pageSize,default=100"`
+	}
+
+	GetManyImportTaskData {
+		Total int64               `json:"total"`
+		List  []GetImportTaskData `json:"data"`
+	}
+
+	GetManyImportTaskLogRequest {
+		Id     string `path:"id" validate:"required"`
+		File   string `form:"file" validate:"required"`
+		Offset int64  `form:"offset" validate:"min=0"`
+		Limit  int64  `form:"limit" validate:"min=1"`
+	}
+
+	GetManyImportTaskLogData {
+		Logs []string `json:"data"`
+	}
+
+	GetImportTaskLogNamesRequest {
+		Id string `path:"id" validate:"required""`
+	}
+
+	GetImportTaskLogNamesData {
+		Names []string `json:"data"`
+	}
+
+	DeleteImportTaskRequest {
+		Id string `path:"id"`
+	}
+
+	StopImportTaskRequest {
+		Id string `path:"id"`
+	}
+
+	DownloadLogsRequest {
+		Id   string `path:"id" validate:"required"`
+		Name string `form:"name" validate:"required"`
+	}
+
+	DownloadConfigsRequest {
+		Id string `path:"id" validate:"required"`
+	}
+
+	GetWorkingDirResult {
+		TaskDir   string `json:"taskDir,omitempty"`
+		UploadDir string `json:"uploadDir,omitempty"`
+	}
+)
+
+@server(
+	group: importtask
+)
+
+service studio-api {
+	@doc "Create Import Task"
+	@handler CreateImportTask
+	post /api/import-tasks(CreateImportTaskRequest) returns(CreateImportTaskData)
+	
+	@doc "Get Import Task"
+	@handler GetImportTask
+	get /api/import-tasks/:id(GetImportTaskRequest) returns(GetImportTaskData)
+	
+	@doc "Get Many Import Task"
+	@handler GetManyImportTask
+	get /api/import-tasks(GetManyImportTaskRequest) returns(GetManyImportTaskData)
+	
+	@doc "Get Many Import Task Log"
+	@handler GetManyImportTaskLog
+	get /api/import-tasks/:id/logs(GetManyImportTaskLogRequest) returns(GetManyImportTaskLogData)
+	
+	@doc "Get all logs file name of a Task"
+	@handler GetImportTaskLogNames
+	get /api/import-tasks/:id/task-log-names(GetImportTaskLogNamesRequest) returns(GetImportTaskLogNamesData)
+	
+	@doc "Delete Import Task"
+	@handler DeleteImportTask
+	delete /api/import-tasks/:id(DeleteImportTaskRequest)
+	
+	@doc "Stop Import Task"
+	@handler StopImportTask
+	get /api/import-tasks/:id/stop(StopImportTaskRequest)
+	
+	@doc "Download logs"
+	@handler DownloadLogs
+	get /api/import-tasks/:id/download-logs(DownloadLogsRequest)
+	
+	@doc "Download Config"
+	@handler DownloadConfig
+	get /api/import-tasks/:id/download-config(DownloadConfigsRequest)
+	
+	@doc "Get Working Dir"
+	@handler GetWorkingDir
+	get /api/import-tasks/working-dir returns(GetWorkingDirResult)
+}
