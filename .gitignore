@@ -22,10 +22,7 @@ dist/
 !.commitlint.js
 !app/**/*.js
 tmp
-server/data
-server/assets/*
-!server/assets/.gitkeep
-server-v2/api/*/data
-server-v2/api/*/assets/*
-!server-v2/api/*/assets/.gitkeep
+server/api/*/data
+server/api/*/assets/*
+!server/api/*/assets/.gitkeep
 bin/

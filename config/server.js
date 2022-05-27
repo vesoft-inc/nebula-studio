@@ -13,7 +13,7 @@ const portal = config.devServer.https ? 'https' : 'http';
 const port = config.devServer.port;
 const ip = config.devServer.host || '127.0.0.1';
 
-const goServerPath = path.resolve(process.cwd(), './server-v2/api/studio');
+const goServerPath = path.resolve(process.cwd(), './server/api/studio');
 
 const goServerProcess = spawn('make run', { cwd: goServerPath, shell: true });
 goServerProcess.stdout.on('data', (data) => console.log(chalk.blue(`server::${data.toString().slice(0, -1)}`)));
