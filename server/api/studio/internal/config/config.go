@@ -4,9 +4,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 
 	"github.com/zeromicro/go-zero/rest"
-	"go.uber.org/zap"
 )
 
 type Config struct {
@@ -27,82 +27,50 @@ type Config struct {
 	}
 }
 
-const (
-	DefaultFilesDataDir     = "data"
-	DefaultTaskIdPath       = "data/taskId.data"
-	DefaultUploadDir        = "data/upload"
-	DefaultTasksDir         = "data/tasks"
-	DefaultSqliteDbFilePath = "data/tasks.db"
-)
+type PathValidator struct {
+	Type        string // folder | file
+	StructAttr  string
+	DefaultPath string
+}
 
 func (c *Config) Validate() error {
 	return nil
 }
 
 func (c *Config) Complete() {
-	taskIdFile := DefaultTaskIdPath
-	if c.File.TaskIdPath != "" {
-		taskIdFile = c.File.TaskIdPath
+	fileValidatorList := []PathValidator{
+		{Type: "folder", StructAttr: "UploadDir", DefaultPath: "data/upload"},
+		{Type: "folder", StructAttr: "TasksDir", DefaultPath: "data/tasks"},
+		{Type: "file", StructAttr: "SqliteDbFilePath", DefaultPath: "data/tasks.db"},
+		{Type: "file", StructAttr: "TaskIdPath", DefaultPath: "data/taskId.data"},
 	}
-	abs, _ := filepath.Abs(taskIdFile)
-	_, err := ioutil.ReadFile(abs)
-	if err != nil {
-		if os.IsNotExist(err) {
-			absDir := filepath.Dir(abs)
-			_, err := os.Stat(absDir)
-			if os.IsNotExist(err) {
-				os.MkdirAll(absDir, 0o776)
-			}
-			_, err = os.Create(abs)
-			if err != nil {
-				zap.L().Fatal("DefaultTaskIdPath Init fail", zap.Error(err))
+
+	fileRefVal := reflect.ValueOf(&c.File).Elem()
+
+	for _, v := range fileValidatorList {
+		pathRef := fileRefVal.FieldByName(v.StructAttr)
+
+		if !pathRef.IsValid() {
+			break
+		}
+
+		if pathRef.String() == "" {
+			pathRef.SetString(v.DefaultPath)
+		}
+
+		abs, _ := filepath.Abs(pathRef.String())
+
+		if _, err := os.Stat(abs); os.IsNotExist(err) {
+			if v.Type == "folder" {
+				os.MkdirAll(abs, os.ModePerm)
+			} else if v.Type == "file" {
+				if _, err := os.Stat(filepath.Dir(abs)); os.IsNotExist(err) {
+					os.MkdirAll(filepath.Dir(abs), os.ModePerm)
+				}
+				ioutil.WriteFile(abs, []byte(""), os.ModePerm)
 			}
 		}
 	}
-	c.File.TaskIdPath = abs
-
-	uploadDir := DefaultUploadDir
-	if c.File.UploadDir != "" {
-		uploadDir = c.File.UploadDir
-	}
-	abs, _ = filepath.Abs(uploadDir)
-	c.File.UploadDir = abs
-	_, err = os.Stat(abs)
-	if os.IsNotExist(err) {
-		os.MkdirAll(abs, 0o776)
-	}
-
-	tasksDir := DefaultTasksDir
-	if c.File.TasksDir != "" {
-		tasksDir = c.File.TasksDir
-	}
-	abs, _ = filepath.Abs(tasksDir)
-	c.File.TasksDir = abs
-	_, err = os.Stat(abs)
-	if os.IsNotExist(err) {
-		os.MkdirAll(abs, 0o776)
-	}
-
-	sqliteDbFilePath := DefaultSqliteDbFilePath
-	if c.File.SqliteDbFilePath != "" {
-		sqliteDbFilePath = c.File.SqliteDbFilePath
-	}
-	abs, _ = filepath.Abs(sqliteDbFilePath)
-	_, err = ioutil.ReadFile(abs)
-	if err != nil {
-		if os.IsNotExist(err) {
-			absDir := filepath.Dir(abs)
-			_, err := os.Stat(absDir)
-			if os.IsNotExist(err) {
-				os.MkdirAll(absDir, 0o776)
-			}
-			_, err = os.Create(abs)
-			if err != nil {
-				zap.L().Fatal("SqliteDbFilePath Init fail", zap.Error(err))
-			}
-		}
-	}
-	c.File.SqliteDbFilePath = abs
 }
 
 func (c *Config) InitConfig() error {
