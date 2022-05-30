@@ -5,8 +5,8 @@ import Icon from '@app/components/Icon';
 import CSVPreviewLink from '@app/components/CSVPreviewLink';
 import { getFileSize } from '@app/utils/file';
 import cls from 'classnames';
-import styles from './index.module.less';
 import { StudioFile } from '@app/interfaces/import';
+import styles from './index.module.less';
 interface IProps {
   fileList: any[];
   onDelete: (index: number) => void;
@@ -36,7 +36,7 @@ const FileList = (props: IProps) => {
       key: 'operation',
       render: (_, file, index) => {
         if(!file.content) {
-          return null
+          return null;
         }
         return (
           <div className={styles.operation}>

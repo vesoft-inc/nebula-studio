@@ -22,7 +22,7 @@ export class FilesStore {
     const { code, data } = (await service.getFiles()) as any;
     if (code === 0 && data) {
       this.update({
-        fileList: data,
+        fileList: data.list || [],
       });
     }
   };

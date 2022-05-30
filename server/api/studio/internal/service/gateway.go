@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/vesoft-inc/go-pkg/middleware"
+	"github.com/vesoft-inc/go-pkg/response"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/types"
@@ -114,7 +115,7 @@ func (s *gatewayService) ExecNGQL(request *types.ExecNGQLParams) (*types.AnyResp
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err, "execute failed")
 	}
 
-	return &types.AnyResponse{Data: execute}, nil
+	return &types.AnyResponse{Data: response.StandardHandlerDataFieldAny(execute)}, nil
 }
 
 func (s *gatewayService) BatchExecNGQL(request *types.BatchExecNGQLParams) (*types.AnyResponse, error) {
@@ -153,5 +154,5 @@ func (s *gatewayService) BatchExecNGQL(request *types.BatchExecNGQLParams) (*typ
 		data = append(data, gqlRes)
 	}
 
-	return &types.AnyResponse{Data: data}, nil
+	return &types.AnyResponse{Data: response.StandardHandlerDataFieldAny(data)}, nil
 }
