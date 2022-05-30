@@ -42,7 +42,7 @@ type FileStat struct {
 }
 
 type FilesIndexData struct {
-	List []FileStat `json:"data"`
+	List []FileStat `json:"list"`
 }
 
 type ImportTaskConnection struct {

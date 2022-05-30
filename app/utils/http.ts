@@ -43,25 +43,25 @@ service.interceptors.request.use(config => {
 
 service.interceptors.response.use(
   (response: any) => {
-    
-    // const isExecReq = /api-nebula\/db\/(exec|batchExec)$/.test(response.config?.url);
-    if (response.data?.data?.data && Object.keys(response.data.data).length === 1) {
-      response.data.data = response.data.data.data;
-    }
     return response.data;
   },
   (error: any) => {
     if (error.response?.status) {
-      message.error(
-        `${intl.get('common.requestError')}: ${error.response.status} ${
-          error.response.statusText
-        }`,
-      );
+      const res = error.response.data || {};
+      if(res.code !== 0 && res.message) {
+        message.error(res.message);
+      } else {
+        message.error(
+          `${intl.get('common.requestError')}: ${error.response.status} ${
+            error.response.statusText
+          }`,
+        );
+      }
       // relogin
-      if (error.response.data?.code === HttpResCode.ErrSession) {
+      if (res.code === HttpResCode.ErrSession) {
         getRootStore().global.logout();
       }
-      return error.response.data;
+      return res;
     } else {
       message.error(`${intl.get('common.requestError')}: ${error}`);
       return error;
