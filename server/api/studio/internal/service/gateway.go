@@ -87,7 +87,7 @@ func (s *gatewayService) DisconnectDB() (*types.AnyResponse, error) {
 	httpRes.Header().Set("Set-Cookie", utils.DisabledCookie(auth.TokenName).String())
 	httpRes.Header().Add("Set-Cookie", utils.DisabledCookie(auth.NSIDName).String())
 
-	return nil, nil
+	return &types.AnyResponse{Data: response.StandardHandlerDataFieldAny(nil)}, nil
 }
 
 func (s *gatewayService) ExecNGQL(request *types.ExecNGQLParams) (*types.AnyResponse, error) {
