@@ -14,7 +14,7 @@ type (
 	}
 
 	FilesIndexData {
-		List []FileStat `json:"data"`
+		List []FileStat `json:"list"`
 	}
 )
 

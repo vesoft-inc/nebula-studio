@@ -193,7 +193,7 @@ type GetManyImportTaskRequest struct {
 
 type GetManyImportTaskData struct {
 	Total int64               `json:"total"`
-	List  []GetImportTaskData `json:"data"`
+	List  []GetImportTaskData `json:"list"`
 }
 
 type GetManyImportTaskLogRequest struct {
@@ -204,7 +204,7 @@ type GetManyImportTaskLogRequest struct {
 }
 
 type GetManyImportTaskLogData struct {
-	Logs []string `json:"data"`
+	Logs []string `json:"logs"`
 }
 
 type GetImportTaskLogNamesRequest struct {
@@ -212,7 +212,7 @@ type GetImportTaskLogNamesRequest struct {
 }
 
 type GetImportTaskLogNamesData struct {
-	Names []string `json:"data"`
+	Names []string `json:"names"`
 }
 
 type DeleteImportTaskRequest struct {

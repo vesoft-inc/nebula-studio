@@ -269,16 +269,14 @@ func (i *importService) GetManyImportTaskLog(req *types.GetManyImportTaskLogRequ
 			return nil, err
 		}
 	}
-
-	if len(lines) == 0 && taskIdJSON[req.Id] {
-		return nil, nil
-	}
-	if len(lines) == 0 {
-		return nil, errors.New("no task")
-	}
-
 	data := &types.GetManyImportTaskLogData{
 		Logs: lines,
+	}
+	if len(lines) == 0 && taskIdJSON[req.Id] {
+		return data, nil
+	}
+	if len(lines) == 0 {
+		return data, errors.New("no task")
 	}
 
 	return data, nil

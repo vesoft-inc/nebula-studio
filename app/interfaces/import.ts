@@ -1,11 +1,12 @@
 import { RcFile } from 'antd/lib/upload';
 
 export enum ITaskStatus {
-  'StatusFinished' = 'statusFinished',
-  'StatusStoped' = 'statusStoped',
-  'StatusProcessing' = 'statusProcessing',
-  'StatusNotExisted' = 'statusNotExisted',
-  'StatusAborted' = 'statusAborted',
+  'StatusFinished' = 'Success',
+  'StatusStoped' = 'Stopped',
+  'StatusProcessing' = 'Running',
+  'StatusNotExisted' = 'NotExisted',
+  'StatusAborted' = 'Failed',
+  'StatusPending' = 'Pending',
 }
 
 export interface ITaskStats {

@@ -4,6 +4,7 @@ import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';
 import { useStore } from '@app/stores';
 import { ITaskStatus } from '@app/interfaces/import';
+import classnames from 'classnames';
 import styles from './index.module.less';
 
 const { TabPane } = Tabs;
@@ -20,6 +21,9 @@ interface IProps {
   onCancel: () => void;
   showLogDownload: boolean
 }
+
+let isMounted = true;
+
 const LogModal = (props: IProps) => {
   const { visible, onCancel, showLogDownload, logDimension: { space, id, status } } = props;
   const { dataImport: { getLogs, downloadTaskLog, getLogDetail } } = useStore();
@@ -28,6 +32,7 @@ const LogModal = (props: IProps) => {
   const offset = useRef(0);
   const _status = useRef(status);
   const [logs, setLogs] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
   const [currentLog, setCurrentLog] = useState<string | null>(null);
   const handleTabChange = (key: string) => {
     setCurrentLog(logs.filter(item => item === key)[0]);
@@ -36,8 +41,9 @@ const LogModal = (props: IProps) => {
   const getAllLogs = async () => {
     const { code, data } = await getLogs(id);
     if(code === 0) {
-      setLogs(data);
-      setCurrentLog(data[0]);
+      const logs = data.names || [];
+      setLogs(logs);
+      setCurrentLog(logs[0]);
     }
   };
 
@@ -51,36 +57,50 @@ const LogModal = (props: IProps) => {
   };
 
   const readLog = async () => {
-    const res = await getLogDetail({
+    const data = await getLogDetail({
       offset: offset.current,
       id,
       limit: 500,
       file: currentLog
     });
-    handleLogData(res);
+    isMounted && handleLogData(data);
   };
 
-  const handleLogData = (res) => {
-    const { data } = res;
+  const handleLogData = (data) => {
     if(!logRef.current) {
       timer.current = setTimeout(readLog, 2000);
       return; 
     }
-    if (data) {
+    if (data && data.length > 0) {
       logRef.current.innerHTML += data.join('<br/>') + '<br/>';
       logRef.current.scrollTop = logRef.current.scrollHeight;
       offset.current += data.length;
-      timer.current = setTimeout(readLog, 2000);
+      if(isMounted) {
+        timer.current = setTimeout(readLog, 2000);
+      }
     } else if (_status.current === ITaskStatus.StatusProcessing) {
-      timer.current = setTimeout(readLog, 2000);
+      if(isMounted) {
+        timer.current = setTimeout(readLog, 2000);
+      }
     } else {
       offset.current = 0;
     }
   };
 
+  const initLog = async () => {
+    setLoading(true)
+    await readLog()
+    setLoading(false)
+  }
   useEffect(() => {
-    getAllLogs();
+    isMounted = true;
+    if(showLogDownload) {
+      getAllLogs();
+    } else {
+      initLog();
+    }
     return () => {
+      isMounted = false;
       clearTimeout(timer.current);
     };
   }, []);
@@ -94,7 +114,7 @@ const LogModal = (props: IProps) => {
       logRef.current.innerHTML = '';
     }
     offset.current = 0;
-    if(currentLog) {
+    if(currentLog && isMounted) {
       readLog();
     }
   }, [currentLog]);
@@ -103,7 +123,7 @@ const LogModal = (props: IProps) => {
       title={<>
         <div className={styles.importModalTitle}>
           <span>{`${space} ${intl.get('import.task')} - ${intl.get('common.log')}`}</span>
-          {status === ITaskStatus.StatusProcessing && <Button type="text" loading={true} />}
+          {(loading || status === ITaskStatus.StatusProcessing ) && <Button type="text" loading={true} />}
         </div>
         {showLogDownload && <Button className="studioAddBtn primaryBtn" onClick={handleLogDownload}>
           <Icon type="icon-studio-btn-download" />
@@ -117,12 +137,12 @@ const LogModal = (props: IProps) => {
       destroyOnClose={true}
       footer={false}
     >
-      <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange}>
+     {showLogDownload && <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange}>
         {logs.map(log => (
           <TabPane tab={log} key={log} />
         ))}
-      </Tabs>
-      <div className={styles.logContainer} ref={logRef}/>
+      </Tabs>}
+      <div className={classnames(styles.logContainer, !showLogDownload && styles.full)} ref={logRef}/>
     </Modal>
   );
 };
