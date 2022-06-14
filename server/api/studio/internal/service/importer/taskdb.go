@@ -44,6 +44,19 @@ func (t *TaskDb) FindTaskInfoByIdAndAddresssAndUser(id int, nebulaAddress, user 
 	return taskInfo, nil
 }
 
+func (t *TaskDb) FindTaskInfoByAddressAndUser(nebulaAddress, user string, pageIndex, pageSize int) ([]*TaskInfo, int64, error) {
+	tasks := make([]*TaskInfo, 0)
+	var count int64
+	tx := t.Model(&TaskInfo{}).Where("nebula_address = ? And user = ?", nebulaAddress, user)
+	if err := tx.Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+	if err := tx.Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&tasks).Error; err != nil {
+		return nil, count, err
+	}
+	return tasks, count, nil
+}
+
 func (t *TaskDb) InsertTaskInfo(info *TaskInfo) error {
 	return t.Create(info).Error
 }
