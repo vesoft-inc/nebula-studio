@@ -42,7 +42,7 @@ const TaskItem = (props: IProps) => {
       space,
       id, 
       name, 
-      stats: { totalImportedBytes, totalBytes, numFailed, numReadFailed }, 
+      stats, 
       status, 
       message,
       updateTime, 
@@ -55,6 +55,7 @@ const TaskItem = (props: IProps) => {
     onTaskDelete } = props;
   const [progressStatus, setStatus] = useState<'success' | 'active' | 'normal' | 'exception' | undefined>(undefined);
   const [extraMsg, setExtraMsg] = useState('');
+  const { totalImportedBytes, totalBytes, numFailed, numReadFailed } = stats || {}
   const addMsg = () => {
     const info: string[] = [];
     if(numFailed > 0) {
@@ -98,6 +99,9 @@ const TaskItem = (props: IProps) => {
                 {intl.get('import.importCompleted')}
                 <span className={styles.red}>{extraMsg && ` (${extraMsg})`}</span>
               </span>}
+              {!stats && status === ITaskStatus.StatusProcessing && <span className={styles.completeInfo}>
+                {intl.get('import.importRunning')}
+              </span>}
               {status === ITaskStatus.StatusAborted && <span className={styles.errInfo}>
                 {intl.get('import.importFailed')}
                 {extraMsg && ` (${extraMsg})`}
@@ -107,18 +111,18 @@ const TaskItem = (props: IProps) => {
               </span>}
             </span>
             <div className={styles.moreInfo}>
-              <span>
+              {totalImportedBytes && <span>
                 {status !== ITaskStatus.StatusFinished && `${getFileSize(totalImportedBytes)} / `}
                 {getFileSize(totalBytes)}{' '}
-              </span>
+              </span>}
               <span>{dayjs.duration(dayjs.unix(updateTime).diff(dayjs.unix(createTime))).format('HH:mm:ss')}</span>
             </div>
           </div>
-          <Progress 
+          {stats && <Progress 
             format={percent => `${percent}%`}
             status={progressStatus} 
             percent={status !== ITaskStatus.StatusFinished ? floor(totalImportedBytes / totalBytes * 100, 2) : 100} 
-            strokeColor={progressStatus && COLOR_MAP[progressStatus]} />
+            strokeColor={progressStatus && COLOR_MAP[progressStatus]} />}
         </div>
         <div className={styles.operations}>
           <Button className="primaryBtn" onClick={() => onViewLog(id, space, status)}>{intl.get('import.viewLogs')}</Button>

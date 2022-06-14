@@ -148,6 +148,7 @@
     "importCompleted": "导入完成",
     "importStopped": "导入中止",
     "importFailed": "导入失败",
+    "importRunning": "导入中",
     "notImported": "{total}行未导入",
     "readFailed": "{total}行读取失败",
     "selectFile": "选择绑定文件",

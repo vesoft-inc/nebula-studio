@@ -239,11 +239,11 @@ const (
 )
 
 var taskStatusMap = map[TaskStatus]string{
-	StatusFinished:   "statusFinished",
-	StatusStoped:     "statusStoped",
-	StatusProcessing: "statusProcessing",
-	StatusNotExisted: "statusNotExisted",
-	StatusAborted:    "statusAborted",
+	StatusFinished:   "Success",
+	StatusStoped:     "Stopped",
+	StatusProcessing: "Running",
+	StatusNotExisted: "NotExisted",
+	StatusAborted:    "Failed",
 }
 
 var taskStatusRevMap = map[string]TaskStatus{

@@ -1,4 +1,4 @@
-import { Button, message } from 'antd';
+import { Button, message, Spin } from 'antd';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import intl from 'react-intl-universal';
@@ -35,6 +35,7 @@ const TaskList = (props: IProps) => {
   const { username, host } = global;
   const [modalVisible, setVisible] = useState(false);
   const [importModalVisible, setImportModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { showTemplateModal = true, showConfigDownload = true, showLogDownload = true } = props;
   const [logDimension, setLogDimension] = useState<ILogDimension>({} as ILogDimension);
   const handleTaskStop = useCallback(async (id: number) => {
@@ -62,9 +63,14 @@ const TaskList = (props: IProps) => {
     });
     setVisible(true);
   };
+  const initList = async () => {
+    setLoading(true)
+    await getTaskList();
+    setLoading(false)
+  }
   useEffect(() => {
     isMounted = true;
-    getTaskList();
+    initList();
     trackPageView('/import/tasks');
     return () => {
       isMounted = false;
@@ -84,6 +90,7 @@ const TaskList = (props: IProps) => {
       }
     }
     if(needRefresh && isMounted) {
+      clearTimeout(timer.current)
       timer.current = setTimeout(getTaskList, 2000);
     } else {
       clearTimeout(timer.current);
@@ -110,21 +117,23 @@ const TaskList = (props: IProps) => {
         </Button>}
       </div>
       <h3 className={styles.taskHeader}>{intl.get('import.taskList')} ({taskList.length})</h3>
-      {taskList.map(item => (
-        <TaskItem key={item.id} 
-          data={item}
-          onViewLog={handleLogView} 
-          onTaskStop={handleTaskStop} 
-          onTaskDelete={handleTaskDelete} 
-          onConfigDownload={downloadTaskConfig} 
-          showConfigDownload={showConfigDownload}
-        />
-      ))}
+      <Spin spinning={loading}>
+        {taskList.map(item => (
+          <TaskItem key={item.id} 
+            data={item}
+            onViewLog={handleLogView} 
+            onTaskStop={handleTaskStop} 
+            onTaskDelete={handleTaskDelete} 
+            onConfigDownload={downloadTaskConfig} 
+            showConfigDownload={showConfigDownload}
+          />
+        ))}
+      </Spin>
       {modalVisible && <LogModal
-        showLogDownload={showLogDownload}
-        logDimension={logDimension}
-        onCancel={() => setVisible(false)}
-        visible={modalVisible} />}
+          showLogDownload={showLogDownload}
+          logDimension={logDimension}
+          onCancel={() => setVisible(false)}
+          visible={modalVisible} />}
       {importModalVisible && <TemplateModal
         onClose={() => setImportModalVisible(false)}
         username={username}

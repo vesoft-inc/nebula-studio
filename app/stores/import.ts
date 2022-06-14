@@ -35,7 +35,7 @@ export class ImportStore {
     const { code, data } = await service.getTaskList();
     if (code === 0 && data) {
       this.update({
-        taskList: data.data || [],
+        taskList: data.list || [],
       });
     }
   };
@@ -109,8 +109,11 @@ export class ImportStore {
     id: string | number;
     file: string
   }) => {
-    const res = await service.getLogDetail(params);
-    return res;
+    const { code, data } = await service.getLogDetail(params);
+    if(code === 0) {
+      return data.logs
+    }
+    return null;
   }
 
   updateTagConfig = async (payload: { 

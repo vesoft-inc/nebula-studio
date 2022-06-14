@@ -149,7 +149,7 @@ type (
 
 	GetManyImportTaskData {
 		Total int64               `json:"total"`
-		List  []GetImportTaskData `json:"data"`
+		List  []GetImportTaskData `json:"list"`
 	}
 
 	GetManyImportTaskLogRequest {
@@ -160,7 +160,7 @@ type (
 	}
 
 	GetManyImportTaskLogData {
-		Logs []string `json:"data"`
+		Logs []string `json:"logs"`
 	}
 
 	GetImportTaskLogNamesRequest {
@@ -168,7 +168,7 @@ type (
 	}
 
 	GetImportTaskLogNamesData {
-		Names []string `json:"data"`
+		Names []string `json:"names"`
 	}
 
 	DeleteImportTaskRequest {

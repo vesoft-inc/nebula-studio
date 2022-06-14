@@ -148,6 +148,7 @@
     "importCompleted": "Import completed",
     "importStopped": "Import stopped",
     "importFailed": "Failed",
+    "importRunning": "Running",
     "notImported": "{total} lines not imported",
     "readFailed": "{total} lines read failed",
     "selectFile": "Select bind source file",
