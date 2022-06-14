@@ -111,7 +111,7 @@ export class ImportStore {
   }) => {
     const { code, data } = await service.getLogDetail(params);
     if(code === 0) {
-      return data.logs
+      return data.logs;
     }
     return null;
   }

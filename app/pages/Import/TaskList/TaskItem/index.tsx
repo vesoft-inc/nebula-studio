@@ -55,7 +55,7 @@ const TaskItem = (props: IProps) => {
     onTaskDelete } = props;
   const [progressStatus, setStatus] = useState<'success' | 'active' | 'normal' | 'exception' | undefined>(undefined);
   const [extraMsg, setExtraMsg] = useState('');
-  const { totalImportedBytes, totalBytes, numFailed, numReadFailed } = stats || {}
+  const { totalImportedBytes, totalBytes, numFailed, numReadFailed } = stats || {};
   const addMsg = () => {
     const info: string[] = [];
     if(numFailed > 0) {
