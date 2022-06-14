@@ -64,10 +64,10 @@ const TaskList = (props: IProps) => {
     setVisible(true);
   };
   const initList = async () => {
-    setLoading(true)
+    setLoading(true);
     await getTaskList();
-    setLoading(false)
-  }
+    setLoading(false);
+  };
   useEffect(() => {
     isMounted = true;
     initList();
@@ -90,7 +90,7 @@ const TaskList = (props: IProps) => {
       }
     }
     if(needRefresh && isMounted) {
-      clearTimeout(timer.current)
+      clearTimeout(timer.current);
       timer.current = setTimeout(getTaskList, 2000);
     } else {
       clearTimeout(timer.current);
@@ -130,10 +130,10 @@ const TaskList = (props: IProps) => {
         ))}
       </Spin>
       {modalVisible && <LogModal
-          showLogDownload={showLogDownload}
-          logDimension={logDimension}
-          onCancel={() => setVisible(false)}
-          visible={modalVisible} />}
+        showLogDownload={showLogDownload}
+        logDimension={logDimension}
+        onCancel={() => setVisible(false)}
+        visible={modalVisible} />}
       {importModalVisible && <TemplateModal
         onClose={() => setImportModalVisible(false)}
         username={username}

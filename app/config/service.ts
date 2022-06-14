@@ -18,10 +18,10 @@ const service = {
     return post('/api/import-tasks')(params, config);
   },
   stopImportTask: (id: number) => {
-    return post(`/api/import-tasks/${id}/stop`)();
+    return get(`/api/import-tasks/${id}/stop`)();
   },
   deleteImportTask: (id: number) => {
-    return post(`/api/import-tasks/${id}/stop`)();
+    return _delete(`/api/import-tasks/${id}`)();
   },
   getTaskList: (params?, config?) => {
     return get('/api/import-tasks')(params, config);

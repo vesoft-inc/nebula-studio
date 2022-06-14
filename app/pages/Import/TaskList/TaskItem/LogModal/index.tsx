@@ -88,10 +88,10 @@ const LogModal = (props: IProps) => {
   };
 
   const initLog = async () => {
-    setLoading(true)
-    await readLog()
-    setLoading(false)
-  }
+    setLoading(true);
+    await readLog();
+    setLoading(false);
+  };
   useEffect(() => {
     isMounted = true;
     if(showLogDownload) {
@@ -123,7 +123,7 @@ const LogModal = (props: IProps) => {
       title={<>
         <div className={styles.importModalTitle}>
           <span>{`${space} ${intl.get('import.task')} - ${intl.get('common.log')}`}</span>
-          {(loading || status === ITaskStatus.StatusProcessing ) && <Button type="text" loading={true} />}
+          {(loading || status === ITaskStatus.StatusProcessing) && <Button type="text" loading={true} />}
         </div>
         {showLogDownload && <Button className="studioAddBtn primaryBtn" onClick={handleLogDownload}>
           <Icon type="icon-studio-btn-download" />
@@ -137,7 +137,7 @@ const LogModal = (props: IProps) => {
       destroyOnClose={true}
       footer={false}
     >
-     {showLogDownload && <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange}>
+      {showLogDownload && <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange}>
         {logs.map(log => (
           <TabPane tab={log} key={log} />
         ))}
