@@ -10,7 +10,7 @@ import 'codemirror/mode/meta';
 import 'codemirror/theme/monokai.css';
 import React from 'react';
 
-import { ban, keyWords, maxLineNum, operators } from '@app/config/nebulaQL';
+import { ban, keyWords, operators } from '@app/config/nebulaQL';
 
 import './index.less';
 
@@ -148,15 +148,6 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
     await this.setOptions(options);
     if (value !== this.editor.getValue()) {
       this.editor.setValue(value || '');
-      let line;
-      if (this.editor.lineCount() > maxLineNum) {
-        line = maxLineNum;
-      } else if (this.editor.lineCount() < 5) {
-        line = 5;
-      } else {
-        line = this.editor.lineCount();
-      }
-      this.editor.setSize(undefined, line * 24 + 10 + 'px');
     }
   }
 

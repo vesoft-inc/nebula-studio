@@ -64,19 +64,6 @@ const Console = (props: IProps) => {
     }
   };
 
-  const handleLineCount = () => {
-    let line;
-    const editorLine = editor.current!.editor.lineCount();
-    if (editorLine > maxLineNum) {
-      line = maxLineNum;
-    } else if (editorLine < 5) {
-      line = 5;
-    } else {
-      line = editorLine;
-    }
-    editor.current!.editor.setSize(undefined, `${line * 24 + 10}px`);
-  };
-
   const updateGql = (value: string) => update({ currentGQL: value });
 
   const handleSaveQuery = (query: string) => {
@@ -158,7 +145,6 @@ const Console = (props: IProps) => {
             <CodeMirror
               value={currentGQL}
               onBlur={value => update({ currentGQL: value })}
-              onChangeLine={handleLineCount}
               ref={editor}
               height={isUpDown ? '120px' : 24 * maxLineNum + 'px'}
               onShiftEnter={handleRun}
