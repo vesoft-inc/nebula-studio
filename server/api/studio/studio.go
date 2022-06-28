@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/vesoft-inc/go-pkg/middleware"
+	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/pool"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/handler"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/service/importer"
@@ -13,9 +15,8 @@ import (
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/logging"
 	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/utils"
-
-	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/core/proc"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/rest/httpx"
 	"go.uber.org/zap"
@@ -38,7 +39,6 @@ func main() {
 	if err := loggingOptions.InitGlobals(); err != nil {
 		panic(err)
 	}
-
 	if err := c.InitConfig(); err != nil {
 		zap.L().Fatal("init config failed", zap.Error(err))
 	}
@@ -53,6 +53,10 @@ func main() {
 	})))
 
 	defer server.Stop()
+	waitForCalled := proc.AddWrapUpListener(func() {
+		pool.ClearClients()
+	})
+	defer waitForCalled()
 
 	// global middleware
 	server.Use(auth.AuthMiddlewareWithCtx(svcCtx))
