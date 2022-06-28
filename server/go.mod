@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/vesoft-inc/go-pkg v0.0.0-20220607054344-28884430c273
+	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220627100120-d7a7667dc8a0
 	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220505095506-93febd41c2be
 	github.com/zeromicro/go-zero v1.3.3
 )
@@ -20,7 +21,6 @@ require (
 require (
 	github.com/facebook/fbthrift v0.31.1-0.20211129061412-801ed7f9f295 // indirect
 	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b // indirect
-	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220518092450-316a5f6420ef
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 )
