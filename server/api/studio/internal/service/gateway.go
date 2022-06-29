@@ -30,16 +30,18 @@ type (
 
 	gatewayService struct {
 		logx.Logger
-		ctx    context.Context
-		svcCtx *svc.ServiceContext
+		ctx              context.Context
+		svcCtx           *svc.ServiceContext
+		withErrorMessage utils.WithErrorMessage
 	}
 )
 
 func NewGatewayService(ctx context.Context, svcCtx *svc.ServiceContext) GatewayService {
 	return &gatewayService{
-		Logger: logx.WithContext(ctx),
-		ctx:    ctx,
-		svcCtx: svcCtx,
+		Logger:           logx.WithContext(ctx),
+		ctx:              ctx,
+		svcCtx:           svcCtx,
+		withErrorMessage: utils.ErrMsgWithLogger(ctx),
 	}
 }
 
@@ -48,27 +50,19 @@ func (s *gatewayService) ConnectDB(request *types.ConnectDBParams) (*types.Conne
 
 	tokenString, clientInfo, err := auth.ParseConnectDBParams(request, &s.svcCtx.Config)
 	if err != nil {
-		return nil, ecode.WithCode(ecode.ErrBadRequest, err, "parse request failed")
+		return nil, s.withErrorMessage(ecode.ErrBadRequest, err, "parse request failed")
 	}
 
 	configAuth := s.svcCtx.Config.Auth
 	tokenCookie := http.Cookie{
-		Name:     auth.TokenName,
+		Name:     configAuth.TokenName,
 		Value:    tokenString,
-		Path:     "/",
-		HttpOnly: true,
-		MaxAge:   int(configAuth.AccessExpire),
-	}
-	NSIDCookie := http.Cookie{
-		Name:     auth.NSIDName,
-		Value:    clientInfo.ClientID,
 		Path:     "/",
 		HttpOnly: true,
 		MaxAge:   int(configAuth.AccessExpire),
 	}
 
 	httpRes.Header().Add("Set-Cookie", tokenCookie.String())
-	httpRes.Header().Add("Set-Cookie", NSIDCookie.String())
 
 	return &types.ConnectDBResult{
 		Version: string(clientInfo.NebulaVersion),
@@ -76,28 +70,23 @@ func (s *gatewayService) ConnectDB(request *types.ConnectDBParams) (*types.Conne
 }
 
 func (s *gatewayService) DisconnectDB() (*types.AnyResponse, error) {
-	httpReq, _ := middleware.GetRequest(s.ctx)
 	httpRes, _ := middleware.GetResponseWriter(s.ctx)
+	configAuth := s.svcCtx.Config.Auth
+	authData := s.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 
-	NSIDCookie, NSIDErr := httpReq.Cookie(auth.NSIDName)
-	if NSIDErr == nil && NSIDCookie.Value != "" {
-		dao.Disconnect(NSIDCookie.Value)
+	if authData.NSID != "" {
+		dao.Disconnect(authData.NSID)
 	}
 
-	httpRes.Header().Set("Set-Cookie", utils.DisabledCookie(auth.TokenName).String())
-	httpRes.Header().Add("Set-Cookie", utils.DisabledCookie(auth.NSIDName).String())
+	httpRes.Header().Set("Set-Cookie", utils.DisabledCookie(configAuth.TokenName).String())
 
 	return &types.AnyResponse{Data: response.StandardHandlerDataFieldAny(nil)}, nil
 }
 
 func (s *gatewayService) ExecNGQL(request *types.ExecNGQLParams) (*types.AnyResponse, error) {
-	httpReq, _ := middleware.GetRequest(s.ctx)
-	NSIDCookie, NSIDErr := httpReq.Cookie(auth.NSIDName)
-	if NSIDErr != nil {
-		return nil, ecode.WithSessionMessage(NSIDErr)
-	}
+	authData := s.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 
-	execute, _, err := dao.Execute(NSIDCookie.Value, request.Gql, request.ParamList)
+	execute, _, err := dao.Execute(authData.NSID, request.Gql, request.ParamList)
 	if err != nil {
 		// TODO: common middleware should handle this
 		subErrMsgStr := []string{
@@ -119,13 +108,9 @@ func (s *gatewayService) ExecNGQL(request *types.ExecNGQLParams) (*types.AnyResp
 }
 
 func (s *gatewayService) BatchExecNGQL(request *types.BatchExecNGQLParams) (*types.AnyResponse, error) {
-	httpReq, _ := middleware.GetRequest(s.ctx)
-	NSIDCookie, NSIDErr := httpReq.Cookie(auth.NSIDName)
-	if NSIDErr != nil {
-		return nil, ecode.WithSessionMessage(NSIDErr)
-	}
+	authData := s.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 
-	NSID := NSIDCookie.Value
+	NSID := authData.NSID
 	gqls := request.Gqls
 	paramList := request.ParamList
 
