@@ -91,7 +91,7 @@ const TaskList = (props: IProps) => {
     }
     if(needRefresh && isMounted) {
       clearTimeout(timer.current);
-      timer.current = setTimeout(getTaskList, 2000);
+      timer.current = setTimeout(getTaskList, 1000);
     } else {
       clearTimeout(timer.current);
     }

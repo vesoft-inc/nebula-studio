@@ -7,7 +7,7 @@ import { useStore } from '@app/stores';
 import { IJobStatus } from '@app/interfaces/schema';
 import { trackPageView } from '@app/utils/stat';
 import Cookie from 'js-cookie';
-
+import EmptyTableTip from '@app/components/EmptyTableTip';
 import styles from './index.module.less';
 
 const SpaceStats = () => {
@@ -95,6 +95,7 @@ const SpaceStats = () => {
       await getStatStatus(id);
     }
   };
+  const showTime = updateTime && jobId == null && !loading;
   return (
     <div className={styles.nebulaStats}>
       <div className={styles.operations}>
@@ -103,17 +104,22 @@ const SpaceStats = () => {
           onClick={handleSubmitStats}
           loading={loading || jobId !== null}
         >
-          {intl.get('schema.refresh')}
+          {intl.get(updateTime ? 'schema.refresh' : 'schema.startStat')}
         </Button>
-        <span className={styles.label}>{intl.get('schema.lastRefreshTime')}</span>
-        <span>
-          {updateTime ? dayjs(updateTime).format('YYYY-MM-DD HH:mm:ss') : null}
-        </span>
+        {showTime ? <>
+          <span className={styles.label}>{intl.get('schema.lastRefreshTime')}</span>
+          <span>
+            {dayjs(updateTime).format('YYYY-MM-DD HH:mm:ss')}
+          </span>
+        </> : <span className={styles.tip}>
+          {intl.get('schema.statTip')}
+        </span>}
       </div>
       <Table
         dataSource={data}
         columns={columns}
         rowKey="Name"
+        locale={{ emptyText: <EmptyTableTip text={intl.get('empty.stats')} tip={intl.get('empty.statsTip')} /> }}
       />
     </div>
   );
