@@ -215,6 +215,8 @@
     "durationFormat": "Supported data inserting methods: <br /> Call function duration(<map>), for example:duration({years: 1, seconds: 0})",
     "setTTL": "Set TTL (Time To Live)",
     "refresh": "Refresh",
+    "startStat": "Start Stats",
+    "statTip": "The statistics execution time is affected by the amount of data.",
     "lastRefreshTime": "Last refreshed time",
     "statsType": "Type",
     "statsName": "Name",
@@ -230,6 +232,16 @@
     "rebuildSuccess": "{names} rebuild successfully",
     "rebuildFailed": "{names} rebuild failed",
     "startRebuildIndex": "Start rebuilding the index {name}"
+  },
+  "empty": {
+    "stats": "No Statistics Data",
+    "statsTip": "Click the button to start statistics",
+    "tag": "No Tag Data",
+    "tagTip": "Click the button to create tag",
+    "edge": "No Edge Data",
+    "edgeTip": "Click the button to create edge",
+    "index": "No Index Data",
+    "indexTip": "Click the button to create index"
   },
   "menu": {
     "use": "Use Manual",

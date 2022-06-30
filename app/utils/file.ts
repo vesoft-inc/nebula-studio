@@ -8,13 +8,14 @@ export function readFileContent(file) {
 }
 
 export function getFileSize(size: number) {
-  if (size < 1000) {
+  const num = 1024;
+  if (size < num) {
     return `${size} B`;
-  } else if (size < 1000000) {
-    return `${(size / 1000).toFixed(2)} KB`;
-  } else if (size < 1000000000) {
-    return `${(size / 1000000).toFixed(2)} MB`;
+  } else if (size < Math.pow(num, 2)) {
+    return `${(size / num).toFixed(2)} KB`;
+  } else if (size < Math.pow(num, 3)) {
+    return `${(size / Math.pow(num, 2)).toFixed(2)} MB`;
   } else {
-    return `${(size / 1000000000).toFixed(2)} GB`;
+    return `${(size / Math.pow(num, 3)).toFixed(2)} GB`;
   }
 }

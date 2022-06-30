@@ -1,6 +1,6 @@
 import { Button, Popconfirm, Progress } from 'antd';
 import { CheckCircleFilled } from '@ant-design/icons';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import intl from 'react-intl-universal';
 import { ITaskItem, ITaskStatus } from '@app/interfaces/import';
 import dayjs from 'dayjs';
@@ -56,6 +56,8 @@ const TaskItem = (props: IProps) => {
   const [progressStatus, setStatus] = useState<'success' | 'active' | 'normal' | 'exception' | undefined>(undefined);
   const [extraMsg, setExtraMsg] = useState('');
   const { totalImportedBytes, totalBytes, numFailed, numReadFailed } = stats || {};
+  const time = useRef('');
+  const timeoutId = useRef<number>(null);
   const addMsg = () => {
     const info: string[] = [];
     if(numFailed > 0) {
@@ -67,6 +69,8 @@ const TaskItem = (props: IProps) => {
     info.length > 0 && setExtraMsg(info.join(', '));
   };
   useEffect(() => {
+    window.clearTimeout(timeoutId.current);
+    refreshTime();
     if(status === ITaskStatus.StatusFinished) {
       setStatus('success');
       addMsg();
@@ -79,7 +83,18 @@ const TaskItem = (props: IProps) => {
         setExtraMsg(message);
       }
     }
+    return () => {
+      window.clearTimeout(timeoutId.current);
+    };
   }, [status]);
+  const refreshTime = () => {
+    if(status === ITaskStatus.StatusProcessing) {
+      time.current = dayjs.duration(dayjs(Date.now()).diff(dayjs.unix(createTime))).format('HH:mm:ss');
+      timeoutId.current = window.setTimeout(refreshTime, 1000);
+    } else {
+      time.current = dayjs.duration(dayjs.unix(updateTime).diff(dayjs.unix(createTime))).format('HH:mm:ss');
+    }
+  };
   return (
     <div className={styles.taskItem}>
       <div className={styles.row}>
@@ -111,11 +126,11 @@ const TaskItem = (props: IProps) => {
               </span>}
             </span>
             <div className={styles.moreInfo}>
-              {totalImportedBytes && <span>
+              {totalImportedBytes > 0 && <span>
                 {status !== ITaskStatus.StatusFinished && `${getFileSize(totalImportedBytes)} / `}
                 {getFileSize(totalBytes)}{' '}
               </span>}
-              <span>{dayjs.duration(dayjs.unix(updateTime).diff(dayjs.unix(createTime))).format('HH:mm:ss')}</span>
+              <span>{time.current}</span>
             </div>
           </div>
           {stats && <Progress 

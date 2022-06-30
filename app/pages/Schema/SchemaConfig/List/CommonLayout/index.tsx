@@ -4,6 +4,7 @@ import intl from 'react-intl-universal';
 import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
+import EmptyTableTip from '@app/components/EmptyTableTip';
 import Search from '../Search';
 import styles from './index.module.less';
 
@@ -51,6 +52,7 @@ const CommonLayout = (props: IProps) => {
         }}
         loading={loading}
         rowKey="name"
+        locale={{ emptyText: <EmptyTableTip text={intl.get(`empty.${type}`)} tip={intl.get(`empty.${type}Tip`)} /> }}
       />
     </div>
   );

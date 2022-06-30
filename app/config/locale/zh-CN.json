@@ -215,6 +215,8 @@
     "durationFormat": "duration 类型支持插入方式: <br /> 调用函数 duration(<map>)，例如：duration({years: 1, seconds: 0})",
     "setTTL": "设置TTL（存活时间）",
     "refresh": "更新",
+    "startStat": "开始统计",
+    "statTip": "统计执行时间受数据量影响。",
     "lastRefreshTime": "上次更新时间",
     "statsType": "维度",
     "statsName": "名称",
@@ -230,6 +232,16 @@
     "rebuildSuccess": "{names}重建完成",
     "rebuildFailed": "{names}重建失败",
     "startRebuildIndex": "开始重建索引{name}"
+  },
+  "empty": {
+    "stats": "暂无统计数据",
+    "statsTip": "请点击按钮开始统计",
+    "tag": "暂无标签数据",
+    "tagTip": "请点击按钮创建标签",
+    "edge": "暂无边类型数据",
+    "edgeTip": "请点击按钮创建边类型",
+    "index": "暂无索引数据",
+    "indexTip": "请点击按钮创建索引"
   },
   "menu": {
     "use": "使用手册",

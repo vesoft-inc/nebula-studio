@@ -47,7 +47,7 @@ func (t *TaskDb) FindTaskInfoByIdAndAddresssAndUser(id int, nebulaAddress, user 
 func (t *TaskDb) FindTaskInfoByAddressAndUser(nebulaAddress, user string, pageIndex, pageSize int) ([]*TaskInfo, int64, error) {
 	tasks := make([]*TaskInfo, 0)
 	var count int64
-	tx := t.Model(&TaskInfo{}).Where("nebula_address = ? And user = ?", nebulaAddress, user)
+	tx := t.Model(&TaskInfo{}).Where("nebula_address = ? And user = ?", nebulaAddress, user).Order("id desc")
 	if err := tx.Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
