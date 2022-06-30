@@ -78,10 +78,11 @@ const TaskList = (props: IProps) => {
     };
   }, []);
   useEffect(() => {
-    const needRefresh = taskList.filter(item => item.status === ITaskStatus.StatusProcessing).length > 0;
-    if(logDimension.id !== undefined && logDimension.status === ITaskStatus.StatusProcessing) {
+    const loadingStatus = [ITaskStatus.StatusProcessing, ITaskStatus.StatusPending]
+    const needRefresh = taskList.filter(item => loadingStatus.includes(item.status)).length > 0;
+    if(logDimension.id !== undefined && loadingStatus.includes(logDimension.status)) {
       const status = taskList.filter(item => item.id === logDimension.id)[0].status;
-      if(status !== ITaskStatus.StatusProcessing) {
+      if(!loadingStatus.includes(status)) {
         setLogDimension({
           id: logDimension.id,
           space: logDimension.space,
