@@ -55,6 +55,7 @@ export class GlobalStore {
     cookies.remove('nu');
     cookies.remove('curAccount');
     sessionStorage.removeItem('nebulaVersion');
+    this.history.push(`/login${location.search}`);
   };
 
   update = (payload: Record<string, any>) => {
