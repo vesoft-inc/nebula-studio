@@ -34,6 +34,7 @@ const TaskCreate = (props: IProps) => {
   const [modalVisible, setVisible] = useState(false);
   const history = useHistory();
   const { needPwdConfirm = true } = props;
+  const [loading, setLoading] = useState(false);
   const routes = [
     {
       path: '/import/tasks',
@@ -55,10 +56,12 @@ const TaskCreate = (props: IProps) => {
   };
   const handleStartImport = async (password?: string) => {
     setVisible(false);
+    setLoading(true);
     const code = await importTask({
       name: basicConfig.taskName, 
       password
     });
+    setLoading(false);
     if(code === 0) {
       message.success(intl.get('import.startImporting'));
       history.push('/import/tasks');
@@ -193,7 +196,7 @@ const TaskCreate = (props: IProps) => {
         <Button type="primary" disabled={
           basicConfig.taskName === ''
           || (!verticesConfig.length && !edgesConfig.length)
-        } onClick={checkConfig}>{intl.get('import.runImport')}</Button>
+        } onClick={checkConfig} loading={!needPwdConfirm && loading}>{intl.get('import.runImport')}</Button>
       </div>
       {needPwdConfirm && <PasswordInputModal 
         visible={modalVisible} 

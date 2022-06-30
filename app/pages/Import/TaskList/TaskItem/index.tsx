@@ -36,6 +36,7 @@ const COLOR_MAP = {
     to: '#2F80ED',
   },
 };
+const loadingStatus = [ITaskStatus.StatusPending, ITaskStatus.StatusProcessing]
 const TaskItem = (props: IProps) => {
   const { 
     data: { 
@@ -74,7 +75,7 @@ const TaskItem = (props: IProps) => {
     if(status === ITaskStatus.StatusFinished) {
       setStatus('success');
       addMsg();
-    } else if(status === ITaskStatus.StatusProcessing) {
+    } else if(loadingStatus.includes(status)) {
       setStatus('active');
       addMsg();
     } else {
@@ -114,6 +115,9 @@ const TaskItem = (props: IProps) => {
                 {intl.get('import.importCompleted')}
                 <span className={styles.red}>{extraMsg && ` (${extraMsg})`}</span>
               </span>}
+              {!stats && status === ITaskStatus.StatusPending && <span className={styles.completeInfo}>
+                {intl.get('import.importPending')}
+              </span>}
               {!stats && status === ITaskStatus.StatusProcessing && <span className={styles.completeInfo}>
                 {intl.get('import.importRunning')}
               </span>}
@@ -151,7 +155,7 @@ const TaskItem = (props: IProps) => {
           >
             <Button className="cancelBtn">{intl.get('import.endImport')}</Button>
           </Popconfirm>}
-          {status !== ITaskStatus.StatusProcessing && 
+          {!loadingStatus.includes(status) && 
           <Popconfirm
             placement="left"
             title={intl.get('common.ask')}
