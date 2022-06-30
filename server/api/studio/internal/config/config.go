@@ -15,6 +15,7 @@ type Config struct {
 		Enable bool
 	}
 	Auth struct {
+		TokenName    string
 		AccessSecret string
 		AccessExpire int64
 	}

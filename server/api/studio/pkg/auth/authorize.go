@@ -28,17 +28,13 @@ type (
 		Port     int    `json:"port"`
 		Username string `json:"username"`
 		Password string `json:"password"`
+		NSID     string `json:"nsid"`
 	}
 
 	authClaims struct {
 		*AuthData
 		jwt.RegisteredClaims
 	}
-)
-
-var (
-	TokenName = "explorer_token"
-	NSIDName  = "explorer_nsid"
 )
 
 func CreateToken(authData *AuthData, config *config.Config) (string, error) {
@@ -88,23 +84,23 @@ func Decode(tokenString, secret string) (*AuthData, error) {
 func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) (string, *pool.ClientInfo, error) {
 	tokenSplit := strings.Split(params.Authorization, " ")
 	if len(tokenSplit) != 2 {
-		return "", nil, ecode.WithCode(ecode.ErrParam, nil, "invalid authorization")
+		return "", nil, fmt.Errorf("invalid authorization")
 	}
 
 	decode, err := base64.StdEncoding.DecodeString(tokenSplit[1])
 	if err != nil {
-		return "", nil, ecode.WithCode(ecode.ErrParam, err)
+		return "", nil, err
 	}
 
 	loginInfo := strings.Split(string(decode), ":")
 	if len(loginInfo) < 2 {
-		return "", nil, ecode.WithCode(ecode.ErrParam, nil, "len of account is less than two")
+		return "", nil, fmt.Errorf("len of account is less than two")
 	}
 
 	username, password := loginInfo[0], loginInfo[1]
 	clientInfo, err := dao.Connect(params.Address, params.Port, username, password)
 	if err != nil {
-		return "", nil, ecode.WithCode(ecode.ErrInternalServer, err)
+		return "", nil, err
 	}
 
 	tokenString, err := CreateToken(
@@ -113,29 +109,49 @@ func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) 
 			Port:     params.Port,
 			Username: username,
 			Password: password,
+			NSID:     clientInfo.ClientID,
 		},
 		config,
 	)
-	return tokenString, clientInfo, err
+	return tokenString, clientInfo, nil
 }
 
 func AuthMiddlewareWithCtx(svcCtx *svc.ServiceContext) rest.Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			if utils.PathHasPrefix(r.URL.Path, []string{"/api-nebula/db/connect", "/api-nebula/db/disconnect"}) {
+			if utils.PathHasPrefix(r.URL.Path, []string{"/api-nebula/db/connect"}) {
 				next(w, r)
 				return
 			}
 
-			tokenCookie, tokenErr := r.Cookie(TokenName)
+			isDisconnectPath := utils.PathHasPrefix(r.URL.Path, []string{"/api-nebula/db/disconnect"})
+
+			tokenCookie, tokenErr := r.Cookie(svcCtx.Config.Auth.TokenName)
+			withErrorMessage := utils.ErrMsgWithLogger(r.Context())
 			if tokenErr != nil {
-				svcCtx.ResponseHandler.Handle(w, r, nil, ecode.WithSessionMessage(tokenErr))
+				// for: empty token...
+				if isDisconnectPath {
+					next(w, r)
+				} else {
+					svcCtx.ResponseHandler.Handle(w, r, nil, withErrorMessage(ecode.ErrSession, tokenErr))
+				}
 				return
 			}
 
 			auth, authErr := Decode(tokenCookie.Value, svcCtx.Config.Auth.AccessSecret)
 			if authErr != nil {
-				svcCtx.ResponseHandler.Handle(w, r, nil, ecode.WithSessionMessage(authErr))
+				// for: invalid token...
+				if isDisconnectPath {
+					next(w, r)
+				} else {
+					svcCtx.ResponseHandler.Handle(w, r, nil, withErrorMessage(ecode.ErrSession, authErr))
+				}
+				return
+			}
+
+			_, clientErr := pool.GetClient(auth.NSID)
+			if clientErr != nil {
+				svcCtx.ResponseHandler.Handle(w, r, nil, withErrorMessage(ecode.ErrSession, clientErr))
 				return
 			}
 
