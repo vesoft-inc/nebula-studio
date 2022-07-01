@@ -149,8 +149,9 @@ func AuthMiddlewareWithCtx(svcCtx *svc.ServiceContext) rest.Middleware {
 				return
 			}
 
+			// for: server restart...
 			_, clientErr := pool.GetClient(auth.NSID)
-			if clientErr != nil {
+			if clientErr != nil && !isDisconnectPath {
 				svcCtx.ResponseHandler.Handle(w, r, nil, withErrorMessage(ecode.ErrSession, clientErr))
 				return
 			}
