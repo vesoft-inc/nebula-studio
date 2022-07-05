@@ -36,7 +36,7 @@ const COLOR_MAP = {
     to: '#2F80ED',
   },
 };
-const loadingStatus = [ITaskStatus.StatusPending, ITaskStatus.StatusProcessing]
+const loadingStatus = [ITaskStatus.StatusPending, ITaskStatus.StatusProcessing];
 const TaskItem = (props: IProps) => {
   const { 
     data: { 

@@ -36,6 +36,40 @@ class TwoGraph {
   setTransform = (transform: Partial<ITransform>) =>
     Object.keys(transform).forEach((key) => (this.transform[key] = transform[key]));
 
+  renderNode = (node, ctx: CanvasRenderingContext2D) => {
+    const { graph } = this;
+    const color = graph.filterExclusionIds[node.id] ? '#efefef' : node.color;
+    const nodeSize = node.nodeArea ? Math.sqrt(node.nodeArea) : NODE_SIZE;
+    ctx.fillStyle = color;
+    ctx.strokeStyle = undefined;
+    ctx.beginPath();
+    ctx.arc(node.x!, node.y!, nodeSize, 0, 2 * Math.PI, false);
+    ctx.fill();
+    if (graph.nodesSelected.has(node) || graph.nodeHovering === node) {
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = !graph.nodesSelected.has(node) ? '#fbe969' : 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowColor = !graph.nodesSelected.has(node) ? '#1890ff' : 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 10;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.shadowColor = null;
+    }
+
+    this.renderNodeLabel(node, ctx, nodeSize);
+  };
+
+  renderNodeLabel = (node, ctx: CanvasRenderingContext2D, nodeSize) => {
+    // renderlabel
+    const label = node.id;
+    if (label && this.transform.k > 0.9) {
+      ctx.strokeStyle = null;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `${FONT_SIZE}px Sans-Serif`;
+      ctx.fillText(label, node.x, node.y + nodeSize + FONT_SIZE);
+    }
+  };
+
   // init ForceGraph instance ,it will be called only once
   init = () => {
     const { graph } = this;
@@ -44,6 +78,7 @@ class TwoGraph {
     Graph.d3Force('link')!.distance((d) => {
       return d.lineLength || LINE_LENGTH;
     });
+    Graph.d3Force('charge')!.strength(-150);
     Graph.width(1100).height(400);
     Graph.onZoom((v) => {
       this.setTransform(v);
@@ -52,6 +87,7 @@ class TwoGraph {
       });
       Graph.linkVisibility(() => false);
     })
+      .d3AlphaDecay(0.05)
       .onZoomEnd(() => Graph.linkVisibility(() => true))
       .minZoom(0.1)
       .nodeVal((node) => {
@@ -63,7 +99,7 @@ class TwoGraph {
         return this.transform.k > 1 ? 6 : 0;
       })
       .linkDirectionalArrowRelPos(1)
-      .cooldownTicks(120)
+      .cooldownTicks(90)
       .onEngineStop(() => {
         // fix every node's pos
         graph.nodes.forEach((item) => {
@@ -96,35 +132,7 @@ class TwoGraph {
       // .autoPauseRedraw(false)
       .nodeCanvasObjectMode(() => 'replace')
       .nodeCanvasObject((node: any, ctx) => {
-        const color = graph.filterExclusionIds[node.id] ? '#efefef' : node.color;
-        const nodeSize = node.nodeArea ? Math.sqrt(node.nodeArea) : NODE_SIZE;
-        ctx.fillStyle = color;
-        ctx.strokeStyle = undefined;
-        ctx.beginPath();
-        ctx.arc(node.x!, node.y!, nodeSize, 0, 2 * Math.PI, false);
-        ctx.fill();
-        if (graph.nodesSelected.has(node) || graph.nodeHovering === node) {
-          ctx.lineWidth = 4;
-          ctx.strokeStyle = !graph.nodesSelected.has(node) ? '#fbe969' : 'rgba(0, 0, 0, 0.5)';
-          ctx.shadowColor = !graph.nodesSelected.has(node) ? '#1890ff' : 'rgba(0, 0, 0, 0.5)';
-          ctx.shadowBlur = 10;
-          ctx.stroke();
-          ctx.shadowBlur = 0;
-          ctx.shadowColor = null;
-        }
-        // renderlabel
-        const label = node.id;
-        if (label && this.transform.k > 0.9) {
-          ctx.strokeStyle = null;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.font = `${FONT_SIZE}px Sans-Serif`;
-          const labels = label.split('\r\n');
-          labels.forEach((each, index) => {
-            // calculate label position
-            ctx.fillText(each, node.x, node.y + nodeSize + FONT_SIZE + index * (FONT_SIZE + 6));
-          });
-        }
+        this.renderNode(node, ctx);
       })
       .onNodeClick((node, event) => {
         graph.setPointer({
