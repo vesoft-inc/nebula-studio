@@ -45,7 +45,7 @@ const devConfig = {
     },
     static: {
       staticOptions: {
-        directory: path.resolve(__dirname, '../dist'),
+        // directory: path.resolve(__dirname, '../public'),
         publicPath: '/',
         // redirect: true,
         serveIndex: true,
