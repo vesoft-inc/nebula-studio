@@ -3,7 +3,11 @@ import React, { Component } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import styles from './index.module.less';
 
-const reorder = (list: string[], startIndex: number, endIndex: number) => {
+interface ISelectField {
+  strLength: string,
+  field: string
+}
+const reorder = (list: ISelectField[], startIndex: number, endIndex: number) => {
   const result = Array.from(list);
 
   const [removed] = result.splice(startIndex, 1);
@@ -17,9 +21,9 @@ const getItemStyle = (_isDragging, draggableStyle) => ({
 });
 
 interface IProps {
-  data: string[];
-  updateData: (data: string[]) => void;
-  removeData: (field: string) => void;
+  data: ISelectField[];
+  updateData: (data: ISelectField[]) => void;
+  removeData: (field: ISelectField) => void;
 }
 
 export default class DraggableTags extends Component<IProps> {
@@ -33,23 +37,25 @@ export default class DraggableTags extends Component<IProps> {
       return;
     }
     // adjust tag order when drop the element
-    const items: string[] = reorder(
+    const items: ISelectField[] = reorder(
       this.props.data,
       result.source.index,
       result.destination.index,
     );
     this.props.updateData(items);
   }
-
   render() {
-    const list = this.props.data.map(item => ({
-      id: `field-${item}`,
-      content: (
-        <Tag className={styles.dragItem} closable={true} onClose={() => this.props.removeData(item)}>
-          {item}
-        </Tag>
-      ),
-    }));
+    const list = this.props.data.map(item => {
+      const content = item.strLength ? `${item.field}(${item.strLength})` : item.field;
+      return {
+        id: `field-${item.field}`,
+        content: (
+          <Tag className={styles.dragItem} closable={true} onClose={() => this.props.removeData(item)}>
+            {content}
+          </Tag>
+        ),
+      };
+    });
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
         <Droppable droppableId="droppable" direction="horizontal">

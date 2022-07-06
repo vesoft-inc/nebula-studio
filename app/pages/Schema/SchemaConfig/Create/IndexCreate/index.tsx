@@ -18,7 +18,10 @@ const Option = Select.Option;
 
 import styles from './index.module.less';
 
-
+interface ISelectField {
+  strLength: string,
+  field: string
+}
 const formItemLayout = {
   labelCol: {
     span: 10,
@@ -28,6 +31,9 @@ const formItemLayout = {
   },
 };
 
+const getFieldStr = (item: ISelectField) => {
+  return `${handleKeyword(item.field)}${item.strLength ? `(${item.strLength})` : ''}`;
+};
 const IndexCreate = () => {
   const history = useHistory();
   const [loading, setLoading] = useState(false);
@@ -39,23 +45,25 @@ const IndexCreate = () => {
   const [visible, setVisible] = useState(false);
   const updateGql = () => {
     const { name, type, associate, fields, comment } = form.getFieldsValue();
+    const _fields = fields.map(i => getFieldStr(i));
     const currentGQL = name ? getIndexCreateGQL({
       type,
       name,
       associate,
-      fields,
+      fields: _fields,
       comment,
     }) : '';
     setGql(currentGQL);
   };
   const handleCreate = async (values) => {
     const { name, type, associate, fields, comment } = values;
+    const _fields = fields.map(i => getFieldStr(i));
     setLoading(true);
     const res = await createIndex({
       name,
       type,
       associate,
-      fields,
+      fields: _fields,
       comment,
     });
     setLoading(false);
@@ -91,14 +99,14 @@ const IndexCreate = () => {
     }
   };
 
-  const updateFields = (data: string[]) => {
+  const updateFields = (data: ISelectField[]) => {
     form.setFieldsValue({
       fields: data,
     });
     updateGql();
   };
 
-  const removeField = (field: string) => {
+  const removeField = (field: ISelectField) => {
     const fields = form.getFieldValue('fields');
     form.setFieldsValue({
       fields: fields.filter(i => i !== field),
@@ -194,7 +202,7 @@ const IndexCreate = () => {
             {({ getFieldValue }) => {
               const fields = getFieldValue('fields') || [];
               const filterList = fieldList.filter(
-                item => !fields.some(field => field.startsWith(handleKeyword(item.Field))),
+                item => !fields.some(field => field.field === item.Field),
               );
               return <>
                 <DraggableTags
