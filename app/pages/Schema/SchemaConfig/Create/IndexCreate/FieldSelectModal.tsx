@@ -4,7 +4,6 @@ import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { IField } from '@app/interfaces/schema';
 import { POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
-import { handleKeyword } from '@app/utils/function';
 import Instruction from '@app/components/Instruction';
 const Option = Select.Option;
 
@@ -14,7 +13,10 @@ interface IProps {
   visible: boolean;
   source: IField[];
   onClose: () => void;
-  onAddField: (field: string) => void;
+  onAddField: (params: {
+    field: string,
+    strLength: string
+  }) => void;
 }
 
 const FieldSelectModal = (props: IProps) => {
@@ -28,11 +30,10 @@ const FieldSelectModal = (props: IProps) => {
     ) {
       return message.warning(intl.get('schema.indexedLengthRequired'));
     }
-    const newField =
-      selectedField?.Type === 'string'
-        ? handleKeyword(selectedField.Field) + `(${indexLength})`
-        : handleKeyword(selectedField!.Field);
-    onAddField(newField);
+    onAddField({
+      field: selectedField.Field,
+      strLength: selectedField?.Type === 'string' ? indexLength : undefined,
+    });
     handleClose();
   };
 
