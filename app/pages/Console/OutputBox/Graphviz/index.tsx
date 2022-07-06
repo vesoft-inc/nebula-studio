@@ -15,7 +15,6 @@ const Graphviz = (props: IProps) => {
     const defaultOptions: GraphvizOptions = {
       width: 1100,
       height: 400,
-      zoomScaleExtent: [0.1, 200],
       fit: true,
     };
     graphviz(`.box-${index}`, {
