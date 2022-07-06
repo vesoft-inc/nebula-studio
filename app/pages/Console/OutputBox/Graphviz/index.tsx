@@ -13,17 +13,19 @@ const Graphviz = (props: IProps) => {
   const { graph, index } = props;
   const renderFlowChart = () => {
     const defaultOptions: GraphvizOptions = {
-      width: '100%',
-      zoom: true,
+      width: 1100,
+      height: 400,
+      zoomScaleExtent: [0.1, 200],
+      fit: true,
     };
-    graphviz(`.box-${index}`)
-      .options({
-        ...defaultOptions,
-      })
+    graphviz(`.box-${index}`, {
+      ...defaultOptions,
+    })
       .renderDot(graph);
   };
   useEffect(() => {
-    renderFlowChart();
+    if(graph)
+      renderFlowChart();
   }, [graph]);
   return <div className={cls(styles.graphvizBox, `box-${index}`)} ref={domRef} />;
 };
