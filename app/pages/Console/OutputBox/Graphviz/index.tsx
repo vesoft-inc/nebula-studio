@@ -18,7 +18,7 @@ const Graphviz = (props: IProps) => {
       zoomScaleExtent: [0.1, 200],
       fit: true,
     };
-    window.graphviz = graphviz(`.box-${index}`, {
+    graphviz(`.box-${index}`, {
       ...defaultOptions,
     })
       .renderDot(graph);
