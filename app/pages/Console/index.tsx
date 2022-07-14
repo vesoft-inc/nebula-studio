@@ -37,7 +37,7 @@ interface IProps {
 const Console = (props: IProps) => {
   const { schema, console, global } = useStore();
   const { onExplorer } = props;
-  const { spaces, getSpaces, switchSpace, currentSpace } = schema;
+  const { spaces, getSpaces, switchSpace, currentSpace, spaceVidType, updateVidType } = schema;
   const { runGQL, currentGQL, results, runGQLLoading, getParams, update, paramsMap } = console;
   const { nebulaVersion } = global;
   const [isUpDown, setUpDown] = useState(false);
@@ -48,6 +48,9 @@ const Console = (props: IProps) => {
     trackPageView('/console');
     getSpaces();
     getParams();
+    if(!spaceVidType && currentSpace) {
+      updateVidType()
+    }
   }, []);
   const handleSpaceSwitch = (space: string) => {
     switchSpace(space);
@@ -55,7 +58,7 @@ const Console = (props: IProps) => {
       results: []
     });
   };
-  
+
   const checkSwitchSpaceGql = (query: string) => {
     const queryList = query.split(SEMICOLON_REG).filter(Boolean);
     const reg = /^USE `?.+`?(?=[\s*;?]?)/gim;
@@ -110,11 +113,14 @@ const Console = (props: IProps) => {
     !modalVisible && setModalVisible(false);
     trackEvent('navigation', 'view_explore', 'from_console_btn');
   };
+  const handleGetSpaces = (open: boolean) => {
+    open && getSpaces();
+  }
   return (
     <div className={styles.nebulaConsole}>
       <div className={styles.spaceSelect}>
         <div className="studioCenterLayout">
-          <Select value={currentSpace || null} placeholder={intl.get('console.selectSpace')} onDropdownVisibleChange={getSpaces} onChange={handleSpaceSwitch}>
+          <Select value={currentSpace || null} placeholder={intl.get('console.selectSpace')} onDropdownVisibleChange={handleGetSpaces} onChange={handleSpaceSwitch}>
             {spaces.map(space => (
               <Option value={space} key={space}>
                 {space}
