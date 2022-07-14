@@ -65,19 +65,26 @@ export class SchemaStore {
     await this.getSchemaInfo();
   }
 
+  updateVidType = async (space?: string) => {
+    const { code, data } = await this.getSpaceInfo(space || this.currentSpace);
+    if(code === 0) {
+      this.update({
+        spaceVidType: data?.tables?.[0]?.['Vid Type'],
+      });
+    }
+  }
+
   switchSpace = async (space: string) => {
     const { code, message } = (await service.execNGQL({
-      // HACK: Processing keyword
       gql: `use ${handleKeyword(space)};`,
     })) as any;
 
     if (code === 0) {
-      const { data } = await this.getSpaceInfo(space);
       this.update({
         currentSpace: space,
-        spaceVidType: data?.tables?.[0]?.['Vid Type'] || 'FIXED_STRING(8)',
       });
       sessionStorage.setItem('currentSpace', space);
+      this.updateVidType(space)
     } else {
       return message;
     }
