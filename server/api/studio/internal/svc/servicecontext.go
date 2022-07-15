@@ -48,8 +48,7 @@ func createResponseHandler(c config.Config) response.Handler { // nolint:gocriti
 				return ecode.ErrInternalServer
 			})
 		},
-		Errorf:    logx.Errorf,
-		DebugInfo: c.Debug.Enable,
+		Errorf: logx.Errorf,
 		CheckBodyType: func(r *http.Request) response.StandardHandlerBodyType {
 			if utils.PathMatchPattern(r.URL.Path, utils.IgnoreHandlerBodyPatterns) {
 				return response.StandardHandlerBodyNone
