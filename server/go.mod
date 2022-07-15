@@ -3,7 +3,7 @@ module github.com/vesoft-inc/nebula-studio/server-v2
 go 1.17
 
 require (
-	github.com/vesoft-inc/go-pkg v0.0.0-20220607054344-28884430c273
+	github.com/vesoft-inc/go-pkg v0.0.0-20220714021138-c5edb9946837
 	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220627100120-d7a7667dc8a0
 	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220505095506-93febd41c2be
 	github.com/zeromicro/go-zero v1.3.3
