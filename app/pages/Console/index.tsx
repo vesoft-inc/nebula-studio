@@ -81,7 +81,8 @@ const Console = (props: IProps) => {
 
   const handleRun = async () => {
     if(editor.current) {
-      const query = editor.current!.editor.getValue();
+      const value = editor.current!.editor.getValue();
+      const query = value.split('\n').filter(i => !i.trim().startsWith('//')).join('\n');
       if (!query) {
         message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
         return;
@@ -93,7 +94,7 @@ const Console = (props: IProps) => {
   
       editor.current!.editor.execCommand('goDocEnd');
       handleSaveQuery(query);
-      await runGQL(query);
+      await runGQL(query, value);
       setUpDown(true);
     }
   };
