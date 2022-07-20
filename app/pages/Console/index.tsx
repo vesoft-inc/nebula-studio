@@ -49,7 +49,7 @@ const Console = (props: IProps) => {
     getSpaces();
     getParams();
     if(!spaceVidType && currentSpace) {
-      updateVidType()
+      updateVidType();
     }
   }, []);
   const handleSpaceSwitch = (space: string) => {
@@ -115,7 +115,7 @@ const Console = (props: IProps) => {
   };
   const handleGetSpaces = (open: boolean) => {
     open && getSpaces();
-  }
+  };
   return (
     <div className={styles.nebulaConsole}>
       <div className={styles.spaceSelect}>

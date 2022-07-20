@@ -84,7 +84,7 @@ export class SchemaStore {
         currentSpace: space,
       });
       sessionStorage.setItem('currentSpace', space);
-      this.updateVidType(space)
+      this.updateVidType(space);
     } else {
       return message;
     }

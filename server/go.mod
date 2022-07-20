@@ -4,12 +4,12 @@ go 1.17
 
 require (
 	github.com/vesoft-inc/go-pkg v0.0.0-20220714021138-c5edb9946837
-	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220627100120-d7a7667dc8a0
-	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220505095506-93febd41c2be
+	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220720014538-1dd39bd43f6c
+	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220719030708-8e376665042e
 	github.com/zeromicro/go-zero v1.3.3
 )
 
-require github.com/vesoft-inc/nebula-go/v3 v3.0.0-20220425030225-cdb52399b40a // indirect
+require github.com/vesoft-inc/nebula-go/v3 v3.2.0 // indirect
 
 require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
