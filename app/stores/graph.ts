@@ -262,7 +262,12 @@ export class GraphStore {
           status = !status;
         }
       } else {
-        sourceMap[key][0].graphIndex = 0;
+        const link = sourceMap[key][0];
+        if (link.source === link.target) {
+          link.graphIndex = 1;
+        } else {
+          link.graphIndex = 0;
+        }
       }
     });
   }
