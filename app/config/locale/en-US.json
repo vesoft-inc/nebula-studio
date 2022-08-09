@@ -72,7 +72,7 @@
   },
   "configServer": {
     "connect": "Connect",
-    "host": "Host",
+    "host": "Host:Port",
     "username": "Username",
     "password": "Password",
     "success": "succeed",

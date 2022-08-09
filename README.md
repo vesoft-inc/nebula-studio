@@ -5,6 +5,17 @@ Nebula Graph Studio (Studio for short) is a web-based visualization tool for Neb
 ## Architecture
 ![](architecture.png)
 
+## Version
+| Nebula Graph version | Nebula Graph Studio tag | 
+|----------------------|---------------------------|
+| 1.x                  | v1.2.7                    |
+| 2.0.x                | v2.2.x                    |
+| 2.5.x                | v3.0.x                    |
+| 2.6.x                | v3.1.x                    |
+| 3.0.x                | v3.2.x                    |
+| 3.1.x                | v3.3.x                    |
+| 3.0.0 ～ 3.2.0       | v3.4.x                    |
+
 ## Development Quick Start
 
 ### set up studio and server at the same time
