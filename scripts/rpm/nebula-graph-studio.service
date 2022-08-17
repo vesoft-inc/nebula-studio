@@ -1,5 +1,5 @@
 [Unit]
-Description=Nebula Graph Studio
+Description=NebulaGraph Studio
 AssertPathExists=PREFIX_TEMPLATE/nebula-graph-studio/
 [Service]
 Restart=always

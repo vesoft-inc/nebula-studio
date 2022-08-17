@@ -1,7 +1,7 @@
-# Nebula Graph Studio Helm Chart
+# NebulaGraph Studio Helm Chart
 
 ## Introduction
-This chart bootstraps Nebula Graph Studio deployment on a Kubernetes cluster using the Helm.
+This chart bootstraps NebulaGraph Studio deployment on a Kubernetes cluster using the Helm.
 
 ## Prerequisites
 

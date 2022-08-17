@@ -1,12 +1,12 @@
-# Nebula Graph Studio
-Nebula Graph Studio (Studio for short) is a web-based visualization tool for Nebula Graph. With Studio, you can create a graph schema, import data and edit nGQL statements for data queries.
+# NebulaGraph Studio
+NebulaGraph Studio (Studio for short) is a web-based visualization tool for Nebula Graph. With Studio, you can create a graph schema, import data and edit nGQL statements for data queries.
 ![](./introduction.png)
 
 ## Architecture
 ![](architecture.png)
 
 ## Version
-| Nebula Graph version | Nebula Graph Studio tag | 
+| Nebula Graph version | NebulaGraph Studio tag | 
 |----------------------|---------------------------|
 | 1.x                  | v1.2.7                    |
 | 2.0.x                | v2.2.x                    |

@@ -1,5 +1,5 @@
 <!--
-Thank you for contributing to **Nebula Graph Studio**! 
+Thank you for contributing to **NebulaGraph Studio**! 
 -->
 
 ### What changes were proposed in this pull request?

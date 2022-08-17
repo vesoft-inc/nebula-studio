@@ -57,7 +57,7 @@ const DocPage = () => {
   
   return (
     <div className={cls(styles.studioDoc, 'studioCenterLayout')}>
-      <h1 className={styles.welcomeLabel}>{intl.get('doc.welcome')} <span>Nebula Studio</span></h1>
+      <h1 className={styles.welcomeLabel}>{intl.get('doc.welcome')} <span>NebulaGraph Studio</span></h1>
       <div className={styles.docBox}>
         <div className={styles.header}>{intl.get('doc.functionIntro')}</div>
         <div className={styles.moduleIntro}>
