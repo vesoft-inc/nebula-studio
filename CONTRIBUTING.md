@@ -1,5 +1,5 @@
-## Nebula Graph Studio Contributing Guide
-Thank you for being interested in contributing to Nebula Graph Studio. Before submitting your contribution, please make sure to take a moment and read through the following guidelines
+## NebulaGraph Studio Contributing Guide
+Thank you for being interested in contributing to NebulaGraph Studio. Before submitting your contribution, please make sure to take a moment and read through the following guidelines
 
 A high level overview of tools used:
 

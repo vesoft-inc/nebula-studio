@@ -4,4 +4,4 @@ if ! type "lsof" > /dev/null; then
     exit 1
 fi
 
-echo "Start installing Nebula Studio now...";
+echo "Start installing NebulaGraph Studio now...";

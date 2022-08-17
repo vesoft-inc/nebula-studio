@@ -1,4 +1,4 @@
-# Nebula Studio Docker Deploy
+# NebulaGraph Studio Docker Deploy
 
 ### Package: 
 

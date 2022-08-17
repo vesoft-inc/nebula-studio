@@ -1,4 +1,4 @@
-# Nebula Graph Studio Tar Package Deploy Guide
+# NebulaGraph Studio Tar Package Deploy Guide
 
 ## Environment
 - Linux
@@ -18,7 +18,7 @@ nohup ./server
 
 You can modify the port in studio-api.yaml in the config directory
 
-2. Open Nebula Graph Studio in browser
+2. Open NebulaGraph Studio in browser
 url: http://{{ip}}:7001
 
 

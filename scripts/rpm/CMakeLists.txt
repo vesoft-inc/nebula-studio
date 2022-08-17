@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project("Nebula Graph Studio")
+project("NebulaGraph Studio")
 # package name
 set(CPACK_PACKAGE_NAME "nebula-graph-studio")
 set(CPACK_RPM_PACKAGE_ARCHITECTURE "x86_64")
@@ -30,7 +30,7 @@ include(CPack)
 
 # 添加一个名为 NebulaGraphStudio 的 component
 cpack_add_component(NebulaGraphStduio
-    DISPLAY_NAME  "Nebula Graph Studio"
+    DISPLAY_NAME  "NebulaGraph Studio"
     DESCRIPTION   "The Web App For Nebula"
     GROUP NebulaGraphStduioGroup)
 

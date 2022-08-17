@@ -5,6 +5,7 @@ import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
+import logo from '@app/static/images/logo_studio.svg';
 import HelpMenu from './HelpMenu';
 import styles from './index.module.less';
 const { Header } = Layout;
@@ -42,7 +43,7 @@ const PageHeader = (props: IProps) => {
 
   return <Header className={styles.studioHeader}>
     <div className={styles.nebulaLogo}>
-      Nebula Studio
+      <img src={logo} alt="logo" />
     </div>
     {host && username ? <>
       <Menu
