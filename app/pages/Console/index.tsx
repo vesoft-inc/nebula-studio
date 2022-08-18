@@ -14,6 +14,7 @@ import FavoriteBtn from './FavoriteBtn';
 import CypherParameterBox from './CypherParameterBox';
 import ExportModal from './ExportModal';
 import styles from './index.module.less';
+import classnames from 'classnames';
 const Option = Select.Option;
 
 // split from semicolon out of quotation marks
@@ -32,11 +33,12 @@ interface IProps {
     space: string;
     vertexes: any[], 
     edges: any[]
-  }) => void
+  }) => void,
+  ConsoleHeaderChildren?: React.ReactNode,
 }
 const Console = (props: IProps) => {
   const { schema, console, global } = useStore();
-  const { onExplorer } = props;
+  const { onExplorer, ConsoleHeaderChildren } = props;
   const { spaces, getSpaces, switchSpace, currentSpace, spaceVidType, updateVidType } = schema;
   const { runGQL, currentGQL, results, runGQLLoading, getParams, update, paramsMap } = console;
   const { nebulaVersion } = global;
@@ -132,18 +134,23 @@ const Console = (props: IProps) => {
       </div>
       <div className="studioCenterLayout">
         <div className={styles.consolePanel}>
-          <div className={styles.panelHeader}>
+          <div className={classnames(styles.panelHeader, !ConsoleHeaderChildren && styles.flex)}>
             <span className={styles.title}>Nebula Console</span>
             <div className={styles.operations}>
-              <FavoriteBtn onGqlSelect={updateGql} />
-              <HistoryBtn onGqlSelect={updateGql} />
-              <Tooltip title={intl.get('common.empty')} placement="top">
-                <Icon className={styles.btnOperations} type="icon-studio-btn-clear" onClick={() => update({ currentGQL: '' })} />
-              </Tooltip>
-              <Button type="primary" onClick={handleRun} loading={runGQLLoading}>
-                <Icon type="icon-studio-btn-play" />
-                {intl.get('common.run')} 
-              </Button>
+              <div className={styles.operationsLeft}>
+                {ConsoleHeaderChildren}
+              </div>
+              <div className={styles.btnOperations}>
+                <FavoriteBtn onGqlSelect={updateGql} />
+                <HistoryBtn onGqlSelect={updateGql} />
+                <Tooltip title={intl.get('common.empty')} placement="top">
+                  <Icon className={styles.btnOperations} type="icon-studio-btn-clear" onClick={() => update({ currentGQL: '' })} />
+                </Tooltip>
+                <Button type="primary" onClick={handleRun} loading={runGQLLoading}>
+                  <Icon type="icon-studio-btn-play" />
+                  {intl.get('common.run')} 
+                </Button>
+              </div>
             </div>
           </div>
           <div className={styles.codeInput}>

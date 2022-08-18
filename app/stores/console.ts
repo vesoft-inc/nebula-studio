@@ -18,7 +18,7 @@ const splitQuery = (query: string) => {
   });
   return {
     paramList,
-    gqlList,
+    gql: gqlList.join(';'),
   };
 };
 
@@ -54,13 +54,13 @@ export class ConsoleStore {
     Object.keys(param).forEach(key => (this[key] = param[key]));
   };
 
-  runGQL = async (gql: string) => {
+  runGQL = async (gqls: string) => {
     this.update({ runGQLLoading: true });
     try {
-      const { gqlList, paramList } = splitQuery(gql);
-      const _results = await service.batchExecNGQL(
+      const { gql, paramList } = splitQuery(gqls);
+      const _results = await service.execNGQL(
         {
-          gqls: gqlList.filter(item => item !== ''),
+          gql,
           paramList,
         },
         {
@@ -70,7 +70,8 @@ export class ConsoleStore {
           },
         },
       );
-      _results.data.forEach(item => item.id = uuidv4());
+      _results.id = uuidv4();
+      _results.gql = gql;
       const updateQuerys = paramList.filter(item => {
         const reg = /^\s*:params/gim;
         return !reg.test(item);
@@ -79,8 +80,8 @@ export class ConsoleStore {
         await this.getParams();
       }
       this.update({
-        results: [..._results.data, ...this.results],
-        currentGQL: gql,
+        results: [_results, ...this.results],
+        currentGQL: gqls,
       });
     } finally {
       window.setTimeout(() => this.update({ runGQLLoading: false }), 300);

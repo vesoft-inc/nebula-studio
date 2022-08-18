@@ -40,10 +40,12 @@
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     border-radius: 6px;
     padding: 14px 30px;
-    .panelHeader {
+    .flex {
       display: flex;
       align-items: center;
       justify-content: space-between;
+    }
+    .panelHeader {
       margin-bottom: 15px;
       .title {
         font-family: Roboto-Regular, sans-serif;
@@ -52,6 +54,12 @@
         color: @lightBlack;
       }
       .operations {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .btnOperations {
         display: flex;
         align-items: center;
         .btnOperations {
