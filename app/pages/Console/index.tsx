@@ -34,11 +34,11 @@ interface IProps {
     vertexes: any[], 
     edges: any[]
   }) => void,
-  ConsoleHeaderChildren?: React.ReactNode,
+  templateRender?: (data?) => JSX.Element
 }
 const Console = (props: IProps) => {
   const { schema, console, global } = useStore();
-  const { onExplorer, ConsoleHeaderChildren } = props;
+  const { onExplorer, templateRender } = props;
   const { spaces, getSpaces, switchSpace, currentSpace, spaceVidType, updateVidType } = schema;
   const { runGQL, currentGQL, results, runGQLLoading, getParams, update, paramsMap } = console;
   const { nebulaVersion } = global;
@@ -134,11 +134,11 @@ const Console = (props: IProps) => {
       </div>
       <div className="studioCenterLayout">
         <div className={styles.consolePanel}>
-          <div className={classnames(styles.panelHeader, !ConsoleHeaderChildren && styles.flex)}>
+          <div className={classnames(styles.panelHeader, !templateRender && styles.flex)}>
             <span className={styles.title}>Nebula Console</span>
             <div className={styles.operations}>
               <div className={styles.operationsLeft}>
-                {ConsoleHeaderChildren}
+                {templateRender?.(currentGQL)}
               </div>
               <div className={styles.btnOperations}>
                 <FavoriteBtn onGqlSelect={updateGql} />
@@ -176,6 +176,7 @@ const Console = (props: IProps) => {
               index={index}
               result={item}
               gql={item.gql}
+              templateRender={templateRender}
               onExplorer={onExplorer ? handleExplorer : undefined}
               onHistoryItem={gql => updateGql(gql)}
               onResultConfig={handleResultConfig}
