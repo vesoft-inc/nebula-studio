@@ -25,11 +25,12 @@ interface IProps {
     vertexes: any[], 
     edges: any[]
   }) => void;
-  onResultConfig?: (data: any) => void
+  onResultConfig?: (data: any) => void;
+  templateRender?: (data) => JSX.Element;
 }
 
 const OutputBox = (props: IProps) => {
-  const { gql, result: { code, data, message }, onHistoryItem, index, onExplorer, onResultConfig } = props;
+  const { gql, result: { code, data, message }, onHistoryItem, index, onExplorer, onResultConfig, templateRender } = props;
   const { console, schema } = useStore();
   const [visible, setVisible] = useState(true);
   const { results, update, favorites, updateFavorites } = console;
@@ -349,7 +350,10 @@ const OutputBox = (props: IProps) => {
             {`${intl.get('console.execTime')} ${data.timeCost /
               1000000} (s)`}
           </span>
-          {onExplorer && <Button className="primaryBtn" type="text" onClick={handleExplore}>{intl.get('common.openInExplore')}</Button>}
+          <div className={styles.btns}>
+            {templateRender?.(gql)}
+            {onExplorer && <Button className="primaryBtn" type="text" onClick={handleExplore}>{intl.get('common.openInExplore')}</Button>}
+          </div>
         </div>
       )}
     </>}
