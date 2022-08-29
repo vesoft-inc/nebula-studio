@@ -8,13 +8,13 @@ import Instruction from '@app/components/Instruction';
 import Icon from '@app/components/Icon';
 import CodeMirror from '@app/components/CodeMirror';
 import { maxLineNum } from '@app/config/nebulaQL';
+import classnames from 'classnames';
 import OutputBox from './OutputBox';
 import HistoryBtn from './HistoryBtn';
 import FavoriteBtn from './FavoriteBtn';
 import CypherParameterBox from './CypherParameterBox';
 import ExportModal from './ExportModal';
 import styles from './index.module.less';
-import classnames from 'classnames';
 const Option = Select.Option;
 
 // split from semicolon out of quotation marks
