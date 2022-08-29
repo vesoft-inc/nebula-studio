@@ -41,7 +41,7 @@ $ make run
 ```
 $ npm install
 $ npm run build
-$ mv dist server/api/studio/assets
+$ mv dist/* server/api/studio/assets
 ```
 
 ### 2. Build Server
