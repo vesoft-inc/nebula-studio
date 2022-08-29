@@ -31,7 +31,7 @@ $ nohup ./server &
 ```
 $ npm install
 $ npm run build
-$ mv dist server/assets
+$ mv dist/* server/assets
 ```
 
 ### 2. Build Server
