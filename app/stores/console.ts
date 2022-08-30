@@ -56,7 +56,7 @@ export class ConsoleStore {
     Object.keys(param).forEach(key => (this[key] = param[key]));
   };
 
-  runGQL = async (gql: string) => {
+  runGQL = async (gql: string, editorValue?: string) => {
     this.update({ runGQLLoading: true });
     try {
       const { gqlList, paramList } = splitQuery(gql);
@@ -82,7 +82,7 @@ export class ConsoleStore {
       }
       this.update({
         results: [..._results.data, ...this.results],
-        currentGQL: gql,
+        currentGQL: editorValue || gql,
       });
     } finally {
       window.setTimeout(() => this.update({ runGQLLoading: false }), 300);

@@ -381,7 +381,7 @@ export class SchemaStore {
       {
         trackEventConfig: {
           category: 'schema',
-          action: `{payload.action === 'DROP' ? 'delete' : 'update'}_${payload.type.toLowerCase()}_property`,
+          action: `${payload.action === 'DROP' ? 'delete' : 'update'}_${payload.type.toLowerCase()}_property`,
         },
       },
     )) as any;
