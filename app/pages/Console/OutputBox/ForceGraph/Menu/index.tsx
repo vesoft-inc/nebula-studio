@@ -39,7 +39,7 @@ const Menu = (props: IProps) => {
   }
 
   return (
-    <div className={styles.contextMenu} style={style}>
+    <div className={styles.contextMenu} style={style} onContextMenu={e => e.preventDefault()}>
       {menuConfig.map((item, index) => (
         <Fragment key={index}>{item.component}</Fragment>
       ))}
