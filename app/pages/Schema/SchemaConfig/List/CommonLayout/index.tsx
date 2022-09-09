@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
 import EmptyTableTip from '@app/components/EmptyTableTip';
+import { IndexType } from '@app/interfaces/schema';
 import Search from '../Search';
 import styles from './index.module.less';
 
@@ -15,10 +16,11 @@ interface IProps {
   loading: boolean;
   renderExpandInfo: (record) => any;
   children?: any;
-  type: string
+  type: string;
+  indexType?: IndexType;
 }
 const CommonLayout = (props: IProps) => {
-  const { onSearch, data, columns, loading, renderExpandInfo, children, type } = props;
+  const { onSearch, data, columns, loading, renderExpandInfo, children, type, indexType } = props;
   const [expandKeys, setExpandKeys] = useState<any[]>([]);
   const handleRowClick = row => {
     const { name: key } = row;
@@ -30,7 +32,7 @@ const CommonLayout = (props: IProps) => {
       <div className={styles.header}>
         <Button type="primary" className="studioAddBtn">
           <Link
-            to={`/schema/${type}/create`}
+            to={`/schema/${type}/create${indexType ? `?type=${indexType}` : ''}`}
             data-track-category="navigation"
             data-track-action={`view_${type}_create`}
             data-track-label={`from_${type}_list`}

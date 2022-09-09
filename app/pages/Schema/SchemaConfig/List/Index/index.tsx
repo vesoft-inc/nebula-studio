@@ -187,6 +187,7 @@ const IndexList = () => {
     loading={loading}
     data={data}
     type="index"
+    indexType={indexType}
     columns={columns}
     renderExpandInfo={renderIndexInfo}
     onSearch={setSearchVal} >

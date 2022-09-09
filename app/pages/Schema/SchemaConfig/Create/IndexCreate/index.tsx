@@ -1,9 +1,10 @@
 import { Button, Col, Form, Input, Row, Select, message } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
+import queryString from 'query-string'
 import { nameRulesFn } from '@app/config/rules';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import GQLCodeMirror from '@app/components/GQLCodeMirror';
 import { getIndexCreateGQL } from '@app/utils/gql';
 import { useStore } from '@app/stores';
@@ -43,6 +44,11 @@ const IndexCreate = () => {
   const [typeList, setTypeList] = useState([]);
   const [fieldList, setFieldList] = useState<IField[]>([]);
   const [visible, setVisible] = useState(false);
+  const location = useLocation();
+  const initialType = useMemo(() => {
+    const { type } = queryString.parse(location.search);
+    return type;
+  }, [location])
   const updateGql = () => {
     const { name, type, associate, fields, comment } = form.getFieldsValue();
     const _fields = fields.map(i => getFieldStr(i));
@@ -115,7 +121,7 @@ const IndexCreate = () => {
   };
   useEffect(() => {
     trackPageView('/schema/config/index/create');
-    getAssociatedList('tag');
+    getAssociatedList(initialType as IndexType || 'tag');
   }, []);
   return (
     <div className={styles.indexCreatePage}>
@@ -125,7 +131,7 @@ const IndexCreate = () => {
         layout="vertical" 
         onFinish={handleCreate}
         initialValues={{
-          type: 'tag',
+          type: initialType || 'tag',
           fields: []
         }}
         {...formItemLayout}>

@@ -5,7 +5,33 @@ import { v4 as uuidv4 } from 'uuid';
 // split from semicolon out of quotation marks
 const SEMICOLON_REG = /((?:[^;'"]*(?:"(?:\\.|[^"])*"|'(?:\\.|[^'])*')[^;'"]*)+)|;(?!\\)(?=\n)/;
 const SEMICOLON_WITH_LINE_REG = /((?:[^;'"]*(?:"(?:\\.|[^"])*"|'(?:\\.|[^'])*')[^;'"]*)+)|;\\\n/g;
-const splitQuery = (query: string) => {
+/*
+Explain:
+Keep the execution logic consistent with the nebula console
+
+Example1: send multi sentences in one line, split by semicolon with backslashes, get error
+Format: sentence1;\ sentence2;\ sentence3;
+Result: error
+
+Example2: A sentence on a single line, ending with a semicolon, without adding a backslash, sent separately, and returning the result of each statement
+Format: 
+  sentence1;
+  sentence2;
+  sentence3;
+Result: [sentence1 result; sentence2 result; sentence3 result];
+
+Example3: send multi sentences in one line, split by semicolon without backslashes, get result of last sentence
+Format: sentence1; sentence2; sentence3;
+Result: sentence3 result;
+
+Example4: 
+Format: Multiple statements ending with a semicolon and a backslash and wrapping to a new line are sent as one statement, returning the last result
+sentence1;\
+sentence2;\
+sentence3;
+Result: sentence3 result;
+*/
+export const splitQuery = (query: string) => {
   const queryList = query.split(SEMICOLON_REG).filter(Boolean);
   const paramList: string[] = [];
   const gqlList: string[] = [];
