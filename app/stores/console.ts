@@ -3,8 +3,8 @@ import service from '@app/config/service';
 import { v4 as uuidv4 } from 'uuid';
 
 // split from semicolon out of quotation marks
-const SEMICOLON_REG = /((?:[^;'"]*(?:"(?:\\.|[^"])*"|'(?:\\.|[^'])*')[^;'"]*)+)|;(?!\\)(?=\n)/;
-const SEMICOLON_WITH_LINE_REG = /((?:[^;'"]*(?:"(?:\\.|[^"])*"|'(?:\\.|[^'])*')[^;'"]*)+)|;\\\n/g;
+const SEMICOLON_REG = /(?=((?:[^;'"]*(?:"(?:\\.|[^"])*"|'(?:\\.|[^'])*')[^;'"]*)+)|);(?=\n)/g;
+const SEMICOLON_WITH_LINE_REG = /(?=((?:[^;'"]*(?:"(?:\\.|[^"])*"|'(?:\\.|[^'])*')[^;'"]*)+)|);\\\n/g;
 /*
 Explain:
 Keep the execution logic consistent with the nebula console
