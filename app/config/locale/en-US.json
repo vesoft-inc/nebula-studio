@@ -90,7 +90,11 @@
     "replicaLimit": "Replica factor must not exceed the number of your current online machines({number})",
     "ttlRequired": "Please select the corresponding property, and the data type of the property must be integer or timestamp",
     "ttlDurationRequired": "Please enter the time (in seconds)",
-    "dataTypeRequired": "Please select the data type"
+    "dataTypeRequired": "Please select the data type",
+    "edgeTypeRequired": "Please select the edge type",
+    "srcIdRequired": "Please select the source VID",
+    "dstIdRequired": "Please select the destination VID",
+    "vidRequired": "Please select the VID"
   },
   "console": {
     "execTime": "Execution Time",

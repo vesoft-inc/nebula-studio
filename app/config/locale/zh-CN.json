@@ -90,7 +90,11 @@
     "replicaLimit": "副本数量不得超过你当前 online 机器数量({number})",
     "ttlRequired": "请选择TTL指定的属性, 且属性的数据类型需为integer或timestamp",
     "ttlDurationRequired": "请输入时间(s)",
-    "dataTypeRequired": "请选择数据类型"
+    "dataTypeRequired": "请选择数据类型",
+    "edgeTypeRequired": "请选择边类型",
+    "srcIdRequired": "请选择起点VID",
+    "dstIdRequired": "请选择终点VID",
+    "vidRequired": "请选择VID"
   },
   "console": {
     "execTime": "执行时间消耗",
