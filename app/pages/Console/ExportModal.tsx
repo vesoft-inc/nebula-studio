@@ -89,7 +89,7 @@ const ExportModal = (props: IProps) => {
             const type = getFieldValue('type');
             return type === 'vertex' ? <>
               <p>{intl.get('console.exportVertex')}</p>
-              <Form.Item label="vid" name="vertexId" rules={[{ required: true }]}>
+              <Form.Item label="vid" name="vertexId" rules={[{ required: true, message: intl.get('formRules.vidRequired') }]}>
                 <Select>
                   {headers.map(i => (
                     <Option value={i} key={i}>
@@ -100,10 +100,10 @@ const ExportModal = (props: IProps) => {
               </Form.Item>
             </> : <> 
               <p>{intl.get('console.exportEdge')}</p>
-              <Form.Item label="Edge Type" name="edgeType" rules={[{ required: true }]}>
+              <Form.Item label="Edge Type" name="edgeType" rules={[{ required: true, message: intl.get('formRules.edgeTypeRequired') }]}>
                 <Input />
               </Form.Item>
-              <Form.Item label="Src ID" name="srcId" rules={[{ required: true }]}>
+              <Form.Item label="Src ID" name="srcId" rules={[{ required: true, message: intl.get('formRules.srcIdRequired') }]}>
                 <Select>
                   {headers.map(i => (
                     <Option value={i} key={i}>
@@ -112,7 +112,7 @@ const ExportModal = (props: IProps) => {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item label="Dst ID" name="dstId" rules={[{ required: true }]}>
+              <Form.Item label="Dst ID" name="dstId" rules={[{ required: true, message: intl.get('formRules.dstIdRequired') }]}>
                 <Select>
                   {headers.map(i => (
                     <Option value={i} key={i}>
