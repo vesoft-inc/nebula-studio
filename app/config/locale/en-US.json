@@ -94,7 +94,9 @@
     "edgeTypeRequired": "Please select the edge type",
     "srcIdRequired": "Please select the source VID",
     "dstIdRequired": "Please select the destination VID",
-    "vidRequired": "Please select the VID"
+    "vidRequired": "Please select the VID",
+    "vidTypeRequired": "Vid type is required",
+    "fixStringLengthRequired": "fix string length limit is required"
   },
   "console": {
     "execTime": "Execution Time",
