@@ -73,31 +73,31 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 	conf := importconfig.YAMLConfig{}
 	err = json.Unmarshal(jsons, &conf)
 	if err != nil {
-		return nil, err
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
 	if err = validClientParams(&conf); err != nil {
 		err = importererrors.Wrap(importererrors.InvalidConfigPathOrFormat, err)
 		zap.L().Warn("client params is wrong", zap.Error(err))
-		return nil, err
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
 	taskDir, err := importer.GetNewTaskDir(i.svcCtx.Config.File.TasksDir)
 	if err != nil {
-		return nil, err
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	logPath := filepath.Join(taskDir, importLogName)
 	conf.LogPath = &logPath
 
 	// create config file
 	if err := importer.CreateConfigFile(i.svcCtx.Config.File.UploadDir, taskDir, conf); err != nil {
-		return nil, err
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
 	// create err dir
 	taskErrDir := filepath.Join(taskDir, "err")
 	if err = utils.CreateDir(taskErrDir); err != nil {
-		return nil, err
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
 	// import
@@ -108,7 +108,7 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 	task, taskID, err := importer.GetTaskMgr().NewTask(nebulaAddress, user, name, space)
 	if err != nil {
 		zap.L().Warn("init task fail", zap.Error(err))
-		return nil, err
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	if err = importer.Import(taskID, &conf); err != nil {
 		//	task err: import task not start err
@@ -118,7 +118,7 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 			zap.L().Warn("finish task fail", zap.Error(err1))
 		}
 		zap.L().Error(fmt.Sprintf("Failed to start a import task: `%s`, task result: `%v`", taskID, err))
-		return nil, err
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
 	// write taskId to file
@@ -126,13 +126,13 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 	taskIDBytes, err := ioutil.ReadFile(i.svcCtx.Config.File.TaskIdPath)
 	if err != nil {
 		zap.L().Warn("read taskId file error", zap.Error(err))
-		return nil, err
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	taskIdJSON := make(map[string]bool)
 	if len(taskIDBytes) != 0 {
 		if err := json.Unmarshal(taskIDBytes, &taskIdJSON); err != nil {
 			zap.L().Warn("read taskId file error", zap.Error(err))
-			return nil, err
+			return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 		}
 	}
 	taskIdJSON[taskID] = true
@@ -228,7 +228,7 @@ func (i *importService) GetImportTaskLogNames(req *types.GetImportTaskLogNamesRe
 	errLogDir := filepath.Join(i.svcCtx.Config.File.TasksDir, id, "err")
 	fileInfos, err := ioutil.ReadDir(errLogDir)
 	if err != nil {
-		return nil, err
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
 	data := &types.GetImportTaskLogNamesData{
@@ -251,7 +251,7 @@ func (i *importService) GetManyImportTaskLog(req *types.GetManyImportTaskLogRequ
 	}
 	lines, err := readFileLines(path, req.Offset, req.Limit)
 	if err != nil {
-		return nil, err
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
 	muTaskId.RLock()
@@ -259,14 +259,14 @@ func (i *importService) GetManyImportTaskLog(req *types.GetManyImportTaskLogRequ
 	muTaskId.RUnlock()
 	if err != nil {
 		zap.L().Warn("read taskId file error", zap.Error(err))
-		return nil, err
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	taskIdJSON := make(map[string]bool)
 	if len(taskIdBytes) != 0 {
 		err = json.Unmarshal(taskIdBytes, &taskIdJSON)
 		if err != nil {
 			zap.L().Warn("parse taskId file error", zap.Error(err))
-			return nil, err
+			return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 		}
 	}
 	data := &types.GetManyImportTaskLogData{
@@ -276,7 +276,7 @@ func (i *importService) GetManyImportTaskLog(req *types.GetManyImportTaskLogRequ
 		return data, nil
 	}
 	if len(lines) == 0 {
-		return data, errors.New("no task")
+		return data, ecode.WithErrorMessage(ecode.ErrInternalServer, errors.New("no task"))
 	}
 
 	return data, nil
@@ -307,7 +307,7 @@ func readFileLines(path string, offset int64, limit int64) ([]string, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		zap.L().Warn("open file error", zap.Error(err))
-		return nil, err
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	defer file.Close()
 	scanner := bufio.NewScanner(file)

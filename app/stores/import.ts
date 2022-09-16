@@ -3,6 +3,21 @@ import service from '@app/config/service';
 import { IBasicConfig, IEdgeConfig, ITaskItem, IVerticesConfig } from '@app/interfaces/import';
 import { configToJson } from '@app/utils/import';
 import { getRootStore } from '.';
+
+const handlePropertyMap = (item, defaultValueFields) => {
+  let type = item.Type;
+  if(item.Type.startsWith('fixed_string')) {
+    type = 'string';
+  } else if (item.Type.startsWith('int')) {
+    type = 'int';
+  }
+  return {
+    name: item.Field,
+    type,
+    isDefault: defaultValueFields.includes(item.Field),
+    mapping: null,
+  };
+}
 export class ImportStore {
   taskList: ITaskItem[] = [];
   verticesConfig: IVerticesConfig[] = [];
@@ -144,14 +159,7 @@ export class ImportStore {
       });
     }
     if (code === 0) {
-      const props = data.tables.map(attr => {
-        return {
-          name: attr.Field,
-          type: attr.Type === 'int64' ? 'int' : attr.Type, // HACK: exec return int64 but importer only use int
-          isDefault: defaultValueFields.includes(attr.Field),
-          mapping: null,
-        };
-      });
+      const props = data.tables.map(attr => handlePropertyMap(attr, defaultValueFields));
       runInAction(() => {
         this.verticesConfig[configIndex].tags[tagIndex] = {
           name: tag,
@@ -192,15 +200,7 @@ export class ImportStore {
         });
       }
       if (code === 0) {
-        const props = data.tables.map(item => {
-          return {
-            name: item.Field,
-            type: item.Type === 'int64' ? 'int' : item.Type,
-            isDefault: defaultValueFields.includes(item.Field),
-            mapping: null,
-          };
-        });
-        
+        const props = data.tables.map(item => handlePropertyMap(item, defaultValueFields));
         runInAction(() => {
           this.edgesConfig[index].type = edgeType;
           this.edgesConfig[index].props = [
