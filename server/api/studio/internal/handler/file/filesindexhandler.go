@@ -4,8 +4,8 @@ package file
 import (
 	"net/http"
 
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/logic/file"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/logic/file"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 )
 
 func FilesIndexHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {

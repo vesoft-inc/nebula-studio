@@ -7,6 +7,7 @@ const SchemaConfig = lazy(() => import('@app/pages/Schema/SchemaConfig'));
 const Import = lazy(() => import('@app/pages/Import'));
 const TaskCreate = lazy(() => import('@app/pages/Import/TaskCreate'));
 const Doc = lazy(() => import('@app/pages/Doc'));
+const SketchModeling = lazy(() => import('@app/pages/SketchModeling'));
 
 
 export const RoutesList = [
@@ -43,6 +44,11 @@ export const RoutesList = [
     component: Doc,
     exact: true,
   },
+  {
+    path: '/sketch',
+    component: SketchModeling,
+    exact: true,
+  },
 ];
 
 export const MENU_LIST = [
@@ -52,6 +58,17 @@ export const MENU_LIST = [
     track: {
       category: 'navigation',
       action: 'view_schema',
+      label: 'from_navigation'
+    },
+    icon: 'icon-studio-nav-schema',
+    intlKey: 'common.schema'
+  },
+  {
+    key: 'sketch',
+    path: '/sketch',
+    track: {
+      category: 'navigation',
+      action: 'view_sketch',
       label: 'from_navigation'
     },
     icon: 'icon-studio-nav-schema',

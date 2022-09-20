@@ -8,12 +8,12 @@ import (
 	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/vesoft-inc/go-pkg/response"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/types"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/auth"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/base"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/ecode"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/utils"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/base"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

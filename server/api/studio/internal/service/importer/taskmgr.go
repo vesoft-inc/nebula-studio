@@ -9,6 +9,8 @@ import (
 	"sync"
 	"time"
 
+	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
+
 	"github.com/vesoft-inc/nebula-importer/pkg/cmd"
 	"github.com/zeromicro/go-zero/core/logx"
 
@@ -33,7 +35,7 @@ func newTask(nebulaAddress string, user string, name string, space string) *Task
 	timeUnix := time.Now().Unix()
 	return &Task{
 		Runner: &cmd.Runner{},
-		TaskInfo: &TaskInfo{
+		TaskInfo: &db.TaskInfo{
 			Name:          name,
 			Space:         space,
 			CreatedTime:   timeUnix,
@@ -216,7 +218,7 @@ func (mgr *TaskMgr) getTaskFromMap(taskID string) (*Task, bool) {
 }
 
 func (mgr *TaskMgr) getTaskFromSQL(taskID string) *Task {
-	taskInfo := new(TaskInfo)
+	taskInfo := new(db.TaskInfo)
 	mgr.db.First(taskInfo, taskID)
 	task := new(Task)
 	task.TaskInfo = taskInfo

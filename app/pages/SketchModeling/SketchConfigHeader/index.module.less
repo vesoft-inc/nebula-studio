@@ -1,0 +1,72 @@
+@import '~@app/common.less';
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 18px;
+  height: 60px;
+  background: #FFFFFF;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  .actions {
+    display: flex;
+    align-items: center;
+    svg {
+      width: 28px;
+      height: 28px;
+      margin-right: 20px;
+      cursor: pointer;
+    }
+  }
+}
+
+.sketchTitle {
+  display: flex;
+  span {
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 21px;
+    color: @headerBlack;
+  }
+  .editIcon {
+    margin-left: 10px;
+    fill: #636F81;
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+}
+
+.radioTabs {
+  width: 100%;
+  margin-bottom: 15px;
+  :global(.ant-radio-button-wrapper) {
+    width: 50%;
+    text-align: center;
+  }
+}
+
+.applyForm {
+  :global(.ant-select) {
+    width: 100%;
+  }
+  .applyTips {
+    display: flex;
+    > span:first-child {
+      margin-top: 4px;
+      margin-right: 4px;
+    }
+    background: #DBEFFF;
+    border-radius: 3px;
+    margin-top: 15px;
+    padding: 13px 10px;
+    color: #0091FF;
+    margin-bottom: 30px;
+  }
+}
+.formFooter {
+  text-align: center;
+  :global(.ant-btn):not(:last-child) {
+    margin-right: 10px;
+  }
+}

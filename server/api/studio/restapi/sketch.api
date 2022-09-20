@@ -1,0 +1,63 @@
+type (
+	GetSketchesRequest {
+		Page     int64  `form:"page,range=[0:],optional"`
+		PageSize int64  `form:"pageSize,default=10,range=[1:1000],optional"`
+		Keyword  string `form:"keyword,optional"`
+	}
+
+	SketchList {
+		Items    []Sketch `json:"items"`
+		Total    int64    `json:"total"`
+		Page     int64    `json:"page"`
+		PageSize int64    `json:"pageSize"`
+	}
+
+	Sketch {
+		ID         int    `json:"id"`
+		Name       string `json:"name"`
+		Schema     string `json:"schema"`
+		Snapshot   string `json:"snapshot"`
+		CreateTime int64  `json:"createTime"`
+		UpdateTime int64  `json:"updateTime"`
+	}
+
+	InitSketchRequest {
+		Name     string `json:"name" validate:"required"`
+		Schema   string `json:"schema,optional"`
+		Snapshot string `json:"snapshot,optional"`
+	}
+
+	UpdateSketchRequest {
+		ID       int    `path:"id" validate:"required"`
+		Name     string `json:"name" validate:"required"`
+		Schema   string `json:"schema,optional"`
+		Snapshot string `json:"snapshot,optional"`
+	}
+	DeleteSketchRequest {
+		ID string `path:"id" validate:"required"`
+	}
+	SketchIDResult {
+		ID int `json:"id"`
+	}
+)
+@server(
+	group: sketches
+)
+service studio-api {
+	@doc "Init Sketch"
+	@handler Init
+	post /api/sketches/sketch (InitSketchRequest) returns (SketchIDResult)
+	
+	@doc "Get Sketch List"
+	@handler GetList
+	get /api/sketches/list (GetSketchesRequest) returns (SketchList)
+	
+	@doc "Delete Sketch"
+	@handler Delete
+	delete /api/sketches/:id (DeleteSketchRequest)
+	
+	@doc "Update Sketch Item"
+	@handler Update
+	put /api/sketches/:id (UpdateSketchRequest)
+	
+}

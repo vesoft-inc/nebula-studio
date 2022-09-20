@@ -8,13 +8,14 @@ import (
 
 	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/pool"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/config"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/handler"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/service/importer"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/auth"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/logging"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/utils"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler"
+	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service/importer"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/logging"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/proc"
 	"github.com/zeromicro/go-zero/rest"
@@ -43,7 +44,8 @@ func main() {
 		zap.L().Fatal("init config failed", zap.Error(err))
 	}
 
-	importer.InitDB(c.File.SqliteDbFilePath)
+	db.InitDB(c.File.SqliteDbFilePath)
+	importer.InitTaskStatus()
 
 	svcCtx := svc.NewServiceContext(c)
 	server := rest.MustNewServer(c.RestConf, rest.WithNotFoundHandler(middleware.NewAssetsHandler(middleware.AssetsConfig{

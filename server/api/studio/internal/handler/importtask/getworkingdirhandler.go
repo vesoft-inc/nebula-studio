@@ -4,8 +4,8 @@ package importtask
 import (
 	"net/http"
 
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/logic/importtask"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/logic/importtask"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 )
 
 func GetWorkingDirHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {

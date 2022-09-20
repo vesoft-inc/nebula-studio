@@ -9,7 +9,7 @@
         "targets": "chrome >= 60, safari >= 14, firefox >= 80",
       }
     ],
-    "@babel/preset-react",
+    ["@babel/preset-react", { "runtime": "automatic" }],
     "@babel/preset-typescript"
   ],
   "plugins": [

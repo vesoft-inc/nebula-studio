@@ -4,11 +4,12 @@ package handler
 import (
 	"net/http"
 
-	file "github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/handler/file"
-	gateway "github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/handler/gateway"
-	health "github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/handler/health"
-	importtask "github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/handler/importtask"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
+	file "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/file"
+	gateway "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/gateway"
+	health "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/health"
+	importtask "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/importtask"
+	sketches "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/sketches"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
 )
@@ -127,6 +128,31 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/api/import-tasks/working-dir",
 				Handler: importtask.GetWorkingDirHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/sketches/sketch",
+				Handler: sketches.InitHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/sketches/list",
+				Handler: sketches.GetListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/api/sketches/:id",
+				Handler: sketches.DeleteHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/api/sketches/:id",
+				Handler: sketches.UpdateHandler(serverCtx),
 			},
 		},
 	)

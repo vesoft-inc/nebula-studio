@@ -10,4 +10,5 @@ export interface Pointer {
   event?: any;
   node?: NodeObject;
   showContextMenu?: boolean;
+  hideContextMenu?: boolean;
 }

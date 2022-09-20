@@ -11,8 +11,8 @@ import (
 	importconfig "github.com/vesoft-inc/nebula-importer/pkg/config"
 	importerErrors "github.com/vesoft-inc/nebula-importer/pkg/errors"
 	"github.com/vesoft-inc/nebula-importer/pkg/logger"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/types"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/utils"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"go.uber.org/zap"
 
 	"gopkg.in/yaml.v2"
