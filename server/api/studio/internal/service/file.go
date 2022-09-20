@@ -17,9 +17,9 @@ import (
 	"github.com/axgle/mahonia"
 	"github.com/saintfish/chardet"
 	"github.com/vesoft-inc/go-pkg/middleware"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/types"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
 	"github.com/zeromicro/go-zero/core/logx"
 	"go.uber.org/zap"
 )

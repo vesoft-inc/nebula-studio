@@ -50,7 +50,8 @@
     "comment": "Comment",
     "space": "Space",
     "version": "Version",
-    "statistics": "Statistics"
+    "statistics": "Statistics",
+    "duplicate": "Duplicate"
   },
   "doc": {
     "welcome": "Welcome to",
@@ -261,5 +262,32 @@
     "mannualHref": "https://docs.nebula-graph.io/3.1.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/",
     "startStudioHref": "https://docs.nebula-graph.io/3.1.0/nebula-studio/quick-start/st-ug-plan-schema/",
     "versionLogHref": "https://docs.nebula-graph.io/3.1.0/nebula-studio/about-studio/st-ug-release-note/"
+  },
+  "sketch": {
+    "dragTip": "Drag and drop to the canvas",
+    "tag": "Tag",
+    "edge": "Edge Type",
+    "name": "{name} Name",
+    "detail": "{name} details",
+    "comment": "Comment",
+    "properties": "Properties",
+    "propertyName": "Property Name",
+    "dataType": "Data Type",
+    "addProperty": "Add Property",
+    "type": "type",
+    "list": "Sketch List",
+    "new": "New",
+    "applyToSpace": "Apply to Space",
+    "createSpace": "Create New Space",
+    "selectSpace": "Select Space",
+    "noCurrentSketch": "No schema sketch selected",
+    "noCurrentSketchTips": "Please select a schema sketch first",
+    "sketchInvalid": "The schema sketch is invalid, please check",
+    "saveSuccess": "Save successfully",
+    "saveReminder": "The current sketch has been modified but not saved, whether to continue to switch sketches?",
+    "confirmDelete": "Sure to delete?",
+    "saveDraft": "Save draft",
+    "export": "Export"
+
   }
 }

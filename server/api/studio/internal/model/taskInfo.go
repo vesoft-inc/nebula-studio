@@ -1,4 +1,4 @@
-package importer
+package db
 
 import "github.com/vesoft-inc/nebula-importer/pkg/stats"
 

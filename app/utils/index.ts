@@ -29,3 +29,19 @@ export const onPointerMove = (container: HTMLElement, callback: (pos: Record<'to
 
   return () => container.removeEventListener('pointermove', listener);
 };
+
+
+export const onAbsolutePositionMove = (
+  container: HTMLElement,
+  callback: (pos: Record<'top' | 'left', number>) => void
+) => {
+  const listener = (ev: PointerEvent) => {
+    // update the pointer pos
+    callback({ left: ev.pageX, top: ev.pageY });
+  };
+
+  // Capture pointer coords on move or touchstart
+  container.addEventListener('pointermove', listener, { passive: true });
+
+  return () => container.removeEventListener('pointermove', listener);
+};

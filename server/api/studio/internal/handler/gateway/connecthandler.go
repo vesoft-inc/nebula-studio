@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	"github.com/vesoft-inc/go-pkg/validator"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
 
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/logic/gateway"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/logic/gateway"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 

@@ -236,3 +236,46 @@ type GetWorkingDirResult struct {
 	TaskDir   string `json:"taskDir,omitempty"`
 	UploadDir string `json:"uploadDir,omitempty"`
 }
+
+type GetSketchesRequest struct {
+	Page     int64  `form:"page,range=[0:],optional"`
+	PageSize int64  `form:"pageSize,default=10,range=[1:1000],optional"`
+	Keyword  string `form:"keyword,optional"`
+}
+
+type SketchList struct {
+	Items    []Sketch `json:"items"`
+	Total    int64    `json:"total"`
+	Page     int64    `json:"page"`
+	PageSize int64    `json:"pageSize"`
+}
+
+type Sketch struct {
+	ID         int    `json:"id"`
+	Name       string `json:"name"`
+	Schema     string `json:"schema"`
+	Snapshot   string `json:"snapshot"`
+	CreateTime int64  `json:"createTime"`
+	UpdateTime int64  `json:"updateTime"`
+}
+
+type InitSketchRequest struct {
+	Name     string `json:"name" validate:"required"`
+	Schema   string `json:"schema,optional"`
+	Snapshot string `json:"snapshot,optional"`
+}
+
+type UpdateSketchRequest struct {
+	ID       int    `path:"id" validate:"required"`
+	Name     string `json:"name" validate:"required"`
+	Schema   string `json:"schema,optional"`
+	Snapshot string `json:"snapshot,optional"`
+}
+
+type DeleteSketchRequest struct {
+	ID string `path:"id" validate:"required"`
+}
+
+type SketchIDResult struct {
+	ID int `json:"id"`
+}

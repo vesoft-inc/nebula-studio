@@ -1,0 +1,91 @@
+@import '~@app/common.less';
+.sketchList {
+  padding: 20px 15px;
+  width: 258px;
+  background: #FFFFFF;
+  border-right: 1px solid #E0E0E0;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    > span {
+      font-weight: 400;
+      font-size: 18px;
+      line-height: 21px;
+      color: #2F3A4A;
+    }
+    .addBtn {
+      padding: 0;
+      display: flex;
+      align-items: center;
+      color: @blue;
+      &:hover, &:active, &:focus {
+        background: none;
+      }
+      svg {
+        fill: @blue;
+        margin-right: 10px;
+        width: 17px;
+        height: 17px;
+      }
+    }
+  }
+  .searchInput {
+    border: 1px solid #D9D9D9;
+    border-radius: 3px;
+    height: 45px;
+    margin-bottom: 15px;
+    svg {
+      fill: #D9D9D9;
+      width: 20px;
+      height: 20px;
+    }
+  }
+  .thumbnailList {
+    overflow: auto;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    .item {
+      width: 100%;
+      height: 160px;
+      border: 1px solid #BDBDBD;
+      box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 3px;
+      margin-bottom: 15px;
+      padding: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      &.active {
+        border: 4px solid #0091FF;
+      }
+      .itemHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .snapshot {
+        flex: 1;
+      }
+      .title {
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 14px;
+        color: @headerBlack;
+      }
+      .closeBtn {
+        width: 15px;
+        height: 15px;
+        fill: #000;
+        cursor: pointer;
+      }
+    }
+  }
+}

@@ -47,6 +47,19 @@ const service = {
   uploadFiles: (params?, config?) => {
     put('/api/files')(params, { ...config, headers: { 'Content-Type': 'multipart/form-data' } });
   },
+  initSketch: (params) => {
+    return post(`/api/sketches/sketch`)(params);
+  },
+  getSketchList: (params) => {
+    return get(`/api/sketches/list`)(params);
+  },
+  updateSketch: (params) => {
+    const { id, ...restParams } = params;
+    return put(`/api/sketches/${id}`)(restParams);
+  },
+  deleteSketch: (id: string) => {
+    return _delete(`/api/sketches/${id}`)();
+  },
 };
 
 export const updateService = (partService: any) => {

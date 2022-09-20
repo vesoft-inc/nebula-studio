@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

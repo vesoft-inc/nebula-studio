@@ -1,5 +1,5 @@
 import { createFromIconfontCN } from '@ant-design/icons';
-import icon from '@app/static/fonts/iconfont.js';
+import icon from '@app/static/fonts/iconpark.js';
 const IconFont = createFromIconfontCN({
   scriptUrl: icon,
 });

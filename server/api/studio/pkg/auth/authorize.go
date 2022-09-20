@@ -12,11 +12,11 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/pool"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/config"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/svc"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/internal/types"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/ecode"
-	"github.com/vesoft-inc/nebula-studio/server-v2/api/studio/pkg/utils"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/rest"
 )
 

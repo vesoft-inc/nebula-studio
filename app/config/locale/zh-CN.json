@@ -50,7 +50,8 @@
     "comment": "描述",
     "space": "图空间",
     "version": "版本",
-    "statistics": "统计"
+    "statistics": "统计",
+    "duplicate": "复制"
   },
   "doc": {
     "welcome": "欢迎使用",
@@ -261,5 +262,31 @@
     "mannualHref": "https://docs.nebula-graph.com.cn/3.1.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/",
     "startStudioHref": "https://docs.nebula-graph.com.cn/3.1.0/nebula-studio/quick-start/st-ug-plan-schema/",
     "versionLogHref": "https://docs.nebula-graph.com.cn/3.1.0/nebula-studio/about-studio/st-ug-release-note/"
+  },
+  "sketch": {
+    "dragTip": "拖放到画布上",
+    "tag": "标签",
+    "edge": "边类型",
+    "name": "{name}名称",
+    "detail": "{name}详情",
+    "comment": "描述",
+    "properties": "属性",
+    "propertyName": "属性名称",
+    "dataType": "数据类型",
+    "addProperty": "添加属性",
+    "type": "类型",
+    "list": "草图列表",
+    "new": "新建",
+    "applyToSpace": "应用到图空间",
+    "createSpace": "创建图空间",
+    "selectSpace": "选择图空间",
+    "noCurrentSketch": "当前没有选中草图",
+    "noCurrentSketchTips": "请在左侧列表中选择草图",
+    "sketchInvalid": "当前草图数据格式错误，请检查",
+    "saveSuccess": "保存成功",
+    "saveReminder": "当前草图有修改未保存，是否继续切换草图?",
+    "confirmDelete": "请确认是否删除",
+    "saveDraft": "保存草稿",
+    "export": "导出"
   }
 }

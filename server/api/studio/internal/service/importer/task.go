@@ -1,13 +1,15 @@
 package importer
 
 import (
+	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
+
 	"github.com/vesoft-inc/nebula-importer/pkg/cmd"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type Task struct {
-	Runner   *cmd.Runner `json:"runner,omitempty"`
-	TaskInfo *TaskInfo   `json:"task_info,omitempty"`
+	Runner   *cmd.Runner  `json:"runner,omitempty"`
+	TaskInfo *db.TaskInfo `json:"task_info,omitempty"`
 }
 
 func (t *Task) UpdateQueryStats() error {

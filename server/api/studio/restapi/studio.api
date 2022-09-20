@@ -10,4 +10,5 @@ import (
 	"gateway.api"
 	"file.api"
 	"import.api"
+	"sketch.api"
 )

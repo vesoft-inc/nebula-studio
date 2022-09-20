@@ -1,32 +1,19 @@
 package importer
 
 import (
+	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
+
 	"github.com/zeromicro/go-zero/core/logx"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 type TaskDb struct {
 	*gorm.DB
 }
 
-func InitDB(sqlitedbFilePath string) {
-	dbFilePath := sqlitedbFilePath
-	db, err := gorm.Open(sqlite.Open(dbFilePath), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
-	if err != nil {
-		logx.Errorf("init db fail: %s", err)
-	}
-
-	err = db.AutoMigrate(&TaskInfo{})
-	if err != nil {
-		logx.Errorf("init taskInfo table fail: %s", err)
-		panic(err)
-	}
+func InitTaskStatus() {
 	GetTaskMgr().db = &TaskDb{
-		DB: db,
+		DB: db.CtxDB,
 	}
 	if err := GetTaskMgr().db.UpdateProcessingTasks2Aborted(); err != nil {
 		logx.Errorf("update processing tasks to aborted failed: %s", err)
@@ -35,19 +22,19 @@ func InitDB(sqlitedbFilePath string) {
 }
 
 // FindTaskInfoByIdAndAddresssAndUser used to check whether the task belongs to the user
-func (t *TaskDb) FindTaskInfoByIdAndAddresssAndUser(id int, nebulaAddress, user string) (*TaskInfo, error) {
-	taskInfo := new(TaskInfo)
-	if err := t.Model(&TaskInfo{}).Where("id = ? AND nebula_address = ? And user = ?", id, nebulaAddress,
+func (t *TaskDb) FindTaskInfoByIdAndAddresssAndUser(id int, nebulaAddress, user string) (*db.TaskInfo, error) {
+	taskInfo := new(db.TaskInfo)
+	if err := t.Model(&db.TaskInfo{}).Where("id = ? AND nebula_address = ? And user = ?", id, nebulaAddress,
 		user).First(&taskInfo).Error; err != nil {
 		return nil, err
 	}
 	return taskInfo, nil
 }
 
-func (t *TaskDb) FindTaskInfoByAddressAndUser(nebulaAddress, user string, pageIndex, pageSize int) ([]*TaskInfo, int64, error) {
-	tasks := make([]*TaskInfo, 0)
+func (t *TaskDb) FindTaskInfoByAddressAndUser(nebulaAddress, user string, pageIndex, pageSize int) ([]*db.TaskInfo, int64, error) {
+	tasks := make([]*db.TaskInfo, 0)
 	var count int64
-	tx := t.Model(&TaskInfo{}).Where("nebula_address = ? And user = ?", nebulaAddress, user).Order("id desc")
+	tx := t.Model(&db.TaskInfo{}).Where("nebula_address = ? And user = ?", nebulaAddress, user).Order("id desc")
 	if err := tx.Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
@@ -57,16 +44,16 @@ func (t *TaskDb) FindTaskInfoByAddressAndUser(nebulaAddress, user string, pageIn
 	return tasks, count, nil
 }
 
-func (t *TaskDb) InsertTaskInfo(info *TaskInfo) error {
+func (t *TaskDb) InsertTaskInfo(info *db.TaskInfo) error {
 	return t.Create(info).Error
 }
 
-func (t *TaskDb) UpdateTaskInfo(info *TaskInfo) error {
-	return t.Model(&TaskInfo{}).Where("id = ?", info.ID).Updates(info).Error
+func (t *TaskDb) UpdateTaskInfo(info *db.TaskInfo) error {
+	return t.Model(&db.TaskInfo{}).Where("id = ?", info.ID).Updates(info).Error
 }
 
 func (t *TaskDb) DelTaskInfo(ID int) error {
-	return t.Delete(&TaskInfo{}, ID).Error
+	return t.Delete(&db.TaskInfo{}, ID).Error
 }
 
 func (t *TaskDb) LastId() (int, error) {
@@ -81,7 +68,7 @@ func (t *TaskDb) LastId() (int, error) {
 }
 
 func (t *TaskDb) SelectAllIds(nebulaAddress, user string) ([]int, error) {
-	var taskInfos []TaskInfo
+	var taskInfos []db.TaskInfo
 	ids := make([]int, 0)
 	if err := t.Select("id").Where("nebula_address = ? And user = ?", nebulaAddress, user).Order("created_time desc").Find(&taskInfos).Error; err != nil {
 		return nil, err
@@ -93,7 +80,7 @@ func (t *TaskDb) SelectAllIds(nebulaAddress, user string) ([]int, error) {
 }
 
 func (t *TaskDb) UpdateProcessingTasks2Aborted() error {
-	if err := t.Model(&TaskInfo{}).Where("task_status = ?", StatusProcessing.String()).Update("task_status", StatusAborted.String()).Error; err != nil {
+	if err := t.Model(&db.TaskInfo{}).Where("task_status = ?", StatusProcessing.String()).Update("task_status", StatusAborted.String()).Error; err != nil {
 		return err
 	}
 	return nil

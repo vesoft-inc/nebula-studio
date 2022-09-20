@@ -1,0 +1,119 @@
+@import '~@app/common.less';
+@keyframes panelOut {
+  0%{
+    right: 0px;
+    opacity: 0;
+    width: 0;
+  }
+  100%{
+    right: 0;
+    opacity: 1; 
+    width: 350px;
+  }
+}
+.schemaConfig {
+  width: 350px;
+  position: absolute;
+  height: calc(100% - 62px);
+  overflow-y: auto;
+  top: 62px;
+  padding-bottom: 20px;
+  background-color: white;
+  border-left: 1px solid #E0E0E0;
+  filter: drop-shadow(-1px 4px 6px rgba(0, 0, 0, 0.25));
+  animation: panelOut 400ms;
+  animation-fill-mode: forwards;
+  &::-webkit-scrollbar{
+    display: none;
+  }
+  .actions {
+    height: 63px;
+    border-bottom: 1px solid @gray;
+    display: flex;
+    align-items: center;
+    padding: 11px 16px;
+    >button{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 100px;
+      height: 40px;;
+      border-radius: 5px;
+      padding:  0 15px;
+      line-height: 40px;;
+      margin-right: 10px;
+      cursor: pointer;
+      border: 1px solid @headerBlack;
+      color: @headerBlack;
+      font-size: 12px;
+      
+      >svg{
+        fill:@headerBlack;
+        display: inline-block;
+        margin-right: 5px;
+        width: 17px;
+        height: 17px;
+      }
+    }
+  }
+  .configForm {
+    .basic, .propertiesForm {
+      padding: 16px;
+    }
+    .basic {
+      border-bottom: 1px solid @gray;
+    }
+    .propertiesForm :global(.ant-form-item) {
+      margin-bottom: 9px;
+    }
+    .label {
+      display: inline-block;
+      font-weight: 500;
+      font-size: 18px;
+      line-height: 21px;
+      color: #333;
+      margin-bottom: 22px;
+    }
+    :global(.ant-input) {
+      border: 1px solid @gray;
+    }
+    .propertyAction {
+      display: flex;
+      justify-content: space-between;
+      .addPropertyBtn {
+        display: flex;
+        align-items: center;
+        color: @blue;
+        &:hover, &:active, &:focus {
+          background: none;
+        }
+        svg {
+          fill: @blue;
+          margin-right: 10px;
+          width: 17px;
+          height: 17px;
+        }
+      }
+    }
+    .formHeader {
+      font-size: 12px;
+      font-weight: 400;
+      margin-bottom: 9px;
+      color: #BDBDBD;
+    }
+    .propertyItem {
+      position: relative;
+    }
+    .itemStringLength {
+      width: 40px;
+      position: absolute;
+      right: 8px;
+      top: 0;
+    }
+    .removeBtn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
