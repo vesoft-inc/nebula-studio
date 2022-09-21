@@ -90,7 +90,7 @@ const TemplateModal = (props: IProps) => {
   return (
     <Modal
       width="820px"
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       className={styles.configImportModal}
       destroyOnClose={true}

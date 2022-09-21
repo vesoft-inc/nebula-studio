@@ -1,4 +1,5 @@
 import { VEditorLine, VEditorNode } from '@vesoft-inc/veditor/types/Model/Schema';
+import { ISchemaEnum } from './schema';
 
 export interface IProperty {
   name: string;
@@ -7,7 +8,7 @@ export interface IProperty {
 }
 export interface ISketchNode extends VEditorNode {
   uuid?: string;
-  type: string;
+  type: ISchemaEnum.Tag;
   fill?: string;
   strokeColor?: string;
   properties: IProperty[];
@@ -18,7 +19,7 @@ export interface ISketchNode extends VEditorNode {
 
 export interface ISketchEdge extends VEditorLine {
   uuid?: string;
-  type?: string;
+  type: ISchemaEnum.Edge;
   fromPoint?: number;
   toPoint?: number;
   from: string;
@@ -27,11 +28,6 @@ export interface ISketchEdge extends VEditorLine {
   properties?: IProperty[];
   comment?: string;
   invalid: boolean;
-}
-
-export enum ISketchType {
-  SketchNode = 'tag',
-  SketchLine = 'edge',
 }
 
 export interface ISketch {

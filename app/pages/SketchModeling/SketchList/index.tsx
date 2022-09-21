@@ -1,5 +1,5 @@
 import Icon from '@app/components/Icon';
-import { Button, Input, Popconfirm, Modal } from 'antd';
+import { Button, Input, Popconfirm, Modal, message } from 'antd';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect } from 'react';
 import intl from 'react-intl-universal';
@@ -13,29 +13,40 @@ const { confirm } = Modal;
 
 const SketchList: React.FC = () => {
   const { sketchModel } = useStore();
-  const { sketchList, initSketch, deleteSketch, getSketchList, currentSketch, update } = sketchModel;
+  const { sketchList, initSketch, deleteSketch, getSketchList, currentSketch, update, checkModified } = sketchModel;
   const handleAdd = useCallback(async () => {
     const id = await initSketch();
     if (id) {
+      message.success(intl.get('schema.createSuccess'));
       const list = await getSketchList();
-      update({ currentSketch: list.items[0] });
+      if (!sketchModel.currentSketch) {
+        update({ currentSketch: list.items[0] });
+        return;
+      }
+      const isModified = checkModified();
+      if(!isModified) {
+        update({ currentSketch: list.items[0], active: null });
+        return;
+      }
     }
   }, []);
   const handleDelete = useCallback(async (id: string) => {
     const result = await deleteSketch(id);
     if (result) {
+      message.success(intl.get('common.deleteSuccess'));
       await getSketchList();
       sketchModel.currentSketch?.id === id && update({ currentSketch: null });
     }
   }, []);
-  const checkModified = (item: ISketch) => {
-    const { sketchList, currentSketch } = sketchModel;
-    const initialData = sketchList.items.find((item) => item.id === currentSketch?.id);
-    const schema = sketchModel.editor.schema.getData();
-    const isEmptySame = !schema.nodes.length && !schema.lines.length && !initialData.schema;
-    const newSchema = JSON.stringify(schema);
-    if (initialData.name === currentSketch.name && (initialData.schema === newSchema || isEmptySame)) {
+
+  const handleSelect = useCallback((item: ISketch) => {
+    if (!sketchModel.currentSketch) {
       update({ currentSketch: item });
+      return;
+    }
+    const isModified = checkModified();
+    if(!isModified) {
+      update({ currentSketch: item, active: null });
       return;
     }
     confirm({
@@ -43,19 +54,12 @@ const SketchList: React.FC = () => {
       okText: intl.get('common.confirm'),
       cancelText: intl.get('common.cancel'),
       onOk() {
-        update({ currentSketch: item });
+        update({ currentSketch: item, active: null });
       },
       onCancel() {
         return;
       },
     });
-  };
-  const handleSelect = useCallback((item: ISketch) => {
-    if (!sketchModel.currentSketch) {
-      update({ currentSketch: item });
-      return;
-    }
-    checkModified(item);
   }, []);
 
   const debounceChange = useCallback(

@@ -4,36 +4,17 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import Icon from '@app/components/Icon';
 import intl from 'react-intl-universal';
-import { IProperty } from '@app/interfaces/sketch';
 import domtoimage from 'dom-to-image';
 import styles from './index.module.less';
 import SketchTitleInput from './SketchTitleInput';
 import ApplySpacePopover from './ApplySpacePopover';
+
+const thumbnailMaxWidth = 195;
+const thumbnailMaxHeight = 113;
+
 const SketchConfigHeader: React.FC = () => {
   const { sketchModel } = useStore();
-  const { editor, updateItem, active, currentSketch, updateSketch, getSketchList } = sketchModel;
-  const validate = (data, type) => {
-    const isInvalid = !data.name || (data.properties as IProperty[])?.some((i) => !i.name || !i.type);
-    if (isInvalid) {
-      updateItem(data as any, { invalid: true });
-      if (type === 'node') {
-        editor.graph.node.updateNode(editor.graph.node.nodes[data.uuid].data, true);
-      } else {
-        editor.graph.line.updateLine(editor.graph.line.lines[data.uuid].data, true);
-      }
-    }
-    if (active?.uuid === data.uuid) {
-      sketchModel.update({ active: { ...active, invalid: isInvalid } });
-    }
-    return !isInvalid;
-  };
-
-  const validateSchema = (data): boolean => {
-    const { nodes, lines } = data;
-    const nodesValid = nodes.reduce((flag, node) => validate(node, 'node') && flag, true);
-    const edgesValid = lines.reduce((flag, line) => validate(line, 'edge') && flag, true);
-    return nodesValid && edgesValid;
-  };
+  const { editor, validateSchema, currentSketch, updateSketch, getSketchList } = sketchModel;
 
   const filter = (node) => {
     if (node instanceof SVGElement) {
@@ -49,9 +30,9 @@ const SketchConfigHeader: React.FC = () => {
   };
   const handleSave = async () => {
     const data = sketchModel.editor.schema.getData();
-    const isValid = validateSchema(data);
+    const isValid = validateSchema();
     if (!isValid) {
-      return message.warning(intl.get('sketch.sketchInvalid'));
+      return;
     }
     const url = await domtoimage.toPng(document.getElementById('sketchContainer'), { bgcolor: 'transparent', filter });
     const img = new Image();
@@ -74,14 +55,11 @@ const SketchConfigHeader: React.FC = () => {
 
   const compressBlob = (img: HTMLImageElement) => {
     const { x, y, width, height } = editor.paper.getBoundingClientRect();
-    let scaledWidth;
-    let scaledHeight;
-    if (width > height) {
-      scaledWidth = 195;
-      scaledHeight = (height / width) * scaledWidth;
-    } else {
-      scaledHeight = 113;
-      scaledWidth = (width / height) * scaledHeight;
+    let scaledWidth = thumbnailMaxWidth;
+    let scaledHeight = (height / width) * scaledWidth;
+    if(scaledHeight > thumbnailMaxHeight) {
+      scaledWidth = (scaledWidth / scaledHeight) * thumbnailMaxHeight;
+      scaledHeight = thumbnailMaxHeight;
     }
     const canvas = document.createElement('canvas');
     canvas.width = scaledWidth;

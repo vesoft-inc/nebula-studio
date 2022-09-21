@@ -42,9 +42,9 @@ const Operations = (props: IOperations) => {
       <Popover
         destroyTooltipOnHide={true}
         placement="leftTop"
-        visible={visible}
+        open={visible}
         trigger="click"
-        onVisibleChange={visible => setVisible(visible)}
+        onOpenChange={visible => setVisible(visible)}
         content={<Form onFinish={handleClone} layout="inline">
           <Form.Item label={intl.get('schema.spaceName')} name="name" rules={[{ required: true }]}>
             <Input />

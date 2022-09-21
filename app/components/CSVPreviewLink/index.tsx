@@ -48,10 +48,10 @@ const CSVPreviewLink = (props: IProps) => {
     <Popover
       destroyTooltipOnHide={true}
       overlayClassName={styles.popoverPreview}
-      visible={visible}
+      open={visible}
       trigger="click"
       arrowPointAtCenter
-      onVisibleChange={visible => setVisible(visible)}
+      onOpenChange={visible => setVisible(visible)}
       content={<div className={styles.csvPreview}>
         <Table
           className={cls({ [styles.noBackground]: !!onMapping })}

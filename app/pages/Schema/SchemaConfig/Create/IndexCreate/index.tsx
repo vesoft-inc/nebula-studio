@@ -2,7 +2,7 @@ import { Button, Col, Form, Input, Row, Select, message } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
-import queryString from 'query-string'
+import queryString from 'query-string';
 import { nameRulesFn } from '@app/config/rules';
 import { useHistory, useLocation } from 'react-router-dom';
 import GQLCodeMirror from '@app/components/GQLCodeMirror';
@@ -48,7 +48,7 @@ const IndexCreate = () => {
   const initialType = useMemo(() => {
     const { type } = queryString.parse(location.search);
     return type;
-  }, [location])
+  }, [location]);
   const updateGql = () => {
     const { name, type, associate, fields, comment } = form.getFieldsValue();
     const _fields = fields.map(i => getFieldStr(i));

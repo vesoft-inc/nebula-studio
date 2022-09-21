@@ -64,17 +64,6 @@ export const MENU_LIST = [
     intlKey: 'common.schema'
   },
   {
-    key: 'sketch',
-    path: '/sketch',
-    track: {
-      category: 'navigation',
-      action: 'view_sketch',
-      label: 'from_navigation'
-    },
-    icon: 'icon-studio-nav-schema',
-    intlKey: 'common.schema'
-  },
-  {
     key: 'import',
     path: '/import/files',
     track: {
@@ -95,5 +84,16 @@ export const MENU_LIST = [
     },
     icon: 'icon-studio-nav-console',
     intlKey: 'common.console'
+  },
+  {
+    key: 'sketch',
+    path: '/sketch',
+    track: {
+      category: 'navigation',
+      action: 'view_sketch',
+      label: 'from_navigation'
+    },
+    icon: 'icon-studio-nav-schema',
+    intlKey: 'common.sketch'
   },
 ];

@@ -22,7 +22,7 @@ const PasswordInputModal = (props: IProps) => {
   return (
     <Modal
       title={intl.get('import.enterPassword')}
-      visible={visible}
+      open={visible}
       onCancel={() => handleCancel()}
       className={styles.passwordModal}
       footer={false}

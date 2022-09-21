@@ -68,7 +68,7 @@ const ExportModal = (props: IProps) => {
       className={styles.exportNodeModal}
       footer={null}
       width="650px"
-      visible={visible}
+      open={visible}
       onCancel={onClose}
     >
       <Form {...layout} onFinish={handleExport} initialValues={{

@@ -263,7 +263,7 @@ module.exports = {
         'react/no-unknown-property': 'error',
         'react/no-unsafe': 'off',
         'react/prop-types': 'off',
-        'react/react-in-jsx-scope': 'error',
+        'react/react-in-jsx-scope': 'off',
         'react/require-render-return': 'error',
         'react/self-closing-comp': ['error'],
         'key-spacing': ['error', {
