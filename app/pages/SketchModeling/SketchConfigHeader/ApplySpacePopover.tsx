@@ -75,7 +75,6 @@ const PopoverContent = (props: IContentProps) => {
   }, []);
 
   const switchSpaceAndApply = useCallback(async (space, schemaInfo) => {
-    const { data } = await schema.getSpaces();
     const err = await schema.switchSpace(space, true);
     if (!err) {
       batchApplySchema(schemaInfo);
@@ -111,7 +110,7 @@ const PopoverContent = (props: IContentProps) => {
         batchApplySchema(schemaInfo);
       }
     });
-  }, []);
+  }, [mode]);
 
   const checkSchemaIntersection = useCallback((schemaInfo) => {
     const { tags, edgeTypes } = schema;
