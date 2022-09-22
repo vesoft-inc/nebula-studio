@@ -16,6 +16,7 @@ var (
 	ErrParam            = newErrCode(CCBadRequest, PlatformCode, 1, "ErrParam")                // 40004001
 	ErrUnauthorized     = newErrCode(CCUnauthorized, PlatformCode, 0, "ErrUnauthorized")       // 40104000
 	ErrSession          = newErrCode(CCUnauthorized, PlatformCode, 1, "ErrSession")            // 40104001
+	ErrOAuth2           = newErrCode(CCUnauthorized, PlatformCode, 2, "ErrOAuth2")             // 40104002
 	ErrForbidden        = newErrCode(CCForbidden, PlatformCode, 0, "ErrForbidden")             // 40304000
 	ErrNotFound         = newErrCode(CCNotFound, PlatformCode, 0, "ErrNotFound")               // 40404000
 	ErrInternalServer   = newErrCode(CCInternalServer, PlatformCode, 0, "ErrInternalServer")   // 50004000
