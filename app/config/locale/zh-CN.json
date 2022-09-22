@@ -51,7 +51,8 @@
     "space": "图空间",
     "version": "版本",
     "statistics": "统计",
-    "duplicate": "复制"
+    "duplicate": "复制",
+    "sketch": "Schema 草图"
   },
   "doc": {
     "welcome": "欢迎使用",
@@ -97,7 +98,8 @@
     "dstIdRequired": "请选择终点 VID",
     "vidRequired": "请选择 VID",
     "vidTypeRequired": "请选择 VID 类型",
-    "fixStringLengthRequired": "请输入字符串固定长度"
+    "fixStringLengthRequired": "请输入字符串固定长度",
+    "spaceRequired": "图空间不能为空"
   },
   "console": {
     "execTime": "执行时间消耗",
@@ -285,8 +287,11 @@
     "sketchInvalid": "当前草图数据格式错误，请检查",
     "saveSuccess": "保存成功",
     "saveReminder": "当前草图有修改未保存，是否继续切换草图?",
+    "saveTip": "当前草图有修改未保存， 请先保存。",
     "confirmDelete": "请确认是否删除",
     "saveDraft": "保存草稿",
-    "export": "导出"
+    "export": "导出",
+    "applySpaceTip": "新的 schema 不会覆盖图空间中已有的 schema 信息",
+    "sameSchemaWarning": "图空间中已存在{content}，请修改{hasType}名称，或者选择其他图空间。"
   }
 }

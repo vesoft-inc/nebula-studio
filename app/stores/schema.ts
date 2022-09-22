@@ -1,6 +1,6 @@
 import { action, makeAutoObservable, observable } from 'mobx';
 import service from '@app/config/service';
-import { IAlterForm, IEdge, IIndexList, ISchemaType, ISpace, ITag, ITree, IndexType } from '@app/interfaces/schema';
+import { IAlterForm, IEdge, IIndexList, ISchemaType, ISpace, ITag, ITree, IndexType, ISchemaEnum } from '@app/interfaces/schema';
 import { handleKeyword } from '@app/utils/function';
 import { findIndex } from 'lodash';
 import {
@@ -74,10 +74,14 @@ export class SchemaStore {
     }
   }
 
-  switchSpace = async (space: string) => {
+  switchSpace = async (space: string, hideErrMsg?: boolean) => {
     const { code, message } = (await service.execNGQL({
       gql: `use ${handleKeyword(space)};`,
-    })) as any;
+    },
+    {
+      hideErrMsg
+    },
+    )) as any;
 
     if (code === 0) {
       this.update({
@@ -216,7 +220,7 @@ export class SchemaStore {
     const { edgeTypes } = payload;
     await Promise.all(
       edgeTypes.map(async item => {
-        const { code, data } = await this.getTagOrEdgeInfo('edge', item);
+        const { code, data } = await this.getTagOrEdgeInfo(ISchemaEnum.Edge, item);
         if (code === 0) {
           const edgeFields = data.tables.map(item => item.Field);
           this.addEdgesName({
@@ -245,7 +249,7 @@ export class SchemaStore {
             name: item,
             fields: [],
           };
-          const { code, data } = await this.getTagOrEdgeInfo('edge', item);
+          const { code, data } = await this.getTagOrEdgeInfo(ISchemaEnum.Edge, item);
           if (code === 0) {
             edge.fields = data.tables;
           }
@@ -303,7 +307,7 @@ export class SchemaStore {
     const { tags } = payload;
     await Promise.all(
       tags.map(async item => {
-        const { code, data } = await this.getTagOrEdgeInfo('tag', item);
+        const { code, data } = await this.getTagOrEdgeInfo(ISchemaEnum.Tag, item);
         if (code === 0) {
           const tagFields = data.tables.map(item => ({
             field: item.Field,
@@ -325,7 +329,7 @@ export class SchemaStore {
             name: item,
             fields: [],
           };
-          const { code, data } = await this.getTagOrEdgeInfo('tag', item);
+          const { code, data } = await this.getTagOrEdgeInfo(ISchemaEnum.Tag, item);
           if (code === 0) {
             tag.fields = data.tables;
           }

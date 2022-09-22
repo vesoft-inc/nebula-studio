@@ -47,8 +47,8 @@ export interface IProperty {
   showType?: string;
 }
 
-export type IndexType = 'tag' | 'edge';
-export type ISchemaType = 'tag' | 'edge';
+export type IndexType = ISchemaEnum.Tag | ISchemaEnum.Edge;
+export type ISchemaType = ISchemaEnum.Tag | ISchemaEnum.Edge;
 export type AlterType = 'ADD' | 'DROP' | 'CHANGE' | 'TTL' | 'COMMENT';
 export interface IAlterConfig {
   fields?: IProperty[];
@@ -66,6 +66,10 @@ export interface IAlterForm {
   config: IAlterConfig;
 }
 
+export enum ISchemaEnum {
+  Tag = 'tag',
+  Edge ='edge',
+}
 export enum IJobStatus {
   Queue = 'QUEUE',
   Running = 'RUNNING',

@@ -131,7 +131,7 @@ const LogModal = (props: IProps) => {
         </Button>}
       </>}
       width="80%"
-      visible={visible}
+      open={visible}
       onCancel={onCancel}
       wrapClassName={styles.logModal}
       destroyOnClose={true}

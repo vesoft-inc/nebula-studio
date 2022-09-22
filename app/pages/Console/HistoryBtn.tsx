@@ -66,7 +66,7 @@ const HistoryBtn = (props: IProps) => {
             </Button>
           </>
         }
-        visible={visible}
+        open={visible}
         className={styles.historyList}
         footer={null}
         onCancel={() => setVisible(false)}

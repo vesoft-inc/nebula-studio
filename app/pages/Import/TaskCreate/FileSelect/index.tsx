@@ -53,9 +53,9 @@ const FileSelect = (props: IProps) => {
     <Popover
       destroyTooltipOnHide={true}
       overlayClassName={styles.popoverFileSelect}
-      visible={visible}
+      open={visible}
       trigger="click"
-      onVisibleChange={visible => setVisible(visible)}
+      onOpenChange={visible => setVisible(visible)}
       content={<Form className={styles.fileSelectForm} onFinish={onFinish} layout="inline">
         <FormItem name="name" rules={[{ required: true }]}>
           <Select className={styles.fileSelect} showSearch={true} onDropdownVisibleChange={handleGetFiles} dropdownMatchSelectWidth={false}>

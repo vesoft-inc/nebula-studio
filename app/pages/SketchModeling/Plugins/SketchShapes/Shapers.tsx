@@ -1,7 +1,8 @@
-import { ISketchNode, ISketchType } from '@app/interfaces/sketch';
+import { ISketchNode } from '@app/interfaces/sketch';
 import VEditor, { DefaultNode } from '@vesoft-inc/veditor';
 import { InstanceNode } from '@vesoft-inc/veditor/types/Shape/Node';
 import ReactDOM from 'react-dom';
+import { ISchemaEnum } from '@app/interfaces/schema';
 import Path from './Path';
 import styles from './index.module.less';
 export default function initShapes(editor: VEditor) {
@@ -73,8 +74,8 @@ export default function initShapes(editor: VEditor) {
       return node.shape;
     },
   };
-  editor.graph.node.registeNode(ISketchType.SketchNode, node);
-  editor.graph.line.registeLine(ISketchType.SketchLine, Path);
+  editor.graph.node.registeNode(ISchemaEnum.Tag, node);
+  editor.graph.line.registeLine(ISchemaEnum.Edge, Path);
 }
 
 export const initShadowFilter = (svg: SVGElement) => {

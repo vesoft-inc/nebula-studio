@@ -1,10 +1,13 @@
 import { makeAutoObservable, observable, action } from 'mobx';
+import { message } from 'antd';
+import intl from 'react-intl-universal';
 import { getRootStore } from '@app/stores';
 import VEditor from '@vesoft-inc/veditor';
-import { ISketch, ISketchEdge, ISketchNode, ISketchType } from '@app/interfaces/sketch';
+import { ISketch, ISketchEdge, ISketchNode } from '@app/interfaces/sketch';
 import initShapes, { initShadowFilter } from '@app/pages/SketchModeling/Plugins/SketchShapes/Shapers';
 import service from '@app/config/service';
 import { Pointer } from '@app/interfaces/graph';
+import { IProperty, ISchemaEnum } from '@app/interfaces/schema';
 
 interface IHoveringItem {
   data: ISketchNode | ISketchEdge;
@@ -61,6 +64,46 @@ export class SketchStore {
     );
   };
 
+  validate = (data, type) => {
+    const isInvalid = !data.name || (data.properties as IProperty[])?.some((i) => !i.name || !i.type);
+    if (isInvalid) {
+      this.updateItem(data as any, { invalid: true });
+      if (type === 'node') {
+        this.editor.graph.node.updateNode(this.editor.graph.node.nodes[data.uuid].data, true);
+      } else {
+        this.editor.graph.line.updateLine(this.editor.graph.line.lines[data.uuid].data, true);
+      }
+    }
+    if (this.active?.uuid === data.uuid) {
+      this.update({ active: { ...this.active, invalid: isInvalid } });
+    }
+    return !isInvalid;
+  };
+
+  validateSchema = () => {
+    const data = this.editor.schema.getData();
+    const { nodes, lines } = data;
+    const nodesValid = nodes.reduce((flag, node) => this.validate(node, 'node') && flag, true);
+    const edgesValid = lines.reduce((flag, line) => this.validate(line, 'edge') && flag, true);
+    if(nodesValid && edgesValid) {
+      return true;
+    }
+    message.warning(intl.get('sketch.sketchInvalid'));
+    return nodesValid && edgesValid;
+  }
+
+  checkModified = () => {
+    const initialData = this.sketchList.items.find((item) => item.id === this.currentSketch?.id);
+    const schema = this.editor.schema.getData();
+    const isEmptySame = !schema.nodes.length && !schema.lines.length && !initialData.schema;
+    const newSchema = JSON.stringify(schema);
+    return (!isEmptySame && newSchema !== initialData.schema) || initialData.name !== this.currentSketch.name;
+    // if (initialData.name === this.currentSketch.name && (initialData.schema === newSchema || isEmptySame)) {
+    //   return false;
+    // }
+    // return true;
+  };
+  
   initSketch = async () => {
     const initData = {
       name: `Schema_${Date.now()}`,
@@ -148,7 +191,7 @@ export class SketchStore {
       this.update({ active: undefined });
     });
     this.editor.graph.on('line:beforeadd', ({ data: line }: { data: any }) => {
-      line.type = ISketchType.SketchLine;
+      line.type = ISchemaEnum.Edge;
       line.style = {
         'stroke-width': 1.6,
         stroke: 'rgba(99, 111, 129, 0.8)',
@@ -162,7 +205,7 @@ export class SketchStore {
         'stroke-linecap': 'round',
       };
     });
-    this.editor.graph.on('node:remove', ({ node }) => {
+    this.editor.graph.on('node:remove', () => {
       this.update({ active: undefined });
     });
     this.editor.graph.on('line:remove', () => {
@@ -216,7 +259,7 @@ export class SketchStore {
     Object.keys(payload).forEach((key) => (node[key] = payload[key]));
     const graph = this.editor.graph;
     const originalData =
-      node.type === ISketchType.SketchLine ? graph.line.lines[node.uuid].data : graph.node.nodes[node.uuid].data;
+      node.type === ISchemaEnum.Edge ? graph.line.lines[node.uuid].data : graph.node.nodes[node.uuid].data;
     Object.assign(originalData, { ...payload });
   };
 
@@ -230,8 +273,15 @@ export class SketchStore {
     });
   };
 
+  batchApply = async (gql) => {
+    const { code, data } = (await service.execNGQL({
+      gql,
+    })) as any;
+    return { code, data };
+  }
+
   deleteElement = (type) => {
-    if (type === ISketchType.SketchNode) {
+    if (type === ISchemaEnum.Tag) {
       this.editor.graph.node.deleteNode(this.active.uuid);
     } else {
       this.editor.graph.line.deleteLine(this.active.uuid);

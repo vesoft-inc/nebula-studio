@@ -51,7 +51,8 @@
     "space": "Space",
     "version": "Version",
     "statistics": "Statistics",
-    "duplicate": "Duplicate"
+    "duplicate": "Duplicate",
+    "sketch": "Schema drafting"
   },
   "doc": {
     "welcome": "Welcome to",
@@ -97,7 +98,8 @@
     "dstIdRequired": "Please select the destination VID",
     "vidRequired": "Please select the VID",
     "vidTypeRequired": "Vid type is required",
-    "fixStringLengthRequired": "fix string length limit is required"
+    "fixStringLengthRequired": "fix string length limit is required",
+    "spaceRequired": "Space is required"
   },
   "console": {
     "execTime": "Execution Time",
@@ -285,9 +287,11 @@
     "sketchInvalid": "The schema sketch is invalid, please check",
     "saveSuccess": "Save successfully",
     "saveReminder": "The current sketch has been modified but not saved, whether to continue to switch sketches?",
+    "saveTip": "The current sketch has been modified but not saved, please save first.",
     "confirmDelete": "Sure to delete?",
     "saveDraft": "Save draft",
-    "export": "Export"
-
+    "export": "Export",
+    "applySpaceTip": "The new schema will not overwrite the original schema in the space",
+    "sameSchemaWarning": "{content} already exists in the space, please change the {hasType} name or select another space."
   }
 }

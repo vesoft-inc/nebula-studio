@@ -2,9 +2,9 @@ import ReactDOM from 'react-dom';
 import rootStore from '@app/stores';
 
 import intl from 'react-intl-universal';
-import { ISketchType } from '@app/interfaces/sketch';
 import { onAbsolutePositionMove } from '@app/utils';
 import { observer } from 'mobx-react-lite';
+import { ISchemaEnum } from '@app/interfaces/schema';
 import styles from './index.module.less';
 
 // get WIDTH & MAX_HEIGHT from css
@@ -28,7 +28,7 @@ const Tooltip = observer(function Tooltip() {
   style.top =
     tooltip.top + OFFSET + TOOLTIP_HEIGHT > container.clientHeight ? top - OFFSET - TOOLTIP_HEIGHT : top + OFFSET;
   const renderLabel = () => {
-    return type === ISketchType.SketchNode ? (
+    return type === ISchemaEnum.Tag ? (
       <span className={styles.tag} style={{ backgroundColor: fill as string, border: `3px solid ${strokeColor}` }}>
         {name}
       </span>

@@ -1,7 +1,7 @@
 import Icon from '@app/components/Icon';
+import { ISchemaEnum } from '@app/interfaces/schema';
 // import { v1 as uuid } from 'uuid';
 import { useStore } from '@app/stores';
-import { ISketchType } from '@app/interfaces/sketch';
 import { Tooltip } from 'antd';
 import cls from 'classnames';
 import { observer } from 'mobx-react-lite';
@@ -58,7 +58,7 @@ const TagBar: React.FC = () => {
     sketchModel.update({
       draggingNewTag: {
         ...item,
-        type: ISketchType.SketchNode,
+        type: ISchemaEnum.Tag,
         name: undefined,
         comment: undefined,
         properties: [],

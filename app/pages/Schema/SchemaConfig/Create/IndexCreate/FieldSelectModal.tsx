@@ -57,7 +57,7 @@ const FieldSelectModal = (props: IProps) => {
       className={styles.modalFieldAdd}
       maskClosable={false}
       destroyOnClose={true}
-      visible={visible}
+      open={visible}
       width="640px"
       onCancel={handleClose}
       title={intl.get('common.addProperty')}

@@ -4,13 +4,14 @@
  * @interface DefaultLine
  */
 import ReactDOM from 'react-dom';
-import { ISketchEdge, ISketchType } from '@app/interfaces/sketch';
+import { ISketchEdge } from '@app/interfaces/sketch';
 import { LineRender } from '@vesoft-inc/veditor/types/Shape/Lines/Line';
 import { DefaultLine } from '@vesoft-inc/veditor';
 import { InstanceLine } from '@vesoft-inc/veditor/types/Shape/Line';
+import { ISchemaEnum } from '@app/interfaces/schema';
 import styles from './index.module.less';
 const Path: LineRender = {
-  type: ISketchType.SketchLine,
+  type: ISchemaEnum.Edge,
   arcRatio: 4,
   ...DefaultLine,
   renderLabel(line: InstanceLine): SVGGElement {

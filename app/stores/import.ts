@@ -17,7 +17,7 @@ const handlePropertyMap = (item, defaultValueFields) => {
     isDefault: defaultValueFields.includes(item.Field),
     mapping: null,
   };
-}
+};
 export class ImportStore {
   taskList: ITaskItem[] = [];
   verticesConfig: IVerticesConfig[] = [];

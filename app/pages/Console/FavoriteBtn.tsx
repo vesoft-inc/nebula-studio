@@ -64,7 +64,7 @@ const FavoriteBtn = (props: IProps) => {
             </Button>
           </>
         }
-        visible={visible}
+        open={visible}
         className={styles.favoriteList}
         footer={null}
         onCancel={() => setVisible(false)}

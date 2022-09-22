@@ -5,8 +5,8 @@ import { useStore } from '@app/stores';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect } from 'react';
 import { nameRulesFn } from '@app/config/rules';
-import { ISketchType } from '@app/interfaces/sketch';
 import { debounce } from 'lodash';
+import { ISchemaEnum } from '@app/interfaces/schema';
 import PropertiesForm from './PropertiesForm';
 import styles from './index.module.less';
 
@@ -22,7 +22,7 @@ const SchemaConfig: React.FC = () => {
 
     const { editor, active } = sketchModel;
     updateItem(active, data);
-    if (sketchModel.active.type === ISketchType.SketchNode) {
+    if (sketchModel.active.type === ISchemaEnum.Tag) {
       editor.graph.node.updateNode(editor.graph.node.nodes[active.uuid].data, true);
     } else {
       editor.graph.line.updateLine(editor.graph.line.lines[active.uuid].data, true);
@@ -60,7 +60,7 @@ const SchemaConfig: React.FC = () => {
   return (
     <div className={styles.schemaConfig}>
       <div className={styles.actions}>
-        {type === ISketchType.SketchNode && (
+        {type === ISchemaEnum.Tag && (
           <Button onClick={duplicateNode} icon={<Icon type="icon-Duplicate" />}>
             {intl.get('common.duplicate')}
           </Button>

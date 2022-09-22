@@ -69,8 +69,8 @@ const NodeStyleSetBtn: React.FC<IProps> = (props: IProps) => {
           />
         }
         trigger={'click'}
-        visible={visible}
-        onVisibleChange={setVisible}
+        open={visible}
+        onOpenChange={setVisible}
       >
         <div className={styles.colorGroup}>
           {colorList.slice(0, 3).map((item) => (

@@ -13,7 +13,7 @@ import Cookie from 'js-cookie';
 import styles from './index.module.less';
 import CreateForm from './CreateForm';
 
-function getVidType(type: string, length?: string) {
+export function getVidType(type: string, length?: string) {
   let result;
   if (type === 'INT64') {
     result = type;
@@ -99,7 +99,7 @@ const SpaceCreate = () => {
       <div className={cls(styles.configContainer, 'studioCenterLayout')}>
         <CreateForm 
           form={form}
-          colSpan='half'
+          colSpan="half"
           onFieldsChange={updateGql} 
           className={styles.spaceForm} 
           formItemLayout={formItemLayout} 

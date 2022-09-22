@@ -49,7 +49,8 @@ service.interceptors.response.use(
     if (error.response?.status) {
       const res = error.response.data || {};
       if(res.code !== 0 && res.message) {
-        message.error(res.message);
+        const hideErrMsg = error.response.config;
+        !hideErrMsg && message.error(res.message);
       } else {
         message.error(
           `${intl.get('common.requestError')}: ${error.response.status} ${

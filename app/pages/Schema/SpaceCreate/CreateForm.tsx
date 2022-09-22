@@ -26,14 +26,14 @@ const CreateForm = (props: IProps) => {
   const { onFieldsChange, onFinish, className, formItemLayout, form, colSpan } = props;
   const { schema } = useStore();
   const { activeMachineNum } = schema;
-  const _colSpan = useMemo(() => colSpan === 'full' ? 24 : 12, [colSpan])
+  const _colSpan = useMemo(() => colSpan === 'full' ? 24 : 12, [colSpan]);
   const vidColSpans = useMemo(() => {
     if(colSpan === 'full') {
       return [14, 9];
     } else {
       return [formItemLayout.wrapperCol.span || 11, 11];
     }
-  }, [colSpan])
+  }, [colSpan]);
   return (
     <Form 
       className={className || styles.spaceForm} 
@@ -50,22 +50,22 @@ const CreateForm = (props: IProps) => {
         </Col>
         <Col span={_colSpan} className={styles.vidItem}>
           <Form.Item noStyle shouldUpdate={true}>
-          {({ getFieldValue }) => {
-            const vidType = getFieldValue('vidType');
-            return <>
-              <Form.Item
-                label="Vid Type"
-                name="vidType"
-                rules={[{ required: true, message: intl.get('formRules.vidTypeRequired') }]}
-                wrapperCol={vidType === 'FIXED_STRING' && { span: vidColSpans[0]}}
-              >
-                <Select placeholder={intl.get('schema.selectVidTypeTip')}>
-                  <Option value="FIXED_STRING">FIXED_STRING</Option>
-                  <Option value="INT64">INT64</Option>
-                </Select>
-              </Form.Item>
-              {vidType === 'FIXED_STRING' 
-                ? <Col span={vidColSpans[1]} offset={vidColSpans[0] + 1} className={styles.stringLength}>
+            {({ getFieldValue }) => {
+              const vidType = getFieldValue('vidType');
+              return <>
+                <Form.Item
+                  label="Vid Type"
+                  name="vidType"
+                  rules={[{ required: true, message: intl.get('formRules.vidTypeRequired') }]}
+                  wrapperCol={vidType === 'FIXED_STRING' && { span: vidColSpans[0] }}
+                >
+                  <Select placeholder={intl.get('schema.selectVidTypeTip')}>
+                    <Option value="FIXED_STRING">FIXED_STRING</Option>
+                    <Option value="INT64">INT64</Option>
+                  </Select>
+                </Form.Item>
+                {vidType === 'FIXED_STRING' 
+                  ? <Col span={vidColSpans[1]} offset={vidColSpans[0] + 1} className={styles.stringLength}>
                     <Form.Item label={intl.get('schema.length')} name="stringLength" rules={[
                       {
                         required: true,
@@ -76,9 +76,9 @@ const CreateForm = (props: IProps) => {
                       <Input />
                     </Form.Item>
                   </Col>
-                : null}
-            </>
-          }}
+                  : null}
+              </>;
+            }}
           </Form.Item>
         
         </Col>
