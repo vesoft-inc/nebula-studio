@@ -2,12 +2,13 @@ import { makeAutoObservable, observable, action } from 'mobx';
 import { message } from 'antd';
 import intl from 'react-intl-universal';
 import { getRootStore } from '@app/stores';
-import VEditor from '@vesoft-inc/veditor';
+import VEditor, { VEditorOptions } from '@vesoft-inc/veditor';
 import { ISketch, ISketchEdge, ISketchNode } from '@app/interfaces/sketch';
 import initShapes, { initShadowFilter } from '@app/pages/SketchModeling/Plugins/SketchShapes/Shapers';
 import service from '@app/config/service';
 import { Pointer } from '@app/interfaces/graph';
 import { IProperty, ISchemaEnum } from '@app/interfaces/schema';
+import { ARROW_STYLE, LINE_STYLE, NODE_RADIUS } from '@app/config/sketch';
 
 interface IHoveringItem {
   data: ISketchNode | ISketchEdge;
@@ -96,12 +97,16 @@ export class SketchStore {
     const initialData = this.sketchList.items.find((item) => item.id === this.currentSketch?.id);
     const schema = this.editor.schema.getData();
     const isEmptySame = !schema.nodes.length && !schema.lines.length && !initialData.schema;
-    const newSchema = JSON.stringify(schema);
-    return (!isEmptySame && newSchema !== initialData.schema) || initialData.name !== this.currentSketch.name;
-    // if (initialData.name === this.currentSketch.name && (initialData.schema === newSchema || isEmptySame)) {
-    //   return false;
-    // }
-    // return true;
+    const newSchema = JSON.stringify({
+      nodes: schema.nodes.map(node => ({ name: node.name, properties: node.properties, comment: node.comment })),
+      lines: schema.lines.map(line => ({ name: line.name, from: line.from, to: line.to, properties: line.properties, comment: line.comment })),
+    });
+    let prevSchema = JSON.parse(initialData.schema);
+    prevSchema = JSON.stringify({
+      nodes: prevSchema.nodes.map(node => ({ name: node.name, properties: node.properties, comment: node.comment })),
+      lines: prevSchema.lines.map(line => ({ name: line.name, from: line.from, to: line.to, properties: line.properties, comment: line.comment })),
+    });
+    return (!isEmptySame && newSchema !== prevSchema) || initialData.name !== this.currentSketch.name;
   };
   
   initSketch = async () => {
@@ -153,17 +158,20 @@ export class SketchStore {
     }
   };
 
-  initEditor = async (container: HTMLDivElement, schema?: string) => {
+  initEditor = async (params: {container: HTMLDivElement, schema?: string, options?: VEditorOptions }) => {
+    const { container, schema, options } = params;
     this.editor = new VEditor({
       dom: container,
       showBackGrid: false,
+      ...options
     });
     this.container = container;
     initShapes(this.editor);
     initShadowFilter(this.editor.svg);
-    this.initEvents();
+    options?.mode !== 'view' && this.initEvents();
     if (schema) {
-      this.editor.schema.setData(JSON.parse(schema));
+      await this.editor.schema.setData(JSON.parse(schema));
+      this.editor.controller.autoFit();
     }
   };
   clearActive = () => {
@@ -192,18 +200,8 @@ export class SketchStore {
     });
     this.editor.graph.on('line:beforeadd', ({ data: line }: { data: any }) => {
       line.type = ISchemaEnum.Edge;
-      line.style = {
-        'stroke-width': 1.6,
-        stroke: 'rgba(99, 111, 129, 0.8)',
-      };
-      line.arrowStyle = {
-        'stroke-width': 1.6,
-        stroke: 'rgba(99, 111, 129, 0.8)',
-        fill: 'transparent',
-        d: 'M-7 7L0 0L7 7',
-        'stroke-linejoin': 'round',
-        'stroke-linecap': 'round',
-      };
+      line.style = LINE_STYLE;
+      line.arrowStyle = ARROW_STYLE;
     });
     this.editor.graph.on('node:remove', () => {
       this.update({ active: undefined });
@@ -245,8 +243,8 @@ export class SketchStore {
       const node = {
         x,
         y,
-        width: 83,
-        height: 83,
+        width: NODE_RADIUS * 2,
+        height: NODE_RADIUS * 2,
         name: undefined,
         ...this.draggingNewTag,
       };
@@ -323,6 +321,7 @@ export class SketchStore {
   destroy = () => {
     this.editor.destroy();
     this.editor = undefined;
+    this.active = undefined;
   };
 }
 

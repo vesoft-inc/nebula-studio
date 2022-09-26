@@ -8,6 +8,7 @@ import (
 	gateway "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/gateway"
 	health "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/health"
 	importtask "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/importtask"
+	schema "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/schema"
 	sketches "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/sketches"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 
@@ -153,6 +154,21 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodPut,
 				Path:    "/api/sketches/:id",
 				Handler: sketches.UpdateHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPut,
+				Path:    "/api/schema/:space/snapshot",
+				Handler: schema.UpdateHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/schema/:space/snapshot",
+				Handler: schema.GetSnapshotHandler(serverCtx),
 			},
 		},
 	)

@@ -60,6 +60,13 @@ const service = {
   deleteSketch: (id: string) => {
     return _delete(`/api/sketches/${id}`)();
   },
+  getSchemaSnapshot: (space) => {
+    return get(`/api/schema/${space}/snapshot`)();
+  },
+  updateSchemaSnapshot: (params) => {
+    const { space, ...restParams } = params;
+    return put(`/api/schema/${space}/snapshot`)(restParams);
+  },
 };
 
 export const updateService = (partService: any) => {

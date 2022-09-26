@@ -93,7 +93,7 @@ export const MENU_LIST = [
       action: 'view_sketch',
       label: 'from_navigation'
     },
-    icon: 'icon-studio-nav-schema',
+    icon: 'icon-navbar-sketch',
     intlKey: 'common.sketch'
   },
 ];

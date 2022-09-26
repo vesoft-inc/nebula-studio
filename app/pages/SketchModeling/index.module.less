@@ -1,4 +1,21 @@
 @import '~@app/common.less';
+@keyframes panelOut {
+  0%{
+    left: calc(100% - 92px);
+  }
+  100%{
+    left: max(calc(50% + 150px), calc(100% - 430px));
+  }
+}
+@keyframes tagPanelOut {
+  0%{
+    right: 50%;
+  }
+  100%{
+    right: min(calc(100% - 320px), calc(50% + 350px));
+  }
+}
+
 .sketchModeling {
   display: flex;
   height: 100%;
@@ -15,10 +32,10 @@
   }
 }
 .tagBar {
-  position: fixed;
+  position: absolute;
   bottom: 33px;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 50%;
+  transform: translateX(50%);
   height: 86px;
   .tags {
     display: flex;
@@ -71,7 +88,8 @@
   margin:0;
 }
 .scaleBtns {
-  position: fixed;
+  position: absolute;
+  width: 42px;
   bottom: 33px;
   right: 50px;
   display: flex;
@@ -91,6 +109,16 @@
     user-select: none;
     cursor: pointer;
   }
+}
+
+.offset {
+  animation: panelOut 400ms;
+  left: max(calc(50% + 150px), calc(100% - 430px));
+}
+
+.offsetBar {
+  animation: tagPanelOut 400ms;
+  right: min(calc(100% - 320px), calc(50% + 350px));
 }
 
 .empty {

@@ -279,3 +279,19 @@ type DeleteSketchRequest struct {
 type SketchIDResult struct {
 	ID int `json:"id"`
 }
+
+type GetSchemaSnapshotRequest struct {
+	Space string `path:"space"`
+}
+
+type UpdateSchemaSnapshotRequest struct {
+	Space    string `path:"space"`
+	Snapshot string `json:"snapshot"`
+}
+
+type SchemaSnapshot struct {
+	Space      string `json:"space"`
+	Snapshot   string `json:"snapshot"`
+	UpdateTime int64  `json:"updateTime"`
+	CreateTime int64  `json:"createTime"`
+}

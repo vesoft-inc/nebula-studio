@@ -42,3 +42,12 @@ export const sortByFieldAndFilter = (payload: {
 export const removeNullCharacters = (data: string) => {
   return data.replace(/\u0000+$/, '');
 };
+
+export const safeParse = <T extends unknown>(data: string) => {
+  try {
+    return JSON.parse(data) as T;
+  } catch (err) {
+    console.error('JSON.parse error', err);
+    return undefined;
+  }
+};

@@ -40,6 +40,9 @@ const SketchList: React.FC = () => {
   }, []);
 
   const handleSelect = useCallback((item: ISketch) => {
+    if(item === sketchModel.currentSketch) {
+      return;
+    }
     if (!sketchModel.currentSketch) {
       update({ currentSketch: item });
       return;

@@ -52,7 +52,9 @@
     "version": "Version",
     "statistics": "Statistics",
     "duplicate": "Duplicate",
-    "sketch": "Schema drafting"
+    "sketch": "Schema drafting",
+    "viewSchema": "View Schema",
+    "beta": "Beta"
   },
   "doc": {
     "welcome": "Welcome to",
@@ -241,7 +243,10 @@
     "pngDownload": "Export PNG File",
     "rebuildSuccess": "{names} rebuild successfully",
     "rebuildFailed": "{names} rebuild failed",
-    "startRebuildIndex": "Start rebuilding the index {name}"
+    "startRebuildIndex": "Start rebuilding the index {name}",
+    "getSchema": "Get Schema",
+    "getSchemaTip": "Because there is no strong binding relationship between tags and edges in the current NebulaGraph version, the results will be generated based on randomly obtained data, for reference only.",
+    "danglingEdge": "Dangling edge"
   },
   "empty": {
     "stats": "No Statistics Data",
