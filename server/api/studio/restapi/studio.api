@@ -11,4 +11,5 @@ import (
 	"file.api"
 	"import.api"
 	"sketch.api"
+	"schema.api"
 )

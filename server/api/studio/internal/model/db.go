@@ -25,6 +25,7 @@ func InitDB(sqlitedbFilePath string) {
 	err = db.AutoMigrate(
 		&TaskInfo{},
 		&Sketch{},
+		&SchemaSnapshot{},
 	)
 	if err != nil {
 		zap.L().Fatal(fmt.Sprintf("init taskInfo table fail: %s", err))

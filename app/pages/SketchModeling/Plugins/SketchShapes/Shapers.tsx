@@ -3,18 +3,18 @@ import VEditor, { DefaultNode } from '@vesoft-inc/veditor';
 import { InstanceNode } from '@vesoft-inc/veditor/types/Shape/Node';
 import ReactDOM from 'react-dom';
 import { ISchemaEnum } from '@app/interfaces/schema';
+import { NODE_RADIUS } from '@app/config/sketch';
 import Path from './Path';
 import styles from './index.module.less';
 export default function initShapes(editor: VEditor) {
-  const radius = 42;
   const node = {
     ...DefaultNode.default,
 
     linkPoints: [
-      { x: radius - 1, y: 0, isPixel: true },
-      { x: radius - 1, y: 2 * (radius - 1), isPixel: true },
-      { x: 2 * (radius - 1), y: radius - 1, isPixel: true },
-      { x: 0, y: radius - 1, isPixel: true },
+      { x: NODE_RADIUS - 1, y: 0, isPixel: true },
+      { x: NODE_RADIUS - 1, y: 2 * (NODE_RADIUS - 1), isPixel: true },
+      { x: 2 * (NODE_RADIUS - 1), y: NODE_RADIUS - 1, isPixel: true },
+      { x: 0, y: NODE_RADIUS - 1, isPixel: true },
     ],
     render: (node: InstanceNode) => {
       const data = node.data as ISketchNode;
@@ -22,12 +22,13 @@ export default function initShapes(editor: VEditor) {
       node.shape = node.shape ? node.shape : document.createElementNS('http://www.w3.org/2000/svg', 'g');
       ReactDOM.render(
         <>
-          <circle className={styles.activeNode} r={radius + 8} cx={radius} cy={radius} />
+          {!data.hideActive && <circle className={styles.activeNode} r={NODE_RADIUS + 8} cx={NODE_RADIUS} cy={NODE_RADIUS} />}
           <circle
             className="svg-item"
-            r={radius - 1}
-            cx={radius}
-            cy={radius}
+            r={NODE_RADIUS - 1}
+            cx={NODE_RADIUS}
+            cy={NODE_RADIUS}
+            strokeDasharray={data.strokeDasharray}
             style={{
               strokeWidth: 3,
               fill: data.fill,
@@ -37,7 +38,7 @@ export default function initShapes(editor: VEditor) {
             <animate
               attributeName="r"
               from={24}
-              to={radius - 1}
+              to={NODE_RADIUS - 1}
               dur="0.2s"
               begin="DOMNodeInsertedIntoDocument"
               fill="freeze"
@@ -45,7 +46,7 @@ export default function initShapes(editor: VEditor) {
           </circle>
 
           {data.name ? (
-            <foreignObject x={0} y={0} width={radius * 2} height={radius * 2}>
+            <foreignObject x={0} y={0} width={NODE_RADIUS * 2} height={NODE_RADIUS * 2}>
               <div className={styles.labelContainer}>
                 <span className={styles.label}>{data.name}</span>
               </div>
@@ -53,10 +54,10 @@ export default function initShapes(editor: VEditor) {
           ) : null}
           {data.invalid && (
             <>
-              <circle cx={radius * 2 - 10} cy={10} r={12} fill="#EB5757" />
+              <circle cx={NODE_RADIUS * 2 - 10} cy={10} r={12} fill="#EB5757" />
               <text
                 style={{ userSelect: 'none' }}
-                x={radius * 2 - 10}
+                x={NODE_RADIUS * 2 - 10}
                 y={10}
                 textAnchor="middle"
                 fontSize={16}

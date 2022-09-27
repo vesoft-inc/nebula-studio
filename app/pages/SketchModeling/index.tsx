@@ -25,7 +25,7 @@ const SketchPage: React.FC = () => {
   }, []);
   useEffect(() => {
     if (currentSketch) {
-      initEditor(editorRef.current, currentSketch.schema);
+      initEditor({ container: editorRef.current, schema: currentSketch.schema });
       initTooltip({ container: editorRef.current });
     }
   }, [currentSketch]);

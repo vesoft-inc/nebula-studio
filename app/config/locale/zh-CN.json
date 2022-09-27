@@ -52,7 +52,9 @@
     "version": "版本",
     "statistics": "统计",
     "duplicate": "复制",
-    "sketch": "Schema 草图"
+    "sketch": "Schema 草图",
+    "viewSchema": "查看 Schema",
+    "beta": "Beta"
   },
   "doc": {
     "welcome": "欢迎使用",
@@ -241,7 +243,10 @@
     "pngDownload": " 导出 PNG",
     "rebuildSuccess": "{names}重建完成",
     "rebuildFailed": "{names}重建失败",
-    "startRebuildIndex": "开始重建索引{name}"
+    "startRebuildIndex": "开始重建索引{name}",
+    "getSchema": "获取 Schema",
+    "getSchemaTip": "因为当前 NebulaGraph 版本下不存在点边的强绑定关系，结果将依据随机捞取到的数据生成，仅供参考。",
+    "danglingEdge": "悬挂边"
   },
   "empty": {
     "stats": "暂无统计数据",

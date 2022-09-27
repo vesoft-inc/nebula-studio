@@ -1,6 +1,6 @@
 import Icon from '@app/components/Icon';
+import { COLOR_LIST } from '@app/config/sketch';
 import { ISchemaEnum } from '@app/interfaces/schema';
-// import { v1 as uuid } from 'uuid';
 import { useStore } from '@app/stores';
 import { Tooltip } from 'antd';
 import cls from 'classnames';
@@ -8,51 +8,10 @@ import { observer } from 'mobx-react-lite';
 import React, { useCallback } from 'react';
 import intl from 'react-intl-universal';
 import styles from './index.module.less';
-const COLOR_LIST = [
-  {
-    fill: '#E6E6E6',
-    strokeColor: 'rgba(60, 60, 60, 0.5)',
-    shadow: 'rgba(90, 90, 90, 0.25)',
-  },
-  {
-    fill: '#E4F1FF',
-    strokeColor: 'rgba(34, 135, 227, 0.5)',
-    shadow: 'rgba(0, 178, 255, 0.25)',
-  },
-  {
-    fill: '#EBE4FF',
-    strokeColor: 'rgba(84, 34, 227, 0.5)',
-    shadow: 'rgba(20, 0, 255, 0.25)',
-  },
-  {
-    fill: '#FEE4FF',
-    strokeColor: 'rgba(227, 34, 196, 0.5)',
-    shadow: 'rgba(255, 0, 229, 0.25)',
-  },
-  {
-    fill: '#FFE4E4',
-    strokeColor: 'rgba(227, 34, 34, 0.5)',
-    shadow: 'rgba(255, 15, 0, 0.25)',
-  },
-  {
-    fill: '#FFF9E4',
-    strokeColor: 'rgba(218, 196, 0, 0.5)',
-    shadow: 'rgba(209, 163, 0, 0.25)',
-  },
-  {
-    fill: '#EFFFE4',
-    strokeColor: 'rgba(54, 200, 2, 0.5)',
-    shadow: 'rgba(0, 255, 10, 0.25)',
-  },
-  {
-    fill: '#E4FFF4',
-    strokeColor: 'rgba(0, 184, 162, 0.5)',
-    shadow: 'rgba(0, 255, 194, 0.25)',
-  },
-];
+
 const TagBar: React.FC = () => {
   const { sketchModel } = useStore();
-  const { draggingNewTag, draggingPosition, addNode } = sketchModel;
+  const { draggingNewTag, draggingPosition, addNode, active } = sketchModel;
   const onDrag = (e: React.MouseEvent, item) => {
     e.preventDefault();
     sketchModel.update({
@@ -98,7 +57,7 @@ const TagBar: React.FC = () => {
   }, []);
   return (
     <>
-      <div className={styles.tagBar}>
+      <div className={cls(styles.tagBar, active && styles.offsetBar)}>
         <div className={styles.tags}>
           <span className={styles.tagLabel}>{intl.get('common.tag')}</span>
           <div className={styles.tagList}>

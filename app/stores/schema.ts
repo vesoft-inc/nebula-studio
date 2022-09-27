@@ -1,8 +1,9 @@
 import { action, makeAutoObservable, observable } from 'mobx';
 import service from '@app/config/service';
 import { IAlterForm, IEdge, IIndexList, ISchemaType, ISpace, ITag, ITree, IndexType, ISchemaEnum } from '@app/interfaces/schema';
-import { handleKeyword } from '@app/utils/function';
+import { handleKeyword, handleVidStringName, safeParse } from '@app/utils/function';
 import { findIndex } from 'lodash';
+
 import {
   getAlterGQL,
   getIndexCreateGQL,
@@ -642,6 +643,68 @@ export class SchemaStore {
       gql,
     })) as any;
     return { code, data };
+  }
+
+  // schema visualization
+  getRandomEdgeData = async () => {
+    const vids:Set<string> = new Set();
+    const edges = [];
+    const edgeQuery = this.edgeTypes.map(edge => `MATCH ()-[e:${handleKeyword(edge)}]->() RETURN e LIMIT 10;`);
+    const { code, data } = await service.batchExecNGQL({
+      gqls: edgeQuery
+    });
+    if(code === 0) {
+      data.forEach(item => {
+        if(item.code === 0) {
+          const edgeList = item.data?.tables || [];
+          edgeList.forEach(item => {
+            const { dstID, srcID, edgeName } = item._edgesParsedList[0];
+            vids.add(srcID);
+            vids.add(dstID);
+            edges.push({
+              src: srcID,
+              dst: dstID,
+              name: edgeName
+            });
+          });
+        }
+      });
+    }
+    return { 
+      vids: [...vids], 
+      edges 
+    };
+  }
+
+  getNodeTagMap = async (ids: string[]) => {
+    const vidMap = {};
+    const tagSet = new Set();
+    const gql = `match (v) where id(v) in [${ids.map(id => handleVidStringName(id)).join(',')}] return id(v) as id, tags(v) as \`tags\``;
+    const res = await service.execNGQL({ gql });
+    if(res.code === 0) {
+      const tables = res.data?.tables || [];
+      tables.forEach(item => {
+        const { id, tags } = item;
+        const _tags: string[] = safeParse(tags) || [];
+        const tagName = _tags.sort().join(' | ');
+        vidMap[id] = tagName;
+        tagSet.add(tagName);
+      });
+      return { vidMap, tags: [...tagSet] };
+    }
+  }
+
+  getSchemaSnapshot = async (space) => {
+    const res = await service.getSchemaSnapshot(space);
+    return res;
+  }
+
+  updateSchemaSnapshot = async (params: {
+    space: string, 
+    snapshot: string
+  }) => {
+    const res = await service.updateSchemaSnapshot(params);
+    return res;
   }
 }
 

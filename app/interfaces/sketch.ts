@@ -15,6 +15,7 @@ export interface ISketchNode extends VEditorNode {
   name?: string;
   comment?: string;
   invalid: boolean;
+  strokeDasharray?: string;
 }
 
 export interface ISketchEdge extends VEditorLine {

@@ -117,7 +117,7 @@ const PopoverContent = (props: IContentProps) => {
     const { tags: newTags, edges: newEdges } = schemaInfo;
     const sameTags = intersection(newTags.map(item => item.name), tags);
     const sameEdges = intersection(newEdges.map(item => item.name), edgeTypes);
-    if(!sameTags.length && !sameEdges.length) {
+    if(sameTags.length || sameEdges.length) {
       return true;
     }
     const tagStr = sameTags.join('、');

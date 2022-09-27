@@ -1,0 +1,29 @@
+type (
+	GetSchemaSnapshotRequest {
+		Space string `path:"space"`
+	}
+
+	UpdateSchemaSnapshotRequest {
+		Space    string `path:"space"`
+		Snapshot string `json:"snapshot"`
+	}
+
+	SchemaSnapshot {
+		Space      string `json:"space"`
+		Snapshot   string `json:"snapshot"`
+		UpdateTime int64  `json:"updateTime"`
+		CreateTime int64  `json:"createTime"`
+	}
+)
+@server(
+	group: schema
+)
+service studio-api {
+	@doc "Update Schema Snapshot"
+	@handler Update
+	put /api/schema/:space/snapshot (UpdateSchemaSnapshotRequest)
+	
+	@doc "Get Schema Snapshot"
+	@handler GetSnapshot
+	get /api/schema/:space/snapshot (GetSchemaSnapshotRequest) returns (SchemaSnapshot)
+}

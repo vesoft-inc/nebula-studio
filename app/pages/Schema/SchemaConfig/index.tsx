@@ -8,10 +8,12 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { LanguageContext } from '@app/context';
 import cls from 'classnames';
+import { ISchemaEnum } from '@app/interfaces/schema';
 import TagList from './List/Tag';
 import EdgeList from './List/Edge';
 import IndexList from './List/Index/index';
 import SpaceStats from './List/SpaceStats';
+import SchemaVisualization from './List/SchemaVisualization';
 import CommonCreate from './Create/CommonCreate';
 import IndexCreate from './Create/IndexCreate';
 import CommonEdit from './Edit/CommonEdit';
@@ -26,7 +28,7 @@ const SchemaConfig = () => {
   const { spaces, getSpaces, switchSpace, currentSpace } = schema;
   const { currentLocale } = useContext(LanguageContext);
   const routes = useMemo(() => {
-    if(action === 'list') {
+    if(action === 'list' || type === 'visualization') {
       return [
         {
           path: '/schema',
@@ -68,11 +70,14 @@ const SchemaConfig = () => {
 
   const handleUpdateSpace = (value: string) => {
     switchSpace(value);
-    history.push(`/schema/${type}/list`);
+    const route = type === 'visualization' ? `/schema/visualization` : `/schema/${type}/list`;
+    history.push(route);
   };
   const handleTabChange = e => {
-    setTab(e.target.value);
-    history.push(`/schema/${e.target.value}/list`);
+    const type = e.target.value;
+    setTab(type);
+    const route = type === 'visualization' ? `/schema/visualization` : `/schema/${type}/list`;
+    history.push(route);
   };
   return (
     <div className={styles.schemaPage}>
@@ -87,7 +92,7 @@ const SchemaConfig = () => {
         </Select> : <span>{currentSpace}</span>}
       </div>} />
       <div className={cls(styles.listContainer, 'studioCenterLayout')}>
-        {action === 'list' && <div className="studioTabHeader">
+        {(action === 'list' || type === 'visualization') && <div className="studioTabHeader">
           <Radio.Group
             className="studioTabGroup"
             value={tab}
@@ -98,6 +103,7 @@ const SchemaConfig = () => {
             <Radio.Button value="edge">{intl.get('common.edge')}</Radio.Button>
             <Radio.Button value="index">{intl.get('common.index')}</Radio.Button>
             <Radio.Button value="statistic">{intl.get('common.statistics')}</Radio.Button>
+            <Radio.Button value="visualization">{intl.get('common.viewSchema')}<span className={styles.betaLabel}>{intl.get('common.beta')}</span></Radio.Button>
           </Radio.Group>
         </div>}
         <>
@@ -122,24 +128,29 @@ const SchemaConfig = () => {
             component={SpaceStats}
           />
           <Route
+            path="/schema/visualization"
+            exact={true}
+            component={SchemaVisualization}
+          />
+          <Route
             path={`/schema/tag/create`}
             exact={true}
-            render={() => <CommonCreate createType="tag" locale={currentLocale} />}
+            render={() => <CommonCreate createType={ISchemaEnum.Tag} locale={currentLocale} />}
           />
           <Route
             path={`/schema/edge/create`}
             exact={true}
-            render={() => <CommonCreate createType="edge" locale={currentLocale} />}
+            render={() => <CommonCreate createType={ISchemaEnum.Edge} locale={currentLocale} />}
           />
           <Route
             path={`/schema/tag/edit`}
             exact={true}
-            render={() => <CommonEdit editType="tag" />}
+            render={() => <CommonEdit editType={ISchemaEnum.Tag} />}
           />
           <Route
             path={`/schema/edge/edit`}
             exact={true}
-            render={() => <CommonEdit editType="edge" />}
+            render={() => <CommonEdit editType={ISchemaEnum.Edge} />}
           />
           
           <Route
