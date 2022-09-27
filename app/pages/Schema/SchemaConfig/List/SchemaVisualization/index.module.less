@@ -30,4 +30,48 @@
     background-color: #fff;
     border: 1px solid #E0E0E0;
   }
+  .visualizationTip {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #F3F6F9;
+    border-radius: 12px;
+    width: 160px;
+    padding: 20px 15px;
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      &:not(:last-child) {
+        margin-bottom: 20px;
+      }
+    }
+    .circle {
+      width: 30px;
+      height: 30px;
+      background-color: rgba(98, 111, 129, 0.3);
+      border-radius: 30px;
+      display: inline-block;
+      border: 3px solid #626F81;
+    }
+    .edge {
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+    }
+    .line {
+      width: 50px;
+      height: 2px;
+      background-color: #636F81;
+    }
+    .arrow {
+      width: 10px;
+      height: 10px;
+      border-top: 2px solid #636F81;
+      border-right: 2px solid #636F81;
+      transform: rotate(45deg);
+      position: absolute;
+      right: 0;
+    }
+  }
 }

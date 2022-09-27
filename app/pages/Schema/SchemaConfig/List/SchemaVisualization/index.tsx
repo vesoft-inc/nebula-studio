@@ -1,4 +1,4 @@
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import dayjs from 'dayjs';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import intl from 'react-intl-universal';
@@ -29,60 +29,69 @@ const SchemaVisualization = () => {
     };
   }, []);
   useEffect(() => {
+    setUpdateTime('');
     sketchModel.editor?.graph.clearGraph();
     getSnapshot();
   }, [currentSpace]);
   const handleGetVisulization = useCallback(async () => {
     setLoading(true);
-    await getSchemaInfo();
-    const { vids, edges } = await getRandomEdgeData();
-    const { tags, vidMap } = await getNodeTagMap(vids);
-    const nodes = tags.map((tag, index) => {
-      const color = COLOR_LIST[index % COLOR_LIST.length];
-      return {
-        name: tag,
-        uuid: uuidv4(),
-        width: NODE_RADIUS * 2,
-        height: NODE_RADIUS * 2,
-        type: ISchemaEnum.Tag,
-        strokeColor: color.strokeColor,
-        fill: color.fill,
-        hideActive: true,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-      };
-    });
-    let lines = [];
-    edges.forEach(line => {
-      const { src, dst, name } = line;
-      const srcTag = vidMap[src];
-      const dstTag = vidMap[dst];
-      lines.push({
-        from: srcTag,
-        to: dstTag,
-        name
+    try {
+      await getSchemaInfo();
+      const { vids, edges } = await getRandomEdgeData();
+      if(vids.length === 0) {
+        message.warning(intl.get('sketch.noData'));
+        return;
+      }
+      const { tags, vidMap } = await getNodeTagMap(vids);
+      const nodes = tags.map((tag, index) => {
+        const color = COLOR_LIST[index % COLOR_LIST.length];
+        return {
+          name: tag,
+          uuid: uuidv4(),
+          width: NODE_RADIUS * 2,
+          height: NODE_RADIUS * 2,
+          type: ISchemaEnum.Tag,
+          strokeColor: color.strokeColor,
+          fill: color.fill,
+          hideActive: true,
+          x: Math.random() * 100,
+          y: Math.random() * 100,
+        };
       });
-    });
-    lines = uniqWith(lines, isEqual);
-    const _lines = lines.map(line => {
-      return {
-        from: nodes.find(node => node.name === line.from)?.uuid,
-        to: nodes.find(node => node.name === line.to)?.uuid,
-        name: line.name,
-        type: ISchemaEnum.Edge,
-        fromPoint: 2,
-        toPoint: 3,
-        style: LINE_STYLE,
-        arrowStyle: ARROW_STYLE,
-      };
-    });
+      let lines = [];
+      edges.forEach(line => {
+        const { src, dst, name } = line;
+        const srcTag = vidMap[src];
+        const dstTag = vidMap[dst];
+        lines.push({
+          from: srcTag,
+          to: dstTag,
+          name
+        });
+      });
+      lines = uniqWith(lines, isEqual);
+      const _lines = lines.map(line => {
+        return {
+          from: nodes.find(node => node.name === line.from)?.uuid,
+          to: nodes.find(node => node.name === line.to)?.uuid,
+          name: line.name,
+          type: ISchemaEnum.Edge,
+          fromPoint: 2,
+          toPoint: 3,
+          style: LINE_STYLE,
+          arrowStyle: ARROW_STYLE,
+        };
+      }).filter(line => line.from && line.to);
 
-    await sketchModel.editor.schema.setData({ nodes, lines: _lines });
-    await sketchModel.editor.schema.format();
-    await sketchModel.editor.controller.autoFit();
-    updateSnapshot();
-    setUpdateTime(dayjs().format('YYYY-MM-DD HH:mm:ss'));
-    setLoading(false);
+      await sketchModel.editor.schema.setData({ nodes, lines: _lines });
+      await sketchModel.editor.schema.format();
+      await sketchModel.editor.controller.autoFit();
+      updateSnapshot();
+      setUpdateTime(dayjs().format('YYYY-MM-DD HH:mm:ss'));
+    } finally {
+      setLoading(false);
+    }
+    
   }, []);
   const updateSnapshot = useCallback(async () => {
     const data = sketchModel.editor.schema.getData();
@@ -141,6 +150,19 @@ const SchemaVisualization = () => {
       </div>
       <div className={styles.container}>
         <div className={styles.visualizationContent} ref={editorRef} />
+        <div className={styles.visualizationTip}>
+          <div className={styles.row}>
+            <span className={styles.circle} />
+            <span>{intl.get('common.tag')}</span>
+          </div>
+          <div className={styles.row}>
+            <span className={styles.edge}>
+              <span className={styles.line} />
+              <span className={styles.arrow} />
+            </span>
+            <span>{intl.get('common.edge')}</span>
+          </div>
+        </div>
         <ZoomBtns />
       </div>
       
