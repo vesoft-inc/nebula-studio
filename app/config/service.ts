@@ -67,6 +67,18 @@ const service = {
     const { space, ...restParams } = params;
     return put(`/api/schema/${space}/snapshot`)(restParams);
   },
+  deleteFavorite: (id) => {
+    return _delete(`/api/favorites/${id}`)();
+  },
+  deleteAllFavorites: () => {
+    return _delete(`/api/favorites`)();
+  },
+  getFavoriteList: () => {
+    return get(`/api/favorites/list`)();
+  },
+  saveFavorite: (params) => {
+    return post(`/api/favorites`)(params);
+  },
 };
 
 export const updateService = (partService: any) => {

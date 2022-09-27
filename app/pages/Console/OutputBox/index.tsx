@@ -33,7 +33,7 @@ const OutputBox = (props: IProps) => {
   const { gql, result: { code, data, message }, onHistoryItem, index, onExplorer, onResultConfig, templateRender } = props;
   const { console, schema } = useStore();
   const [visible, setVisible] = useState(true);
-  const { results, update, favorites, updateFavorites } = console;
+  const { results, update, favorites, saveFavorite, deleteFavorite, getFavoriteList } = console;
   const { spaceVidType, currentSpace } = schema;
   const [columns, setColumns] = useState<any>([]);
   const [dataSource, setDataSource] = useState<any>([]);
@@ -41,8 +41,7 @@ const OutputBox = (props: IProps) => {
   const [showGraph, setShowGraph] = useState(false);
   const [graph, setGraph] = useState<GraphStore | null>(null);
   const [tab, setTab] = useState('');
-  const [curAccount] = useState(sessionStorage.getItem('curAccount'));
-  const initData = () => {
+  const initData = useCallback(() => {
     let _columns = [] as any;
     let _dataSource = [] as any;
     if(!data) {
@@ -107,7 +106,7 @@ const OutputBox = (props: IProps) => {
     }
     setDataSource(_dataSource);
     setColumns(_columns);
-  };
+  }, []);
   
   useEffect(() => {
     initData();
@@ -118,35 +117,28 @@ const OutputBox = (props: IProps) => {
     trackEvent('console', `change_tab_${key}`);
   }, []);
 
-  const addFavorites = () => {
+  const addFavorites = useCallback(async () => {
     if(!gql) {
       return;
     }
-    const _favorites = { ...favorites };
-    if (_favorites[curAccount]) {
-      _favorites[curAccount].unshift(gql);
-    } else {
-      _favorites[curAccount] = [gql];
-    }
-    updateFavorites(_favorites);
-  };
-  const removeFavorite = () => {
-    const _favorites = { ...favorites };
-    _favorites[curAccount].splice(index, 1);
-    updateFavorites(_favorites);
-  };
+    await saveFavorite(gql);
+    getFavoriteList();
+  }, [gql]);
+  const removeFavorite = useCallback(async () => {
+    const id = console.favorites.find(item => item.content === gql)?.id;
+    await deleteFavorite(id);
+    getFavoriteList();
+  }, []);
 
   useEffect(() => { 
-    if(gql && favorites[curAccount]) {
-      setIsFavorited(favorites[curAccount].includes(gql));
-    }
+    setIsFavorited(favorites.filter(item => item.content === gql).length > 0);
   }, [favorites, gql]);
 
-  const handleItemRemove = () => {
+  const handleItemRemove = useCallback(() => {
     update({
       results: results.filter((_, i) => i !== index)
     });
-  };
+  }, [results, index]);
 
   const downloadCsv = () => {
     if (!data) {

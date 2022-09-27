@@ -45,6 +45,7 @@ func (s *schemaService) UpdateSchemaSnapshot(request types.UpdateSchemaSnapshotR
 	host := auth.Address + ":" + strconv.Itoa(auth.Port)
 	var data *db.SchemaSnapshot
 	filters := db.CtxDB.Where("host = ?", host)
+	filters = filters.Where("username = ?", auth.Username)
 	result := filters.Where("space = ?", request.Space).First(&data)
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return ecode.WithErrorMessage(ecode.ErrInternalDatabase, result.Error)
@@ -74,6 +75,7 @@ func (s *schemaService) GetSchemaSnapshot(request types.GetSchemaSnapshotRequest
 	host := auth.Address + ":" + strconv.Itoa(auth.Port)
 	var data *db.SchemaSnapshot
 	filters := db.CtxDB.Where("host = ?", host)
+	filters = filters.Where("username = ?", auth.Username)
 	result := filters.Where("space = ?", request.Space).First(&data)
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalDatabase, result.Error)

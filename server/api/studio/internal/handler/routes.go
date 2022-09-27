@@ -4,6 +4,7 @@ package handler
 import (
 	"net/http"
 
+	favorite "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/favorite"
 	file "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/file"
 	gateway "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/gateway"
 	health "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/health"
@@ -169,6 +170,31 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/api/schema/:space/snapshot",
 				Handler: schema.GetSnapshotHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/favorites",
+				Handler: favorite.AddHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/favorites/list",
+				Handler: favorite.GetListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/api/favorites/:id",
+				Handler: favorite.DeleteHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/api/favorites",
+				Handler: favorite.DeleteAllHandler(serverCtx),
 			},
 		},
 	)

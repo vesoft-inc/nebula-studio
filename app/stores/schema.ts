@@ -105,7 +105,7 @@ export class SchemaStore {
       gql: 'show spaces;',
     })) as any;
     if (code === 0) {
-      const spaces = data.tables.map(item => item.Name).sort();
+      const spaces = data.tables.map(item => item.Name);
       this.update({
         spaces,
       });

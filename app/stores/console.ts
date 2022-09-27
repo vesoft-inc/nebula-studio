@@ -1,6 +1,8 @@
 import { makeAutoObservable, observable } from 'mobx';
 import service from '@app/config/service';
 import { v4 as uuidv4 } from 'uuid';
+import { message } from 'antd';
+import intl from 'react-intl-universal';
 
 // split from semicolon out of quotation marks
 const SEMICOLON_REG = /(?=((?:[^;'"]*(?:"(?:\\.|[^"])*"|'(?:\\.|[^'])*')[^;'"]*)+)|);(?=\n)/g;
@@ -55,7 +57,10 @@ export class ConsoleStore {
   currentGQL = 'SHOW SPACES;';
   results = [] as any;
   paramsMap = null as any;
-  favorites = JSON.parse(localStorage.getItem('favorites') || '{}') ;
+  favorites = [] as {
+    id: string;
+    content: string;
+  }[] ;
   constructor() {
     makeAutoObservable(this, {
       results: observable.ref,
@@ -71,11 +76,6 @@ export class ConsoleStore {
       results: [],
       paramsMap: null
     });
-  }
-
-  updateFavorites = (value) => {
-    localStorage.setItem('favorites', JSON.stringify(value));
-    this.favorites = value;
   }
 
   update = (param: Partial<ConsoleStore>) => {
@@ -125,6 +125,28 @@ export class ConsoleStore {
     this.update({
       paramsMap: results.data?.localParams || {},
     });
+  }
+  saveFavorite = async (content: string) => {
+    const res = await service.saveFavorite({ content });
+    if(res.code === 0) {
+      message.success(intl.get('sketch.saveSuccess'));
+    }
+  }
+  deleteFavorite = async (id?: number) => {
+    const res = id !== undefined ? await service.deleteFavorite(id) : await service.deleteAllFavorites();
+    if(res.code === 0) {
+      message.success(intl.get('common.deleteSuccess'));
+    }
+  }
+
+  getFavoriteList = async () => {
+    const res = await service.getFavoriteList();
+    if(res.code === 0) {
+      this.update({
+        favorites: res.data.items
+      });
+    }
+    return res;
   }
 }
 

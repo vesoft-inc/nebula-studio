@@ -1,5 +1,5 @@
-import { Button, List, Modal, Tooltip } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { Button, List, Modal, Tooltip, Popconfirm } from 'antd';
+import React, { useCallback, useState } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
@@ -13,40 +13,29 @@ interface IProps {
 }
 const FavoriteBtn = (props: IProps) => {
   const { onGqlSelect } = props;
-  const { console: { favorites, updateFavorites } } = useStore();
+  const { console } = useStore();
   const [visible, setVisible] = useState(false);
-  const [data, setData] = useState([]);
-  const [curAccount] = useState(sessionStorage.getItem('curAccount'));
 
-  useEffect(() => {
-    const curAccount = sessionStorage.getItem('curAccount');
-    if (favorites[curAccount]) {
-      setData(favorites[curAccount]);
-    }
-  }, [favorites]);
-
-
-  const handleClear = () => {
-    if(!data.length) {
+  const handleClear = useCallback(async () => {
+    const { favorites, deleteFavorite, getFavoriteList } = console;
+    if(!favorites.length) {
       return; 
     }
-    const _favorites = { ...favorites };
-    _favorites[curAccount] = [];
-    updateFavorites(_favorites);
-    setVisible(false);
-  };
+    await deleteFavorite();
+    getFavoriteList();
+  }, []);
 
-  const handleSelect = (gql: string) => {
+  const handleSelect = useCallback((gql: string) => {
     onGqlSelect(gql);
     setVisible(false);
-  };
+  }, []);
 
-  const renderStr = (str: string) => {
+  const renderStr = useCallback((str: string) => {
     if (str.length < 300) {
       return str;
     }
     return str.substring(0, 300) + '...';
-  };
+  }, []);
 
   return (
     <>
@@ -59,9 +48,16 @@ const FavoriteBtn = (props: IProps) => {
             <span >
               {intl.get('console.favorites')}
             </span>
-            <Button type="link" onClick={handleClear}>
-              {intl.get('console.clearFavorites')}
-            </Button>
+            <Popconfirm
+              title={intl.get('sketch.confirmDelete')}
+              okText={intl.get('common.confirm')}
+              cancelText={intl.get('common.cancel')}
+              onConfirm={handleClear}
+            >
+              <Button type="link">
+                {intl.get('console.clearFavorites')}
+              </Button>
+            </Popconfirm>
           </>
         }
         open={visible}
@@ -71,13 +67,16 @@ const FavoriteBtn = (props: IProps) => {
       >
         <List
           itemLayout="horizontal"
-          dataSource={data}
-          renderItem={(item: string) => (
+          dataSource={console.favorites}
+          renderItem={(item: {
+            id: string;
+            content: string;
+          }) => (
             <List.Item
               style={{ cursor: 'pointer', wordBreak: 'break-all' }}
-              onClick={() => handleSelect(item)}
+              onClick={() => handleSelect(item.content)}
             >
-              {renderStr(item)}
+              {renderStr(item.content)}
             </List.Item>
           )}
         />

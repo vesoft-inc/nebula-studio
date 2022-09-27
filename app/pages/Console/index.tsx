@@ -40,7 +40,7 @@ const Console = (props: IProps) => {
   const { schema, console, global } = useStore();
   const { onExplorer, templateRender } = props;
   const { spaces, getSpaces, switchSpace, currentSpace, spaceVidType, updateVidType } = schema;
-  const { runGQL, currentGQL, results, runGQLLoading, getParams, update, paramsMap } = console;
+  const { runGQL, currentGQL, results, runGQLLoading, getParams, update, paramsMap, getFavoriteList } = console;
   const { nebulaVersion } = global;
   const [isUpDown, setUpDown] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -50,6 +50,7 @@ const Console = (props: IProps) => {
     trackPageView('/console');
     getSpaces();
     getParams();
+    getFavoriteList();
     if(!spaceVidType && currentSpace) {
       updateVidType();
     }

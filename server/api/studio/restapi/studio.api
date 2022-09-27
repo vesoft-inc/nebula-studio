@@ -12,4 +12,5 @@ import (
 	"import.api"
 	"sketch.api"
 	"schema.api"
+	"favorite.api"
 )
