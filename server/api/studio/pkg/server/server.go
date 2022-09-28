@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler"
+	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service/importer"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/zeromicro/go-zero/rest"
@@ -15,7 +16,8 @@ type (
 
 var NewServiceContext = svc.NewServiceContext
 
-func InitTaskStatus() {
+func InitDB(dbFilePath string) {
+	db.InitDB(dbFilePath)
 	importer.InitTaskStatus()
 }
 

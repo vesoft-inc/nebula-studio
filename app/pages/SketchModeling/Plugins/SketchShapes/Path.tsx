@@ -186,19 +186,23 @@ const Path: LineRender = {
     if (name && name.length > showNum && showNum) {
       string = name.slice(0, showNum) + '...';
     }
-    ReactDOM.render(
-      <>
-        <foreignObject x={x - 50} y={y - 28} width={100} height={45} textAnchor="middle">
-          <div className={styles.edgeLabel}>
-            <span>
-              {string}
-              {invalid && <span className={styles.invalid} />}
-            </span>
-          </div>
-        </foreignObject>
-      </>,
-      line.label.labelGroup
-    );
+
+    if(string || invalid) {
+      const width = string ? Math.min(string?.length * 10 + 15, 100) : 15;
+      ReactDOM.render(
+        <>
+          <foreignObject x={x - width / 2} y={y - 20} width={width} height={45} textAnchor="middle">
+            <div className={styles.edgeLabel}>
+              <span>
+                {string}
+                {invalid && <span className={styles.invalid} />}
+              </span>
+            </div>
+          </foreignObject>
+        </>,
+        line.label.labelGroup
+      );
+    }
     return line.label.labelGroup;
   },
   renderArrow(line: InstanceLine): SVGElement {

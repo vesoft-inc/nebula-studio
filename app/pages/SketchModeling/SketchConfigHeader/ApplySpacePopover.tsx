@@ -1,5 +1,6 @@
 import { Popover, Radio, Button, Form, Select, message } from 'antd';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { observer } from 'mobx-react-lite';
 import intl from 'react-intl-universal';
 import CreateForm from '@app/pages/Schema/SpaceCreate/CreateForm';
 import { useStore } from '@app/stores';
@@ -213,8 +214,9 @@ const PopoverContent = (props: IContentProps) => {
   );
 };
 
-export default function ApplySpacePopover() {
+export default observer(function ApplySpacePopover() {
   const [open, setOpen] = useState(false);
+  const [disabled, setDisable] = useState(false);
   const close = useCallback(() => setOpen(false), []);
   const { sketchModel } = useStore();
   const handleOpen = () => {
@@ -225,8 +227,10 @@ export default function ApplySpacePopover() {
     }
     setOpen(!open);
   };
-  const data = sketchModel.editor?.schema?.getData();
-
+  useEffect(() => {
+    const data = sketchModel.editor?.schema?.getData();
+    setDisable(!data?.nodes.length && !data?.lines.length);
+  }, [sketchModel.active]);
   return (
     <Popover
       overlayClassName="applyPopover"
@@ -238,9 +242,9 @@ export default function ApplySpacePopover() {
       destroyTooltipOnHide={true}
       onOpenChange={open => !open && setOpen(false)}
     >
-      <Button type="primary" onClick={handleOpen} disabled={!data?.nodes.length && !data?.lines.length}>
+      <Button type="primary" onClick={handleOpen} disabled={disabled}>
         {intl.get('sketch.applyToSpace')}
       </Button>
     </Popover>
   );
-}
+});
