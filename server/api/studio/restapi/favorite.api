@@ -1,0 +1,44 @@
+type (
+	FavoriteList {
+		Items []FavoriteItem `json:"items"`
+		Total int64          `json:"total"`
+	}
+
+	FavoriteItem {
+		ID         int    `json:"id"`
+		Content    string `json:"content"`
+		CreateTime int64  `json:"createTime"`
+	}
+
+	CreateFavoriteRequest {
+		Content string `json:"content" validate:"required"`
+	}
+
+	DeleteFavoriteRequest {
+		Id string `path:"id" validate:"required"`
+	}
+
+	FavoriteIDResult {
+		ID int `json:"id"`
+	}
+)
+@server(
+	group: favorite
+)
+service studio-api {
+	@doc "Add Favorite"
+	@handler Add
+	post /api/favorites (CreateFavoriteRequest) returns (FavoriteIDResult)
+	
+	@doc "Get Favorite List"
+	@handler GetList
+	get /api/favorites/list returns (FavoriteList)
+	
+	@doc "Delete Favorite"
+	@handler Delete
+	delete /api/favorites/:id (DeleteFavoriteRequest)
+	
+	@doc "Clear Favorites"
+	@handler DeleteAll
+	delete /api/favorites
+}

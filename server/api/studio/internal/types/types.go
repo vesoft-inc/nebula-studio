@@ -295,3 +295,26 @@ type SchemaSnapshot struct {
 	UpdateTime int64  `json:"updateTime"`
 	CreateTime int64  `json:"createTime"`
 }
+
+type FavoriteList struct {
+	Items []FavoriteItem `json:"items"`
+	Total int64          `json:"total"`
+}
+
+type FavoriteItem struct {
+	ID         int    `json:"id"`
+	Content    string `json:"content"`
+	CreateTime int64  `json:"createTime"`
+}
+
+type CreateFavoriteRequest struct {
+	Content string `json:"content" validate:"required"`
+}
+
+type DeleteFavoriteRequest struct {
+	Id string `path:"id" validate:"required"`
+}
+
+type FavoriteIDResult struct {
+	ID int `json:"id"`
+}

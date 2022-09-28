@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"strconv"
+
 	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
 
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
@@ -83,6 +84,7 @@ func (s *sketchService) GetList(request types.GetSketchesRequest) (*types.Sketch
 	host := auth.Address + ":" + strconv.Itoa(auth.Port)
 	var sketchList []db.Sketch
 	filters := db.CtxDB.Where("host = ?", host)
+	filters = filters.Where("username = ?", auth.Username)
 	if request.Keyword != "" {
 		filters = filters.Where("name LIKE ?", "%"+request.Keyword+"%")
 	}
