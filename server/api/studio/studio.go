@@ -10,11 +10,10 @@ import (
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/pool"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler"
-	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service/importer"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/logging"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/server"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/proc"
@@ -43,9 +42,7 @@ func main() {
 	if err := c.InitConfig(); err != nil {
 		zap.L().Fatal("init config failed", zap.Error(err))
 	}
-
-	db.InitDB(c.File.SqliteDbFilePath)
-	importer.InitTaskStatus()
+	server.InitDB(c.File.SqliteDbFilePath)
 
 	svcCtx := svc.NewServiceContext(c)
 	server := rest.MustNewServer(c.RestConf, rest.WithNotFoundHandler(middleware.NewAssetsHandler(middleware.AssetsConfig{

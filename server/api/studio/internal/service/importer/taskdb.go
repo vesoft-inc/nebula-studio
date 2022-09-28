@@ -80,7 +80,7 @@ func (t *TaskDb) SelectAllIds(nebulaAddress, user string) ([]int, error) {
 }
 
 func (t *TaskDb) UpdateProcessingTasks2Aborted() error {
-	if err := t.Model(&db.TaskInfo{}).Where("task_status = ?", StatusProcessing.String()).Update("task_status", StatusAborted.String()).Error; err != nil {
+	if err := t.Model(&db.TaskInfo{}).Where("task_status = ?", StatusProcessing.String()).Updates(&db.TaskInfo{TaskStatus: StatusAborted.String(), TaskMessage: "Service execption"}).Error; err != nil {
 		return err
 	}
 	return nil

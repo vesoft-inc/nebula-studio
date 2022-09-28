@@ -78,7 +78,7 @@ export function makeLineSort(links) {
     if (sourceMap[key].length > 1) {
       const source = sourceMap[key][0].from;
       let status = true;
-      let number = 1;
+      let number = sourceMap[key].length % 2 === 0 ? 1 : 0;
       while (sourceMap[key].length) {
         const link = status ? sourceMap[key].pop() : sourceMap[key].shift();
         link.graphIndex = number;

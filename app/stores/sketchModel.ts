@@ -98,13 +98,13 @@ export class SketchStore {
     const schema = this.editor.schema.getData();
     const isEmptySame = !schema.nodes.length && !schema.lines.length && !initialData.schema;
     const newSchema = JSON.stringify({
-      nodes: schema.nodes.map(node => ({ name: node.name, properties: node.properties, comment: node.comment })),
-      lines: schema.lines.map(line => ({ name: line.name, from: line.from, to: line.to, properties: line.properties, comment: line.comment })),
+      nodes: schema.nodes?.map(node => ({ name: node.name, properties: node.properties, comment: node.comment })),
+      lines: schema.lines?.map(line => ({ name: line.name, from: line.from, to: line.to, properties: line.properties, comment: line.comment })),
     });
     let prevSchema = JSON.parse(initialData.schema || '{}');
     prevSchema = JSON.stringify({
-      nodes: prevSchema.nodes.map(node => ({ name: node.name, properties: node.properties, comment: node.comment })),
-      lines: prevSchema.lines.map(line => ({ name: line.name, from: line.from, to: line.to, properties: line.properties, comment: line.comment })),
+      nodes: prevSchema.nodes?.map(node => ({ name: node.name, properties: node.properties, comment: node.comment })),
+      lines: prevSchema.lines?.map(line => ({ name: line.name, from: line.from, to: line.to, properties: line.properties, comment: line.comment })),
     });
     return (!isEmptySame && newSchema !== prevSchema) || initialData.name !== this.currentSketch.name;
   };
@@ -208,14 +208,22 @@ export class SketchStore {
       line.style = LINE_STYLE;
       line.arrowStyle = ARROW_STYLE;
     });
-    this.editor.graph.on('node:remove', () => {
-      this.update({ active: undefined });
+    this.editor.graph.on('node:remove', ({ node }) => {
+      const param = { active: undefined } as any;
+      if (this.hoveringItem?.data.uuid === node.data.uuid) {
+        param.hoveringItem = undefined;
+      }
+      this.update(param);
     });
-    this.editor.graph.on('line:remove', () => {
+    this.editor.graph.on('line:remove', ({ line }) => {
       const data = this.editor.schema.getData();
       makeLineSort(data.lines);
       this.editor.graph.line.update();
-      this.update({ active: undefined });
+      const param = { active: undefined } as any;
+      if (this.hoveringItem?.data.uuid === line.data.uuid) {
+        param.hoveringItem = undefined;
+      }
+      this.update(param);
     });
 
     this.editor.graph.on('node:mouseenter', ({ node }) => {
