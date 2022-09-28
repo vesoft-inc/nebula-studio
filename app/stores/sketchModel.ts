@@ -8,7 +8,7 @@ import initShapes, { initShadowFilter } from '@app/pages/SketchModeling/Plugins/
 import service from '@app/config/service';
 import { Pointer } from '@app/interfaces/graph';
 import { IProperty, ISchemaEnum } from '@app/interfaces/schema';
-import { ARROW_STYLE, LINE_STYLE, NODE_RADIUS } from '@app/config/sketch';
+import { ARROW_STYLE, LINE_STYLE, makeLineSort, NODE_RADIUS } from '@app/config/sketch';
 
 interface IHoveringItem {
   data: ISketchNode | ISketchEdge;
@@ -101,7 +101,7 @@ export class SketchStore {
       nodes: schema.nodes.map(node => ({ name: node.name, properties: node.properties, comment: node.comment })),
       lines: schema.lines.map(line => ({ name: line.name, from: line.from, to: line.to, properties: line.properties, comment: line.comment })),
     });
-    let prevSchema = JSON.parse(initialData.schema);
+    let prevSchema = JSON.parse(initialData.schema || '{}');
     prevSchema = JSON.stringify({
       nodes: prevSchema.nodes.map(node => ({ name: node.name, properties: node.properties, comment: node.comment })),
       lines: prevSchema.lines.map(line => ({ name: line.name, from: line.from, to: line.to, properties: line.properties, comment: line.comment })),
@@ -170,7 +170,9 @@ export class SketchStore {
     initShadowFilter(this.editor.svg);
     options?.mode !== 'view' && this.initEvents();
     if (schema) {
-      await this.editor.schema.setData(JSON.parse(schema));
+      const _schema = JSON.parse(schema);
+      makeLineSort(_schema.lines);
+      await this.editor.schema.setData(_schema);
       this.editor.controller.autoFit();
     }
   };
@@ -191,6 +193,7 @@ export class SketchStore {
       this.update({ active: line.data });
     });
     this.editor.graph.on('line:add', ({ line }) => {
+      this.editor.graph.line.update();
       this.update({ active: line.data });
       this.clearActive();
       this.editor.graph.line.setActiveLine(line);
@@ -199,6 +202,8 @@ export class SketchStore {
       this.update({ active: undefined });
     });
     this.editor.graph.on('line:beforeadd', ({ data: line }: { data: any }) => {
+      const data = this.editor.schema.getData();
+      makeLineSort([...data.lines, line]);
       line.type = ISchemaEnum.Edge;
       line.style = LINE_STYLE;
       line.arrowStyle = ARROW_STYLE;
@@ -207,6 +212,9 @@ export class SketchStore {
       this.update({ active: undefined });
     });
     this.editor.graph.on('line:remove', () => {
+      const data = this.editor.schema.getData();
+      makeLineSort(data.lines);
+      this.editor.graph.line.update();
       this.update({ active: undefined });
     });
 

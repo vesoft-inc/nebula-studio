@@ -56,3 +56,62 @@ export const ARROW_STYLE = {
   'stroke-linejoin': 'round',
   'stroke-linecap': 'round',
 };
+
+export function makeLineSort(links) {
+  // update link sort
+  const sourceMap = {};
+  links.forEach((link: any) => {
+    const sourceId = link.from;
+    const targetId = link.to;
+    const sourceCommonId = `${sourceId}=>${targetId}`;
+    const targetCommonId = `${targetId}=>${sourceId}`;
+    const linkArr = sourceMap[sourceCommonId] || sourceMap[targetCommonId];
+    if (!linkArr) {
+      sourceMap[sourceCommonId] = [link];
+    } else if (sourceMap[sourceCommonId]) {
+      linkArr.unshift(link);
+    } else if (sourceMap[targetCommonId]) {
+      linkArr.push(link);
+    }
+  });
+  Object.keys(sourceMap).forEach((key) => {
+    if (sourceMap[key].length > 1) {
+      const source = sourceMap[key][0].from;
+      let status = true;
+      let number = 1;
+      while (sourceMap[key].length) {
+        const link = status ? sourceMap[key].pop() : sourceMap[key].shift();
+        link.graphIndex = number;
+        // check direction
+        if (link.from !== source) {
+          link.graphIndex *= -1;
+        }
+        number++;
+        status = !status;
+      }
+    } else {
+      const link = sourceMap[key][0];
+      if (link.from === link.to) {
+        link.graphIndex = 1;
+      } else {
+        link.graphIndex = 0;
+      }
+    }
+  });
+}
+
+export function getLinkCurvature(link) {
+  let curvature = 0;
+  const data = link.data;
+  if(data.from === data.to) {
+    curvature = link.graphIndex;
+  } else {
+    const { graphIndex } = data;
+    if (graphIndex !== 0) {
+      const direction = graphIndex % 2 === 0;
+      curvature = (direction ? 1 : -1) * (graphIndex > 0 ? 1 : -1) * (Math.ceil(Math.abs(graphIndex) / 2) * 0.1);
+    }
+  }
+  link.curvature = curvature;
+  return curvature;
+}
