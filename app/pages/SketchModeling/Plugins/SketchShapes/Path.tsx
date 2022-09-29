@@ -120,9 +120,7 @@ const Path: LineRender = {
         endControlPoint
       };
     } else {
-      // TODO optimization
       const selfLoopRadius = 30;
-      const arcRatio = 4;
       const startSpace = 8;
       const endSpace = 8;
       const start = { x: from.x, y: from.y };
@@ -136,18 +134,8 @@ const Path: LineRender = {
       const selfLoopIndex = getSelfLoopLineIndex(line, this.graph);
       const angle = (from.index === to.index) ? 0 : (Math.PI / (selfLoopRadius / 10 + selfLoopIndex));
       const dis = Math.sqrt(Math.pow(from.x - to.x, 2) + Math.pow(from.y - to.y, 2));
-      let radius = (dis / 2) / Math.sin(angle / 2);
-      if (!radius) { // when from point and to point are the same
-        radius = (selfLoopIndex / arcRatio + 1) * selfLoopRadius;
-        const topPos = {
-          x: start.x + radius * 2 * Math.cos(startAngle),
-          y: start.y + radius * 2 * Math.sin(startAngle),
-        };
-        path = `M${from.x} ${from.y} L${from.x} ${from.y} M${start.x} ${start.y} A ${radius} ${radius} 0 1 0 ${topPos.x} ${topPos.y}`;
-        path += ` M${topPos.x} ${topPos.y} A ${radius} ${radius} 0 1 0 ${end.x} ${end.y} L${to.x} ${to.y}`;
-      } else {
-        path = `M${from.x} ${from.y} A ${radius} ${radius} 0 1 0 ${end.x} ${end.y} L${to.x} ${to.y}`;
-      }
+      const radius = (dis / 2) / Math.sin(angle / 2);
+      path = `M${from.x} ${from.y} A ${radius} ${radius} 0 1 0 ${end.x} ${end.y} L${to.x} ${to.y}`;
     }
     line.data.fromX = src.x;
     line.data.fromY = src.y;
@@ -279,7 +267,11 @@ const Path: LineRender = {
     }
     return svgEl;
   },
-  checkNewLine() {
+  checkNewLine(data) {
+    const { from, to, fromPoint, toPoint } = data;
+    if (from === to && fromPoint === toPoint) {
+      return false;
+    }
     return true;
   },
 };

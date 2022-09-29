@@ -7,6 +7,7 @@ import cls from 'classnames';
 import { useStore } from '@app/stores';
 import { ISketch } from '@app/interfaces/sketch';
 import { debounce } from 'lodash';
+import { safeParse } from '@app/utils/function';
 import styles from './index.module.less';
 
 const { confirm } = Modal;
@@ -14,10 +15,10 @@ const { confirm } = Modal;
 const SketchList: React.FC = () => {
   const { sketchModel } = useStore();
   const { sketchList, initSketch, deleteSketch, getSketchList, currentSketch, update, checkModified } = sketchModel;
-  const handleAdd = useCallback(async () => {
+  const handleAdd = useCallback(async (noTip?: boolean) => {
     const id = await initSketch();
     if (id) {
-      message.success(intl.get('schema.createSuccess'));
+      !noTip && message.success(intl.get('schema.createSuccess'));
       const list = await getSketchList();
       if (!sketchModel.currentSketch) {
         update({ currentSketch: list.items[0] });
@@ -30,7 +31,8 @@ const SketchList: React.FC = () => {
       }
     }
   }, []);
-  const handleDelete = useCallback(async (id: string) => {
+  const handleDelete = useCallback(async (id: string, e) => {
+    e.stopPropagation();
     const result = await deleteSketch(id);
     if (result) {
       message.success(intl.get('common.deleteSuccess'));
@@ -69,14 +71,19 @@ const SketchList: React.FC = () => {
     debounce((e) => getSketchList({ page: 1, keyword: e.target.value }), 300),
     []
   );
+
+  const init = useCallback(async () => {
+    const list = await getSketchList();
+    list && list.items.length === 0 && handleAdd(true);
+  }, []);
   useEffect(() => {
-    getSketchList();
+    init();
   }, []);
   return (
     <div className={styles.sketchList}>
       <div className={styles.header}>
         <span>{intl.get('sketch.list')}</span>
-        <Button onClick={handleAdd} className={styles.addBtn} icon={<Icon type="icon-studio-btn-add" />} type="text">
+        <Button onClick={() => handleAdd()} className={styles.addBtn} icon={<Icon type="icon-studio-btn-add" />} type="text">
           {intl.get('sketch.new')}
         </Button>
       </div>
@@ -87,26 +94,30 @@ const SketchList: React.FC = () => {
         suffix={<Icon type="icon-nav-filter" />}
       />
       <div className={styles.thumbnailList}>
-        {sketchList.items.map((item) => (
-          <div
-            key={item.id}
-            className={cls(styles.item, currentSketch?.id === item.id && styles.active)}
-            onClick={() => handleSelect(item)}
-          >
-            <div className={styles.itemHeader}>
-              <span className={styles.title}>{item.name}</span>
-              <Popconfirm
-                title={intl.get('sketch.confirmDelete')}
-                okText={intl.get('common.confirm')}
-                cancelText={intl.get('common.cancel')}
-                onConfirm={() => handleDelete(item.id)}
-              >
-                <Icon className={styles.closeBtn} type="icon-studio-btn-close" />
-              </Popconfirm>
+        {sketchList.items.map((item) => {
+          const schema = safeParse(item.schema || '{}');
+          return (
+            <div
+              key={item.id}
+              className={cls(styles.item, currentSketch?.id === item.id && styles.active)}
+              onClick={() => handleSelect(item)}
+            >
+              <div className={styles.itemHeader}>
+                <span className={styles.title}>{item.name}</span>
+                <Popconfirm
+                  title={intl.get('sketch.confirmDelete')}
+                  okText={intl.get('common.confirm')}
+                  cancelText={intl.get('common.cancel')}
+                  onConfirm={(e) => handleDelete(item.id, e)}
+                >
+                  <Icon className={styles.closeBtn} type="icon-studio-btn-close" onClick={e => e.stopPropagation()} />
+                </Popconfirm>
+              </div>
+              <span className={styles.count}>{intl.get('common.tag')} {schema.nodes?.length || 0} | {intl.get('common.edge')} {schema.lines?.length || 0}</span>
+              <div className={styles.snapshot} style={{ background: `url(${item.snapshot}) center center no-repeat` }} />
             </div>
-            <div className={styles.snapshot} style={{ background: `url(${item.snapshot}) center center no-repeat` }} />
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
