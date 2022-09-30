@@ -29,11 +29,46 @@ const SchemaConfig: React.FC = () => {
     }
   }, []);
 
+  const validateSameName = () => {
+    const prevName = sketchModel.active?.name;
+    const name = form.getFieldValue('name');
+    const data = sketchModel.editor.schema.getData();
+    let invalid = false;
+    data.nodes.forEach((item) => {
+      if(item.uuid === sketchModel.active?.uuid) {
+        return;
+      }
+      if(item.name === name) {
+        invalid = true;
+        item.invalid = true;
+        sketchModel.editor.graph.node.updateNode(item, true);
+      } else if (item.name === prevName) {
+        item.invalid = false;
+        sketchModel.editor.graph.node.updateNode(item, true);
+      }
+    });
+    data.lines.forEach((item) => {
+      if(item.uuid === sketchModel.active?.uuid) {
+        return;
+      }
+      if(item.name === name) {
+        invalid = true;
+        item.invalid = true;
+        sketchModel.editor.graph.line.updateLine(item, true);
+      } else if (item.name === prevName) {
+        item.invalid = false;
+        sketchModel.editor.graph.line.updateLine(item, false);
+      }
+    });
+    invalid && form.setFields([{ name: 'name', errors: [intl.get('sketch.uniqName')] }]);
+    return invalid;
+  };
   const handleUpdate = useCallback(
     debounce((_, allValues) => {
       const formValues = form.getFieldsValue();
+      const hasSameName = validateSameName();
       const hasError = allValues.some((item) => item.errors.length > 0);
-      update({ ...formValues, invalid: hasError });
+      update({ ...formValues, invalid: hasError || hasSameName });
     }, 300),
     []
   );
@@ -48,7 +83,10 @@ const SchemaConfig: React.FC = () => {
 
     const { name, comment, properties, invalid } = active;
     form.setFieldsValue({ name, comment, properties });
-    invalid && form.validateFields();
+    if(invalid) {
+      validateSameName();
+      form.validateFields();
+    }
   }, [active]);
 
   if (!active) {

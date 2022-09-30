@@ -679,7 +679,10 @@ export class SchemaStore {
   getNodeTagMap = async (ids: string[]) => {
     const vidMap = {};
     const tagSet = new Set();
-    const gql = `match (v) where id(v) in [${ids.map(id => handleVidStringName(id)).join(',')}] return id(v) as id, tags(v) as \`tags\``;
+    if(!this.spaceVidType) {
+      await this.updateVidType();
+    }
+    const gql = `match (v) where id(v) in [${ids.map(id => handleVidStringName(id, this.spaceVidType)).join(',')}] return id(v) as id, tags(v) as \`tags\``;
     const res = await service.execNGQL({ gql });
     if(res.code === 0) {
       const tables = res.data?.tables || [];

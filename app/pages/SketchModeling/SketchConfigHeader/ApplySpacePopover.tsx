@@ -93,8 +93,13 @@ const PopoverContent = (props: IContentProps) => {
       const schemaInfo = getSchemaInfo(data);
       if (mode === 'create') {
         setLoading(true);
-        const res = await handleCreateSpace(values);
-        if (res.code !== 0) {
+        const { code, message: errMsg } = await handleCreateSpace(values);
+        if (code !== 0) {
+          if (errMsg && errMsg.toLowerCase().includes('existed')) {
+            message.warning(intl.get('sketch.spaceExisted'));
+          } else {
+            message.warning(errMsg);
+          }
           setLoading(false);
           return;
         }
@@ -228,13 +233,15 @@ export default observer(function ApplySpacePopover() {
     setOpen(!open);
   };
   useEffect(() => {
-    const data = sketchModel.editor?.schema?.getData();
-    setDisable(!data?.nodes.length && !data?.lines.length);
-  }, [sketchModel.active]);
+    setTimeout(() => {
+      const data = sketchModel.editor?.schema?.getData();
+      setDisable(!data?.nodes.length && !data?.lines.length);
+    }, 200);
+  }, [sketchModel.active, sketchModel.editor, sketchModel.currentSketch]);
   return (
     <Popover
       overlayClassName="applyPopover"
-      placement="bottom"
+      placement="bottomRight"
       content={<PopoverContent close={close} />}
       arrowPointAtCenter={true}
       trigger="click"

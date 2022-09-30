@@ -298,6 +298,8 @@
     "export": "导出",
     "applySpaceTip": "新的 schema 不会覆盖图空间中已有的 schema 信息",
     "sameSchemaWarning": "图空间中已存在{content}，请修改{hasType}名称，或者选择其他图空间。",
-    "noData": "暂无数据，请先导入数据"
+    "noData": "暂无数据，请先导入数据",
+    "uniqName": "标签和边类型名称不允许重名",
+    "spaceExisted": "图空间已存在"
   }
 }

@@ -27,17 +27,22 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  max-height: 100%;
   >span {
+    max-width: 80px;
+    height: 100%;
     padding-right: 15px;
     position: relative;
     overflow: hidden;
     text-overflow: ellipsis;
     min-height: 10px;
-    display: inline-block;
-    max-width: 80px;
+    display: -webkit-box;
     white-space: pre-wrap;
     word-break: break-word;
-    height: 100%;
+    user-select: none;
+    line-height: 12px;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
   .invalid {
     width: 10px;

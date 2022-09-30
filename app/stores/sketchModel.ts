@@ -86,11 +86,19 @@ export class SketchStore {
     const { nodes, lines } = data;
     const nodesValid = nodes.reduce((flag, node) => this.validate(node, 'node') && flag, true);
     const edgesValid = lines.reduce((flag, line) => this.validate(line, 'edge') && flag, true);
-    if(nodesValid && edgesValid) {
+    const hasSameName = this.checkSameName();
+    if(nodesValid && edgesValid && !hasSameName) {
       return true;
     }
-    message.warning(intl.get('sketch.sketchInvalid'));
-    return nodesValid && edgesValid;
+    hasSameName ? message.error(intl.get('sketch.uniqName')) : message.error(intl.get('sketch.sketchInvalid'));
+    return false;
+  }
+
+  checkSameName = () => {
+    const data = this.editor.schema.getData();
+    const { nodes, lines } = data;
+    const name = new Set([...nodes.map((i) => i.name), ...lines.map((i) => i.name)]);
+    return name.size !== nodes.length + lines.length;
   }
 
   checkModified = () => {

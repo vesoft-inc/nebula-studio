@@ -9,7 +9,7 @@ import { isEqual, uniqWith } from 'lodash';
 import { ISchemaEnum } from '@app/interfaces/schema';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ARROW_STYLE, LINE_STYLE, NODE_RADIUS, COLOR_LIST } from '@app/config/sketch';
+import { ARROW_STYLE, LINE_STYLE, NODE_RADIUS, COLOR_LIST, makeLineSort } from '@app/config/sketch';
 import ZoomBtns from '@app/pages/SketchModeling/ZoomBtns';
 import styles from './index.module.less';
 
@@ -66,7 +66,7 @@ const SchemaVisualization = () => {
         lines.push({
           from: srcTag,
           to: dstTag,
-          name
+          name,
         });
       });
       lines = uniqWith(lines, isEqual);
@@ -82,7 +82,7 @@ const SchemaVisualization = () => {
           arrowStyle: ARROW_STYLE,
         };
       }).filter(line => line.from && line.to);
-
+      makeLineSort(_lines);
       await sketchModel.editor.schema.setData({ nodes, lines: _lines });
       await sketchModel.editor.schema.format();
       await sketchModel.editor.controller.autoFit();

@@ -1,5 +1,5 @@
 import { Button, Popconfirm, Table, message, Popover, Form, Input, Dropdown, Menu, Tooltip } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';
 import { trackPageView } from '@app/utils/stat';
@@ -9,6 +9,7 @@ import { NebulaVersion } from '@app/stores/types.d.ts';
 import cls from 'classnames';
 import { Link, useHistory } from 'react-router-dom';
 import styles from './index.module.less';
+import Search from './SchemaConfig/List/Search';
 
 interface IOperations {
   space: string;
@@ -67,6 +68,7 @@ const Operations = (props: IOperations) => {
 const Schema = () => {
   const { schema, global } = useStore();
   const [loading, setLoading] = useState(false);
+  const [searchVal, setSearchVal] = useState('');
   const history = useHistory();
   const { nebulaVersion } = global;
   const { currentSpace, switchSpace, getSpacesList, deleteSpace, spaceList, cloneSpace } = schema;
@@ -202,24 +204,28 @@ const Schema = () => {
       },
     },
   ];
+  const data = useMemo(() => spaceList.filter(item => item.Name.includes(searchVal)), [spaceList, searchVal]);
   return <div className={cls(styles.schemaPage, 'studioCenterLayout')}>
     <div className={styles.schemaHeader}>
       {intl.get('schema.spaceList')}
     </div>
     <div className={styles.schemaContainer}>
-      <Button className={cls(styles.btnCreate, 'studioAddBtn')} type="primary">
-        <Link
-          to="/schema/space/create"
-          data-track-category="navigation"
-          data-track-action="view_space_create"
-          data-track-label="from_space_list"
-        >
-          <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('schema.createSpace')}
-        </Link>
-      </Button>
+      <div className={styles.row}>
+        <Button className={cls(styles.btnCreate, 'studioAddBtn')} type="primary">
+          <Link
+            to="/schema/space/create"
+            data-track-category="navigation"
+            data-track-action="view_space_create"
+            data-track-label="from_space_list"
+          >
+            <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('schema.createSpace')}
+          </Link>
+        </Button>
+        <Search type={intl.get('common.space')} onSearch={setSearchVal} />
+      </div>
       <Table
         className={styles.tableSpaceList}
-        dataSource={spaceList}
+        dataSource={data}
         columns={columns}
         loading={!!loading}
         rowKey="ID"
