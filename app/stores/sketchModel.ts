@@ -7,6 +7,8 @@ import { ISketch, ISketchEdge, ISketchNode } from '@app/interfaces/sketch';
 import initShapes, { initShadowFilter } from '@app/pages/SketchModeling/Plugins/SketchShapes/Shapers';
 import service from '@app/config/service';
 import { Pointer } from '@app/interfaces/graph';
+import { v4 as uuidv4 } from 'uuid';
+
 import { IProperty, ISchemaEnum } from '@app/interfaces/schema';
 import { ARROW_STYLE, LINE_STYLE, makeLineSort, NODE_RADIUS } from '@app/config/sketch';
 
@@ -288,10 +290,11 @@ export class SketchStore {
   duplicateNode = () => {
     const { x, y, name, ...others } = this.active as ISketchNode;
     this.editor.graph.node.addNode({
+      ...others,
       x: x + 40,
       y: y + 40,
       name: `${name || ''}(1)`,
-      ...others,
+      uuid: uuidv4()
     });
   };
 
