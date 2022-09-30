@@ -1,9 +1,10 @@
 import { Input } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 import { SearchOutlined } from '@ant-design/icons';
 import { useLocation } from 'react-router-dom';
 
+import { debounce } from 'lodash';
 import styles from './index.module.less';
 
 interface IProps {
@@ -18,6 +19,14 @@ const Search = (props: IProps) => {
   useEffect(() => {
     setValue('');
   }, [location.pathname]);
+  const onChange = useCallback(e => {
+    setValue(e.target.value);
+    search(e.target.value);
+  }, []);
+  const search = useCallback(debounce((value) => {
+    onSearch(value);
+  }, 500), []);
+
   return (
     <div className={styles.schemaSearch}>
       <Input
@@ -25,7 +34,7 @@ const Search = (props: IProps) => {
         prefix={<SearchOutlined className={styles.inputSearch} onClick={() => onSearch(value)} />}
         allowClear={true}
         placeholder={intl.get('common.namePlaceholder', { name: type })}
-        onChange={e => setValue(e.target.value)}
+        onChange={onChange}
         onPressEnter={() => onSearch(value)}
         style={{ width: 300 }}
         suffix={null}
