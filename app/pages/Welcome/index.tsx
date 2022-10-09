@@ -24,34 +24,34 @@ export interface ModuleItem {
   withOrder?: boolean;
 }
 
-export const ModuleList: ModuleItem[] = [
+export const getModuleList = (): ModuleItem[] => [
   {
     icon: 'icon-studio-nav-schema',
-    title: 'common.schema',
-    tip: 'doc.schemaIntro',
+    title: intl.get('common.schema'),
+    tip: intl.get('doc.schemaIntro'),
     startLink: '/schema',
-    docLink: 'welcome.schemaModuleLink',
+    docLink: intl.get('welcome.schemaModuleLink'),
   },
   {
     icon: 'icon-studio-nav-import',
-    title: 'import.importData',
-    tip: 'doc.importIntro',
+    title: intl.get('import.importData'),
+    tip: intl.get('doc.importIntro'),
     startLink: '/import/files',
-    docLink: 'welcome.importModuleLink',
+    docLink: intl.get('welcome.importModuleLink'),
   },
   {
     icon: 'icon-studio-nav-console',
-    title: 'common.console',
-    tip: 'doc.consoleIntro',
+    title: intl.get('common.console'),
+    tip: intl.get('doc.consoleIntro'),
     startLink: '/console',
-    docLink: 'welcome.consoleModuleLink',
+    docLink: intl.get('welcome.consoleModuleLink'),
   },
   {
     icon: 'icon-navbar-sketch',
-    title: 'common.sketch',
-    tip: 'doc.sketchIntro',
+    title: intl.get('common.sketch'),
+    tip: intl.get('doc.sketchIntro'),
     startLink: '/sketch',
-    docLink: 'welcome.sketchModuleLink',
+    docLink: intl.get('welcome.sketchModuleLink'),
   },
 ];
 
@@ -73,7 +73,7 @@ export interface DatasetItem {
 
 export const shouldAlwaysShowWelcome = () => localStorage.getItem('showWelcome') !== 'false';
 
-const DatasetList: DatasetItem[] = [
+const getDatasetList = (): DatasetItem[] => [
   {
     type: 'starter',
     tags: ['starter'],
@@ -85,7 +85,7 @@ const DatasetList: DatasetItem[] = [
       edgeCount: 233,
     },
     coverImg: `${process.env.CDN_PATH || ''}/images/welcome/basketballplayer.png`,
-    docLink: 'welcome.basketballplayerDocLink',
+    docLink: intl.get('welcome.basketballplayerDocLink'),
   },
   {
     type: 'solution',
@@ -98,7 +98,7 @@ const DatasetList: DatasetItem[] = [
       edgeCount: 13150,
     },
     coverImg: `${process.env.CDN_PATH || ''}/images/welcome/shareholding.png`,
-    docLink: 'welcome.shareholdingDocLink',
+    docLink: intl.get('welcome.shareholdingDocLink'),
   },
 ];
 
@@ -114,8 +114,8 @@ interface IProps {
 
 function Welcome(props: IProps) {
   const {
-    datasetList = DatasetList,
-    moduleList = ModuleList,
+    datasetList = getDatasetList(),
+    moduleList = getModuleList(),
     onDatasetLoad,
     product = 'NebulaGraph Studio',
     onClosePage,
@@ -145,7 +145,7 @@ function Welcome(props: IProps) {
   ];
 
   const downloadDemo = useCallback(
-    debounce(async (space: typeof DatasetList[number]) => {
+    debounce(async (space: DatasetItem) => {
       const showSpaceRes = await service.execNGQL({ gql: 'show spaces;' });
       if (showSpaceRes?.code !== 0) {
         return;
@@ -223,11 +223,7 @@ function Welcome(props: IProps) {
                     >
                       {intl.get('welcome.demoDownload')}
                     </Button>
-                    <Button
-                      className={cls(styles.action, styles.sub)}
-                      href={dataset.docLink && intl.get(dataset.docLink)}
-                      target="_blank"
-                    >
+                    <Button className={cls(styles.action, styles.sub)} href={dataset.docLink} target="_blank">
                       {intl.get('welcome.demoIntro')}
                     </Button>
                   </div>
@@ -263,13 +259,13 @@ function Welcome(props: IProps) {
             <Col span={8} key={module.title}>
               <div className={styles.moduleItem}>
                 <Icon type={module.icon} />
-                <span className={cls(styles.title, module.beta && styles.beta)}>{intl.get(module.title)}</span>
-                <span className={styles.tip}>{intl.get(module.tip)}</span>
+                <span className={cls(styles.title, module.beta && styles.beta)}>{module.title}</span>
+                <span className={styles.tip}>{module.tip}</span>
                 <div className={styles.actionWrapper}>
                   <Button className={styles.action} type="primary" onClick={() => history.push(module.startLink)}>
                     {intl.get('welcome.quickStart')}
                   </Button>
-                  <Button className={cls(styles.action, styles.sub)} href={intl.get(module.docLink)} target="_blank">
+                  <Button className={cls(styles.action, styles.sub)} href={module.docLink} target="_blank">
                     {intl.get('welcome.quickStartDesc')}
                   </Button>
                 </div>
