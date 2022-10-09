@@ -2,9 +2,14 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"regexp"
+	"strconv"
 	"strings"
+	"time"
 
+	"github.com/samber/lo"
 	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/vesoft-inc/go-pkg/response"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
@@ -26,6 +31,7 @@ type (
 		BatchExecNGQL(request *types.BatchExecNGQLParams) (*types.AnyResponse, error)
 		ConnectDB(request *types.ConnectDBParams) (*types.ConnectDBResult, error)
 		DisconnectDB() (*types.AnyResponse, error)
+		ExecSeqNGQL(request *types.ExecNGQLParams) (*types.ExecSeqNGQLResult, error)
 	}
 
 	gatewayService struct {
@@ -151,4 +157,61 @@ func (s *gatewayService) BatchExecNGQL(request *types.BatchExecNGQLParams) (*typ
 	}
 
 	return &types.AnyResponse{Data: response.StandardHandlerDataFieldAny(data)}, nil
+}
+
+func (s *gatewayService) ExecSeqNGQL(request *types.ExecNGQLParams) (*types.ExecSeqNGQLResult, error) {
+	authData := s.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+
+	reg, _ := regexp.Compile(`:sleep\s+(\d+);`)
+
+	/**
+	 * ```text
+	 * create tag index player_index_0 on player();
+	 * :sleep 1;
+	 * create tag index player_index_1 on player(name(20));
+	 * :sleep 3;
+	 * insert vertex player(name,age) values "player100":("Tim Duncan", 42);
+	 * ```
+	 */
+	gqlStrList := reg.Split(request.Gql, -1)
+	// [[":sleep 1;", "1"], [":sleep 3;", "3"]] --> [1, 3]
+	sleepTimeList := lo.Map(reg.FindAllStringSubmatch(request.Gql, -1), func(s []string, _ int) int {
+		sleepTime, _ := strconv.Atoi(s[1])
+		return sleepTime
+	})
+
+	totalSleepTime := lo.Reduce(sleepTimeList, func(a, b, _ int) int { return a + b }, 0)
+
+	maxTimeout := lo.Ternary(s.svcCtx.Config.Timeout > 0, int(s.svcCtx.Config.Timeout), 3000) / 1000
+
+	if totalSleepTime >= maxTimeout {
+		return nil, s.withErrorMessage(ecode.ErrParam, fmt.Errorf("total sleep time must less than %ds", maxTimeout))
+	}
+
+	// The maximum number of statements ngql can execute at the same time is 512
+	maxStatementNum := 512
+	for idx, gql := range gqlStrList {
+		gqlList := strings.Split(gql, ";")
+
+		if len(gqlList) <= maxStatementNum {
+			_, _, err := dao.Execute(authData.NSID, gql, request.ParamList)
+			if err != nil {
+				return nil, s.withErrorMessage(ecode.ErrInternalServer, err, "execute failed")
+			}
+		} else {
+			for chunkIdx := 0; chunkIdx < len(gqlList); chunkIdx += maxStatementNum {
+				gqlChunkList := gqlList[chunkIdx:lo.Min([]int{chunkIdx + maxStatementNum, len(gqlList)})]
+				_, _, err := dao.Execute(authData.NSID, strings.Join(gqlChunkList[:], ";"), request.ParamList)
+				if err != nil {
+					return nil, s.withErrorMessage(ecode.ErrInternalServer, err, "execute failed")
+				}
+			}
+		}
+
+		if idx < len(sleepTimeList) {
+			time.Sleep(time.Duration(sleepTimeList[idx]) * time.Second)
+		}
+	}
+
+	return &types.ExecSeqNGQLResult{OK: true}, nil
 }

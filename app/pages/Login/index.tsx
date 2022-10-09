@@ -1,7 +1,6 @@
 import { Button, Form, Input } from 'antd';
 import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
-import { useHistory, useLocation } from 'react-router-dom';
 import { hostRulesFn, passwordRulesFn, usernameRulesFn } from '@app/config/rules';
 import { observer } from 'mobx-react-lite';
 import { trackPageView } from '@app/utils/stat';
@@ -22,16 +21,11 @@ const fomrItemLayout = {
 const LoginPage: React.FC = () => {
   const { global } = useStore();
   const { version } = global;
-  const history = useHistory();
-  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const onConfig = async (values: any) => {
     setLoading(true);
     const ok = await global.login(values);
-    setLoading(false);
-    setTimeout(() => {
-      ok && history.replace(`/console${location.search}`);
-    }, 400);
+    !ok && setTimeout(() => setLoading(false), 400);
   };
 
   useEffect(() => {

@@ -5,7 +5,7 @@ import Icon from '@app/components/Icon';
 import { trackPageView } from '@app/utils/stat';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
-import { NebulaVersion } from '@app/stores/types.d.ts';
+import { NebulaVersion } from '@app/stores/types.d';
 import cls from 'classnames';
 import { Link, useHistory } from 'react-router-dom';
 import styles from './index.module.less';
@@ -72,6 +72,7 @@ const Schema = () => {
   const history = useHistory();
   const { nebulaVersion } = global;
   const { currentSpace, switchSpace, getSpacesList, deleteSpace, spaceList, cloneSpace } = schema;
+  const activeSpace = location.hash.slice(1);
   useEffect(() => {
     trackPageView('/schema');
     getSpaces();
@@ -229,6 +230,7 @@ const Schema = () => {
         columns={columns}
         loading={!!loading}
         rowKey="ID"
+        rowClassName={(item) => item.Name === activeSpace ? styles.active : ''}
       />
     </div>
   </div>;

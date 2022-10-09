@@ -1,3 +1,4 @@
+import { useCallback, useState } from 'react';
 import { NODE_SIZE } from '@app/config/explore';
 /**
  * onPointerMove
@@ -45,3 +46,13 @@ export const onAbsolutePositionMove = (
 
   return () => container.removeEventListener('pointermove', listener);
 };
+
+export function useBatchState<T extends Record<string, any>>(initState: T) {
+  const [state, updateState] = useState(initState);
+
+  const setState = useCallback((action: Partial<T> | ((preState: T) => T)) => {
+    typeof action === 'function' ? updateState(action) : updateState((s) => ({ ...s, ...action }));
+  }, []);
+
+  return { state, setState };
+}

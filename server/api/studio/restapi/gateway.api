@@ -20,6 +20,9 @@ type (
 	AnyResponse {
 		Data interface{} `json:"data"`
 	}
+	ExecSeqNGQLResult {
+		OK bool `json:"ok"`
+	}
 )
 
 @server(
@@ -35,6 +38,10 @@ service studio-api {
 	@doc "BatchExec NGQL"
 	@handler BatchExecNGQL
 	post /batchExec(BatchExecNGQLParams) returns (AnyResponse)
+	
+	@doc "Exec Sequence NGQL"
+	@handler ExecSeqNGQL
+	post /exec_seq(ExecNGQLParams) returns (ExecSeqNGQLResult)
 }
 
 @server(

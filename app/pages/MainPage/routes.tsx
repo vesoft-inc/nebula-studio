@@ -8,6 +8,7 @@ const Import = lazy(() => import('@app/pages/Import'));
 const TaskCreate = lazy(() => import('@app/pages/Import/TaskCreate'));
 const Doc = lazy(() => import('@app/pages/Doc'));
 const SketchModeling = lazy(() => import('@app/pages/SketchModeling'));
+const Welcome = lazy(() => import('@app/pages/Welcome'));
 
 
 export const RoutesList = [
@@ -47,6 +48,11 @@ export const RoutesList = [
   {
     path: '/sketch',
     component: SketchModeling,
+    exact: true,
+  },
+  {
+    path: '/welcome',
+    component: Welcome,
     exact: true,
   },
 ];

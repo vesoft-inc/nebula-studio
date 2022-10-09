@@ -69,7 +69,8 @@
     "useGuideTip": "Learn how to use NebulaGraph Studio",
     "ngqlIntro": "NebulaGraph Query Language (nGQL)",
     "ngqlIntroTip": "nGQL is a declarative graph query language for NebulaGraph. It allows expressive and efficient graph patterns. ",
-    "start": "Get Started"
+    "start": "Get Started",
+    "sketchIntro": "Schema drafting"
   },
   "warning": {
     "connectError": "Connection refused, please configure server again"
@@ -301,5 +302,32 @@
     "noData": "No data, please import data first",
     "uniqName": "Tag & Edge type name cannot be duplicated",
     "spaceExisted": "Space already exists"
+  },
+  "welcome": {
+    "guide": "Beginner's Guide",
+    "quickStart": "Start",
+    "quickStartDesc": "Documents",
+    "explorerGraph": "Explorer Graph",
+    "explorerGraphTip": "It is used with the Nebula Graph core to visualize interaction with graph data.",
+    "visualQuery": "Visual Query",
+    "visualQueryTip": "It is used with the Nebula Graph core to visualize interaction with graph data.",
+    "workflow": "Workflow",
+    "workflowTip": "It is used with the Nebula Graph core to visualize interaction with graph data.",
+    "starterDatasets": "Starter Datasets",
+    "solutionDatasets": "Solution Datasets",
+    "demoDownload": "Download",
+    "demoDownloading": "downloading",
+    "demoIntro": "Demo Introduction",
+    "loadWaiting": "Data is loading, please wait... It will end in {second}s",
+    "downloadSuccess": "Dataset `{space}` has been downloaded successfully",
+    "spaceExist": "The graph space `{space}` already exists",
+    "schemaModuleLink": "https://docs.nebula-graph.io/3.2.1/nebula-studio/quick-start/st-ug-create-schema/",
+    "importModuleLink": "https://docs.nebula-graph.io/3.2.1/nebula-studio/quick-start/st-ug-import-data/",
+    "consoleModuleLink": "https://docs.nebula-graph.io/3.2.1/nebula-studio/quick-start/st-ug-console/",
+    "sketchModuleLink": "https://docs.nebula-graph.io/3.2.1/nebula-studio/quick-start/st-ug-sketch/",
+    "basketballplayerDocLink": "https://nebula-graph.io/posts/playground-basketball-player",
+    "shareholdingDocLink": "https://nebula-graph.io/demo/shared-holding",
+    "alwaysShow": "Always show the welcome page",
+    "progressTitle": "Download & Import Data"
   }
 }

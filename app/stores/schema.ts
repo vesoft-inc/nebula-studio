@@ -124,6 +124,7 @@ export class SchemaStore {
 
   getSpacesList = async () => {
     const res = await this.getSpaces();
+    const activeSpace = location.hash.slice(1);
     if (res.data) {
       const spaces: ISpace[] = [];
       await Promise.all(
@@ -133,7 +134,7 @@ export class SchemaStore {
           );
           if (code === 0) {
             const space = (data.tables && data.tables[0]) || {};
-            space.serialNumber = i + 1;
+            space.serialNumber = space.Name === activeSpace ? 0 : i + 1;
             spaces.push(space);
           }
         }),
