@@ -203,9 +203,13 @@ function Welcome(props: IProps) {
                   </div>
                   <div className={styles.infoWrapper}>
                     <span>
-                      {`${intl.get('import.edgeText')}: `}<strong>{dataset.detail.edgeCount}</strong>
+                      {`${intl.get('import.edgeText')}: `}
+                      <strong>{dataset.detail.edgeCount}</strong>
                     </span>
-                    <span>{`${intl.get('import.vertexText')}: `}<strong>{dataset.detail.vertexCount}</strong></span>
+                    <span>
+                      {`${intl.get('import.vertexText')}: `}
+                      <strong>{dataset.detail.vertexCount}</strong>
+                    </span>
                   </div>
                 </div>
                 <div className={styles.contentTitle}>{dataset.spaceName}</div>
@@ -236,8 +240,8 @@ function Welcome(props: IProps) {
   );
 
   // @ts-ignore
-  const percent = ((initLoadingTime - spaceLoading?.leftTime) / initLoadingTime * 100) | 0;
-  const renderPercent = percent > 99 ? 99 : percent; 
+  const percent = (((initLoadingTime - spaceLoading?.leftTime) / initLoadingTime) * 100) | 0;
+  const renderPercent = percent > 99 ? 99 : percent;
 
   return (
     <div className={styles.welcomeWrapper}>
