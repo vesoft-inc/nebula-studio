@@ -7,6 +7,9 @@ const service = {
   batchExecNGQL: (params, config?) => {
     return post('/api-nebula/db/batchExec')(params, config);
   },
+  execSeqNGQL: (params, config?) => {
+    return post('/api-nebula/db/exec_seq')(params, config);
+  },
   connectDB: (params, config?) => {
     return post('/api-nebula/db/connect')(params, config);
   },

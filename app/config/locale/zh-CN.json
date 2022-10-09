@@ -69,7 +69,8 @@
     "useGuideTip": "学习如何使用 NebulaGraph Studio。",
     "ngqlIntro": "NebulaGraph 查询语言 (nGQL)",
     "ngqlIntroTip": "nGQL 是 NebulaGraph 使用的的声明式图查询语言，是为开发和运维人员设计的类 SQL 查询语言，易于学习。",
-    "start": "快速开始"
+    "start": "快速开始",
+    "sketchIntro": "Schema 草图"
   },
   "warning": {
     "connectError": "数据库连接有误，请重新配置"
@@ -301,5 +302,33 @@
     "noData": "暂无数据，请先导入数据",
     "uniqName": "标签和边类型名称不允许重名",
     "spaceExisted": "图空间已存在"
+  },
+  "welcome": {
+    "doc": "文档",
+    "guide": "新手引导",
+    "quickStart": "开始",
+    "quickStartDesc": "文档",
+    "explorerGraph": "探索图数据",
+    "explorerGraphTip": "It is used with the Nebula Graph core to visualize interaction with graph data.",
+    "visualQuery": "可视化查询",
+    "visualQueryTip": "It is used with the Nebula Graph core to visualize interaction with graph data.",
+    "workflow": "工作流",
+    "workflowTip": "It is used with the Nebula Graph core to visualize interaction with graph data.",
+    "starterDatasets": "基础数据集",
+    "solutionDatasets": "领域数据集",
+    "demoDownload": "下载",
+    "demoDownloading": "下载中",
+    "demoIntro": "Demo 介绍",
+    "loadWaiting": "数据加载中，请稍等...预计将在 {second}s 后结束",
+    "downloadSuccess": "数据集 `{space}` 下载成功",
+    "spaceExist": "图空间 `{space}` 已存在",
+    "schemaModuleLink": "https://docs.nebula-graph.com.cn/3.2.1/nebula-studio/quick-start/st-ug-create-schema/",
+    "importModuleLink": "https://docs.nebula-graph.com.cn/3.2.1/nebula-studio/quick-start/st-ug-import-data/",
+    "consoleModuleLink": "https://docs.nebula-graph.com.cn/3.2.1/nebula-studio/quick-start/st-ug-console/",
+    "sketchModuleLink": "https://docs.nebula-graph.com.cn/3.2.1/nebula-studio/quick-start/st-ug-sketch/",
+    "basketballplayerDocLink": "https://nebula-graph.com.cn/posts/playground-basketball-player",
+    "shareholdingDocLink": "https://nebula-graph.com.cn/demo/shared-holding",
+    "alwaysShow": "始终展示欢迎页",
+    "progressTitle": "下载 & 导入数据"
   }
 }

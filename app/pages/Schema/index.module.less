@@ -1,4 +1,14 @@
 @import '~@app/common.less';
+
+@keyframes blinkFadeOut {
+  from {
+    background-color: #fff8c5;
+  }
+  to {
+    background-color: #fff;
+  }
+}
+
 .schemaPage {
   padding: 25px 0;
   .schemaHeader {
@@ -66,6 +76,7 @@
     }
   }
 }
+
 .operationsSpace {
   background: #FFFFFF;
   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.25) !important;
@@ -73,4 +84,8 @@
   :global(.ant-btn) {
     padding-left: 0;
   }
+}
+
+.active {
+  animation: blinkFadeOut ease-in-out 3s;
 }

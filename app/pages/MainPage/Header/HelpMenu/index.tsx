@@ -38,8 +38,8 @@ const HelpMenu = () => {
       }))
     },
     {
-      key: 'doc',
-      label: <Link className={styles.nebulaLink} to="/doc">
+      key: 'welcome',
+      label: <Link className={styles.nebulaLink} to="/welcome">
         <Icon className={styles.navIcon} type="icon-studio-nav-help" />
       </Link>
     },

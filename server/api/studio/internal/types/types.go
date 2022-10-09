@@ -29,6 +29,10 @@ type AnyResponse struct {
 	Data interface{} `json:"data"`
 }
 
+type ExecSeqNGQLResult struct {
+	OK bool `json:"ok"`
+}
+
 type FileDestroyRequest struct {
 	Name string `path:"name" validate:"required"`
 }
