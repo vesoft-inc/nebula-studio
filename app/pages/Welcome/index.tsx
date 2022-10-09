@@ -203,9 +203,9 @@ function Welcome(props: IProps) {
                   </div>
                   <div className={styles.infoWrapper}>
                     <span>
-                      Edge: <strong>{dataset.detail.edgeCount}</strong>
+                      {`${intl.get('import.edgeText')}: `}<strong>{dataset.detail.edgeCount}</strong>
                     </span>
-                    <span>Vertex: {dataset.detail.vertexCount}</span>
+                    <span>{`${intl.get('import.vertexText')}: `}<strong>{dataset.detail.vertexCount}</strong></span>
                   </div>
                 </div>
                 <div className={styles.contentTitle}>{dataset.spaceName}</div>
