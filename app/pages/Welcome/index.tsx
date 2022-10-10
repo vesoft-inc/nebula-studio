@@ -19,6 +19,7 @@ export interface ModuleItem {
   title: string;
   tip: string;
   startLink: string;
+  startDisabled?: boolean;
   docLink: string;
   beta?: boolean;
   withOrder?: boolean;
@@ -262,7 +263,12 @@ function Welcome(props: IProps) {
                 <span className={cls(styles.title, module.beta && styles.beta)}>{module.title}</span>
                 <span className={styles.tip}>{module.tip}</span>
                 <div className={styles.actionWrapper}>
-                  <Button className={styles.action} type="primary" onClick={() => history.push(module.startLink)}>
+                  <Button
+                    className={styles.action}
+                    disabled={!!module.startDisabled}
+                    type="primary"
+                    onClick={() => history.push(module.startLink)}
+                  >
                     {intl.get('welcome.quickStart')}
                   </Button>
                   <Button className={cls(styles.action, styles.sub)} href={module.docLink} target="_blank">
