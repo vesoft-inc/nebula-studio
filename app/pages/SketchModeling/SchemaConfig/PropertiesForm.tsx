@@ -89,7 +89,12 @@ const PropertiesForm = (props: IProps) => {
                                   name={[name, 'name']}
                                   {...restField}
                                   {...itemLayout}
-                                  rules={nameRulesFn(intl)}
+                                  rules={[...nameRulesFn(), () => ({ validator: (_, value) => {
+                                    if (!value || properties.filter((item, i) => item.name === value && i !== index).length === 0) {
+                                      return Promise.resolve();
+                                    }
+                                    return Promise.reject(intl.get('schema.uniqProperty'));
+                                  } })]}
                                 >
                                   <Input />
                                 </Form.Item>

@@ -301,7 +301,8 @@
     "sameSchemaWarning": "{content} already exists in the space, please change the {hasType} name or select another space.",
     "noData": "No data, please import data first",
     "uniqName": "Tag & Edge type name cannot be duplicated",
-    "spaceExisted": "Space already exists"
+    "spaceExisted": "Space already exists",
+    "updateNameSuccess": "Update name successfully"
   },
   "welcome": {
     "guide": "Beginner's Guide",

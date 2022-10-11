@@ -123,8 +123,8 @@ const PopoverContent = (props: IContentProps) => {
     const { tags: newTags, edges: newEdges } = schemaInfo;
     const sameTags = intersection(newTags.map(item => item.name), tags);
     const sameEdges = intersection(newEdges.map(item => item.name), edgeTypes);
-    if(sameTags.length || sameEdges.length) {
-      return true;
+    if(!sameTags.length && !sameEdges.length) {
+      return false;
     }
     const tagStr = sameTags.join('、');
     const edgeStr = sameEdges.join('、');
@@ -139,7 +139,7 @@ const PopoverContent = (props: IContentProps) => {
       hasType += `${hasType ? ' / ' : ''}` + intl.get('common.edge');
     }
     message.warning(intl.get('sketch.sameSchemaWarning', { content, hasType }));
-    return false;
+    return true;
   }, []);
 
   const handleCreateSpace = useCallback(async (data) => {

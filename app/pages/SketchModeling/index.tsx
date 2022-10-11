@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import intl from 'react-intl-universal';
 import { useStore } from '@app/stores';
@@ -15,6 +15,7 @@ import { initTooltip } from './Plugins/Tooltip';
 const SketchPage: React.FC = () => {
   const { sketchModel } = useStore();
   const { initEditor, currentSketch } = sketchModel;
+  const [item, setItem] = useState(null);
   const editorRef = useRef();
 
   useEffect(() => {
@@ -25,8 +26,13 @@ const SketchPage: React.FC = () => {
   }, []);
   useEffect(() => {
     if (currentSketch) {
-      initEditor({ container: editorRef.current, schema: currentSketch.schema });
-      initTooltip({ container: editorRef.current });
+      if(!item || item.id !== currentSketch.id) {
+        initEditor({ container: editorRef.current, schema: currentSketch.schema });
+        initTooltip({ container: editorRef.current });
+      }
+      setItem(currentSketch);
+    } else {
+      setItem(null);
     }
   }, [currentSketch]);
   return (

@@ -11,13 +11,14 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { ARROW_STYLE, LINE_STYLE, NODE_RADIUS, COLOR_LIST, makeLineSort } from '@app/config/sketch';
 import ZoomBtns from '@app/pages/SketchModeling/ZoomBtns';
+import { initTooltip } from '@app/pages/SketchModeling/Plugins/Tooltip';
 import styles from './index.module.less';
 
 const SchemaVisualization = () => {
   const editorRef = useRef();
   const { schema, sketchModel } = useStore();
   const { initEditor } = sketchModel;
-  const { currentSpace, getSchemaSnapshot, getSchemaInfo, getRandomEdgeData, getNodeTagMap, updateSchemaSnapshot } = schema;
+  const { currentSpace, getSchemaSnapshot, tagList, getTagList, getEdgeList, getRandomEdgeData, getNodeTagMap, updateSchemaSnapshot } = schema;
 
   const [updateTime, setUpdateTime] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,8 @@ const SchemaVisualization = () => {
   const handleGetVisulization = useCallback(async () => {
     setLoading(true);
     try {
-      await getSchemaInfo();
+      await getEdgeList();
+      await getTagList();
       const { vids, edges } = await getRandomEdgeData();
       if(vids.length === 0) {
         message.warning(intl.get('sketch.noData'));
@@ -47,6 +49,10 @@ const SchemaVisualization = () => {
         const color = COLOR_LIST[index % COLOR_LIST.length];
         return {
           name: tag,
+          properties: schema.tagList.find(i => i.name === tag).fields.map(field => ({
+            name: field.Field,
+            type: field.Type,
+          })),
           uuid: uuidv4(),
           width: NODE_RADIUS * 2,
           height: NODE_RADIUS * 2,
@@ -60,13 +66,18 @@ const SchemaVisualization = () => {
       });
       let lines = [];
       edges.forEach(line => {
-        const { src, dst, name } = line;
-        const srcTag = vidMap[src];
-        const dstTag = vidMap[dst];
-        lines.push({
-          from: srcTag,
-          to: dstTag,
-          name,
+        const { src, dst, name, properties } = line;
+        const srcTags = vidMap[src];
+        const dstTags = vidMap[dst];
+        srcTags.forEach(srcTag => {
+          dstTags.forEach(dstTag => {
+            lines.push({
+              from: srcTag,
+              to: dstTag,
+              name,
+              properties,
+            });
+          });
         });
       });
       lines = uniqWith(lines, isEqual);
@@ -80,6 +91,7 @@ const SchemaVisualization = () => {
           toPoint: 3,
           style: LINE_STYLE,
           arrowStyle: ARROW_STYLE,
+          properties: line.properties,
         };
       }).filter(line => line.from && line.to);
       makeLineSort(_lines);
@@ -114,6 +126,7 @@ const SchemaVisualization = () => {
         }
       } 
     });
+    initTooltip({ container: editorRef.current });
   }, []);
   const getSnapshot = useCallback(async () => {
     setLoading(true);

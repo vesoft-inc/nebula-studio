@@ -20,7 +20,6 @@ const SketchConfigHeader: React.FC = () => {
     if (node instanceof SVGElement) {
       const classname = typeof node.className === 'string' ? node.className : node.className.baseVal;
       return (
-        node.tagName !== 'foreignObject' &&
         !classname?.includes('activeNode') &&
         !classname?.includes('ve-link-points') &&
         !classname?.includes('ve-shdow-path')
@@ -80,8 +79,12 @@ const SketchConfigHeader: React.FC = () => {
     a.click();
   };
 
-  const handleUpdateName = (value: string) => {
-    sketchModel.update({ currentSketch: { ...currentSketch, name: value } });
+  const handleUpdateName = async (value: string) => {
+    const code = await updateSketch({ name: value });
+    if (code === 0) {
+      message.success(intl.get('sketch.updateNameSuccess'));
+      await getSketchList();
+    }
   };
   return (
     <div className={styles.header}>
