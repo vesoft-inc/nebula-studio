@@ -34,11 +34,12 @@ export const onPointerMove = (container: HTMLElement, callback: (pos: Record<'to
 
 export const onAbsolutePositionMove = (
   container: HTMLElement,
-  callback: (pos: Record<'top' | 'left', number>) => void
+  callback: (pos: Record<'top' | 'left' | 'offsetX' | 'offsetY', number>) => void
 ) => {
   const listener = (ev: PointerEvent) => {
     // update the pointer pos
-    callback({ left: ev.pageX, top: ev.pageY });
+    const offset = container.getBoundingClientRect();
+    callback({ left: ev.pageX, top: ev.pageY, offsetX: offset.x, offsetY: offset.y });
   };
 
   // Capture pointer coords on move or touchstart

@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { IProperty, ISchemaEnum } from '@app/interfaces/schema';
 import { ARROW_STYLE, LINE_STYLE, makeLineSort, NODE_RADIUS } from '@app/config/sketch';
+import { uniqBy } from 'lodash';
 
 interface IHoveringItem {
   data: ISketchNode | ISketchEdge;
@@ -68,7 +69,12 @@ export class SketchStore {
   };
 
   validate = (data, type) => {
-    const isInvalid = !data.name || (data.properties as IProperty[])?.some((i) => !i.name || !i.type);
+    const { name, properties } = data;
+    let isInvalid = !name || (properties as IProperty[])?.some((i) => !i.name || !i.type);
+    const uniqProperties = uniqBy(data.properties, 'name');
+    if(properties && data.properties?.length !== uniqProperties.length) {
+      isInvalid = true;
+    }
     if (isInvalid) {
       this.updateItem(data as any, { invalid: true });
       if (type === 'node') {
@@ -99,8 +105,10 @@ export class SketchStore {
   checkSameName = () => {
     const data = this.editor.schema.getData();
     const { nodes, lines } = data;
-    const name = new Set([...nodes.map((i) => i.name), ...lines.map((i) => i.name)]);
-    return name.size !== nodes.length + lines.length;
+    const _nodes = nodes.map((i) => i.name).filter(Boolean);
+    const _lines = lines.map((i) => i.name).filter(Boolean);
+    const name = new Set([..._nodes, ..._lines]);
+    return name.size !== _nodes.length + _lines.length;
   }
 
   checkModified = () => {
@@ -163,7 +171,11 @@ export class SketchStore {
     this.update({ loading: false });
     if (res.code === 0) {
       const sketchList = { ...res.data, filter: newFilter };
-      this.update({ sketchList });
+      const params = { sketchList } as any;
+      if(this.currentSketch) {
+        params.currentSketch = sketchList.items.find((item) => item.id === this.currentSketch.id);
+      }
+      this.update(params);
       return sketchList;
     }
   };
@@ -178,7 +190,7 @@ export class SketchStore {
     this.container = container;
     initShapes(this.editor);
     initShadowFilter(this.editor.svg);
-    options?.mode !== 'view' && this.initEvents();
+    this.initEvents(options?.mode);
     if (schema) {
       const _schema = JSON.parse(schema);
       makeLineSort(_schema.lines);
@@ -190,52 +202,7 @@ export class SketchStore {
     this.editor.graph.node.unActive();
     this.editor.graph.line.unActiveLine();
   };
-  initEvents = () => {
-    this.editor.graph.on('node:click', ({ node }) => {
-      this.update({ active: node.data });
-    });
-    this.editor.graph.on('node:change', ({ node }) => {
-      this.update({ active: node.data });
-      this.clearActive();
-      this.editor.graph.node.setActive(node);
-    });
-    this.editor.graph.on('line:click', ({ line }) => {
-      this.update({ active: line.data });
-    });
-    this.editor.graph.on('line:add', ({ line }) => {
-      this.editor.graph.line.update();
-      this.update({ active: line.data });
-      this.clearActive();
-      this.editor.graph.line.setActiveLine(line);
-    });
-    this.editor.graph.on('paper:click', () => {
-      this.update({ active: undefined });
-    });
-    this.editor.graph.on('line:beforeadd', ({ data: line }: { data: any }) => {
-      const data = this.editor.schema.getData();
-      makeLineSort([...data.lines, line]);
-      line.type = ISchemaEnum.Edge;
-      line.style = LINE_STYLE;
-      line.arrowStyle = ARROW_STYLE;
-    });
-    this.editor.graph.on('node:remove', ({ node }) => {
-      const param = { active: undefined } as any;
-      if (this.hoveringItem?.data.uuid === node.data.uuid) {
-        param.hoveringItem = undefined;
-      }
-      this.update(param);
-    });
-    this.editor.graph.on('line:remove', ({ line }) => {
-      const data = this.editor.schema.getData();
-      makeLineSort(data.lines);
-      this.editor.graph.line.update();
-      const param = { active: undefined } as any;
-      if (this.hoveringItem?.data.uuid === line.data.uuid) {
-        param.hoveringItem = undefined;
-      }
-      this.update(param);
-    });
-
+  initEvents = (mode) => {
     this.editor.graph.on('node:mouseenter', ({ node }) => {
       this.update({ hoveringItem: node });
     });
@@ -248,6 +215,52 @@ export class SketchStore {
     this.editor.graph.on('line:mouseleave', () => {
       this.update({ hoveringItem: undefined });
     });
+    if(mode !== 'view') {
+      this.editor.graph.on('node:click', ({ node }) => {
+        this.update({ active: node.data });
+      });
+      this.editor.graph.on('node:change', ({ node }) => {
+        this.update({ active: node.data });
+        this.clearActive();
+        this.editor.graph.node.setActive(node);
+      });
+      this.editor.graph.on('line:click', ({ line }) => {
+        this.update({ active: line.data });
+      });
+      this.editor.graph.on('line:add', ({ line }) => {
+        this.editor.graph.line.update();
+        this.update({ active: line.data });
+        this.clearActive();
+        this.editor.graph.line.setActiveLine(line);
+      });
+      this.editor.graph.on('paper:click', () => {
+        this.update({ active: undefined });
+      });
+      this.editor.graph.on('line:beforeadd', ({ data: line }: { data: any }) => {
+        const data = this.editor.schema.getData();
+        makeLineSort([...data.lines, line]);
+        line.type = ISchemaEnum.Edge;
+        line.style = LINE_STYLE;
+        line.arrowStyle = ARROW_STYLE;
+      });
+      this.editor.graph.on('node:remove', ({ node }) => {
+        const param = { active: undefined } as any;
+        if (this.hoveringItem?.data.uuid === node.data.uuid) {
+          param.hoveringItem = undefined;
+        }
+        this.update(param);
+      });
+      this.editor.graph.on('line:remove', ({ line }) => {
+        const data = this.editor.schema.getData();
+        makeLineSort(data.lines);
+        this.editor.graph.line.update();
+        const param = { active: undefined } as any;
+        if (this.hoveringItem?.data.uuid === line.data.uuid) {
+          param.hoveringItem = undefined;
+        }
+        this.update(param);
+      });
+    }
   };
 
   setHoveringItem = (item?: IHoveringItem) => {
@@ -339,10 +352,7 @@ export class SketchStore {
     document.removeEventListener('mouseup', this.zoomMouseUp);
   };
   setTooltip = (tooltip: any) => {
-    // The offset of the canvas relative to the page
-    const offsetX = 258;
-    const offsetY = 120;
-    const { left, top } = tooltip;
+    const { left, top, offsetX, offsetY } = tooltip;
     this.tooltip = { ...this.tooltip, left: left - offsetX, top: top - offsetY };
   };
   destroy = () => {

@@ -650,7 +650,7 @@ export class SchemaStore {
   getRandomEdgeData = async () => {
     const vids:Set<string> = new Set();
     const edges = [];
-    const edgeQuery = this.edgeTypes.map(edge => `MATCH ()-[e:${handleKeyword(edge)}]->() RETURN e LIMIT 10;`);
+    const edgeQuery = this.edgeList.map(edge => `MATCH ()-[e:${handleKeyword(edge.name)}]->() RETURN e LIMIT 10;`);
     const { code, data } = await service.batchExecNGQL({
       gqls: edgeQuery
     });
@@ -665,7 +665,11 @@ export class SchemaStore {
             edges.push({
               src: srcID,
               dst: dstID,
-              name: edgeName
+              name: edgeName,
+              properties: this.edgeList.find(i => i.name === edgeName).fields.map(field => ({
+                name: field.Field,
+                type: field.Type,
+              }))
             });
           });
         }
@@ -690,9 +694,8 @@ export class SchemaStore {
       tables.forEach(item => {
         const { id, tags } = item;
         const _tags: string[] = safeParse(tags) || [];
-        const tagName = _tags.sort().join(' | ');
-        vidMap[id] = tagName;
-        tagSet.add(tagName);
+        vidMap[id] = _tags;
+        _tags.forEach(i => tagSet.add(i));
       });
       return { vidMap, tags: [...tagSet] };
     }
