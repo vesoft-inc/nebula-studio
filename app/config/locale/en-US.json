@@ -52,6 +52,8 @@
     "version": "Version",
     "statistics": "Statistics",
     "duplicate": "Duplicate",
+    "copy": "Copy",
+    "copySuccess": "Copied successfully",
     "sketch": "Schema drafting",
     "viewSchema": "View Schema",
     "beta": "Beta"
@@ -73,7 +75,12 @@
     "sketchIntro": "Schema drafting"
   },
   "warning": {
-    "connectError": "Connection refused, please configure server again"
+    "connectError": "Connection refused, please configure server again",
+    "crashPage": "Oops, something went wrong",
+    "crashPageTip": "Service crashed, please contact administrator",
+    "refreshPage": "Refresh page",
+    "contactStaff": "Contact Us",
+    "errorMessage": "Error Message"
   },
   "configServer": {
     "connect": "Connect",
@@ -269,7 +276,8 @@
     "nGQLHref": "https://docs.nebula-graph.io/3.1.0/3.ngql-guide/1.nGQL-overview/1.overview/",
     "mannualHref": "https://docs.nebula-graph.io/3.1.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/",
     "startStudioHref": "https://docs.nebula-graph.io/3.1.0/nebula-studio/quick-start/st-ug-plan-schema/",
-    "versionLogHref": "https://docs.nebula-graph.io/3.1.0/nebula-studio/about-studio/st-ug-release-note/"
+    "versionLogHref": "https://docs.nebula-graph.io/3.1.0/nebula-studio/about-studio/st-ug-release-note/",
+    "forumHref": "https://discuss.nebula-graph.io/"
   },
   "sketch": {
     "dragTip": "Drag and drop to the canvas",
