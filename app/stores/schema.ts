@@ -694,7 +694,7 @@ export class SchemaStore {
       tables.forEach(item => {
         const { id, tags } = item;
         const _tags: string[] = safeParse(tags) || [];
-        vidMap[id] = _tags;
+        vidMap[id] = _tags.length > 0 ? _tags : undefined;
         _tags.forEach(i => tagSet.add(i));
       });
       return { vidMap, tags: [...tagSet] };

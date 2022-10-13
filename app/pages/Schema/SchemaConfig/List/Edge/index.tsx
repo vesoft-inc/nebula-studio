@@ -96,7 +96,8 @@ const EdgeList = () => {
                 </Link>
               </Button>
               <Popconfirm
-                onConfirm={() => {
+                onConfirm={(e) => {
+                  e.stopPropagation();
                   handleDeleteEdge(edge.name);
                 }}
                 title={intl.get('common.ask')}

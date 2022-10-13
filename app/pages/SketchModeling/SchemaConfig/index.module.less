@@ -64,10 +64,12 @@
       border-bottom: 1px solid @gray;
     }
     .propertiesForm :global(.ant-form-item) {
-      margin-bottom: 9px;
+      margin-bottom: 13px;
     }
-    .propertiesForm :global(.ant-form-item-with-help .ant-form-item-explain) {
-      white-space: nowrap;
+    .propertiesForm :global(.ant-row) {
+      &:has(:global(.ant-form-item-explain)) {
+        height: 60px;
+      }
     }
     .label {
       display: inline-block;
@@ -111,6 +113,11 @@
       position: absolute;
       right: 8px;
       top: 0;
+      :global(.ant-form-item-explain) {
+        white-space: nowrap;
+        position: relative;
+        left: -100px;
+      }
     }
     .removeBtn {
       display: flex;

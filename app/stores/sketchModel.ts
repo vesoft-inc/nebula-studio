@@ -194,7 +194,7 @@ export class SketchStore {
     if (schema) {
       const _schema = JSON.parse(schema);
       makeLineSort(_schema.lines);
-      await this.editor.schema.setData(_schema);
+      await this.editor.schema.setInitData(_schema);
       this.editor.controller.autoFit();
     }
   };

@@ -19,6 +19,7 @@
       white-space: nowrap;
     }
     .tip {
+      max-width: 600px;
       background: #DBEFFF;
       border-radius: 3px;
       padding: 13px;
@@ -35,6 +36,9 @@
     height: 700px;
     background-color: #fff;
     border: 1px solid #E0E0E0;
+    :global(.ve-link-points) {
+      display: none !important;
+    }
   }
   .visualizationTip {
     position: absolute;
@@ -51,6 +55,10 @@
       &:not(:last-child) {
         margin-bottom: 20px;
       }
+      & > span:nth-child(2) {
+        width: 55px;
+        font-size: 12px;
+      }
     }
     .circle {
       width: 30px;
@@ -59,6 +67,13 @@
       border-radius: 30px;
       display: inline-block;
       border: 3px solid #626F81;
+    }
+    .dashedCircle {
+      width: 28px;
+      height: 28px;
+      border-radius: 28px;
+      display: inline-block;
+      border: 3px dashed #626F81;
     }
     .edge {
       display: inline-flex;
@@ -69,6 +84,17 @@
       width: 50px;
       height: 2px;
       background-color: #636F81;
+    }
+    .danglingEdges {
+      display: inline-flex;
+      align-items: center;
+    }
+    .danglingLine {
+      display: inline-block;
+      width: 26px;
+      height: 2px;
+      background-color: #636F81;
+      margin-left: 2px;
     }
     .arrow {
       width: 10px;

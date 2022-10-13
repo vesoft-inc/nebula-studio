@@ -14,11 +14,24 @@ import ZoomBtns from '@app/pages/SketchModeling/ZoomBtns';
 import { initTooltip } from '@app/pages/SketchModeling/Plugins/Tooltip';
 import styles from './index.module.less';
 
+const NODE_CONFIG = {
+  width: NODE_RADIUS * 2,
+  height: NODE_RADIUS * 2,
+  type: ISchemaEnum.Tag,
+  hideActive: true,
+  x: Math.random() * 100,
+  y: Math.random() * 100,
+};
+const DANLEING_NODE_CONFIG = {
+  strokeDasharray: '10 5',
+  strokeColor: 'rgba(60, 60, 60, 0.5)',
+  fill: 'transparent',
+};
 const SchemaVisualization = () => {
   const editorRef = useRef();
   const { schema, sketchModel } = useStore();
   const { initEditor } = sketchModel;
-  const { currentSpace, getSchemaSnapshot, tagList, getTagList, getEdgeList, getRandomEdgeData, getNodeTagMap, updateSchemaSnapshot } = schema;
+  const { currentSpace, getSchemaSnapshot, getTagList, getEdgeList, getRandomEdgeData, getNodeTagMap, updateSchemaSnapshot } = schema;
 
   const [updateTime, setUpdateTime] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,23 +58,19 @@ const SchemaVisualization = () => {
         return;
       }
       const { tags, vidMap } = await getNodeTagMap(vids);
+      const danglingEdges = [];
       const nodes = tags.map((tag, index) => {
         const color = COLOR_LIST[index % COLOR_LIST.length];
         return {
+          ...NODE_CONFIG,
           name: tag,
           properties: schema.tagList.find(i => i.name === tag).fields.map(field => ({
             name: field.Field,
             type: field.Type,
           })),
           uuid: uuidv4(),
-          width: NODE_RADIUS * 2,
-          height: NODE_RADIUS * 2,
-          type: ISchemaEnum.Tag,
           strokeColor: color.strokeColor,
           fill: color.fill,
-          hideActive: true,
-          x: Math.random() * 100,
-          y: Math.random() * 100,
         };
       });
       let lines = [];
@@ -69,22 +78,94 @@ const SchemaVisualization = () => {
         const { src, dst, name, properties } = line;
         const srcTags = vidMap[src];
         const dstTags = vidMap[dst];
-        srcTags.forEach(srcTag => {
-          dstTags.forEach(dstTag => {
-            lines.push({
-              from: srcTag,
-              to: dstTag,
-              name,
-              properties,
+        if(!srcTags || !dstTags) {
+          danglingEdges.push(line);
+        } else {
+          srcTags?.forEach(srcTag => {
+            dstTags?.forEach(dstTag => {
+              lines.push({
+                from: srcTag,
+                to: dstTag,
+                name,
+                properties,
+              });
             });
           });
+        }
+      });
+      const result = danglingEdges.reduce((acc, cur) => {
+        // {
+        //   e1: {
+        //     noSrc: [edge2, edge3],
+        //     noDst: [],
+        //     noBoth: edge1
+        //   },
+        //   ...,
+        //   flatten: []
+        // }
+        const _acc = { ...acc };
+        const { src, dst, name } = cur;
+        const uniqLines = _acc.flatten;
+        _acc[name] = _acc[name] || {};
+        const lines = _acc[name];
+        const srcTags = vidMap[src];
+        const dstTags = vidMap[dst];
+        if(!srcTags && !dstTags) {
+          if(!lines.noBoth) {
+            lines.noBoth = cur;
+            uniqLines.push({ ...cur, srcId: src, dstId: dst });
+          }
+        } else if (!srcTags) {
+          dstTags.forEach(dstTag => {
+            const hasDst = lines.noSrc?.find(i => i.dst === dstTag);
+            const _line = { ...cur, dst: dstTag, srcId: src };
+            if(!hasDst) {
+              uniqLines.push(_line);
+            }
+            lines.noSrc ? lines.noSrc.push(_line) : lines.noSrc = [_line];
+          });
+        } else if (!dstTags) {
+          srcTags.forEach(srcTag => {
+            const hasDst = lines.noDst?.find(i => i.src === srcTag);
+            const _line = { ...cur, src: srcTag, dstId: dst };
+            if(!hasDst) {
+              uniqLines.push(_line);
+            }
+            lines.noDst ? lines.noDst.push(_line) : lines.noDst = [_line];
+          });
+        }
+        return _acc;
+      }, { flatten: [] });
+      result.flatten.forEach(line => {
+        const { src, dst, srcId, dstId, name, properties } = line;
+        if(srcId && !nodes.find(i => i.vid === srcId)) {
+          nodes.push({
+            ...NODE_CONFIG,
+            ...DANLEING_NODE_CONFIG,
+            vid: srcId,
+            uuid: uuidv4(),
+          });
+        }
+        if(dstId && !nodes.find(i => i.vid === dstId)) {
+          nodes.push({
+            ...NODE_CONFIG,
+            ...DANLEING_NODE_CONFIG,
+            vid: dstId,
+            uuid: uuidv4(),
+          });
+        }
+        lines.push({
+          from: src,
+          to: dst,
+          name,
+          properties,
         });
       });
       lines = uniqWith(lines, isEqual);
       const _lines = lines.map(line => {
         return {
-          from: nodes.find(node => node.name === line.from)?.uuid,
-          to: nodes.find(node => node.name === line.to)?.uuid,
+          from: nodes.find(node => node.name === line.from || node.vid === line.from)?.uuid,
+          to: nodes.find(node => node.name === line.to || node.vid === line.to)?.uuid,
           name: line.name,
           type: ISchemaEnum.Edge,
           fromPoint: 2,
@@ -174,6 +255,13 @@ const SchemaVisualization = () => {
               <span className={styles.arrow} />
             </span>
             <span>{intl.get('common.edge')}</span>
+          </div>
+          <div className={styles.row}>
+            <span className={styles.danglingEdges}>
+              <span className={styles.dashedCircle} />
+              <span className={styles.danglingLine} />
+            </span>
+            <span>{intl.get('common.danglingEdge')}</span>
           </div>
         </div>
         <ZoomBtns />

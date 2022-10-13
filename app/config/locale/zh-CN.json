@@ -56,7 +56,8 @@
     "copySuccess": "复制成功",
     "sketch": "Schema 草图",
     "viewSchema": "查看 Schema",
-    "beta": "Beta"
+    "beta": "Beta",
+    "danglingEdge": "悬挂边"
   },
   "doc": {
     "welcome": "欢迎使用",

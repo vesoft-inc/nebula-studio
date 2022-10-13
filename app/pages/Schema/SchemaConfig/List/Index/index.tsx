@@ -143,6 +143,7 @@ const IndexList = () => {
               </Button>
               <Popconfirm
                 onConfirm={(e) => {
+                  e.stopPropagation();
                   handleDeleteIndex(e, indexType, index.name);
                 }}
                 title={intl.get('common.ask')}

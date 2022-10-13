@@ -38,6 +38,9 @@ const Tooltip = observer(function Tooltip() {
   const {
     data: { type, name, properties = [], fill, strokeColor },
   } = data;
+  if(!name && !properties.length) {
+    return null;
+  }
   const { left, top } = tooltip;
   const style = { left, top } as any;
   const TOOLTIP_HEIGHT = Math.min(TOOLTIP_MIN_HEIGHT + properties.length * 30, TOOLTIP_MAX_HEIGHT);

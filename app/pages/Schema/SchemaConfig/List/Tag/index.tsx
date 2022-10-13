@@ -99,7 +99,8 @@ const TagList = () => {
               </Link>
             </Button>
             <Popconfirm
-              onConfirm={() => {
+              onConfirm={(e) => {
+                e.stopPropagation();
                 handleDeleteTag(tag.name);
               }}
               title={intl.get('common.ask')}

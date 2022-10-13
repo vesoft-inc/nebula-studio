@@ -21,7 +21,7 @@ const SketchPage: React.FC = () => {
   useEffect(() => {
     trackPageView('/sketchModeling');
     return () => {
-      currentSketch && sketchModel.destroy();
+      sketchModel.currentSketch && sketchModel.destroy();
     };
   }, []);
   useEffect(() => {
