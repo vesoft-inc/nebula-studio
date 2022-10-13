@@ -311,7 +311,8 @@
     "noData": "暂无数据，请先导入数据",
     "uniqName": "标签和边类型名称不允许重名",
     "spaceExisted": "图空间已存在",
-    "updateNameSuccess": "更新名称成功"
+    "updateNameSuccess": "更新名称成功",
+    "search": "搜索草图名称"
   },
   "welcome": {
     "doc": "文档",

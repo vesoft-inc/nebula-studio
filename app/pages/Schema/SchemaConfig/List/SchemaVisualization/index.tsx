@@ -103,11 +103,10 @@ const SchemaVisualization = () => {
         //   ...,
         //   flatten: []
         // }
-        const _acc = { ...acc };
         const { src, dst, name } = cur;
-        const uniqLines = _acc.flatten;
-        _acc[name] = _acc[name] || {};
-        const lines = _acc[name];
+        const uniqLines = acc.flatten;
+        acc[name] = acc[name] || {};
+        const lines = acc[name];
         const srcTags = vidMap[src];
         const dstTags = vidMap[dst];
         if(!srcTags && !dstTags) {
@@ -134,26 +133,16 @@ const SchemaVisualization = () => {
             lines.noDst ? lines.noDst.push(_line) : lines.noDst = [_line];
           });
         }
-        return _acc;
+        return acc;
       }, { flatten: [] });
       result.flatten.forEach(line => {
         const { src, dst, srcId, dstId, name, properties } = line;
-        if(srcId && !nodes.find(i => i.vid === srcId)) {
-          nodes.push({
-            ...NODE_CONFIG,
-            ...DANLEING_NODE_CONFIG,
-            vid: srcId,
-            uuid: uuidv4(),
-          });
-        }
-        if(dstId && !nodes.find(i => i.vid === dstId)) {
-          nodes.push({
-            ...NODE_CONFIG,
-            ...DANLEING_NODE_CONFIG,
-            vid: dstId,
-            uuid: uuidv4(),
-          });
-        }
+        [srcId, dstId].forEach(vid => vid && nodes.every(i => i.vid !== vid) && nodes.push({
+          ...NODE_CONFIG,
+          ...DANLEING_NODE_CONFIG,
+          vid,
+          uuid: uuidv4(),
+        }));
         lines.push({
           from: src,
           to: dst,

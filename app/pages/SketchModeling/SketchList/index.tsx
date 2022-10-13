@@ -89,6 +89,7 @@ const SketchList: React.FC = () => {
       </div>
       <Input
         allowClear
+        placeholder={intl.get('sketch.search')}
         className={styles.searchInput}
         onChange={debounceChange}
         suffix={<Icon type="icon-nav-filter" />}

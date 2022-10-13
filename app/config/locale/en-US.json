@@ -311,7 +311,8 @@
     "noData": "No data, please import data first",
     "uniqName": "Tag & Edge type name cannot be duplicated",
     "spaceExisted": "Space already exists",
-    "updateNameSuccess": "Update name successfully"
+    "updateNameSuccess": "Update name successfully",
+    "search": "Search name"
   },
   "welcome": {
     "guide": "Beginner's Guide",
