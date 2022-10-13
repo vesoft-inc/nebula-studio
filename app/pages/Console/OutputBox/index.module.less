@@ -71,9 +71,9 @@
 		position: relative;
 		border-top: 1px solid #E0E0E0;
 		flex: 1;
-		overflow: auto;
 		.outputTab {
 			min-height: 300px;
+			max-height: 720px;
 			& > :global(.ant-tabs-nav) {
 				width: 80px;
 				:global {
@@ -111,6 +111,7 @@
 			& > :global(.ant-tabs-content-holder) {
 				position: relative;
 				background-color: @lightBlue;
+				overflow: auto;
 				:global {
 					.ant-tabs-content {
 						.ant-table, .ant-pagination {

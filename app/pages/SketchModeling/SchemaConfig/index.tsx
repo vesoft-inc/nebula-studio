@@ -33,8 +33,9 @@ const SchemaConfig: React.FC = () => {
   const validateSameName = () => {
     const prevName = sketchModel.active?.name;
     const name = form.getFieldValue('name');
-    const data = sketchModel.editor.schema.getData();
+    const data = sketchModel.editor?.schema.getData();
     let invalid = false;
+    if(!data) return invalid;
     data.nodes.forEach((item) => {
       if(item.uuid === sketchModel.active?.uuid || !name) {
         return;

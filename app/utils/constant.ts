@@ -106,7 +106,7 @@ export const ENUM_OF_COMPARE = {
 export const DATA_TYPE = [
   {
     value: 'int',
-    label: 'int',
+    label: 'int64',
   },
   {
     value: 'bool',

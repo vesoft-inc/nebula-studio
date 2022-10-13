@@ -17,9 +17,9 @@ class ErrorBoundary extends React.PureComponent<IProps, IState> {
       errInfo: null,
     };
   }
-  componentDidCatch(_error, errorInfo) {
+  componentDidCatch(error) {
     this.setState({
-      errInfo: errorInfo.componentStack,
+      errInfo: error?.stack?.toString(),
     });
   }
   componentDidUpdate(prevProps: Readonly<IProps>): void {
