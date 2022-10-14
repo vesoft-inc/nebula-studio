@@ -5,7 +5,6 @@ import Icon from '@app/components/Icon';
 import { trackPageView } from '@app/utils/stat';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
-import { NebulaVersion } from '@app/stores/types.d';
 import cls from 'classnames';
 import { Link, useHistory } from 'react-router-dom';
 import styles from './index.module.less';
@@ -15,62 +14,64 @@ interface IOperations {
   space: string;
   onClone: (name: string, oldSpace: string) => void
   onDelete: (name: string) => void;
-  version: NebulaVersion
 }
 
 const Operations = (props: IOperations) => {
-  const { space, onClone, onDelete, version } = props;
+  const { space, onClone, onDelete } = props;
   const [visible, setVisible] = useState(false);
   const handleClone = (values) => {
     const { name } = values;
     onClone(name, space);
     setVisible(false);
   };
-  return <Menu className={styles.operationsSpace}>
-    <Menu.Item key="delete">
-      <Popconfirm
-        onConfirm={() => onDelete(space)}
-        title={intl.get('common.ask')}
-        okText={intl.get('common.ok')}
-        cancelText={intl.get('common.cancel')}
-      >
-        <Button type="link" danger>
-          {intl.get('schema.deleteSpace')}
-        </Button>
-      </Popconfirm>
-    </Menu.Item>
-    {version !== NebulaVersion.V2_5 && <Menu.Item key="clone">
-      <Popover
-        destroyTooltipOnHide={true}
-        placement="leftTop"
-        open={visible}
-        trigger="click"
-        onOpenChange={visible => setVisible(visible)}
-        content={<Form onFinish={handleClone} layout="inline">
-          <Form.Item label={intl.get('schema.spaceName')} name="name" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item>
-            <Button htmlType="submit" type="primary">
-              {intl.get('common.confirm')}
-            </Button>
-          </Form.Item>
-        </Form>}
-      >
-        <Button type="link" onClick={() => setVisible(true)}>
-          {intl.get('schema.cloneSpace')}
-        </Button>
-      </Popover>
-    </Menu.Item>}
-  </Menu>;
+  const items = [
+    {
+      key: 'delete',
+      label: <Popconfirm
+      onConfirm={() => onDelete(space)}
+      title={intl.get('common.ask')}
+      okText={intl.get('common.ok')}
+      cancelText={intl.get('common.cancel')}
+    >
+      <Button type="link" danger>
+        {intl.get('schema.deleteSpace')}
+      </Button>
+    </Popconfirm>
+    },
+    {
+      key: 'clone',
+      label: <Popover
+      overlayClassName={styles.clonePopover}
+      destroyTooltipOnHide={true}
+      placement="leftTop"
+      open={visible}
+      trigger="click"
+      onOpenChange={visible => setVisible(visible)}
+      content={<Form onFinish={handleClone} layout="inline">
+        <Form.Item label={intl.get('schema.spaceName')} name="name" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item>
+          <Button htmlType="submit" type="primary">
+            {intl.get('common.confirm')}
+          </Button>
+        </Form.Item>
+      </Form>}
+    >
+      <Button type="link" onClick={() => setVisible(true)}>
+        {intl.get('schema.cloneSpace')}
+      </Button>
+    </Popover>
+    }
+  ]
+  return <Menu className={styles.operationsSpace} items={items} />
 };
 
 const Schema = () => {
-  const { schema, global } = useStore();
+  const { schema } = useStore();
   const [loading, setLoading] = useState(false);
   const [searchVal, setSearchVal] = useState('');
   const history = useHistory();
-  const { nebulaVersion } = global;
   const { currentSpace, switchSpace, getSpacesList, deleteSpace, spaceList, cloneSpace } = schema;
   const activeSpace = location.hash.slice(1);
   useEffect(() => {
@@ -196,7 +197,7 @@ const Schema = () => {
               >
                 {intl.get('common.schema')}
               </Button>
-              <Dropdown overlay={<Operations version={nebulaVersion} space={space.Name} onDelete={handleDeleteSpace} onClone={handleCloneSpace} />} placement="bottomLeft">
+              <Dropdown overlay={<Operations space={space.Name} onDelete={handleDeleteSpace} onClone={handleCloneSpace} />} placement="bottomLeft">
                 <Icon className={styles.btnMore} type="icon-studio-more" />
               </Dropdown>
             </div>
