@@ -68,6 +68,12 @@ func (s *gatewayService) ConnectDB(request *types.ConnectDBParams) (*types.Conne
 		MaxAge:   int(configAuth.AccessExpire),
 	}
 
+	httpsEnable := s.svcCtx.Config.CertFile != "" && s.svcCtx.Config.KeyFile != ""
+	if httpsEnable {
+		tokenCookie.Secure = true
+		tokenCookie.SameSite = http.SameSiteNoneMode
+	}
+
 	httpRes.Header().Add("Set-Cookie", tokenCookie.String())
 
 	return &types.ConnectDBResult{
