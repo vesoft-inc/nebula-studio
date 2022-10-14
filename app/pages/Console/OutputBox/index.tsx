@@ -1,6 +1,6 @@
 import { Button, Table, Tabs, Tooltip, Popover } from 'antd';
 import { BigNumber } from 'bignumber.js';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
@@ -221,9 +221,9 @@ const OutputBox = (props: IProps) => {
       edges
     });
   };
-
+  const resultSuccess = useMemo(() => code === 0, [code]);
   const items = [
-    code === 0 && {
+    resultSuccess && {
       key: 'table',
       label: <>
         <Icon type="icon-studio-console-table" />
@@ -240,7 +240,7 @@ const OutputBox = (props: IProps) => {
         rowKey={() => uuidv4()}
       />
     },
-    code === 0 && data.headers[0] === 'format' && {
+    resultSuccess && data.headers[0] === 'format' && {
       key: 'graphViz',
       label: <>
         <Icon type="icon-studio-console-graphviz" />
@@ -256,7 +256,7 @@ const OutputBox = (props: IProps) => {
       </>,
       children: <ForceGraph data={dataSource} spaceVidType={spaceVidType} onGraphInit={setGraph} />
     },
-    code !== 0 && {
+    !resultSuccess && {
       key: 'log',
       label: <>
       <Icon type="icon-studio-console-logs" />
@@ -267,7 +267,7 @@ const OutputBox = (props: IProps) => {
   ].filter(Boolean)
   return <div className={styles.outputBox}>
     <div className={styles.outputHeader}>
-      <p className={cls(styles.gql, { [styles.errorInfo]: code !== 0 })} onClick={() => onHistoryItem(gql)}>
+      <p className={cls(styles.gql, { [styles.errorInfo]: !resultSuccess })} onClick={() => onHistoryItem(gql)}>
         <span className={styles.gqlValue}>$ {gql}</span>
       </p>
       <div className={styles.outputOperations}>
@@ -318,7 +318,7 @@ const OutputBox = (props: IProps) => {
           items={items}
         />
       </div>
-      {code === 0 && data.timeCost !== undefined && (
+      {resultSuccess && data.timeCost !== undefined && (
         <div className={styles.outputFooter}>
           <span>
             {`${intl.get('console.execTime')} ${data.timeCost /
