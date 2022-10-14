@@ -1,6 +1,6 @@
 import { Button, Table, Tabs, Tooltip, Popover } from 'antd';
 import { BigNumber } from 'bignumber.js';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
@@ -221,10 +221,53 @@ const OutputBox = (props: IProps) => {
       edges
     });
   };
-
+  const resultSuccess = useMemo(() => code === 0, [code]);
+  const items = [
+    resultSuccess && {
+      key: 'table',
+      label: <>
+        <Icon type="icon-studio-console-table" />
+        {intl.get('common.table')}
+      </>,
+      children: <Table
+        bordered={true}
+        columns={columns}
+        dataSource={dataSource}
+        pagination={{
+          showTotal: () =>
+            `${intl.get('common.total')} ${dataSource.length}`,
+        }}
+        rowKey={() => uuidv4()}
+      />
+    },
+    resultSuccess && data.headers[0] === 'format' && {
+      key: 'graphViz',
+      label: <>
+        <Icon type="icon-studio-console-graphviz" />
+        {intl.get('console.graphviz')}
+      </>,
+      children: <Graphviz graph={dataSource[0]?.format} index={index} />
+    },
+    showGraph && {
+      key: 'graph',
+      label: <>
+        <Icon type="icon-studio-console-graph" />
+        {intl.get('common.graph')}
+      </>,
+      children: <ForceGraph data={dataSource} spaceVidType={spaceVidType} onGraphInit={setGraph} />
+    },
+    !resultSuccess && {
+      key: 'log',
+      label: <>
+      <Icon type="icon-studio-console-logs" />
+      {intl.get('common.log')}
+    </>,
+      children: <div className={styles.errContainer}>{message}</div>
+    }
+  ].filter(Boolean)
   return <div className={styles.outputBox}>
     <div className={styles.outputHeader}>
-      <p className={cls(styles.gql, { [styles.errorInfo]: code !== 0 })} onClick={() => onHistoryItem(gql)}>
+      <p className={cls(styles.gql, { [styles.errorInfo]: !resultSuccess })} onClick={() => onHistoryItem(gql)}>
         <span className={styles.gqlValue}>$ {gql}</span>
       </p>
       <div className={styles.outputOperations}>
@@ -272,71 +315,10 @@ const OutputBox = (props: IProps) => {
           size={'large'}
           tabPosition={'left'}
           onChange={handleTabChange}
-        >
-          {code === 0 && (
-            <Tabs.TabPane
-              tab={
-                <>
-                  <Icon type="icon-studio-console-table" />
-                  {intl.get('common.table')}
-                </>
-              }
-              key="table"
-            >
-              <Table
-                bordered={true}
-                columns={columns}
-                dataSource={dataSource}
-                pagination={{
-                  showTotal: () =>
-                    `${intl.get('common.total')} ${dataSource.length}`,
-                }}
-                rowKey={() => uuidv4()}
-              />
-            </Tabs.TabPane>
-          )}
-          {code === 0 && data.headers[0] === 'format' && (
-            <Tabs.TabPane
-              tab={
-                <>
-                  <Icon type="icon-studio-console-graphviz" />
-                  {intl.get('console.graphviz')}
-                </>
-              }
-              key="graph"
-            >
-              {<Graphviz graph={dataSource[0]?.format} index={index} />}
-            </Tabs.TabPane>
-          )}
-          {showGraph && (
-            <Tabs.TabPane
-              tab={
-                <>
-                  <Icon type="icon-studio-console-graph" />
-                  {intl.get('common.graph')}
-                </>
-              }
-              key="graph"
-            >
-              <ForceGraph data={dataSource} spaceVidType={spaceVidType} onGraphInit={setGraph} />
-            </Tabs.TabPane>
-          )}
-          {code !== 0 && (
-            <Tabs.TabPane
-              tab={
-                <>
-                  <Icon type="icon-studio-console-logs" />
-                  {intl.get('common.log')}
-                </>
-              }
-              key="log"
-            >
-              <div className={styles.errContainer}>{message}</div>
-            </Tabs.TabPane>
-          )}
-        </Tabs>
+          items={items}
+        />
       </div>
-      {code === 0 && data.timeCost !== undefined && (
+      {resultSuccess && data.timeCost !== undefined && (
         <div className={styles.outputFooter}>
           <span>
             {`${intl.get('console.execTime')} ${data.timeCost /

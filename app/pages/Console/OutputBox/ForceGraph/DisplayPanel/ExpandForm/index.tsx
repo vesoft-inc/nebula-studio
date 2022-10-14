@@ -4,7 +4,6 @@ import intl from 'react-intl-universal';
 import { LinkObject, NodeObject } from '@vesoft-inc/force-graph';
 import ExpandItem from '../ExpandItem';
 import styles from './index.module.less';
-const TabPane = Tabs.TabPane;
 
 interface IProps {
   data: {
@@ -80,18 +79,19 @@ const DisplayComponent = (props: IProps) => {
       return _data;
     });
   };
+  const items = [
+    {
+      label: intl.get('import.vertexText') + `(${nodes.length})`,
+      key: 'nodes'
+    },
+    {
+      label: intl.get('import.edgeText') + `(${links.length})`,
+      key: 'links'
+    },
+  ]
   return (
     <div className={styles.displayExpand}>
-      <Tabs className={styles.headerTab} onChange={setTab} defaultActiveKey={tab}>
-        <TabPane
-          tab={intl.get('import.vertexText') + `(${nodes.length})`}
-          key="nodes"
-        />
-        <TabPane
-          tab={intl.get('import.edgeText') + `(${links.length})`}
-          key="links"
-        />
-      </Tabs>
+      <Tabs className={styles.headerTab} onChange={setTab} defaultActiveKey={tab} items={items} />
       <div className={styles.content}>
         {list[tab].length > 0 && list[tab].map((item: NodeObject | LinkObject, index) => (
           <ExpandItem

@@ -89,3 +89,10 @@
 .active {
   animation: blinkFadeOut ease-in-out 3s;
 }
+
+.clonePopover {
+  :global(.ant-popover-content) {
+    position: relative;
+    top: -100px;
+  }
+}
