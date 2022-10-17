@@ -1,6 +1,6 @@
 module github.com/vesoft-inc/nebula-studio/server-v2
 
-go 1.17
+go 1.18
 
 require (
 	github.com/vesoft-inc/go-pkg v0.0.0-20220714021138-c5edb9946837
