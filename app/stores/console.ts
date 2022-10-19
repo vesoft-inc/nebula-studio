@@ -10,7 +10,7 @@ export const splitQuery = (query: string) => {
     const { gqlList, paramList } = acc;
     let line = cur.trim();
     if(line.startsWith(':')) {
-      paramList.push(acc);
+      paramList.push(line);
     } else {
       // if line ends with `\`, then it is a multi-line query
       if(gqlList[gqlList.length - 1]?.endsWith('\\')) {
@@ -20,7 +20,7 @@ export const splitQuery = (query: string) => {
       }
     }
     return acc
-  }, { gqlList: [], paramList: [] })
+  }, { gqlList: [] as string[], paramList: [] as string[]})
   return result
 };
 
