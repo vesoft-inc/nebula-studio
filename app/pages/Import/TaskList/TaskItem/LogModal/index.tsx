@@ -118,6 +118,10 @@ const LogModal = (props: IProps) => {
       readLog();
     }
   }, [currentLog]);
+  const items = logs.map(log => ({
+    key: log,
+    label: log
+  }))
   return (
     <Modal
       title={<>
@@ -137,11 +141,7 @@ const LogModal = (props: IProps) => {
       destroyOnClose={true}
       footer={false}
     >
-      {showLogDownload && <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange}>
-        {logs.map(log => (
-          <TabPane tab={log} key={log} />
-        ))}
-      </Tabs>}
+      {showLogDownload && <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange} items={items} />}
       <div className={classnames(styles.logContainer, !showLogDownload && styles.full)} ref={logRef}/>
     </Modal>
   );

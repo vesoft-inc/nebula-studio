@@ -47,19 +47,14 @@ const Import = (props: IProps) => {
         <Route
           path={`/import/files`}
           exact={true}
-        >
-          <FileUpload />
-        </Route>
+          component={FileUpload}
+        />
 
         <Route
           path={`/import/tasks`}
           exact={true}
-        >
-          <TaskList 
-            showConfigDownload={showConfigDownload} 
-            showLogDownload={showLogDownload} 
-            showTemplateModal={showTemplateModal} />
-        </Route>
+          render={(props) => <TaskList showConfigDownload={showConfigDownload} showLogDownload={showLogDownload} showTemplateModal={showTemplateModal} {...props} />}
+        />
       </div>
     </div>
   );

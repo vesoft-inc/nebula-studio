@@ -359,6 +359,7 @@ export class SketchStore {
     this.editor.destroy();
     this.editor = undefined;
     this.active = undefined;
+    this.currentSketch = undefined;
   };
 }
 
