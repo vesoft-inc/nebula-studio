@@ -1,10 +1,9 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import intl from 'react-intl-universal';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
 import emptyPng from '@app/static/images/empty.png';
-import { ISketch } from '@app/interfaces/sketch';
 import styles from './index.module.less';
 import TagBar from './TagBar';
 import ZoomBtns from './ZoomBtns';
@@ -13,9 +12,8 @@ import SchemaConfig from './SchemaConfig';
 import SketchList from './SketchList';
 
 import { initTooltip } from './Plugins/Tooltip';
-import { safeParse } from '@app/utils/function';
 import { LanguageContext } from '@app/context';
-const SketchPage: React.FC = (props) => {
+const SketchPage: React.FC = () => {
   const { sketchModel } = useStore();
   const { initEditor, currentSketch } = sketchModel;
   const [item, setItem] = useState(null);
@@ -24,25 +22,17 @@ const SketchPage: React.FC = (props) => {
   useEffect(() => {
     trackPageView('/sketchModeling');
     return () => {
-      const { currentSketch, editor } = sketchModel;
-      if(currentSketch) {
-        if(editor) {
-          const data = editor.schema.getData();
-          const _data = {
-            ...currentSketch,
-            schema: JSON.stringify(data),
-          }
-          sessionStorage.setItem('temporarySketch', JSON.stringify(_data))
-        }
-        sketchModel.destroy();
-      }
+      sketchModel.currentSketch && sketchModel.destroy();
     };
   }, []);
+  const init = useCallback((data) => {
+    initEditor({ container: editorRef.current, schema: data });
+    initTooltip({ container: editorRef.current });
+  }, [])
   useEffect(() => {
     if (currentSketch) {
       if(!item || item.id !== currentSketch.id) {
-        initEditor({ container: editorRef.current, schema: currentSketch.schema });
-        initTooltip({ container: editorRef.current });
+        init(currentSketch.schema);
       }
       setItem(currentSketch);
     } else {
@@ -51,23 +41,20 @@ const SketchPage: React.FC = (props) => {
   }, [currentSketch]);
   useEffect(() => {
     if(sketchModel.currentSketch) {
-      const temporarySketch: ISketch = safeParse(sessionStorage.getItem('temporarySketch'));
-      if(temporarySketch && temporarySketch.id === sketchModel.currentSketch.id) {
-        sketchModel.editor.schema.setInitData(JSON.parse(temporarySketch.schema));
-        sessionStorage.removeItem('temporarySketch');
-      }
+      let data = sketchModel.editor ? JSON.stringify(sketchModel.editor.schema.getData()) : null;
+      init(data);
     }
   }, [currentLocale])
   return (
-    <div className={styles.sketchModeling}>
-      <SketchList {...props} />
+    <div className={styles.sketchModeling} key={currentLocale}>
+      <SketchList />
       {currentSketch ? (
         <div className={styles.sketchCanvas}>
-          <SketchConfigHeader {...props} />
+          <SketchConfigHeader />
           <div id="sketchContainer" className={styles.content} ref={editorRef} />
-          <TagBar {...props}  />
-          <ZoomBtns {...props}  />
-          <SchemaConfig {...props}  />
+          <TagBar />
+          <ZoomBtns />
+          <SchemaConfig />
         </div>
       ) : (
         <>
