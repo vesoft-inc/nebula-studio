@@ -323,7 +323,7 @@ function Welcome(props: IProps) {
           ))}
         </Row>
       </div>
-      <div className={styles.docBox} style={{ paddingBottom: 36 }}>
+      <div className={styles.docBox}>
         <div className={styles.header}>{intl.get('welcome.demos')}</div>
         <Tabs
           className={styles.tabTypeSet}

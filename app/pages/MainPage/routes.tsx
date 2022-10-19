@@ -6,7 +6,6 @@ const SpaceCreate = lazy(() => import('@app/pages/Schema/SpaceCreate'));
 const SchemaConfig = lazy(() => import('@app/pages/Schema/SchemaConfig'));
 const Import = lazy(() => import('@app/pages/Import'));
 const TaskCreate = lazy(() => import('@app/pages/Import/TaskCreate'));
-const Doc = lazy(() => import('@app/pages/Doc'));
 const SketchModeling = lazy(() => import('@app/pages/SketchModeling'));
 const Welcome = lazy(() => import('@app/pages/Welcome'));
 
@@ -39,11 +38,6 @@ export const RoutesList = [
   {
     path: '/import/:type?',
     component: Import,
-  },
-  {
-    path: '/doc',
-    component: Doc,
-    exact: true,
   },
   {
     path: '/sketch',
