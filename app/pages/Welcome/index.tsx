@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect } from 'react';
-import { Button, Checkbox, Col, message, Modal, Progress, Row, Tabs, TabsProps, Tag } from 'antd';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { Button, Carousel, Checkbox, Col, message, Modal, Progress, Row, Tabs, TabsProps, Tag } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
@@ -72,6 +72,30 @@ export interface DatasetItem {
   docLink?: string;
 }
 
+export interface DocItem {
+  title: string;
+  tip: string;
+  link: string;
+}
+
+export const getDocList = (): DocItem[] => [
+  {
+    title: intl.get('doc.getStarted'),
+    tip: intl.get('doc.getStartedTip'),
+    link: intl.get('link.mannualHref'),
+  },
+  {
+    title: intl.get('doc.useGuide'),
+    tip: intl.get('doc.useGuideTip'),
+    link: intl.get('link.startStudioHref'),
+  },
+  {
+    title: intl.get('doc.ngqlIntro'),
+    tip: intl.get('doc.ngqlIntroTip'),
+    link: intl.get('link.nGQLHref'),
+  },
+];
+
 export const shouldAlwaysShowWelcome = () => localStorage.getItem('showWelcome') !== 'false';
 
 const getDatasetList = (): DatasetItem[] => [
@@ -108,6 +132,7 @@ const initLoadingTime = 21;
 interface IProps {
   datasetList?: DatasetItem[];
   moduleList?: ModuleItem[];
+  docList?: DocItem[];
   product?: string;
   onDatasetLoad?: (spaceName: string) => void;
   onClosePage?: () => void;
@@ -117,6 +142,7 @@ function Welcome(props: IProps) {
   const {
     datasetList = getDatasetList(),
     moduleList = getModuleList(),
+    docList = getDocList(),
     onDatasetLoad,
     product = 'NebulaGraph Studio',
     onClosePage,
@@ -144,6 +170,16 @@ function Welcome(props: IProps) {
       children: null,
     },
   ];
+
+  const docGroup = useMemo(
+    () =>
+      docList.reduce((ret, item, idx) => {
+        const groupIdx = Math.floor(idx / 3);
+        ret[groupIdx] = (ret[groupIdx] || []).concat(item);
+        return ret;
+      }, [] as DocItem[][]),
+    [docList],
+  );
 
   const downloadDemo = useCallback(
     debounce(async (space: DatasetItem) => {
@@ -224,7 +260,13 @@ function Welcome(props: IProps) {
                     >
                       {intl.get('welcome.demoDownload')}
                     </Button>
-                    <Button className={cls(styles.action, styles.sub)} href={dataset.docLink} target="_blank">
+                    <Button
+                      className={cls(styles.action, styles.sub)}
+                      disabled={!dataset.docLink}
+                      href={dataset.docLink}
+                      target="_blank"
+                      type="link"
+                    >
                       {intl.get('welcome.demoIntro')}
                     </Button>
                   </div>
@@ -282,7 +324,7 @@ function Welcome(props: IProps) {
         </Row>
       </div>
       <div className={styles.docBox} style={{ paddingBottom: 36 }}>
-        <div className={styles.header}>{intl.get('doc.functionIntro')}</div>
+        <div className={styles.header}>{intl.get('welcome.demos')}</div>
         <Tabs
           className={styles.tabTypeSet}
           tabBarGutter={0}
@@ -294,6 +336,34 @@ function Welcome(props: IProps) {
         />
         {getTabItem(datasetType)}
       </div>
+      {!!docList?.length && (
+        <div className={styles.docBox} style={{ paddingBottom: '24px' }}>
+          <div className={styles.header}>{intl.get('doc.learningDoc')}</div>
+          <Carousel dotPosition="bottom" lazyLoad="progressive">
+            {docGroup.map((group, index) => (
+              <div key={index}>
+                <Row className={styles.docGroup} gutter={26}>
+                  {group.map((doc) => (
+                    <Col span={8} key={doc.title}>
+                      <div className={styles.docItem}>
+                        <div className={styles.docDesc}>
+                          <p className={styles.docTitle}>{doc.title}</p>
+                          <p className={styles.docTip}>{doc.tip}</p>
+                        </div>
+                        <Button type="primary" block>
+                          <a href={doc.link} target="_blank" rel="noreferrer">
+                            {intl.get('doc.start')}
+                          </a>
+                        </Button>
+                      </div>
+                    </Col>
+                  ))}
+                </Row>
+              </div>
+            ))}
+          </Carousel>
+        </div>
+      )}
       <Modal
         footer={null}
         maskClosable={false}

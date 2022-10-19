@@ -33,6 +33,10 @@
     &.sub {
       color: #29a9ff;
       border-color: #29a9ff;
+      &:global(.ant-btn-disabled) {
+        color: rgba(0, 0, 0, 0.25);
+        border-color: rgba(0, 0, 0, 0.25);
+      }
     }
   }
 }
@@ -222,6 +226,32 @@
           }
         }
       }
+    }
+  }
+  .docGroup {
+    display: flex;
+    padding: 14px;
+    .docItem {
+      height: 295px;
+      background: #FFFFFF;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+      padding: 30px 20px 15px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-family: Roboto-Regular, sans-serif;
+      border-radius: 6px;
+      
+    }
+    .docTitle {
+      font-weight: 500;
+      font-size: 24px;
+      height: 72px;
+    } 
+    .docTip {
+      font-weight: 300;
+      font-size: 14px;
+      color: #4F4F4F;
     }
   }
 }
