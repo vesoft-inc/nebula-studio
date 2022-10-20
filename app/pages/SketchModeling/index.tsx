@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import intl from 'react-intl-universal';
 import { useStore } from '@app/stores';
@@ -12,31 +12,41 @@ import SchemaConfig from './SchemaConfig';
 import SketchList from './SketchList';
 
 import { initTooltip } from './Plugins/Tooltip';
+import { LanguageContext } from '@app/context';
 const SketchPage: React.FC = () => {
   const { sketchModel } = useStore();
   const { initEditor, currentSketch } = sketchModel;
   const [item, setItem] = useState(null);
   const editorRef = useRef();
-
+  const { currentLocale } = useContext(LanguageContext)
   useEffect(() => {
     trackPageView('/sketchModeling');
     return () => {
       sketchModel.currentSketch && sketchModel.destroy();
     };
   }, []);
+  const init = useCallback((data) => {
+    initEditor({ container: editorRef.current, schema: data });
+    initTooltip({ container: editorRef.current });
+  }, [])
   useEffect(() => {
     if (currentSketch) {
       if(!item || item.id !== currentSketch.id) {
-        initEditor({ container: editorRef.current, schema: currentSketch.schema });
-        initTooltip({ container: editorRef.current });
+        init(currentSketch.schema);
       }
       setItem(currentSketch);
     } else {
       setItem(null);
     }
   }, [currentSketch]);
+  useEffect(() => {
+    if(sketchModel.currentSketch) {
+      let data = sketchModel.editor ? JSON.stringify(sketchModel.editor.schema.getData()) : null;
+      init(data);
+    }
+  }, [currentLocale])
   return (
-    <div className={styles.sketchModeling}>
+    <div className={styles.sketchModeling} key={currentLocale}>
       <SketchList />
       {currentSketch ? (
         <div className={styles.sketchCanvas}>

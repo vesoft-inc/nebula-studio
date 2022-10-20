@@ -4,52 +4,24 @@ import { v4 as uuidv4 } from 'uuid';
 import { message } from 'antd';
 import intl from 'react-intl-universal';
 
-// split from semicolon out of quotation marks
-const SEMICOLON_REG = /(?=((?:[^;'"]*(?:"(?:\\.|[^"])*"|'(?:\\.|[^'])*')[^;'"]*)+)|);(?=\n)/g;
-const SEMICOLON_WITH_LINE_REG = /(?=((?:[^;'"]*(?:"(?:\\.|[^"])*"|'(?:\\.|[^'])*')[^;'"]*)+)|);\\\n/g;
-/*
-Explain:
-Keep the execution logic consistent with the nebula console
-
-Example1: send multi sentences in one line, split by semicolon with backslashes, get error
-Format: sentence1;\ sentence2;\ sentence3;
-Result: error
-
-Example2: A sentence on a single line, ending with a semicolon, without adding a backslash, sent separately, and returning the result of each statement
-Format: 
-  sentence1;
-  sentence2;
-  sentence3;
-Result: [sentence1 result; sentence2 result; sentence3 result];
-
-Example3: send multi sentences in one line, split by semicolon without backslashes, get result of last sentence
-Format: sentence1; sentence2; sentence3;
-Result: sentence3 result;
-
-Example4: 
-Format: Multiple statements ending with a semicolon and a backslash and wrapping to a new line are sent as one statement, returning the last result
-sentence1;\
-sentence2;\
-sentence3;
-Result: sentence3 result;
-*/
 export const splitQuery = (query: string) => {
-  const queryList = query.split(SEMICOLON_REG).filter(Boolean);
-  const paramList: string[] = [];
-  const gqlList: string[] = [];
-  queryList.forEach(query => {
-    let _query = query.trim();
-    if (_query.startsWith(':')) {
-      paramList.push(_query);
+  const _query = query.split('\n')
+  const result = _query.reduce((acc, cur) => {
+    const { gqlList, paramList } = acc;
+    let line = cur.trim();
+    if(line.startsWith(':')) {
+      paramList.push(line);
     } else {
-      _query = _query.replaceAll(SEMICOLON_WITH_LINE_REG, ';');
-      gqlList.push(_query);
+      // if line ends with `\`, then it is a multi-line query
+      if(gqlList[gqlList.length - 1]?.endsWith('\\')) {
+        gqlList[gqlList.length - 1] = gqlList[gqlList.length - 1].slice(0, -1) + line;
+      } else {
+        gqlList.push(line);
+      }
     }
-  });
-  return {
-    paramList,
-    gqlList
-  };
+    return acc
+  }, { gqlList: [] as string[], paramList: [] as string[]})
+  return result
 };
 
 export class ConsoleStore {
@@ -88,7 +60,9 @@ export class ConsoleStore {
       const { gqlList, paramList } = splitQuery(gql);
       const _results = await service.batchExecNGQL(
         {
-          gqls: gqlList.filter(item => item !== ''),
+          gqls: gqlList.filter(item => item !== '').map(item => {
+            return item.endsWith('\\') ? item.slice(0, -1) : item
+          }),
           paramList,
         },
         {

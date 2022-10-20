@@ -5,8 +5,6 @@ import ColorPicker from '@app/components/ColorPicker';
 
 import styles from './index.module.less';
 
-const TabPane = Tabs.TabPane;
-
 interface IProps {
   onColorChange?: (color) => void;
   title?: string;
@@ -21,14 +19,16 @@ interface ISetProps {
 const SetContent: React.FC<ISetProps> = (props: ISetProps) => {
   const { onColorChange } = props;
   const [tagType, setTagType] = useState('color');
-
+  const items = [
+    {
+      key: 'color',
+      label: intl.get('common.color'),
+      children: <ColorPicker onChangeComplete={onColorChange} />
+    }
+  ]
   return (
     <div>
-      <Tabs onChange={setTagType} defaultActiveKey={tagType} className={styles.tabTypeSet}>
-        <TabPane tab={intl.get('common.color')} key="color">
-          <ColorPicker onChangeComplete={onColorChange} />
-        </TabPane>
-      </Tabs>
+      <Tabs onChange={setTagType} defaultActiveKey={tagType} className={styles.tabTypeSet} items={items} />
     </div>
   );
 };
