@@ -56,9 +56,9 @@ const PageHeader = (props: IProps) => {
   }, [pathname]);
 
   return <Header className={styles.studioHeader}>
-    <div className={styles.nebulaLogo}>
+    <Link to="/welcome" className={styles.nebulaLogo}>
       <img src={logo} alt="logo" />
-    </div>
+    </Link>
     {host && username ? <>
       <Menu
         className={styles.mainMenu}
