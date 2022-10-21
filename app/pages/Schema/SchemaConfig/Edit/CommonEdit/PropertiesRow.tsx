@@ -2,7 +2,7 @@ import { Button, Checkbox, Col, Form, Input, Popconfirm, Popover, Row, Select } 
 import React from 'react';
 import intl from 'react-intl-universal';
 import { AlterType, IProperty } from '@app/interfaces/schema';
-import { nameRulesFn, numberRulesFn } from '@app/config/rules';
+import { nameRulesFn, numberRulesFn, stringByteRulesFn } from '@app/config/rules';
 import { DATA_TYPE, EXPLAIN_DATA_TYPE } from '@app/utils/constant';
 
 import styles from './index.module.less';
@@ -155,7 +155,7 @@ export const EditRow = (props: IEditProps) => {
               </Form.Item>
             </Col>
             <Col span={4}>
-              <Form.Item name="comment" initialValue={comment}>
+              <Form.Item name="comment" initialValue={comment} rules={stringByteRulesFn()}>
                 <Input />
               </Form.Item>
             </Col>

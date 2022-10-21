@@ -121,7 +121,7 @@ const LogModal = (props: IProps) => {
   const items = logs.map(log => ({
     key: log,
     label: log
-  }))
+  }));
   return (
     <Modal
       title={<>

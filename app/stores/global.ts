@@ -38,7 +38,7 @@ export class GlobalStore {
       _username: '',
       _host: '',
     });
-  }
+  };
 
   logout = async () => {
     await service.disconnectDB(

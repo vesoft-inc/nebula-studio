@@ -3,7 +3,7 @@ import { FormInstance } from 'antd/lib/form';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
-import { nameRulesFn, numberRulesFn } from '@app/config/rules';
+import { nameRulesFn, numberRulesFn, stringByteRulesFn } from '@app/config/rules';
 import Icon from '@app/components/Icon';
 import { DATA_TYPE, EXPLAIN_DATA_TYPE } from '@app/utils/constant';
 
@@ -187,7 +187,7 @@ const PropertiesForm = (props: IProps) => {
                                 </Form.Item>
                               </Col>
                               <Col span={4}>
-                                <Form.Item {...restField} {...itemLayout} name={[name, 'comment']}>
+                                <Form.Item {...restField} {...itemLayout} name={[name, 'comment']} rules={stringByteRulesFn()}>
                                   <Input />
                                 </Form.Item>
                               </Col>

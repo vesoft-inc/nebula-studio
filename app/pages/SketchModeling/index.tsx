@@ -4,6 +4,7 @@ import intl from 'react-intl-universal';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
 import emptyPng from '@app/static/images/empty.png';
+import { LanguageContext } from '@app/context';
 import styles from './index.module.less';
 import TagBar from './TagBar';
 import ZoomBtns from './ZoomBtns';
@@ -12,13 +13,12 @@ import SchemaConfig from './SchemaConfig';
 import SketchList from './SketchList';
 
 import { initTooltip } from './Plugins/Tooltip';
-import { LanguageContext } from '@app/context';
 const SketchPage: React.FC = () => {
   const { sketchModel } = useStore();
   const { initEditor, currentSketch } = sketchModel;
   const [item, setItem] = useState(null);
   const editorRef = useRef();
-  const { currentLocale } = useContext(LanguageContext)
+  const { currentLocale } = useContext(LanguageContext);
   useEffect(() => {
     trackPageView('/sketchModeling');
     return () => {
@@ -28,7 +28,7 @@ const SketchPage: React.FC = () => {
   const init = useCallback((data) => {
     initEditor({ container: editorRef.current, schema: data });
     initTooltip({ container: editorRef.current });
-  }, [])
+  }, []);
   useEffect(() => {
     if (currentSketch) {
       if(!item || item.id !== currentSketch.id) {
@@ -41,10 +41,10 @@ const SketchPage: React.FC = () => {
   }, [currentSketch]);
   useEffect(() => {
     if(sketchModel.currentSketch) {
-      let data = sketchModel.editor ? JSON.stringify(sketchModel.editor.schema.getData()) : null;
+      const data = sketchModel.editor ? JSON.stringify(sketchModel.editor.schema.getData()) : null;
       init(data);
     }
-  }, [currentLocale])
+  }, [currentLocale]);
   return (
     <div className={styles.sketchModeling} key={currentLocale}>
       <SketchList />

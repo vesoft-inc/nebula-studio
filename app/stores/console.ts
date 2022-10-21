@@ -5,10 +5,10 @@ import { message } from 'antd';
 import intl from 'react-intl-universal';
 
 export const splitQuery = (query: string) => {
-  const _query = query.split('\n')
+  const _query = query.split('\n');
   const result = _query.reduce((acc, cur) => {
     const { gqlList, paramList } = acc;
-    let line = cur.trim();
+    const line = cur.trim();
     if(line.startsWith(':')) {
       paramList.push(line);
     } else {
@@ -19,9 +19,9 @@ export const splitQuery = (query: string) => {
         gqlList.push(line);
       }
     }
-    return acc
-  }, { gqlList: [] as string[], paramList: [] as string[]})
-  return result
+    return acc;
+  }, { gqlList: [] as string[], paramList: [] as string[] });
+  return result;
 };
 
 export class ConsoleStore {
@@ -48,7 +48,7 @@ export class ConsoleStore {
       results: [],
       paramsMap: null
     });
-  }
+  };
 
   update = (param: Partial<ConsoleStore>) => {
     Object.keys(param).forEach(key => (this[key] = param[key]));
@@ -61,7 +61,7 @@ export class ConsoleStore {
       const _results = await service.batchExecNGQL(
         {
           gqls: gqlList.filter(item => item !== '').map(item => {
-            return item.endsWith('\\') ? item.slice(0, -1) : item
+            return item.endsWith('\\') ? item.slice(0, -1) : item;
           }),
           paramList,
         },
@@ -99,19 +99,19 @@ export class ConsoleStore {
     this.update({
       paramsMap: results.data?.localParams || {},
     });
-  }
+  };
   saveFavorite = async (content: string) => {
     const res = await service.saveFavorite({ content });
     if(res.code === 0) {
       message.success(intl.get('sketch.saveSuccess'));
     }
-  }
+  };
   deleteFavorite = async (id?: number) => {
     const res = id !== undefined ? await service.deleteFavorite(id) : await service.deleteAllFavorites();
     if(res.code === 0) {
       message.success(intl.get('common.deleteSuccess'));
     }
-  }
+  };
 
   getFavoriteList = async () => {
     const res = await service.getFavoriteList();
@@ -121,7 +121,7 @@ export class ConsoleStore {
       });
     }
     return res;
-  }
+  };
 }
 
 const consoleStore = new ConsoleStore();

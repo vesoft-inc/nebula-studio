@@ -4,7 +4,7 @@ import intl from 'react-intl-universal';
 import { useStore } from '@app/stores';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect } from 'react';
-import { nameRulesFn } from '@app/config/rules';
+import { nameRulesFn, stringByteRulesFn } from '@app/config/rules';
 import { debounce } from 'lodash';
 import { ISchemaEnum } from '@app/interfaces/schema';
 import PropertiesForm from './PropertiesForm';
@@ -68,8 +68,10 @@ const SchemaConfig: React.FC = () => {
   const handleUpdate = useCallback(
     debounce((_, allValues) => {
       const formValues = form.getFieldsValue();
-      !flag && form.validateFields();
-      flag = !flag;
+      if(!flag && sketchModel.active?.invalid) {
+        form.validateFields();
+        flag = !flag;
+      }
       const hasSameName = validateSameName();
       const hasError = allValues.some((item) => item.errors.length > 0);
       update({ ...formValues, invalid: hasError || hasSameName });
@@ -129,7 +131,7 @@ const SchemaConfig: React.FC = () => {
             >
               <Input />
             </Form.Item>
-            <Form.Item label={intl.get('sketch.comment')} name="comment">
+            <Form.Item label={intl.get('sketch.comment')} name="comment" rules={stringByteRulesFn()}>
               <Input />
             </Form.Item>
           </div>

@@ -58,7 +58,7 @@ export class ImportStore {
   getLogs = async (id: number) => {
     const { code, data } = (await service.getTaskLogs({ id })) as any;
     return { code, data };
-  }
+  };
   
   importTask = async (params: {
     config?: any,
@@ -88,24 +88,24 @@ export class ImportStore {
       name
     })) as any;
     return code;
-  }
+  };
 
   stopTask = async (id: number) => {
     const res = await service.stopImportTask(id);
     return res;
-  }
+  };
 
   deleteTask = async (id: number) => {
     const res = await service.deleteImportTask(id);
     return res;
-  }
+  };
 
   downloadTaskConfig = async (id: number) => {
     const link = document.createElement('a');
     link.href = service.getTaskConfig(id);
     link.download = `config.yml`;
     link.click();
-  }
+  };
 
   downloadTaskLog = async (params: {
     id: string | number,
@@ -116,7 +116,7 @@ export class ImportStore {
     link.href = service.getTaskLog(id) + `?name=${name}`;
     link.download = `log.yml`;
     link.click();
-  }
+  };
 
   getLogDetail = async (params: {
     offset: number;
@@ -129,7 +129,7 @@ export class ImportStore {
       return data.logs;
     }
     return null;
-  }
+  };
 
   updateTagConfig = async (payload: { 
     tag: string; 
@@ -167,11 +167,11 @@ export class ImportStore {
         };
       });
     }
-  }
+  };
 
   updateBasicConfig = (key: string, value: any) => {
     this.basicConfig[key] = value;
-  }
+  };
 
   updateEdgeConfig = async (payload: { edgeType?: string, index: number; }) => {
     const { edgeType, index } = payload;
@@ -225,7 +225,7 @@ export class ImportStore {
         });
       }
     }
-  }
+  };
 
   updateVerticesConfig = (payload: {
     index: number
@@ -238,7 +238,7 @@ export class ImportStore {
     } else {
       this.verticesConfig.splice(index, 1);
     }
-  }
+  };
 
   updateTagPropMapping = (payload: {
     configIndex: number,
@@ -257,7 +257,7 @@ export class ImportStore {
       _tag.props[propIndex][field!] = value;
       tags.splice(tagIndex, 1, _tag);
     }
-  }
+  };
 
   updateEdgePropMapping = (payload: {
     configIndex,
@@ -274,7 +274,7 @@ export class ImportStore {
       _edge.props[propIndex][field] = value;
       this.edgesConfig[configIndex] = _edge;
     }
-  }
+  };
 }
 
 const importStore = new ImportStore();

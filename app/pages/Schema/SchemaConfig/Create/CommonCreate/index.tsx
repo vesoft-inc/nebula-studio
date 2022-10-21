@@ -2,7 +2,7 @@ import { Button, Col, Form, Input, Row, message } from 'antd';
 import React, { useState, useEffect } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
-import { nameRulesFn } from '@app/config/rules';
+import { nameRulesFn, stringByteRulesFn } from '@app/config/rules';
 import { useHistory } from 'react-router-dom';
 import { uniqBy } from 'lodash';
 import GQLCodeMirror from '@app/components/GQLCodeMirror';
@@ -87,7 +87,7 @@ const ConfigCreate = (props: IProps) => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label={intl.get('common.comment')} name="comment">
+            <Form.Item label={intl.get('common.comment')} name="comment" rules={stringByteRulesFn()}>
               <Input />
             </Form.Item>
           </Col>

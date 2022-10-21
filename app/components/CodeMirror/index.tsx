@@ -119,7 +119,7 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
     } else if(info?.wrapClass === 'notes') {
       this.editor.removeLineClass(line, 'wrap', 'notes');
     }
-  }
+  };
   blur = instance => {
     if (this.props.onBlur) {
       this.props.onBlur(instance.doc.getValue());

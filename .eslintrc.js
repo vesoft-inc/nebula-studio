@@ -7,7 +7,6 @@ module.exports = {
     extends: [
         'plugin:react/recommended',
         'prettier',
-        'prettier/@typescript-eslint',
     ],
     ignorePatterns: [
         'coverage',
