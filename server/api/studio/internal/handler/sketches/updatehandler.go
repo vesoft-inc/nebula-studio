@@ -17,7 +17,7 @@ func UpdateHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.UpdateSketchRequest
 		if err := httpx.Parse(r, &req); err != nil {
-			err = ecode.WithCode(ecode.ErrParam, err)
+			err = ecode.WithErrorMessage(ecode.ErrParam, err)
 			svcCtx.ResponseHandler.Handle(w, r, nil, err)
 			return
 		}

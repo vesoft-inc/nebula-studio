@@ -1,7 +1,7 @@
 import { Col, Form, Input, Row, Select, FormProps } from 'antd';
 import React, { useMemo } from 'react';
 import { useStore } from '@app/stores';
-import { nameRulesFn, numberRulesFn, replicaRulesFn } from '@app/config/rules';
+import { nameRulesFn, numberRulesFn, replicaRulesFn, stringByteRulesFn } from '@app/config/rules';
 import intl from 'react-intl-universal';
 import styles from './index.module.less';
 const Option = Select.Option;
@@ -88,7 +88,7 @@ const CreateForm = (props: IProps) => {
           <Form.Item label={<span>
             {intl.get('common.comment')}:
             <span className={styles.optionalItem}>({intl.get('common.optional')})</span>
-          </span>} name="comment">
+          </span>} name="comment" rules={stringByteRulesFn()}>
             <Input />
           </Form.Item>
         </Col>

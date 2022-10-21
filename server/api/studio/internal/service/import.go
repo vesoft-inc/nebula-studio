@@ -67,7 +67,7 @@ func NewImportService(ctx context.Context, svcCtx *svc.ServiceContext) ImportSer
 func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*types.CreateImportTaskData, error) {
 	jsons, err := json.Marshal(req.Config)
 	if err != nil {
-		return nil, ecode.WithCode(ecode.ErrParam, nil)
+		return nil, ecode.WithErrorMessage(ecode.ErrParam, err)
 	}
 
 	conf := importconfig.YAMLConfig{}

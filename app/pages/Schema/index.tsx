@@ -28,43 +28,43 @@ const Operations = (props: IOperations) => {
     {
       key: 'delete',
       label: <Popconfirm
-      onConfirm={() => onDelete(space)}
-      title={intl.get('common.ask')}
-      okText={intl.get('common.ok')}
-      cancelText={intl.get('common.cancel')}
-    >
-      <Button type="link" danger>
-        {intl.get('schema.deleteSpace')}
-      </Button>
-    </Popconfirm>
+        onConfirm={() => onDelete(space)}
+        title={intl.get('common.ask')}
+        okText={intl.get('common.ok')}
+        cancelText={intl.get('common.cancel')}
+      >
+        <Button type="link" danger>
+          {intl.get('schema.deleteSpace')}
+        </Button>
+      </Popconfirm>
     },
     {
       key: 'clone',
       label: <Popover
-      overlayClassName={styles.clonePopover}
-      destroyTooltipOnHide={true}
-      placement="leftTop"
-      open={visible}
-      trigger="click"
-      onOpenChange={visible => setVisible(visible)}
-      content={<Form onFinish={handleClone} layout="inline">
-        <Form.Item label={intl.get('schema.spaceName')} name="name" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
-        <Form.Item>
-          <Button htmlType="submit" type="primary">
-            {intl.get('common.confirm')}
-          </Button>
-        </Form.Item>
-      </Form>}
-    >
-      <Button type="link" onClick={() => setVisible(true)}>
-        {intl.get('schema.cloneSpace')}
-      </Button>
-    </Popover>
+        overlayClassName={styles.clonePopover}
+        destroyTooltipOnHide={true}
+        placement="leftTop"
+        open={visible}
+        trigger="click"
+        onOpenChange={visible => setVisible(visible)}
+        content={<Form onFinish={handleClone} layout="inline">
+          <Form.Item label={intl.get('schema.spaceName')} name="name" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item>
+            <Button htmlType="submit" type="primary">
+              {intl.get('common.confirm')}
+            </Button>
+          </Form.Item>
+        </Form>}
+      >
+        <Button type="link" onClick={() => setVisible(true)}>
+          {intl.get('schema.cloneSpace')}
+        </Button>
+      </Popover>
     }
-  ]
-  return <Menu className={styles.operationsSpace} items={items} />
+  ];
+  return <Menu className={styles.operationsSpace} items={items} />;
 };
 
 const Schema = () => {

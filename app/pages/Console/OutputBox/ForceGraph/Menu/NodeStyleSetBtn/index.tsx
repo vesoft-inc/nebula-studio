@@ -25,7 +25,7 @@ const SetContent: React.FC<ISetProps> = (props: ISetProps) => {
       label: intl.get('common.color'),
       children: <ColorPicker onChangeComplete={onColorChange} />
     }
-  ]
+  ];
   return (
     <div>
       <Tabs onChange={setTagType} defaultActiveKey={tagType} className={styles.tabTypeSet} items={items} />

@@ -110,7 +110,8 @@
     "vidRequired": "请选择 VID",
     "vidTypeRequired": "请选择 VID 类型",
     "fixStringLengthRequired": "请输入字符串固定长度",
-    "spaceRequired": "图空间不能为空"
+    "spaceRequired": "图空间不能为空",
+    "maxBytes": "不能超过 {max} 字节"
   },
   "console": {
     "execTime": "执行时间消耗",

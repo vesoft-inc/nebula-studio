@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import queryString from 'query-string';
-import { nameRulesFn } from '@app/config/rules';
+import { nameRulesFn, stringByteRulesFn } from '@app/config/rules';
 import { useHistory, useLocation } from 'react-router-dom';
 import GQLCodeMirror from '@app/components/GQLCodeMirror';
 import { getIndexCreateGQL } from '@app/utils/gql';
@@ -184,7 +184,7 @@ const IndexCreate = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label={intl.get('common.comment')} name="comment">
+            <Form.Item label={intl.get('common.comment')} name="comment" rules={stringByteRulesFn()}>
               <Input />
             </Form.Item>
           </Col>

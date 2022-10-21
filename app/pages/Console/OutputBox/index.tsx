@@ -259,12 +259,12 @@ const OutputBox = (props: IProps) => {
     !resultSuccess && {
       key: 'log',
       label: <>
-      <Icon type="icon-studio-console-logs" />
-      {intl.get('common.log')}
-    </>,
+        <Icon type="icon-studio-console-logs" />
+        {intl.get('common.log')}
+      </>,
       children: <div className={styles.errContainer}>{message}</div>
     }
-  ].filter(Boolean)
+  ].filter(Boolean);
   return <div className={styles.outputBox}>
     <div className={styles.outputHeader}>
       <p className={cls(styles.gql, { [styles.errorInfo]: !resultSuccess })} onClick={() => onHistoryItem(gql)}>

@@ -88,7 +88,7 @@ const DisplayComponent = (props: IProps) => {
       label: intl.get('import.edgeText') + `(${links.length})`,
       key: 'links'
     },
-  ]
+  ];
   return (
     <div className={styles.displayExpand}>
       <Tabs className={styles.headerTab} onChange={setTab} defaultActiveKey={tab} items={items} />

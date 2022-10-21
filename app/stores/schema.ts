@@ -54,7 +54,7 @@ export class SchemaStore {
       spaces: [],
     });
     sessionStorage.removeItem('currentSpace');
-  }
+  };
 
   update = (payload: Record<string, any>) =>
     Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
@@ -64,7 +64,7 @@ export class SchemaStore {
   updateSpaceInfo = async (space: string) => {
     await this.switchSpace(space);
     await this.getSchemaInfo();
-  }
+  };
 
   updateVidType = async (space?: string) => {
     const { code, data } = await this.getSpaceInfo(space || this.currentSpace);
@@ -73,7 +73,7 @@ export class SchemaStore {
         spaceVidType: data?.tables?.[0]?.['Vid Type'],
       });
     }
-  }
+  };
 
   switchSpace = async (space: string, hideErrMsg?: boolean) => {
     const { code, message } = (await service.execNGQL({
@@ -98,7 +98,7 @@ export class SchemaStore {
   getSchemaInfo = async () => {
     const [tags, edges] = await Promise.all([this.getTags(), this.getEdges()]);
     this.update({ tags, edgeTypes: edges });
-  }
+  };
 
   getSpaces = async () => {
     const { code, data } = (await service.execNGQL({
@@ -120,7 +120,7 @@ export class SchemaStore {
       gql: `DESCRIBE SPACE ${handleKeyword(space)}`,
     })) as any;
     return { code, data };
-  }
+  };
 
   getSpacesList = async () => {
     const res = await this.getSpaces();
@@ -143,7 +143,7 @@ export class SchemaStore {
         spaceList: spaces.sort((a, b) => a.serialNumber - b.serialNumber),
       });
     }
-  }
+  };
 
   deleteSpace = async (space: string) => {
     const { code, data } = (await service.execNGQL(
@@ -158,7 +158,7 @@ export class SchemaStore {
       },
     )) as any;
     return { code, data };
-  }
+  };
 
   cloneSpace = async (name: string, space: string) => {
     const { code, data } = (await service.execNGQL(
@@ -173,7 +173,7 @@ export class SchemaStore {
       },
     )) as any;
     return { code, data };
-  }
+  };
 
   createSpace = async (gql: string) => {
     const { code, data, message } = (await service.execNGQL(
@@ -188,7 +188,7 @@ export class SchemaStore {
       },
     )) as any;
     return { code, data, message };
-  }
+  };
 
   getMachineNumber = async () => {
     const { code, data } = (await service.execNGQL({
@@ -202,7 +202,7 @@ export class SchemaStore {
       });
     }
     return { code, data };
-  }
+  };
 
   // edges
   getEdges = async () => {
@@ -216,7 +216,7 @@ export class SchemaStore {
       this.update({ edgeTypes });
       return edgeTypes;
     }
-  }
+  };
 
   getEdgeTypesFields = async (payload: { edgeTypes: any[] }) => {
     const { edgeTypes } = payload;
@@ -232,14 +232,14 @@ export class SchemaStore {
         }
       }),
     );
-  }
+  };
 
   getEdgesAndFields = async () => {
     const edgeTypes = await this.getEdges();
     if (edgeTypes) {
       this.getEdgeTypesFields({ edgeTypes });
     }
-  }
+  };
 
   getEdgeList = async () => {
     const edgeTypes = await this.getEdges();
@@ -260,7 +260,7 @@ export class SchemaStore {
       );
       this.update({ edgeList });
     }
-  }
+  };
 
   deleteEdge = async (name: string) => {
     const { code, data, message } = (await service.execNGQL(
@@ -277,13 +277,13 @@ export class SchemaStore {
       },
     )) as any;
     return { code, data, message };
-  }
+  };
 
   addEdgesName = async (payload: any) => {
     const { edgeType, edgeFields } = payload;
     const index = findIndex(this.edgesFields, edgeType);
     this.edgesFields[!~index ? this.edgesFields.length : index] = { [edgeType]: edgeFields };
-  }
+  };
 
   // tags
   getTags = async () => {
@@ -297,7 +297,7 @@ export class SchemaStore {
       const tags = data.tables.map(item => item.Name);
       return tags;
     }
-  }
+  };
 
   addTagsName = (payload: any) => {
     const { tag, tagFields } = payload;
@@ -340,7 +340,7 @@ export class SchemaStore {
       );
       this.update({ tagList });
     }
-  }
+  };
 
   deleteTag = async (name: string) => {
     const { code, data, message } = (await service.execNGQL(
@@ -357,7 +357,7 @@ export class SchemaStore {
       },
     )) as any;
     return { code, data, message };
-  }
+  };
 
   createTagOrEdge = async (payload: {
     type: ISchemaType,
@@ -376,7 +376,7 @@ export class SchemaStore {
       },
     )) as any;
     return { code, data, message };
-  }
+  };
 
   alterField = async (payload: IAlterForm) => {
     const gql = getAlterGQL(payload);
@@ -392,7 +392,7 @@ export class SchemaStore {
       },
     )) as any;
     return { code, data, message };
-  }
+  };
 
   getTagOrEdgeDetail = async (type: ISchemaType, name: string) => {
     const gql = `show create ${type} ${handleKeyword(name)}`;
@@ -400,7 +400,7 @@ export class SchemaStore {
       gql,
     })) as any;
     return { code, data, message };
-  }
+  };
 
   getTagOrEdgeInfo = async (type: ISchemaType, name: string) => {
     const gql = `desc ${type}  ${handleKeyword(name)}`;
@@ -408,7 +408,7 @@ export class SchemaStore {
       gql,
     })) as any;
     return { code, data };
-  }
+  };
 
   // indexes
   getIndexes = async (type: IndexType) => {
@@ -430,7 +430,7 @@ export class SchemaStore {
       });
       return indexes;
     }
-  }
+  };
 
   getIndexComment = async (payload: { type: IndexType; name: string }) => {
     const { type, name } = payload;
@@ -449,7 +449,7 @@ export class SchemaStore {
     } else {
       return null;
     }
-  }
+  };
 
   getIndexFields = async (payload: { type: IndexType; name: string }) => {
     const { type, name } = payload;
@@ -459,7 +459,7 @@ export class SchemaStore {
       `,
     })) as any;
     return { code, data };
-  }
+  };
 
   getIndexTree = async (type: IndexType) => {
     const indexes = await this.getIndexes(type);
@@ -508,7 +508,7 @@ export class SchemaStore {
       });
       return tree;
     }
-  }
+  };
 
   getIndexList = async (type: IndexType) => {
     const indexes = await this.getIndexes(type);
@@ -539,7 +539,7 @@ export class SchemaStore {
       );
       this.update({ indexList });
     }
-  }
+  };
 
   deleteIndex = async (payload: { type: IndexType; name: string }) => {
     const { type, name } = payload;
@@ -557,7 +557,7 @@ export class SchemaStore {
       },
     )) as any;
     return { code, data };
-  }
+  };
 
   createIndex = async (payload: {
     type: IndexType;
@@ -579,7 +579,7 @@ export class SchemaStore {
       },
     )) as any;
     return { code, data, message };
-  }
+  };
 
   rebuildIndex = async (payload: { type: IndexType; name: string }) => {
     const { type, name } = payload;
@@ -597,7 +597,7 @@ export class SchemaStore {
       },
     )) as any;
     return { code, data };
-  }
+  };
 
   getIndexesStatus = async (type: IndexType) => {
     const { code, data } = (await service.execNGQL({
@@ -609,7 +609,7 @@ export class SchemaStore {
       return data.tables;
     }
     return null;
-  }
+  };
 
   // stats
   submitStats = async () => {
@@ -627,7 +627,7 @@ export class SchemaStore {
       },
     )) as any;
     return { code, data };
-  }
+  };
 
   getStats = async () => {
     const { code, data } = (await service.execNGQL({
@@ -636,7 +636,7 @@ export class SchemaStore {
       `,
     })) as any;
     return { code, data };
-  }
+  };
 
   getJobStatus = async (id?) => {
     const gql = id === undefined ? 'SHOW JOBS' : `SHOW JOB ${id}`;
@@ -644,7 +644,7 @@ export class SchemaStore {
       gql,
     })) as any;
     return { code, data };
-  }
+  };
 
   // schema visualization
   getRandomEdgeData = async () => {
@@ -679,7 +679,7 @@ export class SchemaStore {
       vids: [...vids], 
       edges 
     };
-  }
+  };
 
   getNodeTagMap = async (ids: string[]) => {
     const vidMap = {};
@@ -699,12 +699,12 @@ export class SchemaStore {
       });
       return { vidMap, tags: [...tagSet] };
     }
-  }
+  };
 
   getSchemaSnapshot = async (space) => {
     const res = await service.getSchemaSnapshot(space);
     return res;
-  }
+  };
 
   updateSchemaSnapshot = async (params: {
     space: string, 
@@ -712,7 +712,7 @@ export class SchemaStore {
   }) => {
     const res = await service.updateSchemaSnapshot(params);
     return res;
-  }
+  };
 }
 
 const schemaStore = new SchemaStore();

@@ -110,7 +110,8 @@
     "vidRequired": "Please select the VID",
     "vidTypeRequired": "Vid type is required",
     "fixStringLengthRequired": "fix string length limit is required",
-    "spaceRequired": "Space is required"
+    "spaceRequired": "Space is required",
+    "maxBytes": "It cannot exceed {max} bytes"
   },
   "console": {
     "execTime": "Execution Time",
@@ -292,7 +293,7 @@
     "dataType": "Data Type",
     "addProperty": "Add Property",
     "type": "type",
-    "list": "Sketch List",
+    "list": "Draft List",
     "new": "New",
     "applyToSpace": "Apply to Space",
     "createSpace": "Create New Space",

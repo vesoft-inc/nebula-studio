@@ -12,6 +12,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { IProperty, ISchemaEnum } from '@app/interfaces/schema';
 import { ARROW_STYLE, LINE_STYLE, makeLineSort, NODE_RADIUS } from '@app/config/sketch';
 import { uniqBy } from 'lodash';
+import { MAX_COMMENT_BYTES } from '@app/utils/constant';
+import { getByteLength } from '@app/utils/function';
 
 interface IHoveringItem {
   data: ISketchNode | ISketchEdge;
@@ -69,11 +71,15 @@ export class SketchStore {
   };
 
   validate = (data, type) => {
-    const { name, properties } = data;
+    const { name, comment, properties } = data;
     let isInvalid = !name || (properties as IProperty[])?.some((i) => !i.name || !i.type);
     const uniqProperties = uniqBy(data.properties, 'name');
     if(properties && data.properties?.length !== uniqProperties.length) {
       isInvalid = true;
+    }
+    if(comment) {
+      const byteLength = getByteLength(comment);
+      byteLength > MAX_COMMENT_BYTES && (isInvalid = true);
     }
     if (isInvalid) {
       this.updateItem(data as any, { invalid: true });
@@ -100,7 +106,7 @@ export class SketchStore {
     }
     hasSameName ? message.error(intl.get('sketch.uniqName')) : message.error(intl.get('sketch.sketchInvalid'));
     return false;
-  }
+  };
 
   checkSameName = () => {
     const data = this.editor.schema.getData();
@@ -109,7 +115,7 @@ export class SketchStore {
     const _lines = lines.map((i) => i.name).filter(Boolean);
     const name = new Set([..._nodes, ..._lines]);
     return name.size !== _nodes.length + _lines.length;
-  }
+  };
 
   checkModified = () => {
     const initialData = this.sketchList.items.find((item) => item.id === this.currentSketch?.id);
@@ -316,7 +322,7 @@ export class SketchStore {
       gql,
     })) as any;
     return { code, data };
-  }
+  };
 
   deleteElement = (type) => {
     if (type === ISchemaEnum.Tag) {

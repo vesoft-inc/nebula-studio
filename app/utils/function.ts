@@ -51,3 +51,8 @@ export const safeParse = <T extends unknown>(data: string) => {
     return undefined;
   }
 };
+
+export const getByteLength = (str: string) => {
+  const utf8Encode = new TextEncoder();
+  return utf8Encode.encode(str).length; 
+};

@@ -15,7 +15,7 @@ export class GraphInstances {
 
   clearGraph = (uuid) => {
     this.graphs = omit(this.graphs, [uuid]);
-  }
+  };
   initGraph = async (params: { 
     container: HTMLElement, 
     id: string,

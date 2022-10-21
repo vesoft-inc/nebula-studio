@@ -7,6 +7,7 @@ import { useStore } from '@app/stores';
 import { convertBigNumberToString } from '@app/utils/function';
 import { IAlterForm, IProperty, ISchemaType } from '@app/interfaces/schema';
 import { trackPageView } from '@app/utils/stat';
+import { stringByteRulesFn } from '@app/config/rules';
 import styles from './index.module.less';
 import TTLForm from './TTLForm';
 import PropertiesForm from './PropertiesForm';
@@ -173,7 +174,7 @@ const ConfigEdit = (props: IProps) => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label={intl.get('common.comment')}>
+                <Form.Item label={intl.get('common.comment')} rules={stringByteRulesFn()}>
                   <Input
                     disabled={editKey !== 'comment'}
                     className={styles.inputComment}

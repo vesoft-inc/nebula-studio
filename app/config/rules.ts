@@ -1,4 +1,5 @@
-import { NAME_REGEX, POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
+import { MAX_COMMENT_BYTES, NAME_REGEX, POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
+import { getByteLength } from '@app/utils/function';
 import intl from 'react-intl-universal';
 
 export const hostRulesFn = () => [
@@ -61,4 +62,14 @@ export const replicaRulesFn = (activeMachineNum) => [
       callback();
     },
   },
+];
+
+export const stringByteRulesFn = () => [
+  { validator: (_, value) => {
+    const byteLength = getByteLength(value);
+    if (byteLength <= MAX_COMMENT_BYTES) {
+      return Promise.resolve();
+    }
+    return Promise.reject(intl.get('formRules.maxBytes', { max: MAX_COMMENT_BYTES }));
+  } }
 ];
