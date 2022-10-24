@@ -89,7 +89,8 @@ func (s *gatewayService) DisconnectDB() (*types.AnyResponse, error) {
 
 	httpRes, _ := middleware.GetResponseWriter(s.ctx)
 	configAuth := s.svcCtx.Config.Auth
-	httpRes.Header().Set("Set-Cookie", utils.DisabledCookie(configAuth.TokenName).String())
+	httpsEnable := s.svcCtx.Config.CertFile != "" && s.svcCtx.Config.KeyFile != ""
+	httpRes.Header().Set("Set-Cookie", utils.DisabledCookie(configAuth.TokenName, httpsEnable).String())
 
 	return &types.AnyResponse{Data: response.StandardHandlerDataFieldAny(nil)}, nil
 }

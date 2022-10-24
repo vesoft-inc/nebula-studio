@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -92,7 +93,13 @@ func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) 
 		return "", nil, err
 	}
 
-	loginInfo := strings.Split(string(decode), ":")
+	loginInfo := []string{}
+	err = json.Unmarshal(decode, &loginInfo)
+
+	if err != nil {
+		return "", nil, err
+	}
+
 	if len(loginInfo) < 2 {
 		return "", nil, fmt.Errorf("len of account is less than two")
 	}
