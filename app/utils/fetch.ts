@@ -59,7 +59,7 @@ export async function fetchVertexProps(payload: {
     const vertexList = data.tables.map(i => i._verticesParsedList).flat();
     const vertexes = vertexList.map(vertex => {
       const _vertex: IMatchVertex = {};
-      _vertex.vid = vertex.vid || '';
+      _vertex.vid = vertex.vid ?? '';
       _vertex.tags = vertex.tags || [];
       _vertex.properties = vertex.properties || {};
       return _vertex;

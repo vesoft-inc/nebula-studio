@@ -13,8 +13,11 @@ export const splitQuery = (query: string) => {
       paramList.push(line);
     } else {
       // if line ends with `\`, then it is a multi-line query
-      if(gqlList[gqlList.length - 1]?.endsWith('\\')) {
+      const last = gqlList[gqlList.length - 1];
+      if(last?.endsWith('\\')) {
         gqlList[gqlList.length - 1] = gqlList[gqlList.length - 1].slice(0, -1) + line;
+      } else if (last && !last.endsWith(';')) {
+        gqlList[gqlList.length - 1] += ' ' + line;
       } else {
         gqlList.push(line);
       }

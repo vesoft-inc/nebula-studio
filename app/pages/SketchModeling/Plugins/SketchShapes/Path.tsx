@@ -104,8 +104,8 @@ const Path: LineRender = {
         });
       const startPos = getCoordsAlongLine((NODE_RADIUS + 8) / lineLen);
       const endPos = getCoordsAlongLine((lineLen - NODE_RADIUS - 8) / lineLen);
-      const pathString = `M${startPos.x} ${startPos.y} L ${startPos.x} ${startPos.y}`;
-      const toPointString = `${endPos.x} ${endPos.y} T ${endPos.x} ${endPos.y} `;
+      const pathString = `M${startPos.x} ${startPos.y}`;
+      const toPointString = `${endPos.x} ${endPos.y}`;
       path = `${pathString}C${startControlPoint.x} ${startControlPoint.y} ${endControlPoint.x} ${endControlPoint.y} ${toPointString}`;
       line.bezierData = {
         from: {
