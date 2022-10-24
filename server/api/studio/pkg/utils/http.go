@@ -51,14 +51,19 @@ func CopyHttpRequest(r *http.Request) *http.Request {
 	return reqCopy
 }
 
-func DisabledCookie(name string) *http.Cookie {
-	return &http.Cookie{
+func DisabledCookie(name string, httpsEnable bool) *http.Cookie {
+	cookie := &http.Cookie{
 		Name:     name,
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,
 		MaxAge:   -1,
 	}
+	if httpsEnable {
+		cookie.Secure = true
+		cookie.SameSite = http.SameSiteNoneMode
+	}
+	return cookie
 }
 
 // dynamicly add query params to the request

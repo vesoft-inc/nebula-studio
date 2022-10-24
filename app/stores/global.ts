@@ -53,7 +53,6 @@ export class GlobalStore {
     resetStore();
     cookies.remove('nh');
     cookies.remove('nu');
-    cookies.remove('curAccount');
     sessionStorage.removeItem('nebulaVersion');
     this.history.push(`/login${location.search}`);
   };
@@ -65,6 +64,7 @@ export class GlobalStore {
   login = async (payload: { host: string; username: string; password: string }) => {
     const { host, username, password } = payload;
     const [address, port] = host.replace(/^https?:\/\//, '').split(':');
+    const authorization = Base64.encode(JSON.stringify([username, password]));
     const { code, data } = (await service.connectDB(
       {
         address,
@@ -76,7 +76,7 @@ export class GlobalStore {
           action: 'sign_in',
         },
         headers: {
-          Authorization: `Bearer ${Base64.encode(`${username}:${password}`)}`,
+          Authorization: `Bearer ${authorization}`,
         },
       },
     )) as any;
@@ -84,7 +84,6 @@ export class GlobalStore {
       message.success(intl.get('configServer.success'));
       cookies.set('nh', host);
       cookies.set('nu', username);
-      sessionStorage.setItem('curAccount', Base64.encode(`${username}:${host}`));
       sessionStorage.setItem('nebulaVersion', data.version);
       this.update({ _host: host, _username: username, nebulaVersion: data.version });
       return true;
@@ -94,7 +93,6 @@ export class GlobalStore {
     cookies.remove('nh');
     cookies.remove('nu');
     sessionStorage.removeItem('nebulaVersion');
-    sessionStorage.removeItem('curAccount');
     return false;
   };
 }
