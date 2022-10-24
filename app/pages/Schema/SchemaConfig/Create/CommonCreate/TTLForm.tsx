@@ -9,7 +9,7 @@ const Option = Select.Option;
 
 const innerItemLayout = {
   labelCol: {
-    span: 8,
+    span: 24,
   },
   wrapperCol: {
     span: 14,
@@ -49,7 +49,10 @@ const formRef = ((props: IProps) => {
               <div className={styles.boxContainer}>
                 <Row>
                   <Col span={12}>
-                    <Form.Item className={styles.inlineItem} label="TTL_COL" {...innerItemLayout} name="ttl_col" rules={[
+                    <Form.Item className={styles.inlineItem} label={<>
+                      <span>TTL_COL</span>
+                      <span className={styles.labelTip}>({intl.get('formRules.ttlLimit')})</span>
+                    </>} {...innerItemLayout} name="ttl_col" rules={[
                       {
                         required: ttlRequired,
                         message: intl.get('formRules.ttlRequired'),

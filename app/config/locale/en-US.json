@@ -111,7 +111,8 @@
     "vidTypeRequired": "Vid type is required",
     "fixStringLengthRequired": "fix string length limit is required",
     "spaceRequired": "Space is required",
-    "maxBytes": "It cannot exceed {max} bytes"
+    "maxBytes": "It cannot exceed {max} bytes",
+    "ttlLimit": "The data type of the property must be int or timestamp"
   },
   "console": {
     "execTime": "Execution Time",
