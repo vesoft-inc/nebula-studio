@@ -371,6 +371,7 @@ function Welcome(props: IProps) {
         title={spaceLoading.spaceName || ''}
         open={spaceLoading.progressModalOpen}
         onCancel={() => setSpaceLoading({ progressModalOpen: false })}
+        closable={false}
       >
         <div className={styles.progressWrapper}>
           <div className={styles.title}>
