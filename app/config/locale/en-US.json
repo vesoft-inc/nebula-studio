@@ -5,7 +5,7 @@
     "seeTheHistory": "History",
     "table": "Table",
     "log": "Log",
-    "sorryNGQLCannotBeEmpty": "Sorry, nGQL cannot be empty",
+    "sorryNGQLCannotBeEmpty": "nGQL cannot be empty",
     "disablesUseToSwitchSpace": "DO NOT switch between graph spaces with nGQL statements in the console.",
     "NGQLHistoryList": "nGQL History",
     "spaceTip": "Only required when you need to execute queries in a specified space.",

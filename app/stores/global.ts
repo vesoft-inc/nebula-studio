@@ -63,7 +63,8 @@ export class GlobalStore {
 
   login = async (payload: { host: string; username: string; password: string }) => {
     const { host, username, password } = payload;
-    const [address, port] = host.replace(/^https?:\/\//, '').split(':');
+    const _host = host.trim().replace(/^https?:\/\//, '');
+    const [address, port] = _host.split(':');
     const authorization = Base64.encode(JSON.stringify([username, password]));
     const { code, data } = (await service.connectDB(
       {
@@ -82,10 +83,10 @@ export class GlobalStore {
     )) as any;
     if (code === 0) {
       message.success(intl.get('configServer.success'));
-      cookies.set('nh', host);
+      cookies.set('nh', _host);
       cookies.set('nu', username);
       sessionStorage.setItem('nebulaVersion', data.version);
-      this.update({ _host: host, _username: username, nebulaVersion: data.version });
+      this.update({ _host, _username: username, nebulaVersion: data.version });
       return true;
     }
 
