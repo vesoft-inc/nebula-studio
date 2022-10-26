@@ -63,7 +63,7 @@ export class GlobalStore {
 
   login = async (payload: { host: string; username: string; password: string }) => {
     const { host, username, password } = payload;
-    const _host = host.replace(/^https?:\/\//, '');
+    const _host = host.trim().replace(/^https?:\/\//, '');
     const [address, port] = _host.split(':');
     const authorization = Base64.encode(JSON.stringify([username, password]));
     const { code, data } = (await service.connectDB(
