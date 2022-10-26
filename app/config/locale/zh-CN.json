@@ -5,7 +5,7 @@
     "seeTheHistory":"查看历史",
     "table": "表格",
     "log":"日志",
-    "sorryNGQLCannotBeEmpty": "对不起，nGQL语句不能为空",
+    "sorryNGQLCannotBeEmpty": "nGQL语句不能为空",
     "disablesUseToSwitchSpace": "禁止使用命令切换Space",
     "NGQLHistoryList": "nGQL历史列表",
     "spaceTip": "仅对某个Space进行操作时需要",

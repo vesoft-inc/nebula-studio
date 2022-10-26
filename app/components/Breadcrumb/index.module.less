@@ -8,6 +8,9 @@
 	display: flex;
 	padding-left: 0;
 	padding-right: 0;
+	:global(.ant-breadcrumb-separator) {
+
+	}
 	ol {
 		li {
 			align-items: center;
@@ -16,9 +19,18 @@
 		span {
 			align-items: center;
 			display: inline-flex;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			white-space: pre-wrap;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			text-align: left;
+			word-break: break-all;
 			a {
 				align-items: center;
 				display: inline-flex;
+				
 			}
 		}
 	}
@@ -38,6 +50,9 @@
 		align-items: center;
 		font-size: 18px;
 		margin-right: 15px;
+		ol {
+			flex-wrap: nowrap;
+		}
 		& > span {
 			display: inline-flex;
 			align-items: center;
@@ -57,6 +72,12 @@
 			a, span {
 				color: @darkBlue;
 				font-weight: 600;
+			}
+		}
+		ol > li:first-child {
+			span {
+				white-space: nowrap;
+				display: inline-flex;
 			}
 		}
 	}

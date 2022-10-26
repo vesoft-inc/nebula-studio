@@ -42,7 +42,7 @@ const service = {
   // files
   deteleFile: params => {
     const { filename } = params;
-    return _delete(`/api/files/${filename}`)();
+    return _delete(`/api/files/${encodeURIComponent(filename)}`)();
   },
   getFiles: () => {
     return get('/api/files')();
@@ -64,11 +64,11 @@ const service = {
     return _delete(`/api/sketches/${id}`)();
   },
   getSchemaSnapshot: (space) => {
-    return get(`/api/schema/${space}/snapshot`)();
+    return get(`/api/schema/${encodeURIComponent(space)}/snapshot`)();
   },
   updateSchemaSnapshot: (params) => {
     const { space, ...restParams } = params;
-    return put(`/api/schema/${space}/snapshot`)(restParams);
+    return put(`/api/schema/${encodeURIComponent(space)}/snapshot`)(restParams);
   },
   deleteFavorite: (id) => {
     return _delete(`/api/favorites/${id}`)();
