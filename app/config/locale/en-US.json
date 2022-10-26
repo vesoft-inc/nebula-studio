@@ -6,7 +6,7 @@
     "table": "Table",
     "log": "Log",
     "sorryNGQLCannotBeEmpty": "Sorry, nGQL cannot be empty",
-    "disablesUseToSwitchSpace": "Switching space from console is not allowed by current role",
+    "disablesUseToSwitchSpace": "DO NOT switch between graph spaces with nGQL statements in the console.",
     "NGQLHistoryList": "nGQL History",
     "spaceTip": "Only required when you need to execute queries in a specified space.",
     "empty": "Clear",
