@@ -1,4 +1,4 @@
-import { makeAutoObservable, observable } from 'mobx';
+import { action, makeAutoObservable, observable } from 'mobx';
 import service from '@app/config/service';
 import { v4 as uuidv4 } from 'uuid';
 import { message } from 'antd';
@@ -27,9 +27,10 @@ export const splitQuery = (query: string) => {
   return result;
 };
 
+const DEFAULT_GQL = 'SHOW SPACES;';
 export class ConsoleStore {
   runGQLLoading = false;
-  currentGQL = 'SHOW SPACES;';
+  currentGQL = DEFAULT_GQL;
   results = [] as any;
   paramsMap = null as any;
   favorites = [] as {
@@ -42,6 +43,7 @@ export class ConsoleStore {
       paramsMap: observable,
       currentGQL: observable,
       favorites: observable,
+      clearConsoleResults: action,
     });
   }
 
@@ -55,6 +57,11 @@ export class ConsoleStore {
 
   update = (param: Partial<ConsoleStore>) => {
     Object.keys(param).forEach(key => (this[key] = param[key]));
+  };
+
+  clearConsoleResults = () => {
+    this.results = [];
+    this.currentGQL = DEFAULT_GQL;
   };
 
   runGQL = async (gql: string, editorValue?: string) => {

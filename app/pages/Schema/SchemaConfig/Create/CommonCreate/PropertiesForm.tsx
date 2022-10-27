@@ -26,7 +26,7 @@ const PropertiesForm = (props: IProps) => {
   const { formRef, onUpdate } = props;
   const handleClearProperties = e => {
     if(!e.target.checked) {
-      formRef.resetFields(['properties', []]);
+      formRef.setFieldsValue({ 'properties': [] });
       setTimeout(onUpdate, 300);
     }
   };

@@ -1,5 +1,6 @@
 import { action, makeAutoObservable, observable } from 'mobx';
 import service from '@app/config/service';
+import { getRootStore } from '@app/stores';
 import { IAlterForm, IEdge, IIndexList, ISchemaType, ISpace, ITag, ITree, IndexType, ISchemaEnum } from '@app/interfaces/schema';
 import { handleKeyword, handleVidStringName, safeParse } from '@app/utils/function';
 import { findIndex } from 'lodash';
@@ -25,6 +26,11 @@ export class SchemaStore {
   tagList: ITag[] = [];
   edgeList: IEdge[] = [];
   indexList: IIndexList[] = [];
+
+  get rootStore() {
+    return getRootStore();
+  }
+
   constructor() {
     makeAutoObservable(this, {
       spaces: observable,
@@ -90,6 +96,7 @@ export class SchemaStore {
       });
       sessionStorage.setItem('currentSpace', space);
       this.updateVidType(space);
+      this.rootStore.console.clearConsoleResults();
     } else {
       return message;
     }

@@ -21,11 +21,21 @@
 
 .sketchTitle {
   display: flex;
+  align-items: center;
   span {
     font-weight: 500;
     font-size: 18px;
     line-height: 21px;
     color: @headerBlack;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: pre-wrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    text-align: left;
+    word-break: break-all;
+    max-width: 90%;
   }
   .editIcon {
     margin-left: 10px;
