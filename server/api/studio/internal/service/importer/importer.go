@@ -88,7 +88,8 @@ func CreateConfigFile(uploadDir, taskdir string, config importconfig.YAMLConfig)
 
 func Import(taskID string, conf *importconfig.YAMLConfig) (err error) {
 	runnerLogger := logger.NewRunnerLogger(*conf.LogPath)
-	if err := conf.ValidateAndReset("", runnerLogger); err != nil {
+	logger.SetLogger(runnerLogger)
+	if err := conf.ValidateAndReset(""); err != nil {
 		return err
 	}
 
