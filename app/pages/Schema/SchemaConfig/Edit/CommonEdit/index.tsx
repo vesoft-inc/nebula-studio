@@ -73,17 +73,15 @@ const ConfigEdit = (props: IProps) => {
     }
     setEditName(_editName);
     setLoading(true);
-    const { code, data } = await getTagOrEdgeDetail(editType, _editName);
+    const createGql = await getTagOrEdgeDetail(editType, _editName);
     const { code: propCode, data: propData } = await getTagOrEdgeInfo(
       editType,
       _editName,
     );
     setLoading(false);
-    if (code === 0) {
-      const key = editType === 'tag' ? 'Create Tag' : 'Create Edge';
-      const info = data.tables[0][key];
+    if (createGql) {
       const fieldInfo = propCode === 0 ? propData.tables : [];
-      handleData(_editName, info, fieldInfo);
+      handleData(_editName, createGql, fieldInfo);
     }
   };
 

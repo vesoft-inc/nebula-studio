@@ -1,3 +1,5 @@
+@import '~@app/common.less';
+
 .CodeMirror-wrap pre.CodeMirror-line,
 .CodeMirror-wrap pre.CodeMirror-line-like {
 	word-break: break-all !important;
@@ -14,5 +16,22 @@
 	}
 	pre, span {
 		font-family: Roboto-Mono,sans-serif;
+	}
+}
+
+.CodeMirror {
+	font-family: Roboto-Mono, sans-serif;
+	.CodeMirror-gutters {
+		background: @lightBlue;
+	}
+	.CodeMirror-linenumber {
+		display: flex;
+		justify-content: center;
+		color: @darkGray;
+	}
+	.CodeMirror-scroll {
+		padding-bottom: 0;
+		margin-right: 0;
+		overflow: auto !important;
 	}
 }

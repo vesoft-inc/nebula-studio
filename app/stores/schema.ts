@@ -129,6 +129,15 @@ export class SchemaStore {
     return { code, data };
   };
 
+  getSpaceCreateGQL = async (space: string) => {
+    const gql = `show create space ${handleKeyword(space)}`;
+    const { code, data } = (await service.execNGQL({
+      gql,
+    })) as any;
+    return code === 0 ? data.tables[0]['Create Space'] : null;
+  };
+
+
   getSpacesList = async () => {
     const res = await this.getSpaces();
     const activeSpace = location.hash.slice(1);
@@ -403,10 +412,14 @@ export class SchemaStore {
 
   getTagOrEdgeDetail = async (type: ISchemaType, name: string) => {
     const gql = `show create ${type} ${handleKeyword(name)}`;
-    const { code, data, message } = (await service.execNGQL({
+    const { code, data } = (await service.execNGQL({
       gql,
     })) as any;
-    return { code, data, message };
+    if(code === 0) {
+      const _type = `Create ${type[0].toUpperCase()}${type.slice(1)}`;
+      return data.tables[0][_type];
+    }
+    return null;
   };
 
   getTagOrEdgeInfo = async (type: ISchemaType, name: string) => {
@@ -439,7 +452,7 @@ export class SchemaStore {
     }
   };
 
-  getIndexComment = async (payload: { type: IndexType; name: string }) => {
+  getIndexGQL = async (payload: { type: IndexType; name: string }) => {
     const { type, name } = payload;
     const { code, data } = (await service.execNGQL({
       gql: `
@@ -447,15 +460,20 @@ export class SchemaStore {
       `,
     })) as any;
     if (code === 0) {
-      const _type = type === 'tag' ? 'tag' : 'edge';
-      const res = data.tables[0]?.[`Create ${_type} Index`] || '';
-      const reg = /comment = "(.+)"/g;
-      const result = reg.exec(res);
-      const comment = result?.[1] || null;
-      return comment;
+      const _type = type === ISchemaEnum.Tag ? 'Tag' : 'Edge';
+      const res = data.tables[0]?.[`Create ${_type} Index`];
+      return res;
     } else {
       return null;
     }
+  };
+
+  getIndexComment = async (payload: { type: IndexType; name: string }) => {
+    const gql = await this.getIndexGQL(payload);
+    const reg = /comment = "(.+)"/g;
+    const result = reg.exec(gql);
+    const comment = result?.[1] || null;
+    return comment;
   };
 
   getIndexFields = async (payload: { type: IndexType; name: string }) => {
@@ -719,6 +737,75 @@ export class SchemaStore {
   }) => {
     const res = await service.updateSchemaSnapshot(params);
     return res;
+  };
+
+  getSchemaDDL = async (space) => {
+    const ddlMap = {
+      space: null,
+      tags: [],
+      edges: [],
+      indexes: [],
+    };
+    await this.switchSpace(space);
+    const spaceGql = await this.getSpaceCreateGQL(space);
+    ddlMap.space = spaceGql;
+    await this.switchSpace(space);
+    const tags = await this.getTags();
+    for await (const tag of tags) {
+      const gql = await this.getTagOrEdgeDetail(ISchemaEnum.Tag, tag);
+      gql && ddlMap.tags.push(gql);
+    }
+    // tags.forEach(async tag => {
+    //   const gql = await this.getTagOrEdgeDetail(ISchemaEnum.Tag, tag);
+    //   gql && ddlMap.tags.push(gql);
+    // });
+    const edges = await this.getEdges();
+    for await (const edge of edges) {
+      const gql = await this.getTagOrEdgeDetail(ISchemaEnum.Edge, edge);
+      gql && ddlMap.edges.push(gql);
+    }
+    // edges.forEach(async edge => {
+    //   const gql = await this.getTagOrEdgeDetail(ISchemaEnum.Edge, edge);
+    //   gql && ddlMap.edges.push(gql);
+    // });
+    const tagIndexes = await this.getIndexes(ISchemaEnum.Tag);
+    for await (const index of tagIndexes) {
+      const gql = await this.getIndexGQL({ type: ISchemaEnum.Tag, name: index.name });
+      gql && ddlMap.indexes.push(gql);
+    }
+    // tagIndexes.forEach(async tagIndex => {
+    //   const gql = await this.getIndexGQL({ type: ISchemaEnum.Tag, name: tagIndex.name });
+    //   gql && ddlMap.indexes.push(gql);
+    // });
+    const edgeIndexes = await this.getIndexes(ISchemaEnum.Edge);
+    for await (const index of edgeIndexes) {
+      const gql = await this.getIndexGQL({ type: ISchemaEnum.Edge, name: index.name });
+      gql && ddlMap.indexes.push(gql);
+    }
+    // edgeIndexes.forEach(async edgeIndex => {
+    //   const gql = await this.getIndexGQL({ type: ISchemaEnum.Edge, name: edgeIndex.name });
+    //   gql && ddlMap.indexes.push(gql);
+    // });
+    // await Promise.all([
+    //   tags.map(async tag => {
+    //     const gql = await this.getTagOrEdgeDetail(ISchemaEnum.Tag, tag);
+    //     gql && ddlMap.tags.push(gql);
+    //   }),
+    //   edges.map(async edge => {
+    //     const gql = await this.getTagOrEdgeDetail(ISchemaEnum.Edge, edge);
+    //     gql && ddlMap.edges.push(gql);
+    //   }),
+    //   tagIndexes.map(async tagIndex => {
+    //     const gql = await this.getIndexGQL({ type: ISchemaEnum.Tag, name: tagIndex.name });
+    //     gql && ddlMap.indexes.push(gql);
+    //   }),
+    //   edgeIndexes.map(async edgeIndex => {
+    //     const gql = await this.getIndexGQL({ type: ISchemaEnum.Edge, name: edgeIndex.name });
+    //     gql && ddlMap.indexes.push(gql);
+    //   })
+    // ]);
+    console.log('ddlMap', ddlMap);
+    return ddlMap;
   };
 }
 
