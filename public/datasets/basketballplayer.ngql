@@ -1,6 +1,6 @@
-create space `demo-basketballplayer`(partition_num=10,replica_factor=1,vid_type=fixed_string(32));
+create space `demo_basketballplayer`(partition_num=10,replica_factor=1,vid_type=fixed_string(32));
 :sleep 10;
-use `demo-basketballplayer`;
+use `demo_basketballplayer`;
 create tag player(name string,age int);
 create tag team(name string);
 create edge serve(start_year int,end_year int);

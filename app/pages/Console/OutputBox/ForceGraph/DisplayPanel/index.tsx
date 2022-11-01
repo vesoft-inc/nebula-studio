@@ -20,7 +20,10 @@ const DisplayPanel = (props: IProps) => {
   return (
     <div className={styles.outputDisplayPanel}>
       <div className={styles.btnTogglePanel} onClick={() => setVisible(!visible)}>
-        <Icon type="icon-studio-btn-back" />
+        <Icon
+          type="icon-studio-btn-back"
+          style={{ transform: `rotate(${visible ? -180 : 0}deg)`, transition: 'all 0.2s' }}
+        />
       </div>
       <div className={cls(styles.displayDrawer, { [styles.active]: visible })}>
         <Expand data={data} spaceVidType={spaceVidType} />
