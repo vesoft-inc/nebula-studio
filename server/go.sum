@@ -406,8 +406,8 @@ github.com/vesoft-inc/nebula-go/v3 v3.2.0 h1:f0IW6W5f91O6FyXAi+kFq1D2bNFXtPtkb/H
 github.com/vesoft-inc/nebula-go/v3 v3.2.0/go.mod h1:+sXv05jYQBARdTbTcIEsWVXCnF/6ttOlDK35xQ6m54s=
 github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220720014538-1dd39bd43f6c h1:iTbPI6CFshXK3LZ5jlc0ZkPyZzaVpC0FxRn8peHQfc0=
 github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220720014538-1dd39bd43f6c/go.mod h1:sFEvE+cY4TgwqWx6H6msOqAUzRhsEHHKaaMgIZENHuQ=
-github.com/vesoft-inc/nebula-importer v1.0.1-0.20220719030708-8e376665042e h1:Xj3N5lfKv+mG59Fh2GoWZ/89kWEwQtW/W4EiKkD2yI0=
-github.com/vesoft-inc/nebula-importer v1.0.1-0.20220719030708-8e376665042e/go.mod h1:8xAQi6KI2qe40Dop/GqDXmBEurt7qGp5Pjd1MESAVNA=
+github.com/vesoft-inc/nebula-importer v1.0.1-0.20221028024308-3cd1335b9502 h1:MDgsFWldRhVFx/ab0lKAkmM0/xd6RQqo8UdLUcROKRQ=
+github.com/vesoft-inc/nebula-importer v1.0.1-0.20221028024308-3cd1335b9502/go.mod h1:8xAQi6KI2qe40Dop/GqDXmBEurt7qGp5Pjd1MESAVNA=
 github.com/xdg-go/pbkdf2 v1.0.0/go.mod h1:jrpuAogTd400dnrH08LKmI/xc1MbPOebTwRqcT5RDeI=
 github.com/xdg-go/scram v1.0.2/go.mod h1:1WAq6h33pAW+iRreB34OORO2Nf7qel3VV3fjBj+hCSs=
 github.com/xdg-go/stringprep v1.0.2/go.mod h1:8F9zXuvzgwmyT5DUm4GUfZGDdT3W+LCvS6+da4O5kxM=
