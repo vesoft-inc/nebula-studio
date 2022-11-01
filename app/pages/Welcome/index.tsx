@@ -102,7 +102,7 @@ const getDatasetList = (): DatasetItem[] => [
   {
     type: 'starter',
     tags: ['starter'],
-    spaceName: 'demo-basketballplayer',
+    spaceName: 'demo_basketballplayer',
     fileName: 'basketballplayer',
     rename: undefined as unknown as string,
     detail: {
