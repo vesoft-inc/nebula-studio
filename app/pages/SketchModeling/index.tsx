@@ -13,38 +13,44 @@ import SchemaConfig from './SchemaConfig';
 import SketchList from './SketchList';
 
 import { initTooltip } from './Plugins/Tooltip';
+
 const SketchPage: React.FC = () => {
   const { sketchModel } = useStore();
   const { initEditor, currentSketch } = sketchModel;
   const editorRef = useRef();
   const { currentLocale } = useContext(LanguageContext);
-  const prevLocale = useRef(currentLocale);
+  const preLocale = useRef(currentLocale);
+
   useEffect(() => {
     trackPageView('/sketchModeling');
+    return () => {
+      if (sketchModel.currentSketch) {
+        sketchModel.currentSketch.schema = JSON.stringify(sketchModel.editor?.schema?.getData() || {});
+        sketchModel.destroy();
+      }
+    };
   }, []);
-  const init = useCallback(async (data) => {
-    await initEditor({ container: editorRef.current, schema: data });
+
+  const init = useCallback((data) => {
+    initEditor({ container: editorRef.current, schema: data });
     initTooltip({ container: editorRef.current });
   }, []);
-  const updateData = useCallback(async () => {
-    const { currentSketch, editor, destroy } = sketchModel;
-    let data = currentSketch.schema;
-    const existData = editor?.schema?.getData();
-    if(existData) {
-      destroy();
-      data = JSON.stringify(existData);
+
+  useEffect(() => {
+    if (!currentSketch?.id) {
+      return;
     }
-    init(data);
-  }, []);
-  useEffect(() => {
-    currentSketch && updateData();
+    init(currentSketch.schema);
   }, [currentSketch?.id]);
+
   useEffect(() => {
-    if(prevLocale.current !== currentLocale) {
-      updateData(); 
-      prevLocale.current = currentLocale;
+    if (sketchModel.currentSketch && preLocale.current !== currentLocale) {
+      const data = sketchModel.editor ? JSON.stringify(sketchModel.editor.schema.getData()) : null;
+      init(data);
+      preLocale.current = currentLocale;
     }
   }, [currentLocale]);
+
   return (
     <div className={styles.sketchModeling} key={currentLocale}>
       <SketchList />
@@ -57,13 +63,11 @@ const SketchPage: React.FC = () => {
           <SchemaConfig />
         </div>
       ) : (
-        <>
-          <div className={styles.empty}>
-            <img src={emptyPng} alt="empty" />
-            <div className={styles.emptyText}>{intl.get('sketch.noCurrentSketch')}</div>
-            <div className={styles.emptyTips}>{intl.get('sketch.noCurrentSketchTips')}</div>
-          </div>
-        </>
+        <div className={styles.empty}>
+          <img src={emptyPng} alt="empty" />
+          <div className={styles.emptyText}>{intl.get('sketch.noCurrentSketch')}</div>
+          <div className={styles.emptyTips}>{intl.get('sketch.noCurrentSketchTips')}</div>
+        </div>
       )}
     </div>
   );
