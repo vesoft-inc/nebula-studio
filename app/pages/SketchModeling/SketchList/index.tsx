@@ -42,15 +42,18 @@ const SketchList: React.FC = () => {
   }, []);
 
   const handleSelect = useCallback((item: ISketch) => {
+    const { destroy } = sketchModel;
     if(item === sketchModel.currentSketch) {
       return;
     }
     if (!sketchModel.currentSketch) {
+      destroy();
       update({ currentSketch: item });
       return;
     }
     const isModified = checkModified();
     if(!isModified) {
+      destroy();
       update({ currentSketch: item, active: null });
       return;
     }
@@ -59,6 +62,7 @@ const SketchList: React.FC = () => {
       okText: intl.get('common.confirm'),
       cancelText: intl.get('common.cancel'),
       onOk() {
+        destroy();
         update({ currentSketch: item, active: null });
       },
       onCancel() {

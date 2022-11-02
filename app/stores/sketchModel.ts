@@ -95,8 +95,8 @@ export class SketchStore {
     return !isInvalid;
   };
 
-  validateSchema = () => {
-    const data = this.editor.schema.getData();
+  validateSchema = async () => {
+    const data = await this.editor.schema.getData();
     const { nodes, lines } = data;
     const nodesValid = nodes.reduce((flag, node) => this.validate(node, 'node') && flag, true);
     const edgesValid = lines.reduce((flag, line) => this.validate(line, 'edge') && flag, true);
@@ -177,10 +177,10 @@ export class SketchStore {
     this.update({ loading: false });
     if (res.code === 0) {
       const sketchList = { ...res.data, filter: newFilter };
-      const params = { sketchList } as any;
-      if(this.currentSketch) {
-        params.currentSketch = sketchList.items.find((item) => item.id === this.currentSketch.id);
+      if(this.currentSketch && !sketchList.items.find(i => i.id === this.currentSketch.id)) {
+        sketchList.items.push(this.currentSketch);
       }
+      const params = { sketchList } as any;
       this.update(params);
       return sketchList;
     }
@@ -362,10 +362,9 @@ export class SketchStore {
     this.tooltip = { ...this.tooltip, left: left - offsetX, top: top - offsetY };
   };
   destroy = () => {
-    this.editor.destroy();
+    this.editor?.destroy();
     this.editor = undefined;
     this.active = undefined;
-    this.currentSketch = undefined;
   };
 }
 

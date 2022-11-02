@@ -60,7 +60,7 @@ export const ARROW_STYLE = {
 export function makeLineSort(links) {
   // update link sort
   const sourceMap = {};
-  links.forEach((link: any) => {
+  links?.forEach((link: any) => {
     const sourceId = link.from;
     const targetId = link.to;
     const sourceCommonId = `${sourceId}=>${targetId}`;

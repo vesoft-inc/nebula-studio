@@ -29,7 +29,7 @@ const SketchConfigHeader: React.FC = () => {
   };
   const handleSave = async () => {
     const data = sketchModel.editor.schema.getData();
-    const isValid = validateSchema();
+    const isValid = await validateSchema();
     if (!isValid) {
       return;
     }
