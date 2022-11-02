@@ -12,7 +12,7 @@ import styles from './index.module.less';
 const OFFSET = 10;
 const TOOLTIP_WIDTH = 280;
 const TOOLTIP_MIN_HEIGHT = 63;
-const TOOLTIP_MAX_HEIGHT = 30000;
+const TOOLTIP_MAX_HEIGHT = 300;
 const Tooltip = observer(function Tooltip() {
   const [visible, setVisible] = useState(false);
   const [data, setData] = useState(null);

@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import intl from 'react-intl-universal';
 import { useStore } from '@app/stores';
@@ -16,33 +16,33 @@ import { initTooltip } from './Plugins/Tooltip';
 const SketchPage: React.FC = () => {
   const { sketchModel } = useStore();
   const { initEditor, currentSketch } = sketchModel;
-  const [item, setItem] = useState(null);
   const editorRef = useRef();
   const { currentLocale } = useContext(LanguageContext);
+  const prevLocale = useRef(currentLocale);
   useEffect(() => {
     trackPageView('/sketchModeling');
-    return () => {
-      sketchModel.currentSketch && sketchModel.destroy();
-    };
   }, []);
-  const init = useCallback((data) => {
-    initEditor({ container: editorRef.current, schema: data });
+  const init = useCallback(async (data) => {
+    await initEditor({ container: editorRef.current, schema: data });
     initTooltip({ container: editorRef.current });
   }, []);
-  useEffect(() => {
-    if (currentSketch) {
-      if(!item || item.id !== currentSketch.id) {
-        init(currentSketch.schema);
-      }
-      setItem(currentSketch);
-    } else {
-      setItem(null);
+  const updateData = useCallback(async () => {
+    const { currentSketch, editor, destroy } = sketchModel;
+    let data = currentSketch.schema;
+    const existData = editor?.schema?.getData();
+    if(existData) {
+      destroy();
+      data = JSON.stringify(existData);
     }
-  }, [currentSketch]);
+    init(data);
+  }, []);
   useEffect(() => {
-    if(sketchModel.currentSketch) {
-      const data = sketchModel.editor ? JSON.stringify(sketchModel.editor.schema.getData()) : null;
-      init(data);
+    currentSketch && updateData();
+  }, [currentSketch?.id]);
+  useEffect(() => {
+    if(prevLocale.current !== currentLocale) {
+      updateData(); 
+      prevLocale.current = currentLocale;
     }
   }, [currentLocale]);
   return (
