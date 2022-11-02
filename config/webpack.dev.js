@@ -34,7 +34,7 @@ const devConfig = {
     open: true,
     headers: { 'Access-Control-Allow-Origin': '*' },
     historyApiFallback: true,
-    host: 'localhost',
+    host: '127.0.0.1',
     allowedHosts: 'all',
     hot: true,
     client: {
