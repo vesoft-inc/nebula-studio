@@ -115,7 +115,7 @@ const getDatasetList = (): DatasetItem[] => [
   {
     type: 'solution',
     tags: ['solution'],
-    spaceName: 'demo-shareholding',
+    spaceName: 'demo_shareholding',
     fileName: 'shareholding',
     rename: undefined as unknown as string,
     detail: {
