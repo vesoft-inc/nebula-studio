@@ -1,4 +1,4 @@
-import { makeAutoObservable, observable, action } from 'mobx';
+import { makeAutoObservable, observable, action, runInAction } from 'mobx';
 import { message } from 'antd';
 import intl from 'react-intl-universal';
 import { getRootStore } from '@app/stores';
@@ -153,13 +153,24 @@ export class SketchStore {
 
   updateSketch = async (params: { name?: string; schema?: string; snapshot?: string }) => {
     const { id, name, schema, snapshot } = this.currentSketch;
-    const { code } = await service.updateSketch({
+    const _params = {
       id,
       name,
       schema,
       snapshot,
       ...params,
-    });
+    };
+    const { code } = await service.updateSketch(_params);
+    if(code === 0) {
+      runInAction(() => {
+        const item = this.sketchList.items.find(item => item.id === id);
+        item.name = _params.name;
+        this.currentSketch = {
+          ...this.currentSketch,
+          ..._params
+        };
+      });
+    }
     return code;
   };
 
