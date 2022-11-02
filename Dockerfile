@@ -1,4 +1,4 @@
-FROM node:12-alpine as nodebuilder
+FROM node:18-alpine as nodebuilder
 LABEL stage=nodebuilder
 # Set the working directory to /app
 WORKDIR /web

@@ -33,12 +33,16 @@ const SketchList: React.FC = () => {
     }
   }, []);
   const handleDelete = useCallback(async (id: string, e) => {
+    const { currentSketch, destroy } = sketchModel;
     e.stopPropagation();
     const result = await deleteSketch(id);
     if (result) {
       message.success(intl.get('common.deleteSuccess'));
+      if(currentSketch?.id === id) {
+        destroy();
+        update({ currentSketch: null });
+      }
       await getSketchList();
-      sketchModel.currentSketch?.id === id && update({ currentSketch: null });
     }
   }, []);
 
