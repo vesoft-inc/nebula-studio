@@ -83,13 +83,6 @@ const SketchConfigHeader: React.FC = () => {
     const code = await updateSketch({ name: value });
     if (code === 0) {
       message.success(intl.get('sketch.updateNameSuccess'));
-      await getSketchList();
-      sketchModel.update({
-        currentSketch: {
-          ...currentSketch,
-          name: value
-        }
-      });
     }
   };
   return (
