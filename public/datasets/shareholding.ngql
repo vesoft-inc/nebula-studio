@@ -1,6 +1,6 @@
-create space `demo-shareholding`(partition_num=5,replica_factor=1,vid_type=FIXED_STRING(10));
+create space `demo_shareholding`(partition_num=5,replica_factor=1,vid_type=FIXED_STRING(10));
 :sleep 10;
-use `demo-shareholding`;
+use `demo_shareholding`;
 CREATE tag person(name string);
 CREATE tag corp(name string);
 CREATE edge role_as(role string);
