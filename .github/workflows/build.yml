@@ -35,7 +35,7 @@ jobs:
           go-version: '^1.18.7'
       - uses: actions/setup-node@v2
         with:
-          node-version: '18'
+          node-version: '16'
       - name: Package
         run: bash ./source/nebula-graph-studio/scripts/pack.sh ${{ secrets.ga_id }} ${{ matrix.os }}
       - name: Upload to OSS
