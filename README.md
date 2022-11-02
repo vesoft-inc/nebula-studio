@@ -64,8 +64,8 @@ kill -9 $(lsof -t -i :7001)
 ```
 
 ## Documentation 
-[中文](https://docs.nebula-graph.com.cn/3.5.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/)
-[ENGLISH](https://docs.nebula-graph.io/3.5.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/)
+[中文](https://docs.nebula-graph.com.cn/3.3.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/)
+[ENGLISH](https://docs.nebula-graph.io/3.3.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/)
 
 ## Contributing
 Contributions are warmly welcomed and greatly appreciated. Please see [Guide Docs](https://github.com/vesoft-inc/nebula-studio/blob/master/CONTRIBUTING.md) 
