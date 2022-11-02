@@ -96,7 +96,7 @@ export class SketchStore {
   };
 
   validateSchema = async () => {
-    const data = await this.editor.schema.getData();
+    const data = await this.editor?.schema?.getData();
     const { nodes, lines } = data;
     const nodesValid = nodes.reduce((flag, node) => this.validate(node, 'node') && flag, true);
     const edgesValid = lines.reduce((flag, line) => this.validate(line, 'edge') && flag, true);
@@ -109,7 +109,7 @@ export class SketchStore {
   };
 
   checkSameName = () => {
-    const data = this.editor.schema.getData();
+    const data = this.editor?.schema?.getData();
     const { nodes, lines } = data;
     const _nodes = nodes.map((i) => i.name).filter(Boolean);
     const _lines = lines.map((i) => i.name).filter(Boolean);
@@ -119,7 +119,7 @@ export class SketchStore {
 
   checkModified = () => {
     const initialData = this.sketchList.items.find((item) => item.id === this.currentSketch?.id);
-    const schema = this.editor.schema.getData();
+    const schema = this.editor?.schema?.getData();
     const isEmptySame = !schema.nodes.length && !schema.lines.length && !initialData.schema;
     const newSchema = JSON.stringify({
       nodes: schema.nodes?.map(node => ({ name: node.name, properties: node.properties, comment: node.comment })),

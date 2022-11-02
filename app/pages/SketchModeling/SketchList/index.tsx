@@ -26,6 +26,7 @@ const SketchList: React.FC = () => {
       }
       const isModified = checkModified();
       if(!isModified) {
+        sketchModel.destroy();
         update({ currentSketch: list.items[0], active: null });
         return;
       }
