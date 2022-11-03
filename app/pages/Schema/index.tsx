@@ -9,6 +9,7 @@ import cls from 'classnames';
 import { Link, useHistory } from 'react-router-dom';
 import styles from './index.module.less';
 import Search from './SchemaConfig/List/Search';
+import DDLButton from './SchemaConfig/DDLButton';
 
 interface IOperations {
   space: string;
@@ -26,17 +27,8 @@ const Operations = (props: IOperations) => {
   };
   const items = [
     {
-      key: 'delete',
-      label: <Popconfirm
-        onConfirm={() => onDelete(space)}
-        title={intl.get('common.ask')}
-        okText={intl.get('common.ok')}
-        cancelText={intl.get('common.cancel')}
-      >
-        <Button type="link" danger>
-          {intl.get('schema.deleteSpace')}
-        </Button>
-      </Popconfirm>
+      key: 'ddl',
+      label: <DDLButton space={space} />
     },
     {
       key: 'clone',
@@ -62,7 +54,20 @@ const Operations = (props: IOperations) => {
           {intl.get('schema.cloneSpace')}
         </Button>
       </Popover>
-    }
+    },
+    {
+      key: 'delete',
+      label: <Popconfirm
+        onConfirm={() => onDelete(space)}
+        title={intl.get('common.ask')}
+        okText={intl.get('common.ok')}
+        cancelText={intl.get('common.cancel')}
+      >
+        <Button type="link" danger>
+          {intl.get('schema.deleteSpace')}
+        </Button>
+      </Popconfirm>
+    },
   ];
   return <Menu className={styles.operationsSpace} items={items} />;
 };

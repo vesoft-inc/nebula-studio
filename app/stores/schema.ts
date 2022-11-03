@@ -4,11 +4,12 @@ import { getRootStore } from '@app/stores';
 import { IAlterForm, IEdge, IIndexList, ISchemaType, ISpace, ITag, ITree, IndexType, ISchemaEnum } from '@app/interfaces/schema';
 import { handleKeyword, handleVidStringName, safeParse } from '@app/utils/function';
 import { findIndex } from 'lodash';
-
+import intl from 'react-intl-universal';
 import {
   getAlterGQL,
   getIndexCreateGQL,
 } from '@app/utils/gql';
+import { message } from 'antd';
 
 export class SchemaStore {
   spaces: string[] = [];
@@ -128,6 +129,15 @@ export class SchemaStore {
     })) as any;
     return { code, data };
   };
+
+  getSpaceCreateGQL = async (space: string) => {
+    const gql = `show create space ${handleKeyword(space)}`;
+    const { code, data } = (await service.execNGQL({
+      gql,
+    })) as any;
+    return code === 0 ? data.tables[0]['Create Space'] : null;
+  };
+
 
   getSpacesList = async () => {
     const res = await this.getSpaces();
@@ -403,10 +413,14 @@ export class SchemaStore {
 
   getTagOrEdgeDetail = async (type: ISchemaType, name: string) => {
     const gql = `show create ${type} ${handleKeyword(name)}`;
-    const { code, data, message } = (await service.execNGQL({
+    const { code, data } = (await service.execNGQL({
       gql,
     })) as any;
-    return { code, data, message };
+    if(code === 0) {
+      const _type = `Create ${type[0].toUpperCase()}${type.slice(1)}`;
+      return data.tables[0][_type];
+    }
+    return null;
   };
 
   getTagOrEdgeInfo = async (type: ISchemaType, name: string) => {
@@ -439,7 +453,7 @@ export class SchemaStore {
     }
   };
 
-  getIndexComment = async (payload: { type: IndexType; name: string }) => {
+  getIndexGQL = async (payload: { type: IndexType; name: string }) => {
     const { type, name } = payload;
     const { code, data } = (await service.execNGQL({
       gql: `
@@ -447,15 +461,20 @@ export class SchemaStore {
       `,
     })) as any;
     if (code === 0) {
-      const _type = type === 'tag' ? 'tag' : 'edge';
-      const res = data.tables[0]?.[`Create ${_type} Index`] || '';
-      const reg = /comment = "(.+)"/g;
-      const result = reg.exec(res);
-      const comment = result?.[1] || null;
-      return comment;
+      const _type = type === ISchemaEnum.Tag ? 'Tag' : 'Edge';
+      const res = data.tables[0]?.[`Create ${_type} Index`];
+      return res;
     } else {
       return null;
     }
+  };
+
+  getIndexComment = async (payload: { type: IndexType; name: string }) => {
+    const gql = await this.getIndexGQL(payload);
+    const reg = /comment = "(.+)"/g;
+    const result = reg.exec(gql);
+    const comment = result?.[1] || null;
+    return comment;
   };
 
   getIndexFields = async (payload: { type: IndexType; name: string }) => {
@@ -719,6 +738,71 @@ export class SchemaStore {
   }) => {
     const res = await service.updateSchemaSnapshot(params);
     return res;
+  };
+
+  getSchemaDDL = async (space) => {
+    const ddlMap = {
+      space: null,
+      tags: [],
+      edges: [],
+      indexes: [],
+    };
+    try {
+      await this.switchSpace(space);
+      const spaceGql = await this.getSpaceCreateGQL(space);
+      ddlMap.space = spaceGql;
+      await this.switchSpace(space);
+      const tags = await this.getTags();
+      const edges = await this.getEdges();
+      const tagIndexes = await this.getIndexes(ISchemaEnum.Tag);
+      const edgeIndexes = await this.getIndexes(ISchemaEnum.Edge);
+      if(!tags || !edges || !tagIndexes || !edgeIndexes) {
+        throw new Error(intl.get('schema.getDDLError'));
+      }
+      const queryList = [
+        {
+          data: tags,
+          type: ISchemaEnum.Tag,
+          destination: ddlMap.tags,
+        },
+        {
+          data: edges,
+          type: ISchemaEnum.Edge,
+          destination: ddlMap.edges,
+        },
+        {
+          data: tagIndexes,
+          type: ISchemaEnum.Tag,
+          isIndex: true,
+          destination: ddlMap.indexes,
+        },
+        {
+          data: edgeIndexes,
+          type: ISchemaEnum.Edge,
+          isIndex: true,
+          destination: ddlMap.indexes,
+        },
+      ];
+      for await (const item of queryList) {
+        const { data, type, isIndex, destination } = item;
+        for await (const _item of data) {
+          if(isIndex) {
+            const gql = await this.getIndexGQL({ type, name: _item.name });
+            gql && destination.push(gql);
+          } else {
+            const gql = await this.getTagOrEdgeDetail(type, _item);
+            if(gql) {
+              destination.push(gql);
+            } else {
+              throw new Error(intl.get('schema.getDDLError'));
+            }
+          }
+        }
+      }
+      return ddlMap;
+    } catch (err) {
+      message.warning(err.toString());
+    }
   };
 }
 

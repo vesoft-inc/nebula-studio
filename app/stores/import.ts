@@ -2,6 +2,7 @@ import { action, makeObservable, observable, runInAction } from 'mobx';
 import service from '@app/config/service';
 import { IBasicConfig, IEdgeConfig, ITaskItem, IVerticesConfig } from '@app/interfaces/import';
 import { configToJson } from '@app/utils/import';
+import { ISchemaEnum } from '@app/interfaces/schema';
 import { getRootStore } from '.';
 
 const handlePropertyMap = (item, defaultValueFields) => {
@@ -139,14 +140,11 @@ export class ImportStore {
     const { schema } = this.rootStore;
     const { getTagOrEdgeInfo, getTagOrEdgeDetail } = schema;
     const { tag, tagIndex, configIndex } = payload;
-    const { code, data } = await getTagOrEdgeInfo('tag', tag);
-    const createTag = await getTagOrEdgeDetail('tag', tag);
+    const { code, data } = await getTagOrEdgeInfo(ISchemaEnum.Tag, tag);
+    const createTagGQL = await getTagOrEdgeDetail(ISchemaEnum.Tag, tag);
     const defaultValueFields: any[] = [];
-    if (!!createTag) {
-      const res =
-        (createTag.data.tables && createTag.data.tables[0]['Create Tag']) ||
-        '';
-      const fields = res.split(/\n|\r\n/);
+    if (createTagGQL) {
+      const fields = createTagGQL.split(/\n|\r\n/);
       fields.forEach(field => {
         const fieldArr = field.trim().split(/\s|\s+/);
         if (fieldArr.includes('default') || fieldArr.includes('DEFAULT')) {
@@ -180,14 +178,11 @@ export class ImportStore {
     } else {
       const { schema } = this.rootStore;
       const { getTagOrEdgeInfo, getTagOrEdgeDetail, spaceVidType } = schema;
-      const { code, data } = await getTagOrEdgeInfo('edge', edgeType);
-      const createTag = await getTagOrEdgeDetail('edge', edgeType);
+      const { code, data } = await getTagOrEdgeInfo(ISchemaEnum.Edge, edgeType);
+      const createEdgeGQL = await getTagOrEdgeDetail(ISchemaEnum.Edge, edgeType);
       const defaultValueFields: any[] = [];
-      if (!!createTag) {
-        const res =
-          (createTag.data.tables && createTag.data.tables[0]['Create Edge']) ||
-          '';
-        const fields = res.split(/\n|\r\n/);
+      if (createEdgeGQL) {
+        const fields = createEdgeGQL.split(/\n|\r\n/);
         fields.forEach(field => {
           const fieldArr = field.trim().split(/\s|\s+/);
           if (field.includes('default') || fieldArr.includes('DEFAULT')) {
