@@ -27,6 +27,7 @@ const DDLButton = (props: IProps) => {
   const [loading, setLoading] = useState(false);
   const { schema: { getSchemaDDL } } = useStore();
   const [ddl, setDDL] = useState('');
+  const handleJoinGQL = useCallback((data) => data.map(i => i.replaceAll('\n', '')).join(';\n'), []);
   const handleOpen = useCallback(async () => {
     setVisible(true);
     setLoading(true);
@@ -35,17 +36,17 @@ const DDLButton = (props: IProps) => {
       const { tags, edges, indexes } = ddlMap;
       let content = `# Create Space \n${ddlMap.space.replace(/ON default_zone_(.*)+/gm, '')};\n${sleepGql}\nUSE ${handleKeyword(space)};`;
       if(tags.length) {
-        content += `\n\n# Create Tag: \n${tags.map(i => i.replaceAll('\n', '')).join(';\n')};`;
+        content += `\n\n# Create Tag: \n${handleJoinGQL(tags)};`;
       }
       if(edges.length) {  
-        content += `\n\n# Create Edge: \n${edges.map(i => i.replaceAll('\n', '')).join(';\n')};`;
+        content += `\n\n# Create Edge: \n${handleJoinGQL(edges)};`;
       }
 
       if(indexes.length) {
         if((tags.length || edges.length)) {
           content += `\n${sleepGql}`;
         }
-        content += `\n\n# Create Index: \n${indexes.map(i => i.replaceAll('\n', '')).join(';\n')};`;
+        content += `\n\n# Create Index: \n${handleJoinGQL(indexes)};`;
       }
       setDDL(content);
     }
