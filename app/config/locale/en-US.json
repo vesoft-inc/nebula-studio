@@ -259,7 +259,8 @@
     "getSchemaTip": "Because there is no strong binding relationship between tags and edges in the current NebulaGraph version, the results will be generated based on randomly obtained data, for reference only.",
     "danglingEdge": "Dangling edge",
     "showDDL": "View Schema DDL",
-    "downloadNGQL": "Download.nGQL"
+    "downloadNGQL": "Download.nGQL",
+    "getDDLError": "Failed to get the schema DDL, Please try again"
   },
   "empty": {
     "stats": "No Statistics Data",

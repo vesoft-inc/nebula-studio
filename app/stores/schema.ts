@@ -4,11 +4,12 @@ import { getRootStore } from '@app/stores';
 import { IAlterForm, IEdge, IIndexList, ISchemaType, ISpace, ITag, ITree, IndexType, ISchemaEnum } from '@app/interfaces/schema';
 import { handleKeyword, handleVidStringName, safeParse } from '@app/utils/function';
 import { findIndex } from 'lodash';
-
+import intl from 'react-intl-universal';
 import {
   getAlterGQL,
   getIndexCreateGQL,
 } from '@app/utils/gql';
+import { message } from 'antd';
 
 export class SchemaStore {
   spaces: string[] = [];
@@ -746,66 +747,62 @@ export class SchemaStore {
       edges: [],
       indexes: [],
     };
-    await this.switchSpace(space);
-    const spaceGql = await this.getSpaceCreateGQL(space);
-    ddlMap.space = spaceGql;
-    await this.switchSpace(space);
-    const tags = await this.getTags();
-    for await (const tag of tags) {
-      const gql = await this.getTagOrEdgeDetail(ISchemaEnum.Tag, tag);
-      gql && ddlMap.tags.push(gql);
+    try {
+      await this.switchSpace(space);
+      const spaceGql = await this.getSpaceCreateGQL(space);
+      ddlMap.space = spaceGql;
+      await this.switchSpace(space);
+      const tags = await this.getTags();
+      const edges = await this.getEdges();
+      const tagIndexes = await this.getIndexes(ISchemaEnum.Tag);
+      const edgeIndexes = await this.getIndexes(ISchemaEnum.Edge);
+      if(!tags || !edges || !tagIndexes || !edgeIndexes) {
+        throw new Error(intl.get('schema.getDDLError'));
+      }
+      const queryList = [
+        {
+          data: tags,
+          type: ISchemaEnum.Tag,
+          destination: ddlMap.tags,
+        },
+        {
+          data: edges,
+          type: ISchemaEnum.Edge,
+          destination: ddlMap.edges,
+        },
+        {
+          data: tagIndexes,
+          type: ISchemaEnum.Tag,
+          isIndex: true,
+          destination: ddlMap.indexes,
+        },
+        {
+          data: edgeIndexes,
+          type: ISchemaEnum.Edge,
+          isIndex: true,
+          destination: ddlMap.indexes,
+        },
+      ];
+      for await (const item of queryList) {
+        const { data, type, isIndex, destination } = item;
+        for await (const _item of data) {
+          if(isIndex) {
+            const gql = await this.getIndexGQL({ type, name: _item.name });
+            gql && destination.push(gql);
+          } else {
+            const gql = await this.getTagOrEdgeDetail(type, _item);
+            if(gql) {
+              destination.push(gql);
+            } else {
+              throw new Error(intl.get('schema.getDDLError'));
+            }
+          }
+        }
+      }
+      return ddlMap;
+    } catch (err) {
+      message.warning(err.toString());
     }
-    // tags.forEach(async tag => {
-    //   const gql = await this.getTagOrEdgeDetail(ISchemaEnum.Tag, tag);
-    //   gql && ddlMap.tags.push(gql);
-    // });
-    const edges = await this.getEdges();
-    for await (const edge of edges) {
-      const gql = await this.getTagOrEdgeDetail(ISchemaEnum.Edge, edge);
-      gql && ddlMap.edges.push(gql);
-    }
-    // edges.forEach(async edge => {
-    //   const gql = await this.getTagOrEdgeDetail(ISchemaEnum.Edge, edge);
-    //   gql && ddlMap.edges.push(gql);
-    // });
-    const tagIndexes = await this.getIndexes(ISchemaEnum.Tag);
-    for await (const index of tagIndexes) {
-      const gql = await this.getIndexGQL({ type: ISchemaEnum.Tag, name: index.name });
-      gql && ddlMap.indexes.push(gql);
-    }
-    // tagIndexes.forEach(async tagIndex => {
-    //   const gql = await this.getIndexGQL({ type: ISchemaEnum.Tag, name: tagIndex.name });
-    //   gql && ddlMap.indexes.push(gql);
-    // });
-    const edgeIndexes = await this.getIndexes(ISchemaEnum.Edge);
-    for await (const index of edgeIndexes) {
-      const gql = await this.getIndexGQL({ type: ISchemaEnum.Edge, name: index.name });
-      gql && ddlMap.indexes.push(gql);
-    }
-    // edgeIndexes.forEach(async edgeIndex => {
-    //   const gql = await this.getIndexGQL({ type: ISchemaEnum.Edge, name: edgeIndex.name });
-    //   gql && ddlMap.indexes.push(gql);
-    // });
-    // await Promise.all([
-    //   tags.map(async tag => {
-    //     const gql = await this.getTagOrEdgeDetail(ISchemaEnum.Tag, tag);
-    //     gql && ddlMap.tags.push(gql);
-    //   }),
-    //   edges.map(async edge => {
-    //     const gql = await this.getTagOrEdgeDetail(ISchemaEnum.Edge, edge);
-    //     gql && ddlMap.edges.push(gql);
-    //   }),
-    //   tagIndexes.map(async tagIndex => {
-    //     const gql = await this.getIndexGQL({ type: ISchemaEnum.Tag, name: tagIndex.name });
-    //     gql && ddlMap.indexes.push(gql);
-    //   }),
-    //   edgeIndexes.map(async edgeIndex => {
-    //     const gql = await this.getIndexGQL({ type: ISchemaEnum.Edge, name: edgeIndex.name });
-    //     gql && ddlMap.indexes.push(gql);
-    //   })
-    // ]);
-    console.log('ddlMap', ddlMap);
-    return ddlMap;
   };
 }
 

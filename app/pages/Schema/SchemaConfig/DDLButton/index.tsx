@@ -14,7 +14,12 @@ import styles from './index.module.less';
 interface IProps {
   space: string;
 }
-
+const options = {
+  keyMap: 'sublime',
+  fullScreen: true,
+  mode: 'nebula',
+  readOnly: true,
+};
 const sleepGql = `:sleep 20;`;
 const DDLButton = (props: IProps) => {
   const { space } = props;
@@ -22,12 +27,6 @@ const DDLButton = (props: IProps) => {
   const [loading, setLoading] = useState(false);
   const { schema: { getSchemaDDL } } = useStore();
   const [ddl, setDDL] = useState('');
-  const options = {
-    keyMap: 'sublime',
-    fullScreen: true,
-    mode: 'nebula',
-    readOnly: true,
-  };
   const handleOpen = useCallback(async () => {
     setVisible(true);
     setLoading(true);

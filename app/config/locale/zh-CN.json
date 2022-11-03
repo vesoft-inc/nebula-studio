@@ -259,7 +259,8 @@
     "getSchemaTip": "因为当前 NebulaGraph 版本下不存在点边的强绑定关系，结果将依据随机捞取到的数据生成，仅供参考。",
     "danglingEdge": "悬挂边",
     "showDDL": "查看 Schema DDL",
-    "downloadNGQL": "下载 .NGQL 文件"
+    "downloadNGQL": "下载 .NGQL 文件",
+    "getDDLError": "获取 Schema DDL 失败, 请重试"
   },
   "empty": {
     "stats": "暂无统计数据",
