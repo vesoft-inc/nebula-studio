@@ -111,7 +111,8 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
   }
   renderLine = (_instance, line, _element) => {
     const info = this.editor.lineInfo(line);
-    if(info?.text?.trim().startsWith('//')) {
+    const _text = info?.text?.trim();
+    if(_text?.startsWith('//') || _text?.startsWith('#')) {
       // will trigger error info in codemirror without setTimeout
       setTimeout(() => {
         this.editor.addLineClass(line, 'wrap', 'notes');
