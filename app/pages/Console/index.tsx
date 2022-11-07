@@ -83,7 +83,7 @@ const Console = (props: IProps) => {
   const handleRun = async () => {
     if(editor.current) {
       const value = editor.current!.editor.getValue();
-      const query = value.split('\n').filter(i => !i.trim().startsWith('//')).join('\n');
+      const query = value.split('\n').filter(i => !i.trim().startsWith('//') && !i.trim().startsWith('#')).join('\n');
       if (!query) {
         message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
         return;
