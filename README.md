@@ -1,7 +1,7 @@
 # NebulaGraph Studio
 
 <div align=center>
-  <img src="./app/static/images/logo_studio.svg" />
+  <img src="./readmeLogo.png" />
 </div>
 
 NebulaGraph Studio (Studio for short) is a web-based visualization tool for NebulaGraph. With Studio, you can create a graph schema, import data and edit nGQL statements for data queries.
