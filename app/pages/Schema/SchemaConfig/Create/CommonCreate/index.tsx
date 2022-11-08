@@ -53,7 +53,7 @@ const ConfigCreate = (props: IProps) => {
     setGql(currentGQL);
   };
   const handleCreate = async (values) => {
-    const { name, properties } = values;
+    const { properties } = values;
     const uniqProperties = uniqBy(properties, 'name');
     if (properties && properties.length !== uniqProperties.length) {
       return message.warning(intl.get('schema.uniqProperty'));
@@ -66,10 +66,7 @@ const ConfigCreate = (props: IProps) => {
     setLoading(false);
     if (res.code === 0) {
       message.success(intl.get('schema.createSuccess'));
-      history.push({
-        pathname: `/schema/${createType}/edit`,
-        state: { [createType]: name },
-      });
+      history.push(`/schema/${createType}/list`);
     }
   };
   return (
