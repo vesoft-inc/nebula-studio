@@ -709,7 +709,12 @@ export class SchemaStore {
   };
 
   getSchemaSnapshot = async (space) => {
-    const res = await service.getSchemaSnapshot(space);
+    const res = await service.getSchemaSnapshot(space, {
+      trackEventConfig: {
+        category: 'schema',
+        action: 'get_schema_visualization',
+      },
+    });
     return res;
   };
 
@@ -717,7 +722,12 @@ export class SchemaStore {
     space: string, 
     snapshot: string
   }) => {
-    const res = await service.updateSchemaSnapshot(params);
+    const res = await service.updateSchemaSnapshot(params, {
+      trackEventConfig: {
+        category: 'sketch',
+        action: 'refresh_schema_visualization',
+      },
+    });
     return res;
   };
 }

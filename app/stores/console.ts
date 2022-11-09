@@ -111,7 +111,12 @@ export class ConsoleStore {
     });
   };
   saveFavorite = async (content: string) => {
-    const res = await service.saveFavorite({ content });
+    const res = await service.saveFavorite({ content }, {
+      trackEventConfig: {
+        category: 'console',
+        action: 'save_favorite',
+      },
+    });
     if(res.code === 0) {
       message.success(intl.get('sketch.saveSuccess'));
     }
