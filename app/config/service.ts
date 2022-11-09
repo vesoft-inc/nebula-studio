@@ -50,28 +50,28 @@ const service = {
   uploadFiles: (params?, config?) => {
     put('/api/files')(params, { ...config, headers: { 'Content-Type': 'multipart/form-data' } });
   },
-  initSketch: (params) => {
-    return post(`/api/sketches/sketch`)(params);
+  initSketch: (params, config?) => {
+    return post(`/api/sketches/sketch`)(params, config);
   },
-  getSketchList: (params) => {
-    return get(`/api/sketches/list`)(params);
+  getSketchList: (params, config?) => {
+    return get(`/api/sketches/list`)(params, config);
   },
-  updateSketch: (params) => {
+  updateSketch: (params, config?) => {
     const { id, ...restParams } = params;
-    return put(`/api/sketches/${id}`)(restParams);
+    return put(`/api/sketches/${id}`)(restParams, config);
   },
-  deleteSketch: (id: string) => {
-    return _delete(`/api/sketches/${id}`)();
+  deleteSketch: (id: string, config?) => {
+    return _delete(`/api/sketches/${id}`)(undefined, config);
   },
-  getSchemaSnapshot: (space) => {
-    return get(`/api/schema/${encodeURIComponent(space)}/snapshot`)();
+  getSchemaSnapshot: (space, config?) => {
+    return get(`/api/schema/${encodeURIComponent(space)}/snapshot`)(undefined, config);
   },
-  updateSchemaSnapshot: (params) => {
+  updateSchemaSnapshot: (params, config?) => {
     const { space, ...restParams } = params;
-    return put(`/api/schema/${encodeURIComponent(space)}/snapshot`)(restParams);
+    return put(`/api/schema/${encodeURIComponent(space)}/snapshot`)(restParams, config);
   },
-  deleteFavorite: (id) => {
-    return _delete(`/api/favorites/${id}`)();
+  deleteFavorite: (id, config?) => {
+    return _delete(`/api/favorites/${id}`)(undefined, config);
   },
   deleteAllFavorites: () => {
     return _delete(`/api/favorites`)();
@@ -79,8 +79,8 @@ const service = {
   getFavoriteList: () => {
     return get(`/api/favorites/list`)();
   },
-  saveFavorite: (params) => {
-    return post(`/api/favorites`)(params);
+  saveFavorite: (params, config?) => {
+    return post(`/api/favorites`)(params, config);
   },
 };
 

@@ -5,6 +5,7 @@ import { useStore } from '@app/stores';
 import Icon from '@app/components/Icon';
 import intl from 'react-intl-universal';
 import domtoimage from 'dom-to-image';
+import { trackEvent } from '@app/utils/stat';
 import styles from './index.module.less';
 import SketchTitleInput from './SketchTitleInput';
 import ApplySpacePopover from './ApplySpacePopover';
@@ -72,6 +73,7 @@ const SketchConfigHeader: React.FC = () => {
   };
 
   const handleDownloadImg = async () => {
+    trackEvent('sketch', 'download_sketch_img');
     const url = await domtoimage.toPng(document.getElementById('sketchContainer'), { bgcolor: '#F8F8F8' });
     const a = document.createElement('a');
     a.href = url;
