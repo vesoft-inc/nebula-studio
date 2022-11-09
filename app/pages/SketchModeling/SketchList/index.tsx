@@ -26,20 +26,18 @@ const SketchList: React.FC = () => {
       }
       const isModified = checkModified();
       if(!isModified) {
-        // sketchModel.destroy();
         update({ currentSketch: list.items[0], active: null });
         return;
       }
     }
   }, []);
   const handleDelete = useCallback(async (id: string, e) => {
-    const { currentSketch, destroy } = sketchModel;
+    const { currentSketch } = sketchModel;
     e.stopPropagation();
     const result = await deleteSketch(id);
     if (result) {
       message.success(intl.get('common.deleteSuccess'));
       if(currentSketch?.id === id) {
-        // destroy();
         update({ currentSketch: null });
       }
       await getSketchList();
@@ -47,18 +45,15 @@ const SketchList: React.FC = () => {
   }, []);
 
   const handleSelect = useCallback((item: ISketch) => {
-    const { destroy } = sketchModel;
     if(item.id === sketchModel.currentSketch?.id) {
       return;
     }
     if (!sketchModel.currentSketch) {
-      // destroy();
       update({ currentSketch: item });
       return;
     }
     const isModified = checkModified();
     if(!isModified) {
-      // destroy();
       update({ currentSketch: item, active: null });
       return;
     }
@@ -67,7 +62,6 @@ const SketchList: React.FC = () => {
       okText: intl.get('common.confirm'),
       cancelText: intl.get('common.cancel'),
       onOk() {
-        // destroy();
         update({ currentSketch: item, active: null });
       },
       onCancel() {

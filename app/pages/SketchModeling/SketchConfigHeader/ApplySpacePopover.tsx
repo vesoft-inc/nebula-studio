@@ -10,6 +10,7 @@ import { getSpaceCreateGQL, getTagOrEdgeCreateGQL } from '@app/utils/gql';
 import { ISketchEdge, ISketchNode } from '@app/interfaces/sketch';
 import { useHistory } from 'react-router-dom';
 import { getVidType } from '@app/pages/Schema/SpaceCreate';
+import { trackEvent } from '@app/utils/stat';
 import styles from './index.module.less';
 
 const Option = Select.Option;
@@ -104,6 +105,7 @@ const PopoverContent = (props: IContentProps) => {
           return;
         }
         switchSpaceAndApply(values.name, schemaInfo);
+        trackEvent('sketch', 'apply_sketch');
       } else {
         const { space } = values;
         await updateSpaceInfo(space);
@@ -114,6 +116,7 @@ const PopoverContent = (props: IContentProps) => {
         }
         setLoading(true);
         batchApplySchema(schemaInfo);
+        trackEvent('sketch', 'batch_apply_sketch');
       }
     });
   }, [mode]);

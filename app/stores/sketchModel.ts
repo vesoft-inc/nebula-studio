@@ -14,6 +14,7 @@ import { ARROW_STYLE, LINE_STYLE, makeLineSort, NODE_RADIUS } from '@app/config/
 import { uniqBy } from 'lodash';
 import { MAX_COMMENT_BYTES } from '@app/utils/constant';
 import { getByteLength } from '@app/utils/function';
+import { trackEvent } from '@app/utils/stat';
 
 interface IHoveringItem {
   data: ISketchNode | ISketchEdge;
@@ -139,7 +140,12 @@ export class SketchStore {
       schema: '',
       snapshot: '',
     };
-    const { code, data } = await service.initSketch(initData);
+    const { code, data } = await service.initSketch(initData, {
+      trackEventConfig: {
+        category: 'sketch',
+        action: 'init_sketch',
+      },
+    });
     if (code === 0) {
       return data.id;
     }
@@ -147,7 +153,12 @@ export class SketchStore {
   };
 
   deleteSketch = async (id: string) => {
-    const { code } = await service.deleteSketch(id);
+    const { code } = await service.deleteSketch(id, {
+      trackEventConfig: {
+        category: 'sketch',
+        action: 'delete_sketch',
+      },
+    });
     return code === 0;
   };
 
@@ -160,7 +171,12 @@ export class SketchStore {
       snapshot,
       ...params,
     };
-    const { code } = await service.updateSketch(_params);
+    const { code } = await service.updateSketch(_params, {
+      trackEventConfig: {
+        category: 'sketch',
+        action: 'update_sketch',
+      },
+    });
     if(code === 0) {
       runInAction(() => {
         const item = this.sketchList.items.find(item => item.id === id);
@@ -184,7 +200,12 @@ export class SketchStore {
     };
     const newFilter = { keyword: params?.keyword ?? filter.keyword };
     this.update({ loading: true });
-    const res = await service.getSketchList(_params);
+    const res = await service.getSketchList(_params, {
+      trackEventConfig: {
+        category: 'sketch',
+        action: 'get_sketch_list',
+      },
+    });
     this.update({ loading: false });
     if (res.code === 0) {
       const sketchList = { ...res.data, filter: newFilter };
@@ -249,6 +270,7 @@ export class SketchStore {
         this.update({ active: line.data });
         this.clearActive();
         this.editor.graph.line.setActiveLine(line);
+        trackEvent('sketch', 'add_line');
       });
       this.editor.graph.on('paper:click', () => {
         this.update({ active: undefined });
@@ -266,6 +288,7 @@ export class SketchStore {
           param.hoveringItem = undefined;
         }
         this.update(param);
+        trackEvent('sketch', 'remove_node');
       });
       this.editor.graph.on('line:remove', ({ line }) => {
         const data = this.editor.schema.getData();
@@ -276,6 +299,7 @@ export class SketchStore {
           param.hoveringItem = undefined;
         }
         this.update(param);
+        trackEvent('sketch', 'remove_line');
       });
     }
   };
@@ -306,6 +330,7 @@ export class SketchStore {
       };
       this.editor.graph.node.addNode(node);
       this.draggingNewTag = undefined;
+      trackEvent('sketch', 'add_node');
     }
   };
 
@@ -319,6 +344,7 @@ export class SketchStore {
 
   duplicateNode = () => {
     const { x, y, name, ...others } = this.active as ISketchNode;
+    trackEvent('sketch', 'duplicate_node');
     this.editor.graph.node.addNode({
       ...others,
       x: x + 40,
