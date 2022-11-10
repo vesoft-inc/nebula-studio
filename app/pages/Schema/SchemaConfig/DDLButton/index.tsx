@@ -92,6 +92,7 @@ const DDLButton = (props: IProps) => {
             <Button
               key="confirm"
               type="primary"
+              disabled={!ddl}
               onClick={handleDownload}
             >
               {intl.get('schema.downloadNGQL')}
@@ -101,7 +102,7 @@ const DDLButton = (props: IProps) => {
       >
         <Spin spinning={loading}>
           {!loading && <div className={styles.modalItem}>
-            <CopyToClipboard key={1} text={ddl} onCopy={handleCopy}>
+            <CopyToClipboard key={1} text={ddl} onCopy={handleCopy} disabled={!ddl}>
               <Button className={styles.duplicateBtn} key="confirm" icon={<Icon type="icon-Duplicate" />}>
                 {intl.get('common.duplicate')}
               </Button>

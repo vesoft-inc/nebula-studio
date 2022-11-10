@@ -11,6 +11,18 @@ import {
 } from '@app/utils/gql';
 import { message } from 'antd';
 
+const initialSchemaData = {
+  edgeTypes: [],
+  tagsFields: [],
+  edgesFields: [],
+  indexes: [],
+  tags: [],
+  tagIndexTree: [],
+  edgeIndexTree: [],
+  tagList: [],
+  edgeList: [],
+  indexList: [],
+};
 export class SchemaStore {
   spaces: string[] = [];
   currentSpace: string = sessionStorage.getItem('currentSpace') || '';
@@ -59,6 +71,7 @@ export class SchemaStore {
     this.update({
       currentSpace: '',
       spaces: [],
+      ...initialSchemaData,
     });
     sessionStorage.removeItem('currentSpace');
   };
@@ -94,6 +107,7 @@ export class SchemaStore {
     if (code === 0) {
       this.update({
         currentSpace: space,
+        ...initialSchemaData
       });
       sessionStorage.setItem('currentSpace', space);
       this.updateVidType(space);
@@ -758,7 +772,10 @@ export class SchemaStore {
       indexes: [],
     };
     try {
-      await this.switchSpace(space);
+      const errMsg = await this.switchSpace(space);
+      if(errMsg) {
+        throw new Error(errMsg);
+      }
       const spaceGql = await this.getSpaceCreateGQL(space);
       ddlMap.space = spaceGql;
       await this.switchSpace(space);
