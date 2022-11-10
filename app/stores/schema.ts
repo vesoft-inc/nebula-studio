@@ -22,7 +22,7 @@ const initialSchemaData = {
   tagList: [],
   edgeList: [],
   indexList: [],
-};
+} as Partial<SchemaStore>;
 export class SchemaStore {
   spaces: string[] = [];
   currentSpace: string = sessionStorage.getItem('currentSpace') || '';
