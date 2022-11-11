@@ -211,6 +211,4 @@ export const EXPLAIN_DATA_TYPE = [
 
 export const MAX_COMMENT_BYTES = 256;
 
-export const NAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_]*$/;
-
 export const POSITIVE_INTEGER_REGEX = /^[1-9]\d*$/g;
