@@ -6,7 +6,7 @@ import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
 import { getSpaceCreateGQL } from '@app/utils/gql';
 import GQLCodeMirror from '@app/components/GQLCodeMirror';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import cls from 'classnames';
 import { useHistory } from 'react-router-dom';
 import Cookie from 'js-cookie';
@@ -35,6 +35,7 @@ const formItemLayout = {
 const SpaceCreate = () => {
   const [form] = Form.useForm();
   const { schema } = useStore();
+  const { intl } = useI18n();
   const { createSpace, getMachineNumber, activeMachineNum } = schema;
   const history = useHistory();
   const [loading, setLoading] = useState(false);

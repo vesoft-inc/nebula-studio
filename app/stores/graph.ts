@@ -1,7 +1,7 @@
 import { LinkObject, NodeObject } from '@vesoft-inc/force-graph';
 import { action, isObservableSet, makeAutoObservable, observable } from 'mobx';
 import { message } from 'antd';
-import intl from 'react-intl-universal';
+import { getI18n } from '@vesoft-inc/i18n';
 import { groupBy, uniqBy, xor } from 'lodash';
 import { getBidrectVertexIds, getTagData, whichColor } from '@app/utils/parseData';
 import { convertBigNumberToString, handleVidStringName } from '@app/utils/function';
@@ -11,6 +11,8 @@ import { makeRoundPosition, updateEdgeMap, updateTagMap } from '@app/config/expl
 import TwoGraph from './twoGraph';
 import { getRootStore } from '.';
 const excludesProperty = ['twoGraph', 'graph', 'canvas', 'width', 'height', 'loading'];
+const { intl } = getI18n();
+
 export class GraphStore {
   nowDataMap: IDataMap = {};
   nodes = observable.set([] as NodeObject[], { deep: false });

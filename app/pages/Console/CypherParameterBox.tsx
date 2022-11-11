@@ -1,6 +1,6 @@
 import { Tooltip } from 'antd';
 import React, { useState } from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import Icon from '@app/components/Icon';
 import styles from './index.module.less';
 
@@ -11,7 +11,7 @@ interface IProps {
 const CypherParameterBox = (props: IProps) => {
   const { data, onSelect } = props;
   const [paramVisible, setParamVisible] = useState(false);
-
+  const { intl } = useI18n();
   if(!paramVisible) {
     return <div className={styles.btnOpenParam} onClick={() => setParamVisible(true)}>
       <Icon type="icon-studio-btn-down" />

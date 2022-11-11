@@ -1,13 +1,11 @@
 import { Button, Modal, Tabs } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
-import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';
 import { useStore } from '@app/stores';
 import { ITaskStatus } from '@app/interfaces/import';
 import classnames from 'classnames';
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
-
-const { TabPane } = Tabs;
 
 interface ILogDimension {
   space: string;
@@ -27,6 +25,7 @@ let isMounted = true;
 const LogModal = (props: IProps) => {
   const { visible, onCancel, showLogDownload, logDimension: { space, id, status } } = props;
   const { dataImport: { getLogs, downloadTaskLog, getLogDetail } } = useStore();
+  const { intl } = useI18n();
   const logRef = useRef<HTMLDivElement>(null);
   const timer = useRef<any>(null);
   const offset = useRef(0);

@@ -1,6 +1,5 @@
 import { message } from 'antd';
 import _ from 'lodash';
-import intl from 'react-intl-universal';
 
 import { handleEscape } from './function';
 

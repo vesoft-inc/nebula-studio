@@ -1,9 +1,9 @@
 import { Button, Checkbox, Col, Form, Modal, Row, message } from 'antd';
 import React, { useEffect, useState } from 'react';
-import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
 import { AlterType, IAlterForm, IProperty, ISchemaType } from '@app/interfaces/schema';
+import { useI18n } from '@vesoft-inc/i18n';
 import { DisplayRow, EditRow } from './PropertiesRow';
 import styles from './index.module.less';
 const confirm = Modal.confirm;
@@ -34,6 +34,7 @@ const PropertiesForm = (props: IProps) => {
     editDisabled,
     onEdit, 
     onBeforeEdit } = props;
+  const { intl } = useI18n();
   const [list, setList] = useState<IProperty[]>(properties);
   const [editField, setEditField] = useState<IEditProperty | null>(null);
   const [editRow, setEditRow] = useState<number | null>(null);

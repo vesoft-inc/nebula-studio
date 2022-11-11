@@ -1,6 +1,5 @@
 import { Button, Col, Form, Input, Row, message } from 'antd';
 import React, { useState, useEffect } from 'react';
-import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { nameRulesFn, stringByteRulesFn } from '@app/config/rules';
 import { useHistory } from 'react-router-dom';
@@ -10,6 +9,7 @@ import { getTagOrEdgeCreateGQL } from '@app/utils/gql';
 import { useStore } from '@app/stores';
 import { ISchemaType } from '@app/interfaces/schema';
 import { trackPageView } from '@app/utils/stat';
+import { useI18n } from '@vesoft-inc/i18n';
 import PropertiesForm from './PropertiesForm';
 import TTLForm from './TTLForm';
 import styles from './index.module.less';
@@ -25,11 +25,11 @@ const formItemLayout = {
 
 interface IProps {
   createType: ISchemaType,
-  locale: string
 }
 const ConfigCreate = (props: IProps) => {
   const { createType } = props;
   const history = useHistory();
+  const { intl } = useI18n();
   const [loading, setLoading] = useState(false);
   const { schema: { createTagOrEdge } } = useStore();
   const [gql, setGql] = useState('');

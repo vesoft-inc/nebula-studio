@@ -1,11 +1,11 @@
 import { Button, Checkbox, Popconfirm, Table, Upload } from 'antd';
 import React from 'react';
-import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';
 import CSVPreviewLink from '@app/components/CSVPreviewLink';
 import { getFileSize } from '@app/utils/file';
 import cls from 'classnames';
 import { StudioFile } from '@app/interfaces/import';
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 interface IProps {
   fileList: any[];
@@ -15,6 +15,7 @@ interface IProps {
 }
 const FileList = (props: IProps) => {
   const { onDelete, fileList, onUpload, loading } = props;
+  const { intl } = useI18n();
   const columns = [
     {
       title: intl.get('import.fileName'),

@@ -1,7 +1,7 @@
 import { Button, message } from 'antd';
 import dayjs from 'dayjs';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
@@ -12,6 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ARROW_STYLE, LINE_STYLE, NODE_RADIUS, COLOR_LIST, makeLineSort } from '@app/config/sketch';
 import ZoomBtns from '@app/pages/SketchModeling/ZoomBtns';
 import { initTooltip } from '@app/pages/SketchModeling/Plugins/Tooltip';
+import { ISketchNode } from '@app/interfaces/sketch';
 import styles from './index.module.less';
 
 const NODE_CONFIG = {
@@ -29,6 +30,7 @@ const DANLEING_NODE_CONFIG = {
 };
 const SchemaVisualization = () => {
   const editorRef = useRef();
+  const { intl } = useI18n();
   const { schema, sketchModel } = useStore();
   const { initEditor } = sketchModel;
   const { currentSpace, getSchemaSnapshot, getTagList, getEdgeList, getRandomEdgeData, getNodeTagMap, updateSchemaSnapshot } = schema;
@@ -71,7 +73,7 @@ const SchemaVisualization = () => {
           uuid: uuidv4(),
           strokeColor: color.strokeColor,
           fill: color.fill,
-        };
+        } as Partial<ISketchNode>;
       });
       let lines = [];
       edges.forEach(line => {
@@ -142,7 +144,7 @@ const SchemaVisualization = () => {
           ...DANLEING_NODE_CONFIG,
           vid,
           uuid: uuidv4(),
-        }));
+        } as Partial<ISketchNode>));
         lines.push({
           from: src,
           to: dst,

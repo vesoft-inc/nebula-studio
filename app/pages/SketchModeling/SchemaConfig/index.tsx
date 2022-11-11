@@ -1,6 +1,6 @@
 import Icon from '@app/components/Icon';
 import { Button, Form, Input } from 'antd';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import { useStore } from '@app/stores';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect } from 'react';
@@ -14,6 +14,7 @@ let flag = false;
 
 const SchemaConfig: React.FC = () => {
   const { sketchModel } = useStore();
+  const { intl } = useI18n();
   const { active, updateItem, deleteElement, duplicateNode } = sketchModel;
   const [form] = Form.useForm();
   const update = useCallback((data) => {

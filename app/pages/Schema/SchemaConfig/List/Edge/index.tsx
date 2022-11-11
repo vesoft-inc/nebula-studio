@@ -1,6 +1,6 @@
 import { Button, Popconfirm, Table, message } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import { Link } from 'react-router-dom';
 import Icon from '@app/components/Icon';
 import { observer } from 'mobx-react-lite';
@@ -11,7 +11,7 @@ import Cookie from 'js-cookie';
 import CommonLayout from '../CommonLayout';
 import styles from '../CommonLayout/index.module.less';
 
-function renderEdgeInfo(edge: IEdge) {
+function renderEdgeInfo(edge: IEdge, intl) {
   const fieldsColumn = [
     {
       title: intl.get('common.propertyName'),
@@ -48,6 +48,7 @@ function renderEdgeInfo(edge: IEdge) {
 const EdgeList = () => {
   const { schema: { edgeList, deleteEdge, getEdgeList, currentSpace } } = useStore();
   const [searchVal, setSearchVal] = useState('');
+  const { intl } = useI18n();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const getData = async () => {

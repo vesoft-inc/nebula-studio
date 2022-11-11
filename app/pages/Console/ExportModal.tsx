@@ -1,9 +1,9 @@
 import { Button, Form, Input, Modal, Radio, Select } from 'antd';
 import React from 'react';
-import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 const Option = Select.Option;
 
@@ -26,6 +26,7 @@ const ExportModal = (props: IProps) => {
   const { data, visible, onClose, onExplorer } = props;
   const { schema: { currentSpace } } = useStore();
   const { headers, tables } = data;
+  const { intl } = useI18n();
   const handleExport = (values) => {
     const { type, vertexId, srcId, dstId, edgeType, rank } = values;
     const vertexes =

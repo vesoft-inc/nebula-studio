@@ -1,9 +1,9 @@
 import { Radio } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Route, useHistory, useLocation } from 'react-router-dom';
-import intl from 'react-intl-universal';
 import { trackPageView } from '@app/utils/stat';
 import cls from 'classnames';
+import { useI18n } from '@vesoft-inc/i18n';
 import FileUpload from './FileUpload';
 import styles from './index.module.less';
 import TaskList from './TaskList';
@@ -18,6 +18,7 @@ const Import = (props: IProps) => {
   const history = useHistory();
   const location = useLocation();
   const [tab, setTab] = useState('files');
+  const { intl } = useI18n();
   const { showConfigDownload, showLogDownload, showTemplateModal } = props;
   useEffect(() => {
     trackPageView('/import');

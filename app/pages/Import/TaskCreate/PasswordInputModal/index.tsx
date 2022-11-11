@@ -1,6 +1,6 @@
+import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Input, Modal } from 'antd';
 import React, { useState } from 'react';
-import intl from 'react-intl-universal';
 
 import styles from './index.module.less';
 interface IProps {
@@ -11,6 +11,7 @@ interface IProps {
 const PasswordInputModal = (props: IProps) => {
   const [password, setPassword] = useState('');
   const { visible, onConfirm, onCancel } = props;
+  const { intl } = useI18n();
   const handleConfirm = (password?: string) => {
     onConfirm(password);
     setPassword('');

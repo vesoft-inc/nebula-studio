@@ -2,7 +2,7 @@ import Icon from '@app/components/Icon';
 import { Button, Input, Popconfirm, Modal, message } from 'antd';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect } from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import cls from 'classnames';
 import { useStore } from '@app/stores';
 import { ISketch } from '@app/interfaces/sketch';
@@ -14,6 +14,7 @@ const { confirm } = Modal;
 
 const SketchList: React.FC = () => {
   const { sketchModel } = useStore();
+  const { intl } = useI18n();
   const { sketchList, initSketch, deleteSketch, getSketchList, currentSketch, update, checkModified } = sketchModel;
   const handleAdd = useCallback(async (noTip?: boolean) => {
     const id = await initSketch();

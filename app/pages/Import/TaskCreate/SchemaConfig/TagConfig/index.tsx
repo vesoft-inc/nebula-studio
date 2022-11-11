@@ -1,11 +1,11 @@
 import { Select, Table, Tooltip } from 'antd';
 import React from 'react';
-import intl from 'react-intl-universal';
 import { CloseOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import CSVPreviewLink from '@app/components/CSVPreviewLink';
 import classNames from 'classnames';
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from '../index.module.less';
 
 const Option = Select.Option;
@@ -21,7 +21,7 @@ const VerticesConfig = (props: IProps) => {
   const { dataImport, schema } = useStore();
   const { updateTagConfig, updateTagPropMapping } = dataImport;
   const { tags } = schema;
-
+  const { intl } = useI18n();
   const handleTagChange = (configIndex: number, tagIndex: number, value: string) => {
     updateTagConfig({ configIndex, tagIndex, tag: value });
   };

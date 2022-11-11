@@ -1,6 +1,6 @@
 import { Button, Checkbox, Col, Form, Input, Modal, Popconfirm, Row, Select, message } from 'antd';
 import React, { useEffect, useState } from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import { observer } from 'mobx-react-lite';
 import { IAlterForm, IProperty, ISchemaType } from '@app/interfaces/schema';
 
@@ -49,7 +49,7 @@ const formRef = ((props: IProps) => {
   const [isEdit, setIsEdit] = useState(false);
   const [ttlOptions, setTtlOptions] = useState<IProperty[]>([]);
   const [form] = Form.useForm();
-
+  const { intl } = useI18n();
   useEffect(() => {
     setTtlRequired(initialRequired);
   }, [initialRequired]);

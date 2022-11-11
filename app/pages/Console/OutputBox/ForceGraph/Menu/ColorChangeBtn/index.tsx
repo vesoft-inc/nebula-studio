@@ -1,9 +1,9 @@
 import React from 'react';
-import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import MenuButton from '@app/components/Button';
 import { uniq } from 'lodash';
 import { GraphStore } from '@app/stores/graph';
+import { useI18n } from '@vesoft-inc/i18n';
 import NodeStyleSetBtn from '../NodeStyleSetBtn';
 
 interface IProps {
@@ -15,7 +15,7 @@ const DEFAULT_CONFIG = ['#ece9e8'];
 const ColorChangeBtn: React.FC<IProps> = (props: IProps) => {
   const { onClose, graph } = props;
   const { nodesSelected } = graph;
-
+  const { intl } = useI18n();
   const handleUpdateVertex = (value, nodesSelected, type) => {
     nodesSelected.forEach(vertex => {
       vertex[type] = value;

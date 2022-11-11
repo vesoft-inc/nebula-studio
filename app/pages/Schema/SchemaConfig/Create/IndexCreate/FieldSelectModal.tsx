@@ -1,12 +1,12 @@
 import { Button, Input, Modal, Select, message } from 'antd';
 import React, { useState } from 'react';
-import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { IField } from '@app/interfaces/schema';
 import { POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
 import Instruction from '@app/components/Instruction';
 const Option = Select.Option;
 
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 
 interface IProps {
@@ -23,6 +23,7 @@ const FieldSelectModal = (props: IProps) => {
   const { source, onAddField, onClose, visible } = props;
   const [selectedField, setSelectedField] = useState<IField | null>(null);
   const [indexLength, setIndexLength] = useState('');
+  const { intl } = useI18n();
   const handleFieldAdd = () => {
     if (
       selectedField?.Type === 'string' &&

@@ -1,7 +1,7 @@
 import { Button, Table, message } from 'antd';
 import dayjs from 'dayjs';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { IJobStatus } from '@app/interfaces/schema';
@@ -12,6 +12,7 @@ import styles from './index.module.less';
 
 const SpaceStats = () => {
   const timer = useRef<NodeJS.Timeout | null>(null);
+  const { intl } = useI18n();
   const { schema: { getJobStatus, submitStats, getStats, currentSpace } } = useStore();
   const [data, setData] = useState([]);
   const [updateTime, setUpdateTime] = useState('');

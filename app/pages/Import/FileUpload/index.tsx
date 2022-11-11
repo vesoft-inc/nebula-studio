@@ -4,12 +4,13 @@ import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
 import { debounce } from 'lodash';
 import { message } from 'antd';
-import intl from 'react-intl-universal';
 import { StudioFile } from '@app/interfaces/import';
+import { useI18n } from '@vesoft-inc/i18n';
 import FileList from './FileList';
 
 const FileUpload = () => {
   const { files } = useStore();
+  const { intl } = useI18n();
   const { fileList, deleteFile, getFiles, uploadFile } = files;
   const [loading, setLoading] = useState(false);
   const transformFile = async (_file: StudioFile, fileList: StudioFile[]) => {

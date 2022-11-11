@@ -1,6 +1,6 @@
 import { Button, Table } from 'antd';
 import React, { useState } from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
@@ -14,7 +14,7 @@ interface IProps {
   data: any;
   columns: any;
   loading: boolean;
-  renderExpandInfo: (record) => any;
+  renderExpandInfo: (record, intl) => any;
   children?: any;
   type: string;
   indexType?: IndexType;
@@ -22,6 +22,7 @@ interface IProps {
 const CommonLayout = (props: IProps) => {
   const { onSearch, data, columns, loading, renderExpandInfo, children, type, indexType } = props;
   const [expandKeys, setExpandKeys] = useState<any[]>([]);
+  const { intl } = useI18n();
   const handleRowClick = row => {
     const { name: key } = row;
     const keys = expandKeys.includes(key) ? [] : [key];
@@ -47,7 +48,7 @@ const CommonLayout = (props: IProps) => {
         dataSource={data}
         columns={columns}
         expandable={{
-          expandedRowRender: record => renderExpandInfo(record),
+          expandedRowRender: record => renderExpandInfo(record, intl),
           expandRowByClick: true,
           expandedRowKeys: expandKeys,
           onExpand: (_, record) => handleRowClick(record)

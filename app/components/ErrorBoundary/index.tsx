@@ -1,6 +1,6 @@
 import React from 'react';
 import errorImg from '@app/static/images/errorBoundary.png';
-import intl from 'react-intl-universal';
+import { I18nContext } from '@vesoft-inc/i18n';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Button, message } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
@@ -17,6 +17,7 @@ class ErrorBoundary extends React.PureComponent<IProps, IState> {
       errInfo: null,
     };
   }
+  static contextType = I18nContext;
   componentDidCatch(error) {
     this.setState({
       errInfo: error?.stack?.toString(),
@@ -31,11 +32,13 @@ class ErrorBoundary extends React.PureComponent<IProps, IState> {
   }
 
   handleCopy = () => {
+    const { intl } = this.context;
     message.success(intl.get('common.copySuccess'));
   };
 
   render() {
     const { errInfo } = this.state;
+    const { intl } = this.context;
     if(!errInfo) return this.props.children;
     return <div className={styles.errPage}>
       <img src={errorImg} className={styles.errImg} />

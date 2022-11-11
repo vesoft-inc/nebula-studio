@@ -1,6 +1,5 @@
 import { Button, Select, Tooltip, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
-import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { trackEvent, trackPageView } from '@app/utils/stat';
 import { useStore } from '@app/stores';
@@ -9,6 +8,7 @@ import Icon from '@app/components/Icon';
 import CodeMirror from '@app/components/CodeMirror';
 import { maxLineNum } from '@app/config/nebulaQL';
 import classnames from 'classnames';
+import { useI18n } from '@vesoft-inc/i18n';
 import OutputBox from './OutputBox';
 import HistoryBtn from './HistoryBtn';
 import FavoriteBtn from './FavoriteBtn';
@@ -38,6 +38,7 @@ interface IProps {
 }
 const Console = (props: IProps) => {
   const { schema, console } = useStore();
+  const { intl } = useI18n();
   const { onExplorer, templateRender } = props;
   const { spaces, getSpaces, switchSpace, currentSpace, spaceVidType, updateVidType } = schema;
   const { runGQL, currentGQL, results, runGQLLoading, getParams, update, paramsMap, getFavoriteList } = console;

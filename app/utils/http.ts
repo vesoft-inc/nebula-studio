@@ -1,7 +1,7 @@
 import { message } from 'antd';
 import axios from 'axios';
 import JSONBigint from 'json-bigint';
-import intl from 'react-intl-universal';
+import { getI18n } from '@vesoft-inc/i18n';
 
 import { getRootStore } from '@app/stores';
 import { trackEvent } from './stat';
@@ -17,6 +17,8 @@ export enum HttpResCode {
   ErrNotImplemented = 50104000,
   ErrUnknown = 90004000,
 }
+
+const { intl } = getI18n();
 
 const service = axios.create({
   transformResponse: [

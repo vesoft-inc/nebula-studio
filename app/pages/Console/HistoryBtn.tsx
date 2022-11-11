@@ -1,7 +1,7 @@
 import { Button, List, Modal, Tooltip } from 'antd';
 import React, { useState } from 'react';
-import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 
 
@@ -12,6 +12,7 @@ const HistoryBtn = (props: IProps) => {
   const { onGqlSelect } = props;
   const [visible, setVisible] = useState(false);
   const [data, setData] = useState([]);
+  const { intl } = useI18n();
   const handleView = () => {
     const data = getHistory();
     setData(data);

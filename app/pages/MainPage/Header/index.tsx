@@ -1,12 +1,11 @@
-import React, { useMemo, useEffect, useState, useContext } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { Layout, Menu } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
-import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import logo from '@app/static/images/logo_studio.svg';
-import { LanguageContext } from '@app/context';
+import { useI18n } from '@vesoft-inc/i18n';
 import HelpMenu from './HelpMenu';
 import styles from './index.module.less';
 const { Header } = Layout;
@@ -29,7 +28,7 @@ interface IProps {
 
 const PageHeader = (props: IProps) => {
   const { menus } = props;
-  const { currentLocale } = useContext(LanguageContext);
+  const { intl, currentLocale } = useI18n();
   const [activeKey, setActiveKey] = useState<string>('');
   const { global: { username, host } } = useStore();
   const { pathname } = useLocation();

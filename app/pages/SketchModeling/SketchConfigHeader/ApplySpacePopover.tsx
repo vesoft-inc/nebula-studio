@@ -1,7 +1,7 @@
 import { Popover, Radio, Button, Form, Select, message } from 'antd';
 import React, { useCallback, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import CreateForm from '@app/pages/Schema/SpaceCreate/CreateForm';
 import { useStore } from '@app/stores';
 import { ExclamationCircleTwoTone } from '@ant-design/icons';
@@ -55,6 +55,7 @@ const getCreateGql = (data: ISketchNode | ISketchEdge) => {
 
 const PopoverContent = (props: IContentProps) => {
   const { close } = props;
+  const { intl } = useI18n();
   const [mode, setMode] = useState('create' as 'create' | 'apply');
   const [spaces, setSpaces] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -227,6 +228,7 @@ export default observer(function ApplySpacePopover() {
   const [disabled, setDisable] = useState(false);
   const close = useCallback(() => setOpen(false), []);
   const { sketchModel } = useStore();
+  const { intl } = useI18n();
   const handleOpen = () => {
     const isModified = sketchModel.checkModified();
     if (isModified) {

@@ -1,6 +1,6 @@
 import { Input } from 'antd';
 import React, { useCallback, useEffect, useState } from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import { SearchOutlined } from '@ant-design/icons';
 import { useLocation } from 'react-router-dom';
 
@@ -14,6 +14,7 @@ interface IProps {
 
 const Search = (props: IProps) => {
   const { onSearch, type } = props;
+  const { intl } = useI18n();
   const location = useLocation();
   const [value, setValue] = useState('');
   useEffect(() => {

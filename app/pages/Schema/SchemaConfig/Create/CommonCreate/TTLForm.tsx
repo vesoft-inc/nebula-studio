@@ -1,9 +1,9 @@
 import { Checkbox, Col, Form, Input, Row, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import React from 'react';
-import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 const Option = Select.Option;
 
@@ -23,6 +23,7 @@ interface IProps {
 
 const formRef = ((props: IProps) => {
   const { formRef, onUpdate } = props;
+  const { intl } = useI18n();
   const handleClearTtl = e => {
     if(!e.target.checked) {
       formRef.resetFields(['ttl_col', '']);

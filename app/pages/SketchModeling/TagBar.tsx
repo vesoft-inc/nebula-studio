@@ -6,11 +6,12 @@ import { Tooltip } from 'antd';
 import cls from 'classnames';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback } from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 
 const TagBar: React.FC = () => {
   const { sketchModel } = useStore();
+  const { intl } = useI18n();
   const { draggingNewTag, draggingPosition, addNode, active } = sketchModel;
   const onDrag = (e: React.MouseEvent, item) => {
     e.preventDefault();

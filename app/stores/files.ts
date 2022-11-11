@@ -1,8 +1,9 @@
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import service from '@app/config/service';
 import { message } from 'antd';
-import intl from 'react-intl-universal';
+import { getI18n } from '@vesoft-inc/i18n';
 import { StudioFile } from '@app/interfaces/import';
+const { intl } = getI18n();
 
 export class FilesStore {
   fileList: any[] = [];

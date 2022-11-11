@@ -1,10 +1,10 @@
 import { Button, Form, Popover, Select } from 'antd';
 import React, { useState } from 'react';
-import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { v4 as uuidv4 } from 'uuid';
 import Icon from '@app/components/Icon';
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 
 const Option = Select.Option;
@@ -19,6 +19,7 @@ const FileSelect = (props: IProps) => {
   const { files, dataImport: { update, verticesConfig, edgesConfig } } = useStore();
   const { fileList, getFiles } = files;
   const [visible, setVisible] = useState(false);
+  const { intl } = useI18n();
   const onFinish = (value) => {
     const file = fileList.filter(item => item.name === value.name)[0];
     if(type === 'vertices') {

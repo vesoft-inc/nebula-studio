@@ -4,12 +4,14 @@ import { getRootStore } from '@app/stores';
 import { IAlterForm, IEdge, IIndexList, ISchemaType, ISpace, ITag, ITree, IndexType, ISchemaEnum } from '@app/interfaces/schema';
 import { handleKeyword, handleVidStringName, safeParse } from '@app/utils/function';
 import { findIndex } from 'lodash';
-import intl from 'react-intl-universal';
+import { getI18n } from '@vesoft-inc/i18n';
 import {
   getAlterGQL,
   getIndexCreateGQL,
 } from '@app/utils/gql';
 import { message } from 'antd';
+const { intl } = getI18n();
+
 
 const initialSchemaData = {
   edgeTypes: [],

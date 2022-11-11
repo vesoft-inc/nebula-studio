@@ -1,7 +1,7 @@
 import { Button, Col, Form, Input, Row, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import React from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import { observer } from 'mobx-react-lite';
 import { nameRulesFn, numberRulesFn } from '@app/config/rules';
 import Icon from '@app/components/Icon';
@@ -22,6 +22,7 @@ interface IProps {
 
 const PropertiesForm = (props: IProps) => {
   const { formRef } = props;
+  const { intl } = useI18n();
   const handlePropertyAdd = (callback) => {
     const properties = formRef.getFieldValue('properties');
     if (properties && properties.length > 0) {
@@ -132,7 +133,7 @@ const PropertiesForm = (props: IProps) => {
                                     className={styles.itemStringLength}
                                     name={[name, 'fixedLength']}
                                     rules={[
-                                      ...numberRulesFn(intl),
+                                      ...numberRulesFn(),
                                       {
                                         required: true,
                                         message: intl.get('formRules.numberRequired'),

@@ -1,13 +1,13 @@
 import { Button, Col, Form, Input, Row, Select, message } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Breadcrumb from '@app/components/Breadcrumb';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
-import intl from 'react-intl-universal';
 import cls from 'classnames';
 import { useHistory } from 'react-router-dom';
 import { POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 import PasswordInputModal from './PasswordInputModal';
 import SchemaConfig from './SchemaConfig';
@@ -27,6 +27,7 @@ interface IProps {
 }
 const TaskCreate = (props: IProps) => {
   const { dataImport, schema, files } = useStore();
+  const { intl, currentLocale } = useI18n();
   const { basicConfig, verticesConfig, edgesConfig, updateBasicConfig, importTask } = dataImport;
   const { spaces, getSpaces, updateSpaceInfo, currentSpace } = schema;
   const { getFiles } = files;
@@ -35,7 +36,7 @@ const TaskCreate = (props: IProps) => {
   const history = useHistory();
   const { needPwdConfirm = true } = props;
   const [loading, setLoading] = useState(false);
-  const routes = [
+  const routes = useMemo(() => ([
     {
       path: '/import/tasks',
       breadcrumbName: intl.get('import.taskList'),
@@ -44,7 +45,7 @@ const TaskCreate = (props: IProps) => {
       path: '#',
       breadcrumbName: intl.get('import.createTask'),
     },
-  ];
+  ]), [currentLocale]);
 
   const checkConfig = () => {
     try {

@@ -2,7 +2,9 @@ import { action, makeAutoObservable, observable } from 'mobx';
 import service from '@app/config/service';
 import { v4 as uuidv4 } from 'uuid';
 import { message } from 'antd';
-import intl from 'react-intl-universal';
+import { getI18n } from '@vesoft-inc/i18n';
+
+const { intl } = getI18n();
 
 export const splitQuery = (query: string) => {
   const _query = query.split('\n');
@@ -121,7 +123,7 @@ export class ConsoleStore {
       message.success(intl.get('sketch.saveSuccess'));
     }
   };
-  deleteFavorite = async (id?: number) => {
+  deleteFavorite = async (id?: string) => {
     const res = id !== undefined ? await service.deleteFavorite(id) : await service.deleteAllFavorites();
     if(res.code === 0) {
       message.success(intl.get('common.deleteSuccess'));

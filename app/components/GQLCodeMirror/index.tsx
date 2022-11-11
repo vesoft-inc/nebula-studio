@@ -1,6 +1,6 @@
 import { Collapse } from 'antd';
 import React from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 
 import CodeMirror from '@app/components/CodeMirror';
 
@@ -17,6 +17,7 @@ const GQLCodeMirror = (props: { currentGQL: string; option?: IOptions }) => {
     readOnly: true,
     ...props.option,
   };
+  const { intl } = useI18n();
   return (
     <Collapse className={styles.exportGql}>
       <Panel header={intl.get('common.exportNGQL')} key="ngql">

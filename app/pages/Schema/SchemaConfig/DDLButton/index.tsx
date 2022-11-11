@@ -1,7 +1,6 @@
 import { Button, message, Modal, Spin } from 'antd';
 import Icon from '@app/components/Icon';
 import React, { useCallback, useEffect, useState } from 'react';
-import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import CodeMirror from '@app/components/CodeMirror';
@@ -9,6 +8,7 @@ import CodeMirror from '@app/components/CodeMirror';
 
 import { useStore } from '@app/stores';
 import { handleKeyword } from '@app/utils/function';
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 
 interface IProps {
@@ -23,6 +23,7 @@ const options = {
 const sleepGql = `:sleep 20;`;
 const DDLButton = (props: IProps) => {
   const { space } = props;
+  const { intl } = useI18n();
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const { schema: { getSchemaDDL } } = useStore();

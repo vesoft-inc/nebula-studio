@@ -4,8 +4,8 @@ import { CloseOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import CSVPreviewLink from '@app/components/CSVPreviewLink';
-import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';
+import { useI18n } from '@vesoft-inc/i18n';
 import TagConfig from './TagConfig';
 import EdgeConfig from './EdgeConfig';
 const { Panel } = Collapse;
@@ -21,7 +21,7 @@ const SchemaConfig = (props: IProps) => {
   const { type, data, configIndex } = props;
   const { dataImport } = useStore();
   const { verticesConfig, updateVerticesConfig, updateEdgeConfig } = dataImport;
-
+  const { intl } = useI18n();
   const addTag = index => {
     updateVerticesConfig({
       index,

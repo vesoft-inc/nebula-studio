@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import intl from 'react-intl-universal';
 import { Popover, Tabs } from 'antd';
 import ColorPicker from '@app/components/ColorPicker';
 
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 
 interface IProps {
@@ -19,6 +19,7 @@ interface ISetProps {
 const SetContent: React.FC<ISetProps> = (props: ISetProps) => {
   const { onColorChange } = props;
   const [tagType, setTagType] = useState('color');
+  const { intl } = useI18n();
   const items = [
     {
       key: 'color',

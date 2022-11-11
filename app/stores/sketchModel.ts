@@ -1,6 +1,6 @@
 import { makeAutoObservable, observable, action, runInAction } from 'mobx';
 import { message } from 'antd';
-import intl from 'react-intl-universal';
+import { getI18n } from '@vesoft-inc/i18n';
 import { getRootStore } from '@app/stores';
 import VEditor, { VEditorOptions } from '@vesoft-inc/veditor';
 import { ISketch, ISketchEdge, ISketchNode } from '@app/interfaces/sketch';
@@ -15,6 +15,7 @@ import { uniqBy } from 'lodash';
 import { MAX_COMMENT_BYTES } from '@app/utils/constant';
 import { getByteLength } from '@app/utils/function';
 import { trackEvent } from '@app/utils/stat';
+const { intl } = getI18n();
 
 interface IHoveringItem {
   data: ISketchNode | ISketchEdge;

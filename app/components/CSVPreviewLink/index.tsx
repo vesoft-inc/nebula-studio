@@ -1,7 +1,7 @@
 import { Button, Popover, Table } from 'antd';
 import { } from 'antd/lib/button';
 import React, { useState } from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import { v4 as uuidv4 } from 'uuid';
 import cls from 'classnames';
 import styles from './index.module.less';
@@ -17,6 +17,7 @@ interface IProps {
 const CSVPreviewLink = (props: IProps) => {
   const { onMapping, file: { content }, children, btnType, selected } = props;
   const [visible, setVisible] = useState(false);
+  const { intl } = useI18n();
   const handleLinkClick = e => {
     e.stopPropagation();
     setVisible(true);
