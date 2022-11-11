@@ -5,7 +5,6 @@ import { Base64 } from 'js-base64';
 import intl from 'react-intl-universal';
 import service from '@app/config/service';
 import { BrowserHistory } from 'history';
-import { NebulaVersion } from './types';
 import { getRootStore, resetStore } from '.';
 
 export class GlobalStore {
@@ -13,7 +12,6 @@ export class GlobalStore {
   _username = cookies.get('nu');
   _host = cookies.get('nh');
   version = process.env.VERSION;
-  nebulaVersion?: NebulaVersion = sessionStorage.getItem('nebulaVersion') as NebulaVersion;
   constructor() {
     makeObservable(this, {
       _username: observable,
@@ -53,7 +51,6 @@ export class GlobalStore {
     resetStore();
     cookies.remove('nh');
     cookies.remove('nu');
-    sessionStorage.removeItem('nebulaVersion');
     this.history.push(`/login${location.search}`);
   };
 
@@ -66,7 +63,7 @@ export class GlobalStore {
     const _host = host.trim().replace(/^https?:\/\//, '');
     const [address, port] = _host.split(':');
     const authorization = Base64.encode(JSON.stringify([username, password]));
-    const { code, data } = (await service.connectDB(
+    const { code } = (await service.connectDB(
       {
         address,
         port: +port,
@@ -85,15 +82,13 @@ export class GlobalStore {
       message.success(intl.get('configServer.success'));
       cookies.set('nh', _host);
       cookies.set('nu', username);
-      sessionStorage.setItem('nebulaVersion', data.version);
-      this.update({ _host, _username: username, nebulaVersion: data.version });
+      this.update({ _host, _username: username });
       return true;
     }
 
     this.update({ _host: '', _username: '' });
     cookies.remove('nh');
     cookies.remove('nu');
-    sessionStorage.removeItem('nebulaVersion');
     return false;
   };
 }
