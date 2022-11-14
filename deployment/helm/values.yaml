@@ -4,7 +4,7 @@ image:
   pullPolicy: IfNotPresent
   nebulaStudio:
     name: vesoft/nebula-graph-studio
-    version: v3.2.3
+    version: v3.2.4
 
 imagePullSecrets: []
 
