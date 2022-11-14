@@ -135,6 +135,17 @@ func (s *gatewayService) BatchExecNGQL(request *types.BatchExecNGQLParams) (*typ
 	paramList := request.ParamList
 
 	data := make([]map[string]interface{}, 0)
+	if len(paramList) > 0 {
+		execute, _, err := dao.Execute(NSID, "", paramList)
+		gqlRes := map[string]interface{}{"gql": strings.Join(paramList, "; "), "data": execute}
+		if err != nil {
+			gqlRes["message"] = err.Error()
+			gqlRes["code"] = base.Error
+		} else {
+			gqlRes["code"] = base.Success
+		}
+		data = append(data, gqlRes)
+	}
 	for _, gql := range gqls {
 		execute, _, err := dao.Execute(NSID, gql, make([]string, 0))
 		gqlRes := map[string]interface{}{"gql": gql, "data": execute}
@@ -143,18 +154,6 @@ func (s *gatewayService) BatchExecNGQL(request *types.BatchExecNGQLParams) (*typ
 			if isSErr {
 				return nil, ecode.WithSessionMessage(err)
 			}
-			gqlRes["message"] = err.Error()
-			gqlRes["code"] = base.Error
-		} else {
-			gqlRes["code"] = base.Success
-		}
-		data = append(data, gqlRes)
-	}
-
-	if len(paramList) > 0 {
-		execute, _, err := dao.Execute(NSID, "", paramList)
-		gqlRes := map[string]interface{}{"gql": strings.Join(paramList, "; "), "data": execute}
-		if err != nil {
 			gqlRes["message"] = err.Error()
 			gqlRes["code"] = base.Error
 		} else {

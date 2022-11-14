@@ -5,8 +5,8 @@ go 1.18
 require (
 	github.com/samber/lo v1.28.2
 	github.com/vesoft-inc/go-pkg v0.0.0-20220714021138-c5edb9946837
-	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20220720014538-1dd39bd43f6c
-	github.com/vesoft-inc/nebula-importer v1.0.1-0.20221028024308-3cd1335b9502
+	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20221114094653-748b8f063bb6
+	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220719030708-8e376665042e
 	github.com/zeromicro/go-zero v1.3.3
 )
 
