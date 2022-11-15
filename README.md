@@ -14,9 +14,10 @@ $ npm run dev
 ```
 ### Set up go-server
 ```
+// remove default port 7001 in config/example-config.yaml first
 $ cd server
 $ go build -o server
-$ nohup ./server &
+$ ./server &
 ```
 
 ## Production Deploy
@@ -29,15 +30,14 @@ $ npm run build
 
 ### 1. Build Web
 ```
-// remove default port 7001 in config/example-config.yaml first
+$ mv dist server/assets
 $ cd server
 $ go build -o server
 ```
 
 ### 3. Start
 ```
-$ mv dist server/assets
-$ nohup ./server &
+$ ./server &
 ```
 
 ### 4. Stop Server
