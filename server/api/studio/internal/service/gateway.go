@@ -117,8 +117,7 @@ func (s *gatewayService) ExecNGQL(request *types.ExecNGQLParams) (*types.AnyResp
 
 	execute, _, err := dao.Execute(authData.NSID, request.Gql, request.ParamList)
 	if err != nil {
-		isSErr := isSessionError(err)
-		if isSErr {
+		if isSessionError(err) {
 			return nil, ecode.WithSessionMessage(err)
 		}
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err, "execute failed")
@@ -150,8 +149,7 @@ func (s *gatewayService) BatchExecNGQL(request *types.BatchExecNGQLParams) (*typ
 		execute, _, err := dao.Execute(NSID, gql, make([]string, 0))
 		gqlRes := map[string]interface{}{"gql": gql, "data": execute}
 		if err != nil {
-			isSErr := isSessionError(err)
-			if isSErr {
+			if isSessionError(err) {
 				return nil, ecode.WithSessionMessage(err)
 			}
 			gqlRes["message"] = err.Error()
