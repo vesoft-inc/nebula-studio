@@ -276,14 +276,21 @@
     "use": "使用手册",
     "release": "更新日志",
     "forum": "求助论坛",
-    "nGql": "nGQL"
+    "nGql": "nGQL",
+    "feedback": "问题反馈",
+    "repo": "GitHub项目",
+    "trial": "企业版试用",
+    "contact":"联系我们"
   },
   "link": {
     "nGQLHref": "https://docs.nebula-graph.com.cn/3.3.0/3.ngql-guide/1.nGQL-overview/1.overview/",
     "mannualHref": "https://docs.nebula-graph.com.cn/3.3.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/",
     "startStudioHref": "https://docs.nebula-graph.com.cn/3.3.0/nebula-studio/quick-start/st-ug-plan-schema/",
     "versionLogHref": "https://docs.nebula-graph.com.cn/3.3.0/20.appendix/release-notes/studio-release-note/",
-    "forumHref": "https://discuss.nebula-graph.com.cn/"
+    "forumHref": "https://discuss.nebula-graph.com.cn/",
+    "feedback": "https://discuss.nebula-graph.com.cn/tag/nebula-studio",
+    "trial": "https://wj.qq.com/s2/10158890/69a8",
+    "contact":"https://www.nebula-graph.com.cn/contact"
   },
   "sketch": {
     "dragTip": "拖放到画布上",

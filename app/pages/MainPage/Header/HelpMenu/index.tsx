@@ -28,7 +28,7 @@ const HelpMenu = () => {
     },
     {
       key: 'language',
-      label: <Icon className={styles.navIcon} type="icon-studio-nav-language" />,
+      label: <Icon className={styles.navIcon} type="icon-studio-nav-language" />, 
       popupClassName: styles.langMenu,
       popupOffset: [-35, 20],
       children: Object.keys(INTL_LOCALE_SELECT).map(locale => ({
@@ -42,6 +42,74 @@ const HelpMenu = () => {
       label: <Link className={styles.nebulaLink} to="/welcome">
         <Icon className={styles.navIcon} type="icon-studio-nav-help" />
       </Link>
+    },
+    {
+      key: 'feedback',
+      popupClassName: styles.accountMenu,
+      popupOffset: [-35, 20],
+      label: <Icon className={styles.navIcon} type="icon-navbar-feedback" />,
+      children: [
+        {
+          key: 'feedback',
+          label: <a
+            className={styles.nebulaLink}
+            href={intl.get('link.feedback')}
+            target="_blank" 
+            rel="noreferrer"
+            data-track-category="navigation"
+            data-track-action="feedback"
+            data-track-label="from_navigation"
+          >
+            <Icon className={styles.menuIcon} type="icon-navbar-troubleFeedback" />
+            {intl.get('menu.feedback')}
+          </a>  
+        },
+        {
+          key: 'repo',
+          label: <a
+            className={styles.nebulaLink}
+            href="https://github.com/vesoft-inc/nebula-studio"
+            target="_blank" 
+            rel="noreferrer"
+            data-track-category="navigation"
+            data-track-action="repo"
+            data-track-label="from_navigation"
+          >
+            <Icon className={styles.menuIcon} type="icon-studio-nav-github" />
+            {intl.get('menu.repo')}
+          </a>  
+        },
+        {
+          key: 'trial',
+          label: <a
+            className={styles.nebulaLink}
+            href={intl.get('link.trial')}
+            target="_blank" 
+            rel="noreferrer"
+            data-track-category="navigation"
+            data-track-action="trial"
+            data-track-label="from_navigation"
+          >
+            <Icon className={styles.menuIcon} type="icon-navbar-enterprise" />
+            {intl.get('menu.trial')}
+          </a>  
+        },
+        {
+          key: 'contact',
+          label: <a
+            className={styles.nebulaLink}
+            href={intl.get('link.contact')}
+            target="_blank" 
+            rel="noreferrer"
+            data-track-category="navigation"
+            data-track-action="contact"
+            data-track-label="from_navigation"
+          >
+            <Icon className={styles.menuIcon} type="icon-navbar-contactUs" />
+            {intl.get('menu.contact')}
+          </a>  
+        }
+      ]
     },
     {
       key: 'user',
