@@ -1,10 +1,9 @@
-import React, { useCallback, useContext, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
 import emptyPng from '@app/static/images/empty.png';
-import { LanguageContext } from '@app/context';
 import styles from './index.module.less';
 import TagBar from './TagBar';
 import ZoomBtns from './ZoomBtns';
@@ -18,7 +17,7 @@ const SketchPage: React.FC = () => {
   const { sketchModel } = useStore();
   const { initEditor, currentSketch } = sketchModel;
   const editorRef = useRef();
-  const { currentLocale } = useContext(LanguageContext);
+  const { currentLocale, intl } = useI18n();
   const preLocale = useRef(currentLocale);
 
   useEffect(() => {

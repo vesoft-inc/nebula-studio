@@ -1,17 +1,16 @@
-import React, { useMemo, useContext } from 'react';
+import React, { useMemo } from 'react';
 import { Menu } from 'antd';
-import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';
 import { Link } from 'react-router-dom';
 import Avatar from '@app/components/Avatar';
-import { LanguageContext } from '@app/context';
+import { useI18n } from '@vesoft-inc/i18n';
 import { INTL_LOCALE_SELECT } from '@app/config';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import styles from './index.module.less';
 
 const HelpMenu = () => {
-  const { toggleLanguage, currentLocale } = useContext(LanguageContext);
+  const { currentLocale, updateI18n, intl } = useI18n();
   const { global: { username, logout, version } } = useStore();
   const items = useMemo(() => [
     {
@@ -33,7 +32,7 @@ const HelpMenu = () => {
       popupOffset: [-35, 20],
       children: Object.keys(INTL_LOCALE_SELECT).map(locale => ({
         key: `language-${locale}`,
-        onClick: () => toggleLanguage(INTL_LOCALE_SELECT[locale].NAME),
+        onClick: () => updateI18n(INTL_LOCALE_SELECT[locale].NAME),
         label: INTL_LOCALE_SELECT[locale].TEXT
       }))
     },

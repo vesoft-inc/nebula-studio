@@ -1,16 +1,15 @@
 import { hot } from 'react-hot-loader/root';
 import { Spin, message } from 'antd';
-import React, { Suspense, lazy, useState, useEffect } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import ReactDom from 'react-dom';
 import { Route, BrowserRouter as Router, Switch, useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import dayjs from 'dayjs';
-import intl from 'react-intl-universal';
 import duration from 'dayjs/plugin/duration';
 import Cookie from 'js-cookie';
 import { trackPageView } from '@app/utils/stat';
+import { I18nProvider, getI18n } from '@vesoft-inc/i18n';
 import { INTL_LOCALES } from '@app/config/constants';
-import { LanguageContext } from '@app/context';
 import { useStore } from '@app/stores';
 import AuthorizedRoute from './AuthorizedRoute';
 import rootStore, { StoreProvider } from './stores';
@@ -24,44 +23,21 @@ message.config({
   maxCount: 1,
 });
 const defaultLanguage = Cookie.get('lang') || document.documentElement.getAttribute('lang');
-intl.init({
-  currentLocale: defaultLanguage || 'EN_US',
-  locales: INTL_LOCALES,
-});
-
-
+const { initI18n } = getI18n();
+initI18n(defaultLanguage, INTL_LOCALES);
 const PageRoot = observer(() => {
   const { global: { version } } = useStore();
-  const [currentLocale, setCurrentLocale] = useState(
-    defaultLanguage || 'EN-US',
-  );
-
-  const toggleLanguage = (locale: string) => {
-    Cookie.set('lang', locale);
-    setCurrentLocale(locale);
-    intl
-      .init({
-        currentLocale: locale,
-        locales: INTL_LOCALES,
-      });
-  };
-
   useEffect(() => {
     trackPageView(`Studio/v${version}`);
   }, []);
 
   return (
     <StoreProvider value={rootStore}>
-      <LanguageContext.Provider
-        value={{
-          currentLocale,
-          toggleLanguage,
-        }}
-      >
+      <I18nProvider locales={INTL_LOCALES}>
         <Router>
           <App />
         </Router>
-      </LanguageContext.Provider>
+      </I18nProvider>
     </StoreProvider>
   );
 });

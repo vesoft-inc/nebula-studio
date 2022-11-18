@@ -1,12 +1,11 @@
 import { Radio, Select } from 'antd';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Route, useHistory, useParams } from 'react-router-dom';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import { trackPageView } from '@app/utils/stat';
 import Breadcrumb from '@app/components/Breadcrumb';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
-import { LanguageContext } from '@app/context';
 import cls from 'classnames';
 import { ISchemaEnum } from '@app/interfaces/schema';
 import TagList from './List/Tag';
@@ -23,10 +22,11 @@ const Option = Select.Option;
 const SchemaConfig = () => {
   const history = useHistory();
   const [tab, setTab] = useState('tag');
+  const { intl } = useI18n();
   const { type, action } = useParams() as { type: string, action: string };
   const { schema } = useStore();
   const { spaces, getSpaces, switchSpace, currentSpace } = schema;
-  const { currentLocale } = useContext(LanguageContext);
+  const { currentLocale } = useI18n();
   const routes = useMemo(() => {
     if(action === 'list' || type === 'visualization') {
       return [
@@ -135,12 +135,12 @@ const SchemaConfig = () => {
           <Route
             path={`/schema/tag/create`}
             exact={true}
-            render={() => <CommonCreate createType={ISchemaEnum.Tag} locale={currentLocale} />}
+            render={() => <CommonCreate createType={ISchemaEnum.Tag} />}
           />
           <Route
             path={`/schema/edge/create`}
             exact={true}
-            render={() => <CommonCreate createType={ISchemaEnum.Edge} locale={currentLocale} />}
+            render={() => <CommonCreate createType={ISchemaEnum.Edge} />}
           />
           <Route
             path={`/schema/tag/edit`}

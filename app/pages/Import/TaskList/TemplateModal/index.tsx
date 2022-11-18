@@ -1,6 +1,5 @@
 import { Button, Form, Input, Modal, Spin, Upload, message } from 'antd';
 import React, { useEffect, useState } from 'react';
-import intl from 'react-intl-universal';
 import Icon from '@app/components/Icon';
 import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
@@ -9,6 +8,7 @@ import { readFileContent } from '@app/utils/file';
 import yaml from 'js-yaml';
 import json2yaml from 'json2yaml';
 import { exampleJson } from '@app/utils/import';
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 const { Dragger } = Upload;
 const { TextArea } = Input;
@@ -26,6 +26,7 @@ const TemplateModal = (props: IProps) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [config, setConfig] = useState('');
+  const { intl } = useI18n();
   const { dataImport: { importTask }, files: { getFiles, fileList } } = useStore();
   useEffect(() => {
     getFiles();

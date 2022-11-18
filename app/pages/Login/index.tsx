@@ -1,13 +1,12 @@
 import { Button, Form, Input } from 'antd';
 import React, { useEffect, useState } from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import { hostRulesFn, passwordRulesFn, usernameRulesFn } from '@app/config/rules';
 import { observer } from 'mobx-react-lite';
 import { trackPageView } from '@app/utils/stat';
 import { useStore } from '@app/stores';
 import nebulaLogo from '@app/static/images/nebula_logo.png';
 import LanguageSelect from './LanguageSelect';
-
 import styles from './index.module.less';
 
 const FormItem = Form.Item;
@@ -21,6 +20,7 @@ const fomrItemLayout = {
 const LoginPage: React.FC = () => {
   const { global } = useStore();
   const { version } = global;
+  const { intl } = useI18n();
   const [loading, setLoading] = useState(false);
   const onConfig = async (values: any) => {
     setLoading(true);
@@ -31,7 +31,6 @@ const LoginPage: React.FC = () => {
   useEffect(() => {
     trackPageView('/login');
   }, []);
-
   return (
     <div className={styles.studioLogin}>
       <div className={styles.content}>

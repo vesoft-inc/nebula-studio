@@ -2,11 +2,12 @@ import { action, makeObservable, observable } from 'mobx';
 import cookies from 'js-cookie';
 import { message } from 'antd';
 import { Base64 } from 'js-base64';
-import intl from 'react-intl-universal';
+import { getI18n } from '@vesoft-inc/i18n';
 import service from '@app/config/service';
 import { BrowserHistory } from 'history';
 import { getRootStore, resetStore } from '.';
 
+const { intl } = getI18n();
 export class GlobalStore {
   history: BrowserHistory;
   _username = cookies.get('nu');

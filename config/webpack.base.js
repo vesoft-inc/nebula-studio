@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-const Package = require('../package.json')
+const Package = require('../package.json');
 
 const commonConfig = {
   entry: {

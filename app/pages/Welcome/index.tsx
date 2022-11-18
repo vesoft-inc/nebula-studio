@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Button, Carousel, Checkbox, Col, message, Modal, Progress, Row, Tabs, TabsProps, Tag } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
-import intl from 'react-intl-universal';
+import { useI18n, getI18n } from '@vesoft-inc/i18n';
 import { observer } from 'mobx-react-lite';
 import debounce from 'lodash/debounce';
 import { useHistory } from 'react-router-dom';
@@ -25,36 +25,40 @@ export interface ModuleItem {
   withOrder?: boolean;
 }
 
-export const getModuleList = (): ModuleItem[] => [
-  {
-    icon: 'icon-studio-nav-schema',
-    title: intl.get('common.schema'),
-    tip: intl.get('doc.schemaIntro'),
-    startLink: '/schema',
-    docLink: intl.get('welcome.schemaModuleLink'),
-  },
-  {
-    icon: 'icon-studio-nav-import',
-    title: intl.get('import.importData'),
-    tip: intl.get('doc.importIntro'),
-    startLink: '/import/files',
-    docLink: intl.get('welcome.importModuleLink'),
-  },
-  {
-    icon: 'icon-studio-nav-console',
-    title: intl.get('common.console'),
-    tip: intl.get('doc.consoleIntro'),
-    startLink: '/console',
-    docLink: intl.get('welcome.consoleModuleLink'),
-  },
-  {
-    icon: 'icon-navbar-sketch',
-    title: intl.get('common.sketch'),
-    tip: intl.get('doc.sketchIntro'),
-    startLink: '/sketch',
-    docLink: intl.get('welcome.sketchModuleLink'),
-  },
-];
+const { intl } = getI18n();
+
+export const getModuleList = (): ModuleItem[] => {
+  return [
+    {
+      icon: 'icon-studio-nav-schema',
+      title: intl.get('common.schema'),
+      tip: intl.get('doc.schemaIntro'),
+      startLink: '/schema',
+      docLink: intl.get('welcome.schemaModuleLink'),
+    },
+    {
+      icon: 'icon-studio-nav-import',
+      title: intl.get('import.importData'),
+      tip: intl.get('doc.importIntro'),
+      startLink: '/import/files',
+      docLink: intl.get('welcome.importModuleLink'),
+    },
+    {
+      icon: 'icon-studio-nav-console',
+      title: intl.get('common.console'),
+      tip: intl.get('doc.consoleIntro'),
+      startLink: '/console',
+      docLink: intl.get('welcome.consoleModuleLink'),
+    },
+    {
+      icon: 'icon-navbar-sketch',
+      title: intl.get('common.sketch'),
+      tip: intl.get('doc.sketchIntro'),
+      startLink: '/sketch',
+      docLink: intl.get('welcome.sketchModuleLink'),
+    },
+  ];
+};
 
 export type DatasetType = 'starter' | 'solution';
 
@@ -78,54 +82,58 @@ export interface DocItem {
   link: string;
 }
 
-export const getDocList = (): DocItem[] => [
-  {
-    title: intl.get('doc.getStarted'),
-    tip: intl.get('doc.getStartedTip'),
-    link: intl.get('link.mannualHref'),
-  },
-  {
-    title: intl.get('doc.useGuide'),
-    tip: intl.get('doc.useGuideTip'),
-    link: intl.get('link.startStudioHref'),
-  },
-  {
-    title: intl.get('doc.ngqlIntro'),
-    tip: intl.get('doc.ngqlIntroTip'),
-    link: intl.get('link.nGQLHref'),
-  },
-];
+export const getDocList = (): DocItem[] => {
+  return [
+    {
+      title: intl.get('doc.getStarted'),
+      tip: intl.get('doc.getStartedTip'),
+      link: intl.get('link.mannualHref'),
+    },
+    {
+      title: intl.get('doc.useGuide'),
+      tip: intl.get('doc.useGuideTip'),
+      link: intl.get('link.startStudioHref'),
+    },
+    {
+      title: intl.get('doc.ngqlIntro'),
+      tip: intl.get('doc.ngqlIntroTip'),
+      link: intl.get('link.nGQLHref'),
+    },
+  ];
+};
 
 export const shouldAlwaysShowWelcome = () => localStorage.getItem('showWelcome') !== 'false';
 
-const getDatasetList = (): DatasetItem[] => [
-  {
-    type: 'starter',
-    tags: ['starter'],
-    spaceName: 'demo_basketballplayer',
-    fileName: 'basketballplayer',
-    rename: undefined as unknown as string,
-    detail: {
-      vertexCount: 81,
-      edgeCount: 233,
+const getDatasetList = (): DatasetItem[] => {
+  return [
+    {
+      type: 'starter',
+      tags: ['starter'],
+      spaceName: 'demo_basketballplayer',
+      fileName: 'basketballplayer',
+      rename: undefined as unknown as string,
+      detail: {
+        vertexCount: 81,
+        edgeCount: 233,
+      },
+      coverImg: `${process.env.CDN_PATH || ''}/images/welcome/basketballplayer.png`,
+      docLink: intl.get('welcome.basketballplayerDocLink'),
     },
-    coverImg: `${process.env.CDN_PATH || ''}/images/welcome/basketballplayer.png`,
-    docLink: intl.get('welcome.basketballplayerDocLink'),
-  },
-  {
-    type: 'solution',
-    tags: ['solution'],
-    spaceName: 'demo_shareholding',
-    fileName: 'shareholding',
-    rename: undefined as unknown as string,
-    detail: {
-      vertexCount: 5500,
-      edgeCount: 13150,
+    {
+      type: 'solution',
+      tags: ['solution'],
+      spaceName: 'demo_shareholding',
+      fileName: 'shareholding',
+      rename: undefined as unknown as string,
+      detail: {
+        vertexCount: 5500,
+        edgeCount: 13150,
+      },
+      coverImg: `${process.env.CDN_PATH || ''}/images/welcome/shareholding.png`,
+      docLink: intl.get('welcome.shareholdingDocLink'),
     },
-    coverImg: `${process.env.CDN_PATH || ''}/images/welcome/shareholding.png`,
-    docLink: intl.get('welcome.shareholdingDocLink'),
-  },
-];
+  ];
+};
 
 const initLoadingTime = 21;
 
@@ -149,6 +157,7 @@ function Welcome(props: IProps) {
   } = props;
   const history = useHistory() as History;
   const { welcome } = useStore();
+  const { intl } = useI18n();
   const { spaceLoading, setSpaceLoading, clearSpaceLoadingTimeout } = welcome;
   const { state, setState } = useBatchState({
     datasetType: 'starter' as DatasetType,

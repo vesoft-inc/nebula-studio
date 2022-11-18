@@ -1,12 +1,12 @@
 import { Button, message, Spin } from 'antd';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
 import { ITaskStatus } from '@app/interfaces/import';
+import { useI18n } from '@vesoft-inc/i18n';
 import LogModal from './TaskItem/LogModal';
 import TemplateModal from './TemplateModal';
 
@@ -30,6 +30,7 @@ interface IProps {
 const TaskList = (props: IProps) => {
   const timer = useRef<any>(null);
   const { dataImport, global } = useStore();
+  const { intl } = useI18n();
   const history = useHistory();
   const { taskList, getTaskList, stopTask, deleteTask, downloadTaskConfig } = dataImport;
   const { username, host } = global;

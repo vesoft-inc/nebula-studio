@@ -1,6 +1,6 @@
 import { Button, Col, Form, Input, Row, Spin, message } from 'antd';
 import React, { useEffect, useState } from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import { observer } from 'mobx-react-lite';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useStore } from '@app/stores';
@@ -45,6 +45,7 @@ const ConfigEdit = (props: IProps) => {
   const { editType } = props;
   const { state } = useLocation();
   const history = useHistory();
+  const { intl } = useI18n();
   const [editName, setEditName] = useState('');
   const [editKey, setEditKey] = useState<string | null>(null);
   const { schema: { getTagOrEdgeDetail, getTagOrEdgeInfo, alterField, getIndexTree } } = useStore();

@@ -1,6 +1,6 @@
 import { Button, Popconfirm, Table, message, Popover, Form, Input, Dropdown, Menu, Tooltip } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import Icon from '@app/components/Icon';
 import { trackPageView } from '@app/utils/stat';
 import { observer } from 'mobx-react-lite';
@@ -20,6 +20,7 @@ interface IOperations {
 const Operations = (props: IOperations) => {
   const { space, onClone, onDelete } = props;
   const [visible, setVisible] = useState(false);
+  const { intl } = useI18n();
   const handleClone = (values) => {
     const { name } = values;
     onClone(name, space);
@@ -77,6 +78,7 @@ const Schema = () => {
   const [loading, setLoading] = useState(false);
   const [searchVal, setSearchVal] = useState('');
   const history = useHistory();
+  const { intl } = useI18n();
   const { currentSpace, switchSpace, getSpacesList, deleteSpace, spaceList, cloneSpace } = schema;
   const activeSpace = location.hash.slice(1);
   useEffect(() => {

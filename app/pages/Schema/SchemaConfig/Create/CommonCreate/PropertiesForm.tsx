@@ -1,13 +1,13 @@
 import { Button, Checkbox, Col, Form, Input, Popover, Row, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import React from 'react';
-import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { nameRulesFn, numberRulesFn, stringByteRulesFn } from '@app/config/rules';
 import Icon from '@app/components/Icon';
 import { DATA_TYPE, EXPLAIN_DATA_TYPE } from '@app/utils/constant';
 
 const Option = Select.Option;
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 
 
@@ -24,6 +24,7 @@ interface IProps {
 
 const PropertiesForm = (props: IProps) => {
   const { formRef, onUpdate } = props;
+  const { intl } = useI18n();
   const handleClearProperties = e => {
     if(!e.target.checked) {
       formRef.setFieldsValue({ 'properties': [] });

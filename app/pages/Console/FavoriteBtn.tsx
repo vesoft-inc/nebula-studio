@@ -1,10 +1,10 @@
 import { Button, List, Modal, Tooltip, Popconfirm } from 'antd';
 import React, { useCallback, useState } from 'react';
-import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
 import { useStore } from '@app/stores';
 
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 
 
@@ -15,7 +15,7 @@ const FavoriteBtn = (props: IProps) => {
   const { onGqlSelect } = props;
   const { console } = useStore();
   const [visible, setVisible] = useState(false);
-
+  const { intl } = useI18n();
   const handleClear = useCallback(async () => {
     const { favorites, deleteFavorite, getFavoriteList } = console;
     if(!favorites.length) {

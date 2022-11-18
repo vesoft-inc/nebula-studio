@@ -1,11 +1,11 @@
 import { Select, Table, Tooltip } from 'antd';
 import React from 'react';
-import intl from 'react-intl-universal';
 import { CloseOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import CSVPreviewLink from '@app/components/CSVPreviewLink';
 import classNames from 'classnames';
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from '../index.module.less';
 
 const Option = Select.Option;
@@ -19,7 +19,7 @@ const EdgeConfig = (configProps: IProps) => {
   const { dataImport, schema } = useStore();
   const { updateEdgeConfig, updateEdgePropMapping } = dataImport;
   const { edgeTypes } = schema;
-
+  const { intl } = useI18n();
   const handleEdgeChange = (index: number, value: string) => {
     updateEdgeConfig({ index, edgeType: value });
   };

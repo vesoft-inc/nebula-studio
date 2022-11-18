@@ -1,6 +1,6 @@
 import { Button, Popconfirm, Radio, Table, message } from 'antd';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import { useHistory, useParams } from 'react-router-dom';
 import Icon from '@app/components/Icon';
 import { observer } from 'mobx-react-lite';
@@ -14,7 +14,7 @@ import CommonLayout from '../CommonLayout';
 import commonStyles from '../CommonLayout/index.module.less';
 import styles from './index.module.less';
 
-function renderIndexInfo(index: IIndexList) {
+function renderIndexInfo(index: IIndexList, intl) {
   const fieldsColumn = [
     {
       title: intl.get('common.propertyName'),
@@ -42,6 +42,7 @@ function renderIndexInfo(index: IIndexList) {
 
 const IndexList = () => {
   const { module } = useParams() as { module: string };
+  const { intl } = useI18n();
   const { schema: { indexList, deleteIndex, getIndexList, rebuildIndex, getIndexesStatus, currentSpace } } = useStore();
   const [searchVal, setSearchVal] = useState('');
   const [loading, setLoading] = useState(false);

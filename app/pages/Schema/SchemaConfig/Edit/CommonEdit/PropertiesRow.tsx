@@ -1,7 +1,7 @@
 import { Button, Checkbox, Col, Form, Input, Popconfirm, Popover, Row, Select } from 'antd';
 import React from 'react';
-import intl from 'react-intl-universal';
 import { AlterType, IProperty } from '@app/interfaces/schema';
+import { useI18n } from '@vesoft-inc/i18n';
 import { nameRulesFn, numberRulesFn, stringByteRulesFn } from '@app/config/rules';
 import { DATA_TYPE, EXPLAIN_DATA_TYPE } from '@app/utils/constant';
 
@@ -26,6 +26,7 @@ interface IEditProps {
 
 export const DisplayRow = (props: IProps) => {
   const { data, onEditBefore, onDelete, disabled } = props;
+  const { intl } = useI18n();
   return <Row className={styles.fieldsItem}>
     <Col span={4}>
       {data.name}
@@ -72,6 +73,7 @@ export const DisplayRow = (props: IProps) => {
 
 export const EditRow = (props: IEditProps) => {
   const { data, onEditCancel, onUpdateType } = props;
+  const { intl } = useI18n();
   if(!data) {
     return null;
   }

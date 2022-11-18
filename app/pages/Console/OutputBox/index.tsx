@@ -1,7 +1,6 @@
 import { Button, Table, Tabs, Tooltip, Popover } from 'antd';
 import { BigNumber } from 'bignumber.js';
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
-import intl from 'react-intl-universal';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { trackEvent } from '@app/utils/stat';
@@ -10,6 +9,7 @@ import Icon from '@app/components/Icon';
 import { parseSubGraph } from '@app/utils/parseData';
 import cls from 'classnames';
 import { GraphStore } from '@app/stores/graph';
+import { useI18n } from '@vesoft-inc/i18n';
 import Graphviz from './Graphviz';
 import ForceGraph from './ForceGraph';
 
@@ -32,6 +32,7 @@ interface IProps {
 const OutputBox = (props: IProps) => {
   const { gql, result: { code, data, message }, onHistoryItem, index, onExplorer, onResultConfig, templateRender } = props;
   const { console, schema } = useStore();
+  const { intl } = useI18n();
   const [visible, setVisible] = useState(true);
   const { results, update, favorites, saveFavorite, deleteFavorite, getFavoriteList } = console;
   const { spaceVidType, currentSpace } = schema;

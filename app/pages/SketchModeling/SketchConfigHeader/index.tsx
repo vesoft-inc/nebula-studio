@@ -3,7 +3,7 @@ import { message, Tooltip } from 'antd';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import Icon from '@app/components/Icon';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import domtoimage from 'dom-to-image';
 import { trackEvent } from '@app/utils/stat';
 import styles from './index.module.less';
@@ -16,7 +16,7 @@ const thumbnailMaxHeight = 113;
 const SketchConfigHeader: React.FC = () => {
   const { sketchModel } = useStore();
   const { editor, validateSchema, currentSketch, updateSketch, getSketchList } = sketchModel;
-
+  const { intl } = useI18n();
   const filter = (node) => {
     if (node instanceof SVGElement) {
       const classname = typeof node.className === 'string' ? node.className : node.className.baseVal;

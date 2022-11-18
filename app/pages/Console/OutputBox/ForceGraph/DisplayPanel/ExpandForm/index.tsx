@@ -1,7 +1,7 @@
 import { Tabs } from 'antd';
 import React, { useEffect, useState } from 'react';
-import intl from 'react-intl-universal';
 import { LinkObject, NodeObject } from '@vesoft-inc/force-graph';
+import { useI18n } from '@vesoft-inc/i18n';
 import ExpandItem from '../ExpandItem';
 import styles from './index.module.less';
 
@@ -16,7 +16,7 @@ interface IProps {
 const DisplayComponent = (props: IProps) => {
   const [tab, setTab] = useState<any>('nodes');
   const { data, spaceVidType } = props;
-  
+  const { intl } = useI18n();
   const { nodes, links } = data;
   const [list, setList] = useState<{
     nodes: NodeObject[];

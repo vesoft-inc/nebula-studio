@@ -4,7 +4,7 @@ import { ISchemaEnum } from './schema';
 export interface IProperty {
   name: string;
   type: string;
-  fixedLength: string;
+  fixedLength?: string;
 }
 export interface ISketchNode extends VEditorNode {
   uuid?: string;
@@ -16,6 +16,7 @@ export interface ISketchNode extends VEditorNode {
   comment?: string;
   invalid: boolean;
   strokeDasharray?: string;
+  vid?: string;
 }
 
 export interface ISketchEdge extends VEditorLine {

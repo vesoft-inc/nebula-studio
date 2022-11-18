@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 import rootStore from '@app/stores';
 
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import { onAbsolutePositionMove } from '@app/utils';
 import { observer } from 'mobx-react-lite';
 import { ISchemaEnum } from '@app/interfaces/schema';
@@ -16,6 +16,7 @@ const TOOLTIP_MAX_HEIGHT = 300;
 const Tooltip = observer(function Tooltip() {
   const [visible, setVisible] = useState(false);
   const [data, setData] = useState(null);
+  const { intl } = useI18n();
   const [finalPos, setFinalPos] = useState({ left: 0, top: 0 });
   const { hoveringItem, tooltip, container } = rootStore.sketchModel;
   useEffect(() => {

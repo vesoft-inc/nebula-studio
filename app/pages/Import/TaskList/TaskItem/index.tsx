@@ -1,12 +1,12 @@
 import { Button, Popconfirm, Progress } from 'antd';
 import { CheckCircleFilled } from '@ant-design/icons';
 import React, { useEffect, useState, useRef } from 'react';
-import intl from 'react-intl-universal';
 import { ITaskItem, ITaskStatus } from '@app/interfaces/import';
 import dayjs from 'dayjs';
 import { floor } from 'lodash';
 import { getFileSize } from '@app/utils/file';
 import Icon from '@app/components/Icon';
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 interface IProps {
   data: ITaskItem;
@@ -54,6 +54,7 @@ const TaskItem = (props: IProps) => {
     onConfigDownload,
     onTaskStop, 
     onTaskDelete } = props;
+  const { intl } = useI18n();
   const [progressStatus, setStatus] = useState<'success' | 'active' | 'normal' | 'exception' | undefined>(undefined);
   const [extraMsg, setExtraMsg] = useState('');
   const { totalImportedBytes, totalBytes, numFailed, numReadFailed } = stats || {};

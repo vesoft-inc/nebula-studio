@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import intl from 'react-intl-universal';
 
 import Icon from '@app/components/Icon';
 import { convertBigNumberToString, removeNullCharacters } from '@app/utils/function';
 import cls from 'classnames';
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 
 interface IProps {
@@ -54,6 +54,7 @@ const RowItem = (props: IProps) => {
   if(!data) {
     return null;
   }
+  const { intl } = useI18n();
   const [dataUnfolded, setDataUnfoldedStatus] = useState(index === 0);
   const needUnfoldMore = data.length > EXPAND_NUM;
   const [hasUnfoldAll, setUnfoldAllStatus] = useState(false);

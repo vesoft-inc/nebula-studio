@@ -2,7 +2,7 @@ import { Col, Form, Input, Row, Select, FormProps } from 'antd';
 import React, { useMemo } from 'react';
 import { useStore } from '@app/stores';
 import { nameRulesFn, numberRulesFn, replicaRulesFn, stringByteRulesFn } from '@app/config/rules';
-import intl from 'react-intl-universal';
+import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 const Option = Select.Option;
 
@@ -24,6 +24,7 @@ interface IProps extends FormProps {
 
 const CreateForm = (props: IProps) => {
   const { onFieldsChange, onFinish, className, formItemLayout, form, colSpan } = props;
+  const { intl } = useI18n();
   const { schema } = useStore();
   const { activeMachineNum } = schema;
   const _colSpan = useMemo(() => colSpan === 'full' ? 24 : 12, [colSpan]);
