@@ -11,7 +11,7 @@ interface IState {
   errInfo: string;
 }
 
-function ErrorFallback(props: { errInfo: string }) {
+function ErrorPanel(props: { errInfo: string }) {
   const { errInfo } = props;
   const { intl } = useI18n();
   const handleCopy = useCallback(() => {
@@ -61,7 +61,7 @@ class ErrorBoundary extends React.PureComponent<IProps, IState> {
   render() {
     const { errInfo } = this.state;
     if(!errInfo) return this.props.children;
-    return <ErrorFallback errInfo={errInfo} />;
+    return <ErrorPanel errInfo={errInfo} />;
   }
 }
 
