@@ -11,6 +11,14 @@ export const hostRulesFn = () => [
     </Translation>,
   },
 ];
+export const portRulesFn = () => [
+  {
+    required: true,
+    message: <Translation>
+      {intl => intl.get('formRules.portRequired')}
+    </Translation>,
+  },
+];
 
 export const usernameRulesFn = () => [
   {

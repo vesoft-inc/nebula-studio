@@ -85,15 +85,18 @@
   },
   "configServer": {
     "connect": "连接",
-    "host": "Host:Port",
+    "host": "Graphd IP 地址",
+    "port": "Port",
     "username": "用户名",
     "password": "密码",
     "success": "配置成功",
     "clear": "登出",
-    "title": "配置数据库"
+    "title": "配置数据库",
+    "tip": "连接数据库说明文档->"
   },
   "formRules": {
     "hostRequired": "请填写数据库服务器的IP地址",
+    "portRequired": "请填写数据库服务器的端口",
     "usernameRequired": "请填写用户名",
     "passwordRequired": "请填写密码",
     "positiveIntegerRequired": "请输入一个非负整数",
@@ -290,7 +293,8 @@
     "forumHref": "https://discuss.nebula-graph.com.cn/",
     "feedback": "https://discuss.nebula-graph.com.cn/tag/nebula-studio",
     "trial": "https://wj.qq.com/s2/10158890/69a8",
-    "contact":"https://www.nebula-graph.com.cn/contact"
+    "contact":"https://www.nebula-graph.com.cn/contact",
+    "loginHref": "https://docs.nebula-graph.com.cn/3.3.0/nebula-studio/deploy-connect/st-ug-connect/"
   },
   "sketch": {
     "dragTip": "拖放到画布上",

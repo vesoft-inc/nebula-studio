@@ -85,15 +85,18 @@
   },
   "configServer": {
     "connect": "Connect",
-    "host": "Host:Port",
+    "host": "Graphd IP address",
+    "port": "Port",
     "username": "Username",
     "password": "Password",
     "success": "succeed",
     "clear": "Log out",
-    "title": "Connect to NebulaGraph"
+    "title": "Connect to NebulaGraph",
+    "tip": "Don't know the address? Docs->"
   },
   "formRules": {
     "hostRequired": "Host Required",
+    "portRequired": "Port Required",
     "usernameRequired": "Username Required",
     "passwordRequired": "Password Required",
     "positiveIntegerRequired": "Please enter a non-negative integer",
@@ -290,7 +293,8 @@
     "forumHref": "https://discuss.nebula-graph.io/",
     "feedback": "https://app.slack.com/client/TJB3N2BPD/CJNFUM7AR",
     "trial": "https://www.nebula-graph.io/visualization-tools-free-trial",
-    "contact":"https://www.nebula-graph.io/contact"
+    "contact":"https://www.nebula-graph.io/contact",
+    "loginHref": "https://docs.nebula-graph.io/3.3.0/nebula-studio/deploy-connect/st-ug-connect/"
   },
   "sketch": {
     "dragTip": "Drag and drop to the canvas",
