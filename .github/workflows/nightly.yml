@@ -21,7 +21,7 @@ jobs:
       uses: actions/checkout@master
     - 
       name: set track
-      run: bash ./scripts/setEventTracking.sh ${{ secrets.GA_ID }}
+      run: bash ./scripts/setEventTracking.sh ${{ secrets.GA_ID }} ${{ secrets.CLARITY_ID }}
     -
       name: Set up QEMU
       uses: docker/setup-qemu-action@v1
