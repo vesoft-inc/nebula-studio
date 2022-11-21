@@ -43,12 +43,29 @@
 				font-size: 24px;
 				line-height: 28px;
 				text-align: center;
-				margin-bottom: 50px;
+				margin-bottom: 20px;
 				display: block;
 			}
 
-			:global(.ant-form-item) {
-				border-bottom: 1px solid #bfbfbf;
+			.loginTip {
+				display: block;
+				text-align: left;
+				margin-bottom: 10px;
+				padding-left: 0;
+			}
+			.split {
+				font-weight: 900;
+				font-size: 14px;
+			}
+			:global {
+				.ant-row {
+					align-items: baseline;
+				}
+				.ant-input, .ant-input-password {
+					border: none;
+					background-color: #F8F8F8;
+					box-shadow: 0 0 0 1000px #F8F8F8 inset !important; 
+				}
 			}
 
 			.btnSubmit {

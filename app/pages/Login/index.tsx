@@ -1,7 +1,7 @@
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, Col, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
-import { hostRulesFn, passwordRulesFn, usernameRulesFn } from '@app/config/rules';
+import { hostRulesFn, portRulesFn, passwordRulesFn, usernameRulesFn } from '@app/config/rules';
 import { observer } from 'mobx-react-lite';
 import { trackPageView } from '@app/utils/stat';
 import { useStore } from '@app/stores';
@@ -42,14 +42,31 @@ const LoginPage: React.FC = () => {
           <FormItem noStyle>
             <span className={styles.formTitle}>{intl.get('configServer.title')}</span>
           </FormItem>
-          <FormItem name="host" rules={hostRulesFn()}>
-            <Input placeholder={intl.get('configServer.host')} bordered={false} />
-          </FormItem>
+          <Button type="link" className={styles.loginTip} onClick={() => window.open(intl.get('link.loginHref'), '_blank')}>
+            {intl.get('configServer.tip')}
+          </Button>
+          <Row>
+            <Col span={12}>
+              <FormItem name="address" rules={hostRulesFn()}>
+                <Input placeholder={intl.get('configServer.host')} />
+              </FormItem>
+            </Col>
+            <Col span={1}>
+              <FormItem noStyle>
+                <span className={styles.split}>:</span>
+              </FormItem>
+            </Col>
+            <Col span={11}>
+              <FormItem name="port" rules={portRulesFn()} initialValue={9669}>
+                <Input placeholder={intl.get('configServer.port')} />
+              </FormItem>
+            </Col>
+          </Row>
           <FormItem name="username" rules={usernameRulesFn()}>
-            <Input placeholder={intl.get('configServer.username')} bordered={false} />
+            <Input placeholder={intl.get('configServer.username')} />
           </FormItem>
           <FormItem name="password" rules={passwordRulesFn()}>
-            <Input.Password placeholder={intl.get('configServer.password')} bordered={false} />
+            <Input.Password placeholder={intl.get('configServer.password')} />
           </FormItem>
           <Button className={styles.btnSubmit} type="primary" htmlType="submit" loading={loading}>
             {intl.get('configServer.connect')}

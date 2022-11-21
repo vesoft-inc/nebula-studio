@@ -59,14 +59,14 @@ export class GlobalStore {
     Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
   };
 
-  login = async (payload: { host: string; username: string; password: string }) => {
-    const { host, username, password } = payload;
-    const _host = host.trim().replace(/^https?:\/\//, '');
-    const [address, port] = _host.split(':');
+  login = async (payload: { address: string; port: string; username: string; password: string }) => {
+    const { address, port, username, password } = payload;
+    const _address = address.trim().replace(/^https?:\/\//, '');
+    const _host = `${_address}:${port}`;
     const authorization = Base64.encode(JSON.stringify([username, password]));
     const { code } = (await service.connectDB(
       {
-        address,
+        address: _address,
         port: +port,
       },
       {
