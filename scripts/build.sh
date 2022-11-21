@@ -2,7 +2,7 @@
 
 set -ex
 # build web
-bash ./scripts/setEventTracking.sh $1
+bash ./scripts/setEventTracking.sh $1 $2
 VERSION=`cat package.json | grep '"version":' | awk 'NR==1{print $2}' | awk -F'"' '{print $2}'`
 
 sed -i "s/CPACK_PACKAGE_VERSION_TEMPLATE/$VERSION/g" ./scripts/deb/CMakeLists.txt
