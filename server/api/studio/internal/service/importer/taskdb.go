@@ -2,6 +2,7 @@ package importer
 
 import (
 	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"gorm.io/gorm"
@@ -81,7 +82,7 @@ func (t *TaskDb) SelectAllIds(nebulaAddress, user string) ([]int, error) {
 
 func (t *TaskDb) UpdateProcessingTasks2Aborted() error {
 	if err := t.Model(&db.TaskInfo{}).Where("task_status = ?", StatusProcessing.String()).Updates(&db.TaskInfo{TaskStatus: StatusAborted.String(), TaskMessage: "Service execption"}).Error; err != nil {
-		return err
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	return nil
 }
