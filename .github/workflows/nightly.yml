@@ -12,6 +12,7 @@ jobs:
       oss_secret: ${{ secrets.OSS_SECRET }}
       oss_url: ${{ secrets.OSS_TEST_URL }}
       ga_id: ${{ secrets.GA_ID }}
+      clarity_id: ${{ secrets.CLARITY_ID }}
   docker-image:
     name: docker image build
     runs-on: ubuntu-latest

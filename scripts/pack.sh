@@ -7,9 +7,9 @@ DIR=`pwd`
 STUDIO=$DIR/source/nebula-graph-studio
 
 cd $STUDIO
-bash ./scripts/build.sh $1
+bash ./scripts/build.sh $1 $2
 cd $DIR
-case $2 in
+case $3 in
   centos7)
     bash $STUDIO/scripts/pack_CentOS.sh
     ;;

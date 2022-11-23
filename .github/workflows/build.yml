@@ -12,6 +12,8 @@ on:
         required: true
       ga_id:
         required: true
+      clarity_id:
+        required: true
 jobs:
   package:
     name: build package
@@ -37,6 +39,6 @@ jobs:
         with:
           node-version: '16'
       - name: Package
-        run: bash ./source/nebula-graph-studio/scripts/pack.sh ${{ secrets.ga_id }} ${{ matrix.os }}
+        run: bash ./source/nebula-graph-studio/scripts/pack.sh ${{ secrets.ga_id }} ${{ secrets.clarity_id }} ${{ matrix.os }}
       - name: Upload to OSS
         run: bash ./source/nebula-graph-studio/scripts/upload.sh ${{ secrets.oss_endpoint }} ${{ secrets.oss_id }} ${{ secrets.oss_secret }} ${{ secrets.oss_url }} ${{ matrix.os }}
