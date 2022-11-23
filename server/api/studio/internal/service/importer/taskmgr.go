@@ -10,6 +10,7 @@ import (
 	"time"
 
 	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
 
 	"github.com/vesoft-inc/nebula-importer/pkg/cmd"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -82,7 +83,7 @@ func GetTaskMgr() *TaskMgr {
 }
 
 /*
-	GetTask get task from map and local sql
+GetTask get task from map and local sql
 */
 func (mgr *TaskMgr) GetTask(taskID string) (*Task, bool) {
 	if task, ok := mgr.getTaskFromMap(taskID); ok {
@@ -97,15 +98,15 @@ func (mgr *TaskMgr) GetTask(taskID string) (*Task, bool) {
 }
 
 /*
-	PutTask put task into tasks map
+PutTask put task into tasks map
 */
 func (mgr *TaskMgr) PutTask(taskID string, task *Task) {
 	mgr.tasks.Store(taskID, task)
 }
 
 /*
-	FinishTask will query task stats, delete task in the map
-	and update the taskInfo in local sql
+FinishTask will query task stats, delete task in the map
+and update the taskInfo in local sql
 */
 func (mgr *TaskMgr) FinishTask(taskID string) (err error) {
 	task, ok := mgr.getTaskFromMap(taskID)
@@ -113,13 +114,13 @@ func (mgr *TaskMgr) FinishTask(taskID string) (err error) {
 		return
 	}
 	if err := task.UpdateQueryStats(); err != nil {
-		return err
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	timeUnix := time.Now().Unix()
 	task.TaskInfo.UpdatedTime = timeUnix
 	err = mgr.db.UpdateTaskInfo(task.TaskInfo)
 	if err != nil {
-		return err
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	mgr.tasks.Delete(taskID)
 	return
@@ -134,7 +135,7 @@ func (mgr *TaskMgr) AbortTask(taskID string) (err error) {
 	task.TaskInfo.UpdatedTime = timeUnix
 	err = mgr.db.UpdateTaskInfo(task.TaskInfo)
 	if err != nil {
-		return err
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	mgr.tasks.Delete(taskID)
 	return
@@ -150,15 +151,15 @@ func (mgr *TaskMgr) DelTask(tasksDir, taskID string) error {
 		return errors.New("taskID is wrong")
 	}
 	if err = mgr.db.DelTaskInfo(id); err != nil {
-		return err
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	taskDir := filepath.Join(tasksDir, taskID)
 	return os.RemoveAll(taskDir)
 }
 
 /*
-	UpdateTaskInfo will query task stats, update task in the map
-	and update the taskInfo in local sql
+UpdateTaskInfo will query task stats, update task in the map
+and update the taskInfo in local sql
 */
 func (mgr *TaskMgr) UpdateTaskInfo(taskID string) error {
 	task, ok := mgr.getTaskFromMap(taskID)
@@ -166,7 +167,7 @@ func (mgr *TaskMgr) UpdateTaskInfo(taskID string) error {
 		return nil
 	}
 	if err := task.UpdateQueryStats(); err != nil {
-		return err
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	timeUnix := time.Now().Unix()
 	task.TaskInfo.UpdatedTime = timeUnix
@@ -174,8 +175,8 @@ func (mgr *TaskMgr) UpdateTaskInfo(taskID string) error {
 }
 
 /*
-	StopTask will change the task status to `StatusStoped`,
-	and then call FinishTask
+StopTask will change the task status to `StatusStoped`,
+and then call FinishTask
 */
 func (mgr *TaskMgr) StopTask(taskID string) error {
 	if task, ok := mgr.getTaskFromMap(taskID); ok {
@@ -188,7 +189,7 @@ func (mgr *TaskMgr) StopTask(taskID string) error {
 		task.TaskInfo.TaskStatus = StatusStoped.String()
 		if err := mgr.FinishTask(taskID); err != nil {
 			logx.Alert(fmt.Sprintf("finish task fail: %s", err))
-			return err
+			return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 		}
 		return nil
 	}
@@ -196,7 +197,7 @@ func (mgr *TaskMgr) StopTask(taskID string) error {
 }
 
 /*
-	`GetAllTaskIDs` will return all task ids in map
+`GetAllTaskIDs` will return all task ids in map
 */
 func (mgr *TaskMgr) GetAllTaskIDs(nebulaAddress, username string) ([]string, error) {
 	ids := make([]string, 0)
@@ -228,8 +229,8 @@ func (mgr *TaskMgr) getTaskFromSQL(taskID string) *Task {
 type TaskStatus int
 
 /*
-	the task in memory (map) has 2 status: processing, aborted;
-	and the task in local sql has 2 status: finished, stoped;
+the task in memory (map) has 2 status: processing, aborted;
+and the task in local sql has 2 status: finished, stoped;
 */
 const (
 	StatusUnknown TaskStatus = iota

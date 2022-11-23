@@ -12,6 +12,7 @@ import (
 	importerErrors "github.com/vesoft-inc/nebula-importer/pkg/errors"
 	"github.com/vesoft-inc/nebula-importer/pkg/logger"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"go.uber.org/zap"
 
@@ -41,7 +42,7 @@ func CreateConfigFile(uploadDir, taskdir string, config importconfig.YAMLConfig)
 	fileName := "config.yaml"
 	// err := utils.CreateDir(taskdir)
 	if err := utils.CreateDir(taskdir); err != nil {
-		return err
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	path := filepath.Join(taskdir, fileName)
 	// erase user information
@@ -68,11 +69,11 @@ func CreateConfigFile(uploadDir, taskdir string, config importconfig.YAMLConfig)
 
 	outYaml, err := yaml.Marshal(config)
 	if err != nil {
-		return err
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	if err := os.WriteFile(path, outYaml, 0o644); err != nil {
 		zap.L().Warn("write"+path+"file error", zap.Error(err))
-		return err
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
 	*config.LogPath = logPath
@@ -89,7 +90,7 @@ func CreateConfigFile(uploadDir, taskdir string, config importconfig.YAMLConfig)
 func Import(taskID string, conf *importconfig.YAMLConfig) (err error) {
 	runnerLogger := logger.NewRunnerLogger(*conf.LogPath)
 	if err := conf.ValidateAndReset("", runnerLogger); err != nil {
-		return err
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
 	task, _ := GetTaskMgr().GetTask(taskID)
@@ -255,7 +256,7 @@ func StopImportTask(taskID, address, username string) error {
 	err := GetTaskMgr().StopTask(taskID)
 	if err != nil {
 		zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
-		return err
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	} else {
 		return nil
 	}

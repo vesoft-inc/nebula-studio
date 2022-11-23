@@ -61,13 +61,13 @@ func (f *fileService) FileDestroy(name string) error {
 	target := filepath.Join(dir, name)
 	if _, err := os.Stat(target); err != nil {
 		logx.Infof("del file error %v", err)
-		return err
+		return ecode.WithInternalServer(err)
 	}
 
 	//	if target is directory, it is not empty
 	if err := os.Remove(target); err != nil {
 		logx.Infof("del file error %v", err)
-		return err
+		return ecode.WithInternalServer(err)
 	}
 
 	return nil
@@ -123,25 +123,25 @@ func (f *fileService) FileUpload() error {
 		if os.IsNotExist(err) {
 			os.MkdirAll(dir, os.ModePerm)
 		} else {
-			return err
+			return ecode.WithErrorMessage(ecode.ErrInternalServer, err, "upload failed")
 		}
 	}
 
 	httpReq, ok := middleware.GetRequest(f.ctx)
 	if !ok {
-		return ecode.WithInternalServer(fmt.Errorf("unset KeepRequest"))
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, fmt.Errorf("unset KeepRequest"), "upload failed")
 	}
 
 	files, _, err := UploadFormFiles(httpReq, dir)
 	if err != nil {
 		logx.Infof("upload file error:%v", err)
-		return err
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err, "upload failed")
 	}
 	for _, file := range files {
 		charSet, err := checkCharset(file)
 		if err != nil {
 			logx.Infof("upload file error, check charset fail:%v", err)
-			return err
+			return ecode.WithErrorMessage(ecode.ErrInternalServer, err, "upload failed")
 		}
 		if charSet == "UTF-8" {
 			continue
@@ -149,7 +149,7 @@ func (f *fileService) FileUpload() error {
 		path := filepath.Join(dir, file.Filename)
 		if err = changeFileCharset2UTF8(path, charSet); err != nil {
 			logx.Infof("upload file error:%v", err)
-			return err
+			return ecode.WithErrorMessage(ecode.ErrInternalServer, err, "upload failed")
 		}
 	}
 	logx.Infof("upload %d files", len(files))
@@ -224,7 +224,7 @@ func changeFileCharset2UTF8(filePath string, charSet string) error {
 		file, err := os.OpenFile(filePath, os.O_RDONLY, 0o666)
 		if err != nil {
 			zap.L().Warn("open file fail", zap.Error(err))
-			return err
+			return ecode.WithErrorMessage(ecode.ErrInternalServer, err, "upload failed")
 		}
 		defer file.Close()
 		reader := bufio.NewReader(file)
@@ -236,12 +236,12 @@ func changeFileCharset2UTF8(filePath string, charSet string) error {
 		decodeReader := decoder.NewReader(reader)
 		fileUTF8, err := os.OpenFile(fileUTF8Path, os.O_RDONLY|os.O_CREATE|os.O_WRONLY, 0o666)
 		if err != nil {
-			return err
+			return ecode.WithErrorMessage(ecode.ErrInternalServer, err, "upload failed")
 		}
 		defer fileUTF8.Close()
 		writer := bufio.NewWriter(fileUTF8)
 		if _, err = writer.ReadFrom(decodeReader); err != nil {
-			return err
+			return ecode.WithErrorMessage(ecode.ErrInternalServer, err, "upload failed")
 		}
 		return nil
 	}()
@@ -256,10 +256,10 @@ func changeFileCharset2UTF8(filePath string, charSet string) error {
 		if err == errNoCharset {
 			return nil
 		}
-		return err
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err, "upload failed")
 	}
 	if err = os.Rename(fileUTF8Path, filePath); err != nil {
-		return err
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err, "upload failed")
 	}
 	return nil
 }
