@@ -285,11 +285,11 @@ type SketchIDResult struct {
 }
 
 type GetSchemaSnapshotRequest struct {
-	Space string `path:"space"`
+	Space string `form:"space"`
 }
 
 type UpdateSchemaSnapshotRequest struct {
-	Space    string `path:"space"`
+	Space    string `json:"space"`
 	Snapshot string `json:"snapshot"`
 }
 
