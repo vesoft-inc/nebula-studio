@@ -63,12 +63,12 @@ const service = {
   deleteSketch: (id: string, config?) => {
     return _delete(`/api/sketches/${id}`)(undefined, config);
   },
-  getSchemaSnapshot: (space, config?) => {
-    return get(`/api/schema/${encodeURIComponent(space)}/snapshot`)(undefined, config);
+  getSchemaSnapshot: (params, config?) => {
+    return get(`/api/schema/snapshot`)(params, config);
   },
   updateSchemaSnapshot: (params, config?) => {
-    const { space, ...restParams } = params;
-    return put(`/api/schema/${encodeURIComponent(space)}/snapshot`)(restParams, config);
+    const { ...restParams } = params;
+    return put(`/api/schema/snapshot`)(restParams, config);
   },
   deleteFavorite: (id, config?) => {
     return _delete(`/api/favorites/${id}`)(undefined, config);

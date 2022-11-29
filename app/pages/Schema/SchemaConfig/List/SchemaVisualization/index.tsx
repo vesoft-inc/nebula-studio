@@ -52,7 +52,11 @@ const SchemaVisualization = () => {
     try {
       await getEdgeList();
       await getTagList();
-      const { vids, edges } = await getRandomEdgeData();
+      const { vids, edges, err } = await getRandomEdgeData();
+      if(err) {
+        message.warning(err);
+        return;
+      }
       if(vids.length === 0) {
         message.warning(intl.get('sketch.noData'));
         return;

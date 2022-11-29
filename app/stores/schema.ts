@@ -658,33 +658,42 @@ export class SchemaStore {
     const vids:Set<string> = new Set();
     const edges = [];
     const edgeQuery = this.edgeList.map(edge => `MATCH ()-[e:${handleKeyword(edge.name)}]->() RETURN e LIMIT 10;`);
-    const { code, data } = await service.batchExecNGQL({
+    const { code, data, message } = await service.batchExecNGQL({
       gqls: edgeQuery
     });
-    if(code === 0) {
-      data.forEach(item => {
-        if(item.code === 0) {
-          const edgeList = item.data?.tables || [];
-          edgeList.forEach(item => {
-            const { dstID, srcID, edgeName } = item._edgesParsedList[0];
-            vids.add(srcID);
-            vids.add(dstID);
-            edges.push({
-              src: srcID,
-              dst: dstID,
-              name: edgeName,
-              properties: this.edgeList.find(i => i.name === edgeName).fields.map(field => ({
-                name: field.Field,
-                type: field.Type,
-              }))
-            });
+    let err;
+    if(code !== 0) {
+      return {
+        err: message
+      };
+    }
+    for(let i = 0; i < data.length; i++) {
+      const item = data[i];
+      if(item.code !== 0) {
+        err = item.message;
+        break;
+      } else {
+        const edgeList = item.data?.tables || [];
+        edgeList.forEach(item => {
+          const { dstID, srcID, edgeName } = item._edgesParsedList[0];
+          vids.add(srcID);
+          vids.add(dstID);
+          edges.push({
+            src: srcID,
+            dst: dstID,
+            name: edgeName,
+            properties: this.edgeList.find(i => i.name === edgeName).fields.map(field => ({
+              name: field.Field,
+              type: field.Type,
+            }))
           });
-        }
-      });
+        });
+      }
     }
     return { 
       vids: [...vids], 
-      edges 
+      edges, 
+      err 
     };
   };
 
@@ -709,7 +718,7 @@ export class SchemaStore {
   };
 
   getSchemaSnapshot = async (space) => {
-    const res = await service.getSchemaSnapshot(space, {
+    const res = await service.getSchemaSnapshot({ space }, {
       trackEventConfig: {
         category: 'schema',
         action: 'get_schema_visualization',

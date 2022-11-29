@@ -1,10 +1,10 @@
 type (
 	GetSchemaSnapshotRequest {
-		Space string `path:"space"`
+		Space string `form:"space"`
 	}
 
 	UpdateSchemaSnapshotRequest {
-		Space    string `path:"space"`
+		Space    string `json:"space"`
 		Snapshot string `json:"snapshot"`
 	}
 
@@ -21,9 +21,9 @@ type (
 service studio-api {
 	@doc "Update Schema Snapshot"
 	@handler Update
-	put /api/schema/:space/snapshot (UpdateSchemaSnapshotRequest)
+	put /api/schema/snapshot (UpdateSchemaSnapshotRequest)
 	
 	@doc "Get Schema Snapshot"
 	@handler GetSnapshot
-	get /api/schema/:space/snapshot (GetSchemaSnapshotRequest) returns (SchemaSnapshot)
+	get /api/schema/snapshot (GetSchemaSnapshotRequest) returns (SchemaSnapshot)
 }
