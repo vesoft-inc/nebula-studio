@@ -37,11 +37,10 @@ interface IProps {
   templateRender?: (data?) => JSX.Element
 }
 const Console = (props: IProps) => {
-  const { schema, console, global } = useStore();
+  const { schema, console } = useStore();
   const { onExplorer, templateRender } = props;
   const { spaces, getSpaces, switchSpace, currentSpace, spaceVidType, updateVidType } = schema;
   const { runGQL, currentGQL, results, runGQLLoading, getParams, update, paramsMap, getFavoriteList } = console;
-  const { nebulaVersion } = global;
   const [isUpDown, setUpDown] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState<any>(null);
@@ -156,7 +155,7 @@ const Console = (props: IProps) => {
             </div>
           </div>
           <div className={styles.codeInput}>
-            {nebulaVersion?.startsWith('v3') && <CypherParameterBox onSelect={addParam} data={paramsMap} />}
+            <CypherParameterBox onSelect={addParam} data={paramsMap} />
             <CodeMirror
               value={currentGQL}
               onBlur={value => update({ currentGQL: value })}
