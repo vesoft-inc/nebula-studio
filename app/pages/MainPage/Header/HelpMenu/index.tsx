@@ -45,7 +45,10 @@ const HelpMenu = () => {
     },
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 6080d50 (fix: issues (#369))
       key: 'feedbackEntrance',
       popupClassName: styles.accountMenu,
       popupOffset: [-35, 20],
