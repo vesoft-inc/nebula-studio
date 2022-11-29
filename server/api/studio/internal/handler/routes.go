@@ -168,12 +168,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		[]rest.Route{
 			{
 				Method:  http.MethodPut,
-				Path:    "/api/schema/:space/snapshot",
+				Path:    "/api/schema/snapshot",
 				Handler: schema.UpdateHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,
-				Path:    "/api/schema/:space/snapshot",
+				Path:    "/api/schema/snapshot",
 				Handler: schema.GetSnapshotHandler(serverCtx),
 			},
 		},
