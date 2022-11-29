@@ -43,7 +43,7 @@ const HelpMenu = () => {
       </Link>
     },
     {
-      key: 'feedback',
+      key: 'feedbackEntrance',
       popupClassName: styles.accountMenu,
       popupOffset: [-35, 20],
       label: <Icon className={styles.navIcon} type="icon-navbar-feedback" />,
