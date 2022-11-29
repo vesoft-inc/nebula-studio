@@ -10,7 +10,7 @@ export const splitQuery = (query: string) => {
     const { gqlList, paramList } = acc;
     const line = cur.trim();
     if(line.startsWith(':')) {
-      paramList.push(line);
+      paramList.push(line.replace(/;$/gm, ''));
     } else {
       // if line ends with `\`, then it is a multi-line query
       const last = gqlList[gqlList.length - 1];
@@ -91,7 +91,7 @@ export class ConsoleStore {
         await this.getParams();
       }
       this.update({
-        results: [..._results.data, ...this.results],
+        results: [..._results.data.reverse(), ...this.results],
         currentGQL: editorValue || gql,
       });
     } finally {
