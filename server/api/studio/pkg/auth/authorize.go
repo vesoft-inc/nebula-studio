@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/pool"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
@@ -37,6 +38,8 @@ type (
 		jwt.RegisteredClaims
 	}
 )
+
+var GraphServiceConnectTimeout = 5 * time.Second
 
 func CreateToken(authData *AuthData, config *config.Config) (string, error) {
 	now := time.Now()
@@ -105,7 +108,8 @@ func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) 
 	}
 
 	username, password := loginInfo[0], loginInfo[1]
-	clientInfo, err := dao.Connect(params.Address, params.Port, username, password)
+	// set Graph Service connect timeout 5s, which is 0s default(means no timeout)
+	clientInfo, err := dao.Connect(params.Address, params.Port, username, password, nebula.WithGraphTimeout(GraphServiceConnectTimeout))
 	if err != nil {
 		return "", nil, err
 	}
