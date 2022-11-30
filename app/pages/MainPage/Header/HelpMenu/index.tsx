@@ -44,8 +44,6 @@ const HelpMenu = () => {
       </Link>
     },
     {
-<<<<<<< HEAD
-=======
       key: 'feedbackEntrance',
       popupClassName: styles.accountMenu,
       popupOffset: [-35, 20],
@@ -114,7 +112,6 @@ const HelpMenu = () => {
       ]
     },
     {
->>>>>>> 6080d50 (fix: issues (#369))
       key: 'user',
       popupClassName: styles.accountMenu,
       popupOffset: [-35, 20],
