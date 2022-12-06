@@ -60,11 +60,13 @@ func CreateConfigFile(uploadDir, taskdir string, config importconfig.YAMLConfig)
 	failDataPaths := make([]string, 0)
 	for _, file := range config.Files {
 		paths = append(paths, filepath.Join(uploadDir, *file.Path))
-		failDataPaths = append(failDataPaths, filepath.Join(taskdir, "err", *file.FailDataPath))
+		failDataPaths = append(failDataPaths, filepath.Join(taskdir, "err"))
 		_, fileName := filepath.Split(*file.Path)
-		_, fileDataName := filepath.Split(*file.FailDataPath)
 		*file.Path = fileName
-		*file.FailDataPath = fileDataName
+		if file.FailDataPath == nil {
+			file.FailDataPath = new(string)
+		}
+		*file.FailDataPath = fileName
 	}
 
 	outYaml, err := yaml.Marshal(config)

@@ -136,7 +136,7 @@ type ImportTaskSchema struct {
 
 type ImportTaskFile struct {
 	Path         *string           `json:"path" validate:"required"`
-	FailDataPath *string           `json:"failDataPath" validate:"required"`
+	FailDataPath *string           `json:"failDataPath,optional" `
 	BatchSize    *int              `json:"batchSize,optional"`
 	Limit        *int              `json:"limit, optional"`
 	InOrder      *bool             `json:"inOrder, optional"`

@@ -188,7 +188,7 @@
     "fileUploadRequired": "1. Please make sure all CSV data files are uploaded before import the YAML file. If not, please go to ",
     "fileUploadRequired2": " first.",
     "exampleDownload": "2. An example for the configuration file: ",
-    "uploadTemplateTip": "3. Configure the Yaml file: please keep only the file name (retain the file extension) for all file paths (path, failDataPath, logPath) in the template, e.g. logPath: config.csv",
+    "uploadTemplateTip": "3. Configure the Yaml file: please keep only the file name (retain the file extension) for all file paths (path, logPath) in the template, e.g. logPath: config.csv",
     "reUpload": "Re-upload",
     "fileNotExist": "{name} file does not exist！",
     "importYaml": "Import the YAML file",
