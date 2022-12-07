@@ -33,7 +33,7 @@ const PasswordInputModal = (props: IProps) => {
         onChange={e => setPassword(e.target.value)}
       />
       <div className={styles.btns}>
-        <Button onClick={() => handleConfirm()}>
+        <Button onClick={() => handleCancel()}>
           {intl.get('common.cancel')}
         </Button>
         <Button

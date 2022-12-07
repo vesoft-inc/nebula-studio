@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import _ from 'lodash';
-
+import { getI18n } from '@vesoft-inc/i18n';
 import { handleEscape } from './function';
 
 export function configToJson(payload) {
@@ -84,10 +84,8 @@ export function edgeDataToJSON(
           edgePorps.push(_prop);
       }
     });
-    const fileName = edge.file.name.replace('.csv', '');
     const edgeConfig = {
       path: edge.file.name,
-      failDataPath: `${fileName}Fail.csv`,
       batchSize: Number(batchSize) || 60,
       type: 'csv',
       csv: {
@@ -136,10 +134,8 @@ export function vertexDataToJSON(
       };
       return _tag;
     });
-    const fileName = vertex.file.name.replace('.csv', '');
     const vertexConfig: any = {
       path: vertex.file.name,
-      failDataPath: `${fileName}Fail.csv`,
       batchSize: Number(batchSize) || 60,
       type: 'csv',
       csv: {
@@ -164,6 +160,7 @@ export function vertexDataToJSON(
 
 export function indexJudge(index: number | null, name: string) {
   if (index === null) {
+    const { intl } = getI18n();
     message.error(`${name} ${intl.get('import.indexNotEmpty')}`);
     throw new Error();
   }
@@ -191,7 +188,6 @@ export const exampleJson = {
   'files': [
     {
       'path': 'item.csv',
-      'failDataPath': 'itemFail.csv',
       'batchSize': 60,
       'limit': null,
       'inOrder': null,
@@ -248,7 +244,6 @@ export const exampleJson = {
     },
     {
       'path': 'orderr.csv',
-      'failDataPath': 'orderrFail.csv',
       'batchSize': 60,
       'limit': null,
       'inOrder': null,
