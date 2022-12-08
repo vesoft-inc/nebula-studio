@@ -39,7 +39,10 @@ type (
 	}
 )
 
-var GraphServiceConnectTimeout = 5 * time.Second
+// set the timeout for the graph service: 8 hours
+// once the timeout is reached, the connection will be closed
+// all requests running ngql will be failed, so keepping a long timeout is necessary, make the connection alive
+const GraphServiceTimeout = 8 * time.Hour
 
 func CreateToken(authData *AuthData, config *config.Config) (string, error) {
 	now := time.Now()
@@ -109,7 +112,7 @@ func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) 
 
 	username, password := loginInfo[0], loginInfo[1]
 	// set Graph Service connect timeout 5s, which is 0s default(means no timeout)
-	clientInfo, err := dao.Connect(params.Address, params.Port, username, password, nebula.WithGraphTimeout(GraphServiceConnectTimeout))
+	clientInfo, err := dao.Connect(params.Address, params.Port, username, password, nebula.WithGraphTimeout(GraphServiceTimeout))
 	if err != nil {
 		return "", nil, err
 	}
