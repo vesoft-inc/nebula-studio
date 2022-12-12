@@ -111,7 +111,7 @@ func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) 
 	}
 
 	username, password := loginInfo[0], loginInfo[1]
-	// set Graph Service connect timeout 5s, which is 0s default(means no timeout)
+	// set Graph Service connect timeout 8h, which is 0s default(means no timeout)
 	clientInfo, err := dao.Connect(params.Address, params.Port, username, password, nebula.WithGraphTimeout(GraphServiceTimeout))
 	if err != nil {
 		return "", nil, err
