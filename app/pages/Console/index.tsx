@@ -159,7 +159,7 @@ const Console = (props: IProps) => {
             <CypherParameterBox onSelect={addParam} data={paramsMap} />
             <CodeMirror
               value={currentGQL}
-              onBlur={value => update({ currentGQL: value })}
+              onChange={value => update({ currentGQL: value })}
               ref={editor}
               height={isUpDown ? '120px' : 24 * maxLineNum + 'px'}
               onShiftEnter={handleRun}

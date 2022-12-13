@@ -213,7 +213,11 @@ const OutputBox = (props: IProps) => {
       onResultConfig!(data);
     }
   };
-
+  const handleRemoveMenu = () => {
+    graph.setPointer({
+      showContextMenu: false,
+    });
+  };
   const parseToGraph = () => {
     const { vertexes, edges } = parseSubGraph(data.tables, spaceVidType);
     onExplorer!({
@@ -320,7 +324,7 @@ const OutputBox = (props: IProps) => {
         />
       </div>
       {resultSuccess && data.timeCost !== undefined && (
-        <div className={styles.outputFooter}>
+        <div className={styles.outputFooter} onClick={handleRemoveMenu}>
           <span>
             {`${intl.get('console.execTime')} ${data.timeCost /
               1000000} (s)`}

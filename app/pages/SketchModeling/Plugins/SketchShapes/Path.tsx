@@ -144,7 +144,7 @@ const Path: LineRender = {
     return path;
   },
   renderLabel(line: InstanceLine): SVGGElement {
-    const { name, invalid } = line.data as ISketchEdge;
+    const { name, invalid, textBackgroundColor } = line.data as ISketchEdge;
     if (!name) {
       if (line.label) {
         line.label.labelGroup.remove();
@@ -165,25 +165,29 @@ const Path: LineRender = {
     // to append to last
     line.shape?.appendChild(line.label.labelGroup);
 
-    let string = name;
-    const showNum = 20;
     const totalLen = line.pathData.getTotalLength();
     const pointLen = line.pathData.getPointAtLength(totalLen / 2);
     // eslint-disable-next-line prefer-const
     let { x, y } = pointLen || {};
-    if (name && name.length > showNum && showNum) {
-      string = name.slice(0, showNum) + '...';
-    }
-
-    if(string || invalid) {
-      const width = string ? Math.min(string?.length * 10 + 15, 100) : 15;
+    const fromPoint = line.bezierData ? line.bezierData.from : line.from;
+    const toPoint = line.bezierData ? line.bezierData.to : line.to;
+    const angle = Math.atan((fromPoint.y - toPoint.y) / (fromPoint.x - toPoint.x)) * 180 / Math.PI;
+    if(name || invalid) {
+      const width = totalLen ? totalLen * 0.4 : 15;
       ReactDOM.render(
         <>
-          <foreignObject x={x - width / 2} y={y - 20} width={width} height={45} textAnchor="middle">
+          <foreignObject x={x - width / 2} y={y - 10}
+            width={width} height={20} 
+            textAnchor="middle" transform-origin={`${x} ${y}`}
+            style={{ transform: `rotate(${angle}deg)` }}>
             <div className={styles.edgeLabel}>
-              <span>
-                {string}
-                {invalid && <span className={styles.invalid} />}
+              <span style={{ paddingRight: invalid ? '10px' : undefined, maxWidth: width, backgroundColor: (textBackgroundColor) as string }}>
+                {name}
+                {invalid && <span className={styles.invalid} style={ !name ? {
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)'
+                } : undefined} />}
               </span>
             </div>
           </foreignObject>
