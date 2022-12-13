@@ -144,7 +144,7 @@ const Path: LineRender = {
     return path;
   },
   renderLabel(line: InstanceLine): SVGGElement {
-    const { name, invalid, textBackground } = line.data as ISketchEdge;
+    const { name, invalid, textBackgroundColor } = line.data as ISketchEdge;
     if (!name) {
       if (line.label) {
         line.label.labelGroup.remove();
@@ -181,9 +181,13 @@ const Path: LineRender = {
             textAnchor="middle" transform-origin={`${x} ${y}`}
             style={{ transform: `rotate(${angle}deg)` }}>
             <div className={styles.edgeLabel}>
-              <span style={{ paddingRight: invalid ? '15' : undefined, maxWidth: width, backgroundColor: (textBackground) as string }}>
+              <span style={{ paddingRight: invalid ? '10px' : undefined, maxWidth: width, backgroundColor: (textBackgroundColor) as string }}>
                 {name}
-                {invalid && <span className={styles.invalid} />}
+                {invalid && <span className={styles.invalid} style={ !name ? {
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)'
+                } : undefined} />}
               </span>
             </div>
           </foreignObject>
