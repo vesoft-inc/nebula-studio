@@ -168,6 +168,7 @@ const SchemaVisualization = () => {
           style: LINE_STYLE,
           arrowStyle: ARROW_STYLE,
           properties: line.properties,
+          textBackground: '#fff'
         };
       }).filter(line => line.from && line.to);
       makeLineSort(_lines);

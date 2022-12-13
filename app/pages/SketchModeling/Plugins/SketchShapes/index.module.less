@@ -1,3 +1,4 @@
+@import '~@app/common.less';
 @shadowBlue: rgba(0, 194, 255, 0.6) !important;
 @pathBlue: rgba(0, 145, 255, 0.7);
 .labelContainer {
@@ -10,12 +11,8 @@
     text-align: center;
     text-overflow: ellipsis;
     overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
     max-width: 70%;
-    word-break: break-all;
-    font-size: 14px;
+    font-size: 12px;
     user-select: none;
   }
 }
@@ -28,21 +25,17 @@
   justify-content: center;
   align-items: center;
   max-height: 100%;
+  font-size: 12px;
   >span {
-    max-width: 80px;
     height: 100%;
-    padding-right: 15px;
     position: relative;
     overflow: hidden;
     text-overflow: ellipsis;
     min-height: 10px;
-    display: -webkit-box;
-    white-space: pre-wrap;
-    word-break: break-word;
+    white-space: nowrap;
     user-select: none;
-    line-height: 12px;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    padding: 0 3px;
+    background-color: @lightWhite;
   }
   .invalid {
     width: 10px;
@@ -77,6 +70,9 @@
 :global(.ve-line.active), :global(.ve-line:hover) {
   .edgeLabel {
     color: #0091FF;
+    span {
+      background-color: @lightWhite;
+    }
   }
 
   .arrow {
