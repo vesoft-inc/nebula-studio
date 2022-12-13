@@ -169,8 +169,8 @@ const formRef = ((props: IProps) => {
                   cancelText={intl.get('common.cancel')}
                 >
                   <Button
+                    danger
                     type="link"
-                    disabled={editDisabled}
                   >
                     {intl.get('common.delete')}
                   </Button>

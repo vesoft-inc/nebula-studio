@@ -62,7 +62,6 @@ export const DisplayRow = (props: IProps) => {
         <Button
           danger
           type="link"
-          disabled={disabled}
         >
           {intl.get('common.delete')}
         </Button>
