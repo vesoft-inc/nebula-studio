@@ -15,7 +15,7 @@ let flag = false;
 const SchemaConfig: React.FC = () => {
   const { sketchModel } = useStore();
   const { intl } = useI18n();
-  const { active, updateItem, deleteElement, duplicateNode } = sketchModel;
+  const { active, updateItem, deleteElement, duplicateNode, validate } = sketchModel;
   const [form] = Form.useForm();
   const update = useCallback((data) => {
     if (!sketchModel.active) {
@@ -36,16 +36,16 @@ const SchemaConfig: React.FC = () => {
     const name = form.getFieldValue('name');
     const data = sketchModel.editor?.schema.getData();
     let invalid = false;
-    if(!data) return invalid;
+    if(!data || name === prevName) return invalid;
     data.nodes.forEach((item) => {
-      if(item.uuid === sketchModel.active?.uuid || !name) {
+      if(item.uuid === sketchModel.active?.uuid || !item.name) {
         return;
       }
       if(item.name === name) {
         invalid = true;
         item.invalid = true;
         sketchModel.editor.graph.node.updateNode(item, true);
-      } else if (item.name === prevName) {
+      } else if (item.name === prevName && validate(item, 'node')) {
         item.invalid = false;
         sketchModel.editor.graph.node.updateNode(item, true);
       }
@@ -58,7 +58,7 @@ const SchemaConfig: React.FC = () => {
         invalid = true;
         item.invalid = true;
         sketchModel.editor.graph.line.updateLine(item, true);
-      } else if (item.name === prevName) {
+      } else if (item.name === prevName && validate(item, 'edge')) {
         item.invalid = false;
         sketchModel.editor.graph.line.updateLine(item, true);
       }

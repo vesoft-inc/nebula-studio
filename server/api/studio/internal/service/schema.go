@@ -62,7 +62,7 @@ func (s *schemaService) UpdateSchemaSnapshot(request types.UpdateSchemaSnapshotR
 			return ecode.WithErrorMessage(ecode.ErrInternalDatabase, result.Error)
 		}
 	} else {
-		result = db.CtxDB.Model(&db.SchemaSnapshot{}).Where("space = ?", request.Space).Update("snapshot", request.Snapshot)
+		result = db.CtxDB.Model(&db.SchemaSnapshot{}).Where("space = ? AND username = ? AND host = ?", request.Space, auth.Username, host).Update("snapshot", request.Snapshot)
 		if result.Error != nil {
 			return s.gormErrorWrapper(result.Error)
 		}

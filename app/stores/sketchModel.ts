@@ -84,17 +84,22 @@ export class SketchStore {
       byteLength > MAX_COMMENT_BYTES && (isInvalid = true);
     }
     if (isInvalid) {
-      this.updateItem(data as any, { invalid: true });
-      if (type === 'node') {
-        this.editor.graph.node.updateNode(this.editor.graph.node.nodes[data.uuid].data, true);
-      } else {
-        this.editor.graph.line.updateLine(this.editor.graph.line.lines[data.uuid].data, true);
-      }
+      this.updateItemStatus(data, type, true);
     }
     if (this.active?.uuid === data.uuid) {
       this.update({ active: { ...this.active, invalid: isInvalid } });
     }
     return !isInvalid;
+  };
+
+  updateItemStatus = (data: ISketchNode | ISketchEdge, type: 'node' | 'edge', status: boolean) => {
+    const { uuid } = data;
+    this.updateItem(data as any, { invalid: status });
+    if (type === 'node') {
+      this.editor.graph.node.updateNode(this.editor.graph.node.nodes[uuid].data, true);
+    } else {
+      this.editor.graph.line.updateLine(this.editor.graph.line.lines[uuid].data, true);
+    } 
   };
 
   validateSchema = async () => {
@@ -108,6 +113,33 @@ export class SketchStore {
     }
     hasSameName ? message.error(intl.get('sketch.uniqName')) : message.error(intl.get('sketch.sketchInvalid'));
     return false;
+  };
+
+  validateSameNameData = () => {
+    const nodes = this.editor.graph.node.nodes;
+    const lines = this.editor.graph.line.lines;
+    const _nodes = Object.values(nodes).filter(i => i.data.invalid === true);
+    const _lines = Object.values(lines).filter(i => i.data.invalid === true && Object.keys(nodes).includes(i.data.from) && Object.keys(nodes).includes(i.data.to));
+    _nodes.forEach(i => {
+      const data = i.data;
+      const isValid = this.validate(data, 'node');
+      if(isValid) {
+        const hasSameName = _nodes.some(node => node.data.uuid !== data.uuid && node.data.name === data.name) && _lines.some(line => line.data.name !== data.name);
+        if(!hasSameName) {
+          this.updateItemStatus(data as ISketchNode, 'node', false);
+        }
+      }
+    });
+    _lines.forEach(i => {
+      const data = i.data;
+      const isValid = this.validate(data, 'edge');
+      if(isValid) {
+        const hasSameName = _lines.some(line => line.data.uuid !== data.uuid && line.data.name === data.name) && _nodes.some(node => node.data.name !== data.name);
+        if(!hasSameName) {
+          this.updateItemStatus(data as ISketchEdge, 'edge', false);
+        } 
+      }
+    });
   };
 
   checkSameName = () => {
@@ -229,13 +261,13 @@ export class SketchStore {
     this.container = container;
     initShapes(this.editor);
     initShadowFilter(this.editor.svg);
-    this.initEvents(options?.mode);
     if (schema) {
       const _schema = JSON.parse(schema);
       makeLineSort(_schema.lines);
       await this.editor.schema.setInitData(_schema);
       this.editor.controller.autoFit();
     }
+    this.initEvents(options?.mode);
   };
   clearActive = () => {
     this.editor.graph.node.unActive();
@@ -289,6 +321,7 @@ export class SketchStore {
           param.hoveringItem = undefined;
         }
         this.update(param);
+        this.validateSameNameData();
         trackEvent('sketch', 'remove_node');
       });
       this.editor.graph.on('line:remove', ({ line }) => {
@@ -300,6 +333,7 @@ export class SketchStore {
           param.hoveringItem = undefined;
         }
         this.update(param);
+        this.validateSameNameData();
         trackEvent('sketch', 'remove_line');
       });
     }
