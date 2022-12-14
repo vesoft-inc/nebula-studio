@@ -36,7 +36,7 @@ const SchemaConfig: React.FC = () => {
     const name = form.getFieldValue('name');
     const data = sketchModel.editor?.schema.getData();
     let invalid = false;
-    if(!data || name === prevName) return invalid;
+    if(!data || name === prevName) return sketchModel.active?.invalid || false;
     data.nodes.forEach((item) => {
       if(item.uuid === sketchModel.active?.uuid || !item.name) {
         return;

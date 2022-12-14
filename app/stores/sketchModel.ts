@@ -84,7 +84,7 @@ export class SketchStore {
       byteLength > MAX_COMMENT_BYTES && (isInvalid = true);
     }
     if (isInvalid) {
-      this.updateItemStatus(data, type, true);
+      this.updateItemStatus({ data, type, status: true });
     }
     if (this.active?.uuid === data.uuid) {
       this.update({ active: { ...this.active, invalid: isInvalid } });
@@ -92,7 +92,11 @@ export class SketchStore {
     return !isInvalid;
   };
 
-  updateItemStatus = (data: ISketchNode | ISketchEdge, type: 'node' | 'edge', status: boolean) => {
+  updateItemStatus = (params: 
+  { data: ISketchNode, type: 'node', status: boolean } 
+  | { data: ISketchEdge, type: 'edge', status: boolean }
+  ) => {
+    const { data, type, status } = params;
     const { uuid } = data;
     this.updateItem(data as any, { invalid: status });
     if (type === 'node') {
@@ -118,15 +122,15 @@ export class SketchStore {
   validateSameNameData = () => {
     const nodes = this.editor.graph.node.nodes;
     const lines = this.editor.graph.line.lines;
-    const _nodes = Object.values(nodes).filter(i => i.data.invalid === true);
-    const _lines = Object.values(lines).filter(i => i.data.invalid === true && Object.keys(nodes).includes(i.data.from) && Object.keys(nodes).includes(i.data.to));
+    const _nodes = Object.values(nodes).filter(i => !!i.data.invalid);
+    const _lines = Object.values(lines).filter(i => !!i.data.invalid && [i.data.from, i.data.to].every(id => id in Object.keys(nodes)));
     _nodes.forEach(i => {
       const data = i.data;
       const isValid = this.validate(data, 'node');
       if(isValid) {
-        const hasSameName = _nodes.some(node => node.data.uuid !== data.uuid && node.data.name === data.name) && _lines.some(line => line.data.name !== data.name);
+        const hasSameName = _nodes.some(node => node.data.uuid !== data.uuid && node.data.name === data.name) || _lines.some(line => line.data.name === data.name);
         if(!hasSameName) {
-          this.updateItemStatus(data as ISketchNode, 'node', false);
+          this.updateItemStatus({ data: data as ISketchNode, type: 'node', status: false });
         }
       }
     });
@@ -134,16 +138,16 @@ export class SketchStore {
       const data = i.data;
       const isValid = this.validate(data, 'edge');
       if(isValid) {
-        const hasSameName = _lines.some(line => line.data.uuid !== data.uuid && line.data.name === data.name) && _nodes.some(node => node.data.name !== data.name);
+        const hasSameName = _lines.some(line => line.data.uuid !== data.uuid && line.data.name === data.name) || _nodes.some(node => node.data.name === data.name);
         if(!hasSameName) {
-          this.updateItemStatus(data as ISketchEdge, 'edge', false);
+          this.updateItemStatus({ data: data as ISketchEdge, type: 'edge', status: false });
         } 
       }
     });
   };
 
   checkSameName = () => {
-    const data = this.editor?.schema?.getData();
+    const data = this.editor.schema.getData();
     const { nodes, lines } = data;
     const _nodes = nodes.map((i) => i.name).filter(Boolean);
     const _lines = lines.map((i) => i.name).filter(Boolean);
