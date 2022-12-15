@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Button, Carousel, Checkbox, Col, message, Modal, Progress, Row, Tabs, TabsProps, Tag } from 'antd';
+import { Button, Carousel, Checkbox, Col, message, Modal, Progress, Row, Tabs, TabsProps, Tag, Tooltip } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { useI18n, getI18n } from '@vesoft-inc/i18n';
 import { observer } from 'mobx-react-lite';
@@ -20,6 +20,7 @@ export interface ModuleItem {
   tip: string;
   startLink: string;
   startDisabled?: boolean;
+  disabledTip?: string;
   docLink: string;
   beta?: boolean;
   withOrder?: boolean;
@@ -314,14 +315,29 @@ function Welcome(props: IProps) {
                 <span className={cls(styles.title, module.beta && styles.beta)}>{module.title}</span>
                 <span className={styles.tip}>{module.tip}</span>
                 <div className={styles.actionWrapper}>
-                  <Button
-                    className={styles.action}
-                    disabled={!!module.startDisabled}
-                    type="primary"
-                    onClick={() => history.push(module.startLink)}
-                  >
-                    {intl.get('welcome.quickStart')}
-                  </Button>
+                  {
+                    module.disabledTip ? (
+                      <Tooltip title={module.disabledTip}>
+                        <Button
+                          className={styles.disabledAction}
+                          disabled={!!module.startDisabled}
+                          type="primary"
+                          onClick={() => history.push(module.startLink)}
+                        >
+                          {intl.get('welcome.quickStart')}
+                        </Button>
+                      </Tooltip>
+                    ) : (
+                      <Button
+                        className={styles.action}
+                        disabled={!!module.startDisabled}
+                        type="primary"
+                        onClick={() => history.push(module.startLink)}
+                      >
+                        {intl.get('welcome.quickStart')}
+                      </Button>
+                    )}
+
                   <Button className={cls(styles.action, styles.sub)} href={module.docLink} target="_blank">
                     {intl.get('welcome.quickStartDesc')}
                   </Button>
