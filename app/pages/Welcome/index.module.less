@@ -39,6 +39,19 @@
       }
     }
   }
+  .disabledAction {
+    margin-right: 16px;
+    
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 30px;
+      font-size: 14px;
+      padding: 0 7px;
+      width: 100px;
+    }
+  }
 }
 
 .welcomeWrapper {
@@ -67,6 +80,17 @@
         width: 10px;
         background-color: #0091ff;
       }
+    }
+  }
+  :global {
+    .ant-tooltip-arrow {
+      display: none;
+    }
+    .ant-tooltip-inner {
+      padding: 0;
+      background-color: transparent;
+      // min-height: 0;
+      // min-width: 0;
     }
   }
 }
