@@ -77,7 +77,7 @@ const Path: LineRender = {
     let startControlPoint;
     let endControlPoint;
     let path;
-    if(l > 0) {
+    if(l >= NODE_RADIUS * 2) {
       const a = Math.atan2(dst.y - src.y, dst.x - src.x);
       const d = l * curvature;
       const cp = {
@@ -119,7 +119,7 @@ const Path: LineRender = {
         startControlPoint,
         endControlPoint
       };
-    } else {
+    } else if (l <= 0) {
       const selfLoopRadius = 30;
       const startSpace = 8;
       const endSpace = 8;
@@ -136,6 +136,8 @@ const Path: LineRender = {
       const dis = Math.sqrt(Math.pow(from.x - to.x, 2) + Math.pow(from.y - to.y, 2));
       const radius = (dis / 2) / Math.sin(angle / 2);
       path = `M${from.x} ${from.y} A ${radius} ${radius} 0 1 0 ${end.x} ${end.y} L${to.x} ${to.y}`;
+    } else {
+      path = `M${from.x} ${from.y} L${to.x} ${to.y}`;
     }
     line.data.fromX = src.x;
     line.data.fromY = src.y;
