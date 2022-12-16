@@ -734,7 +734,7 @@ export class SchemaStore {
 
   getNodeTagMap = async (ids: string[]) => {
     const vidMap = {};
-    const tagSet = new Set();
+    const tagSet = new Set(this.tagList.map(i => i.name));
     if(!this.spaceVidType) {
       await this.updateVidType();
     }

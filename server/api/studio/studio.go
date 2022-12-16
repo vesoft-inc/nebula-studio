@@ -13,6 +13,7 @@ import (
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/logging"
+	studioMiddleware "github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/middleware"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/server"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/core/conf"
@@ -45,11 +46,7 @@ func main() {
 	server.InitDB(c.File.SqliteDbFilePath)
 
 	svcCtx := svc.NewServiceContext(c)
-	server := rest.MustNewServer(c.RestConf, rest.WithNotFoundHandler(middleware.NewAssetsHandler(middleware.AssetsConfig{
-		Root:       "assets",
-		Filesystem: http.FS(embedAssets),
-		SPA:        true,
-	})))
+	server := rest.MustNewServer(c.RestConf, rest.WithNotFoundHandler(studioMiddleware.AssetsMiddlewareWithCtx(svcCtx, embedAssets)))
 
 	defer server.Stop()
 	waitForCalled := proc.AddWrapUpListener(func() {

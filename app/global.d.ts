@@ -7,3 +7,8 @@ declare module '*.bmp';
 declare module '*.tiff';
 declare module '*.less';
  
+interface Window {
+  gConfig: {
+    maxBytes: number
+  };
+}

@@ -4,6 +4,12 @@ const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const Package = require('../package.json');
+const { getAppConfig } = require('./config');
+const { getEnv } = require('./env');
+
+const appConfig = getAppConfig();
+
+const isDevEnv = () => getEnv() === 'development';
 
 const commonConfig = {
   entry: {
@@ -119,6 +125,10 @@ const commonConfig = {
         removeStyleLinkTypeAttributes: true,
         useShortDoctype: true,
       },
+      pageInitialProps: {
+        dev: isDevEnv(),
+        maxBytes: appConfig.MaxBytes
+      }
     }),
     new AntdDayjsWebpackPlugin(),
     new CopyPlugin({

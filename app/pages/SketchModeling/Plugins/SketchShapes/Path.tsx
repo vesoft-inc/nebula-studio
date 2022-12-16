@@ -119,7 +119,8 @@ const Path: LineRender = {
         startControlPoint,
         endControlPoint
       };
-    } else if (l <= 0) {
+    } else if (l <= 0 && from.nodeId === to.nodeId) {
+      // from.nodeId === to.nodeId Avoid two circles completely coincident 
       const selfLoopRadius = 30;
       const startSpace = 8;
       const endSpace = 8;
