@@ -6,14 +6,20 @@ import { debounce } from 'lodash';
 import { message } from 'antd';
 import { StudioFile } from '@app/interfaces/import';
 import { useI18n } from '@vesoft-inc/i18n';
+import { getFileSize } from '@app/utils/file';
 import FileList from './FileList';
 
 const FileUpload = () => {
-  const { files } = useStore();
+  const { files, global } = useStore();
   const { intl } = useI18n();
   const { fileList, deleteFile, getFiles, uploadFile } = files;
   const [loading, setLoading] = useState(false);
   const transformFile = async (_file: StudioFile, fileList: StudioFile[]) => {
+    const size = fileList.reduce((acc, cur) => acc + cur.size, 0);
+    if(size > global.gConfig.maxBytes) {
+      message.error(intl.get('import.fileSizeLimit', { size: getFileSize(global.gConfig.maxBytes) }));
+      return false;
+    }
     fileList.forEach(file => {
       file.path = `${file.name}`;
       file.withHeader = false;
@@ -22,13 +28,15 @@ const FileUpload = () => {
     return false;
   };
 
-  const handleUpdate = async (fileList: StudioFile[]) => {
+  const handleUpdate = (fileList: StudioFile[]) => {
     setLoading(true);
-    await uploadFile(fileList).then(_ => {
-      setTimeout(() => {
-        getFileList();
+    uploadFile(fileList).then(res => {
+      if(res.code === 0) {
         message.success(intl.get('import.uploadSuccessfully'));
-      }, 2000);
+        getFileList();
+      } else {
+        setLoading(false);
+      }
     }).catch(_err => {
       setLoading(false);
     });

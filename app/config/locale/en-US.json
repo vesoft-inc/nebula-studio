@@ -193,7 +193,8 @@
     "fileNotExist": "{name} file does not exist！",
     "importYaml": "Import the YAML file",
     "templateMatchError": "The {type} in the configuration does not match the current login account/host",
-    "uploadSuccessfully": "Upload files successfully."
+    "uploadSuccessfully": "Upload files successfully.",
+    "fileSizeLimit": "The file is too large and exceeds the upload limit({size}), please modify the MaxBytes in the startup configuration file and restart the service"
   },
   "schema": {
     "spaceList": "Graph Space List",
@@ -315,7 +316,7 @@
     "selectSpace": "Select Space",
     "noCurrentSketch": "No schema sketch selected",
     "noCurrentSketchTips": "Please select a schema sketch first",
-    "sketchInvalid": "The schema sketch is invalid, please check",
+    "sketchInvalid": "Please complete the current Schema information",
     "saveSuccess": "Save successfully",
     "saveReminder": "The current sketch has been modified but not saved, whether to continue to switch sketches?",
     "saveTip": "The current sketch has been modified but not saved, please save first.",

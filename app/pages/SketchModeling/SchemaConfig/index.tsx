@@ -51,7 +51,7 @@ const SchemaConfig: React.FC = () => {
       }
     });
     data.lines.forEach((item) => {
-      if(item.uuid === sketchModel.active?.uuid || !name) {
+      if(item.uuid === sketchModel.active?.uuid || !item.name) {
         return;
       }
       if(item.name === name) {

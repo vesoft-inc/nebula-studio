@@ -9,6 +9,7 @@ import { getRootStore, resetStore } from '.';
 
 const { intl } = getI18n();
 export class GlobalStore {
+  gConfig = window.gConfig;
   history: BrowserHistory;
   _username = cookies.get('nu');
   _host = cookies.get('nh');

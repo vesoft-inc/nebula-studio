@@ -138,6 +138,9 @@ func (f *fileService) FileUpload() error {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err, "upload failed")
 	}
 	for _, file := range files {
+		if file.Size == 0 {
+			continue
+		}
 		charSet, err := checkCharset(file)
 		if err != nil {
 			logx.Infof("upload file error, check charset fail:%v", err)

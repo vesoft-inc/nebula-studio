@@ -193,7 +193,8 @@
     "fileNotExist": "文件 {name} 不存在",
     "importYaml": "导入 YAML 文件",
     "templateMatchError": "配置中的{type}与当前登录账号/地址不匹配",
-    "uploadSuccessfully": "上传文件成功"
+    "uploadSuccessfully": "上传文件成功",
+    "fileSizeLimit": "文件过大，超过上传限制({size})，请修改启动配置文件中的 MaxBytes 并重启服务"
   },
   "schema": {
     "spaceList": "图空间列表",
@@ -315,7 +316,7 @@
     "selectSpace": "选择图空间",
     "noCurrentSketch": "当前没有选中草图",
     "noCurrentSketchTips": "请在左侧列表中选择草图",
-    "sketchInvalid": "当前草图数据格式错误，请检查",
+    "sketchInvalid": "请完善当前 Schema 信息。",
     "saveSuccess": "保存成功",
     "saveReminder": "当前草图有修改未保存，是否继续切换草图?",
     "saveTip": "当前草图有修改未保存， 请先保存。",

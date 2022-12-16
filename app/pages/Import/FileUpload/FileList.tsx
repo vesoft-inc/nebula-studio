@@ -20,6 +20,7 @@ const FileList = (props: IProps) => {
     {
       title: intl.get('import.fileName'),
       dataIndex: 'name',
+      width: '50%'
     },
     {
       title: intl.get('import.withHeader'),

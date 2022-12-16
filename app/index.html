@@ -1,3 +1,5 @@
+<% var initProps=htmlWebpackPlugin.options.pageInitialProps %>
+
 <!DOCTYPE html>
 <html lang="EN_US">
 
@@ -8,6 +10,13 @@
 		<title>NebulaGraph Studio</title>
 		<script async defer src="https://buttons.github.io/buttons.js"></script>
 		<!-- Global Event Tracking -->
+		<script>
+			<% if (initProps.dev) { %>
+				window.gConfig = { maxBytes: <%= JSON.stringify(initProps.maxBytes) %> }
+			<% } else { %>
+					window.gConfig = { maxBytes: { {.maxBytes } } }
+			<% } %>
+		</script>
     <style>
 		@-webkit-keyframes square-spin {
 			25% {
