@@ -16,6 +16,7 @@ import (
 	studioMiddleware "github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/middleware"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/server"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ws"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/proc"
 	"github.com/zeromicro/go-zero/rest"
@@ -69,6 +70,22 @@ func main() {
 
 	// api handlers
 	handler.RegisterHandlers(server, svcCtx)
+
+	// websocket
+	hub := ws.NewHub()
+	go hub.Run()
+	server.AddRoute(rest.Route{
+		Method: http.MethodGet,
+		Path:   "/nebula_ws",
+		Handler: func(w http.ResponseWriter, r *http.Request) {
+			auth, ok := r.Context().Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+			if !ok {
+				svcCtx.ResponseHandler.Handle(w, r, nil, fmt.Errorf("auth failed"))
+				return
+			}
+			ws.ServeWebSocket(hub, w, r, auth)
+		},
+	})
 
 	httpx.SetErrorHandler(func(err error) (int, interface{}) {
 		return svcCtx.ResponseHandler.GetStatusBody(nil, nil, err)

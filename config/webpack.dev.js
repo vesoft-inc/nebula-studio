@@ -62,6 +62,13 @@ const devConfig = {
         target: 'http://127.0.0.1:9000',
         changeOrigin: true,
       },
+      {
+        path: '/nebula_ws',
+        target: 'ws://127.0.0.1:9000',
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+      },
     ]
   },
 };
