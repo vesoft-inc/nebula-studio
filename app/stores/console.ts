@@ -7,7 +7,7 @@ import { getI18n } from '@vesoft-inc/i18n';
 const { intl } = getI18n();
 
 export const splitQuery = (query: string) => {
-  const _query = query.split('\n');
+  const _query = query.split('\n').filter(i => !i.trim().startsWith('//') && !i.trim().startsWith('#'));
   const result = _query.reduce((acc, cur) => {
     const { gqlList, paramList } = acc;
     const line = cur.trim();
