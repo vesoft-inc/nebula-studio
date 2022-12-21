@@ -136,7 +136,7 @@ type ImportTaskSchema struct {
 
 type ImportTaskFile struct {
 	Path         *string           `json:"path" validate:"required"`
-	FailDataPath *string           `json:"failDataPath,optional" `
+	FailDataPath *string           `json:"failDataPath,optional"`
 	BatchSize    *int              `json:"batchSize,optional"`
 	Limit        *int              `json:"limit, optional"`
 	InOrder      *bool             `json:"inOrder, optional"`
@@ -192,7 +192,7 @@ type ImportTaskStats struct {
 
 type GetManyImportTaskRequest struct {
 	Page     int `form:"page,default=1"`
-	PageSize int `form:"pageSize,default=100"`
+	PageSize int `form:"pageSize,default=999"`
 }
 
 type GetManyImportTaskData struct {
