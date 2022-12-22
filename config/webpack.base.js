@@ -4,6 +4,7 @@ const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const Package = require('../package.json');
+
 const { getAppConfig } = require('./config');
 const { getEnv } = require('./env');
 
@@ -15,6 +16,13 @@ const commonConfig = {
   entry: {
     app: [path.join(__dirname, '../app/index.tsx')],
   },
+  output: {
+    path: path.join(__dirname, '../dist/'),
+    filename: '[name].[chunkhash].js',
+    chunkFilename: '[name].[contenthash].js',
+    publicPath: '/',
+  },
+  mode: isDevEnv() ? 'development' : 'production',
   module: {
     exprContextCritical: true,
     rules: [
@@ -127,7 +135,7 @@ const commonConfig = {
       },
       pageInitialProps: {
         dev: isDevEnv(),
-        maxBytes: appConfig.MaxBytes
+        maxBytes: appConfig.MaxBytes || 1048576 // go-zero default value
       }
     }),
     new AntdDayjsWebpackPlugin(),

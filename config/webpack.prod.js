@@ -1,37 +1,28 @@
+const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const path = require('path');
-const { merge } = require('webpack-merge');
-
-const commonConfig = require('./webpack.base');
 const { setEnv } = require('./env');
 
 setEnv('production');
-const publicConfig = {
-  mode: 'production',
-  output: {
-    path: path.join(__dirname, '../dist/'),
-    filename: '[name].[chunkhash].js',
-    chunkFilename: '[name].[contenthash].js',
-    publicPath: '/',
+
+const config = require('./webpack.base');
+config.module.rules.push(
+  {
+    test: /\.css$/,
+    use: [MiniCssExtractPlugin.loader, 'css-loader'],
   },
-  module: {
-    rules: [
-      {
-        test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader'],
-      },
-    ],
-  },
+);
+config.plugins.push(
+  new CleanWebpackPlugin({
+    cleanOnceBeforeBuildPatterns: [path.resolve(__dirname, '..', 'dist')],
+  }),
+);
 
-  plugins: [
-    new CleanWebpackPlugin(),
+config.plugins.push(
+  new MiniCssExtractPlugin({
+    filename: '[name].[fullhash].css',
+    chunkFilename: '[id].[fullhash].css',
+  }),
+);
 
-    new MiniCssExtractPlugin({
-      filename: '[name].[fullhash].css',
-      chunkFilename: '[id].[fullhash].css',
-    }),
-  ],
-};
-
-module.exports = merge(commonConfig, publicConfig);
+module.exports = config;
