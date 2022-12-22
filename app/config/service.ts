@@ -1,8 +1,12 @@
 import { _delete, get, post, put } from '../utils/http';
+import ngqlRunner from '@app/utils/websocket';
 
 const service = {
+  // execNGQL: (params, config?) => {
+  //   return post('/api-nebula/db/exec')(params, config);
+  // },
   execNGQL: (params, config?) => {
-    return post('/api-nebula/db/exec')(params, config);
+    return ngqlRunner.runNgql(params, config);
   },
   batchExecNGQL: (params, config?) => {
     return post('/api-nebula/db/batchExec')(params, config);

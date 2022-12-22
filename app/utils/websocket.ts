@@ -9,48 +9,72 @@ interface MessageReceive {
   body: {
     msgType: string;
     content: Record<string, unknown>;
-  }
-}
-
-export function createWebSocketConnection(param: {
-  url: string | URL;
-  protocols?: string | string[];
-  onOpen?: (event: Event) => void;
-  onMessage?: (event: MessageEvent) => void;
-  onError?: (event: Event) => void;
-  onClose?: (event: CloseEvent) => void;
-}) {
-  const { url, protocols } = param;
-  const socket = new WebSocket(url, protocols);
-  return socket;
+  };
 }
 
 export class NgqlRunner {
   socket: WebSocket | undefined;
 
+  socketUrl: string | URL | undefined;
+  socketProtocols: string | string[] | undefined;
+
+  socketMessageListeners: Array<(e: MessageEvent) => void> = [];
+
   constructor() {
     this.socket = undefined;
   }
 
-  connect = (url: string, protocols?: string | string[]) => new Promise<boolean>((resolve) => {
-    const socket = new WebSocket(url, protocols);
-    socket.onopen = () => {
-      console.log('=====ngqlSocket open');
-      this.socket = socket;
-      resolve(true);
-    };
-    socket.onerror = (e) => {
-      console.error('=====ngqlSocket error', e);
-      resolve(false);
-    };
-    socket.onclose = () => {
-      console.log('=====ngqlSocket close');
-      this.socket = undefined;
-    };
-  });
+  addSocketMessageListener = (listener: (e: MessageEvent) => void) => {
+    this.socket?.addEventListener('message', listener);
+    this.socketMessageListeners.push(listener);
+  };
 
-  runNgql = ({ gql }: { gql: string; }) => {
-    const message = JSON.stringify({
+  rmSocketMessageListener = (listener: (e: MessageEvent) => void) => {
+    this.socket?.removeEventListener('message', listener);
+    this.socketMessageListeners = this.socketMessageListeners.filter(l => l !== listener);
+  };
+
+  clearSocketMessageListener = () => {
+    this.socketMessageListeners.forEach((l) => {
+      this.socket?.removeEventListener('message', l);
+    });
+    this.socketMessageListeners = [];
+  };
+
+  connect = (url: string, protocols?: string | string[]) =>
+    new Promise<boolean>((resolve) => {
+      const socket = new WebSocket(url, protocols);
+      socket.onopen = () => {
+        console.log('=====ngqlSocket open');
+        this.socket = socket;
+        this.socketUrl = url;
+        this.socketProtocols = protocols;
+        resolve(true);
+      };
+      socket.onerror = (e) => {
+        console.error('=====ngqlSocket error', e);
+        resolve(false);
+      };
+      socket.onclose = () => {
+        console.log('=====ngqlSocket close');
+        this.socket = undefined;
+      };
+    });
+
+  disconnect = () => {
+    this.clearSocketMessageListener();
+    this.socket?.close();
+    this.socket = undefined;
+    this.socketUrl = undefined;
+    this.socketProtocols = undefined;
+  };
+
+  ping = () => {
+    this.socket?.send('ping');
+  };
+
+  runNgql = ({ gql }: { gql: string }, _config: any) => {
+    const message = {
       header: {
         msgId: uuidv4(),
         version: '1.0',
@@ -60,7 +84,7 @@ export class NgqlRunner {
         msgType: 'ngql',
         content: { gql },
       },
-    });
+    };
 
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       return Promise.reject(new Error('socket is not ready'));
@@ -68,14 +92,19 @@ export class NgqlRunner {
 
     return new Promise((resolve) => {
       const receiveMsg = (e: MessageEvent<string>) => {
-        console.log('=====msg', e.data);
         const msgReceive = safeParse<MessageReceive>(e.data);
-        resolve(msgReceive.body.content);
-        this.socket?.removeEventListener('message', receiveMsg);
+        if (msgReceive.header.msgId === message.header.msgId) {
+          resolve(msgReceive.body.content);
+          this.rmSocketMessageListener(receiveMsg);
+        }
       };
-  
-      this.socket?.send(message);
-      this.socket?.addEventListener('message', receiveMsg);
+
+      this.socket?.send(JSON.stringify(message));
+      this.addSocketMessageListener(receiveMsg);
     });
   };
 }
+
+const ngqlRunner = new NgqlRunner();
+
+export default ngqlRunner;

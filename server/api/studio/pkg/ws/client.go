@@ -3,7 +3,6 @@ package ws
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -24,10 +23,10 @@ const (
 	pingPeriod = (pongWait * 9) / 10
 
 	// Maximum message size allowed from peer.
-	maxMessageSize = 512
+	maxMessageSize = 16 * 1024
 
 	// send buffer size
-	bufSize = 256
+	bufSize = 512
 )
 
 var (
@@ -56,6 +55,32 @@ type Client struct {
 	send chan []byte
 }
 
+func (c *Client) runNgql(msgReceived *MessageReceive) {
+	execute, _, err := dao.Execute(c.clientInfo.NSID, msgReceived.Body.Content["gql"].(string), nil)
+
+	msgPost := MessagePost{}
+	msgPost.Header.MsgId = msgReceived.Header.MsgId
+	msgPost.Header.SendTime = time.Now().UnixMilli()
+	msgPost.Body.MsgType = msgReceived.Body.MsgType
+
+	if err != nil {
+		msgPost.Body.Content = map[string]any{
+			"code":    -1,
+			"message": err.Error(),
+		}
+	} else {
+		msgPost.Body.Content = map[string]any{
+			"code":    0,
+			"data":    &execute,
+			"message": "Success",
+		}
+	}
+
+	msgSend, _ := json.Marshal(msgPost)
+
+	c.send <- msgSend
+}
+
 // readPump pumps messages from the websocket connection to the hub.
 //
 // The application runs readPump in a per-connection goroutine. The application
@@ -63,7 +88,6 @@ type Client struct {
 // reads from this goroutine.
 func (c *Client) readPump() {
 	defer func() {
-		fmt.Println("=====unregister")
 		c.hub.unregister <- c
 		c.conn.Close()
 	}()
@@ -83,20 +107,8 @@ func (c *Client) readPump() {
 		msgReceived := MessageReceive{}
 		json.Unmarshal(msgReceivedStr, &msgReceived)
 
-		fmt.Println("=====gql", msgReceived.Body.Content["gql"].(string))
-
-		execute, _, err := dao.Execute(c.clientInfo.NSID, msgReceived.Body.Content["gql"].(string), nil)
-
-		msgPost := MessagePost{}
-		msgPost.Header.MsgId = msgReceived.Header.MsgId
-		msgPost.Header.SendTime = time.Now().UnixMilli()
-		msgPost.Body.MsgType = msgReceived.Body.MsgType
-		msgPost.Body.Content = &execute
-
-		msgSend, err := json.Marshal(msgPost)
-
-		c.send <- msgSend
-		// c.hub.broadcast <- message
+		// async run ngql
+		go c.runNgql(&msgReceived)
 	}
 }
 

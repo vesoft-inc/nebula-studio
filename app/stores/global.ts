@@ -3,10 +3,9 @@ import cookies from 'js-cookie';
 import { message } from 'antd';
 import { Base64 } from 'js-base64';
 import { getI18n } from '@vesoft-inc/i18n';
-import intl from 'react-intl-universal';
 import { BrowserHistory } from 'history';
-import service, { updateService } from '@app/config/service';
-import { NgqlRunner } from '@app/utils/websocket';
+import service from '@app/config/service';
+import ngqlRunner from '@app/utils/websocket';
 import { getRootStore, resetStore } from '.';
 
 const { intl } = getI18n();
@@ -24,7 +23,7 @@ export class GlobalStore {
   _host = cookies.get('nh');
   version = process.env.VERSION;
 
-  ngqlRunner = new NgqlRunner();
+  ngqlRunner = ngqlRunner;
 
   constructor() {
     makeObservable(this, {
@@ -107,8 +106,8 @@ export class GlobalStore {
       cookies.set('nu', username);
       this.update({ _host, _username: username });
       const socketConncted = await this.ngqlRunner.connect(`ws://${location.host}/nebula_ws`);
-      updateService({ execNGQL: this.ngqlRunner.runNgql });
       return socketConncted;
+      // return true;
     }
 
     this.update({ _host: '', _username: '' });
