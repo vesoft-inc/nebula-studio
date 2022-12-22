@@ -50,11 +50,12 @@ export class ConsoleStore {
   }
 
   resetModel = () => {
-    this.update({
-      currentGQL: 'SHOW SPACES;',
-      results: [],
-      paramsMap: null
-    });
+    const shadowStore = new ConsoleStore();
+    for (const key in shadowStore) {
+      if (typeof shadowStore[key] !== 'function') {
+        this[key] = shadowStore[key];
+      }
+    }
   };
 
   update = (param: Partial<ConsoleStore>) => {

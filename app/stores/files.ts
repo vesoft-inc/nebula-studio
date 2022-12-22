@@ -19,6 +19,15 @@ export class FilesStore {
     Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
   };
 
+  resetModel = () => {
+    const shadowStore = new FilesStore();
+    for (const key in shadowStore) {
+      if (typeof shadowStore[key] !== 'function') {
+        this[key] = shadowStore[key];
+      }
+    }
+  };
+
   getFiles = async () => {
     const { code, data } = (await service.getFiles()) as any;
     if (code === 0 && data) {

@@ -16,7 +16,7 @@ const FileUpload = () => {
   const [loading, setLoading] = useState(false);
   const transformFile = async (_file: StudioFile, fileList: StudioFile[]) => {
     const size = fileList.reduce((acc, cur) => acc + cur.size, 0);
-    if(size > global.gConfig.maxBytes) {
+    if(global.gConfig?.maxBytes && size > global.gConfig.maxBytes) {
       message.error(intl.get('import.fileSizeLimit', { size: getFileSize(global.gConfig.maxBytes) }));
       return false;
     }

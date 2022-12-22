@@ -14,7 +14,7 @@
 			<% if (initProps.dev) { %>
 				window.gConfig = { maxBytes: <%= JSON.stringify(initProps.maxBytes) %> }
 			<% } else { %>
-					window.gConfig = { maxBytes: { {.maxBytes } } }
+					window.gConfig = { maxBytes: {{.maxBytes}} }
 			<% } %>
 		</script>
     <style>

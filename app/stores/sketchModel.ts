@@ -65,7 +65,14 @@ export class SketchStore {
       sketchList: observable.deep,
     });
   }
-
+  resetModel = () => {
+    const shadowStore = new SketchStore();
+    for (const key in shadowStore) {
+      if (typeof shadowStore[key] !== 'function') {
+        this[key] = shadowStore[key];
+      }
+    }
+  };
   update = (payload: Record<string, any>) => {
     Object.keys(payload).forEach(
       (key) => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key])
