@@ -27,6 +27,10 @@ const (
 
 	// send buffer size
 	bufSize = 512
+
+	heartbeatRequest = "1"
+
+	heartbeatResponse = "2"
 )
 
 var (
@@ -39,6 +43,10 @@ var upgrader = websocket.Upgrader{
 	// WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
 		return true
+	},
+	Error: func(w http.ResponseWriter, r *http.Request, status int, reason error) {
+		w.WriteHeader(status)
+		w.Write([]byte(reason.Error()))
 	},
 }
 
@@ -104,6 +112,12 @@ func (c *Client) readPump() {
 		}
 
 		msgReceivedStr := bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
+
+		if string(msgReceivedStr) == heartbeatRequest {
+			c.send <- []byte(heartbeatResponse)
+			continue
+		}
+
 		msgReceived := MessageReceive{}
 		json.Unmarshal(msgReceivedStr, &msgReceived)
 
@@ -163,7 +177,6 @@ func (c *Client) writePump() {
 func ServeWebSocket(hub *Hub, w http.ResponseWriter, r *http.Request, clientInfo *auth.AuthData) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
 		return
 	}
 

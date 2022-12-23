@@ -12,16 +12,27 @@ interface MessageReceive {
   };
 }
 
+export const WsHeartbeatReq = '1';
+export const WsHeartbeatRes = '2';
+
 export class NgqlRunner {
-  socket: WebSocket | undefined;
+  socket: WebSocket | undefined = undefined;
 
   socketUrl: string | URL | undefined;
   socketProtocols: string | string[] | undefined;
 
   socketMessageListeners: Array<(e: MessageEvent) => void> = [];
 
+  socketIsConnecting = false;
+  socketConnectingPromise: Promise<boolean> | undefined;
+  socketPingTimeInterval: number | undefined;
+
   constructor() {
-    this.socket = undefined;
+    const urlItem = localStorage.getItem('socketUrl');
+    const protocolsItem = localStorage.getItem('socketProtocols');
+
+    urlItem && (this.socketUrl = safeParse<string>(urlItem));
+    protocolsItem && (this.socketProtocols = safeParse<string>(protocolsItem));
   }
 
   addSocketMessageListener = (listener: (e: MessageEvent) => void) => {
@@ -41,27 +52,71 @@ export class NgqlRunner {
     this.socketMessageListeners = [];
   };
 
-  connect = (url: string, protocols?: string | string[]) =>
-    new Promise<boolean>((resolve) => {
+  connect = (url: string | URL, protocols?: string | string[]) => {
+    if (this.socketIsConnecting) {
+      return this.socketConnectingPromise;
+    }
+    this.socketIsConnecting = true;
+    this.socketConnectingPromise = new Promise<boolean>((resolve) => {
       const socket = new WebSocket(url, protocols);
       socket.onopen = () => {
         console.log('=====ngqlSocket open');
         this.socket = socket;
         this.socketUrl = url;
         this.socketProtocols = protocols;
+
+        localStorage.setItem('socketUrl', JSON.stringify(url));
+        protocols && localStorage.setItem('socketProtocols', JSON.stringify(protocols));
+
+        if (this.socketPingTimeInterval) {
+          clearTimeout(this.socketPingTimeInterval);
+        }
+        this.socketPingTimeInterval = window.setInterval(this.ping, 1000 * 30);
+        this.socketIsConnecting = false;
+        this.socketConnectingPromise = undefined;
+
+        socket.onerror = undefined;
+        socket.onclose = undefined;
+        
+        // reconnect
+        this.socket.addEventListener('close', this.onDisconnect);
+        this.socket.addEventListener('error', this.onDisconnect);
+
         resolve(true);
       };
       socket.onerror = (e) => {
         console.error('=====ngqlSocket error', e);
+        this.socketIsConnecting = false;
+        this.socketConnectingPromise = undefined;
         resolve(false);
       };
       socket.onclose = () => {
         console.log('=====ngqlSocket close');
         this.socket = undefined;
       };
-    });
+    })
+    return this.socketConnectingPromise;
+  };
 
-  disconnect = () => {
+  reConnect = () => {
+    return this.connect(this.socketUrl, this.socketProtocols);
+  };
+
+  onDisconnect = () => {
+    this.socket?.removeEventListener('close', this.onDisconnect);
+    this.socket?.removeEventListener('error', this.onDisconnect);
+    this.clearSocketMessageListener();
+    this.socket?.close();
+
+    clearTimeout(this.socketPingTimeInterval);
+    this.socketPingTimeInterval = undefined;
+    this.socket = undefined;
+
+    setTimeout(this.reConnect, 1000);
+  }
+
+  desctory = () => {
+    clearTimeout(this.socketPingTimeInterval);
     this.clearSocketMessageListener();
     this.socket?.close();
     this.socket = undefined;
@@ -70,10 +125,10 @@ export class NgqlRunner {
   };
 
   ping = () => {
-    this.socket?.send('ping');
+    this.socket?.readyState === WebSocket.OPEN && this.socket.send(WsHeartbeatReq);
   };
 
-  runNgql = ({ gql }: { gql: string }, _config: any) => {
+  runNgql = async ({ gql }: { gql: string }, _config: any) => {
     const message = {
       header: {
         msgId: uuidv4(),
@@ -87,13 +142,16 @@ export class NgqlRunner {
     };
 
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
-      return Promise.reject(new Error('socket is not ready'));
+      await this.reConnect();
     }
 
     return new Promise((resolve) => {
       const receiveMsg = (e: MessageEvent<string>) => {
+        if (e.data === WsHeartbeatRes) {
+          return;
+        }
         const msgReceive = safeParse<MessageReceive>(e.data);
-        if (msgReceive.header.msgId === message.header.msgId) {
+        if (msgReceive?.header?.msgId === message.header.msgId) {
           resolve(msgReceive.body.content);
           this.rmSocketMessageListener(receiveMsg);
         }
