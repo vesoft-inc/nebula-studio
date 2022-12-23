@@ -214,7 +214,7 @@ const OutputBox = (props: IProps) => {
     }
   };
   const handleRemoveMenu = () => {
-    graph.setPointer({
+    graph?.setPointer({
       showContextMenu: false,
     });
   };
