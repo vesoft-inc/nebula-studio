@@ -73,7 +73,7 @@ export function edgeDataToJSON(
           };
           break;
         default:
-          if (prop.mapping === null && prop.isDefault) {
+          if (prop.mapping === null && (prop.allowNull || prop.isDefault)) {
             break;
           }
           const _prop = {
@@ -119,7 +119,7 @@ export function vertexDataToJSON(
       const props = tag.props
         .sort((p1, p2) => p1.mapping - p2.mapping)
         .map(prop => {
-          if (prop.mapping === null && prop.isDefault) {
+          if (prop.mapping === null && (prop.allowNull || prop.isDefault)) {
             return null;
           }
           return {

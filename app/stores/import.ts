@@ -16,6 +16,7 @@ const handlePropertyMap = (item, defaultValueFields) => {
     name: item.Field,
     type,
     isDefault: defaultValueFields.includes(item.Field),
+    allowNull: item.Null === 'YES',
     mapping: null,
   };
 };
