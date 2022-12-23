@@ -86,7 +86,7 @@ const TaskCreate = (props: IProps) => {
           throw new Error();
         }
         tag.props.forEach(prop => {
-          if (prop.mapping === null && !prop.isDefault) {
+          if (prop.mapping === null && !prop.allowNull && !prop.isDefault) {
             message.error(`${prop.name} ${intl.get('import.indexNotEmpty')}`);
             throw new Error();
           }
@@ -99,7 +99,7 @@ const TaskCreate = (props: IProps) => {
         throw new Error();
       }
       edge.props.forEach(prop => {
-        if (prop.mapping === null && prop.name !== 'rank' && !prop.isDefault) {
+        if (prop.mapping === null && !prop.allowNull && prop.name !== 'rank' && !prop.isDefault) {
           message.error(`${prop.name} ${intl.get('import.indexNotEmpty')}`);
           throw new Error();
         }
