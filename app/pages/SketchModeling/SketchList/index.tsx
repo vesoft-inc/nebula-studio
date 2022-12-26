@@ -120,7 +120,7 @@ const SketchList: React.FC = () => {
                 </Popconfirm>
               </div>
               <span className={styles.count}>{intl.get('common.tag')} {schema.nodes?.length || 0} | {intl.get('common.edge')} {schema.lines?.length || 0}</span>
-              <div className={styles.snapshot} style={{ background: `url(${item.snapshot}) center center no-repeat` }} />
+              <div className={styles.snapshot} style={{ backgroundImage: `url(${item.snapshot})` }} />
             </div>
           );
         })}

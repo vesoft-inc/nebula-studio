@@ -61,14 +61,15 @@ const SketchConfigHeader: React.FC = () => {
       scaledWidth = (scaledWidth / scaledHeight) * thumbnailMaxHeight;
       scaledHeight = thumbnailMaxHeight;
     }
+    const scaleBy = 2;
     const canvas = document.createElement('canvas');
-    canvas.width = scaledWidth;
-    canvas.height = scaledHeight;
+    canvas.width = scaledWidth * scaleBy;
+    canvas.height = scaledHeight * scaleBy;
     const ctx = canvas.getContext('2d');
     const { x: cx, y: cy } = document.getElementById('sketchContainer').getBoundingClientRect();
     const offsetX = x - cx;
     const offsetY = y - cy;
-    ctx.drawImage(img, offsetX, offsetY, width, height, 0, 0, scaledWidth, scaledHeight);
+    ctx.drawImage(img, offsetX, offsetY, width, height, 0, 0, scaledWidth * scaleBy, scaledHeight * scaleBy);
     return canvas.toDataURL('image/png');
   };
 
