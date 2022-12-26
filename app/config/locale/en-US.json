@@ -248,7 +248,7 @@
     "statsType": "Type",
     "statsName": "Name",
     "statsCount": "Count",
-    "statError": "Update Failed, Please try again.",
+    "statError": "Stat failed, Please try again.",
     "statFinished": "Statistics end",
     "deleteSpace": "Delete Graph Space",
     "cloneSpace": "Clone Graph Space",
