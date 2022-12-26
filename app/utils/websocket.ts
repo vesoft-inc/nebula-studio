@@ -1,5 +1,7 @@
+import { getRootStore } from '@app/stores';
 import { v4 as uuidv4 } from 'uuid';
 import { safeParse } from './function';
+import { HttpResCode } from './http';
 
 interface MessageReceive {
   header: {
@@ -112,7 +114,7 @@ export class NgqlRunner {
     this.socketPingTimeInterval = undefined;
     this.socket = undefined;
 
-    setTimeout(this.reConnect, 1000);
+    this.socketUrl && setTimeout(this.reConnect, 1000);
   }
 
   desctory = () => {
@@ -128,7 +130,7 @@ export class NgqlRunner {
     this.socket?.readyState === WebSocket.OPEN && this.socket.send(WsHeartbeatReq);
   };
 
-  runNgql = async ({ gql }: { gql: string }, _config: any) => {
+  runNgql = async ({ gql, paramList }: { gql: string; paramList?: string[] }, _config: any) => {
     const message = {
       header: {
         msgId: uuidv4(),
@@ -137,7 +139,7 @@ export class NgqlRunner {
       body: {
         product: 'Studio',
         msgType: 'ngql',
-        content: { gql },
+        content: { gql, paramList },
       },
     };
 
@@ -151,6 +153,50 @@ export class NgqlRunner {
           return;
         }
         const msgReceive = safeParse<MessageReceive>(e.data);
+        if (msgReceive?.body?.content?.code === HttpResCode.ErrSession) {
+          this.desctory();
+          getRootStore().global.logout();
+          return;
+        }
+        if (msgReceive?.header?.msgId === message.header.msgId) {
+          resolve(msgReceive.body.content);
+          this.rmSocketMessageListener(receiveMsg);
+        }
+      };
+
+      this.socket?.send(JSON.stringify(message));
+      this.addSocketMessageListener(receiveMsg);
+    });
+  };
+
+  runBatchNgql = async ({ gqls, paramList }: { gqls: string[]; paramList?: string[] }, _config: any) => {
+    const message = {
+      header: {
+        msgId: uuidv4(),
+        version: '1.0',
+      },
+      body: {
+        product: 'Studio',
+        msgType: 'batch_ngql',
+        content: { gqls, paramList },
+      },
+    };
+
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+      await this.reConnect();
+    }
+
+    return new Promise((resolve) => {
+      const receiveMsg = (e: MessageEvent<string>) => {
+        if (e.data === WsHeartbeatRes) {
+          return;
+        }
+        const msgReceive = safeParse<MessageReceive>(e.data);
+        if (msgReceive?.body?.content?.code === HttpResCode.ErrSession) {
+          this.desctory();
+          getRootStore().global.logout();
+          return;
+        }
         if (msgReceive?.header?.msgId === message.header.msgId) {
           resolve(msgReceive.body.content);
           this.rmSocketMessageListener(receiveMsg);

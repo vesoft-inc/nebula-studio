@@ -8,8 +8,11 @@ const service = {
   execNGQL: (params, config?) => {
     return ngqlRunner.runNgql(params, config);
   },
+  // batchExecNGQL: (params, config?) => {
+  //   return post('/api-nebula/db/batchExec')(params, config);
+  // },
   batchExecNGQL: (params, config?) => {
-    return post('/api-nebula/db/batchExec')(params, config);
+    return ngqlRunner.runBatchNgql(params, config);
   },
   execSeqNGQL: (params, config?) => {
     return post('/api-nebula/db/exec_seq')(params, config);

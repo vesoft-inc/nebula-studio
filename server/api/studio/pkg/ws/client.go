@@ -5,11 +5,15 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"reflect"
+	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/base"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
 )
 
 const (
@@ -64,28 +68,109 @@ type Client struct {
 }
 
 func (c *Client) runNgql(msgReceived *MessageReceive) {
-	execute, _, err := dao.Execute(c.clientInfo.NSID, msgReceived.Body.Content["gql"].(string), nil)
-
 	msgPost := MessagePost{}
 	msgPost.Header.MsgId = msgReceived.Header.MsgId
 	msgPost.Header.SendTime = time.Now().UnixMilli()
 	msgPost.Body.MsgType = msgReceived.Body.MsgType
 
+	gql, paramList := "", []string{}
+
+	reqGql := msgReceived.Body.Content["gql"]
+	if reqGql != nil {
+		gql, _ = reqGql.(string)
+	}
+
+	reqParamList := msgReceived.Body.Content["paramList"]
+	if reqParamList != nil && reflect.TypeOf(reqParamList).Kind() == reflect.Slice {
+		s := reqParamList.([]interface{})
+		for i := 0; i < len(s); i++ {
+			paramList = append(paramList, s[i].(string))
+		}
+	}
+
+	execute, _, err := dao.Execute(c.clientInfo.NSID, gql, paramList)
+
 	if err != nil {
-		msgPost.Body.Content = map[string]any{
-			"code":    -1,
+		content := map[string]any{
+			"code":    base.Error,
 			"message": err.Error(),
 		}
+		if auth.IsSessionError(err) {
+			content["code"] = ecode.ErrSession.GetCode()
+		}
+		msgPost.Body.Content = &content
 	} else {
 		msgPost.Body.Content = map[string]any{
-			"code":    0,
+			"code":    base.Success,
 			"data":    &execute,
 			"message": "Success",
 		}
 	}
 
 	msgSend, _ := json.Marshal(msgPost)
+	c.send <- msgSend
+}
 
+func (c *Client) runBatchNgql(msgReceived *MessageReceive) {
+	msgPost := MessagePost{}
+	msgPost.Header.MsgId = msgReceived.Header.MsgId
+	msgPost.Header.SendTime = time.Now().UnixMilli()
+	msgPost.Body.MsgType = msgReceived.Body.MsgType
+
+	gqls, paramList := []string{}, []string{}
+	resContentData := make([]map[string]interface{}, 0)
+
+	reqGqls := msgReceived.Body.Content["gqls"]
+	if reqGqls != nil && reflect.TypeOf(reqGqls).Kind() == reflect.Slice {
+		s := reqGqls.([]interface{})
+		for i := 0; i < len(s); i++ {
+			gqls = append(gqls, s[i].(string))
+		}
+	}
+
+	reqParamList := msgReceived.Body.Content["paramList"]
+	if reqParamList != nil && reflect.TypeOf(reqParamList).Kind() == reflect.Slice {
+		s := reqParamList.([]interface{})
+		for i := 0; i < len(s); i++ {
+			paramList = append(paramList, s[i].(string))
+		}
+	}
+
+	if len(paramList) > 0 {
+		execute, _, err := dao.Execute(c.clientInfo.NSID, "", paramList)
+		gqlRes := map[string]any{"gql": strings.Join(paramList, "; "), "data": &execute}
+		if err != nil {
+			gqlRes["message"] = err.Error()
+			gqlRes["code"] = base.Error
+		} else {
+			gqlRes["code"] = base.Success
+		}
+
+		resContentData = append(resContentData, gqlRes)
+	}
+
+	for _, gql := range gqls {
+		execute, _, err := dao.Execute(c.clientInfo.NSID, gql, make([]string, 0))
+		gqlRes := map[string]interface{}{"gql": gql, "data": execute}
+		if err != nil {
+			gqlRes["message"] = err.Error()
+			gqlRes["code"] = base.Error
+			if auth.IsSessionError(err) {
+				gqlRes["code"] = ecode.ErrSession.GetCode()
+			}
+		} else {
+			gqlRes["code"] = base.Success
+		}
+
+		resContentData = append(resContentData, gqlRes)
+	}
+
+	msgPost.Body.Content = map[string]any{
+		"code":    base.Success,
+		"data":    resContentData,
+		"message": "Success",
+	}
+	msgSend, _ := json.Marshal(msgPost)
 	c.send <- msgSend
 }
 
@@ -121,8 +206,13 @@ func (c *Client) readPump() {
 		msgReceived := MessageReceive{}
 		json.Unmarshal(msgReceivedStr, &msgReceived)
 
-		// async run ngql
-		go c.runNgql(&msgReceived)
+		if msgReceived.Body.MsgType == "ngql" {
+			// async run ngql
+			go c.runNgql(&msgReceived)
+		} else if msgReceived.Body.MsgType == "batch_ngql" {
+			// async run batch ngql
+			go c.runBatchNgql(&msgReceived)
+		}
 	}
 }
 

@@ -44,6 +44,23 @@ type (
 // all requests running ngql will be failed, so keepping a long timeout is necessary, make the connection alive
 const GraphServiceTimeout = 8 * time.Hour
 
+func IsSessionError(err error) bool {
+	subErrMsgStr := []string{
+		"session expired",
+		"connection refused",
+		"broken pipe",
+		"an existing connection was forcibly closed",
+		"Token is expired",
+		"Session not existed",
+	}
+	for _, subErrMsg := range subErrMsgStr {
+		if strings.Contains(err.Error(), subErrMsg) {
+			return true
+		}
+	}
+	return false
+}
+
 func CreateToken(authData *AuthData, config *config.Config) (string, error) {
 	now := time.Now()
 	expiresAt := now.Add(time.Duration(config.Auth.AccessExpire) * time.Second).Unix()
@@ -133,7 +150,7 @@ func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) 
 func AuthMiddlewareWithCtx(svcCtx *svc.ServiceContext) rest.Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			if utils.PathHasPrefix(r.URL.Path, []string{"/api-nebula/db/connect"}) {
+			if utils.PathHasPrefix(r.URL.Path, []string{"/api-nebula/db/connect", "/nebula_ws"}) {
 				next(w, r)
 				return
 			}

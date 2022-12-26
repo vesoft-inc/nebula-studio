@@ -78,12 +78,12 @@ func main() {
 		Method: http.MethodGet,
 		Path:   "/nebula_ws",
 		Handler: func(w http.ResponseWriter, r *http.Request) {
-			auth, ok := r.Context().Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
-			if !ok {
-				svcCtx.ResponseHandler.Handle(w, r, nil, fmt.Errorf("auth failed"))
-				return
+			clientInfo := &auth.AuthData{}
+			tokenCookie, err := r.Cookie(svcCtx.Config.Auth.TokenName)
+			if err == nil {
+				clientInfo, _ = auth.Decode(tokenCookie.Value, svcCtx.Config.Auth.AccessSecret)
 			}
-			ws.ServeWebSocket(hub, w, r, auth)
+			ws.ServeWebSocket(hub, w, r, clientInfo)
 		},
 	})
 

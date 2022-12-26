@@ -95,29 +95,12 @@ func (s *gatewayService) DisconnectDB() (*types.AnyResponse, error) {
 	return &types.AnyResponse{Data: response.StandardHandlerDataFieldAny(nil)}, nil
 }
 
-func isSessionError(err error) bool {
-	subErrMsgStr := []string{
-		"session expired",
-		"connection refused",
-		"broken pipe",
-		"an existing connection was forcibly closed",
-		"Token is expired",
-		"Session not existed",
-	}
-	for _, subErrMsg := range subErrMsgStr {
-		if strings.Contains(err.Error(), subErrMsg) {
-			return true
-		}
-	}
-	return false
-}
-
 func (s *gatewayService) ExecNGQL(request *types.ExecNGQLParams) (*types.AnyResponse, error) {
 	authData := s.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 
 	execute, _, err := dao.Execute(authData.NSID, request.Gql, request.ParamList)
 	if err != nil {
-		if isSessionError(err) {
+		if auth.IsSessionError(err) {
 			return nil, ecode.WithSessionMessage(err)
 		}
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err, "execute failed")
@@ -149,7 +132,7 @@ func (s *gatewayService) BatchExecNGQL(request *types.BatchExecNGQLParams) (*typ
 		execute, _, err := dao.Execute(NSID, gql, make([]string, 0))
 		gqlRes := map[string]interface{}{"gql": gql, "data": execute}
 		if err != nil {
-			if isSessionError(err) {
+			if auth.IsSessionError(err) {
 				return nil, ecode.WithSessionMessage(err)
 			}
 			gqlRes["message"] = err.Error()
