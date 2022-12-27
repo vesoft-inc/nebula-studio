@@ -184,7 +184,7 @@
     "config": "任务配置",
     "parseFailed": "文件解析失败",
     "uploadTemplate": "将 YAML 配置文件拖放到该区域",
-    "uploadBoxTip": "The YAML configuration file is used to describe information about the files to be imported, the NebulaGraph server, and more. ",
+    "uploadBoxTip": "使用 YAML 配置文件用来描述待导入文件信息、NebulaGraph 服务器等信息。",
     "fileUploadRequired": "1. 请确保在导入 YAML 文件之前上传所有 CSV 数据文件。 如果没有，请先前往",
     "fileUploadRequired2": "数据文件",
     "exampleDownload": "2. 配置文件示例:",
