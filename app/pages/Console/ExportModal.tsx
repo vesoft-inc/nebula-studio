@@ -1,5 +1,5 @@
 import { Button, Form, Input, Modal, Radio, Select } from 'antd';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 
@@ -27,34 +27,41 @@ const ExportModal = (props: IProps) => {
   const { schema: { currentSpace } } = useStore();
   const { headers, tables } = data;
   const { intl } = useI18n();
+  const isExist = useCallback((value) => value !== null && value !== undefined && value !== '', []);
   const handleExport = (values) => {
     const { type, vertexIds, srcId, dstId, edgeType, rank } = values;
     const vertexes =
       type === 'vertex'
         ? tables.reduce((acc, cur) => {
           if (cur.type === 'vertex') {
-            acc.push(cur.vid);
+            isExist(cur.vid) && acc.push(cur.vid);
           } else {
             vertexIds.forEach(id => {
-              acc.push(cur[id].toString());
+              isExist(cur[id]) && acc.push(cur[id].toString());
             });
           }
           return acc;
-        }, []).filter(vertexId => vertexId !== '')
-        : tables
-          .map(edge => [edge[srcId], edge[dstId]])
-          .flat()
-          .filter(id => id !== '');
+        }, [])
+        : tables.reduce((acc, cur) => {
+          isExist(cur[srcId]) && acc.push(cur[srcId]);
+          isExist(cur[dstId]) && acc.push(cur[dstId]);
+          return acc;
+        }, []);
     const edges =
       type === 'edge'
-        ? tables
-          .map(edge => ({
-            srcId: edge[srcId],
-            dstId: edge[dstId],
-            rank: rank !== '' && rank !== undefined ? edge[rank] : 0,
-            edgeType,
-          }))
-          .filter(edge => edge.srcId !== '' && edge.dstId !== '')
+        ? tables.reduce((acc, cur) => {
+          const _srcId = cur[srcId];
+          const _dstId = cur[dstId];
+          if(isExist(_srcId) && isExist(_dstId)) {
+            acc.push({
+              srcId: _srcId,
+              dstId: _dstId,
+              rank: isExist(rank) ? cur[rank] : 0,
+              edgeType,
+            });
+          }
+          return acc;
+        }, [])
         : [];
     onExplorer({
       space: currentSpace,

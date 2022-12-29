@@ -56,11 +56,11 @@ const TemplateModal = (props: IProps) => {
         // empty props in yaml will converted to null, but its required in nebula-importer
         parseContent.files.forEach(file => {
           if(file.schema.edge) {
-            file.schema.edge.props = file.schema.edge?.props || [];
+            file.schema.edge.props ||= [];
           }
           if(file.schema.vertex) {
             file.schema.vertex?.tags.forEach(tag => {
-              tag.props = tag.props || [];
+              tag.props ||= [];
             });
           }
         });

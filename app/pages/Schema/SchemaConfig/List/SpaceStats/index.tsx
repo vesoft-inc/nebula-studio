@@ -20,11 +20,11 @@ const SpaceStats = () => {
       Name: string,
       Count: number,
     }[],
-    total: {
+    total?: {
       vertices: number,
       edges: number,
-    } | null
-  } | null>(null);
+    }
+  }>({ list: [], total: undefined });
   const [updateTime, setUpdateTime] = useState('');
   const [jobId, setJobId] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -56,7 +56,7 @@ const SpaceStats = () => {
     setUpdateTime('');
     setData({
       list: [],
-      total: null
+      total: undefined
     });
   };
 
@@ -65,18 +65,13 @@ const SpaceStats = () => {
     if (code === 0) {
       const _data = data.tables.reduce((prev, cur) => {
         if (cur.Type === 'Space') {
-          if(!prev.total) {
-            prev.total = {
-              vertex: 0,
-              edge: 0,
-            };
-          }
+          prev.total ||= { vertex: 0, edge: 0 };
           prev.total[cur.Name] = cur.Count;
         } else {
           prev.list.push(cur);
         }
         return prev;
-      }, { list: [], total: null });
+      }, { list: [], total: undefined });
       setData(_data);
     }
   };
