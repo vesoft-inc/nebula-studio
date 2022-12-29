@@ -28,18 +28,19 @@ const ExportModal = (props: IProps) => {
   const { headers, tables } = data;
   const { intl } = useI18n();
   const handleExport = (values) => {
-    const { type, vertexId, srcId, dstId, edgeType, rank } = values;
+    const { type, vertexIds, srcId, dstId, edgeType, rank } = values;
     const vertexes =
       type === 'vertex'
-        ? tables
-          .map(vertex => {
-            if (vertex.type === 'vertex') {
-              return vertex.vid;
-            } else {
-              return vertex[vertexId].toString();
-            }
-          })
-          .filter(vertexId => vertexId !== '')
+        ? tables.reduce((acc, cur) => {
+          if (cur.type === 'vertex') {
+            acc.push(cur.vid);
+          } else {
+            vertexIds.forEach(id => {
+              acc.push(cur[id].toString());
+            });
+          }
+          return acc;
+        }, []).filter(vertexId => vertexId !== '')
         : tables
           .map(edge => [edge[srcId], edge[dstId]])
           .flat()
@@ -90,8 +91,8 @@ const ExportModal = (props: IProps) => {
             const type = getFieldValue('type');
             return type === 'vertex' ? <>
               <p>{intl.get('console.exportVertex')}</p>
-              <Form.Item label="vid" name="vertexId" rules={[{ required: true, message: intl.get('formRules.vidRequired') }]}>
-                <Select>
+              <Form.Item label="vid" name="vertexIds" rules={[{ required: true, message: intl.get('formRules.vidRequired') }]}>
+                <Select mode="multiple" allowClear>
                   {headers.map(i => (
                     <Option value={i} key={i}>
                       {i}

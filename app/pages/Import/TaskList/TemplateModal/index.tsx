@@ -53,6 +53,17 @@ const TemplateModal = (props: IProps) => {
             throw new Error(intl.get('import.fileNotExist', { name: file.path }));
           }
         });
+        // empty props in yaml will converted to null, but its required in nebula-importer
+        parseContent.files.forEach(file => {
+          if(file.schema.edge) {
+            file.schema.edge.props = file.schema.edge?.props || [];
+          }
+          if(file.schema.vertex) {
+            file.schema.vertex?.tags.forEach(tag => {
+              tag.props = tag.props || [];
+            });
+          }
+        });
         setConfig(JSON.stringify(parseContent, null, 2));
         form.setFieldsValue({
           name: `task-${Date.now()}`,
