@@ -267,6 +267,7 @@ export class SketchStore {
     this.editor = new VEditor({
       dom: container,
       showBackGrid: false,
+      disableCopy: true,
       ...options
     });
     this.container = container;

@@ -39,6 +39,9 @@ const TemplateModal = (props: IProps) => {
       const parseContent = yaml.load(content);
       if(typeof parseContent === 'object') {
         const connection = parseContent.clientSettings?.connection || {};
+        if(connection.address.startsWith('http')) {
+          throw new Error(intl.get('import.noHttp'));
+        }
         if(connection.address !== host) {
           throw new Error(intl.get('import.templateMatchError', { type: 'address' }));
         }
