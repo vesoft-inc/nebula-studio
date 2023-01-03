@@ -83,7 +83,7 @@ export class ConsoleStore {
     try {
       const err = await this.rootStore.schema.switchSpace(space);
       if(err) {
-        throw new Error(err);
+        return;
       }
       const { gqlList, paramList } = splitQuery(gql);
       const data = await service.batchExecNGQL(
