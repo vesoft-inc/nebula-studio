@@ -114,7 +114,8 @@
     "fixStringLengthRequired": "fix string length limit is required",
     "spaceRequired": "Space is required",
     "maxBytes": "It cannot exceed {max} bytes",
-    "ttlLimit": "The data type of the property must be int or timestamp"
+    "ttlLimit": "The data type of the property must be int or timestamp",
+    "associateNameRequired": "Associated {type} name is required"
   },
   "console": {
     "execTime": "Execution Time",
