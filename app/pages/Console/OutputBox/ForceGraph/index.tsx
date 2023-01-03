@@ -15,13 +15,14 @@ import styles from './index.module.less';
 interface IProps {
   data: any;
   spaceVidType: string;
+  space: string;
   onGraphInit: (graph: GraphStore) => void;
 }
 const ForceGraphBox = (props: IProps) => {
   const [uuid ] = useState(uuidv4());
-  const { graphInstances: { graphs, initGraph, clearGraph } } = useStore();
+  const { graphInstances: { graphs, initGraph, clearGraph, renderData } } = useStore();
   const grapfDomRef = useRef<any>();
-  const { data, spaceVidType, onGraphInit } = props;
+  const { data, spaceVidType, onGraphInit, space } = props;
   const [loading, setLoading] = useState(false);
   const init = async () => {
     const { vertexes, edges } = parseSubGraph(data, spaceVidType);
@@ -29,11 +30,11 @@ const ForceGraphBox = (props: IProps) => {
     await initGraph({
       container: grapfDomRef.current,
       id: uuid,
-      data: { vertexes, edges }
     });
     onGraphInit(graphs[uuid]);
     initTooltip({ container: grapfDomRef.current, id: uuid });
     initBrushSelect({ container: grapfDomRef.current, id: uuid });
+    await renderData({ space, graph: graphs[uuid], data: { vertexes, edges } });
     setLoading(false);
   };
 

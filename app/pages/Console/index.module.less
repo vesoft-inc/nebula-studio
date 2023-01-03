@@ -1,35 +1,29 @@
 @import '~@app/common.less';
 .nebulaConsole {
   .spaceSelect {
-    padding: 10px 42px;
-    height: 60px;
-    background: #FFFFFF;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-    > div {
-      display: flex;
-      align-items: center;
-      :global {
-        .ant-select {
-          width: 320px;
-          .ant-select-selector {
-            background: @lightBlue;
-            border-radius: 3px;
-            border: none;
-          }
-          .ant-select-selection-item {
-            color: @darkBlue;
-          }
-          .ant-select-arrow {
-            color: @darkBlue;
-          }
+    display: flex;
+    align-items: center;
+    :global {
+      .ant-select {
+        width: 306px;
+        .ant-select-selector {
+          background: @lightBlue;
+          border-radius: 3px;
+          border: none;
         }
-        .studioIconInstruction {
-          margin-left: 15px;
-          svg {
-            width: 22px;
-            height: 22px;
-            color: @darkGray;
-          }
+        .ant-select-selection-item {
+          color: @darkBlue;
+        }
+        .ant-select-arrow {
+          color: @darkBlue;
+        }
+      }
+      .studioIconInstruction {
+        margin-left: 15px;
+        svg {
+          width: 22px;
+          height: 22px;
+          color: @darkGray;
         }
       }
     }
@@ -40,11 +34,6 @@
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     border-radius: 6px;
     padding: 14px 30px;
-    .flex {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
     .panelHeader {
       margin-bottom: 15px;
       .title {

@@ -163,6 +163,7 @@ const IndexCreate = () => {
                     rules={[
                       {
                         required: true,
+                        message: intl.get('formRules.associateNameRequired', { type }),
                       },
                     ]}>
                     <Select onChange={getFieldList}>

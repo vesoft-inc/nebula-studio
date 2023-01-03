@@ -58,6 +58,7 @@ export class GlobalStore {
       },
     );
     resetStore();
+    sessionStorage.clear();
     cookies.remove('nh');
     cookies.remove('nu');
     this.history.push(`/login${location.search}`);

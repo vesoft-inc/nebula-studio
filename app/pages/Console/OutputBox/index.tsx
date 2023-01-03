@@ -18,6 +18,7 @@ import styles from './index.module.less';
 interface IProps {
   index: number;
   gql: string;
+  space?: string;
   result: any;
   onHistoryItem: (gql: string) => void;
   onExplorer?: (params: {
@@ -30,7 +31,7 @@ interface IProps {
 }
 
 const OutputBox = (props: IProps) => {
-  const { gql, result: { code, data, message }, onHistoryItem, index, onExplorer, onResultConfig, templateRender } = props;
+  const { gql, space, result: { code, data, message }, onHistoryItem, index, onExplorer, onResultConfig, templateRender } = props;
   const { console, schema } = useStore();
   const { intl } = useI18n();
   const [visible, setVisible] = useState(true);
@@ -259,7 +260,7 @@ const OutputBox = (props: IProps) => {
         <Icon type="icon-studio-console-graph" />
         {intl.get('common.graph')}
       </>,
-      children: <ForceGraph data={dataSource} spaceVidType={spaceVidType} onGraphInit={setGraph} />
+      children: <ForceGraph space={space} data={dataSource} spaceVidType={spaceVidType} onGraphInit={setGraph} />
     },
     !resultSuccess && {
       key: 'log',
@@ -273,7 +274,7 @@ const OutputBox = (props: IProps) => {
   return <div className={styles.outputBox}>
     <div className={styles.outputHeader}>
       <p className={cls(styles.gql, { [styles.errorInfo]: !resultSuccess })} onClick={() => onHistoryItem(gql)}>
-        <span className={styles.gqlValue}>$ {gql}</span>
+        <span className={styles.gqlValue}>{space ? `[${space}]>` : '&'} {gql}</span>
       </p>
       <div className={styles.outputOperations}>
         {!isFavorited ? <Tooltip title={intl.get('console.addToFavorites')} placement="top">

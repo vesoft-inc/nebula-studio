@@ -8,7 +8,6 @@
     "sorryNGQLCannotBeEmpty": "nGQL cannot be empty",
     "disablesUseToSwitchSpace": "DO NOT switch between graph spaces with nGQL statements in the console.",
     "NGQLHistoryList": "nGQL History",
-    "spaceTip": "Only required when you need to execute queries in a specified space.",
     "empty": "Clear",
     "run": "Run",
     "console": "Console",
@@ -115,7 +114,8 @@
     "fixStringLengthRequired": "fix string length limit is required",
     "spaceRequired": "Space is required",
     "maxBytes": "It cannot exceed {max} bytes",
-    "ttlLimit": "The data type of the property must be int or timestamp"
+    "ttlLimit": "The data type of the property must be int or timestamp",
+    "associateNameRequired": "Associated {type} name is required"
   },
   "console": {
     "execTime": "Execution Time",

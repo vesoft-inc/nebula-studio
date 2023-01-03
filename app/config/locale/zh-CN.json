@@ -8,7 +8,6 @@
     "sorryNGQLCannotBeEmpty": "nGQL语句不能为空",
     "disablesUseToSwitchSpace": "禁止使用命令切换Space",
     "NGQLHistoryList": "nGQL历史列表",
-    "spaceTip": "仅对某个Space进行操作时需要",
     "empty": "清空",
     "run":"运行",
     "console": "控制台",
@@ -115,7 +114,8 @@
     "fixStringLengthRequired": "请输入字符串固定长度",
     "spaceRequired": "图空间不能为空",
     "maxBytes": "不能超过 {max} 字节",
-    "ttlLimit": "属性的数据类型必须是int或者timestamp"
+    "ttlLimit": "属性的数据类型必须是int或者timestamp",
+    "associateNameRequired": "请选择关联 {type} 名称"
   },
   "console": {
     "execTime": "执行时间消耗",
