@@ -57,7 +57,9 @@
     "sketch": "Schema 草图",
     "viewSchema": "查看 Schema",
     "beta": "Beta",
-    "danglingEdge": "悬挂边"
+    "danglingEdge": "悬挂边",
+    "spaceChangeTitle": "图空间变更", 
+    "spaceChangeDescription": "已同步在浏览器其他页面中切换的最新图空间"
   },
   "doc": {
     "welcome": "欢迎使用",

@@ -57,7 +57,9 @@
     "sketch": "Schema drafting",
     "viewSchema": "View Schema",
     "beta": "Beta",
-    "danglingEdge": "Dangling edge"
+    "danglingEdge": "Dangling edge",
+    "spaceChangeTitle": "Space Changed", 
+    "spaceChangeDescription": "The space has synced from other browser tabs"
   },
   "doc": {
     "welcome": "Welcome to",

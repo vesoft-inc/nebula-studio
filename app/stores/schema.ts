@@ -27,7 +27,7 @@ const initialSchemaData = {
 } as Partial<SchemaStore>;
 export class SchemaStore {
   spaces: string[] = [];
-  currentSpace: string = sessionStorage.getItem('currentSpace') || '';
+  currentSpace: string = localStorage.getItem('currentSpace') || '';
   spaceVidType: string;
   edgeTypes: string[] = [];
   tagsFields: any[] = [];
@@ -75,7 +75,7 @@ export class SchemaStore {
       spaces: [],
       ...initialSchemaData,
     });
-    sessionStorage.removeItem('currentSpace');
+    localStorage.removeItem('currentSpace');
   };
 
   update = (payload: Record<string, any>) =>
@@ -108,10 +108,10 @@ export class SchemaStore {
 
     if (code === 0) {
       this.update({
+        ...initialSchemaData,
         currentSpace: space,
-        ...initialSchemaData
       });
-      sessionStorage.setItem('currentSpace', space);
+      localStorage.setItem('currentSpace', space);
       this.updateVidType(space);
       this.rootStore.console.clearConsoleResults();
     } else {
