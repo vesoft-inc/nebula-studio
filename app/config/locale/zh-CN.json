@@ -194,7 +194,9 @@
     "importYaml": "导入 YAML 文件",
     "templateMatchError": "配置中的{type}与当前登录账号/地址不匹配",
     "uploadSuccessfully": "上传文件成功",
-    "fileSizeLimit": "文件过大，超过上传限制({size})，请修改启动配置文件中的 MaxBytes 并重启服务"
+    "fileSizeLimit": "文件过大，超过上传限制({size})，请修改启动配置文件中的 MaxBytes 并重启服务",
+    "noHttp": "配置文件中的 address 不支持携带 http 协议，请去除 http(s)://",
+    "addressMatch": "配置文件中的 address 字段必须包含当前登录的 Graph 地址。多个地址用“,”隔开。"
   },
   "schema": {
     "spaceList": "图空间列表",
@@ -264,7 +266,9 @@
     "danglingEdge": "悬挂边",
     "showDDL": "查看 Schema DDL",
     "downloadNGQL": "下载 .NGQL 文件",
-    "getDDLError": "获取 Schema DDL 失败, 请重试"
+    "getDDLError": "获取 Schema DDL 失败, 请重试",
+    "totalVertices": "总计点数量",
+    "totalEdges": "总计边数量"
   },
   "empty": {
     "stats": "暂无统计数据",

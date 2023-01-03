@@ -194,7 +194,9 @@
     "importYaml": "Import the YAML file",
     "templateMatchError": "The {type} in the configuration does not match the current login account/host",
     "uploadSuccessfully": "Upload files successfully.",
-    "fileSizeLimit": "The file is too large and exceeds the upload limit({size}), please modify the MaxBytes in the startup configuration file and restart the service"
+    "fileSizeLimit": "The file is too large and exceeds the upload limit({size}), please modify the MaxBytes in the startup configuration file and restart the service",
+    "noHttp": "The address in the configuration file does not support http protocol, please remove http(s)://",
+    "addressMatch": "The address in the configuration file must contain the Graph address of current login connection. Separate multiple addresses with "
   },
   "schema": {
     "spaceList": "Graph Space List",
@@ -264,7 +266,9 @@
     "danglingEdge": "Dangling edge",
     "showDDL": "View Schema DDL",
     "downloadNGQL": "Download.nGQL",
-    "getDDLError": "Failed to get the schema DDL, Please try again"
+    "getDDLError": "Failed to get the schema DDL, Please try again",
+    "totalVertices": "Total Vertices Count",
+    "totalEdges": "Total Edges Count"
   },
   "empty": {
     "stats": "No Statistics Data",

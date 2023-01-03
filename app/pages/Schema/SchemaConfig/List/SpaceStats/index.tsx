@@ -14,7 +14,17 @@ const SpaceStats = () => {
   const timer = useRef<NodeJS.Timeout | null>(null);
   const { intl } = useI18n();
   const { schema: { getJobStatus, submitStats, getStats, currentSpace } } = useStore();
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<{
+    list: {
+      Type: string,
+      Name: string,
+      Count: number,
+    }[],
+    total?: {
+      vertices: number,
+      edges: number,
+    }
+  }>({ list: [], total: undefined });
   const [updateTime, setUpdateTime] = useState('');
   const [jobId, setJobId] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -44,13 +54,25 @@ const SpaceStats = () => {
   const initData = () => {
     setJobId(null);
     setUpdateTime('');
-    setData([]);
+    setData({
+      list: [],
+      total: undefined
+    });
   };
 
   const getData = async () => {
     const { code, data } = await getStats();
     if (code === 0) {
-      setData(data.tables);
+      const _data = data.tables.reduce((prev, cur) => {
+        if (cur.Type === 'Space') {
+          prev.total ||= { vertex: 0, edge: 0 };
+          prev.total[cur.Name] = cur.Count;
+        } else {
+          prev.list.push(cur);
+        }
+        return prev;
+      }, { list: [], total: undefined });
+      setData(_data);
     }
   };
 
@@ -99,25 +121,37 @@ const SpaceStats = () => {
   const showTime = updateTime && jobId == null && !loading;
   return (
     <div className={styles.nebulaStats}>
-      <div className={styles.operations}>
-        <Button
-          type="primary"
-          onClick={handleSubmitStats}
-          loading={loading || jobId !== null}
-        >
-          {intl.get(updateTime ? 'schema.refresh' : 'schema.startStat')}
-        </Button>
-        {showTime ? <>
-          <span className={styles.label}>{intl.get('schema.lastRefreshTime')}</span>
-          <span>
-            {dayjs(updateTime).format('YYYY-MM-DD HH:mm:ss')}
-          </span>
-        </> : <span className={styles.tip}>
-          {intl.get('schema.statTip')}
-        </span>}
+      <div className={styles.row}>
+        <div className={styles.operations}>
+          <Button
+            type="primary"
+            onClick={handleSubmitStats}
+            loading={loading || jobId !== null}
+          >
+            {intl.get(updateTime ? 'schema.refresh' : 'schema.startStat')}
+          </Button>
+          {showTime ? <>
+            <span className={styles.label}>{intl.get('schema.lastRefreshTime')}</span>
+            <span>
+              {dayjs(updateTime).format('YYYY-MM-DD HH:mm:ss')}
+            </span>
+          </> : <span className={styles.tip}>
+            {intl.get('schema.statTip')}
+          </span>}
+        </div>
+        {data?.total && <div className={styles.totalCount}>
+          <div className={styles.totalItem}>
+            <span className={styles.label}>{intl.get('schema.totalVertices')}</span>
+            <span>{data.total.vertices}</span>
+          </div>
+          <div className={styles.totalItem}>
+            <span className={styles.label}>{intl.get('schema.totalEdges')}</span>
+            <span>{data.total.edges}</span>
+          </div>
+        </div>}
       </div>
       <Table
-        dataSource={data}
+        dataSource={data?.list || []}
         columns={columns}
         rowKey="Name"
         locale={{ emptyText: <EmptyTableTip text={intl.get('empty.stats')} tip={intl.get('empty.statsTip')} /> }}

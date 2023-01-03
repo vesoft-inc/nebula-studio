@@ -39,6 +39,9 @@ const TemplateModal = (props: IProps) => {
       const parseContent = yaml.load(content);
       if(typeof parseContent === 'object') {
         const connection = parseContent.clientSettings?.connection || {};
+        if(connection.address.startsWith('http')) {
+          throw new Error(intl.get('import.noHttp'));
+        }
         if(connection.address !== host) {
           throw new Error(intl.get('import.templateMatchError', { type: 'address' }));
         }
@@ -48,6 +51,17 @@ const TemplateModal = (props: IProps) => {
         parseContent.files?.forEach(file => {
           if(!files.includes(file.path)) {
             throw new Error(intl.get('import.fileNotExist', { name: file.path }));
+          }
+        });
+        // empty props in yaml will converted to null, but its required in nebula-importer
+        parseContent.files.forEach(file => {
+          if(file.schema.edge) {
+            file.schema.edge.props ||= [];
+          }
+          if(file.schema.vertex) {
+            file.schema.vertex?.tags.forEach(tag => {
+              tag.props ||= [];
+            });
           }
         });
         setConfig(JSON.stringify(parseContent, null, 2));
