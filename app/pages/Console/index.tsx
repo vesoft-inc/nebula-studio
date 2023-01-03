@@ -5,7 +5,6 @@ import { trackEvent, trackPageView } from '@app/utils/stat';
 import { useStore } from '@app/stores';
 import Icon from '@app/components/Icon';
 import CodeMirror from '@app/components/CodeMirror';
-import { maxLineNum } from '@app/config/nebulaQL';
 import { useI18n } from '@vesoft-inc/i18n';
 import OutputBox from './OutputBox';
 import HistoryBtn from './HistoryBtn';
@@ -40,7 +39,6 @@ const Console = (props: IProps) => {
   const { onExplorer, templateRender } = props;
   const { spaces, getSpaces, spaceVidType, updateVidType } = schema;
   const { runGQL, currentGQL, results, runGQLLoading, getParams, update, paramsMap, getFavoriteList, currentSpace } = console;
-  const [isUpDown, setUpDown] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState<any>(null);
   const editor = useRef<any>(null);
@@ -93,7 +91,6 @@ const Console = (props: IProps) => {
         space: currentSpace,
         editorValue: value
       });
-      setUpDown(true);
     }
   };
 
@@ -153,7 +150,7 @@ const Console = (props: IProps) => {
               value={currentGQL}
               onChange={value => update({ currentGQL: value })}
               ref={editor}
-              height={isUpDown ? '120px' : 24 * maxLineNum + 'px'}
+              height="120px"
               onShiftEnter={handleRun}
               options={{
                 keyMap: 'sublime',
