@@ -1,13 +1,11 @@
 import { Button, Select, Tooltip, message } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { trackEvent, trackPageView } from '@app/utils/stat';
 import { useStore } from '@app/stores';
-import Instruction from '@app/components/Instruction';
 import Icon from '@app/components/Icon';
 import CodeMirror from '@app/components/CodeMirror';
 import { maxLineNum } from '@app/config/nebulaQL';
-import classnames from 'classnames';
 import { useI18n } from '@vesoft-inc/i18n';
 import OutputBox from './OutputBox';
 import HistoryBtn from './HistoryBtn';
@@ -40,8 +38,8 @@ const Console = (props: IProps) => {
   const { schema, console } = useStore();
   const { intl } = useI18n();
   const { onExplorer, templateRender } = props;
-  const { spaces, getSpaces, switchSpace, currentSpace, spaceVidType, updateVidType } = schema;
-  const { runGQL, currentGQL, results, runGQLLoading, getParams, update, paramsMap, getFavoriteList } = console;
+  const { spaces, getSpaces, spaceVidType, updateVidType } = schema;
+  const { runGQL, currentGQL, results, runGQLLoading, getParams, update, paramsMap, getFavoriteList, currentSpace } = console;
   const [isUpDown, setUpDown] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState<any>(null);
@@ -55,12 +53,7 @@ const Console = (props: IProps) => {
       updateVidType();
     }
   }, []);
-  const handleSpaceSwitch = (space: string) => {
-    switchSpace(space);
-    update({
-      results: []
-    });
-  };
+  const handleSpaceSwitch = useCallback((space: string) => update({ currentSpace: space }), []);
 
   const checkSwitchSpaceGql = (query: string) => {
     const queryList = query.split(SEMICOLON_REG).filter(Boolean);
@@ -95,7 +88,11 @@ const Console = (props: IProps) => {
   
       editor.current!.editor.execCommand('goDocEnd');
       handleSaveQuery(query);
-      await runGQL(query, value);
+      await runGQL({
+        gql: query, 
+        space: currentSpace,
+        editorValue: value
+      });
       setUpDown(true);
     }
   };
@@ -122,27 +119,22 @@ const Console = (props: IProps) => {
   };
   return (
     <div className={styles.nebulaConsole}>
-      <div className={styles.spaceSelect}>
-        <div className="studioCenterLayout">
-          <Select value={currentSpace || null} placeholder={intl.get('console.selectSpace')} onDropdownVisibleChange={handleGetSpaces} onChange={handleSpaceSwitch}>
-            {spaces.map(space => (
-              <Option value={space} key={space}>
-                {space}
-              </Option>
-            ))}
-          </Select>
-          <Instruction description={intl.get('common.spaceTip')} />
-        </div>
-      </div>
       <div className="studioCenterLayout">
         <div className={styles.consolePanel}>
-          <div className={classnames(styles.panelHeader, !templateRender && styles.flex)}>
+          <div className={styles.panelHeader}>
             <span className={styles.title}>Nebula Console</span>
             <div className={styles.operations}>
-              <div className={styles.operationsLeft}>
-                {templateRender?.(currentGQL)}
+              <div className={styles.spaceSelect}>
+                <Select value={currentSpace || null} placeholder={intl.get('console.selectSpace')} onDropdownVisibleChange={handleGetSpaces} onChange={handleSpaceSwitch}>
+                  {spaces.map(space => (
+                    <Option value={space} key={space}>
+                      {space}
+                    </Option>
+                  ))}
+                </Select>
               </div>
               <div className={styles.btnOperations}>
+                {templateRender?.(currentGQL)}
                 <FavoriteBtn onGqlSelect={updateGql} />
                 <HistoryBtn onGqlSelect={updateGql} />
                 <Tooltip title={intl.get('common.empty')} placement="top">
@@ -178,6 +170,7 @@ const Console = (props: IProps) => {
               index={index}
               result={item}
               gql={item.gql}
+              space={item.space}
               templateRender={templateRender}
               onExplorer={onExplorer ? handleExplorer : undefined}
               onHistoryItem={gql => updateGql(gql)}

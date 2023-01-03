@@ -3,6 +3,8 @@ import service from '@app/config/service';
 import { v4 as uuidv4 } from 'uuid';
 import { message } from 'antd';
 import { getI18n } from '@vesoft-inc/i18n';
+import { safeParse } from '@app/utils/function';
+import { getRootStore } from '.';
 
 const { intl } = getI18n();
 
@@ -33,7 +35,8 @@ const DEFAULT_GQL = 'SHOW SPACES;';
 export class ConsoleStore {
   runGQLLoading = false;
   currentGQL = DEFAULT_GQL;
-  results = [] as any;
+  currentSpace: string = sessionStorage.getItem('currentSpace') || '';
+  results: any[] = safeParse(sessionStorage.getItem('consoleResults')) || [];
   paramsMap = null as any;
   favorites = [] as {
     id: string;
@@ -42,13 +45,16 @@ export class ConsoleStore {
   constructor() {
     makeAutoObservable(this, {
       results: observable.ref,
+      currentSpace: observable,
       paramsMap: observable,
       currentGQL: observable,
       favorites: observable,
       clearConsoleResults: action,
     });
   }
-
+  get rootStore() {
+    return getRootStore();
+  }
   resetModel = () => {
     const shadowStore = new ConsoleStore();
     for (const key in shadowStore) {
@@ -67,11 +73,20 @@ export class ConsoleStore {
     this.currentGQL = DEFAULT_GQL;
   };
 
-  runGQL = async (gql: string, editorValue?: string) => {
+  runGQL = async (payload: {
+    gql: string, 
+    space: string,
+    editorValue?: string
+  }) => {
+    const { gql, space, editorValue } = payload;
     this.update({ runGQLLoading: true });
     try {
+      const err = await this.rootStore.schema.switchSpace(space);
+      if(err) {
+        throw new Error(err);
+      }
       const { gqlList, paramList } = splitQuery(gql);
-      const _results = await service.batchExecNGQL(
+      const data = await service.batchExecNGQL(
         {
           gqls: gqlList.filter(item => item !== '').map(item => {
             return item.endsWith('\\') ? item.slice(0, -1) : item;
@@ -85,7 +100,10 @@ export class ConsoleStore {
           },
         },
       );
-      _results.data.forEach(item => item.id = uuidv4());
+      data.data.forEach(item => {
+        item.id = uuidv4();
+        item.space = space;
+      });
       const updateQuerys = paramList.filter(item => {
         const reg = /^\s*:params/gim;
         return !reg.test(item);
@@ -93,10 +111,12 @@ export class ConsoleStore {
       if (updateQuerys.length > 0) {
         await this.getParams();
       }
+      const _results = [...data.data.reverse(), ...this.results];
       this.update({
-        results: [..._results.data.reverse(), ...this.results],
+        results: _results,
         currentGQL: editorValue || gql,
       });
+      sessionStorage.setItem('consoleResults', JSON.stringify(_results));
     } finally {
       window.setTimeout(() => this.update({ runGQLLoading: false }), 300);
     }

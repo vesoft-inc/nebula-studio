@@ -8,7 +8,6 @@
     "sorryNGQLCannotBeEmpty": "nGQL语句不能为空",
     "disablesUseToSwitchSpace": "禁止使用命令切换Space",
     "NGQLHistoryList": "nGQL历史列表",
-    "spaceTip": "仅对某个Space进行操作时需要",
     "empty": "清空",
     "run":"运行",
     "console": "控制台",
