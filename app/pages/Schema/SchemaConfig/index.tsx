@@ -24,9 +24,10 @@ const SchemaConfig = () => {
   const [tab, setTab] = useState('tag');
   const { intl } = useI18n();
   const { type, action } = useParams() as { type: string, action: string };
-  const { schema } = useStore();
+  const { schema, global } = useStore();
   const { spaces, getSpaces, switchSpace, currentSpace } = schema;
   const { currentLocale } = useI18n();
+  const showViewSchemaBetaFunc = global.appSetting.beta.functions.viewSchema.open;
   const routes = useMemo(() => {
     if(action === 'list' || type === 'visualization') {
       return [
@@ -39,24 +40,25 @@ const SchemaConfig = () => {
           breadcrumbName: currentSpace,
         },
       ];
-    } else {
-      return [
-        {
-          path: '/schema',
-          breadcrumbName: intl.get('schema.spaceList'),
-        },
-        {
-          path: `/schema/${type}/list`,
-          breadcrumbName: intl.get('schema.configTypeList', { type: intl.get(`common.${type}`) }),
-        },
-        {
-          path: '#',
-          breadcrumbName: intl.get('schema.configTypeAction', { 
-            action: intl.get(`common.${action}`), 
-            type: intl.get(`common.${type}`) }),
-        },
-      ];
     }
+
+    return [
+      {
+        path: '/schema',
+        breadcrumbName: intl.get('schema.spaceList'),
+      },
+      {
+        path: `/schema/${type}/list`,
+        breadcrumbName: intl.get('schema.configTypeList', { type: intl.get(`common.${type}`) }),
+      },
+      {
+        path: '#',
+        breadcrumbName: intl.get('schema.configTypeAction', {
+          action: intl.get(`common.${action}`),
+          type: intl.get(`common.${type}`),
+        }),
+      },
+    ];
   }, [currentSpace, action, currentLocale]);
   useEffect(() => {
     setTab(type);
@@ -103,7 +105,12 @@ const SchemaConfig = () => {
             <Radio.Button value="edge">{intl.get('common.edge')}</Radio.Button>
             <Radio.Button value="index">{intl.get('common.index')}</Radio.Button>
             <Radio.Button value="statistic">{intl.get('common.statistics')}</Radio.Button>
-            <Radio.Button value="visualization">{intl.get('common.viewSchema')}<span className={styles.betaLabel}>{intl.get('common.beta')}</span></Radio.Button>
+            {showViewSchemaBetaFunc && (
+              <Radio.Button value="visualization">
+                {intl.get('common.viewSchema')}
+                <span className={styles.betaLabel}>{intl.get('common.beta')}</span>
+              </Radio.Button>
+            )}
           </Radio.Group>
         </div>}
         <>
@@ -127,11 +134,7 @@ const SchemaConfig = () => {
             exact={true}
             component={SpaceStats}
           />
-          <Route
-            path="/schema/visualization"
-            exact={true}
-            component={SchemaVisualization}
-          />
+          {showViewSchemaBetaFunc && <Route path="/schema/visualization" exact={true} component={SchemaVisualization} />}
           <Route
             path={`/schema/tag/create`}
             exact={true}
