@@ -274,9 +274,10 @@ const OutputBox = (props: IProps) => {
   return <div className={styles.outputBox}>
     <div className={styles.outputHeader}>
       <p className={cls(styles.gql, { [styles.errorInfo]: !resultSuccess })} onClick={() => onHistoryItem(gql)}>
-        <span className={styles.gqlValue}>{space ? `[${space}]>` : '&'} {gql}</span>
+        <span className={styles.gqlValue}>{space ? `[${space}]>` : '$'} {gql}</span>
       </p>
       <div className={styles.outputOperations}>
+        {templateRender?.(gql)}
         {!isFavorited ? <Tooltip title={intl.get('console.addToFavorites')} placement="top">
           <Icon
             type="icon-studio-btn-save"
@@ -331,7 +332,6 @@ const OutputBox = (props: IProps) => {
               1000000} (s)`}
           </span>
           <div className={styles.btns}>
-            {templateRender?.(gql)}
             {onExplorer && <Button className="primaryBtn" type="text" onClick={handleExplore}>{intl.get('common.openInExplore')}</Button>}
           </div>
         </div>

@@ -245,7 +245,7 @@ export default observer(function ApplySpacePopover() {
   }, [sketchModel.active, sketchModel.editor, sketchModel.currentSketch]);
   return (
     <Popover
-      overlayClassName="applyPopover"
+      overlayClassName={styles.applyPopover}
       placement="bottomRight"
       content={<PopoverContent close={close} />}
       arrowPointAtCenter={true}

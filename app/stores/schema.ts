@@ -111,7 +111,7 @@ export class SchemaStore {
         currentSpace: space,
         ...initialSchemaData
       });
-      sessionStorage.setItem('currentSpace', space);
+      localStorage.setItem('currentSpace', space);
       // add await to make sure vidType is updated before other operations executed
       await this.updateVidType(space);
     } else {
