@@ -52,7 +52,6 @@ const Console = (props: IProps) => {
     }
   }, []);
   const handleSpaceSwitch = useCallback((space: string) => update({ currentSpace: space }), []);
-
   const checkSwitchSpaceGql = (query: string) => {
     const queryList = query.split(SEMICOLON_REG).filter(Boolean);
     const reg = /^USE `?.+`?(?=[\s*;?]?)/gim;

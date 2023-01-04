@@ -1,4 +1,4 @@
-import { action, makeAutoObservable, observable } from 'mobx';
+import { makeAutoObservable, observable } from 'mobx';
 import service from '@app/config/service';
 import { v4 as uuidv4 } from 'uuid';
 import { message } from 'antd';
@@ -35,7 +35,7 @@ const DEFAULT_GQL = 'SHOW SPACES;';
 export class ConsoleStore {
   runGQLLoading = false;
   currentGQL = DEFAULT_GQL;
-  currentSpace: string = sessionStorage.getItem('currentSpace') || '';
+  currentSpace: string = localStorage.getItem('currentSpace') || '';
   results: any[] = safeParse(sessionStorage.getItem('consoleResults')) || [];
   paramsMap = null as any;
   favorites = [] as {
@@ -49,7 +49,6 @@ export class ConsoleStore {
       paramsMap: observable,
       currentGQL: observable,
       favorites: observable,
-      clearConsoleResults: action,
     });
   }
   get rootStore() {
@@ -68,11 +67,6 @@ export class ConsoleStore {
     Object.keys(param).forEach(key => (this[key] = param[key]));
   };
 
-  clearConsoleResults = () => {
-    this.results = [];
-    this.currentGQL = DEFAULT_GQL;
-  };
-
   runGQL = async (payload: {
     gql: string, 
     space: string,
@@ -81,9 +75,11 @@ export class ConsoleStore {
     const { gql, space, editorValue } = payload;
     this.update({ runGQLLoading: true });
     try {
-      const err = await this.rootStore.schema.switchSpace(space);
-      if(err) {
-        return;
+      if(space) {
+        const err = await this.rootStore.schema.switchSpace(space);
+        if(err) {
+          return;
+        }
       }
       const { gqlList, paramList } = splitQuery(gql);
       const data = await service.batchExecNGQL(

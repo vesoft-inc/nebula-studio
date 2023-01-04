@@ -58,12 +58,19 @@ export class GlobalStore {
       },
     );
     resetStore();
-    sessionStorage.clear();
-    cookies.remove('nh');
-    cookies.remove('nu');
+    this.clearStorage();
+    this.clearCookies();
     this.history.push(`/login${location.search}`);
   };
 
+  clearCookies = () => {
+    cookies.remove('nh');
+    cookies.remove('nu');
+  };
+  clearStorage = () => {
+    sessionStorage.clear();
+    localStorage.removeItem('currentSpace');
+  };
   update = (payload: Record<string, any>) => {
     Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
   };
