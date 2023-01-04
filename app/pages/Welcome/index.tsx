@@ -117,7 +117,7 @@ const getDatasetList = (): DatasetItem[] => {
         vertexCount: 81,
         edgeCount: 227,
       },
-      coverImg: `${process.env.CDN_PATH || ''}/images/welcome/basketballplayer.png`,
+      coverImg: `${process.env.CDN_PATH || '/'}images/welcome/basketballplayer.png`,
       docLink: intl.get('welcome.basketballplayerDocLink'),
     },
     {
@@ -130,7 +130,7 @@ const getDatasetList = (): DatasetItem[] => {
         vertexCount: 5500,
         edgeCount: 13130,
       },
-      coverImg: `${process.env.CDN_PATH || ''}/images/welcome/shareholding.png`,
+      coverImg: `${process.env.CDN_PATH || '/'}images/welcome/shareholding.png`,
       docLink: intl.get('welcome.shareholdingDocLink'),
     },
   ];
