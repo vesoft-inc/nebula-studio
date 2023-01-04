@@ -27,7 +27,7 @@ const initialSchemaData = {
 } as Partial<SchemaStore>;
 export class SchemaStore {
   spaces: string[] = [];
-  currentSpace: string = sessionStorage.getItem('currentSpace') || '';
+  currentSpace: string = localStorage.getItem('currentSpace') || '';
   spaceVidType: string;
   edgeTypes: string[] = [];
   tagsFields: any[] = [];
@@ -70,12 +70,12 @@ export class SchemaStore {
   }
 
   resetModel = () => {
-    this.update({
-      currentSpace: '',
-      spaces: [],
-      ...initialSchemaData,
-    });
-    sessionStorage.removeItem('currentSpace');
+    const shadowStore = new SchemaStore();
+    for (const key in shadowStore) {
+      if (typeof shadowStore[key] !== 'function') {
+        this[key] = shadowStore[key];
+      }
+    }
   };
 
   update = (payload: Record<string, any>) =>

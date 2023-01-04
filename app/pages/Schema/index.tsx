@@ -97,7 +97,7 @@ const Schema = () => {
         schema.update({
           currentSpace: ''
         });
-        sessionStorage.removeItem('currentSpace');
+        localStorage.removeItem('currentSpace');
       }
     }
   };
