@@ -1,4 +1,5 @@
 import { getRootStore } from '@app/stores';
+import { message } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import { safeParse } from './function';
 import { HttpResCode } from './http';
@@ -57,6 +58,8 @@ export class NgqlRunner {
   connect = (url: string | URL, protocols?: string | string[]) => {
     if (this.socketIsConnecting) {
       return this.socketConnectingPromise;
+    } else if (this.socket?.readyState === WebSocket.OPEN) {
+      return Promise.resolve(true);
     }
     this.socketIsConnecting = true;
     this.socketConnectingPromise = new Promise<boolean>((resolve) => {
@@ -82,7 +85,7 @@ export class NgqlRunner {
         
         // reconnect
         this.socket.addEventListener('close', this.onDisconnect);
-        this.socket.addEventListener('error', this.onDisconnect);
+        this.socket.addEventListener('error', this.onError);
 
         resolve(true);
       };
@@ -104,9 +107,15 @@ export class NgqlRunner {
     return this.connect(this.socketUrl, this.socketProtocols);
   };
 
+  onError = (e: Event) => {
+    console.error('=====ngqlSocket error', e);
+    message.error('WebSocket error, try to reconnect...');
+    this.onDisconnect();
+  };
+
   onDisconnect = () => {
     this.socket?.removeEventListener('close', this.onDisconnect);
-    this.socket?.removeEventListener('error', this.onDisconnect);
+    this.socket?.removeEventListener('error', this.onError);
     this.clearSocketMessageListener();
     this.socket?.close();
 
