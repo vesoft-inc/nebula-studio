@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"reflect"
 	"strings"
 	"time"
 
@@ -68,28 +67,32 @@ type Client struct {
 }
 
 func (c *Client) runNgql(msgReceived *MessageReceive) {
-	msgPost := MessagePost{}
-	msgPost.Header.MsgId = msgReceived.Header.MsgId
-	msgPost.Header.SendTime = time.Now().UnixMilli()
-	msgPost.Body.MsgType = msgReceived.Body.MsgType
+	msgPost := MessagePost{
+		Header: MessagePostHeader{
+			MsgId:    msgReceived.Header.MsgId,
+			SendTime: time.Now().UnixMilli(),
+		},
+		Body: MessagePostBody{
+			MsgType: msgReceived.Body.MsgType,
+		},
+	}
 
 	gql, paramList := "", []string{}
 
-	reqGql := msgReceived.Body.Content["gql"]
-	if reqGql != nil {
-		gql, _ = reqGql.(string)
+	if reqGql, ok := msgReceived.Body.Content["gql"].(string); ok {
+		gql = reqGql
 	}
 
-	reqParamList := msgReceived.Body.Content["paramList"]
-	if reqParamList != nil && reflect.TypeOf(reqParamList).Kind() == reflect.Slice {
-		s := reqParamList.([]interface{})
-		for i := 0; i < len(s); i++ {
-			paramList = append(paramList, s[i].(string))
+	reqParamList, ok := msgReceived.Body.Content["paramList"].([]any)
+	if ok {
+		for _, param := range reqParamList {
+			if paramStr, ok := param.(string); ok {
+				paramList = append(paramList, paramStr)
+			}
 		}
 	}
 
 	execute, _, err := dao.Execute(c.clientInfo.NSID, gql, paramList)
-
 	if err != nil {
 		content := map[string]any{
 			"code":    base.Error,
@@ -112,27 +115,32 @@ func (c *Client) runNgql(msgReceived *MessageReceive) {
 }
 
 func (c *Client) runBatchNgql(msgReceived *MessageReceive) {
-	msgPost := MessagePost{}
-	msgPost.Header.MsgId = msgReceived.Header.MsgId
-	msgPost.Header.SendTime = time.Now().UnixMilli()
-	msgPost.Body.MsgType = msgReceived.Body.MsgType
+	msgPost := MessagePost{
+		Header: MessagePostHeader{
+			MsgId:    msgReceived.Header.MsgId,
+			SendTime: time.Now().UnixMilli(),
+		},
+		Body: MessagePostBody{
+			MsgType: msgReceived.Body.MsgType,
+		},
+	}
 
 	gqls, paramList := []string{}, []string{}
-	resContentData := make([]map[string]interface{}, 0)
+	resContentData := make([]map[string]any, 0)
 
-	reqGqls := msgReceived.Body.Content["gqls"]
-	if reqGqls != nil && reflect.TypeOf(reqGqls).Kind() == reflect.Slice {
-		s := reqGqls.([]interface{})
-		for i := 0; i < len(s); i++ {
-			gqls = append(gqls, s[i].(string))
+	if reqGqls, ok := msgReceived.Body.Content["gqls"].([]any); ok {
+		for _, s := range reqGqls {
+			if gql, ok := s.(string); ok {
+				gqls = append(gqls, gql)
+			}
 		}
 	}
 
-	reqParamList := msgReceived.Body.Content["paramList"]
-	if reqParamList != nil && reflect.TypeOf(reqParamList).Kind() == reflect.Slice {
-		s := reqParamList.([]interface{})
-		for i := 0; i < len(s); i++ {
-			paramList = append(paramList, s[i].(string))
+	if reqParamList, ok := msgReceived.Body.Content["paramList"].([]any); ok {
+		for _, param := range reqParamList {
+			if paramStr, ok := param.(string); ok {
+				paramList = append(paramList, paramStr)
+			}
 		}
 	}
 
@@ -151,7 +159,7 @@ func (c *Client) runBatchNgql(msgReceived *MessageReceive) {
 
 	for _, gql := range gqls {
 		execute, _, err := dao.Execute(c.clientInfo.NSID, gql, make([]string, 0))
-		gqlRes := map[string]interface{}{"gql": gql, "data": execute}
+		gqlRes := map[string]any{"gql": gql, "data": execute}
 		if err != nil {
 			gqlRes["message"] = err.Error()
 			gqlRes["code"] = base.Error

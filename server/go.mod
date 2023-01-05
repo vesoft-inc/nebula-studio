@@ -3,6 +3,7 @@ module github.com/vesoft-inc/nebula-studio/server
 go 1.18
 
 require (
+	github.com/gorilla/websocket v1.5.0
 	github.com/samber/lo v1.28.2
 	github.com/vesoft-inc/go-pkg v0.0.0-20220714021138-c5edb9946837
 	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20221130062253-8ae8bd95d139
@@ -21,7 +22,6 @@ require (
 
 require (
 	github.com/facebook/fbthrift v0.31.1-0.20211129061412-801ed7f9f295 // indirect
-	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
