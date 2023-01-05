@@ -69,8 +69,9 @@ const ExportModal = (props: IProps) => {
         ? tables.reduce((acc, cur) => {
           const _srcId = cur[srcId];
           const _dstId = cur[dstId];
-          const [type, ...value] = edgeType.split('-');
-          const _edgeType = type === 'edge' ? value.join('-') : cur[value];
+          const regex = /^(column|edge)-(.*)/gm;
+          const [, type, value] = regex.exec(edgeType) || [];
+          const _edgeType = type === 'edge' ? value : cur[value];
           if(isExist(_srcId) && isExist(_dstId)) {
             acc.push({
               srcId: _srcId,
