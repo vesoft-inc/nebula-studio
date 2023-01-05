@@ -37,19 +37,20 @@ const Console = (props: IProps) => {
   const { schema, console } = useStore();
   const { intl } = useI18n();
   const { onExplorer, templateRender } = props;
-  const { spaces, getSpaces, spaceVidType, updateVidType } = schema;
+  const { spaces, getSpaces } = schema;
   const { runGQL, currentGQL, results, runGQLLoading, getParams, update, paramsMap, getFavoriteList, currentSpace } = console;
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalData, setModalData] = useState<any>(null);
+  const [modalData, setModalData] = useState<{
+    space: string;
+    spaceVidType: string;
+    [key: string]: any;
+  }>(null);
   const editor = useRef<any>(null);
   useEffect(() => {
     trackPageView('/console');
     getSpaces();
     getParams();
     getFavoriteList();
-    if(!spaceVidType && currentSpace) {
-      updateVidType();
-    }
   }, []);
   const handleSpaceSwitch = useCallback((space: string) => update({ currentSpace: space }), []);
   const checkSwitchSpaceGql = (query: string) => {
@@ -97,7 +98,11 @@ const Console = (props: IProps) => {
     update({ currentGQL: currentGQL + ` $${param}` });
   };
 
-  const handleResultConfig = (data: any) => {
+  const handleResultConfig = (data: {
+    space: string;
+    spaceVidType: string;
+    [key: string]: any;
+  }) => {
     setModalData(data);
     setModalVisible(true);
   };
@@ -167,6 +172,7 @@ const Console = (props: IProps) => {
               result={item}
               gql={item.gql}
               space={item.space}
+              spaceVidType={item.spaceVidType}
               templateRender={templateRender}
               onExplorer={onExplorer ? handleExplorer : undefined}
               onHistoryItem={gql => updateGql(gql)}

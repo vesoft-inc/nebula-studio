@@ -58,7 +58,7 @@ const FileSelect = (props: IProps) => {
       trigger="click"
       onOpenChange={visible => setVisible(visible)}
       content={<Form className={styles.fileSelectForm} onFinish={onFinish} layout="inline">
-        <FormItem name="name" rules={[{ required: true }]}>
+        <FormItem name="name" rules={[{ required: true, message: intl.get('formRules.fileRequired') }]}>
           <Select className={styles.fileSelect} showSearch={true} onDropdownVisibleChange={handleGetFiles} dropdownMatchSelectWidth={false}>
             {fileList.map((file: any) => (
               <Option value={file.name} key={file.name}>
