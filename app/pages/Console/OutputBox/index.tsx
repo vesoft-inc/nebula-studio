@@ -19,6 +19,7 @@ interface IProps {
   index: number;
   gql: string;
   space?: string;
+  spaceVidType?: string;
   result: any;
   onHistoryItem: (gql: string) => void;
   onExplorer?: (params: {
@@ -26,17 +27,20 @@ interface IProps {
     vertexes: any[], 
     edges: any[]
   }) => void;
-  onResultConfig?: (data: any) => void;
+  onResultConfig?: (data: {
+    space: string;
+    spaceVidType: string;
+    [key: string]: any;
+  }) => void;
   templateRender?: (data) => JSX.Element;
 }
 
 const OutputBox = (props: IProps) => {
-  const { gql, space, result: { code, data, message }, onHistoryItem, index, onExplorer, onResultConfig, templateRender } = props;
-  const { console, schema } = useStore();
+  const { gql, space, spaceVidType, result: { code, data, message }, onHistoryItem, index, onExplorer, onResultConfig, templateRender } = props;
+  const { console } = useStore();
   const { intl } = useI18n();
   const [visible, setVisible] = useState(true);
   const { results, update, favorites, saveFavorite, deleteFavorite, getFavoriteList } = console;
-  const { spaceVidType, currentSpace } = schema;
   const [columns, setColumns] = useState<any>([]);
   const [dataSource, setDataSource] = useState<any>([]);
   const [isFavorited, setIsFavorited] = useState(false);
@@ -211,7 +215,11 @@ const OutputBox = (props: IProps) => {
     ) {
       parseToGraph();
     } else {
-      onResultConfig!(data);
+      onResultConfig!({
+        ...data,
+        space,
+        spaceVidType,
+      });
     }
   };
   const handleRemoveMenu = () => {
@@ -222,7 +230,7 @@ const OutputBox = (props: IProps) => {
   const parseToGraph = () => {
     const { vertexes, edges } = parseSubGraph(data.tables, spaceVidType);
     onExplorer!({
-      space: currentSpace,
+      space,
       vertexes, 
       edges
     });

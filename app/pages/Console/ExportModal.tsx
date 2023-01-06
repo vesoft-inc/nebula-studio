@@ -1,5 +1,5 @@
-import { Button, Form, Input, Modal, Radio, Select } from 'antd';
-import React, { useCallback } from 'react';
+import { Button, Form, Modal, Radio, Select } from 'antd';
+import React, { useCallback, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 
@@ -13,7 +13,11 @@ const layout = {
 };
 
 interface IProps {
-  data: any;
+  data: {
+    space: string;
+    spaceVidType: string;
+    [key: string]: any;
+  };
   visible: boolean;
   onClose: () => void;
   onExplorer: (params: {
@@ -24,10 +28,23 @@ interface IProps {
 }
 const ExportModal = (props: IProps) => {
   const { data, visible, onClose, onExplorer } = props;
-  const { schema: { currentSpace } } = useStore();
-  const { headers, tables } = data;
+  const { schema: { switchSpace, getEdges } } = useStore();
+  const { headers, tables, space } = data;
   const { intl } = useI18n();
+  const [edges, setEdges] = useState([]);
+  const [loading, setLoading] = useState(false);
   const isExist = useCallback((value) => value !== null && value !== undefined && value !== '', []);
+  useEffect(() => {
+    init();
+  }, [space]);
+
+  const init = async () => {
+    setLoading(true);
+    await switchSpace(space);
+    const _edges = await getEdges();
+    setEdges(_edges);
+    setLoading(false);
+  };
   const handleExport = (values) => {
     const { type, vertexIds, srcId, dstId, edgeType, rank } = values;
     const vertexes =
@@ -52,19 +69,22 @@ const ExportModal = (props: IProps) => {
         ? tables.reduce((acc, cur) => {
           const _srcId = cur[srcId];
           const _dstId = cur[dstId];
+          const regex = /^(column|edge)-(.*)/gm;
+          const [, type, value] = regex.exec(edgeType) || [];
+          const _edgeType = type === 'edge' ? value : cur[value];
           if(isExist(_srcId) && isExist(_dstId)) {
             acc.push({
               srcId: _srcId,
               dstId: _dstId,
               rank: isExist(rank) ? cur[rank] : 0,
-              edgeType,
+              edgeType: _edgeType,
             });
           }
           return acc;
         }, [])
         : [];
     onExplorer({
-      space: currentSpace,
+      space,
       vertexes, 
       edges
     });
@@ -110,7 +130,24 @@ const ExportModal = (props: IProps) => {
             </> : <> 
               <p>{intl.get('console.exportEdge')}</p>
               <Form.Item label="Edge Type" name="edgeType" rules={[{ required: true, message: intl.get('formRules.edgeTypeRequired') }]}>
-                <Input />
+                <Select loading={loading} popupClassName={styles.edgeSelect} optionLabelProp="label">
+                  {headers.map(i => (
+                    <Option value={`column-${i}`} key={`column-${i}`} label={i}>
+                      <span className={styles.edgeItem} aria-label={i}>
+                        <span className={styles.value}>{i}</span>
+                        <span className={styles.type}>{intl.get('common.columnName')}</span>
+                      </span>
+                    </Option>
+                  ))}
+                  {edges.map(i => (
+                    <Option value={`edge-${i}`} key={`edge-${i}`} label={i}>
+                      <span className={styles.edgeItem} aria-label={i}>
+                        <span className={styles.value}>{i}</span>
+                        <span className={styles.type}>{intl.get('common.edge')}</span>
+                      </span>
+                    </Option>
+                  ))}
+                </Select>
               </Form.Item>
               <Form.Item label="Src ID" name="srcId" rules={[{ required: true, message: intl.get('formRules.srcIdRequired') }]}>
                 <Select>

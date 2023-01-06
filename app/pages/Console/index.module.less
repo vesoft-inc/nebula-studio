@@ -135,6 +135,25 @@
   }
 }
 
+.edgeSelect {
+  .edgeItem {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .type {
+      color: @darkGray;
+      font-size: 12px;
+    }
+    .value {
+      font-family: Roboto-Bold, sans-serif;
+      max-width: 50%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
+}
+
 .historyList, .favoriteList {
 	height: 80%;
 	overflow: hidden;

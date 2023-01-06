@@ -81,6 +81,7 @@ export class ConsoleStore {
           return;
         }
       }
+      const spaceVidType = this.rootStore.schema.spaceVidType;
       const { gqlList, paramList } = splitQuery(gql);
       const data = await service.batchExecNGQL(
         {
@@ -99,6 +100,7 @@ export class ConsoleStore {
       data.data.forEach(item => {
         item.id = uuidv4();
         item.space = space;
+        item.spaceVidType = spaceVidType;
       });
       const updateQuerys = paramList.filter(item => {
         const reg = /^\s*:params/gim;

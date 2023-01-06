@@ -41,7 +41,7 @@ const Operations = (props: IOperations) => {
         trigger="click"
         onOpenChange={visible => setVisible(visible)}
         content={<Form onFinish={handleClone} layout="inline">
-          <Form.Item label={intl.get('schema.spaceName')} name="name" rules={[{ required: true }]}>
+          <Form.Item label={intl.get('schema.spaceName')} name="name" rules={[{ required: true, message: intl.get('formRules.nameRequired') }]}>
             <Input />
           </Form.Item>
           <Form.Item>

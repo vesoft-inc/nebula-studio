@@ -56,7 +56,8 @@
     "sketch": "Schema drafting",
     "viewSchema": "View Schema",
     "beta": "Beta",
-    "danglingEdge": "Dangling edge"
+    "danglingEdge": "Dangling edge",
+    "columnName": "Column name"
   },
   "doc": {
     "welcome": "Welcome to",
@@ -115,7 +116,8 @@
     "spaceRequired": "Space is required",
     "maxBytes": "It cannot exceed {max} bytes",
     "ttlLimit": "The data type of the property must be int or timestamp",
-    "associateNameRequired": "Associated {type} name is required"
+    "associateNameRequired": "Associated {type} name is required",
+    "fileRequired": "Please select the file"
   },
   "console": {
     "execTime": "Execution Time",

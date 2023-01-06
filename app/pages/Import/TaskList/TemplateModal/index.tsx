@@ -140,7 +140,7 @@ const TemplateModal = (props: IProps) => {
         form={form} 
         layout="vertical" 
         onFinish={handleImport}>
-        <Form.Item label={intl.get('import.taskName')} name="name" rules={[{ required: true }]}>
+        <Form.Item label={intl.get('import.taskName')} name="name" rules={[{ required: true, message: intl.get('formRules.nameRequired') }]}>
           <Input />
         </Form.Item>
         <Form.Item label={intl.get('import.config')} name="content" rules={[{ required: true }]}>
