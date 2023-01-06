@@ -62,10 +62,10 @@ export class NgqlRunner {
   };
 
   connect = (url: string | URL, protocols?: string | string[]) => {
-    if (this.socketIsConnecting) {
+    if (this.socket && this.socketIsConnecting) {
       return this.socketConnectingPromise;
     } else if (this.socket?.readyState === WebSocket.OPEN) {
-      return Promise.resolve(true);
+      this.desctory();
     }
     this.socketIsConnecting = true;
     this.socketConnectingPromise = new Promise<boolean>((resolve) => {
@@ -125,15 +125,19 @@ export class NgqlRunner {
     this.clearSocketMessageListener();
     this.socket?.close();
 
-    clearTimeout(this.socketPingTimeInterval);
-    this.socketPingTimeInterval = undefined;
+    this.stopSocketPing();
     this.socket = undefined;
 
     this.socketUrl && setTimeout(this.reConnect, 1000);
   };
 
-  desctory = () => {
+  stopSocketPing = () => {
     clearTimeout(this.socketPingTimeInterval);
+    this.socketPingTimeInterval = undefined;
+  };
+
+  desctory = () => {
+    this.stopSocketPing();
     this.clearSocketMessageListener();
     this.socket?.close();
     this.socket = undefined;
