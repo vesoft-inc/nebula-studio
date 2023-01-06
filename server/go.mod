@@ -3,6 +3,7 @@ module github.com/vesoft-inc/nebula-studio/server
 go 1.18
 
 require (
+	github.com/gorilla/websocket v1.5.0
 	github.com/samber/lo v1.28.2
 	github.com/vesoft-inc/go-pkg v0.0.0-20220714021138-c5edb9946837
 	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20221130062253-8ae8bd95d139

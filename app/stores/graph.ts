@@ -81,7 +81,7 @@ export class GraphStore {
     return edgeMap;
   }
 
-  constructor(data?) {
+  constructor() {
     makeAutoObservable(this, {
       nodeHovering: observable.ref,
       nodeDragging: observable.ref,
