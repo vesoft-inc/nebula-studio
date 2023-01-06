@@ -83,8 +83,7 @@ func (c *Client) runNgql(msgReceived *MessageReceive) {
 		gql = reqGql
 	}
 
-	reqParamList, ok := msgReceived.Body.Content["paramList"].([]any)
-	if ok {
+	if reqParamList, ok := msgReceived.Body.Content["paramList"].([]any); ok {
 		for _, param := range reqParamList {
 			if paramStr, ok := param.(string); ok {
 				paramList = append(paramList, paramStr)
@@ -204,15 +203,15 @@ func (c *Client) readPump() {
 			break
 		}
 
-		msgReceivedStr := bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
+		msgReceivedByte := bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
 
-		if string(msgReceivedStr) == heartbeatRequest {
+		if string(msgReceivedByte) == heartbeatRequest {
 			c.send <- []byte(heartbeatResponse)
 			continue
 		}
 
 		msgReceived := MessageReceive{}
-		json.Unmarshal(msgReceivedStr, &msgReceived)
+		json.Unmarshal(msgReceivedByte, &msgReceived)
 
 		if msgReceived.Body.MsgType == "ngql" {
 			// async run ngql
