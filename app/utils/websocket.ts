@@ -4,15 +4,21 @@ import { v4 as uuidv4 } from 'uuid';
 import { safeParse } from './function';
 import { HttpResCode } from './http';
 
-interface MessageReceive {
+export interface MessageReceive<T extends unknown = Record<string, unknown>> {
   header: {
     msgId: string;
     sendTime: number;
   };
   body: {
     msgType: string;
-    content: Record<string, unknown>;
+    content: T;
   };
+}
+
+export interface NgqlRes<T = any> {
+  code: number;
+  data?: T;
+  message: string;
 }
 
 export const WsHeartbeatReq = '1';
@@ -45,7 +51,7 @@ export class NgqlRunner {
 
   rmSocketMessageListener = (listener: (e: MessageEvent) => void) => {
     this.socket?.removeEventListener('message', listener);
-    this.socketMessageListeners = this.socketMessageListeners.filter(l => l !== listener);
+    this.socketMessageListeners = this.socketMessageListeners.filter((l) => l !== listener);
   };
 
   clearSocketMessageListener = () => {
@@ -82,7 +88,7 @@ export class NgqlRunner {
 
         socket.onerror = undefined;
         socket.onclose = undefined;
-        
+
         // reconnect
         this.socket.addEventListener('close', this.onDisconnect);
         this.socket.addEventListener('error', this.onError);
@@ -99,7 +105,7 @@ export class NgqlRunner {
         console.log('=====ngqlSocket close');
         this.socket = undefined;
       };
-    })
+    });
     return this.socketConnectingPromise;
   };
 
@@ -124,7 +130,7 @@ export class NgqlRunner {
     this.socket = undefined;
 
     this.socketUrl && setTimeout(this.reConnect, 1000);
-  }
+  };
 
   desctory = () => {
     clearTimeout(this.socketPingTimeInterval);
@@ -139,7 +145,10 @@ export class NgqlRunner {
     this.socket?.readyState === WebSocket.OPEN && this.socket.send(WsHeartbeatReq);
   };
 
-  runNgql = async ({ gql, paramList }: { gql: string; paramList?: string[] }, _config: any) => {
+  runNgql = async (
+    { gql, paramList }: { gql: string; paramList?: string[] },
+    _config: any,
+  ): Promise<{ code: number; data?: any; message: string }> => {
     const message = {
       header: {
         msgId: uuidv4(),
@@ -161,7 +170,7 @@ export class NgqlRunner {
         if (e.data === WsHeartbeatRes) {
           return;
         }
-        const msgReceive = safeParse<MessageReceive>(e.data);
+        const msgReceive = safeParse<MessageReceive<NgqlRes>>(e.data);
         if (msgReceive?.body?.content?.code === HttpResCode.ErrSession) {
           this.desctory();
           getRootStore().global.logout();
@@ -178,7 +187,10 @@ export class NgqlRunner {
     });
   };
 
-  runBatchNgql = async ({ gqls, paramList }: { gqls: string[]; paramList?: string[] }, _config: any) => {
+  runBatchNgql = async (
+    { gqls, paramList }: { gqls: string[]; paramList?: string[] },
+    _config: any,
+  ): Promise<{ code: number; data?: any[]; message: string }> => {
     const message = {
       header: {
         msgId: uuidv4(),
@@ -200,7 +212,7 @@ export class NgqlRunner {
         if (e.data === WsHeartbeatRes) {
           return;
         }
-        const msgReceive = safeParse<MessageReceive>(e.data);
+        const msgReceive = safeParse<MessageReceive<NgqlRes>>(e.data);
         if (msgReceive?.body?.content?.code === HttpResCode.ErrSession) {
           this.desctory();
           getRootStore().global.logout();
