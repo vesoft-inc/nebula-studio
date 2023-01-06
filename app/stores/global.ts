@@ -65,6 +65,7 @@ export class GlobalStore {
     resetStore();
     this.clearStorage();
     this.clearCookies();
+    this.ngqlRunner?.desctory();
     this.history.push(`/login${location.search}`);
   };
 
