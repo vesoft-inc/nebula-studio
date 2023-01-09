@@ -98,13 +98,10 @@ export class SchemaStore {
   };
 
   switchSpace = async (space: string, hideErrMsg?: boolean) => {
-    const { code, message } = (await service.execNGQL({
-      gql: `use ${handleKeyword(space)};`,
-    },
-    {
-      hideErrMsg
-    },
-    )) as any;
+    const { code, message } = await service.execNGQL(
+      { gql: `use ${handleKeyword(space)};` },
+      { hideErrMsg },
+    );
 
     if (code === 0) {
       this.update({

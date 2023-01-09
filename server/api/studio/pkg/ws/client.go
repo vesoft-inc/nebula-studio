@@ -3,7 +3,6 @@ package ws
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -13,6 +12,7 @@ import (
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/base"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 const (
@@ -93,6 +93,7 @@ func (c *Client) runNgql(msgReceived *MessageReceive) {
 
 	execute, _, err := dao.Execute(c.clientInfo.NSID, gql, paramList)
 	if err != nil {
+		logx.ErrorStackf("[WebSocket ngql query]: msgReceived.Body.Content(%v); error(%v)", &msgReceived.Body.Content, err)
 		content := map[string]any{
 			"code":    base.Error,
 			"message": err.Error(),
@@ -198,7 +199,9 @@ func (c *Client) readPump() {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
+				logx.ErrorStackf("[WebSocket UnexpectedClose]: %v", err)
+			} else {
+				logx.ErrorStackf("[WebSocket ReadMessage]: %v", err)
 			}
 			break
 		}
@@ -247,6 +250,7 @@ func (c *Client) writePump() {
 
 			w, err := c.conn.NextWriter(websocket.TextMessage)
 			if err != nil {
+				logx.ErrorStackf("[WebSocket WriteMessage]: %v", err)
 				return
 			}
 			w.Write(message)
