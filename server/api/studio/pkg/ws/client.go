@@ -3,6 +3,7 @@ package ws
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -37,8 +38,9 @@ const (
 )
 
 var (
-	newline = []byte{'\n'}
-	space   = []byte{' '}
+	newline      = []byte{'\n'}
+	space        = []byte{' '}
+	nsidSpaceMap = map[string]string{}
 )
 
 var upgrader = websocket.Upgrader{
@@ -55,15 +57,37 @@ var upgrader = websocket.Upgrader{
 
 // Client is a middleman between the websocket connection and the hub.
 type Client struct {
-	hub *Hub
-
+	hub        *Hub
 	clientInfo *auth.AuthData
-
 	// The websocket connection.
 	conn *websocket.Conn
-
 	// Buffered channel of outbound messages.
 	send chan []byte
+}
+
+func (c *Client) switchSpace(msgReceived *MessageReceive) *map[string]any {
+	reqSpace, ok := msgReceived.Body.Content["space"].(string)
+	shouldSwitch := ok && reqSpace != "" && nsidSpaceMap[c.clientInfo.NSID] != reqSpace
+	if !shouldSwitch {
+		return nil
+	}
+	// name.replace(/\\/gm, '\\\\').replace(/`/gm, '\\`')
+	reqSpace = strings.Replace(reqSpace, "\\", "\\\\", -1)
+	reqSpace = strings.Replace(reqSpace, "`", "\\`", -1)
+	_, _, err := dao.Execute(c.clientInfo.NSID, fmt.Sprintf("USE `%s`", reqSpace), nil)
+	if err != nil {
+		logx.ErrorStackf("[WebSocket ngql query]: msgReceived.Body.Content(%v); error(%v)", &msgReceived.Body.Content, err)
+		content := map[string]any{
+			"code":    base.Error,
+			"message": err.Error(),
+		}
+		if auth.IsSessionError(err) {
+			content["code"] = ecode.ErrSession.GetCode()
+		}
+		return &content
+	}
+	nsidSpaceMap[c.clientInfo.NSID] = reqSpace
+	return nil
 }
 
 func (c *Client) runNgql(msgReceived *MessageReceive) {
@@ -75,6 +99,14 @@ func (c *Client) runNgql(msgReceived *MessageReceive) {
 		Body: MessagePostBody{
 			MsgType: msgReceived.Body.MsgType,
 		},
+	}
+
+	errorContent := c.switchSpace(msgReceived)
+	if errorContent != nil {
+		msgPost.Body.Content = errorContent
+		msgSend, _ := json.Marshal(msgPost)
+		c.send <- msgSend
+		return
 	}
 
 	gql, paramList := "", []string{}
@@ -123,6 +155,14 @@ func (c *Client) runBatchNgql(msgReceived *MessageReceive) {
 		Body: MessagePostBody{
 			MsgType: msgReceived.Body.MsgType,
 		},
+	}
+
+	errorContent := c.switchSpace(msgReceived)
+	if errorContent != nil {
+		msgPost.Body.Content = errorContent
+		msgSend, _ := json.Marshal(msgPost)
+		c.send <- msgSend
+		return
 	}
 
 	gqls, paramList := []string{}, []string{}
@@ -234,6 +274,7 @@ func (c *Client) readPump() {
 func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
+		delete(nsidSpaceMap, c.clientInfo.NSID)
 		ticker.Stop()
 		c.conn.Close()
 	}()

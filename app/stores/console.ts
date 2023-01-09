@@ -76,10 +76,7 @@ export class ConsoleStore {
     this.update({ runGQLLoading: true });
     try {
       if(space) {
-        const err = await this.rootStore.schema.switchSpace(space);
-        if(err) {
-          return;
-        }
+        await this.rootStore.schema.switchSpace(space);
       }
       const spaceVidType = this.rootStore.schema.spaceVidType;
       const { gqlList, paramList } = splitQuery(gql);
@@ -89,6 +86,7 @@ export class ConsoleStore {
             return item.endsWith('\\') ? item.slice(0, -1) : item;
           }),
           paramList,
+          space,
         },
         {
           trackEventConfig: {

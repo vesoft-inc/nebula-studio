@@ -154,7 +154,7 @@ export class NgqlRunner {
   };
 
   runNgql = async (
-    { gql, paramList }: { gql: string; paramList?: string[] },
+    { gql, paramList, space }: { gql: string; paramList?: string[]; space?: string },
     config: Record<string, unknown> = {},
   ): Promise<{ code: number; data?: any; message: string }> => {
     const reqMsg = {
@@ -165,7 +165,7 @@ export class NgqlRunner {
       body: {
         product: this.product,
         msgType: 'ngql',
-        content: { gql, paramList },
+        content: { gql, paramList, space },
       },
     };
 
@@ -199,8 +199,8 @@ export class NgqlRunner {
   };
 
   runBatchNgql = async (
-    { gqls, paramList }: { gqls: string[]; paramList?: string[]; },
-    _config: any,
+    { gqls, paramList, space }: { gqls: string[]; paramList?: string[]; space?: string },
+    _config: Record<string, unknown> = {},
   ): Promise<{ code: number; data?: any[]; message: string }> => {
     const message = {
       header: {
@@ -210,7 +210,7 @@ export class NgqlRunner {
       body: {
         product: this.product,
         msgType: 'batch_ngql',
-        content: { gqls, paramList },
+        content: { gqls, paramList, space },
       },
     };
 
