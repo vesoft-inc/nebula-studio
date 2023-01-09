@@ -32,7 +32,6 @@ export class NgqlRunner {
 
   socketMessageListeners: Array<(e: MessageEvent) => void> = [];
 
-  socketIsConnecting = false;
   socketConnectingPromise: Promise<boolean> | undefined;
   socketPingTimeInterval: number | undefined;
 
@@ -62,12 +61,11 @@ export class NgqlRunner {
   };
 
   connect = (url: string | URL, protocols?: string | string[]) => {
-    if (this.socket && this.socketIsConnecting) {
+    if (this.socketConnectingPromise) {
       return this.socketConnectingPromise;
     } else if (this.socket?.readyState === WebSocket.OPEN) {
       this.desctory();
     }
-    this.socketIsConnecting = true;
     this.socketConnectingPromise = new Promise<boolean>((resolve) => {
       const socket = new WebSocket(url, protocols);
       socket.onopen = () => {
@@ -83,7 +81,6 @@ export class NgqlRunner {
           clearTimeout(this.socketPingTimeInterval);
         }
         this.socketPingTimeInterval = window.setInterval(this.ping, 1000 * 30);
-        this.socketIsConnecting = false;
         this.socketConnectingPromise = undefined;
 
         socket.onerror = undefined;
@@ -97,7 +94,6 @@ export class NgqlRunner {
       };
       socket.onerror = (e) => {
         console.error('=====ngqlSocket error', e);
-        this.socketIsConnecting = false;
         this.socketConnectingPromise = undefined;
         resolve(false);
       };
@@ -235,5 +231,11 @@ export class NgqlRunner {
 }
 
 const ngqlRunner = new NgqlRunner();
+
+// for hot module reload
+// @ts-ignore
+window.__ngqlRunner?.desctory();
+// @ts-ignore
+window.__ngqlRunner = ngqlRunner;
 
 export default ngqlRunner;
