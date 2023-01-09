@@ -27,17 +27,23 @@
     font-size: 14px;
     padding: 0 7px;
     width: 100px;
+    background: #0091FF;
+    border-color: #0091FF;
     &:not(:last-child) {
       margin-right: 16px;
     }
     &.sub {
-      color: #29a9ff;
-      border-color: #29a9ff;
+      background: #fff;
+      color: #0091FF;
+      border-color: #0091FF;
       &:global(.ant-btn-disabled) {
         color: rgba(0, 0, 0, 0.25);
         border-color: rgba(0, 0, 0, 0.25);
       }
     }
+  }
+  .link:not(:global(.ant-btn-disabled)) {
+    color: #0091FF;
   }
   .disabledAction {
     margin-right: 16px;
@@ -154,7 +160,6 @@
       }
       .title {
         position: relative;
-        color: #0091ff;
         font-weight: 500;
         font-size: 20px;
         margin: 8px 0 6px;
@@ -276,6 +281,9 @@
       font-weight: 300;
       font-size: 14px;
       color: #4F4F4F;
+    }
+    :global(.ant-btn-block) {
+      background-color: #0091FF;
     }
   }
 }

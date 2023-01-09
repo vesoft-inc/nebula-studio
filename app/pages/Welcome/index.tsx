@@ -263,15 +263,14 @@ function Welcome(props: IProps) {
                 <div className={styles.contentFooter}>
                   <div className={styles.actionWrapper}>
                     <Button
-                      className={styles.action}
-                      type="primary"
+                      className={cls(styles.action, styles.sub)}
                       onClick={() => downloadDemo(dataset)}
                       disabled={!!spaceLoading.spaceName}
                     >
                       {intl.get('welcome.demoDownload')}
                     </Button>
                     <Button
-                      className={cls(styles.action, styles.sub)}
+                      className={styles.link}
                       disabled={!dataset.docLink}
                       href={dataset.docLink}
                       target="_blank"
