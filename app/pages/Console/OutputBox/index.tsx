@@ -10,6 +10,7 @@ import { parseSubGraph } from '@app/utils/parseData';
 import cls from 'classnames';
 import { GraphStore } from '@app/stores/graph';
 import { useI18n } from '@vesoft-inc/i18n';
+import type { HistoryResult } from '@app/stores/console';
 import Graphviz from './Graphviz';
 import ForceGraph from './ForceGraph';
 
@@ -17,10 +18,7 @@ import styles from './index.module.less';
 
 interface IProps {
   index: number;
-  gql: string;
-  space?: string;
-  spaceVidType?: string;
-  result: any;
+  result: HistoryResult;
   onHistoryItem: (gql: string) => void;
   onExplorer?: (params: {
     space: string;
@@ -36,11 +34,12 @@ interface IProps {
 }
 
 const OutputBox = (props: IProps) => {
-  const { gql, space, spaceVidType, result: { code, data, message }, onHistoryItem, index, onExplorer, onResultConfig, templateRender } = props;
+  const { result, onHistoryItem, index, onExplorer, onResultConfig, templateRender } = props;
   const { console } = useStore();
   const { intl } = useI18n();
   const [visible, setVisible] = useState(true);
   const { results, update, favorites, saveFavorite, deleteFavorite, getFavoriteList } = console;
+  const { code, data, message, gql, space, spaceVidType } = result; 
   const [columns, setColumns] = useState<any>([]);
   const [dataSource, setDataSource] = useState<any>([]);
   const [isFavorited, setIsFavorited] = useState(false);

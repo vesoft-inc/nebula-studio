@@ -9,7 +9,7 @@ import { fetchBidirectVertexes, fetchEdgeProps, fetchVertexProps } from '@app/ut
 import { IDataMap, Pointer } from '@app/interfaces/graph';
 import { makeRoundPosition, updateEdgeMap, updateTagMap } from '@app/config/explore';
 import TwoGraph from './twoGraph';
-import { getRootStore } from '.';
+
 const excludesProperty = ['twoGraph', 'graph', 'canvas', 'width', 'height', 'loading'];
 const { intl } = getI18n();
 
@@ -44,12 +44,10 @@ export class GraphStore {
   canvas: HTMLCanvasElement | undefined;
   width: number = 0;
   height: number = 0;
+  currentSpace: string | undefined;
+  spaceVidType: string | undefined;
   get selectedNodeIds() {
     return [...this.nodesSelected].map(({ id }) => id);
-  }
-
-  get rootStore() {
-    return getRootStore();
   }
 
   get tagColorMap() {
@@ -81,7 +79,7 @@ export class GraphStore {
     return edgeMap;
   }
 
-  constructor() {
+  constructor(props?: { space: string; spaceVidType?: string; }) {
     makeAutoObservable(this, {
       nodeHovering: observable.ref,
       nodeDragging: observable.ref,
@@ -92,6 +90,8 @@ export class GraphStore {
       canvas: false,
       update: action,
     });
+    this.currentSpace = props?.space;
+    this.spaceVidType = props?.spaceVidType;
   }
 
   update = (payload: Record<string, any>) =>
@@ -299,19 +299,17 @@ export class GraphStore {
 
   getExploreEdge = async (edgeList) => {
     let _edges = [];
-    const {
-      schema: { spaceVidType },
-    } = this.rootStore;
     if (edgeList.length > 0) {
       const edgeType = edgeList[0].edgeType;
       const res = await fetchEdgeProps({
         idRoutes: edgeList.map(
           (i) =>
-            `${handleVidStringName(i.srcId, spaceVidType)}->${handleVidStringName(i.dstId, spaceVidType)}@${
+            `${handleVidStringName(i.srcId, this.spaceVidType)}->${handleVidStringName(i.dstId, this.spaceVidType)}@${
               i.rank
             }`
         ),
         type: edgeType,
+        space: this.currentSpace,
       });
       _edges = res.tables
         .map((item) => item._edgesParsedList)
@@ -353,10 +351,7 @@ export class GraphStore {
 
   getVertexes = async (payload) => {
     const { ids, expand } = payload;
-    const {
-      schema: { spaceVidType },
-    } = this.rootStore;
-    const res = await fetchVertexProps({ ids, spaceVidType });
+    const res = await fetchVertexProps({ ids, spaceVidType: this.spaceVidType, space: this.currentSpace });
     let newVertexes = res.code === 0 ? getTagData(res.data, expand, this.tagColorMap) : [];
     if (newVertexes.length > 0) {
       newVertexes = await this.checkVertexesExist({
@@ -371,9 +366,6 @@ export class GraphStore {
   checkVertexesExist = async (payload) => {
     const { preAddVertexes, inputIds, expand } = payload;
     const preAddIds = preAddVertexes.map((i) => String(i.id));
-    const {
-      schema: { spaceVidType },
-    } = this.rootStore;
     if (preAddIds.length !== inputIds.length) {
       // Get the missing id in the returned result
       const notIncludedIds = xor(preAddIds, inputIds);
@@ -390,7 +382,7 @@ export class GraphStore {
       }
       addIds.forEach((id) => {
         const vertex: any = {
-          id: spaceVidType === 'INT64' ? Number(id) : String(id),
+          id: this.spaceVidType === 'INT64' ? Number(id) : String(id),
           tags: [],
           properties: {},
         };
@@ -405,10 +397,7 @@ export class GraphStore {
 
   async getVertexesOnHangingEdge(payload: { ids: string[] }) {
     const { ids } = payload;
-    const {
-      schema: { spaceVidType },
-    } = this.rootStore;
-    const res = await fetchBidirectVertexes({ ids, spaceVidType });
+    const res = await fetchBidirectVertexes({ ids, spaceVidType: this.spaceVidType, space: this.currentSpace });
     const vertexIds = res.code === 0 ? getBidrectVertexIds(res.data) : [];
     return vertexIds.filter((id) => ids.includes(id));
   }

@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { message } from 'antd';
 import { getI18n } from '@vesoft-inc/i18n';
 import { safeParse } from '@app/utils/function';
+import { NgqlRes } from '@app/utils/websocket';
 import { getRootStore } from '.';
 
 const { intl } = getI18n();
@@ -31,17 +32,24 @@ export const splitQuery = (query: string) => {
   return result;
 };
 
+export type HistoryResult = NgqlRes & {
+  id: string;
+  gql: string;
+  space?: string;
+  spaceVidType?: string;
+}
+
 const DEFAULT_GQL = 'SHOW SPACES;';
 export class ConsoleStore {
   runGQLLoading = false;
   currentGQL = DEFAULT_GQL;
   currentSpace: string = localStorage.getItem('currentSpace') || '';
-  results: any[] = safeParse(sessionStorage.getItem('consoleResults')) || [];
+  results: HistoryResult[] = safeParse(sessionStorage.getItem('consoleResults')) || [];
   paramsMap = null as any;
   favorites = [] as {
     id: string;
     content: string;
-  }[] ;
+  }[];
   constructor() {
     makeAutoObservable(this, {
       results: observable.ref,
@@ -64,29 +72,36 @@ export class ConsoleStore {
   };
 
   update = (param: Partial<ConsoleStore>) => {
-    Object.keys(param).forEach(key => (this[key] = param[key]));
+    Object.keys(param).forEach((key) => (this[key] = param[key]));
   };
 
-  runGQL = async (payload: {
-    gql: string, 
-    space: string,
-    editorValue?: string
-  }) => {
-    const { gql, space, editorValue } = payload;
+  updateCurrentSpace = (space: string) => {
+    this.currentSpace = space;
+    localStorage.setItem('currentSpace', space);
+  };
+
+  runGQL = async (payload: { gql: string; editorValue?: string }) => {
+    const { gql, editorValue } = payload;
     this.update({ runGQLLoading: true });
     try {
-      if(space) {
-        await this.rootStore.schema.switchSpace(space);
+      let spaceVidType = undefined as unknown as string;
+      if (this.currentSpace) {
+        const { data } = await this.rootStore.schema.getSpaceInfo(this.currentSpace);
+        spaceVidType = data?.tables?.[0]?.['Vid Type'];
+        if (!spaceVidType) {
+          return;
+        }
       }
-      const spaceVidType = this.rootStore.schema.spaceVidType;
       const { gqlList, paramList } = splitQuery(gql);
       const data = await service.batchExecNGQL(
         {
-          gqls: gqlList.filter(item => item !== '').map(item => {
-            return item.endsWith('\\') ? item.slice(0, -1) : item;
-          }),
+          gqls: gqlList
+            .filter((item) => item !== '')
+            .map((item) => {
+              return item.endsWith('\\') ? item.slice(0, -1) : item;
+            }),
           paramList,
-          space,
+          space: this.currentSpace,
         },
         {
           trackEventConfig: {
@@ -95,12 +110,12 @@ export class ConsoleStore {
           },
         },
       );
-      data.data.forEach(item => {
+      data.data.forEach((item) => {
         item.id = uuidv4();
-        item.space = space;
+        item.space = this.currentSpace;
         item.spaceVidType = spaceVidType;
       });
-      const updateQuerys = paramList.filter(item => {
+      const updateQuerys = paramList.filter((item) => {
         const reg = /^\s*:params/gim;
         return !reg.test(item);
       });
@@ -119,39 +134,35 @@ export class ConsoleStore {
   };
 
   getParams = async () => {
-    const results = (await service.execNGQL(
-      {
-        gql: '',
-        paramList: [':params'],
-      },
-    )) as any;
-    this.update({
-      paramsMap: results.data?.localParams || {},
-    });
+    const results = await service.execNGQL({ gql: '', paramList: [':params'] });
+    this.update({ paramsMap: results.data?.localParams || {} });
   };
   saveFavorite = async (content: string) => {
-    const res = await service.saveFavorite({ content }, {
-      trackEventConfig: {
-        category: 'console',
-        action: 'save_favorite',
+    const res = await service.saveFavorite(
+      { content },
+      {
+        trackEventConfig: {
+          category: 'console',
+          action: 'save_favorite',
+        },
       },
-    });
-    if(res.code === 0) {
+    );
+    if (res.code === 0) {
       message.success(intl.get('sketch.saveSuccess'));
     }
   };
   deleteFavorite = async (id?: string) => {
     const res = id !== undefined ? await service.deleteFavorite(id) : await service.deleteAllFavorites();
-    if(res.code === 0) {
+    if (res.code === 0) {
       message.success(intl.get('common.deleteSuccess'));
     }
   };
 
   getFavoriteList = async () => {
     const res = await service.getFavoriteList();
-    if(res.code === 0) {
+    if (res.code === 0) {
       this.update({
-        favorites: res.data.items
+        favorites: res.data.items,
       });
     }
     return res;

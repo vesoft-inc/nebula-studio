@@ -30,11 +30,13 @@ const ForceGraphBox = (props: IProps) => {
     await initGraph({
       container: grapfDomRef.current,
       id: uuid,
+      space,
+      spaceVidType,
     });
     onGraphInit(graphs[uuid]);
     initTooltip({ container: grapfDomRef.current, id: uuid });
     initBrushSelect({ container: grapfDomRef.current, id: uuid });
-    await renderData({ space, graph: graphs[uuid], data: { vertexes, edges } });
+    await renderData({ graph: graphs[uuid], data: { vertexes, edges } });
     setLoading(false);
   };
 

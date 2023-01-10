@@ -98,7 +98,6 @@ export class SchemaStore {
   switchSpace = async (space: string) => {
     this.update({ currentSpace: space, ...initialSchemaData });
     localStorage.setItem('currentSpace', space);
-
     await this.updateVidType(space);
   };
 
