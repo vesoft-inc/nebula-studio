@@ -13,6 +13,7 @@ import (
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/base"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -40,20 +41,8 @@ const (
 var (
 	newline      = []byte{'\n'}
 	space        = []byte{' '}
-	nsidSpaceMap = map[string]string{}
+	nsidSpaceMap = utils.NewMutexMap[string]()
 )
-
-var upgrader = websocket.Upgrader{
-	// ReadBufferSize:  1024,
-	// WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-	Error: func(w http.ResponseWriter, r *http.Request, status int, reason error) {
-		w.WriteHeader(status)
-		w.Write([]byte(reason.Error()))
-	},
-}
 
 // Client is a middleman between the websocket connection and the hub.
 type Client struct {
@@ -67,10 +56,13 @@ type Client struct {
 
 func (c *Client) switchSpace(msgReceived *MessageReceive) *map[string]any {
 	reqSpace, ok := msgReceived.Body.Content["space"].(string)
-	shouldSwitch := ok && reqSpace != "" && nsidSpaceMap[c.clientInfo.NSID] != reqSpace
+	currentSpace, _ := nsidSpaceMap.Get(c.clientInfo.NSID)
+
+	shouldSwitch := ok && reqSpace != "" && currentSpace != reqSpace
 	if !shouldSwitch {
 		return nil
 	}
+
 	// name.replace(/\\/gm, '\\\\').replace(/`/gm, '\\`')
 	reqSpace = strings.Replace(reqSpace, "\\", "\\\\", -1)
 	reqSpace = strings.Replace(reqSpace, "`", "\\`", -1)
@@ -86,7 +78,7 @@ func (c *Client) switchSpace(msgReceived *MessageReceive) *map[string]any {
 		}
 		return &content
 	}
-	nsidSpaceMap[c.clientInfo.NSID] = reqSpace
+	nsidSpaceMap.Set(c.clientInfo.NSID, reqSpace)
 	return nil
 }
 
@@ -274,7 +266,7 @@ func (c *Client) readPump() {
 func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
-		delete(nsidSpaceMap, c.clientInfo.NSID)
+		nsidSpaceMap.Delete(c.clientInfo.NSID)
 		ticker.Stop()
 		c.conn.Close()
 	}()
@@ -310,6 +302,17 @@ func (c *Client) writePump() {
 
 // ServeWs handles websocket requests from the peer.
 func ServeWebSocket(hub *Hub, w http.ResponseWriter, r *http.Request, clientInfo *auth.AuthData) {
+	upgrader := websocket.Upgrader{
+		// ReadBufferSize:  1024,
+		// WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+		Error: func(w http.ResponseWriter, r *http.Request, status int, reason error) {
+			w.WriteHeader(status)
+			w.Write([]byte(reason.Error()))
+		},
+	}
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		return
