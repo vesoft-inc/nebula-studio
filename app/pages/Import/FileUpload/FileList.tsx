@@ -76,7 +76,7 @@ const FileList = (props: IProps) => {
       </Upload>
 
       <div className={styles.fileList}>
-        <h3>{intl.get('import.fileTitle')}</h3>
+        <h3>{intl.get('import.fileTitle')} ({fileList.length})</h3>
         <Table
           loading={!!loading}
           dataSource={fileList}
