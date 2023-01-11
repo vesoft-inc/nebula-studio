@@ -11,6 +11,7 @@ import { ISketchEdge, ISketchNode } from '@app/interfaces/sketch';
 import { useHistory } from 'react-router-dom';
 import { getVidType } from '@app/pages/Schema/SpaceCreate';
 import { trackEvent } from '@app/utils/stat';
+import { DEFAULT_PARTITION_NUM } from '@app/utils/constant';
 import styles from './index.module.less';
 
 const Option = Select.Option;
@@ -157,7 +158,7 @@ const PopoverContent = (props: IContentProps) => {
     } = data;
     const _vidType = getVidType(vidType, stringLength);
     const options = {
-      partition_num: partitionNum,
+      partition_num: partitionNum || DEFAULT_PARTITION_NUM,
       replica_factor: replicaFactor,
       vid_type: _vidType,
     };

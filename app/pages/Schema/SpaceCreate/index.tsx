@@ -10,6 +10,7 @@ import { useI18n } from '@vesoft-inc/i18n';
 import cls from 'classnames';
 import { useHistory } from 'react-router-dom';
 import Cookie from 'js-cookie';
+import { DEFAULT_PARTITION_NUM } from '@app/utils/constant';
 import styles from './index.module.less';
 import CreateForm from './CreateForm';
 
@@ -77,7 +78,7 @@ const SpaceCreate = () => {
     if(name) {
       const _vidType = getVidType(vidType, stringLength);
       const options = {
-        partition_num: partitionNum,
+        partition_num: partitionNum || DEFAULT_PARTITION_NUM,
         replica_factor: replicaFactor,
         vid_type: _vidType,
       };
