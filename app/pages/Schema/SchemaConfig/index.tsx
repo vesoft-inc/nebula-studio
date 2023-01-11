@@ -1,5 +1,5 @@
 import { Radio, Select } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Route, useHistory, useParams } from 'react-router-dom';
 import { useI18n } from '@vesoft-inc/i18n';
 import { trackPageView } from '@app/utils/stat';
@@ -19,11 +19,19 @@ import CommonEdit from './Edit/CommonEdit';
 import styles from './index.module.less';
 const Option = Select.Option;
 
+enum SchemaSubPage {
+  List = 'list',
+  Tag = 'tag',
+  Edge = 'edge',
+  Index = 'index',
+  Statistic = 'statistic',
+  Visualization = 'visualization',
+}
+
 const SchemaConfig = () => {
   const history = useHistory();
-  const [tab, setTab] = useState('tag');
   const { intl } = useI18n();
-  const { type, action } = useParams() as { type: string, action: string };
+  const { type, action } = useParams() as { type: SchemaSubPage, action: string };
   const { schema, global } = useStore();
   const { spaces, getSpaces, switchSpace, currentSpace } = schema;
   const { currentLocale } = useI18n();
@@ -61,7 +69,6 @@ const SchemaConfig = () => {
     ];
   }, [currentSpace, action, currentLocale]);
   useEffect(() => {
-    setTab(type);
     if(spaces.length === 0) {
       getSpaces();
     }
@@ -72,13 +79,10 @@ const SchemaConfig = () => {
 
   const handleUpdateSpace = (value: string) => {
     switchSpace(value);
-    const route = type === 'visualization' ? `/schema/visualization` : `/schema/${type}/list`;
-    history.push(route);
   };
   const handleTabChange = e => {
     const type = e.target.value;
-    setTab(type);
-    const route = type === 'visualization' ? `/schema/visualization` : `/schema/${type}/list`;
+    const route = type === SchemaSubPage.Visualization ? `/schema/${SchemaSubPage.Visualization}` : `/schema/${type}/list`;
     history.push(route);
   };
   return (
@@ -97,16 +101,16 @@ const SchemaConfig = () => {
         {(action === 'list' || type === 'visualization') && <div className="studioTabHeader">
           <Radio.Group
             className="studioTabGroup"
-            value={tab}
+            value={type}
             buttonStyle="solid"
             onChange={handleTabChange}
           >
-            <Radio.Button value="tag">{intl.get('common.tag')}</Radio.Button>
-            <Radio.Button value="edge">{intl.get('common.edge')}</Radio.Button>
-            <Radio.Button value="index">{intl.get('common.index')}</Radio.Button>
-            <Radio.Button value="statistic">{intl.get('common.statistics')}</Radio.Button>
+            <Radio.Button value={SchemaSubPage.Tag}>{intl.get('common.tag')}</Radio.Button>
+            <Radio.Button value={SchemaSubPage.Edge}>{intl.get('common.edge')}</Radio.Button>
+            <Radio.Button value={SchemaSubPage.Index}>{intl.get('common.index')}</Radio.Button>
+            <Radio.Button value={SchemaSubPage.Statistic}>{intl.get('common.statistics')}</Radio.Button>
             {showViewSchemaBetaFunc && (
-              <Radio.Button value="visualization">
+              <Radio.Button value={SchemaSubPage.Visualization}>
                 {intl.get('common.viewSchema')}
                 <span className={styles.betaLabel}>{intl.get('common.beta')}</span>
               </Radio.Button>
