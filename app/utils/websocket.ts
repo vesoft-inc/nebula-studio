@@ -1,6 +1,7 @@
 import { getRootStore } from '@app/stores';
 import { message } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
+import JSONBigint from 'json-bigint';
 import { safeParse } from './function';
 import { HttpResCode } from './http';
 
@@ -18,7 +19,7 @@ export interface MessageReceive<T extends unknown = Record<string, unknown>> {
 export interface NgqlRes<T = any> {
   code: number;
   data?: T;
-  message: string;
+  message?: string;
 }
 
 export const WsHeartbeatReq = '1';
@@ -29,6 +30,8 @@ export class NgqlRunner {
 
   socketUrl: string | URL | undefined;
   socketProtocols: string | string[] | undefined;
+
+  product = 'Studio';
 
   socketMessageListeners: Array<(e: MessageEvent) => void> = [];
 
@@ -61,6 +64,12 @@ export class NgqlRunner {
   };
 
   connect = (url: string | URL, protocols?: string | string[]) => {
+    if (!url) {
+      getRootStore().global.logout();
+      message.error('WebSocket URL is empty');
+      return Promise.reject('WebSocket URL is empty');
+    }
+
     if (this.socketConnectingPromise) {
       return this.socketConnectingPromise;
     } else if (this.socket?.readyState === WebSocket.OPEN) {
@@ -146,18 +155,18 @@ export class NgqlRunner {
   };
 
   runNgql = async (
-    { gql, paramList }: { gql: string; paramList?: string[] },
-    _config: any,
-  ): Promise<{ code: number; data?: any; message: string }> => {
-    const message = {
+    { gql, paramList, space }: { gql: string; paramList?: string[]; space?: string },
+    config: Record<string, unknown> = {},
+  ): Promise<NgqlRes> => {
+    const reqMsg = {
       header: {
         msgId: uuidv4(),
         version: '1.0',
       },
       body: {
-        product: 'Studio',
+        product: this.product,
         msgType: 'ngql',
-        content: { gql, paramList },
+        content: { gql, paramList, space },
       },
     };
 
@@ -170,36 +179,39 @@ export class NgqlRunner {
         if (e.data === WsHeartbeatRes) {
           return;
         }
-        const msgReceive = safeParse<MessageReceive<NgqlRes>>(e.data);
+        const msgReceive = safeParse<MessageReceive<NgqlRes>>(e.data, { paser: JSONBigint.parse });
         if (msgReceive?.body?.content?.code === HttpResCode.ErrSession) {
-          this.desctory();
           getRootStore().global.logout();
           return;
         }
-        if (msgReceive?.header?.msgId === message.header.msgId) {
+        if (msgReceive?.header?.msgId === reqMsg.header.msgId) {
+          const content = msgReceive.body.content;
+          if (config.hideErrMsg !== false && content.code !== 0) {
+            message.error(content.message);
+          }
           resolve(msgReceive.body.content);
           this.rmSocketMessageListener(receiveMsg);
         }
       };
 
-      this.socket?.send(JSON.stringify(message));
+      this.socket?.send(JSON.stringify(reqMsg));
       this.addSocketMessageListener(receiveMsg);
     });
   };
 
   runBatchNgql = async (
-    { gqls, paramList }: { gqls: string[]; paramList?: string[] },
-    _config: any,
-  ): Promise<{ code: number; data?: any[]; message: string }> => {
+    { gqls, paramList, space }: { gqls: string[]; paramList?: string[]; space?: string },
+    _config: Record<string, unknown> = {},
+  ): Promise<NgqlRes> => {
     const message = {
       header: {
         msgId: uuidv4(),
         version: '1.0',
       },
       body: {
-        product: 'Studio',
+        product: this.product,
         msgType: 'batch_ngql',
-        content: { gqls, paramList },
+        content: { gqls, paramList, space },
       },
     };
 
@@ -212,7 +224,7 @@ export class NgqlRunner {
         if (e.data === WsHeartbeatRes) {
           return;
         }
-        const msgReceive = safeParse<MessageReceive<NgqlRes>>(e.data);
+        const msgReceive = safeParse<MessageReceive<NgqlRes>>(e.data, { paser: JSONBigint.parse });
         if (msgReceive?.body?.content?.code === HttpResCode.ErrSession) {
           this.desctory();
           getRootStore().global.logout();
@@ -223,6 +235,7 @@ export class NgqlRunner {
           this.rmSocketMessageListener(receiveMsg);
         }
       };
+      receiveMsg.sendTime = Date.now();
 
       this.socket?.send(JSON.stringify(message));
       this.addSocketMessageListener(receiveMsg);
@@ -232,10 +245,8 @@ export class NgqlRunner {
 
 const ngqlRunner = new NgqlRunner();
 
-// for hot module reload
-// @ts-ignore
-window.__ngqlRunner?.desctory();
-// @ts-ignore
-window.__ngqlRunner = ngqlRunner;
+// for HMR, ensure only one socket
+window.__ngqlRunner__?.desctory();
+window.__ngqlRunner__ = ngqlRunner;
 
 export default ngqlRunner;

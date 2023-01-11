@@ -11,4 +11,5 @@ interface Window {
   gConfig: {
     maxBytes: number
   };
+  __ngqlRunner__: any;
 }

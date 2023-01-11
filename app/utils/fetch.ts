@@ -12,8 +12,9 @@ export async function fetchEdgeProps(payload: {
   idRoutes: string[];
   type: string;
   edgeFields?: any;
+  space?: string;
 }) {
-  const { idRoutes, edgeFields, type } = payload;
+  const { idRoutes, edgeFields, type, space } = payload;
   const edgeType = handleKeyword(type);
   let gql = `fetch prop on ${edgeType} ${idRoutes.join(', ')}`;
   if (edgeFields) {
@@ -27,9 +28,7 @@ export async function fetchEdgeProps(payload: {
     gql += ' YIELD edge as `edges_`';
   }
 
-  const { data } = (await service.execNGQL({
-    gql,
-  })) as any;
+  const { data } = await service.execNGQL({ gql, space });
   return data;
 }
 
@@ -39,22 +38,19 @@ export async function fetchVertexPropsWithIndex(payload: {
   quantityLimit: number | null;
 }) {
   const gql = getExploreGQLWithIndex(payload);
-  const { code, data, message } = (await service.execNGQL({
-    gql,
-  })) as any;
+  const { code, data, message } = await service.execNGQL({ gql });
   return { code, data, message };
 }
 
 export async function fetchVertexProps(payload: {
   ids: string[];
   spaceVidType: string;
+  space?: string;
 }) {
-  const { ids, spaceVidType } = payload;
+  const { ids, spaceVidType, space } = payload;
   const _ids = ids.map(id => handleVidStringName(id, spaceVidType)).join(', ');
   const gql = `MATCH (n) WHERE id(n) IN [${_ids}] RETURN n`;
-  const { data, code, message } = (await service.execNGQL({
-    gql,
-  })) as any;
+  const { data, code, message } = await service.execNGQL({ gql, space });
   if (code === 0) {
     const vertexList = data.tables.map(i => i._verticesParsedList).flat();
     const vertexes = vertexList.map(vertex => {
@@ -72,12 +68,11 @@ export async function fetchVertexProps(payload: {
 export async function fetchBidirectVertexes(payload: {
   ids: string[];
   spaceVidType: string;
+  space?: string;
 }) {
-  const { ids, spaceVidType } = payload;
+  const { ids, spaceVidType, space } = payload;
   const _ids = ids.map(id => handleVidStringName(id, spaceVidType)).join(', ');
   const gql = `GO FROM ${_ids} OVER * BIDIRECT yield edge as \`_edge\``;
-  const { code, data, message } = (await service.execNGQL({
-    gql,
-  })) as any;
+  const { code, data, message } = await service.execNGQL({ gql, space });
   return { code, data, message };
 }

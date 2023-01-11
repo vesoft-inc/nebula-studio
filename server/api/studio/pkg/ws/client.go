@@ -3,7 +3,7 @@ package ws
 import (
 	"bytes"
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -13,6 +13,8 @@ import (
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/base"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 const (
@@ -37,33 +39,47 @@ const (
 )
 
 var (
-	newline = []byte{'\n'}
-	space   = []byte{' '}
+	newline      = []byte{'\n'}
+	space        = []byte{' '}
+	nsidSpaceMap = utils.NewMutexMap[string]()
 )
-
-var upgrader = websocket.Upgrader{
-	// ReadBufferSize:  1024,
-	// WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-	Error: func(w http.ResponseWriter, r *http.Request, status int, reason error) {
-		w.WriteHeader(status)
-		w.Write([]byte(reason.Error()))
-	},
-}
 
 // Client is a middleman between the websocket connection and the hub.
 type Client struct {
-	hub *Hub
-
+	hub        *Hub
 	clientInfo *auth.AuthData
-
 	// The websocket connection.
 	conn *websocket.Conn
-
 	// Buffered channel of outbound messages.
 	send chan []byte
+}
+
+func (c *Client) switchSpace(msgReceived *MessageReceive) *map[string]any {
+	reqSpace, ok := msgReceived.Body.Content["space"].(string)
+	currentSpace, _ := nsidSpaceMap.Get(c.clientInfo.NSID)
+
+	shouldSwitch := ok && reqSpace != "" && currentSpace != reqSpace
+	if !shouldSwitch {
+		return nil
+	}
+
+	// name.replace(/\\/gm, '\\\\').replace(/`/gm, '\\`')
+	reqSpace = strings.Replace(reqSpace, "\\", "\\\\", -1)
+	reqSpace = strings.Replace(reqSpace, "`", "\\`", -1)
+	_, _, err := dao.Execute(c.clientInfo.NSID, fmt.Sprintf("USE `%s`", reqSpace), nil)
+	if err != nil {
+		logx.ErrorStackf("[WebSocket ngql query]: msgReceived.Body.Content(%v); error(%v)", &msgReceived.Body.Content, err)
+		content := map[string]any{
+			"code":    base.Error,
+			"message": err.Error(),
+		}
+		if auth.IsSessionError(err) {
+			content["code"] = ecode.ErrSession.GetCode()
+		}
+		return &content
+	}
+	nsidSpaceMap.Set(c.clientInfo.NSID, reqSpace)
+	return nil
 }
 
 func (c *Client) runNgql(msgReceived *MessageReceive) {
@@ -75,6 +91,14 @@ func (c *Client) runNgql(msgReceived *MessageReceive) {
 		Body: MessagePostBody{
 			MsgType: msgReceived.Body.MsgType,
 		},
+	}
+
+	errorContent := c.switchSpace(msgReceived)
+	if errorContent != nil {
+		msgPost.Body.Content = errorContent
+		msgSend, _ := json.Marshal(msgPost)
+		c.send <- msgSend
+		return
 	}
 
 	gql, paramList := "", []string{}
@@ -93,6 +117,7 @@ func (c *Client) runNgql(msgReceived *MessageReceive) {
 
 	execute, _, err := dao.Execute(c.clientInfo.NSID, gql, paramList)
 	if err != nil {
+		logx.ErrorStackf("[WebSocket ngql query]: msgReceived.Body.Content(%v); error(%v)", &msgReceived.Body.Content, err)
 		content := map[string]any{
 			"code":    base.Error,
 			"message": err.Error(),
@@ -122,6 +147,14 @@ func (c *Client) runBatchNgql(msgReceived *MessageReceive) {
 		Body: MessagePostBody{
 			MsgType: msgReceived.Body.MsgType,
 		},
+	}
+
+	errorContent := c.switchSpace(msgReceived)
+	if errorContent != nil {
+		msgPost.Body.Content = errorContent
+		msgSend, _ := json.Marshal(msgPost)
+		c.send <- msgSend
+		return
 	}
 
 	gqls, paramList := []string{}, []string{}
@@ -198,7 +231,9 @@ func (c *Client) readPump() {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
+				logx.ErrorStackf("[WebSocket UnexpectedClose]: %v", err)
+			} else {
+				logx.ErrorStackf("[WebSocket ReadMessage]: %v", err)
 			}
 			break
 		}
@@ -231,6 +266,7 @@ func (c *Client) readPump() {
 func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
+		nsidSpaceMap.Delete(c.clientInfo.NSID)
 		ticker.Stop()
 		c.conn.Close()
 	}()
@@ -247,6 +283,7 @@ func (c *Client) writePump() {
 
 			w, err := c.conn.NextWriter(websocket.TextMessage)
 			if err != nil {
+				logx.ErrorStackf("[WebSocket WriteMessage]: %v", err)
 				return
 			}
 			w.Write(message)
@@ -265,6 +302,17 @@ func (c *Client) writePump() {
 
 // ServeWs handles websocket requests from the peer.
 func ServeWebSocket(hub *Hub, w http.ResponseWriter, r *http.Request, clientInfo *auth.AuthData) {
+	upgrader := websocket.Upgrader{
+		// ReadBufferSize:  1024,
+		// WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+		Error: func(w http.ResponseWriter, r *http.Request, status int, reason error) {
+			w.WriteHeader(status)
+			w.Write([]byte(reason.Error()))
+		},
+	}
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		return

@@ -4,13 +4,13 @@ import { GraphStore } from './graph';
 import { getRootStore } from '.';
 export class GraphInstances {
   graphs: {
-    [id: string]: GraphStore
+    [id: string]: GraphStore;
   } = {};
-  
+
   constructor() {
     makeAutoObservable(this, {
       graphs: observable,
-      clearGraph: action
+      clearGraph: action,
     });
   }
   get rootStore() {
@@ -19,27 +19,20 @@ export class GraphInstances {
   clearGraph = (uuid) => {
     this.graphs = omit(this.graphs, [uuid]);
   };
-  initGraph = async (params: { 
-    container: HTMLElement, 
-    id: string,
-  }) => {
-    const { container, id } = params;
-    const graph = new GraphStore();
-    graph.initGraph({
-      container
-    });
+  initGraph = async (params: { container: HTMLElement; id: string; space: string; spaceVidType: string; }) => {
+    const { container, id, space, spaceVidType } = params;
+    const graph = new GraphStore({ space, spaceVidType });
+    graph.initGraph({ container });
     this.graphs[id] = graph;
   };
   renderData = async (params: {
-    space: string;
     graph: GraphStore;
     data: {
       vertexes: any;
-      edges: any
-    }
+      edges: any;
+    };
   }) => {
-    const { graph, data, space } = params;
-    await this.rootStore.schema.switchSpace(space);
+    const { graph, data } = params;
     await graph.getExploreInfo({ data });
   };
 }

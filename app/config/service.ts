@@ -5,13 +5,15 @@ const service = {
   // execNGQL: (params, config?) => {
   //   return post('/api-nebula/db/exec')(params, config);
   // },
-  execNGQL: (params, config?) => {
+  execNGQL: (...args: Parameters<typeof ngqlRunner.runNgql>) => {
+    const [params, config] = args;
     return ngqlRunner.runNgql(params, config);
   },
   // batchExecNGQL: (params, config?) => {
   //   return post('/api-nebula/db/batchExec')(params, config);
   // },
-  batchExecNGQL: (params, config?) => {
+  batchExecNGQL: (...args: Parameters<typeof ngqlRunner.runBatchNgql>) => {
+    const [params, config] = args;
     return ngqlRunner.runBatchNgql(params, config);
   },
   execSeqNGQL: (params, config?) => {

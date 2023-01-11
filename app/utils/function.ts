@@ -5,8 +5,7 @@ export const handleKeyword = (name: string) => {
   return `\`${handleEscape(name)}\``;
 };
 
-export const handleEscape = (name: string) =>
-  name.replace(/\\/gm, '\\\\').replace(/`/gm, '\\`');
+export const handleEscape = (name: string) => name.replace(/\\/gm, '\\\\').replace(/`/gm, '\\`');
 
 export const handleVidStringName = (name: string, spaceVidType?: string) => {
   if (spaceVidType && spaceVidType === 'INT64') {
@@ -24,16 +23,10 @@ export const convertBigNumberToString = (value: any) => {
   return BigNumber.isBigNumber(value) ? value.toString() : value;
 };
 
-export const sortByFieldAndFilter = (payload: {
-  field: string;
-  searchVal: string;
-  list: any[];
-}) => {
+export const sortByFieldAndFilter = (payload: { field: string; searchVal: string; list: any[] }) => {
   const { searchVal, list, field } = payload;
   if (searchVal) {
-    return _.orderBy(list, [field], ['asc']).filter((item: any) =>
-      item.name.includes(searchVal),
-    );
+    return _.orderBy(list, [field], ['asc']).filter((item: any) => item.name.includes(searchVal));
   } else {
     return _.orderBy(list, [field], ['asc']);
   }
@@ -43,9 +36,13 @@ export const removeNullCharacters = (data: string) => {
   return data.replace(/\u0000+$/, '');
 };
 
-export const safeParse = <T extends unknown>(data: string) => {
+export const safeParse = <T extends unknown>(
+  data: string,
+  options?: { paser?: (data: string) => T },
+): T | undefined => {
+  const { paser } = options || {};
   try {
-    return JSON.parse(data) as T;
+    return paser ? paser(data) : JSON.parse(data);
   } catch (err) {
     console.error('JSON.parse error', err);
     return undefined;
@@ -54,5 +51,5 @@ export const safeParse = <T extends unknown>(data: string) => {
 
 export const getByteLength = (str: string) => {
   const utf8Encode = new TextEncoder();
-  return utf8Encode.encode(str).length; 
+  return utf8Encode.encode(str).length;
 };

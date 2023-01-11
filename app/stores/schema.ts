@@ -91,32 +91,14 @@ export class SchemaStore {
   updateVidType = async (space?: string) => {
     const { code, data } = await this.getSpaceInfo(space || this.currentSpace);
     if(code === 0) {
-      this.update({
-        spaceVidType: data?.tables?.[0]?.['Vid Type'],
-      });
+      this.update({ spaceVidType: data?.tables?.[0]?.['Vid Type'] });
     }
   };
 
-  switchSpace = async (space: string, hideErrMsg?: boolean) => {
-    const { code, message } = (await service.execNGQL({
-      gql: `use ${handleKeyword(space)};`,
-    },
-    {
-      hideErrMsg
-    },
-    )) as any;
-
-    if (code === 0) {
-      this.update({
-        currentSpace: space,
-        ...initialSchemaData
-      });
-      localStorage.setItem('currentSpace', space);
-      // add await to make sure vidType is updated before other operations executed
-      await this.updateVidType(space);
-    } else {
-      return message;
-    }
+  switchSpace = async (space: string) => {
+    this.update({ currentSpace: space, ...initialSchemaData });
+    localStorage.setItem('currentSpace', space);
+    await this.updateVidType(space);
   };
 
   getSchemaInfo = async () => {
@@ -125,9 +107,7 @@ export class SchemaStore {
   };
 
   getSpaces = async () => {
-    const { code, data } = (await service.execNGQL({
-      gql: 'show spaces;',
-    })) as any;
+    const { code, data } = await service.execNGQL({ gql: 'show spaces;' });
     if (code === 0) {
       const spaces = data.tables.map(item => item.Name);
       this.update({
@@ -140,17 +120,13 @@ export class SchemaStore {
   };
 
   getSpaceInfo = async (space: string) => {
-    const { code, data } = (await service.execNGQL({
-      gql: `DESCRIBE SPACE ${handleKeyword(space)}`,
-    })) as any;
+    const { code, data } = await service.execNGQL({ gql: `DESCRIBE SPACE ${handleKeyword(space)}` });
     return { code, data };
   };
 
   getSpaceCreateGQL = async (space: string) => {
     const gql = `show create space ${handleKeyword(space)}`;
-    const { code, data } = (await service.execNGQL({
-      gql,
-    })) as any;
+    const { code, data } = await service.execNGQL({ gql });
     return code === 0 ? data.tables[0]['Create Space'] : null;
   };
 
@@ -162,9 +138,7 @@ export class SchemaStore {
       const spaces: ISpace[] = [];
       await Promise.all(
         res.data.map(async (item, i) => {
-          const { code, data } = await this.getSpaceInfo(
-            item,
-          );
+          const { code, data } = await this.getSpaceInfo(item);
           if (code === 0) {
             const space = (data.tables && data.tables[0]) || {};
             space.serialNumber = space.Name === activeSpace ? 0 : i + 1;
@@ -172,9 +146,7 @@ export class SchemaStore {
           }
         }),
       );
-      this.update({
-        spaceList: spaces.sort((a, b) => a.serialNumber - b.serialNumber),
-      });
+      this.update({ spaceList: spaces.sort((a, b) => a.serialNumber - b.serialNumber) });
     }
   };
 
@@ -209,24 +181,15 @@ export class SchemaStore {
   };
 
   createSpace = async (gql: string) => {
-    const { code, data, message } = (await service.execNGQL(
-      {
-        gql,
-      },
-      {
-        trackEventConfig: {
-          category: 'schema',
-          action: 'create_space',
-        },
-      },
-    )) as any;
+    const { code, data, message } = await service.execNGQL(
+      { gql },
+      { trackEventConfig: { category: 'schema', action: 'create_space' } },
+    );
     return { code, data, message };
   };
 
   getMachineNumber = async () => {
-    const { code, data } = (await service.execNGQL({
-      gql: `SHOW HOSTS`,
-    })) as any;
+    const { code, data } = await service.execNGQL({ gql: `SHOW HOSTS` });
     if (code === 0) {
       const activeMachineNum = data.tables.filter(i => i.Status === 'ONLINE')
         .length;
@@ -239,11 +202,10 @@ export class SchemaStore {
 
   // edges
   getEdges = async () => {
-    const { code, data } = (await service.execNGQL({
-      gql: `
-        show edges;
-      `,
-    })) as any;
+    const { code, data } = await service.execNGQL({
+      gql: `show edges;`,
+      space: this.currentSpace,
+    });
     if (code === 0) {
       const edgeTypes = data.tables.map(item => item.Name);
       this.update({ edgeTypes });
@@ -298,9 +260,8 @@ export class SchemaStore {
   deleteEdge = async (name: string) => {
     const { code, data, message } = (await service.execNGQL(
       {
-        gql: `
-        DROP EDGE ${handleKeyword(name)}
-      `,
+        gql: `DROP EDGE ${handleKeyword(name)}`,
+        space: this.currentSpace,
       },
       {
         trackEventConfig: {
@@ -320,11 +281,10 @@ export class SchemaStore {
 
   // tags
   getTags = async () => {
-    const { code, data } = (await service.execNGQL({
-      gql: `
-        SHOW TAGS;
-      `,
-    })) as any;
+    const { code, data } = await service.execNGQL({
+      gql: `SHOW TAGS;`,
+      space: this.currentSpace,
+    });
 
     if (code === 0) {
       const tags = data.tables.map(item => item.Name);
@@ -378,9 +338,8 @@ export class SchemaStore {
   deleteTag = async (name: string) => {
     const { code, data, message } = (await service.execNGQL(
       {
-        gql: `
-        DROP TAG ${handleKeyword(name)}
-      `,
+        gql: `DROP TAG ${handleKeyword(name)}`,
+        space: this.currentSpace,
       },
       {
         trackEventConfig: {
@@ -398,9 +357,7 @@ export class SchemaStore {
   }) => {
     const { type, gql } = payload;
     const { code, data, message } = (await service.execNGQL(
-      {
-        gql,
-      },
+      { gql, space: this.currentSpace },
       {
         trackEventConfig: {
           category: 'schema',
@@ -414,9 +371,7 @@ export class SchemaStore {
   alterField = async (payload: IAlterForm) => {
     const gql = getAlterGQL(payload);
     const { code, data, message } = (await service.execNGQL(
-      {
-        gql,
-      },
+      { gql, space: this.currentSpace },
       {
         trackEventConfig: {
           category: 'schema',
@@ -429,9 +384,7 @@ export class SchemaStore {
 
   getTagOrEdgeDetail = async (type: ISchemaType, name: string) => {
     const gql = `show create ${type} ${handleKeyword(name)}`;
-    const { code, data } = (await service.execNGQL({
-      gql,
-    })) as any;
+    const { code, data } = await service.execNGQL({ gql, space: this.currentSpace });
     if(code === 0) {
       const _type = `Create ${type[0].toUpperCase()}${type.slice(1)}`;
       return data.tables[0][_type];
@@ -441,19 +394,16 @@ export class SchemaStore {
 
   getTagOrEdgeInfo = async (type: ISchemaType, name: string) => {
     const gql = `desc ${type}  ${handleKeyword(name)}`;
-    const { code, data } = (await service.execNGQL({
-      gql,
-    })) as any;
+    const { code, data } = await service.execNGQL({ gql, space: this.currentSpace });
     return { code, data };
   };
 
   // indexes
   getIndexes = async (type: IndexType) => {
-    const { code, data } = (await service.execNGQL({
-      gql: `
-        SHOW ${type} INDEXES
-      `,
-    })) as any;
+    const { code, data } = await service.execNGQL({
+      gql: `SHOW ${type} INDEXES`,
+      space: this.currentSpace,
+    });
     if (code === 0) {
       const key = type === 'tag' ? 'By Tag' : 'By Edge';
       const indexes = data.tables.map(item => {
@@ -471,11 +421,10 @@ export class SchemaStore {
 
   getIndexGQL = async (payload: { type: IndexType; name: string }) => {
     const { type, name } = payload;
-    const { code, data } = (await service.execNGQL({
-      gql: `
-        SHOW CREATE ${type} index ${handleKeyword(name)}
-      `,
-    })) as any;
+    const { code, data } = await service.execNGQL({
+      gql: `SHOW CREATE ${type} index ${handleKeyword(name)}`,
+      space: this.currentSpace,
+    });
     if (code === 0) {
       const _type = type === ISchemaEnum.Tag ? 'Tag' : 'Edge';
       const res = data.tables[0]?.[`Create ${_type} Index`];
@@ -495,11 +444,10 @@ export class SchemaStore {
 
   getIndexFields = async (payload: { type: IndexType; name: string }) => {
     const { type, name } = payload;
-    const { code, data } = (await service.execNGQL({
-      gql: `
-        DESCRIBE ${type} INDEX ${handleKeyword(name)}
-      `,
-    })) as any;
+    const { code, data } = await service.execNGQL({
+      gql: `DESCRIBE ${type} INDEX ${handleKeyword(name)}`,
+      space: this.currentSpace,
+    });
     return { code, data };
   };
 
@@ -587,9 +535,8 @@ export class SchemaStore {
     const { type, name } = payload;
     const { code, data } = (await service.execNGQL(
       {
-        gql: `
-        DROP ${type} INDEX ${handleKeyword(name)}
-      `,
+        gql: `DROP ${type} INDEX ${handleKeyword(name)}`,
+        space: this.currentSpace,
       },
       {
         trackEventConfig: {
@@ -609,27 +556,24 @@ export class SchemaStore {
     fields: string[];
   }) => {
     const gql = getIndexCreateGQL(payload);
-    const { code, data, message } = (await service.execNGQL(
-      {
-        gql,
-      },
+    const { code, data, message } = await service.execNGQL(
+      { gql, space: this.currentSpace },
       {
         trackEventConfig: {
           category: 'schema',
           action: 'create_index',
         },
       },
-    )) as any;
+    );
     return { code, data, message };
   };
 
   rebuildIndex = async (payload: { type: IndexType; name: string }) => {
     const { type, name } = payload;
-    const { code, data } = (await service.execNGQL(
+    const { code, data } = await service.execNGQL(
       {
-        gql: `
-        REBUILD ${type} INDEX ${handleKeyword(name)}
-      `,
+        gql: `REBUILD ${type} INDEX ${handleKeyword(name)}`,
+        space: this.currentSpace,
       },
       {
         trackEventConfig: {
@@ -637,54 +581,40 @@ export class SchemaStore {
           action: 'rebuild_index',
         },
       },
-    )) as any;
+    );
     return { code, data };
   };
 
   getIndexesStatus = async (type: IndexType) => {
-    const { code, data } = (await service.execNGQL({
-      gql: `
-        SHOW ${type} INDEX STATUS
-      `,
-    })) as any;
-    if (code === 0) {
-      return data.tables;
-    }
-    return null;
+    const { code, data } = await service.execNGQL({
+      gql: `SHOW ${type} INDEX STATUS`,
+      space: this.currentSpace,
+    });
+    return code === 0 ? data.tables : null;
   };
 
   // stats
   submitStats = async () => {
-    const { code, data } = (await service.execNGQL(
-      {
-        gql: `
-        SUBMIT JOB STATS
-      `,
-      },
+    const { code, data } = await service.execNGQL(
+      { gql: `SUBMIT JOB STATS` },
       {
         trackEventConfig: {
           category: 'schema',
           action: 'submit_stats',
         },
       },
-    )) as any;
+    );
     return { code, data };
   };
 
   getStats = async () => {
-    const { code, data } = (await service.execNGQL({
-      gql: `
-        SHOW STATS
-      `,
-    })) as any;
+    const { code, data } = await service.execNGQL({ gql: `SHOW STATS` });
     return { code, data };
   };
 
   getJobStatus = async (id?) => {
     const gql = id === undefined ? 'SHOW JOBS' : `SHOW JOB ${id}`;
-    const { code, data } = (await service.execNGQL({
-      gql,
-    })) as any;
+    const { code, data } = await service.execNGQL({ gql });
     return { code, data };
   };
 
@@ -694,7 +624,8 @@ export class SchemaStore {
     const edges = [];
     const edgeQuery = this.edgeList.map(edge => `MATCH ()-[e:${handleKeyword(edge.name)}]->() RETURN e LIMIT 10;`);
     const { code, data, message } = await service.batchExecNGQL({
-      gqls: edgeQuery
+      gqls: edgeQuery,
+      space: this.currentSpace,
     });
     let err;
     if(code !== 0) {
@@ -739,7 +670,7 @@ export class SchemaStore {
       await this.updateVidType();
     }
     const gql = `match (v) where id(v) in [${ids.map(id => handleVidStringName(id, this.spaceVidType)).join(',')}] return id(v) as id, tags(v) as \`tags\``;
-    const res = await service.execNGQL({ gql });
+    const res = await service.execNGQL({ gql, space: this.currentSpace });
     if(res.code === 0) {
       const tables = res.data?.tables || [];
       tables.forEach(item => {
@@ -783,10 +714,7 @@ export class SchemaStore {
       indexes: [],
     };
     try {
-      const errMsg = await this.switchSpace(space);
-      if(errMsg) {
-        throw new Error(errMsg);
-      }
+      await this.switchSpace(space);
       const spaceGql = await this.getSpaceCreateGQL(space);
       ddlMap.space = spaceGql;
       await this.switchSpace(space);

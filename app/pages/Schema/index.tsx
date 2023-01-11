@@ -103,12 +103,8 @@ const Schema = () => {
   };
 
   const handleSwitchSpace = async (space: string) => {
-    const err = await switchSpace(space);
-    if (!err) {
-      history.push(`/schema/tag/list`);
-    } else if (err && err.toLowerCase().includes('spacenotfound')) {
-      message.warning(intl.get('schema.useSpaceErrTip'));
-    }
+    await switchSpace(space);
+    history.push(`/schema/tag/list`);
   };
   const getSpaces = async () => {
     setLoading(true);

@@ -1,5 +1,5 @@
 import { Button, Select, Tooltip, message } from 'antd';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { trackEvent, trackPageView } from '@app/utils/stat';
 import { useStore } from '@app/stores';
@@ -38,7 +38,18 @@ const Console = (props: IProps) => {
   const { intl } = useI18n();
   const { onExplorer, templateRender } = props;
   const { spaces, getSpaces } = schema;
-  const { runGQL, currentGQL, results, runGQLLoading, getParams, update, paramsMap, getFavoriteList, currentSpace } = console;
+  const {
+    runGQL,
+    currentGQL,
+    results,
+    runGQLLoading,
+    getParams,
+    update,
+    paramsMap,
+    getFavoriteList,
+    currentSpace,
+    updateCurrentSpace,
+  } = console;
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState<{
     space: string;
@@ -52,7 +63,7 @@ const Console = (props: IProps) => {
     getParams();
     getFavoriteList();
   }, []);
-  const handleSpaceSwitch = useCallback((space: string) => update({ currentSpace: space }), []);
+
   const checkSwitchSpaceGql = (query: string) => {
     const queryList = query.split(SEMICOLON_REG).filter(Boolean);
     const reg = /^USE `?.+`?(?=[\s*;?]?)/gim;
@@ -86,11 +97,7 @@ const Console = (props: IProps) => {
   
       editor.current!.editor.execCommand('goDocEnd');
       handleSaveQuery(query);
-      await runGQL({
-        gql: query, 
-        space: currentSpace,
-        editorValue: value
-      });
+      await runGQL({ gql: query, editorValue: value });
     }
   };
 
@@ -126,7 +133,7 @@ const Console = (props: IProps) => {
             <span className={styles.title}>Nebula Console</span>
             <div className={styles.operations}>
               <div className={styles.spaceSelect}>
-                <Select value={currentSpace || null} placeholder={intl.get('console.selectSpace')} onDropdownVisibleChange={handleGetSpaces} onChange={handleSpaceSwitch}>
+                <Select value={currentSpace || null} placeholder={intl.get('console.selectSpace')} onDropdownVisibleChange={handleGetSpaces} onChange={updateCurrentSpace}>
                   {spaces.map(space => (
                     <Option value={space} key={space}>
                       {space}
@@ -170,9 +177,6 @@ const Console = (props: IProps) => {
               key={item.id}
               index={index}
               result={item}
-              gql={item.gql}
-              space={item.space}
-              spaceVidType={item.spaceVidType}
               templateRender={templateRender}
               onExplorer={onExplorer ? handleExplorer : undefined}
               onHistoryItem={gql => updateGql(gql)}
@@ -181,8 +185,7 @@ const Console = (props: IProps) => {
           )) : <OutputBox
             key="empty"
             index={0}
-            result={{ code: 0, data: { headers: [], tables: [] } }}
-            gql={''}
+            result={{ id: 'empty', gql: '', code: 0, data: { headers: [], tables: [] } }}
             onHistoryItem={gql => updateGql(gql)}
           />}
         </div>

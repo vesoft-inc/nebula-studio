@@ -402,9 +402,7 @@ export class SketchStore {
   };
 
   batchApply = async (gql) => {
-    const { code, data } = (await service.execNGQL({
-      gql,
-    })) as any;
+    const { code, data } = await service.execNGQL({ gql });
     return { code, data };
   };
 
