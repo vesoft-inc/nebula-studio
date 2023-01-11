@@ -212,3 +212,5 @@ export const EXPLAIN_DATA_TYPE = [
 export const MAX_COMMENT_BYTES = 256;
 
 export const POSITIVE_INTEGER_REGEX = /^[1-9]\d*$/g;
+
+export const DEFAULT_PARTITION_NUM = 10;
