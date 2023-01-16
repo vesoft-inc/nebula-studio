@@ -68,7 +68,7 @@ func (c *Client) switchSpace(msgReceived *MessageReceive) *map[string]any {
 	reqSpace = strings.Replace(reqSpace, "`", "\\`", -1)
 	_, _, err := dao.Execute(c.clientInfo.NSID, fmt.Sprintf("USE `%s`", reqSpace), nil)
 	if err != nil {
-		logx.ErrorStackf("[WebSocket ngql query]: msgReceived.Body.Content(%v); error(%v)", &msgReceived.Body.Content, err)
+		logx.Errorf("[WebSocket switchSpace]: msgReceived.Body.Content(%+v); error(%+v)", &msgReceived.Body.Content, err)
 		content := map[string]any{
 			"code":    base.Error,
 			"message": err.Error(),
@@ -82,7 +82,14 @@ func (c *Client) switchSpace(msgReceived *MessageReceive) *map[string]any {
 	return nil
 }
 
-func (c *Client) runNgql(msgReceived *MessageReceive) {
+func (c *Client) runNgql(msgReceived *MessageReceive) (closed bool) {
+	defer func() {
+		if err := recover(); err != nil {
+			logx.Errorf("[WebSocket runNgql panic]: %+v", err)
+			closed = true
+		}
+	}()
+
 	msgPost := MessagePost{
 		Header: MessagePostHeader{
 			MsgId:    msgReceived.Header.MsgId,
@@ -117,7 +124,7 @@ func (c *Client) runNgql(msgReceived *MessageReceive) {
 
 	execute, _, err := dao.Execute(c.clientInfo.NSID, gql, paramList)
 	if err != nil {
-		logx.ErrorStackf("[WebSocket ngql query]: msgReceived.Body.Content(%v); error(%v)", &msgReceived.Body.Content, err)
+		logx.Errorf("[WebSocket runNgql]: msgReceived.Body.Content(%v); error(%v)", &msgReceived.Body.Content, err)
 		content := map[string]any{
 			"code":    base.Error,
 			"message": err.Error(),
@@ -133,12 +140,19 @@ func (c *Client) runNgql(msgReceived *MessageReceive) {
 			"message": "Success",
 		}
 	}
-
 	msgSend, _ := json.Marshal(msgPost)
 	c.send <- msgSend
+	return false
 }
 
-func (c *Client) runBatchNgql(msgReceived *MessageReceive) {
+func (c *Client) runBatchNgql(msgReceived *MessageReceive) (closed bool) {
+	defer func() {
+		if err := recover(); err != nil {
+			logx.Errorf("[WebSocket runBatchNgql panic]: %+v", err)
+			closed = true
+		}
+	}()
+
 	msgPost := MessagePost{
 		Header: MessagePostHeader{
 			MsgId:    msgReceived.Header.MsgId,
@@ -212,6 +226,7 @@ func (c *Client) runBatchNgql(msgReceived *MessageReceive) {
 	}
 	msgSend, _ := json.Marshal(msgPost)
 	c.send <- msgSend
+	return false
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -231,9 +246,9 @@ func (c *Client) readPump() {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				logx.ErrorStackf("[WebSocket UnexpectedClose]: %v", err)
+				logx.Errorf("[WebSocket UnexpectedClose]: %v", err)
 			} else {
-				logx.ErrorStackf("[WebSocket ReadMessage]: %v", err)
+				logx.Errorf("[WebSocket ReadMessage]: %v", err)
 			}
 			break
 		}
@@ -283,7 +298,7 @@ func (c *Client) writePump() {
 
 			w, err := c.conn.NextWriter(websocket.TextMessage)
 			if err != nil {
-				logx.ErrorStackf("[WebSocket WriteMessage]: %v", err)
+				logx.Errorf("[WebSocket WriteMessage]: %v", err)
 				return
 			}
 			w.Write(message)
