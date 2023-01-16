@@ -1,5 +1,5 @@
 import { Button, Col, Form, Input, Row, Select, message } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Breadcrumb from '@app/components/Breadcrumb';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
@@ -8,10 +8,11 @@ import cls from 'classnames';
 import { useHistory } from 'react-router-dom';
 import { POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
 import { useI18n } from '@vesoft-inc/i18n';
+import { ISchemaEnum, ISchemaType } from '@app/interfaces/schema';
+import Icon from '@app/components/Icon';
 import styles from './index.module.less';
 import PasswordInputModal from './PasswordInputModal';
 import SchemaConfig from './SchemaConfig';
-import FileSelect from './FileSelect';
 const Option = Select.Option;
 const formItemLayout = {
   labelCol: {
@@ -25,10 +26,23 @@ const formItemLayout = {
 interface IProps {
   needPwdConfirm?: boolean;
 }
+
+
+const AddMappingBtn = (props: { type: ISchemaType }) => {
+  const { intl } = useI18n();
+  const { type } = props;
+  const { dataImport: { addConfigItem } } = useStore();
+  const addMapping = useCallback(() => addConfigItem(type), [type]);
+  return <Button type="primary" className="studioAddBtnIcon" onClick={addMapping}>
+    <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
+    {intl.get(type === ISchemaEnum.Tag ? 'import.addTag' : 'import.addEdge')}
+  </Button>;
+};
+
 const TaskCreate = (props: IProps) => {
   const { dataImport, schema, files } = useStore();
   const { intl, currentLocale } = useI18n();
-  const { basicConfig, verticesConfig, edgesConfig, updateBasicConfig, importTask } = dataImport;
+  const { basicConfig, tagConfig, edgesConfig, updateBasicConfig, importTask } = dataImport;
   const { spaces, getSpaces, updateSpaceInfo, currentSpace } = schema;
   const { getFiles } = files;
   const { batchSize } = basicConfig;
@@ -47,6 +61,17 @@ const TaskCreate = (props: IProps) => {
     },
   ]), [currentLocale]);
 
+  useEffect(() => {
+    initTaskDir();
+    getSpaces();
+    getFiles();
+    if(currentSpace) {
+      updateSpaceInfo(currentSpace);
+    }
+    trackPageView('/import/create');
+    return () => clearConfig('all');
+  }, []);
+  
   const checkConfig = () => {
     try {
       check();
@@ -71,74 +96,65 @@ const TaskCreate = (props: IProps) => {
 
 
   const check = () => {
-    verticesConfig.forEach(config => {
-      if(config.idMapping === null) {
-        message.error(`vertexId ${intl.get('import.indexNotEmpty')}`);
-        throw new Error();
-      }
-      if(config.tags.length === 0) {
-        message.error(`Tag Mapping ${intl.get('import.isEmpty')}`);
-        throw new Error();
-      }
-      config.tags.forEach(tag => {
-        if (!tag.name) {
-          message.error(`Tag ${intl.get('import.isEmpty')}`);
-          throw new Error();
-        }
-        tag.props.forEach(prop => {
-          if (prop.mapping === null && !prop.allowNull && !prop.isDefault) {
-            message.error(`${prop.name} ${intl.get('import.indexNotEmpty')}`);
-            throw new Error();
-          }
-        });
-      });
-    });
-    edgesConfig.forEach(edge => {
-      if (!edge.type) {
-        message.error(`edgeType ${intl.get('import.isEmpty')}`);
-        throw new Error();
-      }
-      edge.props.forEach(prop => {
-        if (prop.mapping === null && !prop.allowNull && prop.name !== 'rank' && !prop.isDefault) {
-          message.error(`${prop.name} ${intl.get('import.indexNotEmpty')}`);
-          throw new Error();
-        }
-      });
-    });
+    // verticesConfig.forEach(config => {
+    //   if(config.idMapping === null) {
+    //     message.error(`vertexId ${intl.get('import.indexNotEmpty')}`);
+    //     throw new Error();
+    //   }
+    //   if(config.tags.length === 0) {
+    //     message.error(`Tag Mapping ${intl.get('import.isEmpty')}`);
+    //     throw new Error();
+    //   }
+    //   config.tags.forEach(tag => {
+    //     if (!tag.name) {
+    //       message.error(`Tag ${intl.get('import.isEmpty')}`);
+    //       throw new Error();
+    //     }
+    //     tag.props.forEach(prop => {
+    //       if (prop.mapping === null && !prop.allowNull && !prop.isDefault) {
+    //         message.error(`${prop.name} ${intl.get('import.indexNotEmpty')}`);
+    //         throw new Error();
+    //       }
+    //     });
+    //   });
+    // });
+    // edgesConfig.forEach(edge => {
+    //   if (!edge.type) {
+    //     message.error(`edgeType ${intl.get('import.isEmpty')}`);
+    //     throw new Error();
+    //   }
+    //   edge.props.forEach(prop => {
+    //     if (prop.mapping === null && !prop.allowNull && prop.name !== 'rank' && !prop.isDefault) {
+    //       message.error(`${prop.name} ${intl.get('import.indexNotEmpty')}`);
+    //       throw new Error();
+    //     }
+    //   });
+    // });
     if(batchSize && !batchSize.match(POSITIVE_INTEGER_REGEX)) {
       message.error(`${intl.get('import.batchSize')} ${intl.get('formRules.numberRequired')}`);
       throw new Error();
     }
   };
 
-  const clearConfig = (type?: string) => {
+  const clearConfig = useCallback((type?: string) => {
     const params = {
-      verticesConfig: [],
+      tagConfig: [],
       edgesConfig: []
     } as any;
     if(type === 'all') {
       params.basicConfig = { taskName: '' };
     }
     dataImport.update(params);
-  };
-  const handleSpaceChange = (space: string) => {
+  }, []);
+  const handleSpaceChange = useCallback((space: string) => {
     clearConfig();
     updateSpaceInfo(space);
-  };
-
-  const initTaskDir = async () => {
-    updateBasicConfig('taskName', `task-${Date.now()}`);
-  };
-  useEffect(() => {
-    initTaskDir();
-    getSpaces();
-    getFiles();
-    if(currentSpace) {
-      updateSpaceInfo(currentSpace);
-    }
-    trackPageView('/import/create');
-    return () => clearConfig('all');
   }, []);
+
+  const initTaskDir = useCallback(() => {
+    updateBasicConfig('taskName', `task-${Date.now()}`);
+  }, []);
+
   return (
     <div className={styles.importCreate}>
       <Breadcrumb routes={routes} />
@@ -175,18 +191,18 @@ const TaskCreate = (props: IProps) => {
         </Form>
         <div className={styles.mapConfig}>
           <Form className={styles.configColumn} layout="vertical">
-            <Form.Item label={intl.get('import.vertices')} required={true}>
+            <Form.Item label={intl.get('import.tag')} required={true}>
               <div className={styles.container}>
-                <FileSelect type="vertices" />
-                {verticesConfig.map((item, index) => <SchemaConfig type="vertices" key={item.name} data={item} configIndex={index} />)}
+                <AddMappingBtn type={ISchemaEnum.Tag} />
+                {tagConfig.map((item) => <SchemaConfig key={item._id} data={item} />)}
               </div>
             </Form.Item>
           </Form>
           <Form className={styles.configColumn} layout="vertical">
             <Form.Item label={intl.get('import.edge')} required={true}>
               <div className={styles.container}>
-                <FileSelect type="edge" />
-                {edgesConfig.map((item, index) => <SchemaConfig type="edge" key={item.name} data={item} configIndex={index} />)}
+                <AddMappingBtn type={ISchemaEnum.Edge} />
+                {edgesConfig.map((item) => <SchemaConfig key={item._id} data={item} />)}
               </div>
             </Form.Item>
           </Form>
@@ -196,7 +212,7 @@ const TaskCreate = (props: IProps) => {
         <Button onClick={() => history.push('/import/tasks')}>{intl.get('common.cancel')}</Button>
         <Button type="primary" disabled={
           basicConfig.taskName === ''
-          || (!verticesConfig.length && !edgesConfig.length)
+          || (!tagConfig.length && !edgesConfig.length)
         } onClick={checkConfig} loading={!needPwdConfirm && loading}>{intl.get('import.runImport')}</Button>
       </div>
       {needPwdConfirm && <PasswordInputModal 
