@@ -4,7 +4,7 @@ import React from 'react';
 
 import './index.less';
 
-const Instruction = (props: { description: string; onClick?: () => void }) => {
+const Instruction = (props: { description: string | React.ReactNode; onClick?: () => void }) => {
   return (
     <Tooltip title={props.description} placement="right">
       <Icon
