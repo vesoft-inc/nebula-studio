@@ -6,6 +6,7 @@ import { getI18n } from '@vesoft-inc/i18n';
 import { BrowserHistory } from 'history';
 import service from '@app/config/service';
 import ngqlRunner from '@app/utils/websocket';
+import { isValidIP } from '@app/utils/function';
 import { getRootStore, resetStore } from '.';
 
 const { intl } = getI18n();
@@ -115,6 +116,17 @@ export class GlobalStore {
     cookies.remove('nh');
     cookies.remove('nu');
     return false;
+  };
+
+  getGraphAddress = async () => {
+    const { code, data } = await service.execNGQL({ gql: 'show hosts graph;' });
+    return code !== 0 ? [] : data.tables.reduce((acc, cur) => {
+      if (isValidIP(cur.Host)) {
+        acc.push(`${cur.Host}:${cur.Port}`);
+      }
+      return acc;
+    }
+    , []);
   };
 }
 

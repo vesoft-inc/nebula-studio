@@ -42,7 +42,7 @@ type (
 	ImportTaskTagProp {
 		Name  *string `json:"name" validate:"required"`
 		Type  *string `json:"type" validate:"required"`
-		Index *int64  `json:"index" validate:"required"`
+		Index *int64  `json:"index, optional"`
 	}
 
 	ImportTaskTag {
@@ -63,13 +63,13 @@ type (
 	}
 
 	ImportTaskEdgeRank {
-		Index *int64 `json:"index"`
+		Index *int64 `json:"index, optional"`
 	}
 
 	ImportTaskEdgeProp {
 		Name  *string `json:"name"`
 		Type  *string `json:"type"`
-		Index *int64  `json:"index"`
+		Index *int64  `json:"index, optional"`
 	}
 
 	ImportTaskEdge {

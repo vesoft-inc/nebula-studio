@@ -1,5 +1,4 @@
 import { RcFile } from 'antd/lib/upload';
-import { ISchemaEnum } from './schema';
 
 export enum ITaskStatus {
   'StatusFinished' = 'Success',
@@ -40,21 +39,6 @@ export interface IPropertyProps {
   mapping?: number
 }
 
-export type IImportSchemaConfig<T extends ISchemaEnum = ISchemaEnum> = {
-  _id: string;
-  type: ISchemaEnum;
-  name: string;
-  props: IPropertyProps[];
-  files: (T extends ISchemaEnum.Edge ? IEdgeFileMapping : ITagFileMapping)[];
-}
-
-// export type IImportSchemaConfig<T extends ISchemaEnum = ISchemaEnum, F extends unknown = unknown> = {
-//   _id: string;
-//   type: T;
-//   name: string;
-//   props: IPropertyProps[];
-//   files: F[];
-// }
 export interface IImportFile {
   name: string;
   content: string[];
@@ -62,30 +46,13 @@ export interface IImportFile {
   delimiter?: string;
 }
 
-
-export interface IFileBasicMapping {
-  file: IImportFile;
-  props: IPropertyProps[]
-}
-
-export interface ITagFileMapping extends IFileBasicMapping {
-  vidIndex?: number;
-  vidFunction?: string;
-  vidPrefix?: string
-}
-
-export interface IEdgeFileMapping extends IFileBasicMapping {
-  srcIdIndex?: number;
-  dstIdIndex?: number; 
-  srcIdFunction?: string;
-  dstIdFunction?: string;
-  srcIdPrefix?: string;
-  dstIdPrefix?: string;
-}
-export type IFileMapping = ITagFileMapping | IEdgeFileMapping;
 export interface IBasicConfig {
   taskName: string;
+  address: string[];
   batchSize?: string;
+  concurrency?: string;
+  retry?: string;
+  channelBufferSize?: string;
 }
 
 export interface ILogDimension {
