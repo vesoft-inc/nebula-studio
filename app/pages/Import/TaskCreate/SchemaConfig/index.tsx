@@ -8,13 +8,14 @@ import { useI18n } from '@vesoft-inc/i18n';
 import cls from 'classnames';
 
 import { ISchemaEnum, ISchemaType } from '@app/interfaces/schema';
-import { IFileMapping, IImportSchemaConfig } from '@app/interfaces/import';
+import { ITagItem, IEdgeItem, ITagFileItem, IEdgeFileItem, TagFileItem, EdgeFileItem } from '@app/stores/import';
+import { IImportFile } from '@app/interfaces/import';
 import styles from './index.module.less';
 import FileMapping from './FileMapping';
 const { Panel } = Collapse;
 const Option = Select.Option;
 interface IProps {
-  data: IImportSchemaConfig
+  configItem: ITagItem | IEdgeItem
 }
 
 interface IHeaderProps {
@@ -52,26 +53,34 @@ const SelectMappingTargetHeader = observer((props: IHeaderProps) => {
   </div>;
 });
 const SchemaConfig = (props: IProps) => {
-  const { data } = props;
+  const { configItem } = props;
   const { dataImport } = useStore();
-  const { name, files, type } = data;
-  const { addFileSource, removeConfigItem, updateConfigItemTarget, removeFileSource } = dataImport;
+  const { name, files, type } = configItem;
+  const { deleteTagConfig, deleteEdgeConfig, updateConfigItemName } = dataImport;
   const { intl } = useI18n();
 
-  const addFile = useCallback(() => addFileSource(data), [data]);
+  const addFileSource = useCallback(() => {
+    const payload = { file: undefined, props: configItem.props };
+    configItem.addFileItem(configItem.type === ISchemaEnum.Tag ? new TagFileItem(payload) : new EdgeFileItem(payload));
+  }, [configItem]);
+
+  const resetFileSource = useCallback((item: ITagFileItem | IEdgeFileItem, file: IImportFile) => {
+    const index = configItem.files.findIndex(f => f === item);
+    const payload = { file, props: [...configItem.props] };
+    configItem.resetFileItem(index, configItem.type === ISchemaEnum.Tag ? new TagFileItem(payload) : new EdgeFileItem(payload));
+  }, [configItem]);
+
 
   const handleRemove = useCallback((event: React.MouseEvent) => {
     event.stopPropagation();
-    removeConfigItem(data);
-  }, [data]);
+    configItem.type === ISchemaEnum.Tag ? deleteTagConfig(configItem) : deleteEdgeConfig(configItem);
+  }, [configItem]);
 
-  const changeMappingTarget = useCallback((value) => {
-    updateConfigItemTarget({ data, value });
-  }, [data]);
+  const changeMappingTarget = useCallback((name: string) => {
+    updateConfigItemName(configItem, name);
+  }, [configItem]);
 
-  const clearFileSource = (item: IFileMapping) => {
-    removeFileSource(data, item);
-  };
+  const clearFileSource = useCallback((item: ITagFileItem | IEdgeFileItem) => configItem.deleteFileItem(item), [configItem]);
   return (
     <Collapse
       bordered={false}
@@ -79,9 +88,9 @@ const SchemaConfig = (props: IProps) => {
       className={styles.configCollapse}
     >
       <Panel header={<SelectMappingTargetHeader value={name} type={type} onSelect={changeMappingTarget} />} key="default" extra={<CloseOutlined className={styles.btnClose} onClick={handleRemove} />}>
-        {files.map((item:IFileMapping, index) => <FileMapping key={index} type={data.type} data={item} onRemove={clearFileSource} />)}
+        {files.map((item: ITagFileItem | IEdgeFileItem, index) => <FileMapping key={index} type={configItem.type} item={item} onRemove={clearFileSource} onReset={resetFileSource} />)}
         {!!name && <div className={styles.btns}>
-          <Button className="primaryBtn studioAddBtn" onClick={addFile}>
+          <Button className="primaryBtn studioAddBtn" onClick={addFileSource}>
             <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
             {intl.get('import.bindDatasource')}
           </Button>

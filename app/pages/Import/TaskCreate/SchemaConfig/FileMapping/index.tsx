@@ -4,42 +4,45 @@ import { observer } from 'mobx-react-lite';
 import cls from 'classnames';
 import { useStore } from '@app/stores';
 import { useI18n } from '@vesoft-inc/i18n';
-import { IFileMapping } from '@app/interfaces/import';
 import CSVPreviewLink from '@app/components/CSVPreviewLink';
 import { CloseOutlined } from '@ant-design/icons';
 import Instruction from '@app/components/Instruction';
 import { ISchemaEnum } from '@app/interfaces/schema';
+import { IEdgeFileItem, ITagFileItem } from '@app/stores/import';
+import { IImportFile } from '@app/interfaces/import';
 import styles from '../index.module.less';
 
 const Option = Select.Option;
 const Panel = Collapse.Panel;
 
 interface IProps {
-  data: IFileMapping
-  onRemove: (file: IFileMapping) => void;
+  item: ITagFileItem | IEdgeFileItem
+  onRemove: (file: ITagFileItem | IEdgeFileItem) => void;
+  onReset: (item: ITagFileItem | IEdgeFileItem, file: IImportFile) => void;
   type: ISchemaEnum
 }
 
+
 const VIDSetting = observer((props: {
-  onUpdate: (key: string, value: any) => void;
-  data: IFileMapping,
+  data: ITagFileItem | IEdgeFileItem,
   keyMap: {
     idKey: string,
-    idFunction: string,
-    idPrefix: string,
+    idFunction?: string,
+    idPrefix?: string,
+    label: string
   }
 }) => {
-  const { onUpdate, keyMap: { idKey, idFunction, idPrefix }, data } = props;
+  const { keyMap: { idKey, idFunction, idPrefix, label }, data } = props;
   const { intl } = useI18n();
   return <div className={styles.row}>
     <Collapse bordered={false} ghost className={styles.vidCollapse}>
       <Panel header={<div className={cls(styles.panelTitle, styles.spaceBetween)}>
         <div>
-          <span className={cls(styles.label, styles.required)}>{intl.get(`import.vidColumn`)}</span>
+          <span className={cls(styles.label, styles.required)}>{intl.get(`import.${label}`)}</span>
           <CSVPreviewLink
             onMapping={(index, e) => {
               e.stopPropagation();
-              onUpdate(idKey, index);
+              data.update({ [idKey]: index });
             }}
             file={data.file}
           >
@@ -57,7 +60,7 @@ const VIDSetting = observer((props: {
           </div>
         </>} />
       </div>} key="default">
-        <div className={styles.rowItem}>
+        {idFunction && <div className={styles.rowItem}>
           <span className={styles.label}>{intl.get('import.vidFunction')}</span>
           <Select
             bordered={false}
@@ -68,15 +71,15 @@ const VIDSetting = observer((props: {
             dropdownMatchSelectWidth={false}
             popupClassName={styles.selectItems}
             onClick={e => e.stopPropagation()}
-            onChange={value => onUpdate(idFunction, value)}
+            onChange={value => data.update({ [idFunction]: value })}
           >
             <Option value="hash">Hash</Option>
           </Select>
-        </div>
-        <div className={styles.rowItem}>
+        </div>}
+        {idPrefix && <div className={styles.rowItem}>
           <span className={styles.label}>{intl.get('import.vidPrefix')}</span>
-          <Input className={styles.prefixInput} bordered={false} placeholder="Input prefix" value={data[idPrefix]} onChange={e => onUpdate(idPrefix, e.target.value)} />
-        </div>
+          <Input className={styles.prefixInput} bordered={false} placeholder="Input prefix" value={data[idPrefix]} onChange={e => data.update({ [idPrefix]: e.target.value })} />
+        </div>}
       </Panel>
     </Collapse>
   </div>;
@@ -87,29 +90,31 @@ const idMap = {
     idKey: 'vidIndex',
     idFunction: 'vidFunction',
     idPrefix: 'vidPrefix',
+    label: 'vidColumn'
   }],
   [ISchemaEnum.Edge]: [{
     idKey: 'srcIdIndex',
     idFunction: 'srcIdFunction',
-    idPrefix: 'srcIdPrefix',
+    label: 'srcVidColumn'
   }, {
     idKey: 'dstIdIndex',
     idFunction: 'dstIdFunction',
-    idPrefix: 'dstIdPrefix',
+    label: 'dstVidColumn'
   }],
 };
 
 const FileMapping = (props: IProps) => {
-  const { data, onRemove, type } = props;
-  const { dataImport, files } = useStore();
+  const { item, onRemove, type, onReset } = props;
+  const { files } = useStore();
   const { fileList, getFiles } = files;
-  const { updateFileSource, updateFileConfig, updateFilePropMapping } = dataImport;
+  const { file, props: mappingProps } = item;
   const { intl } = useI18n();
-
-  const handleFileChange = (value) => {
+  const handleFileChange = (value: string) => {
     const file = fileList.find(item => item.name === value);
-    updateFileSource(data, file);
+    onReset(item, file);
   };
+
+  const updateFilePropMapping = (index: number, value: number) => item.updatePropItem(index, { mapping: value });
   const columns = [
     {
       title: intl.get('import.prop'),
@@ -117,26 +122,23 @@ const FileMapping = (props: IProps) => {
       ellipsis: {
         showTitle: false,
       },
-      render: (value, record) => (
-        <Tooltip placement="topLeft" title={value}>
-          <div className={!record.isDefault && styles.required}>
-            {value}
-          </div>
-          {/* {!record.isDefault && <span className="csv-index-mark">*</span>} */}
-        </Tooltip>
-      ),
+      render: (value, record) => {
+        return (
+          <Tooltip placement="topLeft" title={value}>
+            <div className={cls({ [styles.required]: !record.isDefault && !record.allowNull })}>
+              {value}
+            </div>
+          </Tooltip>
+        );
+      },
     },
     {
       title: intl.get('import.mapping'),
       dataIndex: 'mapping',
-      render: (mappingIndex, prop, propIndex) => (
+      render: (mappingIndex, _, propIndex) => (
         <CSVPreviewLink
-          onMapping={columnIndex => {
-            updateFilePropMapping(data, propIndex, columnIndex);
-            console.log('param', mappingIndex, prop, propIndex, columnIndex); 
-          }
-          }
-          file={data.file}
+          onMapping={columnIndex => updateFilePropMapping(propIndex, columnIndex)}
+          file={file}
         >
           {!mappingIndex && mappingIndex !== 0 ? intl.get('import.choose') : `Column ${mappingIndex}`}
         </CSVPreviewLink>
@@ -153,14 +155,11 @@ const FileMapping = (props: IProps) => {
     }
   };
 
-  const handleUpdate = (key: string, value: any) => {
-    updateFileConfig(data, key, value);
-  };
   const idConfig = useMemo(() => type === ISchemaEnum.Tag ? idMap[ISchemaEnum.Tag] : idMap[ISchemaEnum.Edge], [type]);
   return (
     <div className={styles.fileMappingContainer}>
       <div className={cls(styles.row, styles.spaceBetween)}>
-        <div>
+        <div className={styles.operation}>
           <span className={cls(styles.label, styles.required)}>{intl.get('import.dataSourceFile')}</span>
           <Select 
             bordered={false}
@@ -177,16 +176,16 @@ const FileMapping = (props: IProps) => {
             ))}
           </Select>
         </div>
-        <CloseOutlined className={styles.btnClose} onClick={() => onRemove(data)} />
+        <CloseOutlined className={styles.btnClose} onClick={() => onRemove(item)} />
       </div>
-      {idConfig.map((item, index) => <VIDSetting key={index} keyMap={item} data={data} onUpdate={handleUpdate} />)}
-      {data.props && <Table
+      {idConfig.map((idItem, index) => <VIDSetting key={index} keyMap={idItem} data={item} />)}
+      <Table
         className={styles.propsMappingTable}
-        dataSource={data.props}
+        dataSource={mappingProps.toJSON()}
         columns={columns}
         rowKey="name"
         pagination={false}
-      />}
+      />
     </div>
   );
 };

@@ -20,11 +20,25 @@
   .configTargetSelect {
     min-width: 60px;
     width: fit-content;
+    max-width: 60%;
     :global {
-      .ant-select-selection-item {
+      .ant-select-selector {
+        padding-right: 20px;
+      }
+      .ant-select-selection-item, .ant-select-selection-placeholder {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+        white-space: nowrap;
+        display: inline-block;
+        padding: 0 20px;
+        background: @blue;
+        border-radius: 30px;
+        color: #FFFFFF;
         font-family: Roboto-Bold, sans-serif;
       }
-      .ant-select-selection-placeholder {
+      .ant-select-arrow {
+        right: 0;
         color: @blue;
       }
     }
@@ -45,10 +59,10 @@
   white-space: nowrap;
   font-family: 'Roboto-Medium', sans-serif;
   color: @darkBlue;
-  &::after {
-    content: ':';
-    padding-right: 5px;
-  }
+}
+.title::after, .label::after {
+  content: ':';
+  padding-right: 5px;
 }
 .required::before {
   content: '*';
@@ -71,19 +85,19 @@
     margin-bottom: 15px;
     border-bottom: 1px solid @gray;
   }
+  .operation {
+    max-width: 100%;
+  }
   .fileSelect {
     :global {
-      .ant-select-selection-placeholder, .anticon-down, .ant-select-selection-item {
-        color: #0091FF;
+      .ant-select-selection-placeholder, .anticon, .ant-select-selection-item {
+        color: @blue;
       }
     }
   }
   .vidCollapse {
     width: 100%;
-    .title::after {
-      content: ':';
-      padding-right: 5px;
-    }
+    
     .rowItem {
       width: 45%;
       display: inline-block;
@@ -97,7 +111,7 @@
       width: 60%;
       background: @lightBlue;
       color: @darkGray;
-      :global(.anticon-down) {
+      :global(.anticon) {
         color: @darkBlue;
       }
     }
@@ -113,6 +127,8 @@
   }
   :global(.ant-select) {
     width: fit-content;
+    min-width: 100px;
+    max-width: 80%;
   }
 }
 

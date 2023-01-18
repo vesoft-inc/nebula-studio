@@ -27,17 +27,18 @@ const CSVPreviewLink = (props: IProps) => {
     setVisible(false);
   };
   const columns = file?.content?.length
-    ? file.content[0].map((_, index) => {
+    ? file.content[0].map((header, index) => {
       const textIndex = index;
+      const _header = file?.withHeader ? header : `Column ${textIndex}`;
       return {
         title: onMapping ? (
           <Button
             type="primary"
             className={styles.csvSelectIndex}
             onClick={(e) => handleMapping(textIndex, e)}
-          >{`column ${textIndex}`}</Button>
+          >{_header}</Button>
         ) : (
-          `Column ${textIndex}`
+          _header
         ),
         dataIndex: index,
         render: value => <span className={styles.limitWidth}>{value}</span>,
@@ -57,7 +58,9 @@ const CSVPreviewLink = (props: IProps) => {
       arrowPointAtCenter
       onOpenChange={handleOpen}
       content={<div className={styles.csvPreview}>
+        <p className={styles.selectTitle}>{intl.get('import.selectCsvColumn')}</p>
         <Table
+          bordered={false}
           className={cls({ [styles.noBackground]: !!onMapping })}
           dataSource={file?.content || []}
           columns={columns}
@@ -66,7 +69,7 @@ const CSVPreviewLink = (props: IProps) => {
         />
         <div className={styles.operation}>
           {onMapping && (
-            <Button onClick={(e) => handleMapping(null, e)}>
+            <Button onClick={(e) => handleMapping(null, e)} className="primaryBtn studioAddBtn">
               {intl.get('import.ignore')}
             </Button>
           )}

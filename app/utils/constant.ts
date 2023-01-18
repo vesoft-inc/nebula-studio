@@ -214,3 +214,10 @@ export const MAX_COMMENT_BYTES = 256;
 export const POSITIVE_INTEGER_REGEX = /^[1-9]\d*$/g;
 
 export const DEFAULT_PARTITION_NUM = 10;
+
+export const DEFAULT_IMPORT_CONFIG = {
+  retry: 3,
+  concurrency: 10,
+  channelBufferSize: 128,
+  batchSize: 128
+};

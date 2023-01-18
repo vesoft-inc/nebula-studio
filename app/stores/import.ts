@@ -1,18 +1,13 @@
 import { makeAutoObservable, observable, runInAction } from 'mobx';
 import { v4 as uuidv4 } from 'uuid';
 import service from '@app/config/service';
-import { IBasicConfig, ITaskItem, IImportSchemaConfig, IFileMapping, IImportFile, IPropertyProps } from '@app/interfaces/import';
-import { configToJson } from '@app/utils/import';
+import { IBasicConfig, ITaskItem, IImportFile, IPropertyProps } from '@app/interfaces/import';
 import { ISchemaEnum } from '@app/interfaces/schema';
+import { configToJson } from '@app/utils/import';
 import { getRootStore } from '.';
 
 const handlePropertyMap = (item, defaultValueFields) => {
-  let type = item.Type;
-  if(item.Type.startsWith('fixed_string')) {
-    type = 'string';
-  } else if (item.Type.startsWith('int')) {
-    type = 'int';
-  }
+  const type = item.Type.startsWith('fixed_string') ? 'string' : item.Type.startsWith('int') ? 'int' : item.Type;
   return {
     name: item.Field,
     type,
@@ -22,45 +17,99 @@ const handlePropertyMap = (item, defaultValueFields) => {
   };
 };
 
-type TagConfig = IImportSchemaConfig<ISchemaEnum.Tag>;
-type EdgeConfig = IImportSchemaConfig<ISchemaEnum.Edge>;
-
-class ITagFileItemStore {
+export class TagFileItem {
   file: IImportFile;
   props = observable.array<IPropertyProps>([]);
   vidIndex?: number;
   vidFunction?: string;
   vidPrefix?: string;
 
-  constructor() {
-    makeAutoObservable(this, {});
+  constructor({ file, props }: { file?: IImportFile; props?: IPropertyProps[] }) {
+    makeAutoObservable(this);
+    file && (this.file = file);
+    props && this.props.replace(props);
   }
-  update = (payload: Partial<ITagFileItemStore>) => {
+
+  update = (payload: Partial<TagFileItem>) => {
     Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
   };
+
+  updatePropItem = (index: number, payload: Partial<IPropertyProps>) => {
+    this.props.splice(index, 1, {
+      ...this.props[index],
+      ...payload,
+    });
+  };
 }
-class IEdgeFileItemStore {
+export class EdgeFileItem {
   file: IImportFile;
   props = observable.array<IPropertyProps>([]);
-  stcIdIndex?: number;
+  srcIdIndex?: number;
   dstIdIndex?: number;
-  stcIdFunction?: string;
+  srcIdFunction?: string;
   dstIdFunction?: string;
-  stcIdPrefix?: string;
-  dstIdPrefix?: string;
 
-  constructor() {
-    makeAutoObservable(this, {});
+  constructor({ file, props }: { file?: IImportFile; props?: IPropertyProps[] }) {
+    makeAutoObservable(this);
+    file && (this.file = file);
+    props && this.props.replace(props);
   }
-  update = (payload: Partial<IEdgeFileItemStore>) => {
+  update = (payload: Partial<EdgeFileItem>) => {
     Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
   };
+
+  updatePropItem = (index: number, payload: Partial<IPropertyProps>) => {
+    this.props.splice(index, 1, {
+      ...this.props[index],
+      ...payload,
+    });
+  };
 }
+class ImportSchemaConfigItem<T extends ISchemaEnum, F = T extends ISchemaEnum.Edge ? EdgeFileItem : TagFileItem> {
+  _id = uuidv4();
+  type: T;
+  name?: string;
+  props = observable.array<IPropertyProps>([]);
+  files = observable.array<F>([]);
+
+  constructor({ name, type }: { type: T; name?: string }) {
+    makeAutoObservable(this);
+    this.type = type;
+    this.name = name;
+  }
+
+  addFileItem = (item: F) => this.files.push(item);
+
+  deleteFileItem = (fileItem: F) => this.files.remove(fileItem);
+
+  resetFileItem = (index: number, item: F) => {
+    // this.files.
+    this.files.splice(index, 1, item);
+  };
+
+  resetConfigItem = (name: string, props: IPropertyProps[]) => {
+    this.name = name;
+    this.props.replace(props);
+    this.files.replace([]);
+  };
+    
+  addProp = (item: IPropertyProps) => this.props.push(item);
+
+  deleteProp = (prop: IPropertyProps) => this.props.remove(prop);
+
+  updateProp = (prop: IPropertyProps, payload: Partial<IPropertyProps>) =>
+    Object.keys(payload).forEach((key) => (prop[key] = payload[key]));
+}
+
+export type ITagItem = ImportSchemaConfigItem<ISchemaEnum.Tag>;
+export type IEdgeItem = ImportSchemaConfigItem<ISchemaEnum.Edge>;
+export type ITagFileItem = TagFileItem;
+export type IEdgeFileItem = EdgeFileItem;
 export class ImportStore {
   taskList: ITaskItem[] = [];
-  tagConfig = observable.array<TagConfig>([]);
-  edgesConfig = observable.array<EdgeConfig>([]);
-  basicConfig: IBasicConfig = { taskName: '' };
+  tagConfig = observable.array<ITagItem>([], { deep: false });
+  edgesConfig = observable.array<IEdgeItem>([], { deep: false });
+  basicConfig: IBasicConfig = { taskName: '', address: [] };
   constructor() {
     makeAutoObservable(this, {
       taskList: observable,
@@ -101,14 +150,13 @@ export class ImportStore {
       _config = config;
     } else {
       const { currentSpace, spaceVidType } = this.rootStore.schema;
-      const { username, host } = this.rootStore.global;
+      const { username } = this.rootStore.global;
       _config = configToJson({
         ...this.basicConfig,
         space: currentSpace,
         tagConfig: this.tagConfig,
         edgesConfig: this.edgesConfig,
         username,
-        host,
         password,
         spaceVidType
       });
@@ -161,73 +209,26 @@ export class ImportStore {
     return null;
   };
 
-  addConfigItem = (type: ISchemaEnum) => {
-    const item = {
-      _id: uuidv4(),
-      name: undefined,
-      files: [],
-      props: [],
-    };
-    type === ISchemaEnum.Tag ? this.tagConfig.push({ ...item, type }) : this.edgesConfig.push({ ...item, type });
-  };
+  addTagConfig = () => this.tagConfig.unshift(new ImportSchemaConfigItem({ type: ISchemaEnum.Tag }));
+  deleteTagConfig = (item: ITagItem) => this.tagConfig.remove(item);
 
-  removeConfigItem = (data: IImportSchemaConfig) => {
-    data.type === ISchemaEnum.Tag ? this.tagConfig.remove(data) : this.edgesConfig.remove(data);
-  };
+  addEdgeConfig = () => this.edgesConfig.unshift(new ImportSchemaConfigItem({ type: ISchemaEnum.Edge }));
+  deleteEdgeConfig = (item: IEdgeItem) => this.edgesConfig.remove(item);
 
-  updateConfigItemTarget = async (payload: {
-    data: IImportSchemaConfig;
-    value: string;
-  }) => {
-    const { data, value } = payload;
-    const props = data.type === ISchemaEnum.Tag ? await this.getTagProps(value) : await this.getEdgeProps(value);
+  updateConfigItemName = async (item: ITagItem | IEdgeItem, name: string) => {
+    const props = item.type === ISchemaEnum.Tag ? await this.getTagProps(name) : await this.getEdgeProps(name);
     runInAction(() => {
-      data.name = value;
-      data.props = props;
-      data.files = [];
+      item.resetConfigItem(name, props);
     });
   };
 
-  addFileSource = (item: IImportSchemaConfig) => {
-    item.files = [...item.files, {
-      file: undefined,
-      props: item.props,
-    }];
-  };
-
-  removeFileSource = (data: IImportSchemaConfig, item: IFileMapping) => {
-    data.files = data.files.filter(i => i !== item);
-  };
-
-  updateFileSource = (data: IFileMapping, file: IImportFile) => {
-    const initialProps = data.props.map(item => ({
-      ...item,
-      mapping: undefined,
-    }));
-    Object.keys(data).forEach((key) => {
-      if (key === 'file') {
-        data[key] = file;
-      } else if (key === 'props') {
-        data[key] = initialProps;
-      } else {
-        delete data[key];
-      }
-    });
-  };
-
-  updateFileConfig = (data, key, value) => {
-    data[key] = value;
-  };
-  updateFilePropMapping = (data, index, value) => {
-    data.props = data.props.map((item, i) => i !== index ? item : {
-      ...item,
-      mapping: value,
-    });
-  };
   updateBasicConfig = (key: string, value: any) => {
-    this.basicConfig[key] = value;
+    if(!value && value !== 0) {
+      delete this.basicConfig[key];
+    } else {
+      this.basicConfig[key] = value;
+    }
   };
-
 
   getTagProps = async (tag: string) => {
     const { schema } = this.rootStore;
@@ -255,7 +256,7 @@ export class ImportStore {
   
   getEdgeProps = async (edgeType: string) => {
     const { schema } = this.rootStore;
-    const { getTagOrEdgeInfo, getTagOrEdgeDetail, spaceVidType } = schema;
+    const { getTagOrEdgeInfo, getTagOrEdgeDetail } = schema;
     const { code, data } = await getTagOrEdgeInfo(ISchemaEnum.Edge, edgeType);
     const createEdgeGQL = await getTagOrEdgeDetail(ISchemaEnum.Edge, edgeType);
     const defaultValueFields: any[] = [];
@@ -275,23 +276,13 @@ export class ImportStore {
     return code !== 0 
       ? []
       : [
-        // each edge must have the three special prop srcId, dstId, rank，put them ahead
-        {
-          name: 'srcId',
-          type: spaceVidType === 'INT64' ? 'int' : 'string',
-          mapping: null,
-        },
-        {
-          name: 'dstId',
-          type: spaceVidType === 'INT64' ? 'int' : 'string',
-          mapping: null,
-        },
+        ...data.tables.map(item => handlePropertyMap(item, defaultValueFields)),
         {
           name: 'rank',
           type: 'int',
+          allowNull: true,
           mapping: null,
         },
-        ...data.tables.map(item => handlePropertyMap(item, defaultValueFields)),
       ];
   };
 }
