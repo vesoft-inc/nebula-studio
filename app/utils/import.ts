@@ -2,28 +2,25 @@ import { message } from 'antd';
 import { getI18n } from '@vesoft-inc/i18n';
 import { IBasicConfig } from '@app/interfaces/import';
 import { IEdgeItem, ITagItem } from '@app/stores/import';
-import { handleEscape } from './function';
+import { handleEscape, isEmpty } from './function';
 import { DEFAULT_IMPORT_CONFIG } from './constant';
 
 interface IConfig extends IBasicConfig {
   space: string;
   tagConfig: ITagItem[];
-  edgesConfig: IEdgeItem[];
+  edgeConfig: IEdgeItem[];
   username: string;
   password: string;
   spaceVidType: string;
 }
 
-const isEmpty = (value: any) => {
-  return !value && value !== 0;
-};
 export function configToJson(payload: IConfig) {
   const {
     space,
     username,
     password,
     tagConfig,
-    edgesConfig,
+    edgeConfig,
     spaceVidType,
     batchSize,
     address,
@@ -37,7 +34,7 @@ export function configToJson(payload: IConfig) {
     batchSize
   );
   const edgeToJSON = edgeDataToJSON(
-    edgesConfig,
+    edgeConfig,
     spaceVidType,
     batchSize
   );

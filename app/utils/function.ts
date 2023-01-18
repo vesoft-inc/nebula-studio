@@ -55,6 +55,10 @@ export const getByteLength = (str: string) => {
 };
 
 export const isValidIP = (ip: string) => {
-  const reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+  const reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){3}$/;
   return reg.test(ip);
 }; 
+
+export const isEmpty = (value: any) => {
+  return !value && value !== 0;
+};

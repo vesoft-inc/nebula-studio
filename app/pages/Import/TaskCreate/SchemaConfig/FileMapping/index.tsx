@@ -40,10 +40,7 @@ const VIDSetting = observer((props: {
         <div>
           <span className={cls(styles.label, styles.required)}>{intl.get(`import.${label}`)}</span>
           <CSVPreviewLink
-            onMapping={(index, e) => {
-              e.stopPropagation();
-              data.update({ [idKey]: index });
-            }}
+            onMapping={(index) => data.update({ [idKey]: index })}
             file={data.file}
           >
             {!data[idKey] && data[idKey] !== 0 ? intl.get('import.selectCsvColumn') : `Column ${data[idKey]}`}
