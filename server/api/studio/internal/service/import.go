@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -67,19 +66,14 @@ func NewImportService(ctx context.Context, svcCtx *svc.ServiceContext) ImportSer
 
 func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*types.CreateImportTaskData, error) {
 	jsons, err := json.Marshal(req.Config)
-	log.Println("json", jsons)
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrParam, err)
 	}
-	log.Println("111111111111")
 	conf := importconfig.YAMLConfig{}
-	log.Println("22222222")
 	err = json.Unmarshal(jsons, &conf)
-	log.Println("3333333333333", err)
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
-	log.Println("444444444")
 	if err = validClientParams(&conf); err != nil {
 		err = importererrors.Wrap(importererrors.InvalidConfigPathOrFormat, err)
 		zap.L().Warn("client params is wrong", zap.Error(err))

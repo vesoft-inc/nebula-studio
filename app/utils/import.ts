@@ -1,5 +1,3 @@
-import { message } from 'antd';
-import { getI18n } from '@vesoft-inc/i18n';
 import { IBasicConfig } from '@app/interfaces/import';
 import { IEdgeItem, ITagItem } from '@app/stores/import';
 import { handleEscape, isEmpty } from './function';
@@ -77,7 +75,7 @@ export function edgeDataToJSON(
         acc.push({
           name: handleEscape(cur.name),
           type: cur.type,
-          index: indexJudge(cur.mapping, cur.name),
+          index: cur.mapping,
         });
         return acc;
       }, []);
@@ -133,7 +131,7 @@ export function tagDataToJSON(
         acc.push({
           name: handleEscape(cur.name),
           type: cur.type,
-          index: indexJudge(cur.mapping, cur.name),
+          index: cur.mapping,
         });
         return acc;
       }, []);
@@ -155,7 +153,7 @@ export function tagDataToJSON(
           type: 'vertex',
           vertex: {
             vid: {
-              index: indexJudge(vidIndex, 'vertexId'),
+              index: vidIndex,
               function: vidFunction,
               type: spaceVidType === 'INT64' ? 'int' : 'string',
               prefix: vidPrefix,
@@ -169,15 +167,6 @@ export function tagDataToJSON(
     return acc;
   }, []);
   return result;
-}
-
-export function indexJudge(index: number | null, name: string) {
-  if (isEmpty(index)) {
-    const { intl } = getI18n();
-    message.error(`${name} ${intl.get('import.indexNotEmpty')}`);
-    throw new Error();
-  }
-  return index;
 }
 
 export const exampleJson = {
