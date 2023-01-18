@@ -28,9 +28,9 @@ const SelectMappingTargetHeader = observer((props: IHeaderProps) => {
   const { value, type, onSelect } = props;
   const { dataImport, schema } = useStore();
   const { tags, edgeTypes } = schema;
-  const { tagConfig, edgesConfig } = dataImport;
+  const { tagConfig, edgeConfig } = dataImport;
   const { intl } = useI18n();
-  const config = type === ISchemaEnum.Tag ? tagConfig : edgesConfig;
+  const config = type === ISchemaEnum.Tag ? tagConfig : edgeConfig;
   const targetList = type === ISchemaEnum.Tag ? tags : edgeTypes;
   return <div className={styles.panelTitle}>
     <span className={cls(styles.label, styles.required)}>{intl.get(`common.${type}`)}</span>

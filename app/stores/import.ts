@@ -4,6 +4,7 @@ import service from '@app/config/service';
 import { IBasicConfig, ITaskItem, IImportFile, IPropertyProps } from '@app/interfaces/import';
 import { ISchemaEnum } from '@app/interfaces/schema';
 import { configToJson } from '@app/utils/import';
+import { isEmpty } from '@app/utils/function';
 import { getRootStore } from '.';
 
 const handlePropertyMap = (item, defaultValueFields) => {
@@ -108,7 +109,7 @@ export type IEdgeFileItem = EdgeFileItem;
 export class ImportStore {
   taskList: ITaskItem[] = [];
   tagConfig = observable.array<ITagItem>([], { deep: false });
-  edgesConfig = observable.array<IEdgeItem>([], { deep: false });
+  edgeConfig = observable.array<IEdgeItem>([], { deep: false });
   basicConfig: IBasicConfig = { taskName: '', address: [] };
   constructor() {
     makeAutoObservable(this, {
@@ -155,7 +156,7 @@ export class ImportStore {
         ...this.basicConfig,
         space: currentSpace,
         tagConfig: this.tagConfig,
-        edgesConfig: this.edgesConfig,
+        edgeConfig: this.edgeConfig,
         username,
         password,
         spaceVidType
@@ -212,8 +213,8 @@ export class ImportStore {
   addTagConfig = () => this.tagConfig.unshift(new ImportSchemaConfigItem({ type: ISchemaEnum.Tag }));
   deleteTagConfig = (item: ITagItem) => this.tagConfig.remove(item);
 
-  addEdgeConfig = () => this.edgesConfig.unshift(new ImportSchemaConfigItem({ type: ISchemaEnum.Edge }));
-  deleteEdgeConfig = (item: IEdgeItem) => this.edgesConfig.remove(item);
+  addEdgeConfig = () => this.edgeConfig.unshift(new ImportSchemaConfigItem({ type: ISchemaEnum.Edge }));
+  deleteEdgeConfig = (item: IEdgeItem) => this.edgeConfig.remove(item);
 
   updateConfigItemName = async (item: ITagItem | IEdgeItem, name: string) => {
     const props = item.type === ISchemaEnum.Tag ? await this.getTagProps(name) : await this.getEdgeProps(name);
@@ -222,12 +223,14 @@ export class ImportStore {
     });
   };
 
-  updateBasicConfig = (key: string, value: any) => {
-    if(!value && value !== 0) {
-      delete this.basicConfig[key];
-    } else {
-      this.basicConfig[key] = value;
-    }
+  updateBasicConfig = <T extends keyof IBasicConfig>(payload: { [K in T]?: Person[K] }) => {
+    Object.keys(payload).forEach(key => {
+      if(isEmpty(payload[key])) {
+        delete this.basicConfig[key];
+      } else {
+        this.basicConfig[key] = payload[key];
+      }
+    });
   };
 
   getTagProps = async (tag: string) => {

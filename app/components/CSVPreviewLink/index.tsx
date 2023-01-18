@@ -9,7 +9,7 @@ import styles from './index.module.less';
 interface IProps {
   file: any;
   children: any;
-  onMapping?: (index: number, e: React.MouseEvent) => void;
+  onMapping?: (index: number) => void;
   btnType?: string
   selected?: boolean
 }
@@ -23,7 +23,8 @@ const CSVPreviewLink = (props: IProps) => {
     setVisible(true);
   };
   const handleMapping = (index: number, e: React.MouseEvent) => {
-    onMapping && onMapping(index, e);
+    e.stopPropagation();
+    onMapping?.(index);
     setVisible(false);
   };
   const columns = file?.content?.length

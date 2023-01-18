@@ -11,6 +11,7 @@ import { useI18n } from '@vesoft-inc/i18n';
 import { ISchemaEnum, ISchemaType } from '@app/interfaces/schema';
 import Icon from '@app/components/Icon';
 import Instruction from '@app/components/Instruction';
+import { isEmpty } from '@app/utils/function';
 import styles from './index.module.less';
 import ConfigConfirmModal from './ConfigConfirmModal';
 import SchemaConfig from './SchemaConfig';
@@ -37,14 +38,10 @@ const AddMappingBtn = (props: { type: ISchemaType }) => {
   </Button>;
 };
 
-const isEmpty = (value) => {
-  return !value && value !== 0;
-};
-
 const TaskCreate = (props: IProps) => {
   const { dataImport, schema, files, global } = useStore();
   const { intl, currentLocale } = useI18n();
-  const { basicConfig, tagConfig, edgesConfig, updateBasicConfig, importTask } = dataImport;
+  const { basicConfig, tagConfig, edgeConfig, updateBasicConfig, importTask } = dataImport;
   const { spaces, getSpaces, updateSpaceInfo, currentSpace } = schema;
   const { getGraphAddress, _host } = global;
   const { getFiles } = files;
@@ -99,7 +96,7 @@ const TaskCreate = (props: IProps) => {
   };
 
   const check = () => {
-    [...tagConfig, ...edgesConfig].forEach(config => {
+    [...tagConfig, ...edgeConfig].forEach(config => {
       const { type, name, files } = config;
       const _type = type === ISchemaEnum.Tag ? 'tag' : 'edge';
       if(!name) {
@@ -147,7 +144,7 @@ const TaskCreate = (props: IProps) => {
   const clearConfig = useCallback((type?: string) => {
     const params = {
       tagConfig: [],
-      edgesConfig: []
+      edgeConfig: []
     } as any;
     if(type === 'all') {
       params.basicConfig = { taskName: '', address: address.map(i => i.value) };
@@ -160,9 +157,9 @@ const TaskCreate = (props: IProps) => {
   }, []);
 
   const initTaskDir = useCallback(async () => {
-    updateBasicConfig('taskName', `task-${Date.now()}`);
+    updateBasicConfig({ 'taskName': `task-${Date.now()}` });
     const graphs = await getGraphAddress();
-    updateBasicConfig('address', graphs);
+    updateBasicConfig({ 'address': graphs });
     setAddress(graphs.map(item => ({
       label: <>
         {item}
@@ -241,7 +238,7 @@ const TaskCreate = (props: IProps) => {
             </Col>
             <Col span={12}>
               <Form.Item label={intl.get('import.taskName')} required={true}>
-                <Input value={basicConfig.taskName} onChange={e => updateBasicConfig('taskName', e.target.value)} />
+                <Input value={basicConfig.taskName} onChange={e => updateBasicConfig({ 'taskName': e.target.value })} />
               </Form.Item>
             </Col>
           </Row>
@@ -259,7 +256,7 @@ const TaskCreate = (props: IProps) => {
                       className={styles.addressCheckbox}
                       options={address}
                       value={basicConfig.address}
-                      onChange={value => updateBasicConfig('address', value)}
+                      onChange={value => updateBasicConfig({ 'address': value })}
                     />
                   </Form.Item>
                 </Col>
@@ -303,7 +300,7 @@ const TaskCreate = (props: IProps) => {
             <Form.Item label={intl.get('import.edge')} required={true}>
               <div className={styles.container}>
                 <AddMappingBtn type={ISchemaEnum.Edge} />
-                {edgesConfig.map((item) => <SchemaConfig key={item._id} configItem={item} />)}
+                {edgeConfig.map((item) => <SchemaConfig key={item._id} configItem={item} />)}
               </div>
             </Form.Item>
           </Form>
@@ -313,7 +310,7 @@ const TaskCreate = (props: IProps) => {
         <Button onClick={() => history.push('/import/tasks')}>{intl.get('common.cancel')}</Button>
         <Button type="primary" disabled={
           basicConfig.taskName === ''
-          || (!tagConfig.length && !edgesConfig.length)
+          || (!tagConfig.length && !edgeConfig.length)
         } onClick={checkConfig} loading={!needPwdConfirm && loading}>{intl.get('import.runImport')}</Button>
       </div>
       {modalVisible && <ConfigConfirmModal 

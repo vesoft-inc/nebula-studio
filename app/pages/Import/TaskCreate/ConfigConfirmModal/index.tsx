@@ -12,7 +12,7 @@ interface IProps {
   needPwdConfirm?: boolean;
 }
 const ConfigConfirmModal = (props: IProps) => {
-  const { dataImport: { tagConfig, edgesConfig } } = useStore();
+  const { dataImport: { tagConfig, edgeConfig } } = useStore();
   const [password, setPassword] = useState('');
   const { visible, onConfirm, onCancel } = props;
   const { intl } = useI18n();
@@ -35,7 +35,7 @@ const ConfigConfirmModal = (props: IProps) => {
       <span className={styles.title}>{intl.get('import.configDisplay')}</span>
       <div className={styles.content}>
         {tagConfig.map((config) => config.files.map((item, index) => <div key={index}>- {intl.get('import.loadToTag', { file: item.file?.name, name: config.name })}</div>))}
-        {edgesConfig.map((config) => config.files.map((item, index) => <div key={index}>- {intl.get('import.loadToEdge', { file: item.file?.name, name: config.name })}</div>))}
+        {edgeConfig.map((config) => config.files.map((item, index) => <div key={index}>- {intl.get('import.loadToEdge', { file: item.file?.name, name: config.name })}</div>))}
       </div>
       <span className={styles.title}>{intl.get('import.enterPassword')}</span>
       <span className={styles.label}>{intl.get('configServer.password')}</span>
