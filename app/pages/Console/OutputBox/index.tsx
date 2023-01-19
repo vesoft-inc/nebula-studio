@@ -19,7 +19,7 @@ import styles from './index.module.less';
 interface IProps {
   index: number;
   result: HistoryResult;
-  onHistoryItem: (gql: string) => void;
+  onHistoryItem: (gql: string, space?: string) => void;
   onExplorer?: (params: {
     space: string;
     vertexes: any[], 
@@ -280,7 +280,7 @@ const OutputBox = (props: IProps) => {
   ].filter(Boolean);
   return <div className={styles.outputBox}>
     <div className={styles.outputHeader}>
-      <p className={cls(styles.gql, { [styles.errorInfo]: !resultSuccess })} onClick={() => onHistoryItem(gql)}>
+      <p className={cls(styles.gql, { [styles.errorInfo]: !resultSuccess })} onClick={() => onHistoryItem(gql, space)}>
         <span className={styles.gqlValue}>{space ? `[${space}]>` : '$'} {gql}</span>
       </p>
       <div className={styles.outputOperations}>
