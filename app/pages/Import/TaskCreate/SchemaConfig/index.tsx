@@ -36,7 +36,7 @@ const SelectMappingTargetHeader = observer((props: IHeaderProps) => {
     <span className={cls(styles.label, styles.required)}>{intl.get(`common.${type}`)}</span>
     <Select
       bordered={false}
-      className={cls(styles.configTargetSelect, { [styles.noValue]: !value })}
+      className={cls(styles.configTargetSelect, { [styles.noValue]: !value, [styles.edgeLabel]: type === ISchemaEnum.Edge })}
       placeholder={intl.get(type === ISchemaEnum.Tag ? 'import.selectTag' : 'import.selectEdge')}
       value={value}
       dropdownMatchSelectWidth={false}

@@ -31,7 +31,7 @@
         width: 100%;
         white-space: nowrap;
         display: inline-block;
-        padding: 0 20px;
+        padding: 0 36px;
         background: @blue;
         border-radius: 30px;
         color: #FFFFFF;
@@ -45,6 +45,26 @@
     
     &.noValue :global(.ant-select-arrow svg) {
       color: @blue;
+    }
+    &.edgeLabel :global(.ant-select-selection-item) {
+      &::before, &::after {
+        content: '';
+        display: inline-block;
+        width: 12px;
+        height: 4px;
+        background: #FFFFFF;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      &::before {
+        left: 15px;
+      }
+      &::after {
+        right: 15px;
+        // Overridden by antd by default
+        visibility: visible;
+      }
     }
   }
   .btns {
