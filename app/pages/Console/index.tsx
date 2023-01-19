@@ -72,7 +72,13 @@ const Console = (props: IProps) => {
     }
   };
 
-  const updateGql = (value: string) => update({ currentGQL: value });
+  const updateGql = (value: string, space?: string) => {
+    update({ currentGQL: value, currentSpace: space || currentSpace });
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
   const handleSaveQuery = (query: string) => {
     if (query !== '') {
@@ -179,7 +185,7 @@ const Console = (props: IProps) => {
               result={item}
               templateRender={templateRender}
               onExplorer={onExplorer ? handleExplorer : undefined}
-              onHistoryItem={gql => updateGql(gql)}
+              onHistoryItem={(gql, space) => updateGql(gql, space)}
               onResultConfig={handleResultConfig}
             />
           )) : <OutputBox
