@@ -1,21 +1,26 @@
-import { Button, Checkbox, Popconfirm, Table, Upload } from 'antd';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '@app/stores';
+import { trackPageView } from '@app/utils/stat';
+import { debounce } from 'lodash';
+import { Button, Checkbox, Popconfirm, Table, Upload, message } from 'antd';
 import Icon from '@app/components/Icon';
 import CSVPreviewLink from '@app/components/CSVPreviewLink';
 import { getFileSize } from '@app/utils/file';
 import cls from 'classnames';
 import { StudioFile } from '@app/interfaces/import';
 import { useI18n } from '@vesoft-inc/i18n';
+import UploadConfigModal from './UploadConfigModal';
+
 import styles from './index.module.less';
-interface IProps {
-  fileList: any[];
-  onDelete: (index: number) => void;
-  onUpload: (file: StudioFile, fileList: StudioFile[]) => void;
-  loading: boolean;
-}
-const FileList = (props: IProps) => {
-  const { onDelete, fileList, onUpload, loading } = props;
+
+const FileList = () => {
+  const { files, global } = useStore();
   const { intl } = useI18n();
+  const { fileList, deleteFile, getFiles, uploadFile } = files;
+  const [loading, setLoading] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [previewList, setPreviewList] = useState<StudioFile[]>([]);
   const columns = [
     {
       title: intl.get('import.fileName'),
@@ -25,6 +30,11 @@ const FileList = (props: IProps) => {
     {
       title: intl.get('import.withHeader'),
       key: 'withHeader',
+      render: () => <Checkbox disabled={true} />,
+    },
+    {
+      title: intl.get('import.delimiter'),
+      key: 'delimiter',
       render: () => <Checkbox disabled={true} />,
     },
     {
@@ -46,7 +56,7 @@ const FileList = (props: IProps) => {
               <Icon type="icon-studio-btn-detail" />
             </CSVPreviewLink>
             <Popconfirm
-              onConfirm={() => onDelete(index)}
+              onConfirm={() => handleDelete(index)}
               title={intl.get('common.ask')}
               okText={intl.get('common.ok')}
               cancelText={intl.get('common.cancel')}
@@ -60,6 +70,45 @@ const FileList = (props: IProps) => {
       },
     },
   ];
+  const transformFile = async (_file: StudioFile, fileList: StudioFile[]) => {
+    const size = fileList.reduce((acc, cur) => acc + cur.size, 0);
+    if(global.gConfig?.maxBytes && size > global.gConfig.maxBytes) {
+      // message.error(intl.get('import.fileSizeLimit', { size: getFileSize(global.gConfig.maxBytes) }));
+      // return false;
+    }
+    fileList.forEach(file => {
+      file.path = `${file.name}`;
+      file.withHeader = false;
+      file.delimiter = ',';
+    });
+    setPreviewList(fileList);
+    setVisible(true);
+    return false;
+  };
+
+  const handleUpdate = (fileList: StudioFile[]) => {
+    uploadFile(fileList).then(res => {
+      if(res.code === 0) {
+        message.success(intl.get('import.uploadSuccessfully'));
+        getFileList();
+      } 
+    });
+  };
+
+  const handleDelete = (index: number) => {
+    const file = fileList[index].name;
+    deleteFile(file);
+  };
+
+  const getFileList = async () => {
+    !loading && setLoading(true);
+    await getFiles();
+    setLoading(false);
+  };
+  useEffect(() => {
+    getFileList();
+    trackPageView('/import/files');
+  }, []);
   return (
     <div className={styles.fileUpload}>
       <Upload
@@ -68,7 +117,7 @@ const FileList = (props: IProps) => {
         showUploadList={false}
         fileList={fileList}
         customRequest={() => {}}
-        beforeUpload={onUpload}
+        beforeUpload={debounce(transformFile)}
       >
         <Button className={cls('studioAddBtn', styles.uploadBtn)} type="primary">
           <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('import.uploadFile')}
@@ -85,8 +134,9 @@ const FileList = (props: IProps) => {
           pagination={false}
         />
       </div>
+      <UploadConfigModal visible={visible} fileList={previewList} onConfirm={handleUpdate} onCancel={() => setVisible(false)} />
     </div>
   );
 };
 
-export default FileList;
+export default observer(FileList);

@@ -63,5 +63,7 @@ export interface ILogDimension {
 
 export interface StudioFile extends RcFile {
   path?: string;
-  withHeader?: boolean
+  withHeader?: boolean;
+  delimiter?: string;
+  content?: any[]
 }

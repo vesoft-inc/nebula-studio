@@ -59,7 +59,8 @@
     "danglingEdge": "Dangling edge",
     "columnName": "Column name",
     "src": "Source",
-    "dst": "Destination"
+    "dst": "Destination",
+    "value": "Value"
   },
   "doc": {
     "welcome": "Welcome to",
@@ -232,7 +233,13 @@
     "configDisplay": "These data files will be loaded",
     "loadToTag": "Load {file} to tag {name}",
     "loadToEdge": "Load {file} to edge type {name}",
-    "importConfirm": "Import task confirm"
+    "importConfirm": "Import task confirm",
+    "delimiter": "Delimiter",
+    "previewFiles": "Preview file list",
+    "sampleData": "Sample data",
+    "hasHeader": "Has header",
+    "enterDelimiter": "Enter delimiter",
+    "applicateToAll": "Apply to all files"
   },
   "schema": {
     "spaceList": "Graph Space List",

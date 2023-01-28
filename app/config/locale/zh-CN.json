@@ -59,7 +59,8 @@
     "danglingEdge": "悬挂边",
     "columnName": "列名",
     "src": "起点",
-    "dst": "终点"
+    "dst": "终点",
+    "value": "值"
   },
   "doc": {
     "welcome": "欢迎使用",
@@ -232,7 +233,13 @@
     "configDisplay": "配置展示",
     "loadToTag": "导入文件 {file} 到标签 {name}",
     "loadToEdge": "导入文件 {file} 到边类型 {name}",
-    "importConfirm": "导入任务确认"
+    "importConfirm": "导入任务确认",
+    "delimiter": "分隔符",
+    "previewFiles": "上传文件预览",
+    "sampleData": "示例数据",
+    "hasHeader": "携带表头",
+    "enterDelimiter": "请输入分隔符",
+    "applicateToAll": "应用到所有文件"
   },
   "schema": {
     "spaceList": "图空间列表",

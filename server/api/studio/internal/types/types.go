@@ -40,6 +40,7 @@ type FileDestroyRequest struct {
 type FileStat struct {
 	Content    [][]string `json:"content"`
 	WithHeader bool       `json:"withHeader"`
+	Delimiter  string     `json:"delimiter"`
 	DataType   string     `json:"dataType"`
 	Name       string     `json:"name"`
 	Size       int64      `json:"size"`

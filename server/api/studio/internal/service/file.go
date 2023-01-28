@@ -97,7 +97,7 @@ func (f *fileService) FilesIndex() (data *types.FilesIndexData, err error) {
 		reader := csv.NewReader(file)
 		count := 0
 		content := make([][]string, 0)
-		for count < 3 {
+		for count < 5 {
 			line, err := reader.Read()
 			count++
 			if err != nil {
@@ -106,11 +106,10 @@ func (f *fileService) FilesIndex() (data *types.FilesIndexData, err error) {
 			content = append(content, line)
 		}
 		data.List = append(data.List, types.FileStat{
-			Content:    content,
-			DataType:   "all",
-			WithHeader: false,
-			Name:       fileInfo.Name(),
-			Size:       fileInfo.Size(),
+			Content:  content,
+			DataType: "all",
+			Name:     fileInfo.Name(),
+			Size:     fileInfo.Size(),
 		})
 	}
 	return data, nil
