@@ -2,7 +2,7 @@ syntax = "v1"
 
 type (
 	FileDestroyRequest {
-		Ids []string `json:"ids"`
+		Names []string `json:"names"`
 	}
 
 	FileStat {

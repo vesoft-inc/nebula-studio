@@ -56,7 +56,7 @@ const FileList = () => {
               <Icon type="icon-studio-btn-detail" />
             </CSVPreviewLink>
             <Popconfirm
-              onConfirm={() => deleteFile([file.id])}
+              onConfirm={() => deleteFile([file.name])}
               title={intl.get('common.ask')}
               okText={intl.get('common.ok')}
               cancelText={intl.get('common.cancel')}
@@ -140,7 +140,7 @@ const FileList = () => {
             onChange: (selectedRowKeys) => setSelectFiles(selectedRowKeys as string[]),
           }}
           columns={columns}
-          rowKey="id"
+          rowKey="name"
           pagination={false}
         />
       </div>

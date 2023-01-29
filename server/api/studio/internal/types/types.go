@@ -34,7 +34,7 @@ type ExecSeqNGQLResult struct {
 }
 
 type FileDestroyRequest struct {
-	Ids []string `json:"ids"`
+	Names []string `json:"names"`
 }
 
 type FileStat struct {

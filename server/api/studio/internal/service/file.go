@@ -72,25 +72,28 @@ func NewFileService(ctx context.Context, svcCtx *svc.ServiceContext) FileService
 
 func (f *fileService) FileDestroy(request types.FileDestroyRequest) error {
 	dir := f.svcCtx.Config.File.UploadDir
-	for _, id := range request.Ids {
-		var file db.File
-		result := db.CtxDB.Where("id = ?", id).First(&file)
-		if result.Error != nil {
-			return f.gormErrorWrapper(result.Error)
-		}
-		target := filepath.Join(dir, file.Name)
+	for _, name := range request.Names {
+		target := filepath.Join(dir, name)
 		if _, err := os.Stat(target); err != nil {
 			logx.Infof("del file error %v", err)
 			return ecode.WithInternalServer(err)
-		}
-		result = db.CtxDB.Delete(&db.File{}, id)
-		if result.Error != nil {
-			return f.gormErrorWrapper(result.Error)
 		}
 		//	if target is directory, it is not empty
 		if err := os.Remove(target); err != nil {
 			logx.Infof("del file error %v", err)
 			return ecode.WithInternalServer(err)
+		}
+		// delete db record
+		var file db.File
+		result := db.CtxDB.Where("name = ?", name).First(&file)
+		if result.Error == gorm.ErrRecordNotFound {
+			continue
+		} else if result.Error != nil {
+			return f.gormErrorWrapper(result.Error)
+		}
+		result = db.CtxDB.Delete(&file)
+		if result.Error != nil {
+			return f.gormErrorWrapper(result.Error)
 		}
 	}
 	return nil
@@ -114,7 +117,9 @@ func (f *fileService) FilesIndex() (data *types.FilesIndexData, err error) {
 		var fileConfig db.File
 		result := db.CtxDB.Where("name = ?", fileInfo.Name()).First(&fileConfig)
 		if result.Error != nil {
-			return nil, f.gormErrorWrapper(result.Error)
+			logx.Errorf("get file config record in db error %v", result.Error)
+			fileConfig.Delimiter = ","
+			fileConfig.WithHeader = false
 		}
 		path := filepath.Join(dir, fileInfo.Name())
 		file, err := os.Open(path)
@@ -135,7 +140,6 @@ func (f *fileService) FilesIndex() (data *types.FilesIndexData, err error) {
 			content = append(content, line)
 		}
 		data.List = append(data.List, types.FileStat{
-			Id:         fileConfig.ID,
 			Content:    content,
 			Name:       fileInfo.Name(),
 			Size:       fileInfo.Size(),

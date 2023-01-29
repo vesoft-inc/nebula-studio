@@ -55,14 +55,14 @@ export class FilesStore {
     return res;
   };
 
-  deleteFile = async (ids: string[]) => {
+  deleteFile = async (names: string[]) => {
     const res: any = await service.deteleFile({
-      ids
+      names
     });
     if (res.code === 0) {
       message.success(intl.get('common.deleteSuccess'));
       runInAction(() => {
-        this.fileList = this.fileList.filter((item) => !ids.includes(item.id));
+        this.fileList = this.fileList.filter((item) => !names.includes(item.name));
       });
     }
   };
