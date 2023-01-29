@@ -12,58 +12,143 @@
     color: @darkBlue;
   }
 
-  .configItem {
-    .idRow {
-      padding: 10px 15px;
-      background: #FFFFFF;
-      border: 1px solid @gray;
-      box-sizing: border-box;
-      border-radius: 3px;
-      margin-bottom: 10px;
-    }
-    .btns {
-      text-align: center;
-    }
+  .panelTitle {
+    display: flex;
+    align-items: center;
   }
-  .configContainer {
-    padding: 10px 15px;
-    margin-bottom: 15px;
-    background: #FFFFFF;
-    border: 1px solid @gray;
-    box-sizing: border-box;
-    border-radius: 3px;
-    .tagSelectRow {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      .left {
-        display: flex;
-        align-items: center;
-        max-width: 95%;
-        .tagSelect {
-          min-width: 60px;
-          :global {
-            .ant-select-selection-item {
-              font-family: Roboto-Bold, sans-serif;
-            }
-            .ant-select-selection-placeholder {
-              color: @blue;
-            }
-          }
-          
-          &.noValue :global(.ant-select-arrow svg) {
-            color: @blue;
-          }
-        }
+  
+  .configTargetSelect {
+    min-width: 60px;
+    width: fit-content;
+    max-width: 60%;
+    :global {
+      .ant-select-selector {
+        padding-right: 20px;
+      }
+      .ant-select-selection-item, .ant-select-selection-placeholder {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+        white-space: nowrap;
+        display: inline-block;
+        padding: 0 36px;
+        background: @blue;
+        border-radius: 30px;
+        color: #FFFFFF;
+        font-family: Roboto-Bold, sans-serif;
+      }
+      .ant-select-arrow {
+        right: 0;
+        color: @blue;
       }
     }
-  
+    
+    &.noValue :global(.ant-select-arrow svg) {
+      color: @blue;
+    }
+    &.edgeLabel :global(.ant-select-selection-item) {
+      &::before, &::after {
+        content: '';
+        display: inline-block;
+        width: 12px;
+        height: 4px;
+        background: #FFFFFF;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      &::before {
+        left: 15px;
+      }
+      &::after {
+        right: 15px;
+        // Overridden by antd by default
+        visibility: visible;
+      }
+    }
+  }
+  .btns {
+    text-align: center;
   }
   .btnClose {
     cursor: pointer;
   }
 }
-.label::after {
+
+.label {
+  white-space: nowrap;
+  font-family: 'Roboto-Medium', sans-serif;
+  color: @darkBlue;
+}
+.title::after, .label::after {
   content: ':';
   padding-right: 5px;
 }
+.required::before {
+  content: '*';
+  padding-right: 3px;
+  color: @red;
+}
+.selectItems {
+  max-width: 400px;
+}
+
+.fileMappingContainer {
+  padding: 15px;
+  background: #FFFFFF;
+  border: 1px solid @gray;
+  border-radius: 3px;
+  margin-bottom: 15px;
+  .row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid @gray;
+  }
+  .operation {
+    max-width: 100%;
+  }
+  .fileSelect {
+    :global {
+      .ant-select-selection-placeholder, .anticon, .ant-select-selection-item {
+        color: @blue;
+      }
+    }
+  }
+  .vidCollapse {
+    width: 100%;
+    
+    .rowItem {
+      width: 45%;
+      display: inline-block;
+    }
+    .functionSelect {
+      width: 60%;
+      background: @lightBlue;
+      color: @darkGray;
+    }
+    .prefixInput {
+      width: 60%;
+      background: @lightBlue;
+      color: @darkGray;
+      :global(.anticon) {
+        color: @darkBlue;
+      }
+    }
+  }
+  .propsMappingTable {
+    :global(.ant-table-row) {
+      background-color: @lightBlue;
+    }
+  }
+  .spaceBetween {
+    display: flex;
+    justify-content: space-between;
+  }
+  :global(.ant-select) {
+    width: fit-content;
+    min-width: 100px;
+    max-width: 80%;
+  }
+}
+

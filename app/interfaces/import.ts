@@ -31,22 +31,28 @@ export interface ITaskItem {
   stats: ITaskStats;
 }
 
-export interface IVerticesConfig {
+export interface IPropertyProps {
   name: string;
-  file: any;
-  tags: any[];
-  idMapping: any;
-}
-export interface IEdgeConfig {
-  name: string;
-  file: any;
-  props: any[];
   type: string;
+  isDefault: boolean;
+  allowNull: boolean;
+  mapping?: number
+}
+
+export interface IImportFile {
+  name: string;
+  content: string[];
+  withHeader?: boolean;
+  delimiter?: string;
 }
 
 export interface IBasicConfig {
   taskName: string;
+  address: string[];
   batchSize?: string;
+  concurrency?: string;
+  retry?: string;
+  channelBufferSize?: string;
 }
 
 export interface ILogDimension {

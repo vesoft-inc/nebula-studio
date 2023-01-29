@@ -16,7 +16,7 @@ const FormItem = Form.Item;
 
 const FileSelect = (props: IProps) => {
   const { type } = props;
-  const { files, dataImport: { update, verticesConfig, edgesConfig } } = useStore();
+  const { files, dataImport: { update, verticesConfig, edgeConfig } } = useStore();
   const { fileList, getFiles } = files;
   const [visible, setVisible] = useState(false);
   const { intl } = useI18n();
@@ -33,7 +33,7 @@ const FileSelect = (props: IProps) => {
       });
     } else {
       update({
-        edgesConfig: [...edgesConfig, {
+        edgeConfig: [...edgeConfig, {
           name: uuidv4(),
           file,
           props: [],

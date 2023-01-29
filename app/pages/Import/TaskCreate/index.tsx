@@ -1,41 +1,56 @@
-import { Button, Col, Form, Input, Row, Select, message } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import { Button, Checkbox, Col, Form, Input, Row, Select, message } from 'antd';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Breadcrumb from '@app/components/Breadcrumb';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
 import cls from 'classnames';
 import { useHistory } from 'react-router-dom';
-import { POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
+import { DEFAULT_IMPORT_CONFIG, POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
 import { useI18n } from '@vesoft-inc/i18n';
+import { ISchemaEnum, ISchemaType } from '@app/interfaces/schema';
+import Icon from '@app/components/Icon';
+import Instruction from '@app/components/Instruction';
+import { isEmpty } from '@app/utils/function';
 import styles from './index.module.less';
-import PasswordInputModal from './PasswordInputModal';
+import ConfigConfirmModal from './ConfigConfirmModal';
 import SchemaConfig from './SchemaConfig';
-import FileSelect from './FileSelect';
 const Option = Select.Option;
 const formItemLayout = {
-  labelCol: {
-    span: 6,
-  },
   wrapperCol: {
-    span: 11,
+    span: 15,
   },
 };
 
 interface IProps {
   needPwdConfirm?: boolean;
 }
+
+
+const AddMappingBtn = (props: { type: ISchemaType }) => {
+  const { intl } = useI18n();
+  const { type } = props;
+  const { dataImport: { addTagConfig, addEdgeConfig } } = useStore();
+  const addMapping = useCallback(() => type === ISchemaEnum.Tag ? addTagConfig() : addEdgeConfig(), [type]);
+  return <Button type="primary" className="studioAddBtnIcon" onClick={addMapping}>
+    <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
+    {intl.get(type === ISchemaEnum.Tag ? 'import.addTag' : 'import.addEdge')}
+  </Button>;
+};
+
 const TaskCreate = (props: IProps) => {
-  const { dataImport, schema, files } = useStore();
+  const { dataImport, schema, files, global } = useStore();
   const { intl, currentLocale } = useI18n();
-  const { basicConfig, verticesConfig, edgesConfig, updateBasicConfig, importTask } = dataImport;
+  const { basicConfig, tagConfig, edgeConfig, updateBasicConfig, importTask } = dataImport;
   const { spaces, getSpaces, updateSpaceInfo, currentSpace } = schema;
+  const { getGraphAddress, _host } = global;
   const { getFiles } = files;
-  const { batchSize } = basicConfig;
   const [modalVisible, setVisible] = useState(false);
   const history = useHistory();
   const { needPwdConfirm = true } = props;
+  const [address, setAddress] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showMoreConfig, setShowMoreConfig] = useState(false);
   const routes = useMemo(() => ([
     {
       path: '/import/tasks',
@@ -46,6 +61,17 @@ const TaskCreate = (props: IProps) => {
       breadcrumbName: intl.get('import.createTask'),
     },
   ]), [currentLocale]);
+
+  useEffect(() => {
+    initTaskDir();
+    getSpaces();
+    getFiles();
+    if(currentSpace) {
+      updateSpaceInfo(currentSpace);
+    }
+    trackPageView('/import/create');
+    return () => clearConfig('all');
+  }, []);
 
   const checkConfig = () => {
     try {
@@ -69,76 +95,130 @@ const TaskCreate = (props: IProps) => {
     }
   };
 
-
   const check = () => {
-    verticesConfig.forEach(config => {
-      if(config.idMapping === null) {
-        message.error(`vertexId ${intl.get('import.indexNotEmpty')}`);
+    [...tagConfig, ...edgeConfig].forEach(config => {
+      const { type, name, files } = config;
+      const _type = type === ISchemaEnum.Tag ? 'tag' : 'edge';
+      if(!name) {
+        message.error(intl.get(`import.${_type}Required`));
         throw new Error();
       }
-      if(config.tags.length === 0) {
-        message.error(`Tag Mapping ${intl.get('import.isEmpty')}`);
+      if(files.length === 0) {
+        message.error(intl.get(`import.${_type}FileRequired`));
         throw new Error();
       }
-      config.tags.forEach(tag => {
-        if (!tag.name) {
-          message.error(`Tag ${intl.get('import.isEmpty')}`);
+      files.forEach((file) => {
+        if(!file.file?.name) {
+          message.error(intl.get(`import.${_type}FileSelect`));
           throw new Error();
         }
-        tag.props.forEach(prop => {
-          if (prop.mapping === null && !prop.allowNull && !prop.isDefault) {
+        if(type === ISchemaEnum.Tag && isEmpty(file.vidIndex)) {
+          message.error(`vertexId ${intl.get('import.indexNotEmpty')}`);
+          throw new Error();
+        } else if (type === ISchemaEnum.Edge) {
+          if(isEmpty(file.srcIdIndex)) {
+            message.error(`${intl.get('common.edge')} ${config.name} ${intl.get('common.src')} id ${intl.get('import.indexNotEmpty')}`);
+            throw new Error();
+          } else if (isEmpty(file.dstIdIndex)) {
+            message.error(`${intl.get('common.edge')} ${config.name} ${intl.get('common.dst')} id ${intl.get('import.indexNotEmpty')}`);
+            throw new Error();
+          }
+        }
+        file.props.forEach(prop => {
+          if (isEmpty(prop.mapping) && !prop.allowNull && !prop.isDefault) {
             message.error(`${prop.name} ${intl.get('import.indexNotEmpty')}`);
             throw new Error();
           }
         });
       });
     });
-    edgesConfig.forEach(edge => {
-      if (!edge.type) {
-        message.error(`edgeType ${intl.get('import.isEmpty')}`);
+    extraConfigs.forEach(config => {
+      const { key, label } = config;
+      if(basicConfig[key] && !basicConfig[key].match(POSITIVE_INTEGER_REGEX)) {
+        message.error(`${label}: ${intl.get('formRules.numberRequired')}`);
         throw new Error();
       }
-      edge.props.forEach(prop => {
-        if (prop.mapping === null && !prop.allowNull && prop.name !== 'rank' && !prop.isDefault) {
-          message.error(`${prop.name} ${intl.get('import.indexNotEmpty')}`);
-          throw new Error();
-        }
-      });
     });
-    if(batchSize && !batchSize.match(POSITIVE_INTEGER_REGEX)) {
-      message.error(`${intl.get('import.batchSize')} ${intl.get('formRules.numberRequired')}`);
-      throw new Error();
-    }
   };
 
-  const clearConfig = (type?: string) => {
+  const clearConfig = useCallback((type?: string) => {
     const params = {
-      verticesConfig: [],
-      edgesConfig: []
+      tagConfig: [],
+      edgeConfig: []
     } as any;
     if(type === 'all') {
-      params.basicConfig = { taskName: '' };
+      params.basicConfig = { taskName: '', address: address.map(i => i.value) };
     }
     dataImport.update(params);
-  };
-  const handleSpaceChange = (space: string) => {
+  }, []);
+  const handleSpaceChange = useCallback((space: string) => {
     clearConfig();
     updateSpaceInfo(space);
-  };
-
-  const initTaskDir = async () => {
-    updateBasicConfig('taskName', `task-${Date.now()}`);
-  };
-  useEffect(() => {
-    initTaskDir();
-    getSpaces();
-    getFiles();
-    if(currentSpace) {
-      updateSpaceInfo(currentSpace);
-    }
-    trackPageView('/import/create');
-    return () => clearConfig('all');
   }, []);
+
+  const initTaskDir = useCallback(async () => {
+    updateBasicConfig({ 'taskName': `task-${Date.now()}` });
+    const graphs = await getGraphAddress();
+    updateBasicConfig({ 'address': graphs });
+    setAddress(graphs.map(item => ({
+      label: <>
+        {item}
+        {item === _host ? <span className={styles.currentHost}>&nbsp;({intl.get('import.currentHost')})</span> : null}
+      </>,
+      value: item,
+      disabled: item === _host
+    })));
+  }, []);
+  const extraConfigs = useMemo(() => [
+    {
+      label: intl.get('import.concurrency'),
+      key: 'concurrency',
+      rules: [
+        {
+          pattern: POSITIVE_INTEGER_REGEX,
+          message: intl.get('formRules.numberRequired'),
+        },
+      ],
+      placeholder: DEFAULT_IMPORT_CONFIG.concurrency,
+      description: intl.get('import.concurrencyTip'),
+    },
+    {
+      label: intl.get('import.batchSize'),
+      key: 'batchSize',
+      rules: [
+        {
+          pattern: POSITIVE_INTEGER_REGEX,
+          message: intl.get('formRules.numberRequired'),
+        },
+      ],
+      placeholder: DEFAULT_IMPORT_CONFIG.batchSize,
+      description: intl.get('import.batchSizeTip'),
+    },
+    {
+      label: intl.get('import.retry'),
+      key: 'retry',
+      rules: [
+        {
+          pattern: POSITIVE_INTEGER_REGEX,
+          message: intl.get('formRules.numberRequired'),
+        },
+      ],
+      placeholder: DEFAULT_IMPORT_CONFIG.retry,
+      description: intl.get('import.retryTip'),
+    },
+    {
+      label: intl.get('import.channelBufferSize'),
+      key: 'channelBufferSize',
+      rules: [
+        {
+          pattern: POSITIVE_INTEGER_REGEX,
+          message: intl.get('formRules.numberRequired'),
+        },
+      ],
+      placeholder: DEFAULT_IMPORT_CONFIG.channelBufferSize,
+      description: intl.get('import.channelBufferSizeTip'),
+    },
+  ], [currentLocale]);
   return (
     <div className={styles.importCreate}>
       <Breadcrumb routes={routes} />
@@ -158,35 +238,69 @@ const TaskCreate = (props: IProps) => {
             </Col>
             <Col span={12}>
               <Form.Item label={intl.get('import.taskName')} required={true}>
-                <Input value={basicConfig.taskName} onChange={e => updateBasicConfig('taskName', e.target.value)} />
+                <Input value={basicConfig.taskName} onChange={e => updateBasicConfig({ 'taskName': e.target.value })} />
               </Form.Item>
             </Col>
           </Row>
-          <Row>
-            <Col span={12}>
-              <Form.Item label={intl.get('import.batchSize')} name="batchSize" rules={[{
-                pattern: POSITIVE_INTEGER_REGEX,
-                message: intl.get('formRules.numberRequired'),
-              }]}>
-                <Input placeholder="60" value={basicConfig.batchSize} onChange={e => updateBasicConfig('batchSize', e.target.value)} />
-              </Form.Item>
-            </Col>
-          </Row>
+          {showMoreConfig ? (
+            <div className={styles.configContainer}>
+              <Row>
+                <Col span={24}>
+                  <Form.Item label={<>
+                    <span className={styles.label}>{intl.get('import.graphAddress')}</span>
+                    <Instruction description={intl.get('import.graphAddressTip')} />
+                  </>} rules={[{
+                    required: true,
+                  }]}>
+                    <Checkbox.Group
+                      className={styles.addressCheckbox}
+                      options={address}
+                      value={basicConfig.address}
+                      onChange={value => updateBasicConfig({ 'address': value })}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row>
+                {extraConfigs.map(item => (
+                  <Col span={6} key={item.key}>
+                    <Form.Item label={<>
+                      <span className={styles.label}>{item.label}</span>
+                      <Instruction description={item.description} />
+                    </>} name={item.key} rules={item.rules}>
+                      <Input placeholder={item.placeholder.toString()} value={basicConfig[item.key]} onChange={e => updateBasicConfig(item.key, e.target.value)} />
+                    </Form.Item>
+                  </Col>
+                ))}
+              </Row>
+              <Row justify="center">
+                <div className={styles.toggleConfigBtn} onClick={() => setShowMoreConfig(false)}>
+                  <Icon type="icon-list-up" className={styles.toggleIcon} />
+                  <span>{intl.get('import.pickUpConfig')}</span>
+                </div>
+              </Row>
+            </div>
+          ) : <Row justify="center">
+            <div className={styles.toggleConfigBtn} onClick={() => setShowMoreConfig(true)}>
+              <Icon type="icon-list-down" className={styles.toggleIcon} />
+              <span>{intl.get('import.expandMoreConfig')}</span>
+            </div>
+          </Row>}
         </Form>
         <div className={styles.mapConfig}>
           <Form className={styles.configColumn} layout="vertical">
-            <Form.Item label={intl.get('import.vertices')} required={true}>
+            <Form.Item label={intl.get('import.tag')} required={true}>
               <div className={styles.container}>
-                <FileSelect type="vertices" />
-                {verticesConfig.map((item, index) => <SchemaConfig type="vertices" key={item.name} data={item} configIndex={index} />)}
+                <AddMappingBtn type={ISchemaEnum.Tag} />
+                {tagConfig.map((item) => <SchemaConfig key={item._id} configItem={item} />)}
               </div>
             </Form.Item>
           </Form>
           <Form className={styles.configColumn} layout="vertical">
             <Form.Item label={intl.get('import.edge')} required={true}>
               <div className={styles.container}>
-                <FileSelect type="edge" />
-                {edgesConfig.map((item, index) => <SchemaConfig type="edge" key={item.name} data={item} configIndex={index} />)}
+                <AddMappingBtn type={ISchemaEnum.Edge} />
+                {edgeConfig.map((item) => <SchemaConfig key={item._id} configItem={item} />)}
               </div>
             </Form.Item>
           </Form>
@@ -196,10 +310,11 @@ const TaskCreate = (props: IProps) => {
         <Button onClick={() => history.push('/import/tasks')}>{intl.get('common.cancel')}</Button>
         <Button type="primary" disabled={
           basicConfig.taskName === ''
-          || (!verticesConfig.length && !edgesConfig.length)
+          || (!tagConfig.length && !edgeConfig.length)
         } onClick={checkConfig} loading={!needPwdConfirm && loading}>{intl.get('import.runImport')}</Button>
       </div>
-      {needPwdConfirm && <PasswordInputModal 
+      {modalVisible && <ConfigConfirmModal 
+        needPwdConfirm={needPwdConfirm}
         visible={modalVisible} 
         onConfirm={handleStartImport} 
         onCancel={() => setVisible(false)}

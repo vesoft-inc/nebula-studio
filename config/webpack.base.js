@@ -42,7 +42,7 @@ const commonConfig = {
               lessOptions: {
                 javascriptEnabled: true,
                 modifyVars: {
-                  'primary-color': '#2F80ED',
+                  'primary-color': '#0091FF',
                   'menu-dark-bg': '#2F3A4A',
                   'table-header-bg': '#E9EDEF',
                   'table-header-color': '#465B7A',

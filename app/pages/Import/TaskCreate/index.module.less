@@ -1,4 +1,5 @@
 @import '~@app/common.less';
+
 .importCreate {
   .createForm {
     padding: 32px 0 100px;
@@ -25,5 +26,48 @@
     .configColumn:not(:last-child) {
       margin-right: 20px;
     }
+  }
+  .configContainer {
+    width: 100%;
+  }
+  .toggleConfigBtn {
+    margin: 20px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: @blue;
+    .toggleIcon svg{
+      width: 25px;
+      height: 25px;
+    }
+  }
+  .addressCheckbox {
+    :global {
+      .ant-checkbox-group-item {
+        background: @gray;
+        border-radius: 3px;
+        color: @darkBlue;
+        padding: 11px 12px;
+      }
+      .ant-checkbox-disabled + span {
+        color: @darkBlue;
+      }
+      .ant-checkbox-disabled {
+        .ant-checkbox-inner {
+          background: rgba(134, 151, 176, 0.4);
+          border: 1px solid #8697B0 !important;
+          &::after {
+            border-color: #FFFFFF;
+          }
+        }
+      }
+    }
+  }
+  .currentHost {
+    color: #8697B0;
+  }
+  .label::after {
+    content: ':';
+    padding-right: 5px;
   }
 }
