@@ -6,15 +6,22 @@
 	max-width: 600px;
 	padding: 16px 8px 50px;
 	overflow: auto;
-
+	.selectTitle {
+		margin-bottom: 0;
+		font-family: Roboto-Medium, sans-serif;
+		color: #212A39;
+	}
 	table {
 		td,
 		th {
 			text-align: center;
 		}
-		.ant-table-tbody {
-			tr {
-				background-color: @lightBlue;
+		:global {
+			.ant-table-tbody {
+				tr {
+					background-color: @lightBlue;
+					color: #212A39;
+				}
 			}
 		}
 		.limitWidth {
@@ -37,16 +44,11 @@
 	}
 
 	> .operation {
-		padding-bottom: 25px;
 		text-align: center;
 		position: absolute;
-    bottom: 0;
+    bottom: 15px;
     left: 50%;
     transform: translateX(-50%);
-	}
-
-	.csvSelectIndex {
-		margin-right: 10px;
 	}
 
 	.anticon {

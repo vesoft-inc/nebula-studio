@@ -69,13 +69,11 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrParam, err)
 	}
-
 	conf := importconfig.YAMLConfig{}
 	err = json.Unmarshal(jsons, &conf)
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
-
 	if err = validClientParams(&conf); err != nil {
 		err = importererrors.Wrap(importererrors.InvalidConfigPathOrFormat, err)
 		zap.L().Warn("client params is wrong", zap.Error(err))

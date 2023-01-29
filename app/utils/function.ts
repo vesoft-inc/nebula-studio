@@ -53,3 +53,12 @@ export const getByteLength = (str: string) => {
   const utf8Encode = new TextEncoder();
   return utf8Encode.encode(str).length;
 };
+
+export const isValidIP = (ip: string) => {
+  const reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){3}$/;
+  return reg.test(ip);
+}; 
+
+export const isEmpty = (value: any) => {
+  return !value && value !== 0;
+};

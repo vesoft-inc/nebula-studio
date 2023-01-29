@@ -90,7 +90,7 @@ type ImportTaskVID struct {
 type ImportTaskTagProp struct {
 	Name  *string `json:"name" validate:"required"`
 	Type  *string `json:"type" validate:"required"`
-	Index *int64  `json:"index" validate:"required"`
+	Index *int64  `json:"index, optional"`
 }
 
 type ImportTaskTag struct {
@@ -111,13 +111,13 @@ type ImportTaskEdgeID struct {
 }
 
 type ImportTaskEdgeRank struct {
-	Index *int64 `json:"index"`
+	Index *int64 `json:"index, optional"`
 }
 
 type ImportTaskEdgeProp struct {
 	Name  *string `json:"name"`
 	Type  *string `json:"type"`
-	Index *int64  `json:"index"`
+	Index *int64  `json:"index, optional"`
 }
 
 type ImportTaskEdge struct {
