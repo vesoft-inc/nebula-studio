@@ -239,7 +239,8 @@
     "sampleData": "Sample data",
     "hasHeader": "Has header",
     "enterDelimiter": "Enter delimiter",
-    "applicateToAll": "Apply to all files"
+    "applicateToAll": "Apply to all files",
+    "deleteFiles": "Delete select files"
   },
   "schema": {
     "spaceList": "Graph Space List",

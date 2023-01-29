@@ -21,6 +21,7 @@ const FileList = () => {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [previewList, setPreviewList] = useState<StudioFile[]>([]);
+  const [selectFiles, setSelectFiles] = useState<string[]>([]);
   const columns = [
     {
       title: intl.get('import.fileName'),
@@ -29,13 +30,12 @@ const FileList = () => {
     },
     {
       title: intl.get('import.withHeader'),
-      key: 'withHeader',
-      render: () => <Checkbox disabled={true} />,
+      dataIndex: 'withHeader',
+      render: value => <Checkbox disabled={true} checked={value} />,
     },
     {
       title: intl.get('import.delimiter'),
-      key: 'delimiter',
-      render: () => <Checkbox disabled={true} />,
+      dataIndex: 'delimiter',
     },
     {
       title: intl.get('import.fileSize'),
@@ -46,7 +46,7 @@ const FileList = () => {
     {
       title: intl.get('common.operation'),
       key: 'operation',
-      render: (_, file, index) => {
+      render: (_, file) => {
         if(!file.content) {
           return null;
         }
@@ -56,7 +56,7 @@ const FileList = () => {
               <Icon type="icon-studio-btn-detail" />
             </CSVPreviewLink>
             <Popconfirm
-              onConfirm={() => handleDelete(index)}
+              onConfirm={() => deleteFile([file.id])}
               title={intl.get('common.ask')}
               okText={intl.get('common.ok')}
               cancelText={intl.get('common.cancel')}
@@ -73,8 +73,8 @@ const FileList = () => {
   const transformFile = async (_file: StudioFile, fileList: StudioFile[]) => {
     const size = fileList.reduce((acc, cur) => acc + cur.size, 0);
     if(global.gConfig?.maxBytes && size > global.gConfig.maxBytes) {
-      // message.error(intl.get('import.fileSizeLimit', { size: getFileSize(global.gConfig.maxBytes) }));
-      // return false;
+      message.error(intl.get('import.fileSizeLimit', { size: getFileSize(global.gConfig.maxBytes) }));
+      return false;
     }
     fileList.forEach(file => {
       file.path = `${file.name}`;
@@ -95,11 +95,6 @@ const FileList = () => {
     });
   };
 
-  const handleDelete = (index: number) => {
-    const file = fileList[index].name;
-    deleteFile(file);
-  };
-
   const getFileList = async () => {
     !loading && setLoading(true);
     await getFiles();
@@ -111,26 +106,41 @@ const FileList = () => {
   }, []);
   return (
     <div className={styles.fileUpload}>
-      <Upload
-        multiple={true}
-        accept=".csv"
-        showUploadList={false}
-        fileList={fileList}
-        customRequest={() => {}}
-        beforeUpload={debounce(transformFile)}
-      >
-        <Button className={cls('studioAddBtn', styles.uploadBtn)} type="primary">
-          <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('import.uploadFile')}
-        </Button>
-      </Upload>
-
+      <div className={styles.fileOperations}>
+        <Upload
+          multiple={true}
+          accept=".csv"
+          showUploadList={false}
+          fileList={fileList}
+          customRequest={() => {}}
+          beforeUpload={debounce(transformFile)}
+        >
+          <Button className={cls('studioAddBtn', styles.uploadBtn)} type="primary">
+            <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('import.uploadFile')}
+          </Button>
+        </Upload>
+        <Popconfirm
+          onConfirm={() => deleteFile(selectFiles)}
+          title={intl.get('common.ask')}
+          okText={intl.get('common.ok')}
+          cancelText={intl.get('common.cancel')}
+        >
+          <Button className={styles.deleteBtn} disabled={!selectFiles.length}>
+            {intl.get('import.deleteFiles')}
+          </Button>
+        </Popconfirm>
+      </div>
       <div className={styles.fileList}>
         <h3>{intl.get('import.fileTitle')} ({fileList.length})</h3>
         <Table
           loading={!!loading}
           dataSource={fileList}
+          rowSelection={{
+            type: 'checkbox',
+            onChange: (selectedRowKeys) => setSelectFiles(selectedRowKeys as string[]),
+          }}
           columns={columns}
-          rowKey="name"
+          rowKey="id"
           pagination={false}
         />
       </div>

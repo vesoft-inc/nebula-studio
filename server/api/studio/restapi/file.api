@@ -2,14 +2,14 @@ syntax = "v1"
 
 type (
 	FileDestroyRequest {
-		Name string `path:"name" validate:"required"`
+		Ids []string `json:"ids"`
 	}
 
 	FileStat {
+		Id         int        `json:"id"`
 		Content    [][]string `json:"content"`
 		WithHeader bool       `json:"withHeader"`
 		Delimiter  string     `json:"delimiter"`
-		DataType   string     `json:"dataType"`
 		Name       string     `json:"name"`
 		Size       int64      `json:"size"`
 	}
@@ -29,7 +29,7 @@ service studio-api {
 	put /api/files
 	@doc "delete file"
 	@handler FileDestroy
-	delete /api/files/:name(FileDestroyRequest)
+	delete /api/files(FileDestroyRequest)
 	@doc "preview file"
 	@handler FilesIndex
 	get /api/files returns(FilesIndexData)

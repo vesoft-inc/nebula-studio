@@ -239,7 +239,8 @@
     "sampleData": "示例数据",
     "hasHeader": "携带表头",
     "enterDelimiter": "请输入分隔符",
-    "applicateToAll": "应用到所有文件"
+    "applicateToAll": "应用到所有文件",
+    "deleteFiles": "删除选中文件"
   },
   "schema": {
     "spaceList": "图空间列表",

@@ -2,7 +2,7 @@ import Icon from '@app/components/Icon';
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Checkbox, Input, Modal, Table, Popconfirm, Dropdown } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { usePapaParse } from 'react-papaparse';
 import cls from 'classnames';
 import { StudioFile } from '@app/interfaces/import';
@@ -43,11 +43,14 @@ const UploadConfigModal = (props: IProps) => {
   const { uploading, data, activeItem, previewContent, checkAll, indeterminate, loading } = state;
   const { readRemoteFile } = usePapaParse();
   useEffect(() => {
+    visible && setState({ data: fileList, activeItem: fileList[0] });
+  }, [visible]);
+  useEffect(() => {
     if (activeItem) {
       readFile(activeItem);
     }
   }, [activeItem]);
-  const readFile = (file) => {
+  const readFile = useCallback((file) => {
     if(!file) return;
     setState({ loading: true });
     const url = URL.createObjectURL(file);
@@ -57,6 +60,7 @@ const UploadConfigModal = (props: IProps) => {
       download: true, 
       preview: 5,
       worker: true, 
+      skipEmptyLines: true,
       step: (row) => {
         content = [...content, row.data];
       },
@@ -64,13 +68,8 @@ const UploadConfigModal = (props: IProps) => {
         setState({ loading: false, previewContent: content });
       } 
     });
-  };
-  const init = () => {
-    setState({ data: fileList, activeItem: fileList[0] });
-  };
-  useEffect(() => {
-    visible && init();
-  }, [visible]);
+  }, []);
+ 
   const onCheckAllChange = (e: CheckboxChangeEvent) => {
     const { checked } = e.target;
     data.forEach(item => item.withHeader = checked);
@@ -85,12 +84,11 @@ const UploadConfigModal = (props: IProps) => {
     e.stopPropagation();
     const { checked } = e.target;
     item.withHeader = checked;
-    const checkedList = state.data.filter((file) => file.withHeader);
+    const checkedList = data.filter((file) => file.withHeader);
     setState({
       checkAll: checkedList.length === data.length,
       indeterminate: !!checkedList.length && checkedList.length < data.length,
     });
-    
   };
   const deletePreviewFile = (e: React.MouseEvent, index: number) => {
     e.stopPropagation();
@@ -178,7 +176,7 @@ const UploadConfigModal = (props: IProps) => {
   const handleConfirm = async () => {
     setState({ uploading: true });
     await onConfirm(data);
-    setState({ uploading: true });
+    setState({ uploading: false });
     onCancel();
   };
   const handleCancel = () => {

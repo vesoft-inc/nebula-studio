@@ -26,5 +26,5 @@ func NewFileDestroyLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FileD
 }
 
 func (l *FileDestroyLogic) FileDestroy(req types.FileDestroyRequest) error {
-	return service.NewFileService(l.ctx, l.svcCtx).FileDestroy(req.Name)
+	return service.NewFileService(l.ctx, l.svcCtx).FileDestroy(req)
 }

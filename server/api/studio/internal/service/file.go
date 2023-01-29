@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/csv"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -12,16 +13,22 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
+
+	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
 
 	"github.com/axgle/mahonia"
 	"github.com/saintfish/chardet"
 	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/core/logx"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 const (
@@ -33,43 +40,59 @@ var (
 	_            FileService = (*fileService)(nil)
 )
 
+type fileConfig struct {
+	Name       string
+	WithHeader bool
+	Delimiter  string
+}
+
 type (
 	FileService interface {
 		FileUpload() error
-		FileDestroy(string) error
+		FileDestroy(request types.FileDestroyRequest) error
 		FilesIndex() (*types.FilesIndexData, error)
 	}
 
 	fileService struct {
 		logx.Logger
-		ctx    context.Context
-		svcCtx *svc.ServiceContext
-		r      *http.Request
+		ctx              context.Context
+		svcCtx           *svc.ServiceContext
+		gormErrorWrapper utils.GormErrorWrapper
 	}
 )
 
 func NewFileService(ctx context.Context, svcCtx *svc.ServiceContext) FileService {
 	return &fileService{
-		Logger: logx.WithContext(ctx),
-		ctx:    ctx,
-		svcCtx: svcCtx,
+		Logger:           logx.WithContext(ctx),
+		ctx:              ctx,
+		svcCtx:           svcCtx,
+		gormErrorWrapper: utils.GormErrorWithLogger(ctx),
 	}
 }
 
-func (f *fileService) FileDestroy(name string) error {
+func (f *fileService) FileDestroy(request types.FileDestroyRequest) error {
 	dir := f.svcCtx.Config.File.UploadDir
-	target := filepath.Join(dir, name)
-	if _, err := os.Stat(target); err != nil {
-		logx.Infof("del file error %v", err)
-		return ecode.WithInternalServer(err)
+	for _, id := range request.Ids {
+		var file db.File
+		result := db.CtxDB.Where("id = ?", id).First(&file)
+		if result.Error != nil {
+			return f.gormErrorWrapper(result.Error)
+		}
+		target := filepath.Join(dir, file.Name)
+		if _, err := os.Stat(target); err != nil {
+			logx.Infof("del file error %v", err)
+			return ecode.WithInternalServer(err)
+		}
+		result = db.CtxDB.Delete(&db.File{}, id)
+		if result.Error != nil {
+			return f.gormErrorWrapper(result.Error)
+		}
+		//	if target is directory, it is not empty
+		if err := os.Remove(target); err != nil {
+			logx.Infof("del file error %v", err)
+			return ecode.WithInternalServer(err)
+		}
 	}
-
-	//	if target is directory, it is not empty
-	if err := os.Remove(target); err != nil {
-		logx.Infof("del file error %v", err)
-		return ecode.WithInternalServer(err)
-	}
-
 	return nil
 }
 
@@ -88,6 +111,11 @@ func (f *fileService) FilesIndex() (data *types.FilesIndexData, err error) {
 		if fileInfo.IsDir() {
 			continue
 		}
+		var fileConfig db.File
+		result := db.CtxDB.Where("name = ?", fileInfo.Name()).First(&fileConfig)
+		if result.Error != nil {
+			return nil, f.gormErrorWrapper(result.Error)
+		}
 		path := filepath.Join(dir, fileInfo.Name())
 		file, err := os.Open(path)
 		if err != nil {
@@ -95,6 +123,7 @@ func (f *fileService) FilesIndex() (data *types.FilesIndexData, err error) {
 			continue
 		}
 		reader := csv.NewReader(file)
+		reader.Comma = []rune(fileConfig.Delimiter)[0]
 		count := 0
 		content := make([][]string, 0)
 		for count < 5 {
@@ -106,10 +135,12 @@ func (f *fileService) FilesIndex() (data *types.FilesIndexData, err error) {
 			content = append(content, line)
 		}
 		data.List = append(data.List, types.FileStat{
-			Content:  content,
-			DataType: "all",
-			Name:     fileInfo.Name(),
-			Size:     fileInfo.Size(),
+			Id:         fileConfig.ID,
+			Content:    content,
+			Name:       fileInfo.Name(),
+			Size:       fileInfo.Size(),
+			WithHeader: fileConfig.WithHeader,
+			Delimiter:  fileConfig.Delimiter,
 		})
 	}
 	return data, nil
@@ -117,6 +148,8 @@ func (f *fileService) FilesIndex() (data *types.FilesIndexData, err error) {
 
 func (f *fileService) FileUpload() error {
 	dir := f.svcCtx.Config.File.UploadDir
+	auth := f.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+	host := auth.Address + ":" + strconv.Itoa(auth.Port)
 	_, err := os.Stat(dir)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -131,7 +164,7 @@ func (f *fileService) FileUpload() error {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, fmt.Errorf("unset KeepRequest"), "upload failed")
 	}
 
-	files, _, err := UploadFormFiles(httpReq, dir)
+	files, _, err := UploadFormFiles(httpReq, dir, auth, host)
 	if err != nil {
 		logx.Infof("upload file error:%v", err)
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err, "upload failed")
@@ -158,16 +191,35 @@ func (f *fileService) FileUpload() error {
 	return nil
 }
 
-func UploadFormFiles(r *http.Request, destDirectory string) (uploaded []*multipart.FileHeader, n int64, err error) {
+func UploadFormFiles(r *http.Request, destDirectory string, auth *auth.AuthData, host string) (uploaded []*multipart.FileHeader, n int64, err error) {
 	err = r.ParseMultipartForm(defaultMulipartMemory)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	if r.MultipartForm != nil {
+		configMap := make(map[string]fileConfig)
+		if configs := r.MultipartForm.Value["config"]; configs != nil {
+			for _, config := range configs {
+				cfg := fileConfig{}
+				err := json.Unmarshal([]byte(config), &cfg)
+				if err != nil {
+					return nil, 0, err
+				}
+				configMap[cfg.Name] = cfg
+			}
+		}
 		if fhs := r.MultipartForm.File; fhs != nil {
 			for _, files := range fhs {
 				for _, file := range files {
+					// save file config in db
+					if _, ok := configMap[file.Filename]; ok {
+						_cfg := configMap[file.Filename]
+						err := SaveFileConfig(auth, host, _cfg)
+						if err != nil {
+							return nil, 0, err
+						}
+					}
 					file.Filename = strings.ReplaceAll(file.Filename, "../", "")
 					file.Filename = strings.ReplaceAll(file.Filename, "..\\", "")
 
@@ -184,6 +236,34 @@ func UploadFormFiles(r *http.Request, destDirectory string) (uploaded []*multipa
 		}
 	}
 	return nil, 0, http.ErrMissingFile
+}
+
+func SaveFileConfig(auth *auth.AuthData, host string, config fileConfig) error {
+	File := &db.File{}
+	result := db.CtxDB.Where("name = ?", config.Name).First(File)
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		return ecode.WithErrorMessage(ecode.ErrInternalDatabase, result.Error)
+	}
+	if result.RowsAffected == 0 {
+		File = &db.File{
+			Name:       config.Name,
+			WithHeader: config.WithHeader,
+			Delimiter:  config.Delimiter,
+			Host:       host,
+			Username:   auth.Username,
+		}
+		result := db.CtxDB.Create(File)
+		if result.Error != nil {
+			return ecode.WithErrorMessage(ecode.ErrInternalDatabase, result.Error)
+		}
+	} else {
+		result = db.CtxDB.Model(&db.File{}).Where("name = ?", config.Name).Updates(map[string]interface{}{"with_header": config.WithHeader, "delimiter": config.Delimiter, "host": host})
+		if result.Error != nil {
+			return ecode.WithErrorMessage(ecode.ErrInternalDatabase, result.Error)
+		}
+	}
+
+	return nil
 }
 
 func SaveFormFile(fh *multipart.FileHeader, dest string) (int64, error) {

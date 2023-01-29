@@ -45,19 +45,24 @@ export class FilesStore {
     const data = new FormData();
     files.forEach(file => {
       data.append('file', file);
+      data.append('config', JSON.stringify({
+        name: file.name,
+        delimiter: file.delimiter || ',',
+        withHeader: file.withHeader || false,
+      }));
     });
     const res = (await service.uploadFiles(data, config)) as any;
     return res;
   };
 
-  deleteFile = async (name: string) => {
+  deleteFile = async (ids: string[]) => {
     const res: any = await service.deteleFile({
-      filename: name,
+      ids
     });
     if (res.code === 0) {
       message.success(intl.get('common.deleteSuccess'));
       runInAction(() => {
-        this.fileList = this.fileList.filter((item) => item.name !== name);
+        this.fileList = this.fileList.filter((item) => !ids.includes(item.id));
       });
     }
   };
