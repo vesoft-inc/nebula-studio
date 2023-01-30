@@ -3,7 +3,6 @@ package service
 import (
 	"bufio"
 	"context"
-	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -51,6 +50,7 @@ type (
 		FileUpload() error
 		FileDestroy(request types.FileDestroyRequest) error
 		FilesIndex() (*types.FilesIndexData, error)
+		FileUpdate(request types.FileConfigUpdateRequest) error
 	}
 
 	fileService struct {
@@ -127,20 +127,20 @@ func (f *fileService) FilesIndex() (data *types.FilesIndexData, err error) {
 			logx.Infof("open files error %v", err)
 			continue
 		}
-		reader := csv.NewReader(file)
-		reader.Comma = []rune(fileConfig.Delimiter)[0]
+		reader := bufio.NewReader(file)
 		count := 0
-		content := make([][]string, 0)
+		sample := ""
 		for count < 5 {
-			line, err := reader.Read()
+			line, _, err := reader.ReadLine()
 			count++
 			if err != nil {
 				break
 			}
-			content = append(content, line)
+			sample += string(line) + "\r\n"
 		}
+		file.Close()
 		data.List = append(data.List, types.FileStat{
-			Content:    content,
+			Sample:     sample,
 			Name:       fileInfo.Name(),
 			Size:       fileInfo.Size(),
 			WithHeader: fileConfig.WithHeader,
@@ -150,6 +150,18 @@ func (f *fileService) FilesIndex() (data *types.FilesIndexData, err error) {
 	return data, nil
 }
 
+func (f *fileService) FileUpdate(request types.FileConfigUpdateRequest) error {
+	File := &db.File{}
+	result := db.CtxDB.Where("name = ?", request.Name).First(File)
+	if result.Error != nil {
+		return ecode.WithErrorMessage(ecode.ErrInternalDatabase, result.Error)
+	}
+	result = db.CtxDB.Model(File).Updates(map[string]interface{}{"with_header": request.WithHeader, "delimiter": request.Delimiter})
+	if result.Error != nil {
+		return ecode.WithErrorMessage(ecode.ErrInternalDatabase, result.Error)
+	}
+	return nil
+}
 func (f *fileService) FileUpload() error {
 	dir := f.svcCtx.Config.File.UploadDir
 	auth := f.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)

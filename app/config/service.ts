@@ -55,6 +55,9 @@ const service = {
   getFiles: () => {
     return get('/api/files')();
   },
+  updateFileConfig: (params?, config?) => {
+    return post('/api/files/update')(params, config);
+  },
   uploadFiles: (params?, config?) => {
     return put('/api/files')(params, { ...config, headers: { 'Content-Type': 'multipart/form-data' } });
   },

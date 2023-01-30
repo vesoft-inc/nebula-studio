@@ -66,6 +66,15 @@ export class FilesStore {
       });
     }
   };
+
+  updateFileConfig = async (payload: {
+    name: string;
+    delimiter?: string;
+    withHeader?: boolean;
+  }) => {
+    const res: any = await service.updateFileConfig(payload);
+    return res;
+  };
 }
 
 const filesStore = new FilesStore();

@@ -65,5 +65,6 @@ export interface StudioFile extends RcFile {
   path?: string;
   withHeader?: boolean;
   delimiter?: string;
-  content?: any[]
+  sample?: string;
+  content?: any[];
 }

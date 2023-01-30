@@ -157,7 +157,7 @@
     "edge": "关联边",
     "runImport": "导入",
     "fileName": "文件名",
-    "withHeader": "头字段",
+    "withHeader": "表头",
     "fileSize": "大小",
     "fileTitle": "文件列表",
     "bindDatasource": "添加导入文件",
@@ -238,9 +238,12 @@
     "previewFiles": "上传文件预览",
     "sampleData": "示例数据",
     "hasHeader": "携带表头",
+    "noHeader": "无表头",
     "enterDelimiter": "请输入分隔符",
     "applicateToAll": "应用到所有文件",
-    "deleteFiles": "删除选中文件"
+    "deleteFiles": "删除选中文件",
+    "fileRepeatTip": "{name} 文件已存在，继续上传将覆盖原文件",
+    "filePreview": "预览文件 {name}"
   },
   "schema": {
     "spaceList": "图空间列表",

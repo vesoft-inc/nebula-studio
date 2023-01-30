@@ -38,16 +38,22 @@ type FileDestroyRequest struct {
 }
 
 type FileStat struct {
-	Id         int        `json:"id"`
-	Content    [][]string `json:"content"`
-	WithHeader bool       `json:"withHeader"`
-	Delimiter  string     `json:"delimiter"`
-	Name       string     `json:"name"`
-	Size       int64      `json:"size"`
+	Id         int    `json:"id"`
+	Sample     string `json:"sample"`
+	WithHeader bool   `json:"withHeader"`
+	Delimiter  string `json:"delimiter"`
+	Name       string `json:"name"`
+	Size       int64  `json:"size"`
 }
 
 type FilesIndexData struct {
 	List []FileStat `json:"list"`
+}
+
+type FileConfigUpdateRequest struct {
+	WithHeader bool   `json:"withHeader"`
+	Delimiter  string `json:"delimiter"`
+	Name       string `json:"name" validate:"required"`
 }
 
 type ImportTaskConnection struct {

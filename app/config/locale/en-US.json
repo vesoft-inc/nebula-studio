@@ -238,9 +238,12 @@
     "previewFiles": "Preview file list",
     "sampleData": "Sample data",
     "hasHeader": "Has header",
+    "noHeader": "No header",
     "enterDelimiter": "Enter delimiter",
     "applicateToAll": "Apply to all files",
-    "deleteFiles": "Delete select files"
+    "deleteFiles": "Delete select files",
+    "fileRepeatTip": "{name} already exists, continuing to upload will overwrite the original file",
+    "filePreview": "Preview file {name}"
   },
   "schema": {
     "spaceList": "Graph Space List",

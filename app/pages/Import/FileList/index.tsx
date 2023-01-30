@@ -3,14 +3,14 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
 import { debounce } from 'lodash';
-import { Button, Checkbox, Popconfirm, Table, Upload, message } from 'antd';
+import { Button, Popconfirm, Table, Upload, message } from 'antd';
 import Icon from '@app/components/Icon';
-import CSVPreviewLink from '@app/components/CSVPreviewLink';
 import { getFileSize } from '@app/utils/file';
 import cls from 'classnames';
 import { StudioFile } from '@app/interfaces/import';
 import { useI18n } from '@vesoft-inc/i18n';
 import UploadConfigModal from './UploadConfigModal';
+import PreviewFileModal from './PreviewFileModal';
 
 import styles from './index.module.less';
 
@@ -31,7 +31,7 @@ const FileList = () => {
     {
       title: intl.get('import.withHeader'),
       dataIndex: 'withHeader',
-      render: value => <Checkbox disabled={true} checked={value} />,
+      render: value => value ? intl.get('import.hasHeader') : intl.get('import.noHeader'),
     },
     {
       title: intl.get('import.delimiter'),
@@ -47,21 +47,21 @@ const FileList = () => {
       title: intl.get('common.operation'),
       key: 'operation',
       render: (_, file) => {
-        if(!file.content) {
+        if(!file.sample) {
           return null;
         }
         return (
           <div className={styles.operation}>
-            <CSVPreviewLink file={file} btnType="default">
+            <PreviewFileModal file={file}>
               <Icon type="icon-studio-btn-detail" />
-            </CSVPreviewLink>
+            </PreviewFileModal>
             <Popconfirm
               onConfirm={() => deleteFile([file.name])}
               title={intl.get('common.ask')}
               okText={intl.get('common.ok')}
               cancelText={intl.get('common.cancel')}
             >
-              <Button className="warningBtn" type="link">
+              <Button className="warningBtn">
                 <Icon type="icon-studio-btn-delete" />
               </Button>
             </Popconfirm>
@@ -144,7 +144,7 @@ const FileList = () => {
           pagination={false}
         />
       </div>
-      <UploadConfigModal visible={visible} fileList={previewList} onConfirm={handleUpdate} onCancel={() => setVisible(false)} />
+      <UploadConfigModal visible={visible} uploadList={previewList} onConfirm={handleUpdate} onCancel={() => setVisible(false)} />
     </div>
   );
 };

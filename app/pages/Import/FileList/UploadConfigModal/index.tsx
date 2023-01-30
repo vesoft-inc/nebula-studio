@@ -8,12 +8,14 @@ import cls from 'classnames';
 import { StudioFile } from '@app/interfaces/import';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { useBatchState } from '@app/utils';
+import { useStore } from '@app/stores';
+import { observer } from 'mobx-react-lite';
 import styles from './index.module.less';
 interface IProps {
   visible: boolean;
   onConfirm: (files: StudioFile[]) => void
   onCancel: () => void;
-  fileList: StudioFile[];
+  uploadList: StudioFile[];
 }
 
 const DelimiterConfigModal = (props: { onConfirm: (string) => void }) => {
@@ -28,7 +30,9 @@ const DelimiterConfigModal = (props: { onConfirm: (string) => void }) => {
   );
 };
 const UploadConfigModal = (props: IProps) => {
-  const { visible, onConfirm, onCancel, fileList } = props;
+  const { visible, onConfirm, onCancel, uploadList } = props;
+  const { files } = useStore();
+  const { fileList } = files;
   const { intl } = useI18n();
   const { state, setState } = useBatchState({
     data: [],
@@ -43,7 +47,7 @@ const UploadConfigModal = (props: IProps) => {
   const { uploading, data, activeItem, previewContent, checkAll, indeterminate, loading } = state;
   const { readRemoteFile } = usePapaParse();
   useEffect(() => {
-    visible && setState({ data: fileList, activeItem: fileList[0] });
+    visible && setState({ data: uploadList, activeItem: uploadList[0] });
   }, [visible]);
   useEffect(() => {
     if (activeItem) {
@@ -174,6 +178,21 @@ const UploadConfigModal = (props: IProps) => {
     })
     : [];
   const handleConfirm = async () => {
+    const existFileName = fileList.map((file) => file.name);
+    const repeatFiles = data.filter((file) => existFileName.includes(file.name));
+    if(repeatFiles.length) {
+      const repeatFileNames = repeatFiles.map((file) => file.name).join(', ');
+      Modal.confirm({
+        content: intl.get('import.fileRepeatTip', { name: repeatFileNames }),
+        okText: intl.get('common.ok'),
+        cancelText: intl.get('common.cancel'),
+        onOk: () => startImport(),
+      });
+    } else {
+      startImport();
+    }
+  };
+  const startImport = async () => {
     setState({ uploading: true });
     await onConfirm(data);
     setState({ uploading: false });
@@ -193,7 +212,7 @@ const UploadConfigModal = (props: IProps) => {
       open={visible}
       width={920}
       onCancel={() => handleCancel()}
-      className={styles.previewModal}
+      className={styles.uploadModal}
       footer={false}
     >
       <div className={styles.container}>
@@ -246,4 +265,4 @@ const UploadConfigModal = (props: IProps) => {
   );
 };
 
-export default UploadConfigModal;
+export default observer(UploadConfigModal);

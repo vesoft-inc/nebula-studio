@@ -6,16 +6,21 @@ type (
 	}
 
 	FileStat {
-		Id         int        `json:"id"`
-		Content    [][]string `json:"content"`
-		WithHeader bool       `json:"withHeader"`
-		Delimiter  string     `json:"delimiter"`
-		Name       string     `json:"name"`
-		Size       int64      `json:"size"`
+		Id         int    `json:"id"`
+		Sample     string `json:"sample"`
+		WithHeader bool   `json:"withHeader"`
+		Delimiter  string `json:"delimiter"`
+		Name       string `json:"name"`
+		Size       int64  `json:"size"`
 	}
 
 	FilesIndexData {
 		List []FileStat `json:"list"`
+	}
+	FileConfigUpdateRequest {
+		WithHeader bool   `json:"withHeader"`
+		Delimiter  string `json:"delimiter"`
+		Name       string `json:"name" validate:"required"`
 	}
 )
 
@@ -33,4 +38,6 @@ service studio-api {
 	@doc "preview file"
 	@handler FilesIndex
 	get /api/files returns(FilesIndexData)
+	@handler FileConfigUpdate
+	post /api/files/update(FileConfigUpdateRequest)
 }
