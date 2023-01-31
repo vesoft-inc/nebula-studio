@@ -28,7 +28,8 @@ const (
 	pingPeriod = (pongWait * 9) / 10
 
 	// Maximum message size allowed from peer.
-	maxMessageSize = 2 * 1024 * 1024
+	// Max ngql length can be executed is 4MB
+	maxMessageSize = 4 * 1024 * 1024
 
 	// send buffer size
 	bufSize = 512
