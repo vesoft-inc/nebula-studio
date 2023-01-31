@@ -93,7 +93,7 @@ export class ConsoleStore {
         }
       }
       const { gqlList, paramList } = splitQuery(gql);
-      const data = await service.batchExecNGQL(
+      const { code, data } = await service.batchExecNGQL(
         {
           gqls: gqlList
             .filter((item) => item !== '')
@@ -110,24 +110,26 @@ export class ConsoleStore {
           },
         },
       );
-      data.data.forEach((item) => {
-        item.id = uuidv4();
-        item.space = this.currentSpace;
-        item.spaceVidType = spaceVidType;
-      });
-      const updateQuerys = paramList.filter((item) => {
-        const reg = /^\s*:params/gim;
-        return !reg.test(item);
-      });
-      if (updateQuerys.length > 0) {
-        await this.getParams();
+      if(code === 0) {
+        data?.forEach((item) => {
+          item.id = uuidv4();
+          item.space = this.currentSpace;
+          item.spaceVidType = spaceVidType;
+        });
+        const updateQuerys = paramList.filter((item) => {
+          const reg = /^\s*:params/gim;
+          return !reg.test(item);
+        });
+        if (updateQuerys.length > 0) {
+          await this.getParams();
+        }
+        const _results = [...data?.reverse(), ...this.results];
+        this.update({
+          results: _results,
+          currentGQL: editorValue || gql,
+        });
+        sessionStorage.setItem('consoleResults', JSON.stringify(_results));
       }
-      const _results = [...data.data.reverse(), ...this.results];
-      this.update({
-        results: _results,
-        currentGQL: editorValue || gql,
-      });
-      sessionStorage.setItem('consoleResults', JSON.stringify(_results));
     } finally {
       window.setTimeout(() => this.update({ runGQLLoading: false }), 300);
     }
