@@ -292,6 +292,7 @@ func (c *Client) writePump() {
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				// The hub closed the channel.
+				logx.Errorf("[WebSocket UnexpectedClose]: c.send length: %v", len(c.send))
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}

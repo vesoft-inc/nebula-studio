@@ -93,7 +93,7 @@ export class ConsoleStore {
         }
       }
       const { gqlList, paramList } = splitQuery(gql);
-      const data = await service.batchExecNGQL(
+      const { code, data } = await service.batchExecNGQL(
         {
           gqls: gqlList
             .filter((item) => item !== '')
@@ -110,7 +110,10 @@ export class ConsoleStore {
           },
         },
       );
-      data.data.forEach((item) => {
+      if (code !== 0) {
+        return;
+      }
+      data?.forEach((item) => {
         item.id = uuidv4();
         item.space = this.currentSpace;
         item.spaceVidType = spaceVidType;
@@ -122,7 +125,7 @@ export class ConsoleStore {
       if (updateQuerys.length > 0) {
         await this.getParams();
       }
-      const _results = [...data.data.reverse(), ...this.results];
+      const _results = [...data?.reverse(), ...this.results];
       this.update({
         results: _results,
         currentGQL: editorValue || gql,
