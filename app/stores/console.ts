@@ -110,26 +110,27 @@ export class ConsoleStore {
           },
         },
       );
-      if(code === 0) {
-        data?.forEach((item) => {
-          item.id = uuidv4();
-          item.space = this.currentSpace;
-          item.spaceVidType = spaceVidType;
-        });
-        const updateQuerys = paramList.filter((item) => {
-          const reg = /^\s*:params/gim;
-          return !reg.test(item);
-        });
-        if (updateQuerys.length > 0) {
-          await this.getParams();
-        }
-        const _results = [...data?.reverse(), ...this.results];
-        this.update({
-          results: _results,
-          currentGQL: editorValue || gql,
-        });
-        sessionStorage.setItem('consoleResults', JSON.stringify(_results));
+      if (code !== 0) {
+        return;
       }
+      data?.forEach((item) => {
+        item.id = uuidv4();
+        item.space = this.currentSpace;
+        item.spaceVidType = spaceVidType;
+      });
+      const updateQuerys = paramList.filter((item) => {
+        const reg = /^\s*:params/gim;
+        return !reg.test(item);
+      });
+      if (updateQuerys.length > 0) {
+        await this.getParams();
+      }
+      const _results = [...data?.reverse(), ...this.results];
+      this.update({
+        results: _results,
+        currentGQL: editorValue || gql,
+      });
+      sessionStorage.setItem('consoleResults', JSON.stringify(_results));
     } finally {
       window.setTimeout(() => this.update({ runGQLLoading: false }), 300);
     }
