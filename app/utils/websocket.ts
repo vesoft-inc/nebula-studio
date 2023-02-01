@@ -63,7 +63,7 @@ export class MessageReceiver<R extends NgqlRes = NgqlRes> {
     this.config = config;
     this.messageSend = {
       header: { msgId: uuidv4(), version: '1.0' },
-      body: { product: product, msgType, content },
+      body: { product, msgType, content },
     };
   }
 }
@@ -76,7 +76,7 @@ export class NgqlRunner {
 
   product = 'Studio';
 
-  socketMessageListeners: Array<(e: MessageEvent) => void> = [];
+  socketMessageListeners: ((e: MessageEvent) => void)[] = [];
   messageReceiverMap = new Map<string, MessageReceiver>();
 
   socketConnectingPromise: Promise<boolean> | undefined;
