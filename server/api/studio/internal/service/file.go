@@ -76,12 +76,12 @@ func (f *fileService) FileDestroy(request types.FileDestroyRequest) error {
 		target := filepath.Join(dir, name)
 		if _, err := os.Stat(target); err != nil {
 			logx.Infof("del file error %v", err)
-			return ecode.WithInternalServer(err)
+			return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 		}
 		//	if target is directory, it is not empty
 		if err := os.Remove(target); err != nil {
 			logx.Infof("del file error %v", err)
-			return ecode.WithInternalServer(err)
+			return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 		}
 		// delete db record
 		var file db.File
@@ -128,11 +128,9 @@ func (f *fileService) FilesIndex() (data *types.FilesIndexData, err error) {
 			continue
 		}
 		reader := bufio.NewReader(file)
-		count := 0
 		sample := ""
-		for count < 5 {
+		for count := 0; count < 5; count++ {
 			line, _, err := reader.ReadLine()
-			count++
 			if err != nil {
 				break
 			}

@@ -48,7 +48,7 @@ export function configToJson(payload: IConfig) {
       connection: {
         user: username,
         password,
-        address: address.join(', ')
+        address: address.join(',')
       },
     },
     files,

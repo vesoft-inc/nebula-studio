@@ -23,19 +23,19 @@ func InitTaskStatus() {
 }
 
 // FindTaskInfoByIdAndAddresssAndUser used to check whether the task belongs to the user
-func (t *TaskDb) FindTaskInfoByIdAndAddresssAndUser(id int, nebulaAddress, user string) (*db.TaskInfo, error) {
+func (t *TaskDb) FindTaskInfoByIdAndAddresssAndUser(id int, address, user string) (*db.TaskInfo, error) {
 	taskInfo := new(db.TaskInfo)
-	if err := t.Model(&db.TaskInfo{}).Where("id = ? AND nebula_address = ? And user = ?", id, nebulaAddress,
+	if err := t.Model(&db.TaskInfo{}).Where("id = ? AND address = ? And user = ?", id, address,
 		user).First(&taskInfo).Error; err != nil {
 		return nil, err
 	}
 	return taskInfo, nil
 }
 
-func (t *TaskDb) FindTaskInfoByAddressAndUser(nebulaAddress, user string, pageIndex, pageSize int) ([]*db.TaskInfo, int64, error) {
+func (t *TaskDb) FindTaskInfoByAddressAndUser(address, user string, pageIndex, pageSize int) ([]*db.TaskInfo, int64, error) {
 	tasks := make([]*db.TaskInfo, 0)
 	var count int64
-	tx := t.Model(&db.TaskInfo{}).Where("nebula_address = ? And user = ?", nebulaAddress, user).Order("id desc")
+	tx := t.Model(&db.TaskInfo{}).Where("address = ? And user = ?", address, user).Order("id desc")
 	if err := tx.Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
@@ -68,10 +68,10 @@ func (t *TaskDb) LastId() (int, error) {
 	return id, nil
 }
 
-func (t *TaskDb) SelectAllIds(nebulaAddress, user string) ([]int, error) {
+func (t *TaskDb) SelectAllIds(address, user string) ([]int, error) {
 	var taskInfos []db.TaskInfo
 	ids := make([]int, 0)
-	if err := t.Select("id").Where("nebula_address = ? And user = ?", nebulaAddress, user).Order("created_time desc").Find(&taskInfos).Error; err != nil {
+	if err := t.Select("id").Where("address = ? And user = ?", address, user).Order("created_time desc").Find(&taskInfos).Error; err != nil {
 		return nil, err
 	}
 	for _, taskInfo := range taskInfos {

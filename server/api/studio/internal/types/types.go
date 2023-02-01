@@ -174,16 +174,17 @@ type GetImportTaskRequest struct {
 }
 
 type GetImportTaskData struct {
-	Id         string          `json:"id"`
-	Name       string          `json:"name"`
-	User       string          `json:"user"`
-	Address    string          `json:"address"`
-	Space      string          `json:"space"`
-	Status     string          `json:"status"`
-	Message    string          `json:"message"`
-	CreateTime int64           `json:"createTime"`
-	UpdateTime int64           `json:"updateTime"`
-	Stats      ImportTaskStats `json:"stats"`
+	Id            string          `json:"id"`
+	Name          string          `json:"name"`
+	User          string          `json:"user"`
+	Address       string          `json:"address"`
+	ImportAddress []string        `json:"importAddress"`
+	Space         string          `json:"space"`
+	Status        string          `json:"status"`
+	Message       string          `json:"message"`
+	CreateTime    int64           `json:"createTime"`
+	UpdateTime    int64           `json:"updateTime"`
+	Stats         ImportTaskStats `json:"stats"`
 }
 
 type ImportTaskStats struct {
