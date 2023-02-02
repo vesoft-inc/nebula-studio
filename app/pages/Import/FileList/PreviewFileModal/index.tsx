@@ -60,7 +60,7 @@ const PreviewFileModal = (props: IProps) => {
         setState({ parseLoading: false, data });
       } 
     });
-  }, [sample]);
+  }, [sample, delimiter]);
   const handleConfirm = async () => {
     setState({ uploading: true });
     const { withHeader, delimiter } = form.getFieldsValue();

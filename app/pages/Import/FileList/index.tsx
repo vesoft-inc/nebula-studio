@@ -58,7 +58,7 @@ const FileList = () => {
             <Popconfirm
               onConfirm={() => deleteFile([file.name])}
               title={intl.get('common.ask')}
-              okText={intl.get('common.ok')}
+              okText={intl.get('common.confirm')}
               cancelText={intl.get('common.cancel')}
             >
               <Button className="warningBtn">
@@ -118,7 +118,7 @@ const FileList = () => {
         <Popconfirm
           onConfirm={() => deleteFile(selectFiles)}
           title={intl.get('common.ask')}
-          okText={intl.get('common.ok')}
+          okText={intl.get('common.confirm')}
           cancelText={intl.get('common.cancel')}
         >
           <Button className={styles.deleteBtn} disabled={!selectFiles.length}>

@@ -2,7 +2,7 @@ import Icon from '@app/components/Icon';
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Checkbox, Input, Modal, Table, Popconfirm, Dropdown } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { usePapaParse } from 'react-papaparse';
 import cls from 'classnames';
 import { StudioFile } from '@app/interfaces/import';
@@ -10,6 +10,7 @@ import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { useBatchState } from '@app/utils';
 import { useStore } from '@app/stores';
 import { observer } from 'mobx-react-lite';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 import styles from './index.module.less';
 interface IProps {
   visible: boolean;
@@ -42,7 +43,6 @@ const UploadConfigModal = (props: IProps) => {
     indeterminate: false,
     loading: false,
     uploading: false,
-    previewColumn: []
   });
   const { uploading, data, activeItem, previewContent, checkAll, indeterminate, loading } = state;
   const { readRemoteFile } = usePapaParse();
@@ -74,7 +74,7 @@ const UploadConfigModal = (props: IProps) => {
     });
   }, []);
  
-  const onCheckAllChange = (e: CheckboxChangeEvent) => {
+  const onCheckAllChange = useCallback((e: CheckboxChangeEvent) => {
     const { checked } = e.target;
     data.forEach(item => item.withHeader = checked);
     setState({
@@ -82,9 +82,9 @@ const UploadConfigModal = (props: IProps) => {
       indeterminate: false,
       data: [...data]
     });
-  };
+  }, [data]);
 
-  const updateItem = (e: CheckboxChangeEvent, item: StudioFile) => {
+  const updateItem = useCallback((e: CheckboxChangeEvent, item: StudioFile) => {
     e.stopPropagation();
     const { checked } = e.target;
     item.withHeader = checked;
@@ -93,8 +93,8 @@ const UploadConfigModal = (props: IProps) => {
       checkAll: checkedList.length === data.length,
       indeterminate: !!checkedList.length && checkedList.length < data.length,
     });
-  };
-  const deletePreviewFile = (e: React.MouseEvent, index: number) => {
+  }, [data]);
+  const deletePreviewFile = useCallback((e: React.MouseEvent, index: number) => {
     e.stopPropagation();
     const isActive = activeItem.uid === data[index].uid;
     const newData = [...data];
@@ -107,18 +107,18 @@ const UploadConfigModal = (props: IProps) => {
       activeItem: isActive ? null : activeItem,
       previewContent: isActive ? [] : previewContent,
     });
-  };
+  }, [activeItem, data]);
 
-  const updateDelimiter = (e: React.ChangeEvent<HTMLInputElement>, item: StudioFile) => {
+  const updateDelimiter = useCallback((e: React.ChangeEvent<HTMLInputElement>, item: StudioFile) => {
     e.stopPropagation();
     item.delimiter = e.target.value;
     item === activeItem && readFile(item);
-  };
+  }, [activeItem]);
 
-  const updateAllDelimiter = (value: string) => {
+  const updateAllDelimiter = useCallback((value: string) => {
     data.forEach(item => item.delimiter = value);
     readFile(activeItem);
-  };
+  }, [data, activeItem]);
 
   const columns = [
     {
@@ -166,7 +166,7 @@ const UploadConfigModal = (props: IProps) => {
       ),
     },
   ];
-  const parseColumns = previewContent.length
+  const parseColumns = useMemo(() => previewContent.length
     ? previewContent[0].map((header, index) => {
       const textIndex = index;
       const title = activeItem?.withHeader ? header : `Column ${textIndex}`;
@@ -176,35 +176,45 @@ const UploadConfigModal = (props: IProps) => {
         render: value => <span className={styles.limitWidth}>{value}</span>,
       };
     })
-    : [];
-  const handleConfirm = () => {
+    : [], [previewContent, activeItem]);
+  const handleConfirm = useCallback(() => {
     const existFileName = fileList.map((file) => file.name);
     const repeatFiles = data.filter((file) => existFileName.includes(file.name));
-    if(repeatFiles.length) {
-      const repeatFileNames = repeatFiles.map((file) => file.name).join(', ');
-      Modal.confirm({
-        content: intl.get('import.fileRepeatTip', { name: repeatFileNames }),
-        okText: intl.get('common.confirm'),
-        cancelText: intl.get('common.cancel'),
-        onOk: () => {
-          startImport();
-        },
-      });
-    } else {
+    if(!repeatFiles.length) {
       startImport();
+      return;
     }
-  };
-  const startImport = async () => {
+    const repeatFileNames = repeatFiles.map((file) => file.name).join(', ');
+    Modal.confirm({
+      title: <>
+        <ExclamationCircleFilled />
+        {intl.get('import.uploadConfirm')}
+      </>,
+      icon: null,
+      content: <>
+        <div className={styles.repeatBox}>{repeatFileNames}</div>
+        <p>{intl.get('import.fileRepeatTip')}</p>
+      </>,
+      okText: intl.get('common.continue'),
+      cancelText: intl.get('common.cancel'),
+      centered: true,
+      wrapClassName: styles.repeatConfirmModal,
+      onOk: () => {
+        startImport();
+      },
+    });
+  }, [fileList, data]);
+  const startImport = useCallback(async () => {
     setState({ uploading: true });
     const res = await uploadFile(data);
     if(res.code === 0) {
       onConfirm();
     }
     setState({ uploading: false });
-  };
-  const handleCancel = () => {
+  }, [state]);
+  const handleCancel = useCallback(() => {
     !uploading && onCancel();
-  };
+  }, [uploading]);
 
   if(!visible) {
     return null;

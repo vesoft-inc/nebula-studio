@@ -60,7 +60,8 @@
     "columnName": "Column name",
     "src": "Source",
     "dst": "Destination",
-    "value": "Value"
+    "value": "Value",
+    "continue": "Continue"
   },
   "doc": {
     "welcome": "Welcome to",
@@ -242,8 +243,9 @@
     "enterDelimiter": "Enter delimiter",
     "applicateToAll": "Apply to all files",
     "deleteFiles": "Delete select files",
-    "fileRepeatTip": "{name} already exists, continuing to upload will overwrite the original file",
-    "filePreview": "Preview file {name}"
+    "fileRepeatTip": "These files are already exists, continuing to upload will overwrite the original file",
+    "filePreview": "Preview file {name}",
+    "uploadConfirm": "Upload Confirm"
   },
   "schema": {
     "spaceList": "Graph Space List",

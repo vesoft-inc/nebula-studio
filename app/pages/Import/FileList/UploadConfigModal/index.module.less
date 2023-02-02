@@ -77,3 +77,35 @@
     width: 100%;
   }
 }
+
+.repeatConfirmModal {
+  :global {
+    .ant-modal-confirm .ant-modal-body {
+      padding: 0;
+    }
+    .ant-modal-confirm-title {
+      padding: 13px 15px;
+      border-bottom: 1px solid @gray;
+      svg {
+        color: #faad14;
+        margin-right: 10px;
+      }
+    }
+    .ant-modal-confirm-content {
+      padding: 10px 15px;
+
+    }
+    .ant-modal-confirm-btns {
+      margin-top: 0;
+      padding-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+  .repeatBox {
+    background: @lightBlue;
+    padding: 19px 15px;
+    margin-bottom: 10px;
+  }
+}
