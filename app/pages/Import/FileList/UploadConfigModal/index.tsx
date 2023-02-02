@@ -13,7 +13,7 @@ import { observer } from 'mobx-react-lite';
 import styles from './index.module.less';
 interface IProps {
   visible: boolean;
-  onConfirm: (files: StudioFile[]) => void
+  onConfirm: () => void;
   onCancel: () => void;
   uploadList: StudioFile[];
 }
@@ -32,7 +32,7 @@ const DelimiterConfigModal = (props: { onConfirm: (string) => void }) => {
 const UploadConfigModal = (props: IProps) => {
   const { visible, onConfirm, onCancel, uploadList } = props;
   const { files } = useStore();
-  const { fileList } = files;
+  const { fileList, uploadFile } = files;
   const { intl } = useI18n();
   const { state, setState } = useBatchState({
     data: [],
@@ -155,7 +155,7 @@ const UploadConfigModal = (props: IProps) => {
           <Popconfirm
             onConfirm={(e) => deletePreviewFile(e, index)}
             title={intl.get('common.ask')}
-            okText={intl.get('common.ok')}
+            okText={intl.get('common.confirm')}
             cancelText={intl.get('common.cancel')}
           >
             <Button className="warningBtn" type="link" onClick={e => e.stopPropagation()}>
@@ -177,16 +177,18 @@ const UploadConfigModal = (props: IProps) => {
       };
     })
     : [];
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
     const existFileName = fileList.map((file) => file.name);
     const repeatFiles = data.filter((file) => existFileName.includes(file.name));
     if(repeatFiles.length) {
       const repeatFileNames = repeatFiles.map((file) => file.name).join(', ');
       Modal.confirm({
         content: intl.get('import.fileRepeatTip', { name: repeatFileNames }),
-        okText: intl.get('common.ok'),
+        okText: intl.get('common.confirm'),
         cancelText: intl.get('common.cancel'),
-        onOk: () => startImport(),
+        onOk: () => {
+          startImport();
+        },
       });
     } else {
       startImport();
@@ -194,9 +196,11 @@ const UploadConfigModal = (props: IProps) => {
   };
   const startImport = async () => {
     setState({ uploading: true });
-    await onConfirm(data);
+    const res = await uploadFile(data);
+    if(res.code === 0) {
+      onConfirm();
+    }
     setState({ uploading: false });
-    onCancel();
   };
   const handleCancel = () => {
     !uploading && onCancel();
@@ -246,6 +250,7 @@ const UploadConfigModal = (props: IProps) => {
             columns={parseColumns}
             pagination={false}
             rowKey={() => uuidv4()}
+            scroll={{ x: 'max-content' }}
           />
         </div>
       </div>

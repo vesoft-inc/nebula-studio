@@ -50,7 +50,7 @@ type (
 		FileUpload() error
 		FileDestroy(request types.FileDestroyRequest) error
 		FilesIndex() (*types.FilesIndexData, error)
-		FileUpdate(request types.FileConfigUpdateRequest) error
+		FileConfigUpdate(request types.FileConfigUpdateRequest) error
 	}
 
 	fileService struct {
@@ -148,9 +148,26 @@ func (f *fileService) FilesIndex() (data *types.FilesIndexData, err error) {
 	return data, nil
 }
 
-func (f *fileService) FileUpdate(request types.FileConfigUpdateRequest) error {
+func (f *fileService) FileConfigUpdate(request types.FileConfigUpdateRequest) error {
 	File := &db.File{}
 	result := db.CtxDB.Where("name = ?", request.Name).First(File)
+	if result.Error == gorm.ErrRecordNotFound {
+		// in case user upload file through ftp, without init file record in db
+		auth := f.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+		host := auth.Address + ":" + strconv.Itoa(auth.Port)
+		File = &db.File{
+			Name:       request.Name,
+			WithHeader: request.WithHeader,
+			Delimiter:  request.Delimiter,
+			Host:       host,
+			Username:   auth.Username,
+		}
+		createResult := db.CtxDB.Create(File)
+		if createResult.Error != nil {
+			return ecode.WithErrorMessage(ecode.ErrInternalDatabase, createResult.Error)
+		}
+		return nil
+	}
 	if result.Error != nil {
 		return ecode.WithErrorMessage(ecode.ErrInternalDatabase, result.Error)
 	}

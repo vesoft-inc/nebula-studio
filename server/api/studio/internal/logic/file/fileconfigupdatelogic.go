@@ -26,5 +26,5 @@ func NewFileConfigUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) F
 }
 
 func (l *FileConfigUpdateLogic) FileConfigUpdate(req types.FileConfigUpdateRequest) error {
-	return service.NewFileService(l.ctx, l.svcCtx).FileUpdate(req)
+	return service.NewFileService(l.ctx, l.svcCtx).FileConfigUpdate(req)
 }

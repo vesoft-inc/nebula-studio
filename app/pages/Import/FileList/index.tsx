@@ -86,13 +86,9 @@ const FileList = () => {
     return false;
   };
 
-  const handleUpdate = (fileList: StudioFile[]) => {
-    uploadFile(fileList).then(res => {
-      if(res.code === 0) {
-        message.success(intl.get('import.uploadSuccessfully'));
-        getFileList();
-      } 
-    });
+  const handleRefresh = () => {
+    getFileList();
+    setVisible(false);
   };
 
   const getFileList = async () => {
@@ -144,7 +140,7 @@ const FileList = () => {
           pagination={false}
         />
       </div>
-      <UploadConfigModal visible={visible} uploadList={previewList} onConfirm={handleUpdate} onCancel={() => setVisible(false)} />
+      <UploadConfigModal visible={visible} uploadList={previewList} onConfirm={handleRefresh} onCancel={() => setVisible(false)} />
     </div>
   );
 };

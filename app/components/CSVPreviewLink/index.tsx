@@ -24,21 +24,20 @@ const CSVPreviewLink = (props: IProps) => {
   const { readString } = usePapaParse();
 
   useEffect(() => {
-    if(file) {
-      const { delimiter, sample } = file;
-      let data = [];
-      readString(sample, { 
-        delimiter,
-        worker: true, 
-        skipEmptyLines: true,
-        step: (row) => {
-          data = [...data, row.data];
-        },
-        complete: () => {
-          setData(data);
-        } 
-      });
-    }
+    if(!file) return;
+    const { delimiter, sample } = file;
+    let data = [];
+    readString(sample, { 
+      delimiter,
+      worker: true, 
+      skipEmptyLines: true,
+      step: (row) => {
+        data = [...data, row.data];
+      },
+      complete: () => {
+        setData(data);
+      } 
+    });
   }, [file]);
   const handleLinkClick = e => {
     e.stopPropagation();

@@ -29,7 +29,7 @@ const PreviewFileModal = (props: IProps) => {
   const { name, withHeader, delimiter, sample } = file;
   const { readString } = usePapaParse();
   useEffect(() => {
-    visible && readFile();
+    visible && (readFile(), form.setFieldsValue({ withHeader, delimiter }));
   }, [visible]);
   useEffect(() => {
     parseColumn(withHeader);
