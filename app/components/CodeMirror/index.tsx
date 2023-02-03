@@ -101,7 +101,6 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
     this.editor.on('change', this.codemirrorValueChange);
     this.editor.on('keydown', this.keydown);
     this.editor.on('blur', this.blur);
-    this.editor.on('renderLine', this.renderLine);
     const { value, width, height } = this.props;
     this.editor.setValue(value || '');
     if (width || height) {
@@ -109,18 +108,6 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
       this.editor.setSize(width, height);
     }
   }
-  renderLine = (_instance, line, _element) => {
-    const info = this.editor.lineInfo(line);
-    const _text = info?.text?.trim();
-    if(_text?.startsWith('//') || _text?.startsWith('#')) {
-      // will trigger error info in codemirror without setTimeout
-      setTimeout(() => {
-        this.editor.addLineClass(line, 'wrap', 'notes');
-      }, 0);
-    } else if(info?.wrapClass === 'notes') {
-      this.editor.removeLineClass(line, 'wrap', 'notes');
-    }
-  };
   blur = instance => {
     if (this.props.onBlur) {
       this.props.onBlur(instance.doc.getValue());
@@ -137,6 +124,13 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
   };
 
   codemirrorValueChange = (doc, change) => {
+    const line = change.from.line;
+    const lineInfo = doc?.lineInfo(line);
+    if (lineInfo?.text?.startsWith('//') || lineInfo?.text?.startsWith('#')) {
+      doc.addLineClass(line, 'wrap', 'notes');
+    } else if(lineInfo?.wrapClass === 'notes') {
+      doc.removeLineClass(line, 'wrap', 'notes');
+    }
     if (change.origin !== 'setValue') {
       if (this.props.onChange) {
         this.props.onChange(doc.getValue());
