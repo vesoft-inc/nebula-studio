@@ -177,7 +177,7 @@ const PopoverContent = (props: IContentProps) => {
       return;
     }
     if (errMsg && errMsg.toLowerCase().includes('spacenotfound')) {
-      setTimeout(() => batchApplySchema(space, schema), 1200);
+      setTimeout(() => batchApplySchema(space, schema), 3000);
     } else {
       setLoading(false);
       message.warning(errMsg);
@@ -215,7 +215,7 @@ const PopoverContent = (props: IContentProps) => {
         </Form>
       )}
       <div className={styles.formFooter}>
-        <Button onClick={close}>{intl.get('common.cancel')}</Button>
+        <Button disabled={loading} onClick={close}>{intl.get('common.cancel')}</Button>
         <Button type="primary" onClick={handleConfirm} loading={loading}>
           {intl.get('common.confirm')}
         </Button>
