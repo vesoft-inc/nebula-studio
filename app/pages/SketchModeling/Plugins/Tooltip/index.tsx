@@ -39,7 +39,7 @@ const Tooltip = observer(function Tooltip() {
   const {
     data: { type, name, properties = [], fill, strokeColor },
   } = data;
-  if(!name && !properties.length) {
+  if(!container || (!name && !properties.length)) {
     return null;
   }
   const { left, top } = tooltip;
