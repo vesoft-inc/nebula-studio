@@ -252,7 +252,6 @@ export default observer(function ApplySpacePopover() {
       arrowPointAtCenter={true}
       trigger="click"
       open={open}
-      destroyTooltipOnHide={true}
       onOpenChange={open => !open && setOpen(false)}
     >
       <Button type="primary" onClick={handleOpen} disabled={disabled}>
