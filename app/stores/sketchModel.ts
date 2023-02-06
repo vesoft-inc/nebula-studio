@@ -401,9 +401,9 @@ export class SketchStore {
     });
   };
 
-  batchApply = async (gql) => {
-    const { code, data } = await service.execNGQL({ gql });
-    return { code, data };
+  batchApply = async (gql, space) => {
+    const { code, data, message } = await service.execNGQL({ gql, space }, { noTip: true });
+    return { code, data, message };
   };
 
   deleteElement = (type) => {

@@ -79,15 +79,8 @@ const PopoverContent = (props: IContentProps) => {
   }, []);
 
   const switchSpaceAndApply = useCallback(async (space, schemaInfo) => {
-    const err = await schema.switchSpace(space, true);
-    if (!err) {
-      batchApplySchema(schemaInfo);
-    } else if (err && err.toLowerCase().includes('spacenotfound')) {
-      setTimeout(() => switchSpaceAndApply(space, schemaInfo), 1200);
-    } else {
-      setLoading(false);
-      return;
-    }
+    await schema.switchSpace(space);
+    batchApplySchema(space, schemaInfo);
   }, []);
 
   const handleConfirm = useCallback(() => {
@@ -117,7 +110,7 @@ const PopoverContent = (props: IContentProps) => {
           return;
         }
         setLoading(true);
-        batchApplySchema(schemaInfo);
+        batchApplySchema(space, schemaInfo);
         trackEvent('sketch', 'batch_apply_sketch');
       }
     });
@@ -171,16 +164,23 @@ const PopoverContent = (props: IContentProps) => {
     return res;
   }, []);
 
-  const batchApplySchema = useCallback(async (schema) => {
+  const batchApplySchema = useCallback(async (space, schema) => {
     const { tags, edges } = schema;
     const gql = tags.map(tag => getCreateGql(tag)).concat(edges.map(edge => getCreateGql(edge))).join(';');
-    const { code } = await sketchModel.batchApply(gql);
-    setLoading(false);
+    const { code, message: errMsg } = await sketchModel.batchApply(gql, space);
     if(code === 0) {
+      setLoading(false);
       message.success(intl.get('schema.createSuccess'));
       setTimeout(() => {
         history.push('/schema/tag/list');
       }, 600);
+      return;
+    }
+    if (errMsg && errMsg.toLowerCase().includes('spacenotfound')) {
+      setTimeout(() => batchApplySchema(space, schema), 1200);
+    } else {
+      setLoading(false);
+      message.warning(errMsg);
     }
   }, []);
   return (
