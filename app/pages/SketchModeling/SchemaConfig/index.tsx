@@ -1,5 +1,5 @@
 import Icon from '@app/components/Icon';
-import { Button, Form, Input } from 'antd';
+import { Button, Form, FormProps, Input } from 'antd';
 import { useI18n } from '@vesoft-inc/i18n';
 import { useStore } from '@app/stores';
 import { observer } from 'mobx-react-lite';
@@ -35,8 +35,8 @@ const SchemaConfig: React.FC = () => {
     const prevName = sketchModel.active?.name;
     const name = form.getFieldValue('name');
     const data = sketchModel.editor?.schema.getData();
+    if(!data || name === prevName) return false;
     let invalid = false;
-    if(!data || name === prevName) return sketchModel.active?.invalid || false;
     data.nodes.forEach((item) => {
       if(item.uuid === sketchModel.active?.uuid || !item.name) {
         return;
@@ -66,15 +66,20 @@ const SchemaConfig: React.FC = () => {
     invalid && form.setFields([{ name: 'name', errors: [intl.get('sketch.uniqName')] }]);
     return invalid;
   };
-  const handleUpdate = useCallback(
-    debounce((_, allValues) => {
+  const handleUpdate:FormProps['onFieldsChange'] = useCallback(
+    debounce((changed, allValues) => {
+      const changedFileds = changed.map((item) => item.name[0]);
       const formValues = form.getFieldsValue();
       if(!flag && sketchModel.active?.invalid) {
-        form.validateFields();
+        form.validateFields(changedFileds);
         flag = !flag;
       }
       const hasSameName = validateSameName();
       const hasError = allValues.some((item) => item.errors.length > 0);
+      // hack delete the row of properties, but allValues is not update immediately, need to validate again
+      if(hasError && allValues.some(item => item.name[0] === 'properties' && item.value === undefined)) {
+        form.validateFields(changedFileds);
+      }
       update({ ...formValues, invalid: hasError || hasSameName });
     }, 300),
     []
