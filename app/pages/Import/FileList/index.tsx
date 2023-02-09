@@ -17,7 +17,7 @@ import styles from './index.module.less';
 const FileList = () => {
   const { files, global } = useStore();
   const { intl } = useI18n();
-  const { fileList, deleteFile, getFiles, uploadFile } = files;
+  const { fileList, deleteFile, getFiles } = files;
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [previewList, setPreviewList] = useState<StudioFile[]>([]);

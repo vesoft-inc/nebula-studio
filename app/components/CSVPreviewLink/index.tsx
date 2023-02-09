@@ -1,5 +1,4 @@
 import { Button, Popover, Table } from 'antd';
-import { } from 'antd/lib/button';
 import React, { useEffect, useState } from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
 import { v4 as uuidv4 } from 'uuid';

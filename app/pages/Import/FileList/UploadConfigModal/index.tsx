@@ -88,21 +88,20 @@ const UploadConfigModal = (props: IProps) => {
     e.stopPropagation();
     const { checked } = e.target;
     item.withHeader = checked;
-    const checkedList = data.filter((file) => file.withHeader);
+    const checkedNum = data.reduce((n, file) => n + (file.withHeader & 1), 0);
     setState({
-      checkAll: checkedList.length === data.length,
-      indeterminate: !!checkedList.length && checkedList.length < data.length,
+      checkAll: checkedNum === data.length,
+      indeterminate: !!checkedNum && checkedNum < data.length,
     });
   }, [data]);
   const deletePreviewFile = useCallback((e: React.MouseEvent, index: number) => {
     e.stopPropagation();
     const isActive = activeItem.uid === data[index].uid;
-    const newData = [...data];
-    newData.splice(index, 1);
-    const checkedList = newData.filter((file) => file.withHeader);
+    const newData = data.filter((_, i) => i !== index);
+    const checkedNum = data.reduce((n, file) => n + (file.withHeader & 1), 0);
     setState({
-      checkAll: checkedList.length === newData.length,
-      indeterminate: !!checkedList.length && checkedList.length < newData.length,
+      checkAll: checkedNum === newData.length,
+      indeterminate: !!checkedNum && checkedNum < newData.length,
       data: newData,
       activeItem: isActive ? null : activeItem,
       previewContent: isActive ? [] : previewContent,

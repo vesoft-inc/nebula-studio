@@ -1,17 +1,15 @@
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Checkbox, Input, Modal, Table, Form, Row, Col, message } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
-import React, { useCallback, useEffect } from 'react';
+import React, { PropsWithChildren, useCallback, useEffect } from 'react';
 import { usePapaParse } from 'react-papaparse';
 import { StudioFile } from '@app/interfaces/import';
 import { observer } from 'mobx-react-lite';
 import { useBatchState } from '@app/utils';
 import { useStore } from '@app/stores';
 import styles from './index.module.less';
-interface IProps {
-  file: StudioFile;
-  children: any;
-}
+
+type IProps = PropsWithChildren<{ file: StudioFile}>
 
 const PreviewFileModal = (props: IProps) => {
   const { children, file } = props;
