@@ -81,7 +81,7 @@ export class SketchStore {
 
   validate = (data, type) => {
     const { name, comment, properties } = data;
-    let isInvalid = !name || (properties as IProperty[])?.some((i) => !i.name || !i.type);
+    let isInvalid = !name || (properties as IProperty[])?.some((i) => !i.name || !i.type || (i.type === 'fixed_string' && !i.fixedLength));
     const uniqProperties = uniqBy(data.properties, 'name');
     if(properties && data.properties?.length !== uniqProperties.length) {
       isInvalid = true;
@@ -401,8 +401,8 @@ export class SketchStore {
     });
   };
 
-  batchApply = async (gql, space) => {
-    const { code, data, message } = await service.execNGQL({ gql, space }, { noTip: true });
+  batchApply = async (gql) => {
+    const { code, data, message } = await service.execNGQL({ gql }, { noTip: true });
     return { code, data, message };
   };
 

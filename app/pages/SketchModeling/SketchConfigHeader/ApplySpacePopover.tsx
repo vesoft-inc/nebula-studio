@@ -12,6 +12,7 @@ import { useHistory } from 'react-router-dom';
 import { getVidType } from '@app/pages/Schema/SpaceCreate';
 import { trackEvent } from '@app/utils/stat';
 import { DEFAULT_PARTITION_NUM } from '@app/utils/constant';
+import { handleKeyword } from '@app/utils/function';
 import styles from './index.module.less';
 
 const Option = Select.Option;
@@ -166,8 +167,9 @@ const PopoverContent = (props: IContentProps) => {
 
   const batchApplySchema = useCallback(async (space, schema) => {
     const { tags, edges } = schema;
-    const gql = tags.map(tag => getCreateGql(tag)).concat(edges.map(edge => getCreateGql(edge))).join(';');
-    const { code, message: errMsg } = await sketchModel.batchApply(gql, space);
+    // hack If the space name is the same as the current space recorded on the golang server (refrence client.go) and the space has just been deleted, need to use it manually
+    const gql = `use ${handleKeyword(space)};` + tags.map(tag => getCreateGql(tag)).concat(edges.map(edge => getCreateGql(edge))).join(';');
+    const { code, message: errMsg } = await sketchModel.batchApply(gql);
     if(code === 0) {
       setLoading(false);
       message.success(intl.get('schema.createSuccess'));

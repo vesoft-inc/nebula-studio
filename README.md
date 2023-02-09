@@ -20,7 +20,8 @@ NebulaGraph Studio (Studio for short) is a web-based visualization tool for Nebu
 | 3.0.x                | v3.2.x                    |
 | 3.1.x                | v3.3.x                    |
 | 3.0.0 ～ 3.2.0       | v3.4.x                    |
-| 3.0.0 ～ 3.2.0       | v3.5.x                    |
+| 3.0.0 ～ 3.3.0       | v3.5.x                    |
+| 3.0.0 ～ 3.4.0       | v3.6.x                    |
 
 ## Development Quick Start
 
