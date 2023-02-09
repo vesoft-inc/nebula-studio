@@ -5,7 +5,7 @@ on:
       - published
 jobs:
   call-workflow:
-    uses: vesoft-inc/nebula-studio/.github/workflows/build.yml@master
+    uses: vesoft-inc/nebula-studio/.github/workflows/build.yml@release-3.5.1
     secrets:
       oss_endpoint: ${{ secrets.OSS_ENDPOINT }}
       oss_id: ${{ secrets.OSS_ID }}
