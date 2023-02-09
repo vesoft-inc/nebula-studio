@@ -39,11 +39,12 @@ const TemplateModal = (props: IProps) => {
       const parseContent = yaml.load(content);
       if(typeof parseContent === 'object') {
         const connection = parseContent.clientSettings?.connection || {};
+        const address = connection.address.split(',');
         if(connection.address.startsWith('http')) {
           throw new Error(intl.get('import.noHttp'));
         }
-        if(connection.address !== host) {
-          throw new Error(intl.get('import.templateMatchError', { type: 'address' }));
+        if(!address.includes(host)) {
+          throw new Error(intl.get('import.addressMatch'));
         }
         if(connection.user !== username) {
           throw new Error(intl.get('import.templateMatchError', { type: 'username' }));

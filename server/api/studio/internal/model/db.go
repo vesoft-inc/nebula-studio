@@ -12,7 +12,7 @@ import (
 var CtxDB *gorm.DB
 
 /*
-	`InitDB` initialize local sql by open sql and create task_infos table
+`InitDB` initialize local sql by open sql and create task_infos table
 */
 func InitDB(sqlitedbFilePath string) {
 	dbFilePath := sqlitedbFilePath
@@ -27,6 +27,7 @@ func InitDB(sqlitedbFilePath string) {
 		&Sketch{},
 		&SchemaSnapshot{},
 		&Favorite{},
+		&File{},
 	)
 	if err != nil {
 		zap.L().Fatal(fmt.Sprintf("init taskInfo table fail: %s", err))

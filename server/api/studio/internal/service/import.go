@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync"
 
 	"github.com/vesoft-inc/go-pkg/middleware"
@@ -99,11 +100,13 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 	}
 
 	// import
-	nebulaAddress := *conf.NebulaClientSettings.Connection.Address
+	address := *conf.NebulaClientSettings.Connection.Address
 	user := *conf.NebulaClientSettings.Connection.User
 	name := req.Name
 	space := *conf.NebulaClientSettings.Space
-	task, taskID, err := importer.GetTaskMgr().NewTask(nebulaAddress, user, name, space)
+	auth := i.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+	host := auth.Address + ":" + strconv.Itoa(auth.Port)
+	task, taskID, err := importer.GetTaskMgr().NewTask(host, address, user, name, space)
 	if err != nil {
 		zap.L().Warn("init task fail", zap.Error(err))
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)

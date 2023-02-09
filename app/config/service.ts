@@ -1,5 +1,5 @@
-import { _delete, get, post, put } from '../utils/http';
 import ngqlRunner from '@app/utils/websocket';
+import { _delete, get, post, put } from '../utils/http';
 
 const service = {
   // execNGQL: (params, config?) => {
@@ -50,11 +50,13 @@ const service = {
   getTaskLog: (id: string | number) => `/api/import-tasks/${id}/download-logs`,
   // files
   deteleFile: params => {
-    const { filename } = params;
-    return _delete(`/api/files/${encodeURIComponent(filename)}`)();
+    return _delete(`/api/files`)(undefined, { data: params });
   },
   getFiles: () => {
     return get('/api/files')();
+  },
+  updateFileConfig: (params?, config?) => {
+    return post('/api/files/update')(params, config);
   },
   uploadFiles: (params?, config?) => {
     return put('/api/files')(params, { ...config, headers: { 'Content-Type': 'multipart/form-data' } });

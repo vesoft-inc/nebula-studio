@@ -34,19 +34,26 @@ type ExecSeqNGQLResult struct {
 }
 
 type FileDestroyRequest struct {
-	Name string `path:"name" validate:"required"`
+	Names []string `json:"names"`
 }
 
 type FileStat struct {
-	Content    [][]string `json:"content"`
-	WithHeader bool       `json:"withHeader"`
-	DataType   string     `json:"dataType"`
-	Name       string     `json:"name"`
-	Size       int64      `json:"size"`
+	Id         int    `json:"id"`
+	Sample     string `json:"sample"`
+	WithHeader bool   `json:"withHeader"`
+	Delimiter  string `json:"delimiter"`
+	Name       string `json:"name"`
+	Size       int64  `json:"size"`
 }
 
 type FilesIndexData struct {
 	List []FileStat `json:"list"`
+}
+
+type FileConfigUpdateRequest struct {
+	WithHeader bool   `json:"withHeader"`
+	Delimiter  string `json:"delimiter"`
+	Name       string `json:"name" validate:"required"`
 }
 
 type ImportTaskConnection struct {
@@ -167,16 +174,17 @@ type GetImportTaskRequest struct {
 }
 
 type GetImportTaskData struct {
-	Id         string          `json:"id"`
-	Name       string          `json:"name"`
-	User       string          `json:"user"`
-	Address    string          `json:"address"`
-	Space      string          `json:"space"`
-	Status     string          `json:"status"`
-	Message    string          `json:"message"`
-	CreateTime int64           `json:"createTime"`
-	UpdateTime int64           `json:"updateTime"`
-	Stats      ImportTaskStats `json:"stats"`
+	Id            string          `json:"id"`
+	Name          string          `json:"name"`
+	User          string          `json:"user"`
+	Address       string          `json:"address"`
+	ImportAddress []string        `json:"importAddress"`
+	Space         string          `json:"space"`
+	Status        string          `json:"status"`
+	Message       string          `json:"message"`
+	CreateTime    int64           `json:"createTime"`
+	UpdateTime    int64           `json:"updateTime"`
+	Stats         ImportTaskStats `json:"stats"`
 }
 
 type ImportTaskStats struct {

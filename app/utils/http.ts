@@ -86,7 +86,7 @@ const sendRequest = async (type: string, api: string, params?, config?) => {
       res = (await service.put(api, params, otherConfig)) as any;
       break;
     case 'delete':
-      res = (await service.delete(api, params)) as any;
+      res = (await service.delete(api, otherConfig)) as any;
       break;
     default:
       break;

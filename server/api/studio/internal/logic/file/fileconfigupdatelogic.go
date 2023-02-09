@@ -11,20 +11,20 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type FileDestroyLogic struct {
+type FileConfigUpdateLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewFileDestroyLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FileDestroyLogic {
-	return &FileDestroyLogic{
+func NewFileConfigUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) FileConfigUpdateLogic {
+	return FileConfigUpdateLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *FileDestroyLogic) FileDestroy(req types.FileDestroyRequest) error {
-	return service.NewFileService(l.ctx, l.svcCtx).FileDestroy(req)
+func (l *FileConfigUpdateLogic) FileConfigUpdate(req types.FileConfigUpdateRequest) error {
+	return service.NewFileService(l.ctx, l.svcCtx).FileConfigUpdate(req)
 }

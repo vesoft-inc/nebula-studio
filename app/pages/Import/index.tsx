@@ -1,10 +1,10 @@
-import { Radio } from 'antd';
+import { Radio, RadioChangeEvent } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Route, useHistory, useLocation } from 'react-router-dom';
 import { trackPageView } from '@app/utils/stat';
 import cls from 'classnames';
 import { useI18n } from '@vesoft-inc/i18n';
-import FileUpload from './FileUpload';
+import FileList from './FileList';
 import styles from './index.module.less';
 import TaskList from './TaskList';
 
@@ -27,7 +27,7 @@ const Import = (props: IProps) => {
     const path = location.pathname;
     setTab(path.includes('files') ? 'files' : 'tasks');
   }, [location.pathname]);
-  const handleTabChange = e => {
+  const handleTabChange = (e: RadioChangeEvent) => {
     setTab(e.target.value);
     history.push(`/import/${e.target.value}`);
   };
@@ -48,7 +48,7 @@ const Import = (props: IProps) => {
         <Route
           path={`/import/files`}
           exact={true}
-          component={FileUpload}
+          component={FileList}
         />
 
         <Route
