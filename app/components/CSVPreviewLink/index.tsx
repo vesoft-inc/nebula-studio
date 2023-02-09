@@ -1,50 +1,73 @@
 import { Button, Popover, Table } from 'antd';
-import { } from 'antd/lib/button';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
 import { v4 as uuidv4 } from 'uuid';
 import cls from 'classnames';
+import { usePapaParse } from 'react-papaparse';
+import { StudioFile } from '@app/interfaces/import';
 import styles from './index.module.less';
 
 interface IProps {
-  file: any;
+  file: StudioFile;
   children: any;
-  onMapping?: (index) => void;
+  onMapping?: (index: number) => void;
   btnType?: string
   selected?: boolean
 }
 
 const CSVPreviewLink = (props: IProps) => {
-  const { onMapping, file: { content }, children, btnType, selected } = props;
+  const { onMapping, file, children, btnType, selected } = props;
   const [visible, setVisible] = useState(false);
+  const [data, setData] = useState<any[]>([]);
   const { intl } = useI18n();
+  const { readString } = usePapaParse();
+
+  useEffect(() => {
+    if(!file) return;
+    const { delimiter, sample } = file;
+    let data = [];
+    readString(sample, { 
+      delimiter,
+      worker: true, 
+      skipEmptyLines: true,
+      step: (row) => {
+        data = [...data, row.data];
+      },
+      complete: () => {
+        setData(data);
+      } 
+    });
+  }, [file]);
   const handleLinkClick = e => {
     e.stopPropagation();
     setVisible(true);
   };
-
-  const handleMapping = index => {
-    onMapping && onMapping(index);
+  const handleMapping = (index: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    onMapping?.(index);
     setVisible(false);
   };
-  const columns = content.length
-    ? content[0].map((_, index) => {
-      const textIndex = index;
-      return {
-        title: onMapping ? (
-          <Button
-            type="primary"
-            className={styles.csvSelectIndex}
-            onClick={() => handleMapping(textIndex)}
-          >{`column ${textIndex}`}</Button>
-        ) : (
-          `Column ${textIndex}`
-        ),
-        dataIndex: index,
-        render: value => <span className={styles.limitWidth}>{value}</span>,
-      };
-    })
-    : [];
+  const columns = data[0]?.map((header, index) => {
+    const textIndex = index;
+    const _header = file?.withHeader ? header : `Column ${textIndex}`;
+    return {
+      title: onMapping ? (
+        <Button
+          type="primary"
+          className={styles.csvSelectIndex}
+          onClick={(e) => handleMapping(textIndex, e)}
+        >{_header}</Button>
+      ) : (
+        _header
+      ),
+      dataIndex: index,
+      render: value => <span className={styles.limitWidth}>{value}</span>,
+    };
+  }) || [];
+  const handleOpen = (visible) => {
+    if(!file) return;
+    setVisible(visible);
+  };
   return (
     <Popover
       destroyTooltipOnHide={true}
@@ -52,25 +75,27 @@ const CSVPreviewLink = (props: IProps) => {
       open={visible}
       trigger="click"
       arrowPointAtCenter
-      onOpenChange={visible => setVisible(visible)}
+      onOpenChange={handleOpen}
       content={<div className={styles.csvPreview}>
+        <p className={styles.selectTitle}>{intl.get('import.selectCsvColumn')}</p>
         <Table
+          bordered={false}
           className={cls({ [styles.noBackground]: !!onMapping })}
-          dataSource={content}
+          dataSource={file?.withHeader ? data.slice(1) : data}
           columns={columns}
           pagination={false}
           rowKey={() => uuidv4()}
         />
         <div className={styles.operation}>
           {onMapping && (
-            <Button onClick={() => handleMapping(null)}>
+            <Button onClick={(e) => handleMapping(null, e)} className="primaryBtn studioAddBtn">
               {intl.get('import.ignore')}
             </Button>
           )}
         </div>
       </div>}
     >
-      <Button type="link" className={cls(styles.btnPreview, { 'primaryBtn': btnType === 'default', [styles.btnActived]: selected })} onClick={handleLinkClick}>
+      <Button type="link" disabled={!file} className={cls(styles.btnPreview, { 'primaryBtn': btnType === 'default', [styles.btnActived]: selected })} onClick={handleLinkClick}>
         {children}
       </Button>
     </Popover>

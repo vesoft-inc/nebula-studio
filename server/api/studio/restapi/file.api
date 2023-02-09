@@ -2,19 +2,25 @@ syntax = "v1"
 
 type (
 	FileDestroyRequest {
-		Name string `path:"name" validate:"required"`
+		Names []string `json:"names"`
 	}
 
 	FileStat {
-		Content    [][]string `json:"content"`
-		WithHeader bool       `json:"withHeader"`
-		DataType   string     `json:"dataType"`
-		Name       string     `json:"name"`
-		Size       int64      `json:"size"`
+		Id         int    `json:"id"`
+		Sample     string `json:"sample"`
+		WithHeader bool   `json:"withHeader"`
+		Delimiter  string `json:"delimiter"`
+		Name       string `json:"name"`
+		Size       int64  `json:"size"`
 	}
 
 	FilesIndexData {
 		List []FileStat `json:"list"`
+	}
+	FileConfigUpdateRequest {
+		WithHeader bool   `json:"withHeader"`
+		Delimiter  string `json:"delimiter"`
+		Name       string `json:"name" validate:"required"`
 	}
 )
 
@@ -28,8 +34,10 @@ service studio-api {
 	put /api/files
 	@doc "delete file"
 	@handler FileDestroy
-	delete /api/files/:name(FileDestroyRequest)
+	delete /api/files(FileDestroyRequest)
 	@doc "preview file"
 	@handler FilesIndex
 	get /api/files returns(FilesIndexData)
+	@handler FileConfigUpdate
+	post /api/files/update(FileConfigUpdateRequest)
 }

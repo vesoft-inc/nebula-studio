@@ -42,7 +42,7 @@ type (
 	ImportTaskTagProp {
 		Name  *string `json:"name" validate:"required"`
 		Type  *string `json:"type" validate:"required"`
-		Index *int64  `json:"index" validate:"required"`
+		Index *int64  `json:"index, optional"`
 	}
 
 	ImportTaskTag {
@@ -63,13 +63,13 @@ type (
 	}
 
 	ImportTaskEdgeRank {
-		Index *int64 `json:"index"`
+		Index *int64 `json:"index, optional"`
 	}
 
 	ImportTaskEdgeProp {
 		Name  *string `json:"name"`
 		Type  *string `json:"type"`
-		Index *int64  `json:"index"`
+		Index *int64  `json:"index, optional"`
 	}
 
 	ImportTaskEdge {
@@ -119,16 +119,17 @@ type (
 	}
 
 	GetImportTaskData {
-		Id         string          `json:"id"`
-		Name       string          `json:"name"`
-		User       string          `json:"user"`
-		Address    string          `json:"address"`
-		Space      string          `json:"space"`
-		Status     string          `json:"status"`
-		Message    string          `json:"message"`
-		CreateTime int64           `json:"createTime"`
-		UpdateTime int64           `json:"updateTime"`
-		Stats      ImportTaskStats `json:"stats"`
+		Id            string          `json:"id"`
+		Name          string          `json:"name"`
+		User          string          `json:"user"`
+		Address       string          `json:"address"`
+		ImportAddress []string        `json:"importAddress"`
+		Space         string          `json:"space"`
+		Status        string          `json:"status"`
+		Message       string          `json:"message"`
+		CreateTime    int64           `json:"createTime"`
+		UpdateTime    int64           `json:"updateTime"`
+		Stats         ImportTaskStats `json:"stats"`
 	}
 
 	ImportTaskStats {

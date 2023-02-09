@@ -1,42 +1,54 @@
-import { message } from 'antd';
-import _ from 'lodash';
-import { getI18n } from '@vesoft-inc/i18n';
-import { handleEscape } from './function';
+import { IBasicConfig } from '@app/interfaces/import';
+import { IEdgeItem, ITagItem } from '@app/stores/import';
+import { handleEscape, isEmpty } from './function';
+import { DEFAULT_IMPORT_CONFIG } from './constant';
 
-export function configToJson(payload) {
+interface IConfig extends IBasicConfig {
+  space: string;
+  tagConfig: ITagItem[];
+  edgeConfig: IEdgeItem[];
+  username: string;
+  password: string;
+  spaceVidType: string;
+}
+
+export function configToJson(payload: IConfig) {
   const {
     space,
     username,
     password,
-    host,
-    verticesConfig,
-    edgesConfig,
+    tagConfig,
+    edgeConfig,
     spaceVidType,
-    batchSize
+    batchSize,
+    address,
+    concurrency,
+    retry,
+    channelBufferSize
   } = payload;
-  const vertexToJSON = vertexDataToJSON(
-    verticesConfig,
+  const vertexToJSON = tagDataToJSON(
+    tagConfig,
     spaceVidType,
     batchSize
   );
   const edgeToJSON = edgeDataToJSON(
-    edgesConfig,
+    edgeConfig,
     spaceVidType,
     batchSize
   );
   const files: any[] = [...vertexToJSON, ...edgeToJSON];
   const configJson = {
     version: 'v2',
-    description: 'web console import',
+    description: 'studio import',
     clientSettings: {
-      retry: 3,
-      concurrency: 10,
-      channelBufferSize: 128,
+      retry: Number(retry ?? DEFAULT_IMPORT_CONFIG.retry),
+      concurrency: Number(concurrency ?? DEFAULT_IMPORT_CONFIG.concurrency),
+      channelBufferSize: Number(channelBufferSize ?? DEFAULT_IMPORT_CONFIG.channelBufferSize),
       space: handleEscape(space),
       connection: {
         user: username,
         password,
-        address: host,
+        address: address.join(',')
       },
     },
     files,
@@ -45,126 +57,116 @@ export function configToJson(payload) {
 }
 
 export function edgeDataToJSON(
-  config: any,
+  configs: IEdgeItem[],
   spaceVidType: string,
   batchSize?: string,
 ) {
-  const files = config.map(edge => {
-    const edgePorps: any[] = [];
-    _.sortBy(edge.props, t => t.mapping).forEach(prop => {
-      switch (prop.name) {
-        case 'rank':
-          if (prop.mapping !== null) {
-            edge.rank = {
-              index: prop.mapping,
-            };
-          }
-          break;
-        case 'srcId':
-          edge.srcVID = {
-            index: indexJudge(prop.mapping, prop.name),
-            type: spaceVidType === 'INT64' ? 'int' : 'string',
-          };
-          break;
-        case 'dstId':
-          edge.dstVID = {
-            index: indexJudge(prop.mapping, prop.name),
-            type: spaceVidType === 'INT64' ? 'int' : 'string',
-          };
-          break;
-        default:
-          if (prop.mapping === null && (prop.allowNull || prop.isDefault)) {
-            break;
-          }
-          const _prop = {
-            name: handleEscape(prop.name),
-            type: prop.type,
-            index: indexJudge(prop.mapping, prop.name),
-          };
-          edgePorps.push(_prop);
-      }
-    });
-    const edgeConfig = {
-      path: edge.file.name,
-      batchSize: Number(batchSize) || 60,
-      type: 'csv',
-      csv: {
-        withHeader: false,
-        withLabel: false,
-      },
-      schema: {
-        type: 'edge',
-        edge: {
-          name: handleEscape(edge.type),
-          srcVID: edge.srcVID,
-          dstVID: edge.dstVID,
-          rank: edge.rank,
-          withRanking: edge.rank?.index !== undefined,
-          props: edgePorps,
+  const result = configs.reduce((acc: any, cur) => {
+    const { name, files } = cur;
+    const _config = files.map(item => {
+      const { file, props, srcIdIndex, srcIdFunction, dstIdIndex, dstIdFunction } = item;
+      const vidType = spaceVidType === 'INT64' ? 'int' : 'string';
+      // rank is the last prop
+      const rank = props[props.length - 1];
+      const edgeProps = props.slice(0, -1).reduce((acc: any, cur) => {
+        if (isEmpty(cur.mapping) && (cur.allowNull || cur.isDefault)) {
+          return acc;
+        }
+        acc.push({
+          name: handleEscape(cur.name),
+          type: cur.type,
+          index: cur.mapping,
+        });
+        return acc;
+      }, []);
+      const edgeConfig = {
+        path: file.name,
+        batchSize: Number(batchSize) || DEFAULT_IMPORT_CONFIG.batchSize,
+        type: 'csv',
+        csv: {
+          withHeader: file.withHeader || false,
+          withLabel: false,
+          delimiter: file.delimiter
         },
-      },
-    };
-    return edgeConfig;
-  });
-  return files;
+        schema: {
+          type: 'edge',
+          edge: {
+            name: handleEscape(name),
+            srcVID: {
+              index: srcIdIndex,
+              function: srcIdFunction,
+              type: vidType,
+            },
+            dstVID: {
+              index: dstIdIndex,
+              function: dstIdFunction,
+              type: vidType,
+            },
+            rank: { index: rank.mapping },
+            props: edgeProps,
+          },
+        },
+      };
+      return edgeConfig;
+    });
+    acc.push(..._config);
+    return acc;
+  }, []);
+  return result;
 }
 
-export function vertexDataToJSON(
-  config: any,
+export function tagDataToJSON(
+  configs: ITagItem[],
   spaceVidType: string,
   batchSize?: string
 ) {
-  const files = config.map(vertex => {
-    const tags = vertex.tags.map(tag => {
-      const props = tag.props
-        .sort((p1, p2) => p1.mapping - p2.mapping)
-        .map(prop => {
-          if (prop.mapping === null && (prop.allowNull || prop.isDefault)) {
-            return null;
-          }
-          return {
-            name: handleEscape(prop.name),
-            type: prop.type,
-            index: indexJudge(prop.mapping, prop.name),
-          };
+  const result = configs.reduce((acc: any, cur) => {
+    const { name, files } = cur;
+    const _config = files.map(item => {
+      const { file, props, vidIndex, vidFunction, vidPrefix } = item;
+      const _props = props.reduce((acc: any, cur) => {
+        if (isEmpty(cur.mapping) && (cur.allowNull || cur.isDefault)) {
+          return acc;
+        }
+        acc.push({
+          name: handleEscape(cur.name),
+          type: cur.type,
+          index: cur.mapping,
         });
-      const _tag = {
-        name: handleEscape(tag.name),
-        props: props.filter(prop => prop),
-      };
-      return _tag;
-    });
-    const vertexConfig: any = {
-      path: vertex.file.name,
-      batchSize: Number(batchSize) || 60,
-      type: 'csv',
-      csv: {
-        withHeader: false,
-        withLabel: false,
-      },
-      schema: {
-        type: 'vertex',
-        vertex: {
-          vid: {
-            index: indexJudge(vertex.idMapping, 'vertexId'),
-            type: spaceVidType === 'INT64' ? 'int' : 'string',
-          },
-          tags,
-        },
-      },
-    };
-    return vertexConfig;
-  });
-  return files;
-}
+        return acc;
+      }, []);
 
-export function indexJudge(index: number | null, name: string) {
-  if (index === null) {
-    const { intl } = getI18n();
-    message.error(`${name} ${intl.get('import.indexNotEmpty')}`);
-    throw new Error();
-  }
-  return index;
+      const tags = [{
+        name: handleEscape(name),
+        props: _props.filter(prop => prop),
+      }];
+      return {
+        path: file.name,
+        batchSize: Number(batchSize) || DEFAULT_IMPORT_CONFIG.batchSize,
+        type: 'csv',
+        csv: {
+          withHeader: file.withHeader || false,
+          withLabel: false,
+          delimiter: file.delimiter
+        },
+        schema: {
+          type: 'vertex',
+          vertex: {
+            vid: {
+              index: vidIndex,
+              function: vidFunction,
+              type: spaceVidType === 'INT64' ? 'int' : 'string',
+              prefix: vidPrefix,
+            },
+            tags,
+          },
+        }
+      };
+    });
+    acc.push(..._config);
+    return acc;
+  }, []);
+  return result;
 }
 
 export const exampleJson = {
@@ -257,7 +259,6 @@ export const exampleJson = {
         'type': 'edge',
         'edge': {
           'name': 'order',
-          'withRanking': false,
           'props': [
             {
               'name': 'order_id',
@@ -294,13 +295,11 @@ export const exampleJson = {
             'index': 1,
             'function': null,
             'type': 'string',
-            'prefix': null
           },
           'dstVID': {
             'index': 1,
             'function': null,
             'type': 'string',
-            'prefix': null
           },
           'rank': null
         },

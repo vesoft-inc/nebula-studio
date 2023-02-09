@@ -1,3 +1,4 @@
+@import '~@app/common.less';
 .loadingWrapper {
   position: fixed;
   left: 0;
@@ -27,15 +28,15 @@
     font-size: 14px;
     padding: 0 7px;
     width: 100px;
-    background: #0091FF;
-    border-color: #0091FF;
+    background: @blue;
+    border-color: @blue;
     &:not(:last-child) {
       margin-right: 16px;
     }
     &.sub {
       background: #fff;
-      color: #0091FF;
-      border-color: #0091FF;
+      color: @blue;
+      border-color: @blue;
       &:global(.ant-btn-disabled) {
         color: rgba(0, 0, 0, 0.25);
         border-color: rgba(0, 0, 0, 0.25);
@@ -43,7 +44,7 @@
     }
   }
   .link:not(:global(.ant-btn-disabled)) {
-    color: #0091FF;
+    color: @blue;
   }
   .disabledAction {
     margin-right: 16px;
@@ -84,7 +85,7 @@
     
       li.slick-active button {
         width: 10px;
-        background-color: #0091ff;
+        background-color: @blue;
       }
     }
   }
@@ -155,8 +156,8 @@
       & :global(.anticon > svg) {
         width: 34px;
         height: 34px;
-        color: #0091ff;
-        fill: #0091ff;
+        color: @blue;
+        fill: @blue;
       }
       .title {
         position: relative;
@@ -195,7 +196,7 @@
         height: 30px;
         border-radius: 15px;
         background-color: #d5ddeb;
-        color: #465b7a;
+        color: @darkBlue;
         font-size: 20px;
         line-height: 30px;
         text-align: center;
@@ -283,7 +284,7 @@
       color: #4F4F4F;
     }
     :global(.ant-btn-block) {
-      background-color: #0091FF;
+      background-color: @blue;
     }
   }
 }
@@ -322,7 +323,7 @@
           justify-content: center;
 
           &.ant-tabs-tab-active {
-            background-color: #0091ff;
+            background-color: @blue;
             border-radius: 14px;
 
             .ant-tabs-tab-btn {

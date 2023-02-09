@@ -32,17 +32,18 @@ type TaskMgr struct {
 	db    *TaskDb
 }
 
-func newTask(nebulaAddress string, user string, name string, space string) *Task {
+func newTask(host string, importAddress string, user string, name string, space string) *Task {
 	timeUnix := time.Now().Unix()
 	return &Task{
 		Runner: &cmd.Runner{},
 		TaskInfo: &db.TaskInfo{
 			Name:          name,
+			Address:       host,
 			Space:         space,
 			CreatedTime:   timeUnix,
 			UpdatedTime:   timeUnix,
 			TaskStatus:    StatusProcessing.String(),
-			NebulaAddress: nebulaAddress,
+			ImportAddress: importAddress,
 			User:          user,
 		},
 	}
@@ -61,10 +62,10 @@ func (mgr *TaskMgr) NewTaskID() (string, error) {
 	return taskID, nil
 }
 
-func (mgr *TaskMgr) NewTask(nebulaAddress string, user string, name string, space string) (*Task, string, error) {
+func (mgr *TaskMgr) NewTask(host string, importAddress string, user string, name string, space string) (*Task, string, error) {
 	mux.Lock()
 	defer mux.Unlock()
-	task := newTask(nebulaAddress, user, name, space)
+	task := newTask(host, importAddress, user, name, space)
 	if err := mgr.db.InsertTaskInfo(task.TaskInfo); err != nil {
 		return nil, "", err
 	}
@@ -199,9 +200,9 @@ func (mgr *TaskMgr) StopTask(taskID string) error {
 /*
 `GetAllTaskIDs` will return all task ids in map
 */
-func (mgr *TaskMgr) GetAllTaskIDs(nebulaAddress, username string) ([]string, error) {
+func (mgr *TaskMgr) GetAllTaskIDs(address, username string) ([]string, error) {
 	ids := make([]string, 0)
-	allIds, err := mgr.db.SelectAllIds(nebulaAddress, username)
+	allIds, err := mgr.db.SelectAllIds(address, username)
 	if err != nil {
 		return nil, err
 	}

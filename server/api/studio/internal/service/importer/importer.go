@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -197,12 +198,17 @@ func GetImportTask(tasksDir, taskID, address, username string) (*types.GetImport
 
 	if t, ok := GetTaskMgr().GetTask(taskID); ok {
 		task = *t
+		importAddress, err := parseImportAddress(task.TaskInfo.ImportAddress)
+		if err != nil {
+			return nil, err
+		}
 		result.Id = strconv.Itoa(t.TaskInfo.ID)
 		result.Status = task.TaskInfo.TaskStatus
 		result.Message = task.TaskInfo.TaskMessage
 		result.CreateTime = task.TaskInfo.CreatedTime
 		result.UpdateTime = task.TaskInfo.UpdatedTime
-		result.Address = task.TaskInfo.NebulaAddress
+		result.Address = task.TaskInfo.Address
+		result.ImportAddress = importAddress
 		result.User = task.TaskInfo.User
 		result.Name = task.TaskInfo.Name
 		result.Space = task.TaskInfo.Space
@@ -224,17 +230,22 @@ func GetManyImportTask(tasksDir, address, username string, pageIndex, pageSize i
 	}
 
 	for _, t := range tasks {
+		importAddress, err := parseImportAddress(t.ImportAddress)
+		if err != nil {
+			return nil, err
+		}
 		data := types.GetImportTaskData{
-			Id:         strconv.Itoa(t.ID),
-			Status:     t.TaskStatus,
-			Message:    t.TaskMessage,
-			CreateTime: t.CreatedTime,
-			UpdateTime: t.UpdatedTime,
-			Address:    t.NebulaAddress,
-			User:       t.User,
-			Name:       t.Name,
-			Space:      t.Space,
-			Stats:      types.ImportTaskStats(t.Stats),
+			Id:            strconv.Itoa(t.ID),
+			Status:        t.TaskStatus,
+			Message:       t.TaskMessage,
+			CreateTime:    t.CreatedTime,
+			UpdateTime:    t.UpdatedTime,
+			Address:       t.Address,
+			ImportAddress: importAddress,
+			User:          t.User,
+			Name:          t.Name,
+			Space:         t.Space,
+			Stats:         types.ImportTaskStats(t.Stats),
 		}
 		result.List = append(result.List, data)
 	}
@@ -262,4 +273,16 @@ func StopImportTask(taskID, address, username string) error {
 	} else {
 		return nil
 	}
+}
+
+func parseImportAddress(address string) ([]string, error) {
+	re := regexp.MustCompile(`,\s*`)
+	split := re.Split(address, -1)
+	importAddress := []string{}
+
+	for i := range split {
+		importAddress = append(importAddress, split[i])
+	}
+
+	return importAddress, nil
 }
