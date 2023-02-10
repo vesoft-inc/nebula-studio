@@ -7,6 +7,7 @@ COPY package.json /web/
 COPY .npmrc /web/
 
 # Install any needed packages
+RUN npm cache clear --force
 RUN npm install
 COPY . /web/
 
