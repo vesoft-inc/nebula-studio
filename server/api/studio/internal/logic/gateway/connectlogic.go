@@ -24,6 +24,6 @@ func NewConnectLogic(ctx context.Context, svcCtx *svc.ServiceContext) ConnectLog
 	}
 }
 
-func (l *ConnectLogic) Connect(req types.ConnectDBParams) (resp *types.ConnectDBResult, err error) {
+func (l *ConnectLogic) Connect(req types.ConnectDBParams) (err error) {
 	return service.NewGatewayService(l.ctx, l.svcCtx).ConnectDB(&req)
 }

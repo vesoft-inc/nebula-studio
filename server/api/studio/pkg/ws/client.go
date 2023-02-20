@@ -3,15 +3,14 @@ package ws
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/base"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/client"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -55,33 +54,32 @@ type Client struct {
 	send chan []byte
 }
 
-func (c *Client) switchSpace(msgReceived *MessageReceive) *map[string]any {
-	reqSpace, ok := msgReceived.Body.Content["space"].(string)
-	currentSpace, _ := nsidSpaceMap.Get(c.clientInfo.NSID)
+// func (c *Client) switchSpace(msgReceived *MessageReceive) *map[string]any {
+// 	reqSpace, ok := msgReceived.Body.Content["space"].(string)
+// 	currentSpace, _ := nsidSpaceMap.Get(c.clientInfo.NSID)
+// 	shouldSwitch := ok && reqSpace != "" && currentSpace != reqSpace
+// 	if !shouldSwitch {
+// 		return nil
+// 	}
 
-	shouldSwitch := ok && reqSpace != "" && currentSpace != reqSpace
-	if !shouldSwitch {
-		return nil
-	}
-
-	// name.replace(/\\/gm, '\\\\').replace(/`/gm, '\\`')
-	reqSpace = strings.Replace(reqSpace, "\\", "\\\\", -1)
-	reqSpace = strings.Replace(reqSpace, "`", "\\`", -1)
-	_, _, err := dao.Execute(c.clientInfo.NSID, fmt.Sprintf("USE `%s`", reqSpace), nil)
-	if err != nil {
-		logx.Errorf("[WebSocket switchSpace]: msgReceived.Body.Content(%+v); error(%+v)", &msgReceived.Body.Content, err)
-		content := map[string]any{
-			"code":    base.Error,
-			"message": err.Error(),
-		}
-		if auth.IsSessionError(err) {
-			content["code"] = ecode.ErrSession.GetCode()
-		}
-		return &content
-	}
-	nsidSpaceMap.Set(c.clientInfo.NSID, reqSpace)
-	return nil
-}
+// 	// name.replace(/\\/gm, '\\\\').replace(/`/gm, '\\`')
+// 	reqSpace = strings.Replace(reqSpace, "\\", "\\\\", -1)
+// 	reqSpace = strings.Replace(reqSpace, "`", "\\`", -1)
+// 	_, _, err := client.Execute(c.clientInfo.NSID, fmt.Sprintf("USE `%s`", reqSpace), nil)
+// 	if err != nil {
+// 		logx.Errorf("[WebSocket switchSpace]: msgReceived.Body.Content(%+v); error(%+v)", &msgReceived.Body.Content, err)
+// 		content := map[string]any{
+// 			"code":    base.Error,
+// 			"message": err.Error(),
+// 		}
+// 		if auth.IsSessionError(err) {
+// 			content["code"] = ecode.ErrSession.GetCode()
+// 		}
+// 		return &content
+// 	}
+// 	nsidSpaceMap.Set(c.clientInfo.NSID, reqSpace)
+// 	return nil
+// }
 
 func (c *Client) runNgql(msgReceived *MessageReceive) (closed bool) {
 	defer func() {
@@ -101,16 +99,16 @@ func (c *Client) runNgql(msgReceived *MessageReceive) (closed bool) {
 		},
 	}
 
-	errorContent := c.switchSpace(msgReceived)
-	if errorContent != nil {
-		msgPost.Body.Content = errorContent
-		msgSend, _ := json.Marshal(msgPost)
-		c.send <- msgSend
-		return
-	}
+	// errorContent := c.switchSpace(msgReceived)
+	// if errorContent != nil {
+	// 	msgPost.Body.Content = errorContent
+	// 	msgSend, _ := json.Marshal(msgPost)
+	// 	c.send <- msgSend
+	// 	return
+	// }
 
 	gql, paramList := "", []string{}
-
+	space, _ := msgReceived.Body.Content["space"].(string)
 	if reqGql, ok := msgReceived.Body.Content["gql"].(string); ok {
 		gql = reqGql
 	}
@@ -123,7 +121,7 @@ func (c *Client) runNgql(msgReceived *MessageReceive) (closed bool) {
 		}
 	}
 
-	execute, _, err := dao.Execute(c.clientInfo.NSID, gql, paramList)
+	execute, err := client.Execute(c.clientInfo.NSID, space, gql, paramList)
 	if err != nil {
 		logx.Errorf("[WebSocket runNgql]: msgReceived.Body.Content(%v); error(%v)", &msgReceived.Body.Content, err)
 		content := map[string]any{
@@ -164,15 +162,17 @@ func (c *Client) runBatchNgql(msgReceived *MessageReceive) (closed bool) {
 		},
 	}
 
-	errorContent := c.switchSpace(msgReceived)
-	if errorContent != nil {
-		msgPost.Body.Content = errorContent
-		msgSend, _ := json.Marshal(msgPost)
-		c.send <- msgSend
-		return
-	}
+	// errorContent := c.switchSpace(msgReceived)
+	// if errorContent != nil {
+	// 	msgPost.Body.Content = errorContent
+	// 	msgSend, _ := json.Marshal(msgPost)
+	// 	c.send <- msgSend
+	// 	return
+	// }
 
 	gqls, paramList := []string{}, []string{}
+	space, _ := msgReceived.Body.Content["space"].(string)
+
 	resContentData := make([]map[string]any, 0)
 
 	if reqGqls, ok := msgReceived.Body.Content["gqls"].([]any); ok {
@@ -192,7 +192,7 @@ func (c *Client) runBatchNgql(msgReceived *MessageReceive) (closed bool) {
 	}
 
 	if len(paramList) > 0 {
-		execute, _, err := dao.Execute(c.clientInfo.NSID, "", paramList)
+		execute, err := client.Execute(c.clientInfo.NSID, space, "", paramList)
 		gqlRes := map[string]any{"gql": strings.Join(paramList, "; "), "data": &execute}
 		if err != nil {
 			gqlRes["message"] = err.Error()
@@ -205,7 +205,7 @@ func (c *Client) runBatchNgql(msgReceived *MessageReceive) (closed bool) {
 	}
 
 	for _, gql := range gqls {
-		execute, _, err := dao.Execute(c.clientInfo.NSID, gql, make([]string, 0))
+		execute, err := client.Execute(c.clientInfo.NSID, space, gql, make([]string, 0))
 		gqlRes := map[string]any{"gql": gql, "data": execute}
 		if err != nil {
 			gqlRes["message"] = err.Error()

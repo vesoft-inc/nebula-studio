@@ -7,11 +7,11 @@ import (
 	"net/http"
 
 	"github.com/vesoft-inc/go-pkg/middleware"
-	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/pool"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/client"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/logging"
 	studioMiddleware "github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/middleware"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/server"
@@ -51,7 +51,7 @@ func main() {
 
 	defer server.Stop()
 	waitForCalled := proc.AddWrapUpListener(func() {
-		pool.ClearClients()
+		client.ClearClients()
 	})
 	defer waitForCalled()
 

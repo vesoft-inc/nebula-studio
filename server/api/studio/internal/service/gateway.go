@@ -12,11 +12,11 @@ import (
 	"github.com/samber/lo"
 	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/vesoft-inc/go-pkg/response"
-	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/base"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/client"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 
@@ -29,7 +29,7 @@ type (
 	GatewayService interface {
 		ExecNGQL(request *types.ExecNGQLParams) (*types.AnyResponse, error)
 		BatchExecNGQL(request *types.BatchExecNGQLParams) (*types.AnyResponse, error)
-		ConnectDB(request *types.ConnectDBParams) (*types.ConnectDBResult, error)
+		ConnectDB(request *types.ConnectDBParams) error
 		DisconnectDB() (*types.AnyResponse, error)
 		ExecSeqNGQL(request *types.ExecNGQLParams) (*types.ExecSeqNGQLResult, error)
 	}
@@ -51,12 +51,12 @@ func NewGatewayService(ctx context.Context, svcCtx *svc.ServiceContext) GatewayS
 	}
 }
 
-func (s *gatewayService) ConnectDB(request *types.ConnectDBParams) (*types.ConnectDBResult, error) {
+func (s *gatewayService) ConnectDB(request *types.ConnectDBParams) error {
 	httpRes, _ := middleware.GetResponseWriter(s.ctx)
 
-	tokenString, clientInfo, err := auth.ParseConnectDBParams(request, &s.svcCtx.Config)
+	tokenString, err := auth.ParseConnectDBParams(request, &s.svcCtx.Config)
 	if err != nil {
-		return nil, s.withErrorMessage(ecode.ErrBadRequest, err, "parse request failed")
+		return s.withErrorMessage(ecode.ErrBadRequest, err, "parse request failed")
 	}
 
 	configAuth := s.svcCtx.Config.Auth
@@ -76,15 +76,13 @@ func (s *gatewayService) ConnectDB(request *types.ConnectDBParams) (*types.Conne
 
 	httpRes.Header().Add("Set-Cookie", tokenCookie.String())
 
-	return &types.ConnectDBResult{
-		Version: string(clientInfo.NebulaVersion),
-	}, nil
+	return nil
 }
 
 func (s *gatewayService) DisconnectDB() (*types.AnyResponse, error) {
 	authData, ok := s.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	if ok && authData.NSID != "" {
-		dao.Disconnect(authData.NSID)
+		client.CloseClient(authData.NSID)
 	}
 
 	httpRes, _ := middleware.GetResponseWriter(s.ctx)
@@ -98,7 +96,7 @@ func (s *gatewayService) DisconnectDB() (*types.AnyResponse, error) {
 func (s *gatewayService) ExecNGQL(request *types.ExecNGQLParams) (*types.AnyResponse, error) {
 	authData := s.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 
-	execute, _, err := dao.Execute(authData.NSID, request.Gql, request.ParamList)
+	execute, err := client.Execute(authData.NSID, request.Space, request.Gql, request.ParamList)
 	if err != nil {
 		if auth.IsSessionError(err) {
 			return nil, ecode.WithSessionMessage(err)
@@ -118,7 +116,7 @@ func (s *gatewayService) BatchExecNGQL(request *types.BatchExecNGQLParams) (*typ
 
 	data := make([]map[string]interface{}, 0)
 	if len(paramList) > 0 {
-		execute, _, err := dao.Execute(NSID, "", paramList)
+		execute, err := client.Execute(NSID, "", "", paramList)
 		gqlRes := map[string]interface{}{"gql": strings.Join(paramList, "; "), "data": execute}
 		if err != nil {
 			gqlRes["message"] = err.Error()
@@ -129,7 +127,7 @@ func (s *gatewayService) BatchExecNGQL(request *types.BatchExecNGQLParams) (*typ
 		data = append(data, gqlRes)
 	}
 	for _, gql := range gqls {
-		execute, _, err := dao.Execute(NSID, gql, make([]string, 0))
+		execute, err := client.Execute(NSID, request.Space, gql, make([]string, 0))
 		gqlRes := map[string]interface{}{"gql": gql, "data": execute}
 		if err != nil {
 			if auth.IsSessionError(err) {
@@ -181,14 +179,14 @@ func (s *gatewayService) ExecSeqNGQL(request *types.ExecNGQLParams) (*types.Exec
 		gqlList := strings.Split(gql, ";")
 
 		if len(gqlList) <= maxStatementNum {
-			_, _, err := dao.Execute(authData.NSID, gql, request.ParamList)
+			_, err := client.Execute(authData.NSID, request.Space, gql, request.ParamList)
 			if err != nil {
 				return nil, s.withErrorMessage(ecode.ErrInternalServer, err, "execute failed")
 			}
 		} else {
 			for chunkIdx := 0; chunkIdx < len(gqlList); chunkIdx += maxStatementNum {
 				gqlChunkList := gqlList[chunkIdx:lo.Min([]int{chunkIdx + maxStatementNum, len(gqlList)})]
-				_, _, err := dao.Execute(authData.NSID, strings.Join(gqlChunkList[:], ";"), request.ParamList)
+				_, err := client.Execute(authData.NSID, request.Space, strings.Join(gqlChunkList[:], ";"), request.ParamList)
 				if err != nil {
 					return nil, s.withErrorMessage(ecode.ErrInternalServer, err, "execute failed")
 				}

@@ -27,7 +27,7 @@ func ConnectHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		l := gateway.NewConnectLogic(r.Context(), svcCtx)
-		data, err := l.Connect(req)
-		svcCtx.ResponseHandler.Handle(w, r, data, err)
+		err := l.Connect(req)
+		svcCtx.ResponseHandler.Handle(w, r, nil, err)
 	}
 }

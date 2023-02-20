@@ -4,18 +4,17 @@ type (
 	ExecNGQLParams {
 		Gql       string   `json:"gql"`
 		ParamList []string `json:"paramList,optional"`
+		Space     string   `json:"space,optional"`
 	}
 	BatchExecNGQLParams {
 		Gqls      []string `json:"gqls"`
 		ParamList []string `json:"paramList,optional"`
+		Space     string   `json:"space,optional"`
 	}
 	ConnectDBParams {
 		Address       string `json:"address"`
 		Port          int    `json:"port"`
 		Authorization string `header:"Authorization"`
-	}
-	ConnectDBResult {
-		Version string `json:"version"`
 	}
 	AnyResponse {
 		Data interface{} `json:"data"`
@@ -52,7 +51,7 @@ service studio-api {
 service studio-api {
 	@doc "Connect DB"
 	@handler Connect
-	post /connect(ConnectDBParams) returns (ConnectDBResult)
+	post /connect(ConnectDBParams)
 	
 	@doc "Disonnect DB"
 	@handler Disonnect

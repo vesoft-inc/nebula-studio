@@ -8,21 +8,19 @@ type GetHealth struct {
 type ExecNGQLParams struct {
 	Gql       string   `json:"gql"`
 	ParamList []string `json:"paramList,optional"`
+	Space     string   `json:"space,optional"`
 }
 
 type BatchExecNGQLParams struct {
 	Gqls      []string `json:"gqls"`
 	ParamList []string `json:"paramList,optional"`
+	Space     string   `json:"space,optional"`
 }
 
 type ConnectDBParams struct {
 	Address       string `json:"address"`
 	Port          int    `json:"port"`
 	Authorization string `header:"Authorization"`
-}
-
-type ConnectDBResult struct {
-	Version string `json:"version"`
 }
 
 type AnyResponse struct {
