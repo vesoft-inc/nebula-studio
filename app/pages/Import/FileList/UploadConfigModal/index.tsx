@@ -96,7 +96,7 @@ const UploadConfigModal = (props: IProps) => {
   }, [data]);
   const deletePreviewFile = useCallback((e: React.MouseEvent, index: number) => {
     e.stopPropagation();
-    const isActive = activeItem.uid === data[index].uid;
+    const isActive = activeItem?.uid === data[index].uid;
     const newData = data.filter((_, i) => i !== index);
     const checkedNum = data.reduce((n, file) => n + (file.withHeader & 1), 0);
     setState({
@@ -175,7 +175,7 @@ const UploadConfigModal = (props: IProps) => {
         render: value => <span className={styles.limitWidth}>{value}</span>,
       };
     })
-    : [], [previewContent, activeItem]);
+    : [], [previewContent, activeItem?.withHeader]);
   const handleConfirm = useCallback(() => {
     const existFileName = fileList.map((file) => file.name);
     const repeatFiles = data.filter((file) => existFileName.includes(file.name));

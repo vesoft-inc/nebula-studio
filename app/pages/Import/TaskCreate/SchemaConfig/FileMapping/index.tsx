@@ -34,6 +34,8 @@ const VIDSetting = observer((props: {
 }) => {
   const { keyMap: { idKey, idFunction, idPrefix, label }, data } = props;
   const { intl } = useI18n();
+  const { schema } = useStore();
+  const { spaceVidType } = schema;
   return <div className={styles.row}>
     <Collapse bordered={false} ghost className={styles.vidCollapse}>
       <Panel header={<div className={cls(styles.panelTitle, styles.spaceBetween)}>
@@ -57,7 +59,7 @@ const VIDSetting = observer((props: {
           </div>
         </>} />
       </div>} key="default">
-        {idFunction && <div className={styles.rowItem}>
+        {spaceVidType === 'INT64' && idFunction && <div className={styles.rowItem}>
           <span className={styles.label}>{intl.get('import.vidFunction')}</span>
           <Select
             bordered={false}
