@@ -404,6 +404,13 @@
     "sketchModuleLink": "https://docs.nebula-graph.com.cn/3.4.0/nebula-studio/quick-start/draft/",
     "basketballplayerDocLink": "https://nebula-graph.com.cn/posts/playground-basketball-player",
     "shareholdingDocLink": "https://nebula-graph.com.cn/demo/shared-holding",
+    "openstackDocLink": "https://www.siwei.io/graph-enabled-infra-ops",
+    "snsDocLink": "https://www.siwei.io/nebulagraph-sns/",
+    "datalineageDocLink": "https://www.siwei.io/data-lineage-oss-ref-solution/",
+    "movieDocLink": "https://www.siwei.io/recommendation-system-with-graphdb/",
+    "idMappingDocLink": "https://www.siwei.io/identity-resolution/",
+    "fraudDetectionDocLink": "https://www.siwei.io/fraud-detection-with-nebulagraph/",
+    "fifa2022DocLink": "https://www.siwei.io/chatgpt-and-nebulagraph-predict-fifa-world-cup/",
     "alwaysShow": "始终展示欢迎页",
     "progressTitle": "下载 & 导入数据"
   }
