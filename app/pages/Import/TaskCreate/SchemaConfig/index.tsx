@@ -44,7 +44,7 @@ const SelectMappingTargetHeader = observer((props: IHeaderProps) => {
       onClick={e => e.stopPropagation()}
       onChange={onSelect}
     >
-      {targetList.filter(t => !config.some(c => c.name === t)).map(t => (
+      {targetList?.filter(t => !config.some(c => c.name === t)).map(t => (
         <Option value={t} key={t}>
           {t}
         </Option>

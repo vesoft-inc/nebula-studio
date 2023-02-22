@@ -63,9 +63,10 @@ export class GlobalStore {
         },
       },
     );
-    resetStore();
+    // clear storage before reset store, some store data is related to storage
     this.clearStorage();
     this.clearCookies();
+    resetStore();
     this.ngqlRunner?.desctory();
     this.history.push(`/login${location.search}`);
   };
@@ -120,13 +121,14 @@ export class GlobalStore {
 
   getGraphAddress = async () => {
     const { code, data } = await service.execNGQL({ gql: 'show hosts graph;' });
-    return code !== 0 ? [] : data.tables.reduce((acc, cur) => {
-      if (isValidIP(cur.Host)) {
+    const list = code !== 0 ? [] : data.tables.reduce((acc, cur) => {
+      if (isValidIP(cur.Host) && cur.Status === 'ONLINE') {
         acc.push(`${cur.Host}:${cur.Port}`);
       }
       return acc;
     }
     , []);
+    return list.length ? list : [this.host];
   };
 }
 

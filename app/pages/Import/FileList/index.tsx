@@ -120,6 +120,7 @@ const FileList = () => {
           title={intl.get('common.ask')}
           okText={intl.get('common.confirm')}
           cancelText={intl.get('common.cancel')}
+          disabled={!selectFiles.length}
         >
           <Button className={styles.deleteBtn} disabled={!selectFiles.length}>
             {intl.get('import.deleteFiles')}
