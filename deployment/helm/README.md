@@ -48,7 +48,7 @@ $ helm uninstall my-studio
 |-----------|-------------|---------|
 | replicaCount  | Replicas for Deployment  | 0  |
 | image.nebulaStudio.name  |  The image name of nebula-graph-studio  | vesoft/nebula-graph-studio |
-| image.nebulaStudio.version  |  The image version nebula-graph-studio  | v3.6.0  |
+| image.nebulaStudio.version  |  The image version nebula-graph-studio  | v3.6.1  |
 | service.type  | The service type, should be one of ['NodePort', 'ClusterIP', 'LoadBalancer'] |  ClusterIP  |
 | service.port  | The expose port for nebula-studio server |  7001  |
 | service.nodePort  | The proxy port for accessing nebula-studio outside k8s cluster |  32701  |
