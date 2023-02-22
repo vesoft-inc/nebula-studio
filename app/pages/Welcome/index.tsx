@@ -162,7 +162,7 @@ const getDatasetList = (): DatasetItem[] => {
     {
       type: 'starter',
       tags: ['starter'],
-      spaceName: 'demo_datalineage',
+      spaceName: 'demo_data_lineage',
       fileName: 'datalineage',
       rename: undefined as unknown as string,
       detail: {
@@ -199,8 +199,8 @@ const getDatasetList = (): DatasetItem[] => {
       docLink: intl.get('welcome.idMappingDocLink'),
     },
     {
-      type: 'starter',
-      tags: ['starter'],
+      type: 'solution',
+      tags: ['solution'],
       spaceName: 'demo_fraud_detection',
       fileName: 'fraud_detection',
       rename: undefined as unknown as string,
