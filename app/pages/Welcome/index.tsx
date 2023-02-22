@@ -179,8 +179,8 @@ const getDatasetList = (): DatasetItem[] => {
       fileName: 'movie',
       rename: undefined as unknown as string,
       detail: {
-        vertexCount: 299589,
-        edgeCount: 1000197,
+        vertexCount: 47766,
+        edgeCount: 160000,
       },
       coverImg: `${process.env.CDN_PATH || '/'}images/welcome/movie.png`,
       docLink: intl.get('welcome.movieDocLink'),
