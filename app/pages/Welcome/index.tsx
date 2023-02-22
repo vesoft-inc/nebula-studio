@@ -292,7 +292,7 @@ function Welcome(props: IProps) {
         message.error(intl.get('welcome.spaceExist', { space: space.spaceName }));
         return;
       }
-      const gql = await fetch(`${process.env.CDN_PATH || ''}/datasets/${space.fileName}.ngql`).then((r) => r.text());
+      const gql = await fetch(`${process.env.CDN_PATH || '/'}datasets/${space.fileName}.ngql`).then((r) => r.text());
       setSpaceLoading({ spaceName: space.spaceName, leftTime: initLoadingTime, progressModalOpen: true });
       const downloadRes = await service.execSeqNGQL({
         gql: gql.replaceAll('\n', ''),
@@ -392,7 +392,7 @@ function Welcome(props: IProps) {
           <Icon type="icon-studio-btn-close" className={styles.actionClose} onClick={closePageHandler} />
         </div>
         <h1 className={styles.welcomeLabel}>
-          {intl.get('doc.welcome')}&nbsp;<span>{product}</span>
+          {intl.get('doc.welcome')}&nbsp;<span style={{ fontWeight: 'bold' }}>{product}</span>
         </h1>
       </div>
       <div className={styles.docBox}>
