@@ -36,5 +36,5 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         platforms: linux/amd64,linux/arm64
-        tags: vesoft/nebula-studio:nightly
+        tags: vesoft/nebula-graph-studio:nightly
         push: true

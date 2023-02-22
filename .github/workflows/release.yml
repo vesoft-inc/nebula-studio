@@ -34,7 +34,7 @@ jobs:
       uses: docker/metadata-action@v4
       with:
         images: |
-          vesoft/nebula-studio
+          vesoft/nebula-graph-studio
         tags: |
           # git tag & latest coverred
           type=ref,event=tag
