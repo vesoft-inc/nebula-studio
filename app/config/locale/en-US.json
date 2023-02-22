@@ -50,7 +50,7 @@
     "space": "Space",
     "version": "Version",
     "statistics": "Statistics",
-    "duplicate": "Duplicate",
+    "duplicate": "Copy",
     "copy": "Copy",
     "copySuccess": "Copied successfully",
     "sketch": "Schema drafting",
@@ -356,6 +356,13 @@
     "sketchModuleLink": "https://docs.nebula-graph.io/3.3.0/nebula-studio/quick-start/draft/",
     "basketballplayerDocLink": "",
     "shareholdingDocLink": "https://nebula-graph.io/demo/shared-holding",
+    "openstackDocLink": "",
+    "snsDocLink": "https://siwei.io/en/nebulagraph-sns/",
+    "datalineageDocLink": "https://siwei.io/en/en/data-lineage-oss-ref-solution/",
+    "movieDocLink": "",
+    "idMappingDocLink": "",
+    "fraudDetectionDocLink": "https://siwei.io/en/fraud-detection-with-nebulagraph/",
+    "fifa2022DocLink": "https://siwei.io/en/chatgpt-and-nebulagraph-predict-fifa-world-cup/",
     "alwaysShow": "Always show the welcome page",
     "progressTitle": "Download & Import Data"
   }
