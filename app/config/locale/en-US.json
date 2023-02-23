@@ -73,7 +73,16 @@
     "ngqlIntro": "NebulaGraph Query Language (nGQL)",
     "ngqlIntroTip": "nGQL is a declarative graph query language for NebulaGraph. It allows expressive and efficient graph patterns. ",
     "start": "Get Started",
-    "sketchIntro": "Schema drafting"
+    "sketchIntro": "Schema drafting",
+    "basketballplayerIntro": "A typical schema composed of two vertex types (player and team) and two edge types (serve and follow), widely referenced by documentation.",
+    "snsIntro": "Social Network Graph demo, new friend recommendation, feed generation, etc.",
+    "movieIntro": "Movie recommendation with CBF, ItemCF and UserCF in Graph.",
+    "datalineageIntro": "Metadata governance on NebulaGraph, data lineage query, data dependency analysis, etc.",
+    "idMappingIntro": "ID Mapping, Identity Resolution for a user system in Graph",
+    "fifa2022Intro": "2022 Football World Game knowledge graph, try predict the winner, assuming we don't know the result.",
+    "shareholdingIntro": "Shareholding graph, query the shareholding relationship of a company, and the relationship between the company and the shareholder.",
+    "openstackIntro": "A demo of AI Ops with Graph, taking OpenStack as an example, where all resources were included in one graph.",
+    "fraudDetectionIntro": "Fraud detection with Graph, taking loan application as an example"
   },
   "warning": {
     "connectError": "Connection refused, please configure server again",
