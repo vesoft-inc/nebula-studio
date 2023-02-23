@@ -90,6 +90,8 @@ func (pool *SessionPool) releaseSession(clientSession *ClientSession) {
 }
 
 func (pool *SessionPool) clearSessions() {
+	pool.mu.Lock()
+	defer pool.mu.Unlock()
 	for _, client := range pool.sessions {
 		client.session.Release()
 	}

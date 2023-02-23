@@ -66,9 +66,7 @@ var (
 	clientMux        sync.Mutex
 )
 
-var log = nebula.DefaultLogger{}
-
-var routineLimit = 100
+var log = newNebulaLogger()
 
 func NewClient(address string, port int, username string, password string, conf nebula.PoolConfig) (*ClientInfo, error) {
 	var err error
@@ -116,9 +114,7 @@ func NewClient(address string, port int, username string, password string, conf 
 	currentClientNum++
 	clientMux.Unlock()
 
-	for i := 0; i < routineLimit; i++ {
-		go client.handleRequest(nsid)
-	}
+	go client.handleRequest(nsid)
 
 	info := &ClientInfo{
 		ClientID: nsid,
@@ -139,23 +135,27 @@ func GetClient(nsid string) (*Client, error) {
 }
 
 func CloseClient(nsid string) {
+	clientMux.Lock()
 	client := clientPool[nsid]
 	if client != nil {
 		client.CloseChannel <- true
 	}
+	clientMux.Unlock()
 }
 
 func ClearClients() {
+	clientMux.Lock()
 	for _, client := range clientPool {
 		client.sessionPool.clearSessions()
 		client.graphClient.Close()
 	}
+	clientMux.Unlock()
 }
 
 func recycleClients() {
 	clientMux.Lock()
+	now := time.Now().Unix()
 	for _, client := range clientPool {
-		now := time.Now().Unix()
 		expireAt := client.updateTime + SessionExpiredDuration
 		if now > expireAt {
 			client.CloseChannel <- true

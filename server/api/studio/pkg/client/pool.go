@@ -320,7 +320,7 @@ func (client *Client) handleRequest(nsid string) {
 	for {
 		select {
 		case request := <-client.RequestChannel:
-			func() {
+			go func() {
 				defer func() {
 					if err := recover(); err != nil {
 						logx.Errorf("[handle request]: &s, %+v", request.Gql, err)
@@ -451,23 +451,19 @@ func Execute(nsid string, space string, gql string, paramList ParameterList) (Ex
 	}
 	client := clientPool[nsid]
 	responseChannel := make(chan ChannelResponse)
-	select {
-	case client.RequestChannel <- ChannelRequest{
+	client.RequestChannel <- ChannelRequest{
 		Gql:             gql,
 		Space:           space,
 		ResponseChannel: responseChannel,
 		ParamList:       paramList,
-	}:
-		response := <-responseChannel
-		paramsMap := response.Params
-		result, err := parseExecuteData(response, paramsMap)
-		if err != nil {
-			return result, err
-		}
-		return result, nil
-	case <-time.After(time.Second * 5):
-		return result, errors.New("client is busy, please try again later")
 	}
+	response := <-responseChannel
+	paramsMap := response.Params
+	result, err := parseExecuteData(response, paramsMap)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 }
 
 func parseExecuteData(response ChannelResponse, paramsMap ParameterMap) (ExecuteResult, error) {
