@@ -65,6 +65,7 @@ export class FilesStore {
         this.fileList = this.fileList.filter((item) => !names.includes(item.name));
       });
     }
+    return res.code === 0;
   };
 
   updateFileConfig = async (payload: {
