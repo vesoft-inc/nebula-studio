@@ -210,7 +210,7 @@
         box-shadow: 0 0 4px #ccc;
       }
       .withCoverContent {
-        height: 190px;
+        height: 240px;
         padding: 16px 30px 20px;
         display: flex;
         flex-direction: column;
@@ -222,7 +222,6 @@
           align-items: center;
         }
         .contentTitle {
-          flex: 1 1 auto;
           padding: 18px 0 6px;
           font-family: Roboto-Regular, sans-serif;
           font-style: normal;
@@ -230,10 +229,20 @@
           font-size: 20px;
           color: #000;
           overflow: hidden;
-          word-break: break-all;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+        .contentDescription {
+          font-weight: 300;
+          font-size: 14px;
+          color: #4F4F4F;
+          flex: 1 1 auto;
+          .descInner {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+          }
         }
         .infoWrapper {
           color: #4f4f4f;
@@ -247,7 +256,7 @@
         }
       }
       &.withCover {
-        height: 400px;
+        // height: 400px;
         padding: 0;
         display: block;
         .actionWrapper {

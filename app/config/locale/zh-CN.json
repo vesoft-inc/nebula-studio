@@ -77,7 +77,16 @@
     "ngqlIntro": "NebulaGraph 查询语言 (nGQL)",
     "ngqlIntroTip": "nGQL 是 NebulaGraph 使用的的声明式图查询语言，是为开发和运维人员设计的类 SQL 查询语言，易于学习。",
     "start": "快速开始",
-    "sketchIntro": "Schema 草图"
+    "sketchIntro": "Schema 草图",
+    "basketballplayerIntro": "最简单的示例图谱空间，最广泛被文档中引用的数据集",
+    "snsIntro": "社交网络示例图谱空间，包含用户、好友、帖子、评论等数据，新好友推荐、时间线生成、社交分析",
+    "movieIntro": "电影推荐图谱，尝试在图上做 CBF、ItemCF 和 UserCF 算法",
+    "datalineageIntro": "元数据管理实例数据集，血缘查询、血缘依赖分析、大数据治理",
+    "idMappingIntro": "ID Mapping，用户系统上的实体分析案例",
+    "fifa2022Intro": "面向关系而非复杂属性的世界杯图谱，尝试利用图算法预测冠军吧（假设我们还不知道冠军）",
+    "shareholdingIntro": "股权关系图谱，图上实做股权穿透、公司实控人分析、背景调查",
+    "openstackIntro": "图驱动的复杂基础设施智能运维实操，基于 OpenStack 全资源抓取图谱的例子",
+    "fraudDetectionIntro": "欺诈检测的图应用，以借贷场景为例"
   },
   "warning": {
     "connectError": "数据库连接有误，请重新配置",

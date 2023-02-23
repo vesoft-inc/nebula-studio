@@ -1,6 +1,6 @@
-CREATE SPACE IF NOT EXISTS `demo_fifa_2022` (partition_num = 3, replica_factor = 1, charset = utf8, collate = utf8_bin, vid_type = FIXED_STRING(32)) comment="https://www.siwei.io/chatgpt-and-nebulagraph-predict-fifa-world-cup/";
+CREATE SPACE IF NOT EXISTS `demo_football_2022` (partition_num = 3, replica_factor = 1, charset = utf8, collate = utf8_bin, vid_type = FIXED_STRING(32)) comment="https://www.siwei.io/chatgpt-and-nebulagraph-predict-fifa-world-cup/";
 :sleep 10;
-USE `demo_fifa_2022`;
+USE `demo_football_2022`;
 CREATE TAG IF NOT EXISTS `Group` ( `name` string NOT NULL) ttl_duration = 0, ttl_col = "";
 CREATE TAG IF NOT EXISTS `club` ( `name` string NOT NULL) ttl_duration = 0, ttl_col = "";
 CREATE TAG IF NOT EXISTS `player` ( `name` string NOT NULL, `number` int64 NOT NULL, `position` string NOT NULL, `DOB` string NOT NULL, `caps` int64 NOT NULL, `goals` int64 NOT NULL, `age` int64 NOT NULL) ttl_duration = 0, ttl_col = "";
