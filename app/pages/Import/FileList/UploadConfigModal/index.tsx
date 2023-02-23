@@ -1,12 +1,11 @@
 import Icon from '@app/components/Icon';
 import { useI18n } from '@vesoft-inc/i18n';
-import { Button, Checkbox, Input, Modal, Table, Popconfirm, Dropdown } from 'antd';
+import { Button, Input, Modal, Table, Popconfirm, Dropdown } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useState } from 'react';
 import { usePapaParse } from 'react-papaparse';
 import cls from 'classnames';
 import { StudioFile } from '@app/interfaces/import';
-import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { useStore } from '@app/stores';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { ExclamationCircleFilled } from '@ant-design/icons';
@@ -39,8 +38,8 @@ const UploadConfigModal = (props: IProps) => {
     data: [],
     activeItem: null,
     previewContent: [],
-    checkAll: false,
-    indeterminate: false,
+    // checkAll: false,
+    // indeterminate: false,
     loading: false,
     uploading: false,
     setState: (obj) => Object.assign(state, obj),
@@ -74,36 +73,36 @@ const UploadConfigModal = (props: IProps) => {
     });
   }, []);
 
-  const onCheckAllChange = useCallback((e: CheckboxChangeEvent) => {
-    const { data, setState } = state;
-    const { checked } = e.target;
-    setState({
-      checkAll: checked,
-      indeterminate: false,
-      data: data.map(i => (i.withHeader = checked, i))
-    });
-  }, []);
+  // const onCheckAllChange = useCallback((e: CheckboxChangeEvent) => {
+  //   const { data, setState } = state;
+  //   const { checked } = e.target;
+  //   setState({
+  //     checkAll: checked,
+  //     indeterminate: false,
+  //     data: data.map(i => (i.withHeader = checked, i))
+  //   });
+  // }, []);
 
-  const updateItem = useCallback((e: CheckboxChangeEvent, item: StudioFile) => {
-    const { data, setState } = state;
-    const { checked } = e.target;
-    const nextData = data.map(i => (i === item && (i.withHeader = checked), i));
-    const checkedNum = data.reduce((n, file) => n + (file.withHeader & 1), 0);
-    setState({
-      checkAll: checkedNum === data.length,
-      indeterminate: !!checkedNum && checkedNum < data.length,
-      data: nextData
-    });
-  }, []);
+  // const updateItem = useCallback((e: CheckboxChangeEvent, item: StudioFile) => {
+  //   const { data, setState } = state;
+  //   const { checked } = e.target;
+  //   const nextData = data.map(i => (i === item && (i.withHeader = checked), i));
+  //   const checkedNum = data.reduce((n, file) => n + (file.withHeader & 1), 0);
+  //   setState({
+  //     checkAll: checkedNum === data.length,
+  //     indeterminate: !!checkedNum && checkedNum < data.length,
+  //     data: nextData
+  //   });
+  // }, []);
   const deletePreviewFile = useCallback((e: React.MouseEvent, index: number) => {
     const { activeItem, data, setState, previewContent } = state;
     e.stopPropagation();
     const isActive = activeItem?.uid === data[index].uid;
     const newData = data.filter((_, i) => i !== index);
-    const checkedNum = data.reduce((n, file) => n + (file.withHeader & 1), 0);
+    // const checkedNum = data.reduce((n, file) => n + (file.withHeader & 1), 0);
     setState({
-      checkAll: checkedNum === newData.length && newData.length > 0,
-      indeterminate: !!checkedNum && checkedNum < newData.length,
+      // checkAll: checkedNum === newData.length && newData.length > 0,
+      // indeterminate: !!checkedNum && checkedNum < newData.length,
       data: newData,
       activeItem: isActive ? null : activeItem,
       previewContent: isActive ? [] : previewContent,
@@ -170,7 +169,7 @@ const UploadConfigModal = (props: IProps) => {
   if(!visible) {
     return null;
   }
-  const { uploading, data, activeItem, previewContent, checkAll, indeterminate, loading, setState } = state;
+  const { uploading, data, activeItem, previewContent, loading, setState } = state;
   const parseColumns = previewContent.length
     ? previewContent[0].map((header, index) => {
       const textIndex = index;
@@ -186,18 +185,18 @@ const UploadConfigModal = (props: IProps) => {
     {
       title: intl.get('import.fileName'),
       dataIndex: 'name',
-      align: 'center' as const,
-      width: '30%'
+      // align: 'center' as const,
+      width: '60%'
     },
-    {
-      title: <>
-        <Checkbox checked={checkAll} indeterminate={indeterminate} onChange={onCheckAllChange} />
-        <span style={{ paddingLeft: '5px' }}>{intl.get('import.withHeader')}</span>
-      </>,
-      key: 'withHeader',
-      width: '30%',
-      render: record => <Checkbox checked={record.withHeader} onChange={e => updateItem(e, record)}>{intl.get('import.hasHeader')}</Checkbox>,
-    },
+    // {
+    //   title: <>
+    //     <Checkbox checked={checkAll} indeterminate={indeterminate} onChange={onCheckAllChange} />
+    //     <span style={{ paddingLeft: '5px' }}>{intl.get('import.withHeader')}</span>
+    //   </>,
+    //   key: 'withHeader',
+    //   width: '30%',
+    //   render: record => <Checkbox checked={record.withHeader} onChange={e => updateItem(e, record)}>{intl.get('import.hasHeader')}</Checkbox>,
+    // },
     {
       title: <>
         <span>{intl.get('import.delimiter')}</span>

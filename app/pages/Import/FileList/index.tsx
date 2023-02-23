@@ -26,13 +26,13 @@ const FileList = () => {
     {
       title: intl.get('import.fileName'),
       dataIndex: 'name',
-      width: '50%'
+      width: '40%'
     },
-    {
-      title: intl.get('import.withHeader'),
-      dataIndex: 'withHeader',
-      render: value => value ? intl.get('import.hasHeader') : intl.get('import.noHeader'),
-    },
+    // {
+    //   title: intl.get('import.withHeader'),
+    //   dataIndex: 'withHeader',
+    //   render: value => value ? intl.get('import.hasHeader') : intl.get('import.noHeader'),
+    // },
     {
       title: intl.get('import.delimiter'),
       dataIndex: 'delimiter',
