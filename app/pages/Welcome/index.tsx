@@ -66,6 +66,7 @@ export type DatasetType = 'starter' | 'solution';
 export interface DatasetItem {
   type: DatasetType;
   tags?: string[];
+  description: string;
   spaceName: string;
   fileName: string;
   rename?: string;
@@ -110,6 +111,7 @@ const getDatasetList = (): DatasetItem[] => {
     {
       type: 'starter',
       tags: ['starter'],
+      description: intl.get('doc.basketballplayerIntro'),
       spaceName: 'demo_basketballplayer',
       fileName: 'basketballplayer',
       rename: undefined as unknown as string,
@@ -123,6 +125,7 @@ const getDatasetList = (): DatasetItem[] => {
     {
       type: 'solution',
       tags: ['solution'],
+      description: intl.get('doc.shareholdingIntro'),
       spaceName: 'demo_shareholding',
       fileName: 'shareholding',
       rename: undefined as unknown as string,
@@ -136,6 +139,7 @@ const getDatasetList = (): DatasetItem[] => {
     {
       type: 'starter',
       tags: ['starter'],
+      description: intl.get('doc.snsIntro'),
       spaceName: 'demo_sns',
       fileName: 'sns',
       rename: undefined as unknown as string,
@@ -149,6 +153,7 @@ const getDatasetList = (): DatasetItem[] => {
     {
       type: 'solution',
       tags: ['solution'],
+      description: intl.get('doc.aiopsIntro'),
       spaceName: 'demo_ai_ops',
       fileName: 'openstack',
       rename: undefined as unknown as string,
@@ -162,6 +167,7 @@ const getDatasetList = (): DatasetItem[] => {
     {
       type: 'starter',
       tags: ['starter'],
+      description: intl.get('doc.datalineageIntro'),
       spaceName: 'demo_data_lineage',
       fileName: 'datalineage',
       rename: undefined as unknown as string,
@@ -175,6 +181,7 @@ const getDatasetList = (): DatasetItem[] => {
     {
       type: 'starter',
       tags: ['starter'],
+      description: intl.get('doc.movieIntro'),
       spaceName: 'demo_movie_recommendation',
       fileName: 'movie',
       rename: undefined as unknown as string,
@@ -188,6 +195,7 @@ const getDatasetList = (): DatasetItem[] => {
     {
       type: 'starter',
       tags: ['starter'],
+      description: intl.get('doc.idMappingIntro'),
       spaceName: 'demo_identity_resolution',
       fileName: 'id_mapping',
       rename: undefined as unknown as string,
@@ -201,6 +209,7 @@ const getDatasetList = (): DatasetItem[] => {
     {
       type: 'solution',
       tags: ['solution'],
+      description: intl.get('doc.fraudDetectionIntro'),
       spaceName: 'demo_fraud_detection',
       fileName: 'fraud_detection',
       rename: undefined as unknown as string,
@@ -214,6 +223,7 @@ const getDatasetList = (): DatasetItem[] => {
     {
       type: 'starter',
       tags: ['starter'],
+      description: intl.get('doc.fifa2022Intro'),
       spaceName: 'demo_fifa_2022',
       fileName: 'fifa2022',
       rename: undefined as unknown as string,
@@ -351,6 +361,7 @@ function Welcome(props: IProps) {
                   </div>
                 </div>
                 <div className={styles.contentTitle}>{dataset.spaceName}</div>
+                <div className={styles.contentDescription}>{dataset.description}</div>
                 <div className={styles.contentFooter}>
                   <div className={styles.actionWrapper}>
                     <Button
