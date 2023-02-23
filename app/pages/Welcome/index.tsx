@@ -224,7 +224,7 @@ const getDatasetList = (): DatasetItem[] => {
       type: 'starter',
       tags: ['starter'],
       description: intl.get('doc.fifa2022Intro'),
-      spaceName: 'demo_fifa_2022',
+      spaceName: 'demo_football_2022',
       fileName: 'fifa2022',
       rename: undefined as unknown as string,
       detail: {
