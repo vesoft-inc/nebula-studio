@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
@@ -96,6 +96,10 @@ const FileList = () => {
     await getFiles();
     setLoading(false);
   };
+  const handleDeleteFiles = useCallback(async () => {
+    const flag = await deleteFile(selectFiles);
+    flag && setSelectFiles([]);
+  }, [selectFiles]);
   useEffect(() => {
     getFileList();
     trackPageView('/import/files');
@@ -116,7 +120,7 @@ const FileList = () => {
           </Button>
         </Upload>
         <Popconfirm
-          onConfirm={() => deleteFile(selectFiles)}
+          onConfirm={handleDeleteFiles}
           title={intl.get('common.ask')}
           okText={intl.get('common.confirm')}
           cancelText={intl.get('common.cancel')}

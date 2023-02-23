@@ -2,15 +2,15 @@ import Icon from '@app/components/Icon';
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Checkbox, Input, Modal, Table, Popconfirm, Dropdown } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { usePapaParse } from 'react-papaparse';
 import cls from 'classnames';
 import { StudioFile } from '@app/interfaces/import';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
-import { useBatchState } from '@app/utils';
 import { useStore } from '@app/stores';
-import { observer } from 'mobx-react-lite';
+import { observer, useLocalObservable } from 'mobx-react-lite';
 import { ExclamationCircleFilled } from '@ant-design/icons';
+import { observable } from 'mobx';
 import styles from './index.module.less';
 interface IProps {
   visible: boolean;
@@ -35,7 +35,7 @@ const UploadConfigModal = (props: IProps) => {
   const { files } = useStore();
   const { fileList, uploadFile } = files;
   const { intl } = useI18n();
-  const { state, setState } = useBatchState({
+  const state = useLocalObservable(() => ({
     data: [],
     activeItem: null,
     previewContent: [],
@@ -43,24 +43,24 @@ const UploadConfigModal = (props: IProps) => {
     indeterminate: false,
     loading: false,
     uploading: false,
-  });
-  const { uploading, data, activeItem, previewContent, checkAll, indeterminate, loading } = state;
+    setState: (obj) => Object.assign(state, obj),
+  }), { data: observable.ref });
   const { readRemoteFile } = usePapaParse();
   useEffect(() => {
+    const { setState } = state;
     visible && setState({ data: uploadList, activeItem: uploadList[0] });
   }, [visible]);
   useEffect(() => {
-    if (activeItem) {
-      readFile(activeItem);
-    }
-  }, [activeItem]);
-  const readFile = useCallback((file) => {
-    if(!file) return;
+    state.activeItem && readFile();
+  }, [state.activeItem]);
+  const readFile = useCallback(() => {
+    const { activeItem, setState } = state;
+    if(!activeItem) return;
     setState({ loading: true });
-    const url = URL.createObjectURL(file);
+    const url = URL.createObjectURL(activeItem);
     let content = [];
     readRemoteFile(url, { 
-      delimiter: file.delimiter, 
+      delimiter: activeItem.delimiter, 
       download: true, 
       preview: 5,
       worker: true, 
@@ -73,52 +73,115 @@ const UploadConfigModal = (props: IProps) => {
       } 
     });
   }, []);
- 
+
   const onCheckAllChange = useCallback((e: CheckboxChangeEvent) => {
+    const { data, setState } = state;
     const { checked } = e.target;
-    data.forEach(item => item.withHeader = checked);
     setState({
       checkAll: checked,
       indeterminate: false,
-      data: [...data]
+      data: data.map(i => (i.withHeader = checked, i))
     });
-  }, [data]);
+  }, []);
 
   const updateItem = useCallback((e: CheckboxChangeEvent, item: StudioFile) => {
-    e.stopPropagation();
+    const { data, setState } = state;
     const { checked } = e.target;
-    item.withHeader = checked;
+    const nextData = data.map(i => (i === item && (i.withHeader = checked), i));
     const checkedNum = data.reduce((n, file) => n + (file.withHeader & 1), 0);
     setState({
       checkAll: checkedNum === data.length,
       indeterminate: !!checkedNum && checkedNum < data.length,
+      data: nextData
     });
-  }, [data]);
+  }, []);
   const deletePreviewFile = useCallback((e: React.MouseEvent, index: number) => {
+    const { activeItem, data, setState, previewContent } = state;
     e.stopPropagation();
     const isActive = activeItem?.uid === data[index].uid;
     const newData = data.filter((_, i) => i !== index);
     const checkedNum = data.reduce((n, file) => n + (file.withHeader & 1), 0);
     setState({
-      checkAll: checkedNum === newData.length,
+      checkAll: checkedNum === newData.length && newData.length > 0,
       indeterminate: !!checkedNum && checkedNum < newData.length,
       data: newData,
       activeItem: isActive ? null : activeItem,
       previewContent: isActive ? [] : previewContent,
     });
-  }, [activeItem, data]);
+  }, []);
 
   const updateDelimiter = useCallback((e: React.ChangeEvent<HTMLInputElement>, item: StudioFile) => {
+    const { activeItem } = state;
     e.stopPropagation();
     item.delimiter = e.target.value;
-    item === activeItem && readFile(item);
-  }, [activeItem]);
+    item === activeItem && readFile();
+  }, []);
 
   const updateAllDelimiter = useCallback((value: string) => {
-    data.forEach(item => item.delimiter = value);
-    readFile(activeItem);
-  }, [data, activeItem]);
+    const { data } = state;
+    setState({
+      data: data.map(item => (item.delimiter = value, item))
+    });
+    readFile();
+  }, []);
 
+  const handleConfirm = useCallback(() => {
+    const { data } = state;
+    const existFileName = fileList.map((file) => file.name);
+    const repeatFiles = data.filter((file) => existFileName.includes(file.name));
+    if(!repeatFiles.length) {
+      startImport();
+      return;
+    }
+    const repeatFileNames = repeatFiles.map((file) => file.name).join(', ');
+    Modal.confirm({
+      title: <>
+        <ExclamationCircleFilled />
+        {intl.get('import.uploadConfirm')}
+      </>,
+      icon: null,
+      content: <>
+        <div className={styles.repeatBox}>{repeatFileNames}</div>
+        <p>{intl.get('import.fileRepeatTip')}</p>
+      </>,
+      okText: intl.get('common.continue'),
+      cancelText: intl.get('common.cancel'),
+      centered: true,
+      wrapClassName: styles.repeatConfirmModal,
+      onOk: () => {
+        startImport();
+      },
+    });
+  }, [fileList]);
+  const startImport = useCallback(async () => {
+    const { data, setState } = state;
+    setState({ uploading: true });
+    const res = await uploadFile(data);
+    if(res.code === 0) {
+      onConfirm();
+    }
+    setState({ uploading: false });
+  }, []);
+  const handleCancel = useCallback(() => {
+    const { uploading } = state;
+    !uploading && onCancel();
+  }, []);
+
+  if(!visible) {
+    return null;
+  }
+  const { uploading, data, activeItem, previewContent, checkAll, indeterminate, loading, setState } = state;
+  const parseColumns = previewContent.length
+    ? previewContent[0].map((header, index) => {
+      const textIndex = index;
+      const title = activeItem?.withHeader ? header : `Column ${textIndex}`;
+      return {
+        title,
+        dataIndex: index,
+        render: value => <span className={styles.limitWidth}>{value}</span>,
+      };
+    })
+    : [];
   const columns = [
     {
       title: intl.get('import.fileName'),
@@ -165,59 +228,6 @@ const UploadConfigModal = (props: IProps) => {
       ),
     },
   ];
-  const parseColumns = useMemo(() => previewContent.length
-    ? previewContent[0].map((header, index) => {
-      const textIndex = index;
-      const title = activeItem?.withHeader ? header : `Column ${textIndex}`;
-      return {
-        title,
-        dataIndex: index,
-        render: value => <span className={styles.limitWidth}>{value}</span>,
-      };
-    })
-    : [], [previewContent, activeItem?.withHeader]);
-  const handleConfirm = useCallback(() => {
-    const existFileName = fileList.map((file) => file.name);
-    const repeatFiles = data.filter((file) => existFileName.includes(file.name));
-    if(!repeatFiles.length) {
-      startImport();
-      return;
-    }
-    const repeatFileNames = repeatFiles.map((file) => file.name).join(', ');
-    Modal.confirm({
-      title: <>
-        <ExclamationCircleFilled />
-        {intl.get('import.uploadConfirm')}
-      </>,
-      icon: null,
-      content: <>
-        <div className={styles.repeatBox}>{repeatFileNames}</div>
-        <p>{intl.get('import.fileRepeatTip')}</p>
-      </>,
-      okText: intl.get('common.continue'),
-      cancelText: intl.get('common.cancel'),
-      centered: true,
-      wrapClassName: styles.repeatConfirmModal,
-      onOk: () => {
-        startImport();
-      },
-    });
-  }, [fileList, data]);
-  const startImport = useCallback(async () => {
-    setState({ uploading: true });
-    const res = await uploadFile(data);
-    if(res.code === 0) {
-      onConfirm();
-    }
-    setState({ uploading: false });
-  }, [state]);
-  const handleCancel = useCallback(() => {
-    !uploading && onCancel();
-  }, [uploading]);
-
-  if(!visible) {
-    return null;
-  }
 
   return (
     <Modal
