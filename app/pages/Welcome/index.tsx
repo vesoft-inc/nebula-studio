@@ -361,7 +361,9 @@ function Welcome(props: IProps) {
                   </div>
                 </div>
                 <div className={styles.contentTitle}>{dataset.spaceName}</div>
-                <div className={styles.contentDescription}>{dataset.description}</div>
+                <div className={styles.contentDescription}>
+                  <span className={styles.descInner}>{dataset.description}</span>
+                </div>
                 <div className={styles.contentFooter}>
                   <div className={styles.actionWrapper}>
                     <Button
