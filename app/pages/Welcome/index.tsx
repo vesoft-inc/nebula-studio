@@ -153,7 +153,7 @@ const getDatasetList = (): DatasetItem[] => {
     {
       type: 'solution',
       tags: ['solution'],
-      description: intl.get('doc.aiopsIntro'),
+      description: intl.get('doc.openstackIntro'),
       spaceName: 'demo_ai_ops',
       fileName: 'openstack',
       rename: undefined as unknown as string,
