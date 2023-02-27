@@ -13,4 +13,5 @@ import (
 	"sketch.api"
 	"schema.api"
 	"favorite.api"
+	"datasource.api"
 )

@@ -5,15 +5,19 @@ go 1.18
 require (
 	github.com/facebook/fbthrift v0.31.1-0.20211129061412-801ed7f9f295
 	github.com/gorilla/websocket v1.5.0
-	github.com/samber/lo v1.28.2
 	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b
-	github.com/vesoft-inc/go-pkg v0.0.0-20220714021138-c5edb9946837
-	github.com/vesoft-inc/nebula-http-gateway/ccore v0.0.0-20230206070120-e133a7783361
+	github.com/vesoft-inc/go-pkg v0.0.0-20230307111816-a43d6a342d23
 	github.com/vesoft-inc/nebula-importer v1.0.1-0.20220719030708-8e376665042e
 	github.com/zeromicro/go-zero v1.3.3
 )
 
-require github.com/vesoft-inc/nebula-go/v3 v3.4.0
+require (
+	github.com/agiledragon/gomonkey/v2 v2.9.0
+	github.com/aws/aws-sdk-go v1.44.217
+	github.com/pkg/sftp v1.13.5
+	github.com/stretchr/testify v1.7.1
+	github.com/vesoft-inc/nebula-go/v3 v3.4.0
+)
 
 require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
@@ -23,9 +27,13 @@ require (
 )
 
 require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/kr/fs v0.1.0 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 require (
@@ -59,10 +67,10 @@ require (
 	go.opentelemetry.io/otel/trace v1.3.0 // indirect
 	go.uber.org/automaxprocs v1.4.0 // indirect
 	go.uber.org/zap v1.21.0
-	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
-	golang.org/x/net v0.0.0-20220421235706-1d1ef9303861 // indirect
-	golang.org/x/sys v0.0.0-20220422013727-9388b58f7150 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3
+	golang.org/x/net v0.1.0 // indirect
+	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/text v0.4.0 // indirect
 	google.golang.org/grpc v1.46.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0

@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"net/http"
@@ -48,7 +49,9 @@ func createResponseHandler(c config.Config) response.Handler { // nolint:gocriti
 				return ecode.ErrInternalServer
 			})
 		},
-		Errorf: logx.Errorf,
+		ContextErrorf: func(ctx context.Context, format string, a ...interface{}) {
+			logx.WithContext(ctx).Errorf(format, a...)
+		},
 		CheckBodyType: func(r *http.Request) response.StandardHandlerBodyType {
 			if utils.PathMatchPattern(r.URL.Path, utils.IgnoreHandlerBodyPatterns) {
 				return response.StandardHandlerBodyNone

@@ -23,6 +23,7 @@ func InitDB(sqlitedbFilePath string) {
 		zap.L().Fatal(fmt.Sprintf("init db fail: %s", err))
 	}
 	err = db.AutoMigrate(
+		&Datasource{},
 		&TaskInfo{},
 		&Sketch{},
 		&SchemaSnapshot{},
