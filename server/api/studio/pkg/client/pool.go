@@ -12,11 +12,16 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ExecuteResult struct {
+type ParsedResult struct {
 	Headers     []string         `json:"headers"`
 	Tables      []map[string]Any `json:"tables"`
 	TimeCost    int64            `json:"timeCost"`
 	LocalParams ParameterMap     `json:"localParams"`
+}
+type ExecuteResult struct {
+	Gql    string
+	Result ParsedResult
+	Error  error
 }
 
 type Any interface{}
@@ -51,6 +56,13 @@ func isThriftTransportError(err error) bool {
 		}
 	}
 	return false
+}
+
+func transformError(err error) error {
+	if isThriftProtoError(err) || isThriftTransportError(err) {
+		return ConnectionClosedError
+	}
+	return err
 }
 
 func getValue(valWarp *nebula.ValueWrapper) (Any, error) {
@@ -320,55 +332,36 @@ func (client *Client) handleRequest(nsid string) {
 	for {
 		select {
 		case request := <-client.RequestChannel:
-			go func() {
+			func() {
 				defer func() {
 					if err := recover(); err != nil {
-						logx.Errorf("[handle request]: &s, %+v", request.Gql, err)
+						logx.Errorf("[handle request]: &s, %+v", request.Gqls, err)
 						request.ResponseChannel <- ChannelResponse{
-							Result: nil,
-							Msg:    err,
-							Error:  SessionLostError,
+							Results: nil,
+							Msg:     err,
+							Error:   SessionLostError,
 						}
 					}
 				}()
 
-				var err error
-				showMap := make(ParameterMap)
-				if request.ParamList != nil && len(request.ParamList) > 0 {
-					showMap, err = executeClientCmd(request.ParamList, client.parameterMap)
+				for {
+					var err error
+					session, err := client.getSession()
 					if err != nil {
 						request.ResponseChannel <- ChannelResponse{
-							Result: nil,
-							Params: showMap,
-							Error:  err,
+							Results: nil,
+							Error:   err,
 						}
 						return
 					}
-				}
-
-				if len(request.Gql) > 0 {
-					ClientSession, err := client.getSession()
-					if err != nil {
-						request.ResponseChannel <- ChannelResponse{
-							Result: nil,
-							Params: showMap,
-							Error:  err,
-						}
-						return
+					if session == nil {
+						// session create failed, bug still has active session, so wait for a while
+						time.Sleep(time.Millisecond * 500)
+						continue
 					}
-					if ClientSession == nil {
-						client.sessionPool.waitMu.Lock()
-						client.sessionPool.waitlist = append(client.sessionPool.waitlist, request)
-						client.sessionPool.waitMu.Unlock()
-					}
-					go ClientSession.executeRequest(request, client.sessionPool, client.parameterMap, showMap)
-
-				} else {
-					request.ResponseChannel <- ChannelResponse{
-						Result: nil,
-						Params: showMap,
-						Error:  nil,
-					}
+					defer client.sessionPool.addSession(session)
+					client.executeRequest(session, request)
+					break
 				}
 			}()
 		case <-client.CloseChannel:
@@ -383,98 +376,104 @@ func (client *Client) handleRequest(nsid string) {
 	}
 }
 
-func (s *ClientSession) executeRequest(request ChannelRequest, pool *SessionPool, parameterMap ParameterMap, showMap ParameterMap) {
-	var execResponse *nebula.ResultSet
-	var err error
+func (client *Client) executeRequest(session *nebula.Session, request ChannelRequest) {
+	parameterMap := client.parameterMap
+	result := make([]SingleResponse, 0)
 	// add use space before execute
 	if request.Space != "" {
 		space := strings.Replace(request.Space, "\\", "\\\\", -1)
 		space = strings.Replace(space, "`", "\\`", -1)
 		gql := fmt.Sprintf("USE `%s`;", space)
-		_, err := s.session.ExecuteWithParameter(gql, parameterMap)
+		_, err := session.ExecuteWithParameter(gql, parameterMap)
 		if err != nil {
 			request.ResponseChannel <- ChannelResponse{
-				Result: nil,
-				Params: showMap,
-				Error:  err,
+				Results: nil,
+				Error:   transformError(err),
 			}
 			return
 		}
 	}
-	execResponse, err = s.session.ExecuteWithParameter(request.Gql, parameterMap)
-	s.isLocked = false
-	s.usedTime = time.Now()
-	// check the waitlist for pending requests
-	pool.mu.Lock()
-	pool.waitMu.Lock()
-	if len(pool.waitlist) > 0 {
-		// get the oldest request from the waitlist
-		req := pool.waitlist[0]
-		pool.waitlist = pool.waitlist[1:]
 
-		// get the session for the request
-		s.isLocked = true
-
-		// execute the request with the session
-		go s.executeRequest(req, pool, parameterMap, showMap)
-	}
-	pool.waitMu.Unlock()
-	pool.mu.Unlock()
-
-	// release the session if there are no pending requests
-	if !s.isLocked {
-		pool.releaseSession(s)
-	}
-
-	if err != nil {
-		if isThriftProtoError(err) || isThriftTransportError(err) {
-			err = ConnectionClosedError
+	for _, gql := range request.Gqls {
+		isLocal, cmd, args := isClientCmd(gql)
+		if isLocal {
+			showMap, err := executeClientCmd(cmd, args, parameterMap)
+			if err != nil {
+				result = append(result, SingleResponse{
+					Gql:    gql,
+					Error:  err,
+					Result: nil,
+				})
+			} else if cmd != 3 {
+				// sleep dont need to return result
+				result = append(result, SingleResponse{
+					Error:  nil,
+					Result: nil,
+					Params: showMap,
+					Gql:    gql,
+				})
+			}
+		} else {
+			execResponse, err := session.ExecuteWithParameter(gql, parameterMap)
+			if err != nil {
+				result = append(result, SingleResponse{
+					Gql:    gql,
+					Error:  transformError(err),
+					Result: nil,
+				})
+			} else {
+				result = append(result, SingleResponse{
+					Gql:    gql,
+					Error:  nil,
+					Result: execResponse,
+				})
+			}
 		}
-		request.ResponseChannel <- ChannelResponse{
-			Result: nil,
-			Error:  err,
-		}
-		return
 	}
+
 	request.ResponseChannel <- ChannelResponse{
-		Result: execResponse,
-		Params: showMap,
-		Error:  err,
+		Results: result,
+		Error:   nil,
 	}
 }
 
-func Execute(nsid string, space string, gql string, paramList ParameterList) (ExecuteResult, error) {
-	result := ExecuteResult{
-		Headers:     make([]string, 0),
-		Tables:      make([]map[string]Any, 0),
-		LocalParams: nil,
-	}
+func Execute(nsid string, space string, gqls []string) ([]ExecuteResult, error) {
 	client := clientPool[nsid]
 	responseChannel := make(chan ChannelResponse)
 	client.RequestChannel <- ChannelRequest{
-		Gql:             gql,
+		Gqls:            gqls,
 		Space:           space,
 		ResponseChannel: responseChannel,
-		ParamList:       paramList,
 	}
 	response := <-responseChannel
-	paramsMap := response.Params
-	result, err := parseExecuteData(response, paramsMap)
-	if err != nil {
-		return result, err
+
+	res := make([]ExecuteResult, 0)
+	if response.Error != nil {
+		return nil, response.Error
 	}
-	return result, nil
+
+	results := response.Results
+	for _, resp := range results {
+		result, err := parseExecuteData(resp)
+		res = append(res, ExecuteResult{
+			Gql:    resp.Gql,
+			Result: result,
+			Error:  err,
+		})
+	}
+	return res, nil
 }
 
-func parseExecuteData(response ChannelResponse, paramsMap ParameterMap) (ExecuteResult, error) {
-	result := ExecuteResult{
+func parseExecuteData(response SingleResponse) (ParsedResult, error) {
+	result := ParsedResult{
 		Headers:     make([]string, 0),
 		Tables:      make([]map[string]Any, 0),
 		LocalParams: nil,
 	}
-	if len(paramsMap) > 0 {
-		result.LocalParams = paramsMap
+	if len(response.Params) > 0 {
+		result.LocalParams = response.Params
 	}
+
 	if response.Error != nil {
 		return result, response.Error
 	}

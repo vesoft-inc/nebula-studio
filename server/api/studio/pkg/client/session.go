@@ -5,94 +5,85 @@ import (
 	"time"
 
 	nebula "github.com/vesoft-inc/nebula-go/v3"
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type SessionPool struct {
-	sessions map[int64]*ClientSession
-	mu       sync.Mutex
-	waitlist []ChannelRequest
-	waitMu   sync.Mutex
+	ildeSessions   []*nebula.Session
+	activeSessions []*nebula.Session
+	mu             sync.Mutex
 }
 
-type ClientSession struct {
-	session  *nebula.Session
-	id       int64
-	isLocked bool
-	usedTime time.Time
-}
-
-func (client *Client) createClientSession() (session *ClientSession, id int64, err error) {
-	_session, err := client.graphClient.GetSession(client.account.username, client.account.password)
+func (client *Client) createClientSession() (session *nebula.Session, err error) {
+	session, err = client.graphClient.GetSession(client.account.username, client.account.password)
 	if err != nil {
-		return nil, id, err
+		return nil, err
 	}
-	id = _session.GetSessionID()
-	clientSession := ClientSession{session: _session, id: id}
-	return &clientSession, id, nil
+	return session, nil
 }
 
-func (client *Client) getSession() (session *ClientSession, err error) {
+func (client *Client) getSession() (session *nebula.Session, err error) {
 	pool := client.sessionPool
 	pool.mu.Lock()
-	defer pool.mu.Unlock()
-	if len(pool.sessions) == 0 {
-		// init first session
-		clientSession, id, err := client.createClientSession()
+	idleLen := len(pool.ildeSessions)
+	activeLen := len(pool.activeSessions)
+	pool.mu.Unlock()
+	if idleLen == 0 {
+		session, err := client.createClientSession()
 		if err != nil {
-			logx.Errorf("[Init first session failed]: %+v", err)
-			return nil, err
+			if activeLen == 0 {
+				return nil, err
+			}
+			// if active session is not empty, wait for the active session
+			return nil, nil
 		}
-		pool.sessions[id] = clientSession
-		clientSession.isLocked = true
-		return clientSession, nil
+		pool.activeSessions = append(pool.activeSessions, session)
+		return session, nil
 	}
-	var clientSession *ClientSession
-	for i := range pool.sessions {
-		if !pool.sessions[i].isLocked {
-			clientSession = pool.sessions[i]
-			clientSession.isLocked = true
+	pool.mu.Lock()
+	curSession := pool.ildeSessions[0]
+	pool.ildeSessions = pool.ildeSessions[1:]
+	pool.activeSessions = append(pool.activeSessions, curSession)
+	pool.mu.Unlock()
+	return curSession, nil
+}
+
+func (pool *SessionPool) addSession(session *nebula.Session) {
+	pool.mu.Lock()
+	defer pool.mu.Unlock()
+	for i, s := range pool.activeSessions {
+		if s == session {
+			pool.activeSessions = append(pool.activeSessions[:i], pool.activeSessions[i+1:]...)
 			break
 		}
 	}
-	if clientSession != nil {
-		return clientSession, nil
-	}
-	clientSession, id, err := client.createClientSession()
-	if err != nil {
-		logx.Errorf("[Init other session failed]: %+v", err)
-		// if create session failed, return nil, add request to waitlist
-		return nil, nil
-	}
-	pool.sessions[id] = clientSession
-	clientSession.isLocked = true
-	return clientSession, nil
-	// TODO session size limit
+	pool.ildeSessions = append(pool.ildeSessions, session)
+	go pool.releaseSession(session)
 }
 
-func (pool *SessionPool) releaseSession(clientSession *ClientSession) {
+func (pool *SessionPool) releaseSession(clientSession *nebula.Session) {
 	// if session is not used for 3 seconds, release it
-	go func() {
-		time.Sleep(3 * time.Second)
-		pool.mu.Lock()
-		defer pool.mu.Unlock()
-		if clientSession.isLocked {
-			return
+	time.Sleep(3 * time.Second)
+	pool.mu.Lock()
+	defer pool.mu.Unlock()
+	if len(pool.ildeSessions) == 1 {
+		return
+	}
+	for i, session := range pool.ildeSessions {
+		if session == clientSession {
+			session.Release()
+			pool.ildeSessions = append(pool.ildeSessions[:i], pool.ildeSessions[i+1:]...)
+			break
 		}
-		if len(pool.sessions) == 1 {
-			return
-		}
-		if time.Since(clientSession.usedTime) >= 3*time.Second {
-			clientSession.session.Release()
-			delete(pool.sessions, clientSession.id)
-		}
-	}()
+	}
 }
 
 func (pool *SessionPool) clearSessions() {
 	pool.mu.Lock()
 	defer pool.mu.Unlock()
-	for _, client := range pool.sessions {
-		client.session.Release()
+	for _, session := range pool.ildeSessions {
+		session.Release()
+	}
+	for _, session := range pool.activeSessions {
+		session.Release()
 	}
 }

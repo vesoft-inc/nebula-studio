@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -28,7 +27,7 @@ const (
 
 	// Maximum message size allowed from peer.
 	// Max ngql length can be executed is 4MB
-	maxMessageSize = 4 * 1024 * 1024
+	maxMessageSize = 8 * 1024 * 1024
 
 	// send buffer size
 	bufSize = 512
@@ -54,33 +53,6 @@ type Client struct {
 	send chan []byte
 }
 
-// func (c *Client) switchSpace(msgReceived *MessageReceive) *map[string]any {
-// 	reqSpace, ok := msgReceived.Body.Content["space"].(string)
-// 	currentSpace, _ := nsidSpaceMap.Get(c.clientInfo.NSID)
-// 	shouldSwitch := ok && reqSpace != "" && currentSpace != reqSpace
-// 	if !shouldSwitch {
-// 		return nil
-// 	}
-
-// 	// name.replace(/\\/gm, '\\\\').replace(/`/gm, '\\`')
-// 	reqSpace = strings.Replace(reqSpace, "\\", "\\\\", -1)
-// 	reqSpace = strings.Replace(reqSpace, "`", "\\`", -1)
-// 	_, _, err := client.Execute(c.clientInfo.NSID, fmt.Sprintf("USE `%s`", reqSpace), nil)
-// 	if err != nil {
-// 		logx.Errorf("[WebSocket switchSpace]: msgReceived.Body.Content(%+v); error(%+v)", &msgReceived.Body.Content, err)
-// 		content := map[string]any{
-// 			"code":    base.Error,
-// 			"message": err.Error(),
-// 		}
-// 		if auth.IsSessionError(err) {
-// 			content["code"] = ecode.ErrSession.GetCode()
-// 		}
-// 		return &content
-// 	}
-// 	nsidSpaceMap.Set(c.clientInfo.NSID, reqSpace)
-// 	return nil
-// }
-
 func (c *Client) runNgql(msgReceived *MessageReceive) (closed bool) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -99,29 +71,12 @@ func (c *Client) runNgql(msgReceived *MessageReceive) (closed bool) {
 		},
 	}
 
-	// errorContent := c.switchSpace(msgReceived)
-	// if errorContent != nil {
-	// 	msgPost.Body.Content = errorContent
-	// 	msgSend, _ := json.Marshal(msgPost)
-	// 	c.send <- msgSend
-	// 	return
-	// }
-
-	gql, paramList := "", []string{}
+	gqls := make([]string, 0)
 	space, _ := msgReceived.Body.Content["space"].(string)
 	if reqGql, ok := msgReceived.Body.Content["gql"].(string); ok {
-		gql = reqGql
+		gqls = append(gqls, reqGql)
 	}
-
-	if reqParamList, ok := msgReceived.Body.Content["paramList"].([]any); ok {
-		for _, param := range reqParamList {
-			if paramStr, ok := param.(string); ok {
-				paramList = append(paramList, paramStr)
-			}
-		}
-	}
-
-	execute, err := client.Execute(c.clientInfo.NSID, space, gql, paramList)
+	execute, err := client.Execute(c.clientInfo.NSID, space, gqls)
 	if err != nil {
 		logx.Errorf("[WebSocket runNgql]: msgReceived.Body.Content(%v); error(%v)", &msgReceived.Body.Content, err)
 		content := map[string]any{
@@ -133,13 +88,26 @@ func (c *Client) runNgql(msgReceived *MessageReceive) (closed bool) {
 		}
 		msgPost.Body.Content = &content
 	} else {
-		msgPost.Body.Content = map[string]any{
-			"code":    base.Success,
-			"data":    &execute,
-			"message": "Success",
+		res := execute[0]
+		if res.Error != nil {
+			err = res.Error
+			content := map[string]any{
+				"code":    base.Error,
+				"message": err.Error(),
+			}
+			if auth.IsSessionError(err) {
+				content["code"] = ecode.ErrSession.GetCode()
+			}
+			msgPost.Body.Content = &content
+		} else {
+			msgPost.Body.Content = map[string]any{
+				"code":    base.Success,
+				"data":    &execute[0].Result,
+				"message": "Success",
+			}
 		}
 	}
-	msgSend, _ := json.Marshal(msgPost)
+	msgSend, err := json.Marshal(msgPost)
 	c.send <- msgSend
 	return false
 }
@@ -162,15 +130,7 @@ func (c *Client) runBatchNgql(msgReceived *MessageReceive) (closed bool) {
 		},
 	}
 
-	// errorContent := c.switchSpace(msgReceived)
-	// if errorContent != nil {
-	// 	msgPost.Body.Content = errorContent
-	// 	msgSend, _ := json.Marshal(msgPost)
-	// 	c.send <- msgSend
-	// 	return
-	// }
-
-	gqls, paramList := []string{}, []string{}
+	gqls := []string{}
 	space, _ := msgReceived.Body.Content["space"].(string)
 
 	resContentData := make([]map[string]any, 0)
@@ -182,49 +142,39 @@ func (c *Client) runBatchNgql(msgReceived *MessageReceive) (closed bool) {
 			}
 		}
 	}
-
-	if reqParamList, ok := msgReceived.Body.Content["paramList"].([]any); ok {
-		for _, param := range reqParamList {
-			if paramStr, ok := param.(string); ok {
-				paramList = append(paramList, paramStr)
+	executes, err := client.Execute(c.clientInfo.NSID, space, gqls)
+	if err != nil {
+		logx.Errorf("[WebSocket runNgql]: msgReceived.Body.Content(%v); error(%v)", &msgReceived.Body.Content, err)
+		content := map[string]any{
+			"code":    base.Error,
+			"message": err.Error(),
+		}
+		if auth.IsSessionError(err) {
+			content["code"] = ecode.ErrSession.GetCode()
+		}
+		msgPost.Body.Content = &content
+	} else {
+		for _, execute := range executes {
+			gqlRes := map[string]any{"gql": execute.Gql, "data": execute.Result, "error": execute.Error}
+			if execute.Error != nil {
+				err = execute.Error
+				gqlRes["message"] = err.Error()
+				gqlRes["code"] = base.Error
+				if auth.IsSessionError(err) {
+					gqlRes["code"] = ecode.ErrSession.GetCode()
+				}
+			} else {
+				gqlRes["code"] = base.Success
 			}
+			resContentData = append(resContentData, gqlRes)
+		}
+		msgPost.Body.Content = map[string]any{
+			"code":    base.Success,
+			"data":    resContentData,
+			"message": "Success",
 		}
 	}
 
-	if len(paramList) > 0 {
-		execute, err := client.Execute(c.clientInfo.NSID, space, "", paramList)
-		gqlRes := map[string]any{"gql": strings.Join(paramList, "; "), "data": &execute}
-		if err != nil {
-			gqlRes["message"] = err.Error()
-			gqlRes["code"] = base.Error
-		} else {
-			gqlRes["code"] = base.Success
-		}
-
-		resContentData = append(resContentData, gqlRes)
-	}
-
-	for _, gql := range gqls {
-		execute, err := client.Execute(c.clientInfo.NSID, space, gql, make([]string, 0))
-		gqlRes := map[string]any{"gql": gql, "data": execute}
-		if err != nil {
-			gqlRes["message"] = err.Error()
-			gqlRes["code"] = base.Error
-			if auth.IsSessionError(err) {
-				gqlRes["code"] = ecode.ErrSession.GetCode()
-			}
-		} else {
-			gqlRes["code"] = base.Success
-		}
-
-		resContentData = append(resContentData, gqlRes)
-	}
-
-	msgPost.Body.Content = map[string]any{
-		"code":    base.Success,
-		"data":    resContentData,
-		"message": "Success",
-	}
 	msgSend, _ := json.Marshal(msgPost)
 	c.send <- msgSend
 	return false

@@ -16,8 +16,8 @@ func newNebulaLogger() nebula.Logger {
 //revive:disable:empty-lines
 
 func (l nebulaLogger) Info(msg string)  { logx.Infof(msg) }
-func (l nebulaLogger) Warn(msg string)  { logx.Infof("[WARNING] %s", msg) }
+func (l nebulaLogger) Warn(msg string)  { logx.Errorf(msg) }
 func (l nebulaLogger) Error(msg string) { logx.Errorf(msg) }
-func (l nebulaLogger) Fatal(msg string) { logx.Infof("[FATAL] %s", msg) }
+func (l nebulaLogger) Fatal(msg string) { logx.Errorf(msg) }
 
 //revive:enable:empty-lines

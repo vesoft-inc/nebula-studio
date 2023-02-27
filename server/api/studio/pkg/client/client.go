@@ -16,11 +16,7 @@ var (
 	ClientNotExistedError = errors.New("get client error: client not existed, session expired")
 )
 
-// Console side commands
 const (
-	Unknown                      = -1
-	Param                        = 1
-	Params                       = 2
 	clientRecycleNum             = 30
 	clientMaxNum                 = 200
 	SessionExpiredDuration int64 = 3600
@@ -33,6 +29,13 @@ type Account struct {
 }
 
 type ChannelResponse struct {
+	Results []SingleResponse
+	Msg     interface{}
+	Error   error
+}
+
+type SingleResponse struct {
+	Gql    string
 	Result *nebula.ResultSet
 	Params ParameterMap
 	Msg    interface{}
@@ -40,9 +43,8 @@ type ChannelResponse struct {
 }
 
 type ChannelRequest struct {
-	Gql             string
+	Gqls            []string
 	ResponseChannel chan ChannelResponse
-	ParamList       ParameterList
 	Space           string
 }
 
@@ -104,8 +106,8 @@ func NewClient(address string, port int, username string, password string, conf 
 			host:     hostAddress,
 		},
 		sessionPool: &SessionPool{
-			sessions: make(map[int64]*ClientSession),
-			waitlist: make([]ChannelRequest, 0),
+			activeSessions: make([]*nebula.Session, 0),
+			ildeSessions:   make([]*nebula.Session, 0),
 		},
 	}
 

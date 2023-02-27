@@ -6,15 +6,13 @@ type GetHealth struct {
 }
 
 type ExecNGQLParams struct {
-	Gql       string   `json:"gql"`
-	ParamList []string `json:"paramList,optional"`
-	Space     string   `json:"space,optional"`
+	Gql   string `json:"gql"`
+	Space string `json:"space,optional"`
 }
 
 type BatchExecNGQLParams struct {
-	Gqls      []string `json:"gqls"`
-	ParamList []string `json:"paramList,optional"`
-	Space     string   `json:"space,optional"`
+	Gqls  []string `json:"gqls"`
+	Space string   `json:"space,optional"`
 }
 
 type ConnectDBParams struct {
@@ -25,10 +23,6 @@ type ConnectDBParams struct {
 
 type AnyResponse struct {
 	Data interface{} `json:"data"`
-}
-
-type ExecSeqNGQLResult struct {
-	OK bool `json:"ok"`
 }
 
 type FileDestroyRequest struct {

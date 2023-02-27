@@ -16,9 +16,6 @@ const service = {
     const [params, config] = args;
     return ngqlRunner.runBatchNgql(params, config);
   },
-  execSeqNGQL: (params, config?) => {
-    return post('/api-nebula/db/exec_seq')(params, config);
-  },
   connectDB: (params, config?) => {
     return post('/api-nebula/db/connect')(params, config);
   },

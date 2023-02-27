@@ -4,11 +4,21 @@ import (
 	"encoding/json"
 	"errors"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type ParameterList []string
 type ParameterMap map[string]interface{}
+
+// Console side commands
+const (
+	Unknown = -1
+	Param   = 1
+	Params  = 2
+	Sleep   = 3
+)
 
 func isClientCmd(query string) (isLocal bool, localCmd int, args []string) {
 	isLocal = false
@@ -27,31 +37,35 @@ func isClientCmd(query string) (isLocal bool, localCmd int, args []string) {
 	case "params":
 		localCmd = Params
 		args = []string{plain}
+	case "sleep":
+		localCmd = Sleep
+		args = []string{words[1]}
 	}
 	return
 }
 
-func executeClientCmd(parameterList ParameterList, parameterMap ParameterMap) (showMap ParameterMap, err error) {
+func executeClientCmd(cmd int, args []string, parameterMap ParameterMap) (showMap ParameterMap, err error) {
 	tempMap := make(ParameterMap)
-	for _, v := range parameterList {
-		// convert interface{} to nebula.Value
-		if isLocal, cmd, args := isClientCmd(v); isLocal {
-			switch cmd {
-			case Param:
-				if len(args) == 1 {
-					err = defineParams(args[0], parameterMap)
-				}
-				if err != nil {
-					return nil, err
-				}
-			case Params:
-				if len(args) == 1 {
-					err = ListParams(args[0], tempMap, parameterMap)
-				}
-				if err != nil {
-					return nil, err
-				}
-			}
+	switch cmd {
+	case Sleep:
+		i, err := strconv.Atoi(args[0])
+		if err != nil {
+			return nil, err
+		}
+		time.Sleep(time.Duration(i) * time.Second)
+	case Param:
+		if len(args) == 1 {
+			err = defineParams(args[0], parameterMap)
+		}
+		if err != nil {
+			return nil, err
+		}
+	case Params:
+		if len(args) == 1 {
+			err = ListParams(args[0], tempMap, parameterMap)
+		}
+		if err != nil {
+			return nil, err
 		}
 	}
 	return tempMap, nil

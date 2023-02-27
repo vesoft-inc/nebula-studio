@@ -130,6 +130,7 @@ func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) 
 	// set Graph Service connect timeout 8h, which is 0s default(means no timeout)
 	poolCfg := nebula.GetDefaultConf()
 	poolCfg.TimeOut = GraphServiceTimeout
+	poolCfg.MaxConnPoolSize = 200
 	clientInfo, err := client.NewClient(params.Address, params.Port, username, password, poolCfg)
 	if err != nil {
 		return "", err
