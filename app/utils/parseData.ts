@@ -4,12 +4,12 @@ import { DEFAULT_COLOR_PICK_LIST } from '@app/config/explore';
 
 export const whichColor = (() => {
   const colorsTotal = DEFAULT_COLOR_PICK_LIST.length;
-  let colorIndex = 0;
+  let colorIndex = Math.floor(Math.random() * colorsTotal);
   const colorsRecord = {};
   return (key) => {
     if (!colorsRecord[key]) {
       colorsRecord[key] = DEFAULT_COLOR_PICK_LIST[colorIndex];
-      colorIndex = (colorIndex + 1) % colorsTotal;
+      colorIndex = (colorIndex + 3) % colorsTotal;
     }
     return colorsRecord[key];
   };
