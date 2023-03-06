@@ -1,5 +1,5 @@
 import { useI18n } from '@vesoft-inc/i18n';
-import { Button, Checkbox, Input, Modal, Table, Form, Row, Col, message } from 'antd';
+import { Button, Input, Modal, Table, Form, Row, Col, message } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import React, { PropsWithChildren, useCallback, useEffect } from 'react';
 import { usePapaParse } from 'react-papaparse';
@@ -92,11 +92,11 @@ const PreviewFileModal = (props: IProps) => {
             delimiter,
           }}>
             <Row className={styles.configOperation}>
-              <Col span={3}>
+              {/* <Col span={3}>
                 <Form.Item name="withHeader" valuePropName="checked">
                   <Checkbox onChange={updateHeader}>{intl.get('import.hasHeader')}</Checkbox>
                 </Form.Item>
-              </Col>
+              </Col> */}
               <Col span={8}>
                 <Form.Item label={intl.get('import.delimiter')} name="delimiter" required={true}>
                   <Input placeholder="," onChange={handlePreview} />
