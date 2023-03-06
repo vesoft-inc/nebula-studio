@@ -14,10 +14,10 @@ type ParameterMap map[string]interface{}
 
 // Console side commands
 const (
-	Unknown = -1
-	Param   = 1
-	Params  = 2
-	Sleep   = 3
+	Unknown = iota
+	Param
+	Params
+	Sleep
 )
 
 func isClientCmd(query string) (isLocal bool, localCmd int, args []string) {

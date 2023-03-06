@@ -11,7 +11,6 @@ import (
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/base"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/client"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -38,9 +37,8 @@ const (
 )
 
 var (
-	newline      = []byte{'\n'}
-	space        = []byte{' '}
-	nsidSpaceMap = utils.NewMutexMap[string]()
+	newline = []byte{'\n'}
+	space   = []byte{' '}
 )
 
 // Client is a middleman between the websocket connection and the hub.
@@ -232,7 +230,6 @@ func (c *Client) readPump() {
 func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
-		nsidSpaceMap.Delete(c.clientInfo.NSID)
 		ticker.Stop()
 		c.conn.Close()
 	}()

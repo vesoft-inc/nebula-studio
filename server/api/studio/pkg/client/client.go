@@ -2,11 +2,11 @@ package client
 
 import (
 	"errors"
-	"sync"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
 	nebula "github.com/vesoft-inc/nebula-go/v3"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -63,9 +63,7 @@ type ClientInfo struct {
 }
 
 var (
-	clientPool       = make(map[string]*Client)
-	currentClientNum = 0
-	clientMux        sync.Mutex
+	clientPool = utils.NewMutexMap[*Client]()
 )
 
 var log = newNebulaLogger()
@@ -74,6 +72,7 @@ func NewClient(address string, port int, username string, password string, conf 
 	var err error
 
 	// TODO: it's better to add a schedule to make it instead
+	currentClientNum := clientPool.Size()
 	if currentClientNum > clientRecycleNum {
 		go recycleClients()
 		if currentClientNum >= clientMaxNum {
@@ -111,10 +110,7 @@ func NewClient(address string, port int, username string, password string, conf 
 		},
 	}
 
-	clientMux.Lock()
-	clientPool[nsid] = client
-	currentClientNum++
-	clientMux.Unlock()
+	clientPool.Set(nsid, client)
 
 	go client.handleRequest(nsid)
 
@@ -125,10 +121,7 @@ func NewClient(address string, port int, username string, password string, conf 
 }
 
 func GetClient(nsid string) (*Client, error) {
-	clientMux.Lock()
-	defer clientMux.Unlock()
-
-	if client, ok := clientPool[nsid]; ok {
+	if client, ok := clientPool.Get(nsid); ok {
 		client.updateTime = time.Now().Unix()
 		return client, nil
 	}
@@ -137,31 +130,27 @@ func GetClient(nsid string) (*Client, error) {
 }
 
 func CloseClient(nsid string) {
-	clientMux.Lock()
-	client := clientPool[nsid]
+	client, _ := clientPool.Get(nsid)
 	if client != nil {
 		client.CloseChannel <- true
+		clientPool.Delete(nsid)
 	}
-	clientMux.Unlock()
 }
 
 func ClearClients() {
-	clientMux.Lock()
-	for _, client := range clientPool {
+	clientPool.ForEach(func(key string, client *Client) {
 		client.sessionPool.clearSessions()
 		client.graphClient.Close()
-	}
-	clientMux.Unlock()
+	})
+	clientPool.Clear()
 }
 
 func recycleClients() {
-	clientMux.Lock()
 	now := time.Now().Unix()
-	for _, client := range clientPool {
+	clientPool.ForEach(func(key string, client *Client) {
 		expireAt := client.updateTime + SessionExpiredDuration
 		if now > expireAt {
 			client.CloseChannel <- true
 		}
-	}
-	clientMux.Unlock()
+	})
 }

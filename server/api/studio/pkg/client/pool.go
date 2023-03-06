@@ -365,12 +365,9 @@ func (client *Client) handleRequest(nsid string) {
 				}
 			}()
 		case <-client.CloseChannel:
-			clientMux.Lock()
 			client.sessionPool.clearSessions()
 			client.graphClient.Close()
-			currentClientNum--
-			delete(clientPool, nsid)
-			clientMux.Unlock()
+			clientPool.Delete(nsid)
 			return // Exit loop
 		}
 	}
@@ -438,7 +435,7 @@ func (client *Client) executeRequest(session *nebula.Session, request ChannelReq
 }
 
 func Execute(nsid string, space string, gqls []string) ([]ExecuteResult, error) {
-	client := clientPool[nsid]
+	client, _ := clientPool.Get(nsid)
 	responseChannel := make(chan ChannelResponse)
 	client.RequestChannel <- ChannelRequest{
 		Gqls:            gqls,
