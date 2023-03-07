@@ -43,7 +43,7 @@ type FilesIndexData struct {
 }
 
 type FileConfigUpdateRequest struct {
-	WithHeader bool   `json:"withHeader"`
+	WithHeader bool   `json:"withHeader, optional"`
 	Delimiter  string `json:"delimiter"`
 	Name       string `json:"name" validate:"required"`
 }
@@ -55,7 +55,7 @@ type ImportTaskCSV struct {
 }
 
 type NodeId struct {
-	Name        string        `json:"name" validate:"required"`
+	Name        string        `json:"name,optional"`
 	Type        string        `json:"type" validate:"required"`
 	Index       int64         `json:"index" validate:"required"`
 	ConcatItems []interface{} `json:"concatItems,optional"`

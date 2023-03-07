@@ -110,6 +110,14 @@ func NewClient(address string, port int, username string, password string, conf 
 		},
 	}
 
+	session, err := client.getSession()
+
+	if err != nil {
+		CloseClient(nsid)
+		return nil, err
+	}
+	client.sessionPool.addSession(session)
+
 	clientPool.Set(nsid, client)
 
 	go client.handleRequest(nsid)
