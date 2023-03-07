@@ -26,32 +26,32 @@ export function configToJson(payload: IConfig) {
     retry,
     channelBufferSize
   } = payload;
+  console.log('tagConfig', tagConfig);
+  console.log('edgeConfig', edgeConfig);
   const vertexToJSON = tagDataToJSON(
     tagConfig,
     spaceVidType,
-    batchSize
   );
+  console.log('vertexToJSON', vertexToJSON);
   const edgeToJSON = edgeDataToJSON(
     edgeConfig,
     spaceVidType,
-    batchSize
   );
-  const files: any[] = [...vertexToJSON, ...edgeToJSON];
+  const sources: any[] = [...vertexToJSON, ...edgeToJSON];
   const configJson = {
-    version: 'v2',
-    description: 'studio import',
-    clientSettings: {
+    client: {
+      version: 'v3',
+      address: address.join(','),
+      user: username,
+      password,
+      concurrencyPerAddress: Number(concurrency ?? DEFAULT_IMPORT_CONFIG.concurrency),
       retry: Number(retry ?? DEFAULT_IMPORT_CONFIG.retry),
-      concurrency: Number(concurrency ?? DEFAULT_IMPORT_CONFIG.concurrency),
-      channelBufferSize: Number(channelBufferSize ?? DEFAULT_IMPORT_CONFIG.channelBufferSize),
-      space: handleEscape(space),
-      connection: {
-        user: username,
-        password,
-        address: address.join(',')
-      },
     },
-    files,
+    manager: {
+      spaceName: handleEscape(space),
+      batch: Number(batchSize) || DEFAULT_IMPORT_CONFIG.batchSize,
+    },
+    sources
   };
   return configJson;
 }
@@ -59,7 +59,6 @@ export function configToJson(payload: IConfig) {
 export function edgeDataToJSON(
   configs: IEdgeItem[],
   spaceVidType: string,
-  batchSize?: string,
 ) {
   const result = configs.reduce((acc: any, cur) => {
     const { name, files } = cur;
@@ -79,33 +78,30 @@ export function edgeDataToJSON(
         });
         return acc;
       }, []);
+      const edges = [{
+        name: handleEscape(name),
+        src: {
+          type: vidType,
+          index: srcIdIndex,
+          function: srcIdFunction,
+        },
+        dst: {
+          type: vidType,
+          index: dstIdIndex,
+          function: dstIdFunction,
+        },
+        rank: { index: rank.mapping },
+        props: edgeProps,
+      }];
       const edgeConfig = {
-        path: file.name,
-        batchSize: Number(batchSize) || DEFAULT_IMPORT_CONFIG.batchSize,
-        type: 'csv',
+        local: {
+          path: file.name,
+        },
         csv: {
           withHeader: file.withHeader || false,
-          withLabel: false,
           delimiter: file.delimiter
         },
-        schema: {
-          type: 'edge',
-          edge: {
-            name: handleEscape(name),
-            srcVID: {
-              index: srcIdIndex,
-              function: srcIdFunction,
-              type: vidType,
-            },
-            dstVID: {
-              index: dstIdIndex,
-              function: dstIdFunction,
-              type: vidType,
-            },
-            rank: { index: rank.mapping },
-            props: edgeProps,
-          },
-        },
+        edges,
       };
       return edgeConfig;
     });
@@ -118,12 +114,11 @@ export function edgeDataToJSON(
 export function tagDataToJSON(
   configs: ITagItem[],
   spaceVidType: string,
-  batchSize?: string
 ) {
   const result = configs.reduce((acc: any, cur) => {
     const { name, files } = cur;
     const _config = files.map(item => {
-      const { file, props, vidIndex, vidFunction, vidPrefix } = item;
+      const { file, props, vidIndex, vidFunction } = item;
       const _props = props.reduce((acc: any, cur) => {
         if (isEmpty(cur.mapping) && (cur.allowNull || cur.isDefault)) {
           return acc;
@@ -138,29 +133,22 @@ export function tagDataToJSON(
 
       const tags = [{
         name: handleEscape(name),
+        id: {
+          type: spaceVidType === 'INT64' ? 'int' : 'string',
+          index: vidIndex,
+          function: vidFunction,
+        },
         props: _props.filter(prop => prop),
       }];
       return {
-        path: file.name,
-        batchSize: Number(batchSize) || DEFAULT_IMPORT_CONFIG.batchSize,
-        type: 'csv',
+        local: {
+          path: file.name,
+        },
         csv: {
           withHeader: file.withHeader || false,
-          withLabel: false,
           delimiter: file.delimiter
         },
-        schema: {
-          type: 'vertex',
-          vertex: {
-            vid: {
-              index: vidIndex,
-              function: vidFunction,
-              type: spaceVidType === 'INT64' ? 'int' : 'string',
-              prefix: vidPrefix,
-            },
-            tags,
-          },
-        }
+        tags
       };
     });
     acc.push(..._config);
@@ -170,141 +158,112 @@ export function tagDataToJSON(
 }
 
 export const exampleJson = {
-  'version': 'v2',
-  'description': 'web console import',
-  'removeTempFiles': null,
-  'clientSettings': {
-    'retry': 3,
-    'concurrency': 10,
-    'channelBufferSize': 128,
-    'space': 'sales',
-    'connection': {
-      'user': '',
-      'password': '',
-      'address': ''
-    },
-    'postStart': null,
-    'preStop': null
+  'client': {
+    'version': 'v3',
+    'user': '',
+    'password': '',
+    'address': ''
   },
-  'logPath': 'import.log',
-  'files': [
+  'manager': {
+    'spaceName': 'sales',
+  },
+  'sources': [
     {
       'path': 'item.csv',
-      'batchSize': 60,
-      'limit': null,
-      'inOrder': null,
-      'type': 'csv',
       'csv': {
         'withHeader': false,
-        'withLabel': false,
         'delimiter': null
       },
-      'schema': {
-        'type': 'vertex',
-        'edge': null,
-        'vertex': {
+      'tags': [
+        {
+          'name': 'item',
           'vid': {
             'index': 0,
             'function': null,
             'type': 'string',
-            'prefix': null
           },
-          'tags': [
-            {
-              'name': 'item',
-              'props': [
-                {
-                  'name': 'id_single_item',
-                  'type': 'string',
-                  'index': 0
-                },
-                {
-                  'name': 'region',
-                  'type': 'string',
-                  'index': 1
-                },
-                {
-                  'name': 'country',
-                  'type': 'string',
-                  'index': 2
-                },
-                {
-                  'name': 'item_type',
-                  'type': 'string',
-                  'index': 3
-                },
-                {
-                  'name': 'sales_channel',
-                  'type': 'string',
-                  'index': 4
-                }
-              ]
-            }
-          ]
-        }
-      }
-    },
-    {
-      'path': 'orderr.csv',
-      'batchSize': 60,
-      'limit': null,
-      'inOrder': null,
-      'type': 'csv',
-      'csv': {
-        'withHeader': false,
-        'withLabel': false,
-        'delimiter': null
-      },
-      'schema': {
-        'type': 'edge',
-        'edge': {
-          'name': 'order',
           'props': [
             {
-              'name': 'order_id',
+              'name': 'id_single_item',
               'type': 'string',
               'index': 0
             },
             {
-              'name': 'id_item',
+              'name': 'region',
               'type': 'string',
-              'index': 0
+              'index': 1
             },
             {
-              'name': 'unit_sold',
+              'name': 'country',
               'type': 'string',
               'index': 2
             },
             {
-              'name': 'unit_price',
+              'name': 'item_type',
               'type': 'string',
               'index': 3
             },
             {
-              'name': 'unit_cost',
+              'name': 'sales_channel',
               'type': 'string',
               'index': 4
-            },
-            {
-              'name': 'total_profit',
-              'type': 'string',
-              'index': 5
             }
-          ],
-          'srcVID': {
-            'index': 1,
-            'function': null,
+          ]
+        }
+      ]
+    },
+    {
+      'path': 'orderr.csv',
+      'csv': {
+        'withHeader': false,
+        'delimiter': null
+      },
+      'edges': [{
+        'name': 'order',
+        'props': [
+          {
+            'name': 'order_id',
             'type': 'string',
+            'index': 0
           },
-          'dstVID': {
-            'index': 1,
-            'function': null,
+          {
+            'name': 'id_item',
             'type': 'string',
+            'index': 0
           },
-          'rank': null
+          {
+            'name': 'unit_sold',
+            'type': 'string',
+            'index': 2
+          },
+          {
+            'name': 'unit_price',
+            'type': 'string',
+            'index': 3
+          },
+          {
+            'name': 'unit_cost',
+            'type': 'string',
+            'index': 4
+          },
+          {
+            'name': 'total_profit',
+            'type': 'string',
+            'index': 5
+          }
+        ],
+        'src': {
+          'index': 1,
+          'function': null,
+          'type': 'string',
         },
-        'vertex': null
-      }
+        'dst': {
+          'index': 1,
+          'function': null,
+          'type': 'string',
+        },
+        'rank': null
+      }],
     }
   ]
 };

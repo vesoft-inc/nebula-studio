@@ -3,21 +3,13 @@ package importer
 import (
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"time"
 
-	importconfig "github.com/vesoft-inc/nebula-importer/pkg/config"
-	importerErrors "github.com/vesoft-inc/nebula-importer/pkg/errors"
-	"github.com/vesoft-inc/nebula-importer/pkg/logger"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
-	"go.uber.org/zap"
-
-	"gopkg.in/yaml.v2"
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type ImportResult struct {
@@ -30,74 +22,21 @@ type ImportResult struct {
 	}
 }
 
-func GetNewTaskDir(tasksDir string) (string, error) {
-	taskId, err := GetTaskMgr().NewTaskID()
-	if err != nil {
-		return "", err
-	}
-	taskDir := filepath.Join(tasksDir, taskId)
-	return taskDir, nil
-}
-
-func CreateConfigFile(uploadDir, taskdir string, config importconfig.YAMLConfig) error {
-	fileName := "config.yaml"
-	// err := utils.CreateDir(taskdir)
-	if err := utils.CreateDir(taskdir); err != nil {
-		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-	}
-	path := filepath.Join(taskdir, fileName)
-	// erase user information
-	address := *config.NebulaClientSettings.Connection.Address
-	user := *config.NebulaClientSettings.Connection.User
-	password := *config.NebulaClientSettings.Connection.Password
-	*config.NebulaClientSettings.Connection.Address = ""
-	*config.NebulaClientSettings.Connection.User = ""
-	*config.NebulaClientSettings.Connection.Password = ""
-
-	// erase path infomation
-	logPath := *config.LogPath
-	*config.LogPath = "import.log"
-	paths := make([]string, 0)
-	failDataPaths := make([]string, 0)
-	for _, file := range config.Files {
-		paths = append(paths, filepath.Join(uploadDir, *file.Path))
-		failDataPaths = append(failDataPaths, filepath.Join(taskdir, "err"))
-		_, fileName := filepath.Split(*file.Path)
-		*file.Path = fileName
-		if file.FailDataPath == nil {
-			file.FailDataPath = new(string)
-		}
-		*file.FailDataPath = fileName
-	}
-
-	outYaml, err := yaml.Marshal(config)
-	if err != nil {
-		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-	}
-	if err := os.WriteFile(path, outYaml, 0o644); err != nil {
-		zap.L().Warn("write"+path+"file error", zap.Error(err))
-		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-	}
-
-	*config.LogPath = logPath
-	*config.NebulaClientSettings.Connection.Address = address
-	*config.NebulaClientSettings.Connection.User = user
-	*config.NebulaClientSettings.Connection.Password = password
-	for i, file := range config.Files {
-		*file.Path = paths[i]
-		*file.FailDataPath = failDataPaths[i]
-	}
-	return nil
-}
-
-func Import(taskID string, conf *importconfig.YAMLConfig) (err error) {
-	runnerLogger := logger.NewRunnerLogger(*conf.LogPath)
-	if err := conf.ValidateAndReset("", runnerLogger); err != nil {
-		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-	}
-
+func StartImport(taskID string) (err error) {
 	task, _ := GetTaskMgr().GetTask(taskID)
 	signal := make(chan struct{}, 1)
+
+	abort := func() {
+		task.TaskInfo.TaskStatus = StatusAborted.String()
+		task.TaskInfo.TaskMessage = err.Error()
+		err = GetTaskMgr().AbortTask(taskID)
+		if err != nil {
+			logx.Errorf("start task fail, %v", err)
+		}
+		signal <- struct{}{}
+		return
+	}
+
 	go func() {
 		ticker := time.NewTicker(2 * time.Second)
 		defer ticker.Stop()
@@ -106,7 +45,7 @@ func Import(taskID string, conf *importconfig.YAMLConfig) (err error) {
 			case <-ticker.C:
 				err := GetTaskMgr().UpdateTaskInfo(taskID)
 				if err != nil {
-					zap.L().Warn(fmt.Sprintf("UpdateTaskInfo fail, id : %s", taskID), zap.Error(err))
+					logx.Errorf(fmt.Sprintf("UpdateTaskInfo fail, id : %s", taskID), err)
 				}
 			case <-signal:
 				return
@@ -114,52 +53,29 @@ func Import(taskID string, conf *importconfig.YAMLConfig) (err error) {
 		}
 	}()
 	go func() {
-		result := ImportResult{}
-		now := time.Now()
-		task.GetRunner().Run(conf)
-		timeCost := time.Since(now).Milliseconds()
-		result.TaskId = taskID
-		result.TimeCost = fmt.Sprintf("%dms", timeCost)
-		if rerrs := task.GetRunner().Errors(); len(rerrs) != 0 {
-			allErrIsNotCompleteError := true
-			for _, rerr := range rerrs {
-				err := rerr.(importerErrors.ImporterError)
-				if err.ErrCode != importerErrors.NotCompleteError {
-					allErrIsNotCompleteError = false
-					break
-				}
-			}
-			if allErrIsNotCompleteError {
-				task.TaskInfo.TaskStatus = StatusFinished.String()
-				result.FailedRows = task.GetRunner().NumFailed
-				err1 := GetTaskMgr().FinishTask(taskID)
-				if err1 != nil {
-					zap.L().Warn("finish task fail", zap.Error(err1))
-				}
-				zap.L().Debug(fmt.Sprintf("Success to finish a import task: `%s`, task result: `%v`", taskID, result))
-				return
-			}
-			// TODO: return all errors
-			task.TaskInfo.TaskStatus = StatusAborted.String()
-			err, _ := rerrs[0].(importerErrors.ImporterError)
-			result.ErrorResult.ErrorCode = err.ErrCode
-			result.ErrorResult.ErrorMsg = err.ErrMsg.Error()
-			task.TaskInfo.TaskMessage = err.ErrMsg.Error()
-			err1 := GetTaskMgr().AbortTask(taskID)
-			if err1 != nil {
-				zap.L().Warn("finish task fail", zap.Error(err1))
-			}
-			zap.L().Warn(fmt.Sprintf("Failed to finish a import task: `%s`, task result: `%v`", taskID, result))
-		} else {
-			task.TaskInfo.TaskStatus = StatusFinished.String()
-			result.FailedRows = task.GetRunner().NumFailed
-			err := GetTaskMgr().FinishTask(taskID)
-			if err != nil {
-				zap.L().Warn("finish task fail", zap.Error(err))
-			}
-			zap.L().Debug(fmt.Sprintf("Success to finish a import task: `%s`, task result: `%v`", taskID, result))
+		mgr := task.Client.Manager
+		cfg := task.Client.Cfg
+		if err = cfg.Build(); err != nil {
+			abort()
 		}
-
+		if err = mgr.Start(); err != nil {
+			abort()
+		}
+		err = mgr.Wait()
+		if err != nil {
+			task.TaskInfo.TaskStatus = StatusAborted.String()
+			task.TaskInfo.TaskMessage = err.Error()
+			err = GetTaskMgr().AbortTask(taskID)
+			if err != nil {
+				logx.Errorf("finish task fail, %v", err)
+			}
+			return
+		}
+		task.TaskInfo.TaskStatus = StatusFinished.String()
+		err = GetTaskMgr().FinishTask(taskID)
+		if err != nil {
+			logx.Errorf("finish task fail, %v", err)
+		}
 		signal <- struct{}{}
 	}()
 	return nil
@@ -167,12 +83,12 @@ func Import(taskID string, conf *importconfig.YAMLConfig) (err error) {
 
 func DeleteImportTask(tasksDir, taskID, address, username string) error {
 	if id, err := strconv.Atoi(taskID); err != nil {
-		zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
+		logx.Errorf(fmt.Sprintf("stop task fail, id : %s", taskID), err)
 		return errors.New("task not existed")
 	} else {
 		_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(id, address, username)
 		if err != nil {
-			zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
+			logx.Errorf(fmt.Sprintf("stop task fail, id : %s", taskID), err)
 			return errors.New("task not existed")
 		}
 	}
@@ -202,17 +118,29 @@ func GetImportTask(tasksDir, taskID, address, username string) (*types.GetImport
 		if err != nil {
 			return nil, err
 		}
+		stats := task.TaskInfo.Stats
 		result.Id = strconv.Itoa(t.TaskInfo.ID)
 		result.Status = task.TaskInfo.TaskStatus
 		result.Message = task.TaskInfo.TaskMessage
-		result.CreateTime = task.TaskInfo.CreatedTime
-		result.UpdateTime = task.TaskInfo.UpdatedTime
+		result.CreateTime = task.TaskInfo.CreateTime.UnixMilli()
+		result.UpdateTime = task.TaskInfo.UpdateTime.UnixMilli()
 		result.Address = task.TaskInfo.Address
 		result.ImportAddress = importAddress
 		result.User = task.TaskInfo.User
 		result.Name = task.TaskInfo.Name
 		result.Space = task.TaskInfo.Space
-		result.Stats = types.ImportTaskStats(task.TaskInfo.Stats)
+		result.Stats = types.ImportTaskStats{
+			TotalBytes:      stats.TotalBytes,
+			ProcessedBytes:  stats.ProcessedBytes,
+			FailedRecords:   stats.FailedRecords,
+			TotalRecords:    stats.TotalRecords,
+			TotalRequest:    stats.TotalRequest,
+			FailedRequest:   stats.FailedRequest,
+			TotalLatency:    int64(stats.TotalLatency),
+			TotalRespTime:   int64(stats.TotalRespTime),
+			FailedProcessed: stats.FailedProcessed,
+			TotalProcessed:  stats.TotalProcessed,
+		}
 	}
 
 	return result, nil
@@ -234,18 +162,30 @@ func GetManyImportTask(tasksDir, address, username string, pageIndex, pageSize i
 		if err != nil {
 			return nil, err
 		}
+		stats := t.Stats
 		data := types.GetImportTaskData{
 			Id:            strconv.Itoa(t.ID),
 			Status:        t.TaskStatus,
 			Message:       t.TaskMessage,
-			CreateTime:    t.CreatedTime,
-			UpdateTime:    t.UpdatedTime,
+			CreateTime:    t.CreateTime.UnixMilli(),
+			UpdateTime:    t.UpdateTime.UnixMilli(),
 			Address:       t.Address,
 			ImportAddress: importAddress,
 			User:          t.User,
 			Name:          t.Name,
 			Space:         t.Space,
-			Stats:         types.ImportTaskStats(t.Stats),
+			Stats: types.ImportTaskStats{
+				TotalBytes:      stats.TotalBytes,
+				ProcessedBytes:  stats.ProcessedBytes,
+				FailedRecords:   stats.FailedRecords,
+				TotalRecords:    stats.TotalRecords,
+				TotalRequest:    stats.TotalRequest,
+				FailedRequest:   stats.FailedRequest,
+				TotalLatency:    int64(stats.TotalLatency),
+				TotalRespTime:   int64(stats.TotalRespTime),
+				FailedProcessed: stats.FailedProcessed,
+				TotalProcessed:  stats.TotalProcessed,
+			},
 		}
 		result.List = append(result.List, data)
 	}
@@ -256,19 +196,19 @@ func GetManyImportTask(tasksDir, address, username string, pageIndex, pageSize i
 
 func StopImportTask(taskID, address, username string) error {
 	if id, err := strconv.Atoi(taskID); err != nil {
-		zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
+		logx.Errorf(fmt.Sprintf("stop task fail, id : %s", taskID), err)
 		return errors.New("task not existed")
 	} else {
 		_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(id, address, username)
 		if err != nil {
-			zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
+			logx.Errorf(fmt.Sprintf("stop task fail, id : %s", taskID), err)
 			return errors.New("task not existed")
 		}
 	}
 
 	err := GetTaskMgr().StopTask(taskID)
 	if err != nil {
-		zap.L().Warn(fmt.Sprintf("stop task fail, id : %s", taskID), zap.Error(err))
+		logx.Errorf(fmt.Sprintf("stop task fail, id : %s", taskID), err)
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	} else {
 		return nil
