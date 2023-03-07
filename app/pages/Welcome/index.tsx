@@ -304,8 +304,8 @@ function Welcome(props: IProps) {
       }
       const gql = await fetch(`${process.env.CDN_PATH || '/'}datasets/${space.fileName}.ngql`).then((r) => r.text());
       setSpaceLoading({ spaceName: space.spaceName, leftTime: initLoadingTime, progressModalOpen: true });
-      const downloadRes = await service.execSeqNGQL({
-        gql: gql.replaceAll('\n', ''),
+      const downloadRes = await service.batchExecNGQL({
+        gqls: gql.split('\n').map(line => line.startsWith(':') ? line.replace(/;$/gm, '') : line).filter(Boolean)
       });
       setSpaceLoading({ spaceName: undefined, leftTime: 0, progressModalOpen: false });
       clearSpaceLoadingTimeout();

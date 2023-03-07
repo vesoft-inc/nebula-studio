@@ -11,12 +11,11 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula"
-	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/dao"
-	"github.com/vesoft-inc/nebula-http-gateway/ccore/nebula/gateway/pool"
+	nebula "github.com/vesoft-inc/nebula-go/v3"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/client"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/rest"
@@ -105,33 +104,36 @@ func Decode(tokenString, secret string) (*AuthData, error) {
 	return auth.AuthData, nil
 }
 
-func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) (string, *pool.ClientInfo, error) {
+func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) (string, error) {
 	tokenSplit := strings.Split(params.Authorization, " ")
 	if len(tokenSplit) != 2 {
-		return "", nil, fmt.Errorf("invalid authorization")
+		return "", fmt.Errorf("invalid authorization")
 	}
 
 	decode, err := base64.StdEncoding.DecodeString(tokenSplit[1])
 	if err != nil {
-		return "", nil, err
+		return "", err
 	}
 
 	loginInfo := []string{}
 	err = json.Unmarshal(decode, &loginInfo)
 
 	if err != nil {
-		return "", nil, err
+		return "", err
 	}
 
 	if len(loginInfo) < 2 {
-		return "", nil, fmt.Errorf("len of account is less than two")
+		return "", fmt.Errorf("len of account is less than two")
 	}
 
 	username, password := loginInfo[0], loginInfo[1]
 	// set Graph Service connect timeout 8h, which is 0s default(means no timeout)
-	clientInfo, err := dao.Connect(params.Address, params.Port, username, password, nebula.WithGraphTimeout(GraphServiceTimeout))
+	poolCfg := nebula.GetDefaultConf()
+	poolCfg.TimeOut = GraphServiceTimeout
+	poolCfg.MaxConnPoolSize = 200
+	clientInfo, err := client.NewClient(params.Address, params.Port, username, password, poolCfg)
 	if err != nil {
-		return "", nil, err
+		return "", err
 	}
 
 	tokenString, err := CreateToken(
@@ -144,7 +146,7 @@ func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) 
 		},
 		config,
 	)
-	return tokenString, clientInfo, nil
+	return tokenString, nil
 }
 
 func AuthMiddlewareWithCtx(svcCtx *svc.ServiceContext) rest.Middleware {
@@ -181,7 +183,7 @@ func AuthMiddlewareWithCtx(svcCtx *svc.ServiceContext) rest.Middleware {
 			}
 
 			// for: server restart...
-			_, clientErr := pool.GetClient(auth.NSID)
+			_, clientErr := client.GetClient(auth.NSID)
 			if clientErr != nil && !isDisconnectPath {
 				svcCtx.ResponseHandler.Handle(w, r, nil, withErrorMessage(ecode.ErrSession, clientErr))
 				return

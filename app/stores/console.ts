@@ -12,24 +12,18 @@ const { intl } = getI18n();
 export const splitQuery = (query: string) => {
   const _query = query.split('\n').filter(i => !i.trim().startsWith('//') && !i.trim().startsWith('#'));
   const result = _query.reduce((acc, cur) => {
-    const { gqlList, paramList } = acc;
     const line = cur.trim();
-    if(line.startsWith(':')) {
-      paramList.push(line.replace(/;$/gm, ''));
+    const last = acc[acc.length - 1];
+    if(last?.endsWith('\\')) {
+      acc[acc.length - 1] = acc[acc.length - 1].slice(0, -1) + line;
+    } else if (last && !last.endsWith(';') && !last.startsWith(':')) {
+      acc[acc.length - 1] += ' ' + line;
     } else {
-      // if line ends with `\`, then it is a multi-line query
-      const last = gqlList[gqlList.length - 1];
-      if(last?.endsWith('\\')) {
-        gqlList[gqlList.length - 1] = gqlList[gqlList.length - 1].slice(0, -1) + line;
-      } else if (last && !last.endsWith(';')) {
-        gqlList[gqlList.length - 1] += ' ' + line;
-      } else {
-        gqlList.push(line);
-      }
+      acc.push(line);
     }
     return acc;
-  }, { gqlList: [] as string[], paramList: [] as string[] });
-  return result;
+  }, []);
+  return result.map(line => line.startsWith(':') ? line.replace(/;$/gm, '') : line);
 };
 
 export type HistoryResult = NgqlRes & {
@@ -92,7 +86,7 @@ export class ConsoleStore {
           return;
         }
       }
-      const { gqlList, paramList } = splitQuery(gql);
+      const gqlList = splitQuery(gql);
       const { code, data } = await service.batchExecNGQL(
         {
           gqls: gqlList
@@ -100,7 +94,6 @@ export class ConsoleStore {
             .map((item) => {
               return item.endsWith('\\') ? item.slice(0, -1) : item;
             }),
-          paramList,
           space: this.currentSpace,
         },
         {
@@ -118,13 +111,11 @@ export class ConsoleStore {
         item.space = this.currentSpace;
         item.spaceVidType = spaceVidType;
       });
-      const updateQuerys = paramList.filter((item) => {
-        const reg = /^\s*:params/gim;
-        return !reg.test(item);
+      const paramUpdated = gqlList.some((item) => {
+        const reg = /^\s*:param/gim;
+        return reg.test(item);
       });
-      if (updateQuerys.length > 0) {
-        await this.getParams();
-      }
+      paramUpdated && this.getParams();
       const _results = [...data?.reverse(), ...this.results];
       this.update({
         results: _results,
@@ -137,7 +128,7 @@ export class ConsoleStore {
   };
 
   getParams = async () => {
-    const results = await service.execNGQL({ gql: '', paramList: [':params'] });
+    const results = await service.execNGQL({ gql: ':params' });
     this.update({ paramsMap: results.data?.localParams || {} });
   };
   saveFavorite = async (content: string) => {

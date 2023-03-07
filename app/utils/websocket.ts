@@ -226,7 +226,7 @@ export class NgqlRunner {
   };
 
   runNgql = async (
-    { gql, paramList, space }: { gql: string; paramList?: string[]; space?: string },
+    { gql, space }: { gql: string; space?: string },
     config: Recordable = {},
   ): Promise<NgqlRes> => {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
@@ -241,7 +241,7 @@ export class NgqlRunner {
         resolve,
         reject,
         product: this.product,
-        content: { gql, paramList, space },
+        content: { gql, space },
         config,
         msgType: 'ngql',
       });
@@ -252,7 +252,7 @@ export class NgqlRunner {
   };
 
   runBatchNgql = async (
-    { gqls, paramList, space }: { gqls: string[]; paramList?: string[]; space?: string },
+    { gqls, space }: { gqls: string[]; space?: string },
     config: Recordable = {},
   ): Promise<NgqlRes> => {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
@@ -264,7 +264,7 @@ export class NgqlRunner {
         resolve,
         reject,
         product: this.product,
-        content: { gqls, paramList, space },
+        content: { gqls, space },
         config,
         msgType: 'batch_ngql',
       });
