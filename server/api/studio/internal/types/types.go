@@ -43,7 +43,7 @@ type FilesIndexData struct {
 }
 
 type FileConfigUpdateRequest struct {
-	WithHeader bool   `json:"withHeader"`
+	WithHeader bool   `json:"withHeader, optional"`
 	Delimiter  string `json:"delimiter"`
 	Name       string `json:"name" validate:"required"`
 }

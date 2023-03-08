@@ -332,7 +332,7 @@ func (client *Client) handleRequest(nsid string) {
 	for {
 		select {
 		case request := <-client.RequestChannel:
-			func() {
+			go func() {
 				defer func() {
 					if err := recover(); err != nil {
 						logx.Errorf("[handle request]: &s, %+v", request.Gqls, err)

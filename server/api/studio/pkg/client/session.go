@@ -36,7 +36,9 @@ func (client *Client) getSession() (session *nebula.Session, err error) {
 			// if active session is not empty, wait for the active session
 			return nil, nil
 		}
+		pool.mu.Lock()
 		pool.activeSessions = append(pool.activeSessions, session)
+		pool.mu.Unlock()
 		return session, nil
 	}
 	pool.mu.Lock()
