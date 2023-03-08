@@ -14,7 +14,7 @@ type Client struct {
 	Manager manager.Manager     `json:"manager,omitempty"`
 }
 type Task struct {
-	Client   Client       `json:"client,omitempty"`
+	Client   *Client      `json:"client,omitempty"`
 	TaskInfo *db.TaskInfo `json:"task_info,omitempty"`
 }
 

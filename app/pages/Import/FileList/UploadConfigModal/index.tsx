@@ -1,6 +1,6 @@
 import Icon from '@app/components/Icon';
 import { useI18n } from '@vesoft-inc/i18n';
-import { Button, Input, Modal, Table, Popconfirm, Dropdown } from 'antd';
+import { Button, Input, Modal, Table, Popconfirm, Dropdown, message } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useState } from 'react';
 import { usePapaParse } from 'react-papaparse';
@@ -158,6 +158,7 @@ const UploadConfigModal = (props: IProps) => {
     const res = await uploadFile(data);
     if(res.code === 0) {
       onConfirm();
+      message.success(intl.get('import.uploadSuccessfully'));
     }
     setState({ uploading: false });
   }, []);

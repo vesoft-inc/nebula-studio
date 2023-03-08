@@ -55,41 +55,45 @@ type ImportTaskCSV struct {
 }
 
 type NodeId struct {
-	Name        string        `json:"name" validate:"required"`
+	Name        string        `json:"name,optional"`
 	Type        string        `json:"type" validate:"required"`
 	Index       int64         `json:"index" validate:"required"`
-	ConcatItems []interface{} `json:"concatItems,optional"`
-	Function    string        `json:"function,optional"`
+	ConcatItems []interface{} `json:"concatItems,optional,omitempty"`
+	Function    string        `json:"function,optional,omitempty"`
 }
 
 type Tag struct {
 	Name               string `json:"name" validate:"required"`
 	ID                 NodeId `json:"id" validate:"required"`
 	Props              []Prop `json:"props" validate:"required"`
-	IgnoreExistedIndex bool   `json:"ignoreExistedIndex,optional"`
+	IgnoreExistedIndex bool   `json:"ignoreExistedIndex,optional,omitempty"`
 }
 
 type Edge struct {
-	Name               string   `json:"name" validate:"required"`
-	Src                NodeId   `json:"src" validate:"required"`
-	Dst                NodeId   `json:"dst" validate:"required"`
-	Props              []Prop   `json:"props" validate:"required"`
-	Rank               EdgeRank `json:"rank, optional"`
-	IgnoreExistedIndex bool     `json:"ignoreExistedIndex,optional"`
+	Name               string      `json:"name" validate:"required"`
+	Src                EdgeNodeRef `json:"src" validate:"required"`
+	Dst                EdgeNodeRef `json:"dst" validate:"required"`
+	Props              []Prop      `json:"props" validate:"required"`
+	Rank               *EdgeRank   `json:"rank,optional,omitempty"`
+	IgnoreExistedIndex bool        `json:"ignoreExistedIndex,optional,omitempty"`
+}
+
+type EdgeNodeRef struct {
+	ID NodeId `json:"id" validate:"required"`
 }
 
 type Prop struct {
 	Name               string  `json:"name" validate:"required"`
 	Type               string  `json:"type" validate:"required"`
-	Index              int64   `json:"index, optional"`
-	Nullable           bool    `json:"nullable, optional"`
-	NullValue          string  `json:"nullValue, optional"`
-	AlternativeIndices []int64 `json:"alternativeIndices, optional"`
-	DefaultValue       string  `json:"defaultValue, optional"`
+	Index              int64   `json:"index,optional,omitempty"`
+	Nullable           bool    `json:"nullable,optional,omitempty"`
+	NullValue          string  `json:"nullValue,optional,omitempty"`
+	AlternativeIndices []int64 `json:"alternativeIndices,optional,omitempty"`
+	DefaultValue       string  `json:"defaultValue,optional,omitempty"`
 }
 
 type EdgeRank struct {
-	Index *int64 `json:"index, optional"`
+	Index *int64 `json:"index,optional,omitempty"`
 }
 
 type S3Config struct {
@@ -121,34 +125,47 @@ type ImportTaskConfig struct {
 	Client  Client    `json:"client" validate:"required"`
 	Manager Manager   `json:"manager" validate:"required"`
 	Sources []Sources `json:"sources" validate:"required"`
+	Log     *Log      `json:"log,omitempty,optional"`
 }
 
 type Client struct {
-	Version                  string `json:"version,omitempty" validate:"required"`
-	Address                  string `json:"address,omitempty" validate:"required"`
-	User                     string `json:"user,omitempty" validate:"required"`
-	Password                 string `json:"password,omitempty" validate:"required"`
-	ConcurrencyPerAddress    int    `json:"concurrencyPerAddress,optional"`
-	ReconnectInitialInterval string `json:"reconnectInitialInterval,optional"`
-	Retry                    int    `json:"retry,optional"`
-	RetryInitialInterval     string `json:"retryInitialInterval,optional"`
+	Version                  string  `json:"version,omitempty" validate:"required"`
+	Address                  string  `json:"address,omitempty" validate:"required"`
+	User                     string  `json:"user,omitempty" validate:"required"`
+	Password                 string  `json:"password,omitempty" validate:"required"`
+	ConcurrencyPerAddress    int     `json:"concurrencyPerAddress,optional"`
+	ReconnectInitialInterval *string `json:"reconnectInitialInterval,optional,omitempty"`
+	Retry                    int     `json:"retry,optional"`
+	RetryInitialInterval     *string `json:"retryInitialInterval,optional,omitempty"`
 }
 
 type Manager struct {
-	SpaceName           string `json:"spaceName,omitempty" validate:"required"`
-	Batch               int    `json:"batch,omitempty, optional"`
-	ReaderConcurrency   int    `json:"readerConcurrency,omitempty, optional"`
-	ImporterConcurrency int    `json:"importerConcurrency,omitempty, optional"`
-	StatsInterval       string `json:"statsInterval,omitempty, optional"`
+	SpaceName           string  `json:"spaceName,omitempty" validate:"required"`
+	Batch               int     `json:"batch,omitempty,optional"`
+	ReaderConcurrency   int     `json:"readerConcurrency,omitempty,optional"`
+	ImporterConcurrency int     `json:"importerConcurrency,omitempty,optional"`
+	StatsInterval       *string `json:"statsInterval,omitempty,optional"`
 }
 
 type Sources struct {
 	CSV   ImportTaskCSV `json:"csv" validate:"required"`
-	Local LocalConfig   `json:"local, optional"`
-	S3    S3Config      `json:"s3, optional"`
-	SFTP  SFTPConfig    `json:"sftpConfig, optional"`
-	Tags  []Tag         `json:"tags, optional"`
-	Edges []Edge        `json:"edges, optional"`
+	Path  string        `json:"path,optional,omitempty"`
+	S3    *S3Config     `json:"s3,optional,omitempty"`
+	SFTP  *SFTPConfig   `json:"sftpConfig,optional,omitempty"`
+	Tags  []Tag         `json:"tags,optional"`
+	Edges []Edge        `json:"edges,optional"`
+}
+
+type Log struct {
+	Level   *string    `json:"level,omitempty,optional"`
+	Console *bool      `json:"console,omitempty,optional"`
+	Files   []string   `json:"files,omitempty,optional"`
+	Fields  []LogField `json:"fields,omitempty,optional"`
+}
+
+type LogField struct {
+	Key   string      `json:"key"`
+	Value interface{} `json:"value"`
 }
 
 type CreateImportTaskRequest struct {
@@ -157,15 +174,15 @@ type CreateImportTaskRequest struct {
 }
 
 type CreateImportTaskData struct {
-	Id string `json:"id"`
+	Id int `json:"id"`
 }
 
 type GetImportTaskRequest struct {
-	Id string `path:"id" validate:"required"`
+	Id int `path:"id" validate:"required"`
 }
 
 type GetImportTaskData struct {
-	Id            string          `json:"id"`
+	Id            int             `json:"id"`
 	Name          string          `json:"name"`
 	User          string          `json:"user"`
 	Address       string          `json:"address"`
@@ -202,7 +219,7 @@ type GetManyImportTaskData struct {
 }
 
 type GetManyImportTaskLogRequest struct {
-	Id     string `path:"id" validate:"required"`
+	Id     int    `path:"id" validate:"required"`
 	File   string `form:"file" validate:"required"`
 	Offset int64  `form:"offset" validate:"min=0"`
 	Limit  int64  `form:"limit" validate:"min=1"`
@@ -213,7 +230,7 @@ type GetManyImportTaskLogData struct {
 }
 
 type GetImportTaskLogNamesRequest struct {
-	Id string `path:"id" validate:"required""`
+	Id int `path:"id" validate:"required"`
 }
 
 type GetImportTaskLogNamesData struct {
@@ -221,20 +238,20 @@ type GetImportTaskLogNamesData struct {
 }
 
 type DeleteImportTaskRequest struct {
-	Id string `path:"id"`
+	Id int `path:"id"`
 }
 
 type StopImportTaskRequest struct {
-	Id string `path:"id"`
+	Id int `path:"id"`
 }
 
 type DownloadLogsRequest struct {
-	Id   string `path:"id" validate:"required"`
+	Id   int    `path:"id" validate:"required"`
 	Name string `form:"name" validate:"required"`
 }
 
 type DownloadConfigsRequest struct {
-	Id string `path:"id" validate:"required"`
+	Id int `path:"id" validate:"required"`
 }
 
 type GetWorkingDirResult struct {

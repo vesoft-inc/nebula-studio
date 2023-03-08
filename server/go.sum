@@ -451,8 +451,8 @@ github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhV
 github.com/urfave/cli/v2 v2.3.0/go.mod h1:LJmUH05zAU44vOAcrfzZQKsZbVcdbOG8rtL3/XcUArI=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
-github.com/veezhang/nebula-importer/v4 v4.0.0-20230302074940-d97c824a6225 h1:BZv/ScJIgYQSeVVJWPDgJKrEhn5TQJ2ZngBpDvGbA9o=
-github.com/veezhang/nebula-importer/v4 v4.0.0-20230302074940-d97c824a6225/go.mod h1:6Z0GAlZdHWMQCyLkq377Li6ibIHkcwkzmBTEwIorAoU=
+github.com/veezhang/nebula-importer/v4 v4.0.0-20230308081941-4dad7d3f5cb1 h1:zZ8LlzkS3ls1OBqQPvqpLSEyZjOrjNaO2ekBAXe7/uI=
+github.com/veezhang/nebula-importer/v4 v4.0.0-20230308081941-4dad7d3f5cb1/go.mod h1:6Z0GAlZdHWMQCyLkq377Li6ibIHkcwkzmBTEwIorAoU=
 github.com/vesoft-inc/go-pkg v0.0.0-20230307111816-a43d6a342d23 h1:uiuSGlc1MTuEOy+VKBFxXA8WayxXeGigh6DT0On5r/I=
 github.com/vesoft-inc/go-pkg v0.0.0-20230307111816-a43d6a342d23/go.mod h1:HCAXRhF2io+nPLQnl+RQ6XyVcp1Xdv6NgslXRBBCiEU=
 github.com/vesoft-inc/nebula-go/v3 v3.4.0 h1:7q2DSW4QABwI2oGPSVuC+Ql7kGwj26G/YVPGD7gETys=

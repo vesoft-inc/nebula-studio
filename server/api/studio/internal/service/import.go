@@ -14,6 +14,8 @@ import (
 	"sync"
 
 	"github.com/vesoft-inc/go-pkg/middleware"
+	"github.com/vesoft-inc/nebula-importer/v4/pkg/config"
+	configbase "github.com/vesoft-inc/nebula-importer/v4/pkg/config/base"
 	configv3 "github.com/vesoft-inc/nebula-importer/v4/pkg/config/v3"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service/importer"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
@@ -61,51 +63,57 @@ func NewImportService(ctx context.Context, svcCtx *svc.ServiceContext) ImportSer
 		svcCtx: svcCtx,
 	}
 }
+func updateConfig(conf configbase.Configurator, taskDir, uploadDir string) {
+	confv3 := conf.(*configv3.Config)
+	if confv3.Log == nil {
+		confv3.Log = &config.Log{}
+		confv3.Log.Files = make([]string, 0)
+	}
+
+	confv3.Log.Files = append(confv3.Log.Files, filepath.Join(taskDir, importLogName))
+	for _, source := range confv3.Sources {
+		source.SourceConfig.Local.Path = filepath.Join(uploadDir, source.SourceConfig.Local.Path)
+	}
+}
 
 func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*types.CreateImportTaskData, error) {
-	// 校验
-	// 初始化
-	// 生成目录
-	// 生成配置文件
-	// 启动任务
 	jsons, err := json.Marshal(req.Config)
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrParam, err)
 	}
-	conf := configv3.Config{}
-	err = json.Unmarshal(jsons, &conf)
+
+	conf, err := config.FromBytes(jsons)
+
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
-	// init task
-	auth := i.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
-	host := auth.Address + ":" + strconv.Itoa(auth.Port)
-	taskMgr := importer.GetTaskMgr()
-	task, taskID, err := taskMgr.NewTask(host, auth.Username, req.Name, conf)
-	if err != nil {
-		logx.Errorf("init task fail", err)
-		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-	}
+
 	// create task dir
-	taskDir, err := importer.CreateTaskDir(i.svcCtx.Config.File.TasksDir, taskID)
+	taskDir, err := importer.CreateNewTaskDir(i.svcCtx.Config.File.TasksDir)
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
 	// create config file
-	if err := importer.CreateConfigFile(taskDir, conf); err != nil {
+	if err := importer.CreateConfigFile(taskDir, jsons); err != nil {
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+	}
+	// modify source file path & add log config
+	updateConfig(conf, taskDir, i.svcCtx.Config.File.UploadDir)
+
+	// init task in db
+	auth := i.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+	host := auth.Address + ":" + strconv.Itoa(auth.Port)
+	taskMgr := importer.GetTaskMgr()
+	task, taskID, err := taskMgr.NewTask(host, auth.Username, req.Name, conf)
+	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
 	// start import
 	if err = importer.StartImport(taskID); err != nil {
-		//	task err: import task not start err
 		task.TaskInfo.TaskStatus = importer.StatusAborted.String()
-		err1 := importer.GetTaskMgr().AbortTask(taskID)
-		if err != nil {
-			logx.Errorf("finish task fail", err1)
-		}
-		logx.Errorf(fmt.Sprintf("Failed to start a import task: `%s`, task result: `%v`", taskID, err))
+		importer.GetTaskMgr().AbortTask(taskID)
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
@@ -113,25 +121,17 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 	muTaskId.Lock()
 	taskIDBytes, err := ioutil.ReadFile(i.svcCtx.Config.File.TaskIdPath)
 	if err != nil {
-		logx.Errorf("read taskId file error", err)
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	taskIdJSON := make(map[string]bool)
 	if len(taskIDBytes) != 0 {
 		if err := json.Unmarshal(taskIDBytes, &taskIdJSON); err != nil {
-			logx.Errorf("read taskId file error", err)
 			return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 		}
 	}
-	taskIdJSON[taskID] = true
-	bytes, err := json.Marshal(taskIdJSON)
-	if err != nil {
-		logx.Errorf("read taskId file error", err)
-	}
-	err = ioutil.WriteFile(i.svcCtx.Config.File.TaskIdPath, bytes, 777)
-	if err != nil {
-		logx.Errorf("write taskId file error", err)
-	}
+	taskIdJSON[strconv.Itoa(taskID)] = true
+	bytes, _ := json.Marshal(taskIdJSON)
+	ioutil.WriteFile(i.svcCtx.Config.File.TaskIdPath, bytes, 777)
 	defer muTaskId.Unlock()
 
 	return &types.CreateImportTaskData{
@@ -156,7 +156,7 @@ func (i *importService) DownloadConfig(req *types.DownloadConfigsRequest) error 
 		return ecode.WithInternalServer(fmt.Errorf("unset KeepResponse Writer"))
 	}
 
-	configPath := filepath.Join(i.svcCtx.Config.File.TasksDir, req.Id, "config.yaml")
+	configPath := filepath.Join(i.svcCtx.Config.File.TasksDir, strconv.Itoa(req.Id), "config.yaml")
 	httpResp.Header().Set("Content-Type", "application/octet-stream")
 	httpResp.Header().Set("Content-Disposition", "attachment;filename="+filepath.Base(configPath))
 	http.ServeFile(httpResp, httpReq, configPath)
@@ -180,9 +180,9 @@ func (i *importService) DownloadLogs(req *types.DownloadLogsRequest) error {
 	filename := req.Name
 	path := ""
 	if filename == importLogName {
-		path = filepath.Join(i.svcCtx.Config.File.TasksDir, id, filename)
+		path = filepath.Join(i.svcCtx.Config.File.TasksDir, strconv.Itoa(id), filename)
 	} else {
-		path = filepath.Join(i.svcCtx.Config.File.TasksDir, id, "err", filename)
+		path = filepath.Join(i.svcCtx.Config.File.TasksDir, strconv.Itoa(id), "err", filename)
 	}
 
 	httpResp.Header().Set("Content-Type", "application/octet-stream")
@@ -211,31 +211,32 @@ func (i *importService) GetManyImportTask(req *types.GetManyImportTaskRequest) (
 
 // GetImportTaskLogNames :Get all log file's name of a task
 func (i *importService) GetImportTaskLogNames(req *types.GetImportTaskLogNamesRequest) (*types.GetImportTaskLogNamesData, error) {
-	id := req.Id
+	// TODO err log will be support in next importer version
+	// id := req.Id
 
-	errLogDir := filepath.Join(i.svcCtx.Config.File.TasksDir, id, "err")
-	fileInfos, err := ioutil.ReadDir(errLogDir)
-	if err != nil {
-		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-	}
+	// errLogDir := filepath.Join(i.svcCtx.Config.File.TasksDir, strconv.Itoa(id), "err")
+	// fileInfos, err := ioutil.ReadDir(errLogDir)
+	// if err != nil {
+	// 	return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+	// }
 
 	data := &types.GetImportTaskLogNamesData{
 		Names: []string{},
 	}
 	data.Names = append(data.Names, importLogName)
-	for _, fileInfo := range fileInfos {
-		name := fileInfo.Name()
-		data.Names = append(data.Names, name)
-	}
+	// for _, fileInfo := range fileInfos {
+	// 	name := fileInfo.Name()
+	// 	data.Names = append(data.Names, name)
+	// }
 	return data, nil
 }
 
 func (i *importService) GetManyImportTaskLog(req *types.GetManyImportTaskLogRequest) (*types.GetManyImportTaskLogData, error) {
 	path := ""
 	if req.File == importLogName {
-		path = filepath.Join(i.svcCtx.Config.File.TasksDir, req.Id, req.File)
+		path = filepath.Join(i.svcCtx.Config.File.TasksDir, strconv.Itoa(req.Id), req.File)
 	} else {
-		path = filepath.Join(i.svcCtx.Config.File.TasksDir, req.Id, errContentDir, req.File)
+		path = filepath.Join(i.svcCtx.Config.File.TasksDir, strconv.Itoa(req.Id), errContentDir, req.File)
 	}
 	lines, err := readFileLines(path, req.Offset, req.Limit)
 	if err != nil {
@@ -260,7 +261,7 @@ func (i *importService) GetManyImportTaskLog(req *types.GetManyImportTaskLogRequ
 	data := &types.GetManyImportTaskLogData{
 		Logs: lines,
 	}
-	if len(lines) == 0 && taskIdJSON[req.Id] {
+	if len(lines) == 0 && taskIdJSON[strconv.Itoa(req.Id)] {
 		return data, nil
 	}
 	if len(lines) == 0 {
@@ -276,20 +277,6 @@ func (i *importService) GetWorkingDir() (*types.GetWorkingDirResult, error) {
 		UploadDir: i.svcCtx.Config.File.UploadDir,
 	}, nil
 }
-
-// func validClientParams(conf *importconfig.YAMLConfig) error {
-// 	if conf.NebulaClientSettings.Connection == nil ||
-// 		conf.NebulaClientSettings.Connection.Address == nil ||
-// 		*conf.NebulaClientSettings.Connection.Address == "" ||
-// 		conf.NebulaClientSettings.Connection.User == nil ||
-// 		*conf.NebulaClientSettings.Connection.User == "" ||
-// 		conf.NebulaClientSettings.Space == nil ||
-// 		*conf.NebulaClientSettings.Space == "" {
-// 		return ecode.WithCode(ecode.ErrParam, nil)
-// 	}
-
-// 	return nil
-// }
 
 func readFileLines(path string, offset int64, limit int64) ([]string, error) {
 	file, err := os.Open(path)

@@ -24,15 +24,11 @@ export function configToJson(payload: IConfig) {
     address,
     concurrency,
     retry,
-    channelBufferSize
   } = payload;
-  console.log('tagConfig', tagConfig);
-  console.log('edgeConfig', edgeConfig);
   const vertexToJSON = tagDataToJSON(
     tagConfig,
     spaceVidType,
   );
-  console.log('vertexToJSON', vertexToJSON);
   const edgeToJSON = edgeDataToJSON(
     edgeConfig,
     spaceVidType,
@@ -81,22 +77,24 @@ export function edgeDataToJSON(
       const edges = [{
         name: handleEscape(name),
         src: {
-          type: vidType,
-          index: srcIdIndex,
-          function: srcIdFunction,
+          id: {
+            type: vidType,
+            index: srcIdIndex,
+            function: srcIdFunction,
+          }
         },
         dst: {
-          type: vidType,
-          index: dstIdIndex,
-          function: dstIdFunction,
+          id: {
+            type: vidType,
+            index: dstIdIndex,
+            function: dstIdFunction,
+          }
         },
-        rank: { index: rank.mapping },
+        rank: typeof rank.mapping == 'number' ? { index: rank.mapping } : null,
         props: edgeProps,
       }];
       const edgeConfig = {
-        local: {
-          path: file.name,
-        },
+        path: file.name,
         csv: {
           withHeader: file.withHeader || false,
           delimiter: file.delimiter
@@ -141,9 +139,7 @@ export function tagDataToJSON(
         props: _props.filter(prop => prop),
       }];
       return {
-        local: {
-          path: file.name,
-        },
+        path: file.name,
         csv: {
           withHeader: file.withHeader || false,
           delimiter: file.delimiter
@@ -253,14 +249,18 @@ export const exampleJson = {
           }
         ],
         'src': {
-          'index': 1,
-          'function': null,
-          'type': 'string',
+          'id': {
+            'index': 1,
+            'function': null,
+            'type': 'string',
+          }
         },
         'dst': {
-          'index': 1,
-          'function': null,
-          'type': 'string',
+          'id': {
+            'index': 1,
+            'function': null,
+            'type': 'string',
+          }
         },
         'rank': null
       }],

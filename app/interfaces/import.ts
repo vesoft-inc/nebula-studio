@@ -10,13 +10,16 @@ export enum ITaskStatus {
 }
 
 export interface ITaskStats {
-  totalBatches: number;
+  processedBytes: number;
   totalBytes: number;
-  totalImportedBytes: number;
+  failedRecords: number;
+  totalRecords: number;
+  failedRequest: number;
+  totalRequest: number;
   totalLatency: number;
-  totalReqTime: number;
-  numFailed: number;
-  numReadFailed: number;
+  totalRespTime: number;
+  failedProcessed: number; // The number of nodes and edges that have failed to be processed.
+  totalProcessed: number; // The number of nodes and edges that have been processed.
 }
 export interface ITaskItem {
   id: number;
@@ -52,7 +55,6 @@ export interface IBasicConfig {
   batchSize?: string;
   concurrency?: string;
   retry?: string;
-  channelBufferSize?: string;
 }
 
 export interface ILogDimension {

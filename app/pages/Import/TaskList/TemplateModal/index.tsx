@@ -38,29 +38,31 @@ const TemplateModal = (props: IProps) => {
     try {
       const parseContent = yaml.load(content);
       if(typeof parseContent === 'object') {
-        const connection = parseContent.clientSettings?.connection || {};
-        const address = connection.address.split(',');
-        if(connection.address.startsWith('http')) {
+        const client = parseContent.client || {};
+        const address = client.address.split(',');
+        if(client.address.startsWith('http')) {
           throw new Error(intl.get('import.noHttp'));
         }
         if(!address.includes(host)) {
           throw new Error(intl.get('import.addressMatch'));
         }
-        if(connection.user !== username) {
+        if(client.user !== username) {
           throw new Error(intl.get('import.templateMatchError', { type: 'username' }));
         }
-        parseContent.files?.forEach(file => {
+        parseContent.sources?.forEach(file => {
           if(!files.includes(file.path)) {
             throw new Error(intl.get('import.fileNotExist', { name: file.path }));
           }
         });
         // empty props in yaml will converted to null, but its required in nebula-importer
-        parseContent.files.forEach(file => {
-          if(file.schema.edge) {
-            file.schema.edge.props ||= [];
+        parseContent.sources.forEach(file => {
+          if(file.edges) {
+            file.edges.forEach(edge => {
+              edge.props ||= [];
+            });
           }
-          if(file.schema.vertex) {
-            file.schema.vertex?.tags.forEach(tag => {
+          if(file.tags) {
+            file.tags.forEach(tag => {
               tag.props ||= [];
             });
           }

@@ -206,18 +206,6 @@ const TaskCreate = (props: IProps) => {
       placeholder: DEFAULT_IMPORT_CONFIG.retry,
       description: intl.get('import.retryTip'),
     },
-    {
-      label: intl.get('import.channelBufferSize'),
-      key: 'channelBufferSize',
-      rules: [
-        {
-          pattern: POSITIVE_INTEGER_REGEX,
-          message: intl.get('formRules.numberRequired'),
-        },
-      ],
-      placeholder: DEFAULT_IMPORT_CONFIG.channelBufferSize,
-      description: intl.get('import.channelBufferSizeTip'),
-    },
   ], [currentLocale]);
   return (
     <div className={styles.importCreate}>

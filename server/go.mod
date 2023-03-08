@@ -17,6 +17,7 @@ require (
 	github.com/pkg/sftp v1.13.5
 	github.com/stretchr/testify v1.8.0
 	github.com/vesoft-inc/nebula-go/v3 v3.4.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -51,10 +52,9 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/vesoft-inc/nebula-importer/v4 => github.com/veezhang/nebula-importer/v4 v4.0.0-20230302074940-d97c824a6225
+replace github.com/vesoft-inc/nebula-importer/v4 => github.com/veezhang/nebula-importer/v4 v4.0.0-20230308081941-4dad7d3f5cb1
 
 require (
 	github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394
@@ -93,6 +93,6 @@ require (
 	golang.org/x/text v0.6.0 // indirect
 	google.golang.org/grpc v1.46.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
-	gopkg.in/yaml.v2 v2.4.0
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/driver/sqlite v1.3.2
 )

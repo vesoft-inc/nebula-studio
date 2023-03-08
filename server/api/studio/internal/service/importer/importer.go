@@ -2,14 +2,11 @@ package importer
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
-	"strconv"
 	"time"
 
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type ImportResult struct {
@@ -22,19 +19,15 @@ type ImportResult struct {
 	}
 }
 
-func StartImport(taskID string) (err error) {
+func StartImport(taskID int) (err error) {
 	task, _ := GetTaskMgr().GetTask(taskID)
 	signal := make(chan struct{}, 1)
 
 	abort := func() {
 		task.TaskInfo.TaskStatus = StatusAborted.String()
 		task.TaskInfo.TaskMessage = err.Error()
-		err = GetTaskMgr().AbortTask(taskID)
-		if err != nil {
-			logx.Errorf("start task fail, %v", err)
-		}
+		GetTaskMgr().AbortTask(taskID)
 		signal <- struct{}{}
-		return
 	}
 
 	go func() {
@@ -43,73 +36,60 @@ func StartImport(taskID string) (err error) {
 		for {
 			select {
 			case <-ticker.C:
-				err := GetTaskMgr().UpdateTaskInfo(taskID)
-				if err != nil {
-					logx.Errorf(fmt.Sprintf("UpdateTaskInfo fail, id : %s", taskID), err)
-				}
+				GetTaskMgr().UpdateTaskInfo(taskID)
 			case <-signal:
 				return
 			}
 		}
 	}()
 	go func() {
-		mgr := task.Client.Manager
 		cfg := task.Client.Cfg
 		if err = cfg.Build(); err != nil {
 			abort()
+			return
 		}
+		mgr := cfg.GetManager()
+		logger := cfg.GetLogger()
+		task.Client.Manager = mgr
+		task.Client.Logger = logger
+
 		if err = mgr.Start(); err != nil {
 			abort()
+			return
 		}
 		err = mgr.Wait()
 		if err != nil {
 			task.TaskInfo.TaskStatus = StatusAborted.String()
 			task.TaskInfo.TaskMessage = err.Error()
-			err = GetTaskMgr().AbortTask(taskID)
-			if err != nil {
-				logx.Errorf("finish task fail, %v", err)
-			}
+			GetTaskMgr().AbortTask(taskID)
 			return
 		}
 		task.TaskInfo.TaskStatus = StatusFinished.String()
-		err = GetTaskMgr().FinishTask(taskID)
-		if err != nil {
-			logx.Errorf("finish task fail, %v", err)
-		}
+		GetTaskMgr().FinishTask(taskID)
 		signal <- struct{}{}
 	}()
 	return nil
 }
 
-func DeleteImportTask(tasksDir, taskID, address, username string) error {
-	if id, err := strconv.Atoi(taskID); err != nil {
-		logx.Errorf(fmt.Sprintf("stop task fail, id : %s", taskID), err)
-		return errors.New("task not existed")
-	} else {
-		_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(id, address, username)
-		if err != nil {
-			logx.Errorf(fmt.Sprintf("stop task fail, id : %s", taskID), err)
-			return errors.New("task not existed")
-		}
-	}
-	err := GetTaskMgr().DelTask(tasksDir, taskID)
+func DeleteImportTask(tasksDir string, taskID int, address, username string) error {
+	_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(taskID, address, username)
 	if err != nil {
-		return fmt.Errorf("task del fail, %s", err.Error())
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+	}
+	err = GetTaskMgr().DelTask(tasksDir, taskID)
+	if err != nil {
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	return nil
 }
 
-func GetImportTask(tasksDir, taskID, address, username string) (*types.GetImportTaskData, error) {
+func GetImportTask(tasksDir string, taskID int, address, username string) (*types.GetImportTaskData, error) {
 	task := Task{}
 	result := &types.GetImportTaskData{}
 
-	if id, err := strconv.Atoi(taskID); err != nil {
+	_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(taskID, address, username)
+	if err != nil {
 		return nil, errors.New("task not existed")
-	} else {
-		_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(id, address, username)
-		if err != nil {
-			return nil, errors.New("task not existed")
-		}
 	}
 
 	if t, ok := GetTaskMgr().GetTask(taskID); ok {
@@ -119,7 +99,7 @@ func GetImportTask(tasksDir, taskID, address, username string) (*types.GetImport
 			return nil, err
 		}
 		stats := task.TaskInfo.Stats
-		result.Id = strconv.Itoa(t.TaskInfo.ID)
+		result.Id = t.TaskInfo.ID
 		result.Status = task.TaskInfo.TaskStatus
 		result.Message = task.TaskInfo.TaskMessage
 		result.CreateTime = task.TaskInfo.CreateTime.UnixMilli()
@@ -164,7 +144,7 @@ func GetManyImportTask(tasksDir, address, username string, pageIndex, pageSize i
 		}
 		stats := t.Stats
 		data := types.GetImportTaskData{
-			Id:            strconv.Itoa(t.ID),
+			Id:            t.ID,
 			Status:        t.TaskStatus,
 			Message:       t.TaskMessage,
 			CreateTime:    t.CreateTime.UnixMilli(),
@@ -194,21 +174,14 @@ func GetManyImportTask(tasksDir, address, username string, pageIndex, pageSize i
 	return result, nil
 }
 
-func StopImportTask(taskID, address, username string) error {
-	if id, err := strconv.Atoi(taskID); err != nil {
-		logx.Errorf(fmt.Sprintf("stop task fail, id : %s", taskID), err)
-		return errors.New("task not existed")
-	} else {
-		_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(id, address, username)
-		if err != nil {
-			logx.Errorf(fmt.Sprintf("stop task fail, id : %s", taskID), err)
-			return errors.New("task not existed")
-		}
+func StopImportTask(taskID int, address, username string) error {
+	_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(taskID, address, username)
+	if err != nil {
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
-	err := GetTaskMgr().StopTask(taskID)
+	err = GetTaskMgr().StopTask(taskID)
 	if err != nil {
-		logx.Errorf(fmt.Sprintf("stop task fail, id : %s", taskID), err)
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	} else {
 		return nil
