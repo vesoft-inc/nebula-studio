@@ -102,7 +102,7 @@ const FileList = () => {
   }, [selectFiles]);
   useEffect(() => {
     getFileList();
-    trackPageView('/import/files');
+    trackPageView('/import/dataSources');
   }, []);
   return (
     <div className={styles.fileUpload}>

@@ -70,3 +70,16 @@ export interface StudioFile extends RcFile {
   sample?: string;
   content?: any[];
 }
+
+export enum IRemoteType {
+  'Cloud' = 'cloudStorage',
+  'Sftp' = 'sftp',
+}
+
+export interface ICloudStorage {
+  ipAddress: string;
+  bucketName: string;
+  accessKeyId: string;
+  region: string;
+  addDate: number;
+}

@@ -4,7 +4,7 @@ import { Route, useHistory, useLocation } from 'react-router-dom';
 import { trackPageView } from '@app/utils/stat';
 import cls from 'classnames';
 import { useI18n } from '@vesoft-inc/i18n';
-import FileList from './FileList';
+import DataSourceList from './DataSourceList';
 import styles from './index.module.less';
 import TaskList from './TaskList';
 
@@ -17,7 +17,7 @@ interface IProps {
 const Import = (props: IProps) => {
   const history = useHistory();
   const location = useLocation();
-  const [tab, setTab] = useState('files');
+  const [tab, setTab] = useState('tasks');
   const { intl } = useI18n();
   const { showConfigDownload, showLogDownload, showTemplateModal } = props;
   useEffect(() => {
@@ -25,7 +25,7 @@ const Import = (props: IProps) => {
   }, []);
   useEffect(() => {
     const path = location.pathname;
-    setTab(path.includes('files') ? 'files' : 'tasks');
+    setTab(path.includes('dataSources') ? 'dataSources' : 'tasks');
   }, [location.pathname]);
   const handleTabChange = (e: RadioChangeEvent) => {
     setTab(e.target.value);
@@ -40,15 +40,15 @@ const Import = (props: IProps) => {
           buttonStyle="solid"
           onChange={handleTabChange}
         >
-          <Radio.Button value="files">{intl.get('import.uploadFile')}</Radio.Button>
           <Radio.Button value="tasks">{intl.get('import.importData')}</Radio.Button>
+          <Radio.Button value="dataSources">{intl.get('import.dataSourceManagement')}</Radio.Button>
         </Radio.Group>
       </div>
       <div>
         <Route
-          path={`/import/files`}
+          path={`/import/dataSources`}
           exact={true}
-          component={FileList}
+          component={DataSourceList}
         />
 
         <Route

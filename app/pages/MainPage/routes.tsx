@@ -65,7 +65,7 @@ export const MENU_LIST = [
   },
   {
     key: 'import',
-    path: '/import/files',
+    path: '/import/tasks',
     track: {
       category: 'navigation',
       action: 'view_import',
