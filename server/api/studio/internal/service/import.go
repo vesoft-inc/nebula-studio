@@ -15,7 +15,6 @@ import (
 
 	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/vesoft-inc/nebula-importer/v4/pkg/config"
-	configbase "github.com/vesoft-inc/nebula-importer/v4/pkg/config/base"
 	configv3 "github.com/vesoft-inc/nebula-importer/v4/pkg/config/v3"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service/importer"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
@@ -63,7 +62,7 @@ func NewImportService(ctx context.Context, svcCtx *svc.ServiceContext) ImportSer
 		svcCtx: svcCtx,
 	}
 }
-func updateConfig(conf configbase.Configurator, taskDir, uploadDir string) {
+func updateConfig(conf config.Configurator, taskDir, uploadDir string) {
 	confv3 := conf.(*configv3.Config)
 	if confv3.Log == nil {
 		confv3.Log = &config.Log{}

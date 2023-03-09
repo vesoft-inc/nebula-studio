@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"sync"
 
-	importConfig "github.com/vesoft-inc/nebula-importer/v4/pkg/config"
+	importconfig "github.com/vesoft-inc/nebula-importer/v4/pkg/config"
 	configv3 "github.com/vesoft-inc/nebula-importer/v4/pkg/config/v3"
 	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
@@ -46,7 +46,7 @@ func CreateNewTaskDir(rootDir string) (string, error) {
 func CreateConfigFile(taskdir string, cfgBytes []byte) error {
 	fileName := "config.yaml"
 	path := filepath.Join(taskdir, fileName)
-	config, _ := importConfig.FromBytes(cfgBytes)
+	config, _ := importconfig.FromBytes(cfgBytes)
 	confv3 := config.(*configv3.Config)
 
 	// erase user information
@@ -65,7 +65,7 @@ func CreateConfigFile(taskdir string, cfgBytes []byte) error {
 	return nil
 }
 
-func (mgr *TaskMgr) NewTask(host string, user string, taskName string, cfg importConfig.Configurator) (*Task, int, error) {
+func (mgr *TaskMgr) NewTask(host string, user string, taskName string, cfg importconfig.Configurator) (*Task, int, error) {
 	mux.Lock()
 	defer mux.Unlock()
 	confv3 := cfg.(*configv3.Config)
@@ -199,11 +199,11 @@ and then call FinishTask
 func (mgr *TaskMgr) StopTask(taskID int) error {
 	if task, ok := mgr.getTaskFromMap(taskID); ok {
 		manager := task.Client.Manager
+		task.TaskInfo.TaskStatus = StatusStoped.String()
 		err := manager.Stop()
 		if err != nil {
 			return errors.New("stop task fail")
 		}
-		task.TaskInfo.TaskStatus = StatusStoped.String()
 		if err := mgr.FinishTask(taskID); err != nil {
 			return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 		}

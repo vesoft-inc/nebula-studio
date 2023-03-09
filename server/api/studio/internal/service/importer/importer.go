@@ -64,8 +64,10 @@ func StartImport(taskID int) (err error) {
 			GetTaskMgr().AbortTask(taskID)
 			return
 		}
-		task.TaskInfo.TaskStatus = StatusFinished.String()
-		GetTaskMgr().FinishTask(taskID)
+		if task.TaskInfo.TaskStatus == StatusProcessing.String() {
+			task.TaskInfo.TaskStatus = StatusFinished.String()
+			GetTaskMgr().FinishTask(taskID)
+		}
 		signal <- struct{}{}
 	}()
 	return nil
