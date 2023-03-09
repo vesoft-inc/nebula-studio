@@ -170,10 +170,6 @@ func (mgr *TaskMgr) DelTask(tasksDir string, taskID int) error {
 	if ok {
 		mgr.tasks.Delete(taskID)
 	}
-	// id, err := strconv.Atoi(taskID)
-	// if err != nil {
-	// 	return errors.New("taskID is wrong")
-	// }
 	if err := mgr.db.DelTaskInfo(taskID); err != nil {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}

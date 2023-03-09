@@ -217,7 +217,6 @@
     "srcVidColumn": "起点 VID 列",
     "dstVidColumn": "终点 VID 列",
     "vidFunction": "VID 函数",
-    "vidPrefix": "VID 前缀",
     "concurrencyTip": "NebulaGraph 客户端并发数",
     "batchSizeTip": "单批次插入数据的语句数量",
     "retryTip": "nGQL 语句执行失败的重试次数",

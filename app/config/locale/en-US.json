@@ -217,7 +217,6 @@
     "srcVidColumn": "Source VID column",
     "dstVidColumn": "Destination VID column",
     "vidFunction": "VID function",
-    "vidPrefix": "VID prefix",
     "concurrencyTip": "Number of NebulaGraph client concurrency.",
     "batchSizeTip": "The number of statements inserting data in a batch.",
     "retryTip": "Retry times of nGQL statement execution failures.",

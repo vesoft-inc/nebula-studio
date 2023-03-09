@@ -21,7 +21,6 @@ const CSVPreviewLink = (props: IProps) => {
   const [data, setData] = useState<any[]>([]);
   const { intl } = useI18n();
   const { readString } = usePapaParse();
-
   useEffect(() => {
     if(!file) return;
     const { delimiter, sample } = file;

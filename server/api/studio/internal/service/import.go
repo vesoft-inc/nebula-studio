@@ -281,7 +281,6 @@ func (i *importService) GetWorkingDir() (*types.GetWorkingDirResult, error) {
 func readFileLines(path string, offset int64, limit int64) ([]string, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		logx.Errorf("open file error", err)
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	defer file.Close()

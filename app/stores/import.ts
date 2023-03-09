@@ -23,7 +23,6 @@ export class TagFileItem {
   props = observable.array<IPropertyProps>([]);
   vidIndex?: number;
   vidFunction?: string;
-  vidPrefix?: string;
 
   constructor({ file, props }: { file?: IImportFile; props?: IPropertyProps[] }) {
     makeAutoObservable(this);
