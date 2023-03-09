@@ -1,0 +1,35 @@
+@import '~@app/common.less';
+.fileUpload {
+	.uploadBtn {
+		margin: 15px 0;
+	}
+	.fileOperations {
+		display: flex;
+		align-items: center;
+		.deleteBtn {
+			margin-left: 15px;
+		}
+	}
+	.fileList {
+		margin-top: 10px;
+		h3 {
+			color: @lightBlack;
+			font-weight: bold;
+			font-size: 18px;
+			padding-bottom: 12px;
+			border-bottom: 1px solid @gray;
+			margin-bottom: 20px;
+		}
+	}
+	.operation {
+		display: flex;
+		align-items: center;
+		button {
+			padding: 8px 24px;
+			justify-content: flex-start;
+		}
+		button:not(:last-child) {
+			margin-right: 30px;
+		}
+	}
+}

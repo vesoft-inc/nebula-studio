@@ -153,6 +153,7 @@
   },
   "import": {
     "uploadFile": "上传文件",
+    "dataSourceManagement": "数据源管理",
     "importData": "导入数据",
     "createTask": "创建导入任务",
     "uploadTemp": "导入模板",
@@ -250,7 +251,19 @@
     "deleteFiles": "删除选中文件",
     "fileRepeatTip": "上述文件已存在，继续上传将覆盖原文件",
     "filePreview": "预览文件 {name}",
-    "uploadConfirm": "上传文件确认"
+    "uploadConfirm": "上传文件确认",
+    "localFiles": "本地文件",
+    "cloudStorage": "云存储",
+    "sftp": "SFTP",
+    "newDataSource": "新建数据源",
+    "deleteDataSource": "删除数据源",
+    "dataSourceList": "{type}列表",
+    "ipAddress": "IP 地址：端口",
+    "bucketName": "Bucket 名称",
+    "accessKeyId": "AccessKeyId",
+    "region": "区域",
+    "addDate": "添加日期",
+    "account": "账号"
   },
   "schema": {
     "spaceList": "图空间列表",

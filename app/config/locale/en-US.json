@@ -153,6 +153,7 @@
   },
   "import": {
     "uploadFile": "Upload Files",
+    "dataSourceManagement": "Data Source Management",
     "importData": "Import Data",
     "createTask": "New Import",
     "uploadTemp": "Import Template",
@@ -250,7 +251,19 @@
     "deleteFiles": "Delete select files",
     "fileRepeatTip": "These files are already exists, continuing to upload will overwrite the original file",
     "filePreview": "Preview file {name}",
-    "uploadConfirm": "Upload Confirm"
+    "uploadConfirm": "Upload Confirm",
+    "localFiles": "Local files",
+    "cloudStorage": "Cloud storage",
+    "sftp": "SFTP",
+    "newDataSource": "New Data Source",
+    "deleteDataSource": "Delete Data Source",
+    "dataSourceList": "{type} list",
+    "ipAddress": "IP Address:Port",
+    "bucketName": "Bucket Name",
+    "accessKeyId": "AccessKeyId",
+    "region": "Region",
+    "addDate": "Add Date",
+    "account": "Account"
   },
   "schema": {
     "spaceList": "Graph Space List",
