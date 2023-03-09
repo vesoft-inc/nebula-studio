@@ -1,0 +1,89 @@
+syntax = "v1"
+
+type (
+	DatasourceS3Config {
+		Endpoint     string `json:"endpoint"`
+		Region       string `json:"region"`
+		AccessKey    string `json:"accessKey"`
+		AccessSecret string `json:"accessSecret"`
+	}
+
+	DatasourceSFTPConfig {
+		Host     string `json:"host"`
+		Port     int    `json:"port"`
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	DatasourceAddRequest {
+		Type       string               `json:"type"`
+		Name       string               `json:"name"`
+		S3Config   DatasourceS3Config   `json:"s3Config,optional"`
+		SFTPConfig DatasourceSFTPConfig `json:"sftpConfig,optional"`
+	}
+
+	DatasourceAddData {
+		ID int `json:"id"`
+	}
+
+	DatasourceRemoveRequest {
+		ID int `path:"id"`
+	}
+
+	DatasourceConfig {
+		ID         int                  `json:"id"`
+		Type       string               `json:"type"`
+		Name       string               `json:"name"`
+		S3Config   DatasourceS3Config   `json:"s3Config,optional"`
+		SFTPConfig DatasourceSFTPConfig `json:"sftpConfig,optional"`
+		CreateTime int64                `json:"createTime,optional"`
+	}
+
+	DatasourceListContentsRequest {
+		DatasourceID int    `path:"id"`
+		Path         string `form:"path,optional"`
+	}
+
+	DatasourceListContentsData {
+		List []string `json:"list"`
+	}
+
+	DatasourceData {
+		List []DatasourceConfig `json:"list"`
+	}
+
+	DatasourcePreviewFileRequest {
+		DatasourceID int    `path:"id"`
+		Path         string `form:"path"`
+	}
+
+	DatasourcePreviewFileData {
+		Contents []string `json:"contents"`
+	}
+)
+
+@server (
+	group: datasource
+)
+
+service studio-api {
+	@doc "Add Datasource"
+	@handler DatasourceAdd
+	post /api/datasources(DatasourceAddRequest) returns(DatasourceAddData)
+	
+	@doc "Remove Datasource"
+	@handler DatasourceRemove
+	delete /api/datasources/:id(DatasourceRemoveRequest)
+	
+	@doc "List Datasource"
+	@handler DatasourceList
+	get /api/datasources returns(DatasourceData)
+	
+	@doc "List Contents"
+	@handler DatasourceListContents
+	get /api/datasources/:id/contents(DatasourceListContentsRequest) returns(DatasourceListContentsData)
+	
+	@doc "Preview File"
+	@handler DatasourcePreviewFile
+	get /api/datasources/:id/file-preview(DatasourcePreviewFileRequest) returns(DatasourcePreviewFileData)
+}

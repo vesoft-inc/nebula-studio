@@ -4,6 +4,7 @@ package handler
 import (
 	"net/http"
 
+	datasource "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/datasource"
 	favorite "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/favorite"
 	file "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/file"
 	gateway "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/gateway"
@@ -200,6 +201,36 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodDelete,
 				Path:    "/api/favorites",
 				Handler: favorite.DeleteAllHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/datasources",
+				Handler: datasource.DatasourceAddHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/api/datasources/:id",
+				Handler: datasource.DatasourceRemoveHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/datasources",
+				Handler: datasource.DatasourceListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/datasources/:id/contents",
+				Handler: datasource.DatasourceListContentsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/datasources/:id/file-preview",
+				Handler: datasource.DatasourcePreviewFileHandler(serverCtx),
 			},
 		},
 	)

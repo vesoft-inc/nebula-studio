@@ -322,3 +322,63 @@ type DeleteFavoriteRequest struct {
 type FavoriteIDResult struct {
 	ID int `json:"id"`
 }
+
+type DatasourceS3Config struct {
+	Endpoint     string `json:"endpoint"`
+	Region       string `json:"region"`
+	AccessKey    string `json:"accessKey"`
+	AccessSecret string `json:"accessSecret"`
+}
+
+type DatasourceSFTPConfig struct {
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type DatasourceAddRequest struct {
+	Type       string               `json:"type"`
+	Name       string               `json:"name"`
+	S3Config   DatasourceS3Config   `json:"s3Config,optional"`
+	SFTPConfig DatasourceSFTPConfig `json:"sftpConfig,optional"`
+}
+
+type DatasourceAddData struct {
+	ID int `json:"id"`
+}
+
+type DatasourceRemoveRequest struct {
+	ID int `path:"id"`
+}
+
+type DatasourceConfig struct {
+	ID         int                  `json:"id"`
+	Type       string               `json:"type"`
+	Name       string               `json:"name"`
+	S3Config   DatasourceS3Config   `json:"s3Config,optional"`
+	SFTPConfig DatasourceSFTPConfig `json:"sftpConfig,optional"`
+	CreateTime int64                `json:"createTime,optional"`
+}
+
+type DatasourceListContentsRequest struct {
+	DatasourceID int    `path:"id"`
+	Path         string `form:"path,optional"`
+}
+
+type DatasourceListContentsData struct {
+	List []string `json:"list"`
+}
+
+type DatasourceData struct {
+	List []DatasourceConfig `json:"list"`
+}
+
+type DatasourcePreviewFileRequest struct {
+	DatasourceID int    `path:"id"`
+	Path         string `form:"path"`
+}
+
+type DatasourcePreviewFileData struct {
+	Contents []string `json:"contents"`
+}
