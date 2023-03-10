@@ -1,6 +1,5 @@
 import service from '@app/config/service';
 import { handleKeyword, handleVidStringName } from '@app/utils/function';
-import { getExploreGQLWithIndex } from '@app/utils/gql';
 
 interface IMatchVertex {
   vid?: string;
@@ -30,16 +29,6 @@ export async function fetchEdgeProps(payload: {
 
   const { data } = await service.execNGQL({ gql, space });
   return data;
-}
-
-export async function fetchVertexPropsWithIndex(payload: {
-  tag: string;
-  filters: any[];
-  quantityLimit: number | null;
-}) {
-  const gql = getExploreGQLWithIndex(payload);
-  const { code, data, message } = await service.execNGQL({ gql });
-  return { code, data, message };
 }
 
 export async function fetchVertexProps(payload: {

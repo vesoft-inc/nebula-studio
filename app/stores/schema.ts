@@ -596,7 +596,7 @@ export class SchemaStore {
   // stats
   submitStats = async () => {
     const { code, data } = await service.execNGQL(
-      { gql: `SUBMIT JOB STATS` },
+      { gql: `SUBMIT JOB STATS`, space: this.currentSpace },
       {
         trackEventConfig: {
           category: 'schema',
@@ -608,13 +608,13 @@ export class SchemaStore {
   };
 
   getStats = async () => {
-    const { code, data } = await service.execNGQL({ gql: `SHOW STATS` });
+    const { code, data } = await service.execNGQL({ gql: `SHOW STATS`, space: this.currentSpace });
     return { code, data };
   };
 
   getJobStatus = async (id?) => {
     const gql = id === undefined ? 'SHOW JOBS' : `SHOW JOB ${id}`;
-    const { code, data } = await service.execNGQL({ gql });
+    const { code, data } = await service.execNGQL({ gql, space: this.currentSpace });
     return { code, data };
   };
 
