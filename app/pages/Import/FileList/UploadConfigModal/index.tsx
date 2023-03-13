@@ -117,7 +117,7 @@ const UploadConfigModal = (props: IProps) => {
   }, []);
 
   const updateAllDelimiter = useCallback((value: string) => {
-    const { data } = state;
+    const { data, setState } = state;
     setState({
       data: data.map(item => (item.delimiter = value, item))
     });
