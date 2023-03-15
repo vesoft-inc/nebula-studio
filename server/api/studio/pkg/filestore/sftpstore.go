@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"os/user"
+
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 )
@@ -90,14 +92,20 @@ func (s *SftpStore) ReadFile(path string, startLine ...int) ([]string, error) {
 
 func (s *SftpStore) ListFiles(dir string) ([]string, error) {
 	var files []string
-	walker := s.SftpClient.Walk(dir)
-	for walker.Step() {
-		if err := walker.Err(); err != nil {
+	if dir == "" {
+		user, err := user.Lookup(s.Username)
+		if err != nil {
 			return nil, err
 		}
-		if !walker.Stat().IsDir() {
-			files = append(files, walker.Path())
-		}
+		dir = user.HomeDir
+	}
+
+	_files, err := s.SftpClient.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+	for _, file := range _files {
+		files = append(files, file.Name())
 	}
 	return files, nil
 }

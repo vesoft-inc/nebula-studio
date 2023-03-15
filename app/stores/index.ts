@@ -7,8 +7,9 @@ import schema from './schema';
 import graphInstances from './graphInstances';
 import sketchModel from './sketchModel';
 import welcome from './welcome';
+import datasource from './datasource';
 
-const rootStore = { global, files, console, dataImport, schema, graphInstances, sketchModel, welcome };
+const rootStore = { global, files, console, dataImport, schema, graphInstances, sketchModel, welcome, datasource };
 const rootStoreRef = { current: rootStore };
 // @ts-ignore
 window.studioStore = rootStore;

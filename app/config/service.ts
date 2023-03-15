@@ -90,6 +90,32 @@ const service = {
   saveFavorite: (params, config?) => {
     return post(`/api/favorites`)(params, config);
   },
+
+  // datasource
+  getDatasourceList: (params?, config?) => {
+    return get('/api/datasources')(params, config);
+  },
+  addDatasource: (params, config?) => {
+    return post('/api/datasources')(params, config);
+  },
+  updateDatasource: (params, config?) => {
+    const { id, ...restParams } = params;
+    return put(`/api/datasources/${id}`)(restParams, config);
+  },
+  deleteDatasource: (id: number, config?) => {
+    return _delete(`/api/datasources/${id}`)(undefined, config);
+  },
+  batchDeleteDatasource: (payload, config?) => {
+    return _delete(`/api/datasources`)(undefined, { data: payload });
+  },
+  getDatasourceDetail: (params, config?) => {
+    const { id, ...restParams } = params;
+    return get(`/api/datasources/${id}/contents`)(restParams, config);
+  },
+  previewFile: (params, config?) => {
+    const { id, ...restParams } = params;
+    return get(`/api/datasources/${id}/file-preview`)(restParams, config);
+  },
 };
 
 export const updateService = (partService: any) => {

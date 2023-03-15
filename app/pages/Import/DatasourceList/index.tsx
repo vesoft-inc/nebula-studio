@@ -2,12 +2,12 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Tabs, TabsProps } from 'antd';
 import { useI18n } from '@vesoft-inc/i18n';
-import { IRemoteType } from '@app/interfaces/import';
+import { IRemoteType } from '@app/interfaces/datasource';
 import LocalFileList from './LocalFileList';
 import RemoteList from './RemoteList';
 import styles from './index.module.less';
 
-const DataSourceList = () => {
+const DatasourceList = () => {
   const { intl } = useI18n();
   const items: TabsProps['items'] = [
     {
@@ -16,9 +16,9 @@ const DataSourceList = () => {
       children: <LocalFileList />
     },
     {
-      key: 'cloud',
-      label: intl.get('import.cloudStorage'),
-      children: <RemoteList type={IRemoteType.Cloud} />
+      key: 's3',
+      label: intl.get('import.s3'),
+      children: <RemoteList type={IRemoteType.S3} />
     },
     {
       key: 'sftp',
@@ -33,4 +33,4 @@ const DataSourceList = () => {
   );
 };
 
-export default observer(DataSourceList);
+export default observer(DatasourceList);

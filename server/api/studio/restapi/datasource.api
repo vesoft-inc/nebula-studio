@@ -4,6 +4,7 @@ type (
 	DatasourceS3Config {
 		Endpoint     string `json:"endpoint"`
 		Region       string `json:"region"`
+		Bucket       string `json:"bucket"`
 		AccessKey    string `json:"accessKey"`
 		AccessSecret string `json:"accessSecret"`
 	}
@@ -16,27 +17,34 @@ type (
 	}
 
 	DatasourceAddRequest {
-		Type       string               `json:"type"`
-		Name       string               `json:"name"`
-		S3Config   DatasourceS3Config   `json:"s3Config,optional"`
-		SFTPConfig DatasourceSFTPConfig `json:"sftpConfig,optional"`
+		Type       string                `json:"type"`
+		Name       string                `json:"name"`
+		S3Config   *DatasourceS3Config   `json:"s3Config,optional"`
+		SFTPConfig *DatasourceSFTPConfig `json:"sftpConfig,optional"`
 	}
 
 	DatasourceAddData {
 		ID int `json:"id"`
 	}
 
+	DatasourceListRequest {
+		Type string `form:"type,optional"`
+	}
+
 	DatasourceRemoveRequest {
 		ID int `path:"id"`
 	}
+	DatasourceBatchRemoveRequest {
+		IDs []int `json:"ids"`
+	}
 
 	DatasourceConfig {
-		ID         int                  `json:"id"`
-		Type       string               `json:"type"`
-		Name       string               `json:"name"`
-		S3Config   DatasourceS3Config   `json:"s3Config,optional"`
-		SFTPConfig DatasourceSFTPConfig `json:"sftpConfig,optional"`
-		CreateTime int64                `json:"createTime,optional"`
+		ID         int                   `json:"id"`
+		Type       string                `json:"type"`
+		Name       string                `json:"name"`
+		S3Config   *DatasourceS3Config   `json:"s3Config,optional"`
+		SFTPConfig *DatasourceSFTPConfig `json:"sftpConfig,optional"`
+		CreateTime int64                 `json:"createTime,optional"`
 	}
 
 	DatasourceListContentsRequest {
@@ -75,9 +83,13 @@ service studio-api {
 	@handler DatasourceRemove
 	delete /api/datasources/:id(DatasourceRemoveRequest)
 	
+	@doc "Batch Remove Datasource"
+	@handler DatasourceBatchRemove
+	delete /api/datasources(DatasourceBatchRemoveRequest)
+	
 	@doc "List Datasource"
 	@handler DatasourceList
-	get /api/datasources returns(DatasourceData)
+	get /api/datasources(DatasourceListRequest) returns(DatasourceData)
 	
 	@doc "List Contents"
 	@handler DatasourceListContents

@@ -18,8 +18,10 @@ export interface ITaskStats {
   totalRequest: number;
   totalLatency: number;
   totalRespTime: number;
-  failedProcessed: number; // The number of nodes and edges that have failed to be processed.
-  totalProcessed: number; // The number of nodes and edges that have been processed.
+  /* The number of nodes and edges that have failed to be processed. */
+  failedProcessed: number; 
+  /* 123. */
+  totalProcessed: number; 
 }
 export interface ITaskItem {
   id: number;
@@ -69,17 +71,4 @@ export interface StudioFile extends RcFile {
   delimiter?: string;
   sample?: string;
   content?: any[];
-}
-
-export enum IRemoteType {
-  'Cloud' = 'cloudStorage',
-  'Sftp' = 'sftp',
-}
-
-export interface ICloudStorage {
-  ipAddress: string;
-  bucketName: string;
-  accessKeyId: string;
-  region: string;
-  addDate: number;
 }

@@ -4,7 +4,7 @@ import { Route, useHistory, useLocation } from 'react-router-dom';
 import { trackPageView } from '@app/utils/stat';
 import cls from 'classnames';
 import { useI18n } from '@vesoft-inc/i18n';
-import DataSourceList from './DataSourceList';
+import DatasourceList from './DatasourceList';
 import styles from './index.module.less';
 import TaskList from './TaskList';
 
@@ -25,7 +25,7 @@ const Import = (props: IProps) => {
   }, []);
   useEffect(() => {
     const path = location.pathname;
-    setTab(path.includes('dataSources') ? 'dataSources' : 'tasks');
+    setTab(path.includes('datasources') ? 'datasources' : 'tasks');
   }, [location.pathname]);
   const handleTabChange = (e: RadioChangeEvent) => {
     setTab(e.target.value);
@@ -41,14 +41,14 @@ const Import = (props: IProps) => {
           onChange={handleTabChange}
         >
           <Radio.Button value="tasks">{intl.get('import.importData')}</Radio.Button>
-          <Radio.Button value="dataSources">{intl.get('import.dataSourceManagement')}</Radio.Button>
+          <Radio.Button value="datasources">{intl.get('import.dataSourceManagement')}</Radio.Button>
         </Radio.Group>
       </div>
       <div>
         <Route
-          path={`/import/dataSources`}
+          path={`/import/datasources`}
           exact={true}
-          component={DataSourceList}
+          component={DatasourceList}
         />
 
         <Route
