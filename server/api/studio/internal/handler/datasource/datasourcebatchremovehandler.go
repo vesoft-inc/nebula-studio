@@ -13,9 +13,9 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-func DatasourceListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func DatasourceBatchRemoveHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.DatasourceListRequest
+		var req types.DatasourceBatchRemoveRequest
 		if err := httpx.Parse(r, &req); err != nil {
 			err = ecode.WithErrorMessage(ecode.ErrParam, err)
 			svcCtx.ResponseHandler.Handle(w, r, nil, err)
@@ -26,8 +26,8 @@ func DatasourceListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := datasource.NewDatasourceListLogic(r.Context(), svcCtx)
-		data, err := l.DatasourceList(req)
-		svcCtx.ResponseHandler.Handle(w, r, data, err)
+		l := datasource.NewDatasourceBatchRemoveLogic(r.Context(), svcCtx)
+		err := l.DatasourceBatchRemove(req)
+		svcCtx.ResponseHandler.Handle(w, r, nil, err)
 	}
 }
