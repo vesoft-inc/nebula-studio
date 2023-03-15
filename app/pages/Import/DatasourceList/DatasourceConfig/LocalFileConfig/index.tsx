@@ -33,7 +33,7 @@ const DelimiterConfigModal = (props: { onConfirm: (string) => void }) => {
 const UploadConfigModal = (props: IProps) => {
   const { visible, onConfirm, onCancel, uploadList } = props;
   const { files } = useStore();
-  const { fileList, uploadFile } = files;
+  const { fileList, uploadFile, getFiles } = files;
   const { intl } = useI18n();
   const state = useLocalObservable(() => ({
     data: [],
@@ -48,7 +48,7 @@ const UploadConfigModal = (props: IProps) => {
   const { readRemoteFile } = usePapaParse();
   useEffect(() => {
     const { setState } = state;
-    visible && setState({ data: uploadList, activeItem: uploadList[0] });
+    visible && (getFiles(), setState({ data: uploadList, activeItem: uploadList[0] }));
   }, [visible]);
   useEffect(() => {
     state.activeItem && readFile();
@@ -289,5 +289,6 @@ const UploadConfigModal = (props: IProps) => {
     </Modal>
   );
 };
+
 
 export default observer(UploadConfigModal);
