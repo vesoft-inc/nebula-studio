@@ -9,7 +9,7 @@ import { IRemoteType } from '@app/interfaces/datasource';
 import { useI18n } from '@vesoft-inc/i18n';
 
 import dayjs from 'dayjs';
-import DatasourceConfigModal from './DatasourceConfigModal';
+import DatasourceConfigModal from '../DatasourceConfig/PlatformConfig';
 import styles from './index.module.less';
 
 interface IProps {

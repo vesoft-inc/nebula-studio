@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { IRemoteType } from '@app/interfaces/datasource';
 import { useStore } from '@app/stores';
 import { observer } from 'mobx-react-lite';
+import UploadLocalBtn from '../FileUploadBtn';
 import S3ConfigForm from './S3ConfigForm';
 import SftpConfigForm from './SftpConfigForm';
 import styles from './index.module.less';
@@ -75,11 +76,26 @@ const DatasourceConfigModal = (props: IProps) => {
             }
           }}
         </FormItem>
-        <div className={styles.btns}>
-          <Button className={styles.btnSubmit} type="primary" htmlType="submit" loading={loading}>
-            {intl.get('common.add')}
-          </Button>
-        </div>
+        <FormItem noStyle shouldUpdate>
+          {({ getFieldValue }) => {
+            const configType = getFieldValue('type');
+            if (configType === 'local') {
+              return <div className={styles.btns}>
+                <UploadLocalBtn onUpload={onCancel}>
+                  <Button className={styles.btnSubmit} type="primary">
+                    {intl.get('common.add')}
+                  </Button>
+                </UploadLocalBtn>
+              </div>;
+            } else {
+              return <div className={styles.btns}>
+                <Button className={styles.btnSubmit} type="primary" htmlType="submit" loading={loading}>
+                  {intl.get('common.add')}
+                </Button>
+              </div>;
+            }
+          }}
+        </FormItem>
       </Form>
     </Modal>
   );
