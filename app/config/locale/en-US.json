@@ -278,7 +278,11 @@
     "enterAddress": "Enter endpoint",
     "enterRegion": "Enter region",
     "serverAddress": "Server Address",
-    "port": "Port"
+    "port": "Port",
+    "newDataSourceTip": "Please add the data source for the first time",
+    "addNewImport": "Add New Import",
+    "addNewImportTip": "After adding the data source, create an import task to import the data into the database",
+    "start": "Start"
   },
   "schema": {
     "spaceList": "Graph Space List",

@@ -279,7 +279,11 @@
     "enterAddress": "请输入终端节点地址",
     "enterRegion": "请输入区域",
     "serverAddress": "服务器地址",
-    "port": "端口"
+    "port": "端口",
+    "newDataSourceTip": "请先添加数据源",
+    "addNewImport": "添加导入任务",
+    "addNewImportTip": "添加数据源后，创建导入任务将数据导入数据库",
+    "start": "开始"
   },
   "schema": {
     "spaceList": "图空间列表",
