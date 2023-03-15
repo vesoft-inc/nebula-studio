@@ -118,7 +118,7 @@ const TemplateModal = (props: IProps) => {
       {!config ? <Spin spinning={loading}>
         <p className={styles.tip}>
           {intl.get('import.fileUploadRequired')} 
-          <Link to="/import/dataSources">{intl.get('import.uploadFile')}</Link>
+          <Link to="/import/datasources">{intl.get('import.uploadFile')}</Link>
           {intl.get('import.fileUploadRequired2')} 
         </p>
         <p className={styles.tip}>

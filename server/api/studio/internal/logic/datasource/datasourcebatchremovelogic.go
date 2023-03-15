@@ -11,20 +11,20 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type DatasourceListLogic struct {
+type DatasourceBatchRemoveLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewDatasourceListLogic(ctx context.Context, svcCtx *svc.ServiceContext) DatasourceListLogic {
-	return DatasourceListLogic{
+func NewDatasourceBatchRemoveLogic(ctx context.Context, svcCtx *svc.ServiceContext) DatasourceBatchRemoveLogic {
+	return DatasourceBatchRemoveLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *DatasourceListLogic) DatasourceList(req types.DatasourceListRequest) (resp *types.DatasourceData, err error) {
-	return service.NewDatasourceService(l.ctx, l.svcCtx).List(req)
+func (l *DatasourceBatchRemoveLogic) DatasourceBatchRemove(req types.DatasourceBatchRemoveRequest) error {
+	return service.NewDatasourceService(l.ctx, l.svcCtx).BatchRemove(req)
 }

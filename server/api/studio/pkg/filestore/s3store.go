@@ -3,9 +3,9 @@ package filestore
 import (
 	"bufio"
 	"errors"
+
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -14,12 +14,12 @@ import (
 
 type S3Store struct {
 	S3Client s3iface.S3API
+	Bucket   string
 }
 
-func NewS3Store(endpoint, region, accessKey, accessSecret string) (*S3Store, error) {
+func NewS3Store(endpoint, region, bucket, accessKey, accessSecret string) (*S3Store, error) {
 	sess, err := session.NewSession(&aws.Config{
 		Region:      aws.String(region),
-		Endpoint:    aws.String(endpoint),
 		Credentials: credentials.NewStaticCredentials(accessKey, accessSecret, ""),
 	})
 	if err != nil {
@@ -29,16 +29,13 @@ func NewS3Store(endpoint, region, accessKey, accessSecret string) (*S3Store, err
 	svc := s3.New(sess)
 	return &S3Store{
 		S3Client: svc,
+		Bucket:   bucket,
 	}, nil
 }
 
 func (s *S3Store) ReadFile(s3path string, startLine ...int) ([]string, error) {
 	var numLines int
 	var start int
-	bucketName, prefix, err := s.parsePath(s3path)
-	if err != nil {
-		return nil, err
-	}
 	if len(startLine) == 0 {
 		start = 0
 		numLines = -1
@@ -51,8 +48,8 @@ func (s *S3Store) ReadFile(s3path string, startLine ...int) ([]string, error) {
 	}
 
 	resp, err := s.S3Client.GetObject(&s3.GetObjectInput{
-		Bucket: aws.String(bucketName),
-		Key:    aws.String(prefix),
+		Bucket: aws.String(s.Bucket),
+		Key:    aws.String(s3path),
 	})
 	if err != nil {
 		return nil, err
@@ -83,14 +80,9 @@ func (s *S3Store) ReadFile(s3path string, startLine ...int) ([]string, error) {
 }
 
 func (s *S3Store) ListFiles(s3path string) ([]string, error) {
-	bucketName, prefix, err := s.parsePath(s3path)
-	if err != nil {
-		return nil, err
-	}
-
 	resp, err := s.S3Client.ListObjectsV2(&s3.ListObjectsV2Input{
-		Bucket:    aws.String(bucketName),
-		Prefix:    aws.String(prefix),
+		Bucket:    aws.String(s.Bucket),
+		Prefix:    aws.String(s3path),
 		Delimiter: aws.String("/"),
 	})
 	if err != nil {
@@ -119,17 +111,4 @@ func (s *S3Store) ListBuckets() ([]string, error) {
 	}
 
 	return buckets, nil
-}
-
-func (s3 *S3Store) parsePath(s3path string) (bucketName string, prefix string, err error) {
-	if len(s3path) == 0 {
-		return "", "", errors.New("the s3path is invalid")
-	}
-	parts := strings.SplitN(s3path, "/", 2)
-
-	if len(parts) == 1 {
-		return parts[0], "", nil
-	}
-
-	return parts[0], parts[1], nil
 }

@@ -344,6 +344,7 @@ type FavoriteIDResult struct {
 type DatasourceS3Config struct {
 	Endpoint     string `json:"endpoint"`
 	Region       string `json:"region"`
+	Bucket       string `json:"bucket"`
 	AccessKey    string `json:"accessKey"`
 	AccessSecret string `json:"accessSecret"`
 }
@@ -356,27 +357,35 @@ type DatasourceSFTPConfig struct {
 }
 
 type DatasourceAddRequest struct {
-	Type       string               `json:"type"`
-	Name       string               `json:"name"`
-	S3Config   DatasourceS3Config   `json:"s3Config,optional"`
-	SFTPConfig DatasourceSFTPConfig `json:"sftpConfig,optional"`
+	Type       string                `json:"type"`
+	Name       string                `json:"name"`
+	S3Config   *DatasourceS3Config   `json:"s3Config,optional"`
+	SFTPConfig *DatasourceSFTPConfig `json:"sftpConfig,optional"`
 }
 
 type DatasourceAddData struct {
 	ID int `json:"id"`
 }
 
+type DatasourceListRequest struct {
+	Type string `form:"type,optional"`
+}
+
 type DatasourceRemoveRequest struct {
 	ID int `path:"id"`
 }
 
+type DatasourceBatchRemoveRequest struct {
+	IDs []int `json:"ids"`
+}
+
 type DatasourceConfig struct {
-	ID         int                  `json:"id"`
-	Type       string               `json:"type"`
-	Name       string               `json:"name"`
-	S3Config   DatasourceS3Config   `json:"s3Config,optional"`
-	SFTPConfig DatasourceSFTPConfig `json:"sftpConfig,optional"`
-	CreateTime int64                `json:"createTime,optional"`
+	ID         int                   `json:"id"`
+	Type       string                `json:"type"`
+	Name       string                `json:"name"`
+	S3Config   *DatasourceS3Config   `json:"s3Config,optional"`
+	SFTPConfig *DatasourceSFTPConfig `json:"sftpConfig,optional"`
+	CreateTime int64                 `json:"createTime,optional"`
 }
 
 type DatasourceListContentsRequest struct {
