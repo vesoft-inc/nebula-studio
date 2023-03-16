@@ -139,7 +139,7 @@ const TaskList = (props: IProps) => {
         </Button>
       </div>
       <h3 className={styles.taskHeader}>{intl.get('import.taskList')} ({taskList.length})</h3>
-      {taskList.length === 0 
+      {!loading && taskList.length === 0 
         ? <div className={styles.emptyTip}>
           {emptyTips.map((item, index) => {
             return (

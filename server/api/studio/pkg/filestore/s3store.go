@@ -3,6 +3,7 @@ package filestore
 import (
 	"bufio"
 	"errors"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -79,7 +80,7 @@ func (s *S3Store) ReadFile(s3path string, startLine ...int) ([]string, error) {
 	return lines, nil
 }
 
-func (s *S3Store) ListFiles(s3path string) ([]string, error) {
+func (s *S3Store) ListFiles(s3path string) ([]FileConfig, error) {
 	resp, err := s.S3Client.ListObjectsV2(&s3.ListObjectsV2Input{
 		Bucket:    aws.String(s.Bucket),
 		Prefix:    aws.String(s3path),
@@ -88,13 +89,30 @@ func (s *S3Store) ListFiles(s3path string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	var files []string
+	var files []FileConfig
 	for _, obj := range resp.CommonPrefixes {
-		files = append(files, *obj.Prefix)
+		name := (*obj.Prefix)[:len(*obj.Prefix)-1] // remove trailing slash
+		files = append(files, FileConfig{
+			Name: strings.TrimPrefix(name, s3path),
+			Type: "directory",
+		})
 	}
 	for _, obj := range resp.Contents {
-		files = append(files, *obj.Key)
+		var objType string
+		key := *obj.Key
+		if key[len(*obj.Key)-1:] == "/" {
+			objType = "directory"
+		} else if strings.HasSuffix(key, ".csv") {
+			objType = "csv"
+		}
+		if objType != "" {
+			s3Object := FileConfig{
+				Name: strings.TrimPrefix(key, s3path),
+				Type: objType,
+				Size: *obj.Size,
+			}
+			files = append(files, s3Object)
+		}
 	}
 
 	return files, nil

@@ -5,7 +5,7 @@ import { trackPageView } from '@app/utils/stat';
 import { Button, message, Popconfirm, Table } from 'antd';
 import Icon from '@app/components/Icon';
 import cls from 'classnames';
-import { IRemoteType } from '@app/interfaces/datasource';
+import { IDatasourceType } from '@app/interfaces/datasource';
 import { useI18n } from '@vesoft-inc/i18n';
 
 import dayjs from 'dayjs';
@@ -13,7 +13,7 @@ import DatasourceConfigModal from '../DatasourceConfig/PlatformConfig';
 import styles from './index.module.less';
 
 interface IProps {
-  type: IRemoteType;
+  type: IDatasourceType;
 }
 const cloudKeys = [
   {
@@ -54,8 +54,8 @@ const sftpKeys = [{
 }
 ];
 const columnKeys = {
-  [IRemoteType.S3]: cloudKeys,
-  [IRemoteType.Sftp]: sftpKeys,
+  [IDatasourceType.s3]: cloudKeys,
+  [IDatasourceType.sftp]: sftpKeys,
 };
 
 const DatasourceList = (props: IProps) => {

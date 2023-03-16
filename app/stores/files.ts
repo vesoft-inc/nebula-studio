@@ -34,6 +34,7 @@ export class FilesStore {
       this.update({
         fileList: data.list || [],
       });
+      return data.list;
     }
   };
   uploadFile = async (files: StudioFile[]) => {

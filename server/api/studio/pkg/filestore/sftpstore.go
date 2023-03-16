@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os/user"
+	"strings"
 
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
@@ -90,8 +91,8 @@ func (s *SftpStore) ReadFile(path string, startLine ...int) ([]string, error) {
 	return lines, nil
 }
 
-func (s *SftpStore) ListFiles(dir string) ([]string, error) {
-	var files []string
+func (s *SftpStore) ListFiles(dir string) ([]FileConfig, error) {
+	var files []FileConfig
 	if dir == "" {
 		user, err := user.Lookup(s.Username)
 		if err != nil {
@@ -105,7 +106,22 @@ func (s *SftpStore) ListFiles(dir string) ([]string, error) {
 		return nil, err
 	}
 	for _, file := range _files {
-		files = append(files, file.Name())
+		isDir := file.IsDir()
+		name := file.Name()
+		var fileType string
+		if isDir {
+			fileType = "directory"
+		} else if strings.HasSuffix(name, ".csv") {
+			fileType = "csv"
+		}
+		if fileType != "" {
+			files = append(files, FileConfig{
+				Name: name,
+				Size: file.Size(),
+				Type: fileType,
+			})
+		}
+
 	}
 	return files, nil
 }
