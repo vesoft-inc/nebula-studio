@@ -1,7 +1,7 @@
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Modal, Form, Select, message } from 'antd';
 import React, { useState } from 'react';
-import { IRemoteType } from '@app/interfaces/datasource';
+import { IDatasourceType } from '@app/interfaces/datasource';
 import { useStore } from '@app/stores';
 import { observer } from 'mobx-react-lite';
 import UploadLocalBtn from '../FileUploadBtn';
@@ -14,7 +14,7 @@ interface IProps {
   visible: boolean;
   onConfirm: () => void;
   onCancel: () => void;
-  type?: IRemoteType;
+  type?: IDatasourceType;
   data?: any;
 }
 
@@ -42,7 +42,6 @@ const DatasourceConfigModal = (props: IProps) => {
     setLoading(false);
     flag && (message.success(intl.get('schema.createSuccess')), onConfirm());
   };
-  console.log('data', data);
   
   return (
     <Modal
@@ -59,24 +58,24 @@ const DatasourceConfigModal = (props: IProps) => {
         <FormItem noStyle shouldUpdate>
           {({ getFieldValue }) => {
             const configType = type || getFieldValue('type');
-            if (configType !== IRemoteType.S3) return;
+            if (configType !== IDatasourceType.s3) return;
             return <p className={styles.tip}>{intl.get('import.s3Tip')}</p>;
           }}
         </FormItem>
-        {!type && <FormItem label={intl.get('import.dataSourceType')} name="type" initialValue={type || IRemoteType.S3}>
+        {!type && <FormItem label={intl.get('import.dataSourceType')} name="type" initialValue={type || IDatasourceType.s3}>
           <Select>
-            <Select.Option value={IRemoteType.S3}>{intl.get('import.s3')}</Select.Option>
-            <Select.Option value={IRemoteType.Sftp}>{intl.get('import.sftp')}</Select.Option>
-            <Select.Option value="local">{intl.get('import.localFiles')}</Select.Option>
+            <Select.Option value={IDatasourceType.s3}>{intl.get('import.s3')}</Select.Option>
+            <Select.Option value={IDatasourceType.sftp}>{intl.get('import.sftp')}</Select.Option>
+            <Select.Option value={IDatasourceType.local}>{intl.get('import.localFiles')}</Select.Option>
           </Select>
         </FormItem>}
         <FormItem noStyle shouldUpdate>
           {({ getFieldValue }) => {
             const configType = type || getFieldValue('type');
             switch (configType) {
-              case IRemoteType.S3:
+              case IDatasourceType.s3:
                 return <S3ConfigForm formRef={form} />;
-              case IRemoteType.Sftp:
+              case IDatasourceType.sftp:
                 return <SftpConfigForm formRef={form} />;
               default:
                 return null;

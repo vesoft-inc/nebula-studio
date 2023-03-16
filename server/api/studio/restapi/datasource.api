@@ -52,8 +52,14 @@ type (
 		Path         string `form:"path,optional"`
 	}
 
+	FileConfig {
+		Size int64  `json:"size"`
+		Type string `json:"type"`
+		Name string `json:"name"`
+	}
+
 	DatasourceListContentsData {
-		List []string `json:"list"`
+		List []FileConfig `json:"list"`
 	}
 
 	DatasourceData {

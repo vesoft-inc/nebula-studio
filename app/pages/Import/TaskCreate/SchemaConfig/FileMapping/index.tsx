@@ -1,5 +1,5 @@
-import { Collapse, Select, Table, Tooltip } from 'antd';
-import React, { useMemo } from 'react';
+import { Button, Collapse, Select, Table, Tooltip } from 'antd';
+import React, { useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import cls from 'classnames';
 import { useStore } from '@app/stores';
@@ -11,6 +11,7 @@ import { ISchemaEnum } from '@app/interfaces/schema';
 import { IEdgeFileItem, ITagFileItem } from '@app/stores/import';
 import { IImportFile } from '@app/interfaces/import';
 import styles from '../index.module.less';
+import FileSelectModal from './FileSelectModal';
 
 const Option = Select.Option;
 const Panel = Collapse.Panel;
@@ -99,6 +100,7 @@ const FileMapping = (props: IProps) => {
   const { fileList, getFiles } = files;
   const { file, props: mappingProps } = item;
   const { intl } = useI18n();
+  const [visible, setVisible] = useState(false);
   const handleFileChange = (value: string) => {
     const file = fileList.find(item => item.name === value);
     onReset(item, file);
@@ -145,13 +147,15 @@ const FileMapping = (props: IProps) => {
     }
   };
 
+
   const idConfig = useMemo(() => type === ISchemaEnum.Tag ? idMap[ISchemaEnum.Tag] : idMap[ISchemaEnum.Edge], [type]);
   return (
     <div className={styles.fileMappingContainer}>
       <div className={cls(styles.row, styles.spaceBetween)}>
         <div className={styles.operation}>
           <span className={cls(styles.label, styles.required)}>{intl.get('import.dataSourceFile')}</span>
-          <Select 
+          <Button type="link" onClick={() => setVisible(true)}>{intl.get('import.selectFile')}</Button>
+          {/* <Select 
             bordered={false}
             placeholder={intl.get('import.selectFile')}
             showSearch={true} 
@@ -164,7 +168,7 @@ const FileMapping = (props: IProps) => {
                 {file.name}
               </Option>
             ))}
-          </Select>
+          </Select> */}
         </div>
         <CloseOutlined className={styles.btnClose} onClick={() => onRemove(item)} />
       </div>
@@ -176,6 +180,7 @@ const FileMapping = (props: IProps) => {
         rowKey="name"
         pagination={false}
       />
+      {visible && <FileSelectModal visible={visible} onCancel={() => setVisible(false)} onConfirm={() => {}} />}
     </div>
   );
 };

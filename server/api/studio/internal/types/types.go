@@ -393,8 +393,14 @@ type DatasourceListContentsRequest struct {
 	Path         string `form:"path,optional"`
 }
 
+type FileConfig struct {
+	Size int64  `json:"size"`
+	Type string `json:"type"`
+	Name string `json:"name"`
+}
+
 type DatasourceListContentsData struct {
-	List []string `json:"list"`
+	List []FileConfig `json:"list"`
 }
 
 type DatasourceData struct {

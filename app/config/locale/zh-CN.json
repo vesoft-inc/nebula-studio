@@ -288,7 +288,11 @@
     "readerConcurrency": "读取并发数",
     "readerConcurrencyTip": "读取文件的并发数",
     "importerConcurrency": "导入并发数",
-    "importerConcurrencyTip": "导入数据的并发数"
+    "importerConcurrencyTip": "导入数据的并发数",
+    "selectDatasourceFile": "选择数据源文件",
+    "datasourceType": "数据源类型",
+    "filePath": "文件路径",
+    "directory": "目录"
   },
   "schema": {
     "spaceList": "图空间列表",

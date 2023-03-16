@@ -8,7 +8,13 @@ import (
 type (
 	FileStore interface {
 		ReadFile(path string, startLine ...int) ([]string, error)
-		ListFiles(dir string) ([]string, error)
+		ListFiles(dir string) ([]FileConfig, error)
+	}
+
+	FileConfig struct {
+		Type string
+		Name string
+		Size int64
 	}
 
 	SftpConfig struct {

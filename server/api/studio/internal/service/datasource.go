@@ -187,11 +187,19 @@ func (d *datasourceService) ListContents(request types.DatasourceListContentsReq
 		return nil, err
 	}
 	fileList, err := store.ListFiles(request.Path)
+	list := make([]types.FileConfig, 0)
+	for _, item := range fileList {
+		list = append(list, types.FileConfig{
+			Name: item.Name,
+			Size: item.Size,
+			Type: item.Type,
+		})
+	}
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrBadRequest, err, "listFiles failed")
 	}
 	return &types.DatasourceListContentsData{
-		List: fileList,
+		List: list,
 	}, nil
 }
 

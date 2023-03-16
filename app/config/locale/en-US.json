@@ -287,7 +287,11 @@
     "readerConcurrency": "Reader concurrency",
     "readerConcurrencyTip": "The number of concurrent readers that read data from the data source",
     "importerConcurrency": "Importer concurrency",
-    "importerConcurrencyTip": "The number of concurrent importers that import data into Nebula Graph"
+    "importerConcurrencyTip": "The number of concurrent importers that import data into Nebula Graph",
+    "selectDatasourceFile": "Select Data Source file",
+    "datasourceType": "Data Source Type",
+    "filePath": "File Path",
+    "directory": "Directory"
   },
   "schema": {
     "spaceList": "Graph Space List",

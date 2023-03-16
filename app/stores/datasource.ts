@@ -37,24 +37,22 @@ export class DatasourceStore {
     return code === 0;
   };
   getDatasourceDetail = async (payload: {
-    id: string,
+    id: number,
     path?: string,
   }) => {
-    const { id } = payload;
-    const { code, data } = await service.getDatasourceDetail({ id });
+    const { id, path } = payload;
+    const { code, data } = await service.getDatasourceDetail({ id, path });
     if(code === 0) {
-      console.log('data', data);
-      return data;
+      return data.list;
     }
   };
   previewFile = async (payload: {
     id: string,
     path?: string,
   }) => {
-    const { id } = payload;
-    const { code, data } = await service.previewFile({ id, path: 'importer-hetao-test/player.csv' });
+    const { id, path } = payload;
+    const { code, data } = await service.previewFile({ id, path });
     if(code === 0) {
-      console.log('data', data);
       return data;
     }
   };
