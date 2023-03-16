@@ -2,23 +2,24 @@ package importer
 
 import (
 	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
 
-	"github.com/vesoft-inc/nebula-importer/pkg/cmd"
-	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/vesoft-inc/nebula-importer/v4/pkg/config"
+	"github.com/vesoft-inc/nebula-importer/v4/pkg/logger"
+	"github.com/vesoft-inc/nebula-importer/v4/pkg/manager"
 )
 
+type Client struct {
+	Cfg     config.Configurator `json:"cfg,omitempty"`
+	Logger  logger.Logger       `json:"logger,omitempty"`
+	Manager manager.Manager     `json:"manager,omitempty"`
+}
 type Task struct {
-	Runner   *cmd.Runner  `json:"runner,omitempty"`
+	Client   *Client      `json:"client,omitempty"`
 	TaskInfo *db.TaskInfo `json:"task_info,omitempty"`
 }
 
 func (t *Task) UpdateQueryStats() error {
-	stats, err := t.Runner.QueryStats()
-	if err != nil {
-		logx.Infof("query import stats fail: %s", err)
-		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-	}
+	stats := t.Client.Manager.Stats()
 	t.TaskInfo.Stats = *stats
 	return nil
 }

@@ -1,4 +1,4 @@
-import { Collapse, Input, Select, Table, Tooltip } from 'antd';
+import { Collapse, Select, Table, Tooltip } from 'antd';
 import React, { useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 import cls from 'classnames';
@@ -53,10 +53,6 @@ const VIDSetting = observer((props: {
             <span className={styles.title}>{intl.get('import.vidFunction')}</span>
             <span>{intl.get('import.vidFunctionTip')}</span>
           </div>
-          <div>
-            <span className={styles.title}>{intl.get('import.vidPrefix')}</span>
-            <span>{intl.get('import.vidPrefixTip')}</span>
-          </div>
         </>} />
       </div>} key="default">
         {spaceVidType === 'INT64' && idFunction && <div className={styles.rowItem}>
@@ -75,10 +71,6 @@ const VIDSetting = observer((props: {
             <Option value="hash">Hash</Option>
           </Select>
         </div>}
-        {idPrefix && <div className={styles.rowItem}>
-          <span className={styles.label}>{intl.get('import.vidPrefix')}</span>
-          <Input className={styles.prefixInput} bordered={false} placeholder="Input prefix" value={data[idPrefix]} onChange={e => data.update({ [idPrefix]: e.target.value })} />
-        </div>}
       </Panel>
     </Collapse>
   </div>;
@@ -88,7 +80,6 @@ const idMap = {
   [ISchemaEnum.Tag]: [{
     idKey: 'vidIndex',
     idFunction: 'vidFunction',
-    idPrefix: 'vidPrefix',
     label: 'vidColumn'
   }],
   [ISchemaEnum.Edge]: [{

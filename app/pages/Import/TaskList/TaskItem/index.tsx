@@ -57,16 +57,13 @@ const TaskItem = (props: IProps) => {
   const { intl } = useI18n();
   const [progressStatus, setStatus] = useState<'success' | 'active' | 'normal' | 'exception' | undefined>(undefined);
   const [extraMsg, setExtraMsg] = useState('');
-  const { totalImportedBytes, totalBytes, numFailed, numReadFailed } = stats || {};
+  const { processedBytes, totalBytes, failedProcessed } = stats || {};
   const time = useRef('');
   const timeoutId = useRef<number>(null);
   const addMsg = () => {
     const info: string[] = [];
-    if(numFailed > 0) {
-      info.push(intl.get('import.notImported', { total: numFailed }));
-    }
-    if(numReadFailed > 0) {
-      info.push(intl.get('import.readFailed', { total: numReadFailed }));
+    if(failedProcessed > 0) {
+      info.push(intl.get('import.notImported', { total: failedProcessed }));
     }
     info.length > 0 && setExtraMsg(info.join(', '));
   };
@@ -91,10 +88,10 @@ const TaskItem = (props: IProps) => {
   }, [status]);
   const refreshTime = () => {
     if(status === ITaskStatus.StatusProcessing) {
-      time.current = dayjs.duration(dayjs(Date.now()).diff(dayjs.unix(createTime))).format('HH:mm:ss');
+      time.current = dayjs.duration(dayjs(Date.now()).diff(dayjs(createTime))).format('HH:mm:ss');
       timeoutId.current = window.setTimeout(refreshTime, 1000);
     } else {
-      time.current = dayjs.duration(dayjs.unix(updateTime).diff(dayjs.unix(createTime))).format('HH:mm:ss');
+      time.current = dayjs.duration(dayjs(updateTime).diff(dayjs(createTime))).format('HH:mm:ss');
     }
   };
   return (
@@ -131,8 +128,8 @@ const TaskItem = (props: IProps) => {
               </span>}
             </span>
             <div className={styles.moreInfo}>
-              {totalImportedBytes > 0 && <span>
-                {status !== ITaskStatus.StatusFinished && `${getFileSize(totalImportedBytes)} / `}
+              {processedBytes > 0 && <span>
+                {status !== ITaskStatus.StatusFinished && `${getFileSize(processedBytes)} / `}
                 {getFileSize(totalBytes)}{' '}
               </span>}
               <span>{time.current}</span>
@@ -141,7 +138,7 @@ const TaskItem = (props: IProps) => {
           {stats && <Progress 
             format={percent => `${percent}%`}
             status={progressStatus} 
-            percent={status !== ITaskStatus.StatusFinished ? floor(totalImportedBytes / totalBytes * 100, 2) : 100} 
+            percent={status !== ITaskStatus.StatusFinished ? floor(processedBytes / totalBytes * 100, 2) : 100} 
             strokeColor={progressStatus && COLOR_MAP[progressStatus]} />}
         </div>
         <div className={styles.operations}>

@@ -218,6 +218,5 @@ export const DEFAULT_PARTITION_NUM = 10;
 export const DEFAULT_IMPORT_CONFIG = {
   retry: 3,
   concurrency: 10,
-  channelBufferSize: 128,
   batchSize: 128
 };

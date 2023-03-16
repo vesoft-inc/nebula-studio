@@ -2,18 +2,17 @@ package importer
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
 	"sync"
-	"time"
 
+	importconfig "github.com/vesoft-inc/nebula-importer/v4/pkg/config"
+	configv3 "github.com/vesoft-inc/nebula-importer/v4/pkg/config/v3"
 	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
-
-	"github.com/vesoft-inc/nebula-importer/pkg/cmd"
-	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
+	"gopkg.in/yaml.v3"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -32,61 +31,89 @@ type TaskMgr struct {
 	db    *TaskDb
 }
 
-func newTask(host string, importAddress string, user string, name string, space string) *Task {
-	timeUnix := time.Now().Unix()
-	return &Task{
-		Runner: &cmd.Runner{},
-		TaskInfo: &db.TaskInfo{
-			Name:          name,
-			Address:       host,
-			Space:         space,
-			CreatedTime:   timeUnix,
-			UpdatedTime:   timeUnix,
-			TaskStatus:    StatusProcessing.String(),
-			ImportAddress: importAddress,
-			User:          user,
-		},
-	}
-}
-
-func (task *Task) GetRunner() *cmd.Runner {
-	return task.Runner
-}
-
-func (mgr *TaskMgr) NewTaskID() (string, error) {
-	tid, err := mgr.db.LastId()
+func CreateNewTaskDir(rootDir string) (string, error) {
+	taskId, err := GetTaskMgr().NewTaskID()
 	if err != nil {
-		return "", err
+		return "", ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
-	taskID := fmt.Sprintf("%v", tid+1)
-	return taskID, nil
+	taskDir := filepath.Join(rootDir, strconv.Itoa(taskId))
+	if err := utils.CreateDir(taskDir); err != nil {
+		return "", ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+	}
+	return taskDir, nil
 }
 
-func (mgr *TaskMgr) NewTask(host string, importAddress string, user string, name string, space string) (*Task, string, error) {
+func CreateConfigFile(taskdir string, cfgBytes []byte) error {
+	fileName := "config.yaml"
+	path := filepath.Join(taskdir, fileName)
+	config, _ := importconfig.FromBytes(cfgBytes)
+	confv3 := config.(*configv3.Config)
+
+	// erase user information
+	_config := confv3
+	_config.Client.User = "YOUR_NEBULA_NAME"
+	_config.Client.Password = "YOUR_NEBULA_PASSWORD"
+	_config.Client.Address = ""
+	// TODO hide data source access key and so on
+	outYaml, err := yaml.Marshal(confv3)
+	if err != nil {
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+	}
+	if err := os.WriteFile(path, outYaml, 0o644); err != nil {
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+	}
+	return nil
+}
+
+func (mgr *TaskMgr) NewTask(host string, user string, taskName string, cfg importconfig.Configurator) (*Task, int, error) {
 	mux.Lock()
 	defer mux.Unlock()
-	task := newTask(host, importAddress, user, name, space)
-	if err := mgr.db.InsertTaskInfo(task.TaskInfo); err != nil {
-		return nil, "", err
+	confv3 := cfg.(*configv3.Config)
+
+	// init task db
+	taskInfo := &db.TaskInfo{
+		Name:          taskName,
+		Address:       host,
+		Space:         confv3.Manager.GraphName,
+		TaskStatus:    StatusProcessing.String(),
+		ImportAddress: confv3.Client.Address,
+		User:          user,
 	}
-	tid, err := mgr.db.LastId()
-	if err != nil {
-		return nil, "", err
+
+	if err := mgr.db.InsertTaskInfo(taskInfo); err != nil {
+		return nil, 0, err
 	}
-	task.TaskInfo.ID = tid
-	taskID := fmt.Sprintf("%v", tid)
-	mgr.PutTask(taskID, task)
-	return task, taskID, nil
+
+	task := &Task{
+		Client: &Client{
+			Cfg:     cfg,
+			Manager: nil,
+			Logger:  nil,
+		},
+		TaskInfo: taskInfo,
+	}
+
+	id := int(taskInfo.ID)
+	mgr.PutTask(id, task)
+	return task, id, nil
 }
 
 func GetTaskMgr() *TaskMgr {
 	return taskmgr
 }
 
+func (mgr *TaskMgr) NewTaskID() (int, error) {
+	tid, err := mgr.db.LastId()
+	if err != nil {
+		return 0, err
+	}
+	return tid + 1, nil
+}
+
 /*
 GetTask get task from map and local sql
 */
-func (mgr *TaskMgr) GetTask(taskID string) (*Task, bool) {
+func (mgr *TaskMgr) GetTask(taskID int) (*Task, bool) {
 	if task, ok := mgr.getTaskFromMap(taskID); ok {
 		return task, true
 	}
@@ -101,7 +128,7 @@ func (mgr *TaskMgr) GetTask(taskID string) (*Task, bool) {
 /*
 PutTask put task into tasks map
 */
-func (mgr *TaskMgr) PutTask(taskID string, task *Task) {
+func (mgr *TaskMgr) PutTask(taskID int, task *Task) {
 	mgr.tasks.Store(taskID, task)
 }
 
@@ -109,7 +136,7 @@ func (mgr *TaskMgr) PutTask(taskID string, task *Task) {
 FinishTask will query task stats, delete task in the map
 and update the taskInfo in local sql
 */
-func (mgr *TaskMgr) FinishTask(taskID string) (err error) {
+func (mgr *TaskMgr) FinishTask(taskID int) (err error) {
 	task, ok := mgr.getTaskFromMap(taskID)
 	if !ok {
 		return
@@ -117,8 +144,6 @@ func (mgr *TaskMgr) FinishTask(taskID string) (err error) {
 	if err := task.UpdateQueryStats(); err != nil {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
-	timeUnix := time.Now().Unix()
-	task.TaskInfo.UpdatedTime = timeUnix
 	err = mgr.db.UpdateTaskInfo(task.TaskInfo)
 	if err != nil {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
@@ -127,13 +152,11 @@ func (mgr *TaskMgr) FinishTask(taskID string) (err error) {
 	return
 }
 
-func (mgr *TaskMgr) AbortTask(taskID string) (err error) {
+func (mgr *TaskMgr) AbortTask(taskID int) (err error) {
 	task, ok := mgr.getTaskFromMap(taskID)
 	if !ok {
 		return
 	}
-	timeUnix := time.Now().Unix()
-	task.TaskInfo.UpdatedTime = timeUnix
 	err = mgr.db.UpdateTaskInfo(task.TaskInfo)
 	if err != nil {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
@@ -142,19 +165,15 @@ func (mgr *TaskMgr) AbortTask(taskID string) (err error) {
 	return
 }
 
-func (mgr *TaskMgr) DelTask(tasksDir, taskID string) error {
+func (mgr *TaskMgr) DelTask(tasksDir string, taskID int) error {
 	_, ok := mgr.getTaskFromMap(taskID)
 	if ok {
 		mgr.tasks.Delete(taskID)
 	}
-	id, err := strconv.Atoi(taskID)
-	if err != nil {
-		return errors.New("taskID is wrong")
-	}
-	if err = mgr.db.DelTaskInfo(id); err != nil {
+	if err := mgr.db.DelTaskInfo(taskID); err != nil {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
-	taskDir := filepath.Join(tasksDir, taskID)
+	taskDir := filepath.Join(tasksDir, strconv.Itoa(taskID))
 	return os.RemoveAll(taskDir)
 }
 
@@ -162,7 +181,7 @@ func (mgr *TaskMgr) DelTask(tasksDir, taskID string) error {
 UpdateTaskInfo will query task stats, update task in the map
 and update the taskInfo in local sql
 */
-func (mgr *TaskMgr) UpdateTaskInfo(taskID string) error {
+func (mgr *TaskMgr) UpdateTaskInfo(taskID int) error {
 	task, ok := mgr.getTaskFromMap(taskID)
 	if !ok {
 		return nil
@@ -170,8 +189,6 @@ func (mgr *TaskMgr) UpdateTaskInfo(taskID string) error {
 	if err := task.UpdateQueryStats(); err != nil {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
-	timeUnix := time.Now().Unix()
-	task.TaskInfo.UpdatedTime = timeUnix
 	return mgr.db.UpdateTaskInfo(task.TaskInfo)
 }
 
@@ -179,17 +196,15 @@ func (mgr *TaskMgr) UpdateTaskInfo(taskID string) error {
 StopTask will change the task status to `StatusStoped`,
 and then call FinishTask
 */
-func (mgr *TaskMgr) StopTask(taskID string) error {
+func (mgr *TaskMgr) StopTask(taskID int) error {
 	if task, ok := mgr.getTaskFromMap(taskID); ok {
-		if task.GetRunner().Readers == nil {
-			return errors.New("task is not initialized")
-		}
-		for _, r := range task.GetRunner().Readers {
-			r.Stop()
-		}
+		manager := task.Client.Manager
 		task.TaskInfo.TaskStatus = StatusStoped.String()
+		err := manager.Stop()
+		if err != nil {
+			return errors.New("stop task fail")
+		}
 		if err := mgr.FinishTask(taskID); err != nil {
-			logx.Alert(fmt.Sprintf("finish task fail: %s", err))
 			return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 		}
 		return nil
@@ -212,14 +227,14 @@ func (mgr *TaskMgr) GetAllTaskIDs(address, username string) ([]string, error) {
 	return ids, nil
 }
 
-func (mgr *TaskMgr) getTaskFromMap(taskID string) (*Task, bool) {
+func (mgr *TaskMgr) getTaskFromMap(taskID int) (*Task, bool) {
 	if task, ok := mgr.tasks.Load(taskID); ok {
 		return task.(*Task), true
 	}
 	return nil, false
 }
 
-func (mgr *TaskMgr) getTaskFromSQL(taskID string) *Task {
+func (mgr *TaskMgr) getTaskFromSQL(taskID int) *Task {
 	taskInfo := new(db.TaskInfo)
 	mgr.db.First(taskInfo, taskID)
 	task := new(Task)
