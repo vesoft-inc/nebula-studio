@@ -54,8 +54,15 @@ const DatasourceConfigModal = (props: IProps) => {
       footer={false}
     >
       <Form form={form} 
-        className={styles.loginForm} requiredMark={false}
+        requiredMark={false}
         layout="horizontal" {...fomrItemLayout} onFinish={submit} initialValues={{ ...data }}>
+        <FormItem noStyle shouldUpdate>
+          {({ getFieldValue }) => {
+            const configType = type || getFieldValue('type');
+            if (configType !== IRemoteType.S3) return;
+            return <p className={styles.tip}>{intl.get('import.s3Tip')}</p>;
+          }}
+        </FormItem>
         {!type && <FormItem label={intl.get('import.dataSourceType')} name="type" initialValue={type || IRemoteType.S3}>
           <Select>
             <Select.Option value={IRemoteType.S3}>{intl.get('import.s3')}</Select.Option>

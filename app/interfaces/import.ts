@@ -57,6 +57,8 @@ export interface IBasicConfig {
   batchSize?: string;
   concurrency?: string;
   retry?: string;
+  readerConcurrency?: string;
+  importerConcurrency?: string;
 }
 
 export interface ILogDimension {
