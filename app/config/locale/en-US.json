@@ -218,7 +218,7 @@
     "importYaml": "Import the YAML file",
     "templateMatchError": "The {type} in the configuration does not match the current login account/host",
     "uploadSuccessfully": "Upload files successfully.",
-    "fileSizeLimit": "The file is too large and exceeds the upload limit({size}), please modify the MaxBytes in the startup configuration file and restart the service",
+    "fileSizeLimit": "The file is too large and exceeds the upload limit({size}), please upload the file to the data/upload directory under the installation directory via scp",
     "noHttp": "The address in the configuration file does not support http protocol, please remove http(s)://",
     "addressMatch": "The address in the configuration file must contain the Graph address of current login connection. Separate multiple addresses with ",
     "dataSourceFile": "Data source file",
@@ -282,7 +282,12 @@
     "newDataSourceTip": "Please add the data source for the first time",
     "addNewImport": "Add New Import",
     "addNewImportTip": "After adding the data source, create an import task to import the data into the database",
-    "start": "Start"
+    "start": "Start",
+    "s3Tip": "Only support cloud services that compatible with the Amazon S3 interface",
+    "readerConcurrency": "Reader concurrency",
+    "readerConcurrencyTip": "The number of concurrent readers that read data from the data source",
+    "importerConcurrency": "Importer concurrency",
+    "importerConcurrencyTip": "The number of concurrent importers that import data into Nebula Graph"
   },
   "schema": {
     "spaceList": "Graph Space List",

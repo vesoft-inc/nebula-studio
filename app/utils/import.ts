@@ -24,6 +24,8 @@ export function configToJson(payload: IConfig) {
     address,
     concurrency,
     retry,
+    readerConcurrency,
+    importerConcurrency
   } = payload;
   const vertexToJSON = tagDataToJSON(
     tagConfig,
@@ -46,6 +48,8 @@ export function configToJson(payload: IConfig) {
     manager: {
       spaceName: handleEscape(space),
       batch: Number(batchSize) || DEFAULT_IMPORT_CONFIG.batchSize,
+      readerConcurrency: Number(readerConcurrency ?? DEFAULT_IMPORT_CONFIG.readerConcurrency),
+      importerConcurrency: Number(importerConcurrency ?? DEFAULT_IMPORT_CONFIG.importerConcurrency),
     },
     sources
   };
