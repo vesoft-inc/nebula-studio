@@ -218,7 +218,7 @@
     "importYaml": "导入 YAML 文件",
     "templateMatchError": "配置中的{type}与当前登录账号/地址不匹配",
     "uploadSuccessfully": "上传文件成功",
-    "fileSizeLimit": "文件过大，超过上传限制({size})，请修改启动配置文件中的 MaxBytes 并重启服务",
+    "fileSizeLimit": "文件过大，超过上传限制({size})，请将文件通过 scp 的方式上传到安装目录下的 data/upload 目录",
     "noHttp": "配置文件中的 address 不支持携带 http 协议，请去除 http(s)://",
     "addressMatch": "配置文件中的 address 字段必须包含当前登录的 Graph 地址。多个地址用“,”隔开。",
     "dataSourceFile": "文件源",
@@ -283,7 +283,12 @@
     "newDataSourceTip": "请先添加数据源",
     "addNewImport": "添加导入任务",
     "addNewImportTip": "添加数据源后，创建导入任务将数据导入数据库",
-    "start": "开始"
+    "start": "开始",
+    "s3Tip": "只支持兼容Amazon S3接口的云服务",
+    "readerConcurrency": "读取并发数",
+    "readerConcurrencyTip": "读取文件的并发数",
+    "importerConcurrency": "导入并发数",
+    "importerConcurrencyTip": "导入数据的并发数"
   },
   "schema": {
     "spaceList": "图空间列表",

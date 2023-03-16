@@ -226,5 +226,7 @@ export const DEFAULT_PARTITION_NUM = 10;
 export const DEFAULT_IMPORT_CONFIG = {
   retry: 3,
   concurrency: 10,
-  batchSize: 128
+  batchSize: 128,
+  readerConcurrency: 50,
+  importerConcurrency: 512,
 };

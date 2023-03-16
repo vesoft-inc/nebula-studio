@@ -206,6 +206,30 @@ const TaskCreate = (props: IProps) => {
       placeholder: DEFAULT_IMPORT_CONFIG.retry,
       description: intl.get('import.retryTip'),
     },
+    {
+      label: intl.get('import.readerConcurrency'),
+      key: 'readerConcurrency',
+      rules: [
+        {
+          pattern: POSITIVE_INTEGER_REGEX,
+          message: intl.get('formRules.numberRequired'),
+        },
+      ],
+      placeholder: DEFAULT_IMPORT_CONFIG.readerConcurrency,
+      description: intl.get('import.readerConcurrencyTip'),
+    },
+    {
+      label: intl.get('import.importerConcurrency'),
+      key: 'importerConcurrency',
+      rules: [
+        {
+          pattern: POSITIVE_INTEGER_REGEX,
+          message: intl.get('formRules.numberRequired'),
+        },
+      ],
+      placeholder: DEFAULT_IMPORT_CONFIG.importerConcurrency,
+      description: intl.get('import.importerConcurrencyTip'),
+    },
   ], [currentLocale]);
   return (
     <div className={styles.importCreate}>
@@ -249,9 +273,9 @@ const TaskCreate = (props: IProps) => {
                   </Form.Item>
                 </Col>
               </Row>
-              <Row>
+              <Row style={{ 'flexWrap': 'nowrap' }}>
                 {extraConfigs.map(item => (
-                  <Col span={6} key={item.key}>
+                  <Col span={5} key={item.key}>
                     <Form.Item label={<>
                       <span className={styles.label}>{item.label}</span>
                       <Instruction description={item.description} />

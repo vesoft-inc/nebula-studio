@@ -11,9 +11,9 @@ type IUploadBtnProps = PropsWithChildren<{
   onUpload?: () => void
 }>
 
-
+const SizeLimit = 200 * 1024 * 1024;
 const UploadBtn = (props: IUploadBtnProps) => {
-  const { files, global } = useStore();
+  const { files } = useStore();
   const { children, onUpload } = props;
   const { intl } = useI18n();
   const [previewList, setPreviewList] = useState<StudioFile[]>([]);
@@ -21,8 +21,8 @@ const UploadBtn = (props: IUploadBtnProps) => {
   const [visible, setVisible] = useState(false);
   const transformFile = async (_file: StudioFile, fileList: StudioFile[]) => {
     const size = fileList.reduce((acc, cur) => acc + cur.size, 0);
-    if(global.gConfig?.maxBytes && size > global.gConfig.maxBytes) {
-      message.error(intl.get('import.fileSizeLimit', { size: getFileSize(global.gConfig.maxBytes) }));
+    if(size > SizeLimit) {
+      message.error(intl.get('import.fileSizeLimit', { size: getFileSize(SizeLimit) }));
       return false;
     }
     fileList.forEach(file => {
