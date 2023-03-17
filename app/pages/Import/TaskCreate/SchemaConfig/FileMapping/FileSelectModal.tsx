@@ -7,46 +7,54 @@ import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Modal, Select, Spin } from 'antd';
 import cls from 'classnames';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect } from 'react';
-
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import FileConfigSetting from '@app/components/FileConfigSetting';
 import styles from './index.module.less';
 const Option = Select.Option;
-interface IProps {
+interface IModalProps {
   visible: boolean;
-  onConfirm: (password: string) => void
+  onConfirm: (file, cachedDatasourceState) => void
   onCancel: () => void;
+  cachedDatasourceState?: any;
 }
-const ConfigConfirmModal = (props: IProps) => {
-  const { visible, onConfirm, onCancel } = props;
-  const { datasource, files } = useStore();
-  const { getFiles } = files;
-  const { getDatasourceList, getDatasourceDetail, previewFile } = datasource;
+interface IFileSelect {
+  onConfirm: (file, cachedState) => void,
+  cachedState?: any
+}
+const FileSelect = observer((props: IFileSelect) => {
   const { intl } = useI18n();
+  const { datasource, files } = useStore();
+  const { onConfirm, cachedState } = props;
+  const { getDatasourceList, getDatasourceDetail, previewFile } = datasource;
+  const { getFiles } = files;
   const { state, setState } = useBatchState({
     loading: false,
     options: [],
-    directory: [],
-    path: '',
-    activeId: null,
-    activeItem: null,
+    directory: cachedState?.directory || [],
+    path: cachedState?.path || '',
+    activeId: cachedState?.activeId,
+    activeItem: cachedState?.activeItem,
   });
   const { options, directory, path, activeItem, activeId, loading } = state;
-  const handleConfirm = (password?: string) => {
-    onConfirm(password);
-  };
-  const handleCancel = () => {
-    onCancel();
-  };
+  const init = useCallback(async () => {
+    setState({ loading: true });
+    const data = await getDatasourceList();
+    setState({
+      options: data,
+      loading: false,
+    });
+  }, []);
 
-  const getLocalFiles = async () => {
+  const getLocalFiles = useCallback(async () => {
     const files = await getFiles();
     setState({
       directory: files,
       path: '/',
-      loading: false
+      loading: false,
+      activeId: IDatasourceType.local
     });
-  };
-  const getDatasourceDirectory = async (id, path?) => {
+  }, []);
+  const getDatasourceDirectory = useCallback(async (id, path?) => {
     const data = await getDatasourceDetail({ id, path });
     setState({
       directory: data,
@@ -54,45 +62,42 @@ const ConfigConfirmModal = (props: IProps) => {
       path: path || '/',
       loading: false
     });
-  };
-  const handleTypeChange = async (value) => {
-    setState({ loading: true });
-    if(value === IDatasourceType.local) {
-      getLocalFiles();
-    } else {
-      getDatasourceDirectory(value);
-    }
-  };
-  const init = async () => {
-    setState({ loading: true });
-    const data = await getDatasourceList();
-    setState({
-      options: data,
-      loading: false
-    });
-  };
-  const handleSelectFile = async (item) => {
+  }, []);
+  
+  useEffect(() => {
+    init();
+  }, []);
+  const handleSelectFile = useCallback(async (item) => {
     setState({ loading: true });
     const newPath = `${path === '/' ? '' : path}${item.name}${item.type === 'directory' ? '/' : ''}`;
+    if (item.type !== 'directory') return;
     if(item.type === 'directory') {
       getDatasourceDirectory(activeId, newPath);
-    } else {
-      await previewFile({ id: activeId, path: newPath });
-      setState({
-        loading: false
-      });
     }
-  };
-  const handlePathBack = async () => {
+  }, [path]);
+
+  const handlePathBack = useCallback(async () => {
     if(!path || path === '/') return;
     setState({ loading: true });
     const _path = path.slice(0, -1).split('/');
     _path.pop();
     const newPath = _path.join('/').length ? _path.join('/') + '/' : '';
     getDatasourceDirectory(activeId, newPath);
-  };
-
-  const handleRefresh = async () => {
+  }, [path, activeId]);
+  const handleTypeChange = useCallback(async (value) => {
+    setState({ 
+      loading: true,
+      activeId: null,
+      activeItem: null,
+      path: '',
+    });
+    if(value === IDatasourceType.local) {
+      getLocalFiles();
+    } else {
+      getDatasourceDirectory(value);
+    }
+  }, []);
+  const handleRefresh = useCallback(async () => {
     setState({ loading: true });
     if (!activeId) {
       getLocalFiles();
@@ -100,75 +105,117 @@ const ConfigConfirmModal = (props: IProps) => {
     }
     const _path = !path || path === '/' ? '' : path;
     getDatasourceDirectory(activeId, _path);
+  }, [activeId, path]);
+  const handleConfirm = useCallback(async () => {
+    if(activeItem && activeId === IDatasourceType.local) {
+      // select local file
+      onConfirm(activeItem, state);
+    } else {
+      setState({ loading: true });
+      const _path = `${path === '/' ? '' : path}${activeItem.name}`;
+      const data = await previewFile({ id: activeId, path: _path });
+      const item = {
+        name: activeItem.name,
+        withHeader: false,
+        delimiter: ',',
+        sample: data.contents.join('\r\n'),
+      };
+      setState({ loading: false });
+      onConfirm(item, state);
+    }
+  }, [activeItem, activeId, path]);
+  return <Spin spinning={loading}>
+    <div className={styles.row}>
+      <span className={styles.label}>{intl.get('import.datasourceType')}</span>
+      <Select 
+        className={styles.typeSelect}
+        onChange={handleTypeChange}
+        popupClassName={styles.typeOptions}
+        optionLabelProp="label"
+        defaultValue={activeId}
+        dropdownMatchSelectWidth={false}>
+        <Option value={IDatasourceType.local}>{intl.get('import.localFiles')}</Option>
+        {options.map((item) => {
+          const endpoint = item.type === IDatasourceType.s3 ? item.s3Config.endpoint : item.sftpConfig.host + ':' + item.sftpConfig.port;
+          return <Option value={item.id} key={item.id} label={endpoint}>
+            <span className={styles.typeItem} aria-label={endpoint}>
+              <span className={styles.value}>{endpoint}</span>
+              <span className={styles.type}>{intl.get(`import.${IDatasourceType[item.type]}`)}</span>
+            </span>
+          </Option>;
+        })}
+      </Select>
+    </div>
+    <div className={styles.row}>
+      <span className={styles.label}>{intl.get('import.filePath')}</span>
+      <div className={styles.operations}>
+        <div className={styles.path}>{path}</div>
+        <div className={cls(styles.btn, !path && styles.disabled)} onClick={handlePathBack}><ArrowLeftOutlined /></div>
+        <div className={styles.btn} onClick={handleRefresh}><SyncOutlined /></div>
+      </div>
+    </div>
+    <div className={styles.fileDirectory}>
+      {directory.map((item) => (
+        <div key={item.name} 
+          className={cls(styles.item, activeItem === item && styles.actived)} 
+          onClick={() => setState({ activeItem: item })}
+          onDoubleClick={() => handleSelectFile(item)}
+        >
+          {item.type === 'directory' ? <FolderFilled className={styles.icon} /> : <FileTextFilled className={styles.icon} />}
+          <div className={styles.content}>
+            <span className={styles.title}>{item.name}</span>
+            <span className={styles.desc}>{item.type === 'directory' ? intl.get('import.directory') : getFileSize(item.size)}</span>
+          </div>
+        </div>    
+      ))}
+    </div>
+    <div className={styles.btns}>
+      <Button
+        type="primary"
+        disabled={!activeItem || activeItem.type === 'directory'}
+        onClick={() => handleConfirm()}
+      >
+        {intl.get('common.add')}
+      </Button>
+    </div>
+  </Spin>;
+});
+const FileSelectModal = (props: IModalProps) => {
+  const { visible, onConfirm, onCancel, cachedDatasourceState } = props;
+  const { intl } = useI18n();
+  const [step, setStep] = useState(0);
+  const [preUploadList, setPreUploadList] = useState([]);
+  const [cachedState, setcachedState] = useState(cachedDatasourceState || undefined);
+  const title = useMemo(() => {
+    if(step === 0) {
+      return intl.get('import.selectDatasourceFile');
+    }
+    return intl.get('import.preview');
+  }, [step]);
+  const handlePreview = (file, cachedState) => {
+    setPreUploadList([file]);
+    setcachedState(cachedState);
+    setStep(1);
   };
-  useEffect(() => {
-    init();
-  }, []);
+  const handleConfirm = (file) => {
+    onConfirm(file[0], cachedState);
+  };
   return (
     <Modal
-      title={intl.get('import.selectDatasourceFile')}
+      title={title}
       open={visible}
-      onCancel={() => handleCancel()}
+      onCancel={onCancel}
       className={styles.selectFileModal}
       footer={false}
-      width={700}
+      width={step === 0 ? 700 : 920}
     >
-      <Spin spinning={loading}>
-        <div className={styles.row}>
-          <span className={styles.label}>{intl.get('import.datasourceType')}</span>
-          <Select 
-            className={styles.typeSelect}
-            onChange={handleTypeChange}
-            popupClassName={styles.typeOptions}
-            dropdownMatchSelectWidth={false}>
-            <Option value={IDatasourceType.local} label={IDatasourceType.local}>{intl.get('import.localFiles')}</Option>
-            {options.map((item) => {
-              const endpoint = item.type === IDatasourceType.s3 ? item.s3Config.endpoint : item.sftpConfig.host + ':' + item.sftpConfig.port;
-              return <Option value={item.id} key={item.id} label={item.id}>
-                <span className={styles.typeItem} aria-label={item.id}>
-                  <span className={styles.value}>{endpoint}</span>
-                  <span className={styles.type}>{intl.get(`import.${IDatasourceType[item.type]}`)}</span>
-                </span>
-              </Option>;
-            })}
-          </Select>
-        </div>
-        <div className={styles.row}>
-          <span className={styles.label}>{intl.get('import.filePath')}</span>
-          <div className={styles.operations}>
-            <div className={styles.path}>{path}</div>
-            <div className={cls(styles.btn, !path && styles.disabled)} onClick={handlePathBack}><ArrowLeftOutlined /></div>
-            <div className={styles.btn} onClick={handleRefresh}><SyncOutlined /></div>
-          </div>
-        </div>
-        <div className={styles.fileDirectory}>
-          {directory.map((item) => (
-            <div key={item.name} 
-              className={cls(styles.item, activeItem === item && styles.actived)} 
-              onClick={() => setState({ activeItem: item })}
-              onDoubleClick={() => handleSelectFile(item)}
-            >
-              {item.type === 'directory' ? <FolderFilled className={styles.icon} /> : <FileTextFilled className={styles.icon} />}
-              <div className={styles.content}>
-                <span className={styles.title}>{item.name}</span>
-                <span className={styles.desc}>{item.type === 'directory' ? intl.get('import.directory') : getFileSize(item.size)}</span>
-              </div>
-            </div>    
-          ))}
-        </div>
-        <div className={styles.btns}>
-          <Button
-            type="primary"
-            // disabled={!password}
-            onClick={() => handleConfirm()}
-          >
-            {intl.get('common.add')}
-          </Button>
-        </div>
-      </Spin>
-      
+      {step === 0 && <FileSelect onConfirm={handlePreview} cachedState={cachedState} />}
+      {step === 1 && <FileConfigSetting 
+        preUploadList={preUploadList}
+        onConfirm={handleConfirm} 
+        onCancel={() => setStep(0)} />}
     </Modal>
   );
 };
 
-export default observer(ConfigConfirmModal);
+export default observer(FileSelectModal);

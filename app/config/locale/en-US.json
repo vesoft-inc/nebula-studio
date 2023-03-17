@@ -291,7 +291,8 @@
     "selectDatasourceFile": "Select Data Source file",
     "datasourceType": "Data Source Type",
     "filePath": "File Path",
-    "directory": "Directory"
+    "directory": "Directory",
+    "preview": "Preview"
   },
   "schema": {
     "spaceList": "Graph Space List",

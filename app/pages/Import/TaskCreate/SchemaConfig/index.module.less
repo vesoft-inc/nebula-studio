@@ -106,7 +106,28 @@
     border-bottom: 1px solid @gray;
   }
   .operation {
-    max-width: 100%;
+    width: 100%;
+    .pathRow {
+      margin: 16px 0;
+      display: flex;
+      align-items: center;
+    }
+    .pathLabel {
+      font-weight: 400;
+      font-size: 14px;
+      &::after {
+        content: ':';
+      }
+    }
+    .pathValue {
+      flex: 1;
+      margin-left: 10px;
+      background: #F3F6F9;
+      padding: 6px 0 6px 8px;
+    }
+  }
+  .btnClose {
+
   }
   .fileSelect {
     :global {
@@ -144,6 +165,7 @@
   .spaceBetween {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
   }
   :global(.ant-select) {
     width: fit-content;

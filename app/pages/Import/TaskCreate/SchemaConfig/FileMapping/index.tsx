@@ -96,15 +96,13 @@ const idMap = {
 
 const FileMapping = (props: IProps) => {
   const { item, onRemove, type, onReset } = props;
-  const { files } = useStore();
-  const { fileList, getFiles } = files;
   const { file, props: mappingProps } = item;
   const { intl } = useI18n();
   const [visible, setVisible] = useState(false);
-  const handleFileChange = (value: string) => {
-    const file = fileList.find(item => item.name === value);
-    onReset(item, file);
-  };
+  const [selectFile, setSelectFile] = useState({
+    file: null,
+    cachedState: null,
+  });
 
   const updateFilePropMapping = (index: number, value: number) => item.updatePropItem(index, { mapping: value });
   const columns = [
@@ -141,12 +139,12 @@ const FileMapping = (props: IProps) => {
       dataIndex: 'type',
     },
   ];
-  const handleGetFiles = () => {
-    if(fileList.length === 0) {
-      getFiles();
-    }
-  };
 
+  const handleUpdateFile = (file, cachedState) => {
+    setSelectFile({ file, cachedState });
+    onReset(item, file);
+    setVisible(false);
+  };
 
   const idConfig = useMemo(() => type === ISchemaEnum.Tag ? idMap[ISchemaEnum.Tag] : idMap[ISchemaEnum.Edge], [type]);
   return (
@@ -154,21 +152,11 @@ const FileMapping = (props: IProps) => {
       <div className={cls(styles.row, styles.spaceBetween)}>
         <div className={styles.operation}>
           <span className={cls(styles.label, styles.required)}>{intl.get('import.dataSourceFile')}</span>
-          <Button type="link" onClick={() => setVisible(true)}>{intl.get('import.selectFile')}</Button>
-          {/* <Select 
-            bordered={false}
-            placeholder={intl.get('import.selectFile')}
-            showSearch={true} 
-            className={styles.fileSelect}
-            onDropdownVisibleChange={handleGetFiles} 
-            onChange={handleFileChange}
-            dropdownMatchSelectWidth={false}>
-            {fileList.map((file: any) => (
-              <Option value={file.name} key={file.name}>
-                {file.name}
-              </Option>
-            ))}
-          </Select> */}
+          <Button type="link" onClick={() => setVisible(true)}>{selectFile.file ? selectFile.file.name : intl.get('import.selectFile')}</Button>
+          {selectFile.file && <div className={styles.pathRow}>
+            <span className={styles.pathLabel}>{intl.get('import.filePath')}</span>
+            <span className={styles.pathValue}>{selectFile.cachedState.path + selectFile.file.name}</span>
+          </div>}
         </div>
         <CloseOutlined className={styles.btnClose} onClick={() => onRemove(item)} />
       </div>
@@ -180,7 +168,11 @@ const FileMapping = (props: IProps) => {
         rowKey="name"
         pagination={false}
       />
-      {visible && <FileSelectModal visible={visible} onCancel={() => setVisible(false)} onConfirm={() => {}} />}
+      {visible && <FileSelectModal 
+        visible={visible}
+        cachedDatasourceState={selectFile.cachedState}
+        onCancel={() => setVisible(false)} 
+        onConfirm={handleUpdateFile} />}
     </div>
   );
 };
