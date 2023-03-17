@@ -292,7 +292,8 @@
     "selectDatasourceFile": "选择数据源文件",
     "datasourceType": "数据源类型",
     "filePath": "文件路径",
-    "directory": "目录"
+    "directory": "目录",
+    "preview": "预览"
   },
   "schema": {
     "spaceList": "图空间列表",

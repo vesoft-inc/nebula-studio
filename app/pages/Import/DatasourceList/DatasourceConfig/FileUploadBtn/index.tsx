@@ -1,12 +1,13 @@
 import { useI18n } from '@vesoft-inc/i18n';
-import { message, Upload } from 'antd';
+import { message, Modal, Upload } from 'antd';
 import React, { PropsWithChildren, useState } from 'react';
 import { StudioFile } from '@app/interfaces/import';
 import { useStore } from '@app/stores';
 import { observer } from 'mobx-react-lite';
 import { debounce } from 'lodash';
 import { getFileSize } from '@app/utils/file';
-import UploadConfigModal from '../LocalFileConfig';
+import FileConfigSetting from '@app/components/FileConfigSetting';
+import styles from './index.module.less';
 type IUploadBtnProps = PropsWithChildren<{
   onUpload?: () => void
 }>
@@ -17,7 +18,7 @@ const UploadBtn = (props: IUploadBtnProps) => {
   const { children, onUpload } = props;
   const { intl } = useI18n();
   const [previewList, setPreviewList] = useState<StudioFile[]>([]);
-  const { fileList } = files;
+  const { fileList, uploadFile } = files;
   const [visible, setVisible] = useState(false);
   const transformFile = async (_file: StudioFile, fileList: StudioFile[]) => {
     const size = fileList.reduce((acc, cur) => acc + cur.size, 0);
@@ -34,7 +35,10 @@ const UploadBtn = (props: IUploadBtnProps) => {
     setVisible(true);
     return false;
   };
-  const handleConfirm = () => {
+  const handleConfirm = async (data) => {
+    const res = await uploadFile(data);
+    if (res.code !== 0) return;
+    message.success(intl.get('import.uploadSuccessfully'));
     onUpload?.();
     setVisible(false);
   };
@@ -50,7 +54,21 @@ const UploadBtn = (props: IUploadBtnProps) => {
       >
         {children}
       </Upload>
-      <UploadConfigModal visible={visible} uploadList={previewList} onConfirm={handleConfirm} onCancel={() => setVisible(false)} />
+      <Modal
+        title={intl.get('import.previewFiles')}
+        open={visible}
+        destroyOnClose
+        width={920}
+        onCancel={() => setVisible(false)}
+        className={styles.uploadModal}
+        footer={false}
+      >
+        <FileConfigSetting 
+          preUploadList={previewList} 
+          onConfirm={handleConfirm} 
+          duplicateCheckList={fileList}
+          onCancel={() => setVisible(false)} />
+      </Modal>
     </>
   );
 };
