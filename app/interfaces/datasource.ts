@@ -3,12 +3,3 @@ export enum IDatasourceType {
   'sftp' = 'sftp',
   'local' = 'local'
 }
-
-
-export interface ICloudStorage {
-  ipAddress: string;
-  bucketName: string;
-  accessKeyId: string;
-  region: string;
-  createTime: number;
-}

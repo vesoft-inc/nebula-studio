@@ -49,8 +49,32 @@ export interface IImportFile {
   content: string[];
   withHeader?: boolean;
   delimiter?: string;
+  s3Config?: IS3Config;
+  sftpConfig?: ISftpConfig;
+  /** remote path */
+  path?: string;
 }
 
+export interface IS3Config {
+  region: string;
+  endpoint: string;
+  accessKey: string;
+  accessSecret: string;
+  bucket?: string;
+  token?: string;
+  key: string;
+}
+
+export interface ISftpConfig {
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  path: string;
+  keyFile?: string;
+  keyData?: string;
+  passPhrase?: string;
+}
 export interface IBasicConfig {
   taskName: string;
   address: string[];

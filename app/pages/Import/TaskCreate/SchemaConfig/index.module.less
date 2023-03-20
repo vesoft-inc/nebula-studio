@@ -126,9 +126,7 @@
       padding: 6px 0 6px 8px;
     }
   }
-  .btnClose {
-
-  }
+ 
   .fileSelect {
     :global {
       .ant-select-selection-placeholder, .anticon, .ant-select-selection-item {
@@ -142,6 +140,25 @@
     .rowItem {
       width: 45%;
       display: inline-block;
+    }
+    .concatPreview {
+      display: flex;
+      margin-top: 15px;
+      align-items: center;
+    }
+    .concatItems {
+      background: #F3F6F9;
+      padding: 8px;
+      flex: 1;
+      .tagItem {
+        background: #8697B0;
+        border-radius: 3px;
+        padding: 6px;
+        color: #fff;
+        &:not(:last-child) {
+          margin-right: 10px;
+        }
+      }
     }
     .functionSelect {
       width: 60%;

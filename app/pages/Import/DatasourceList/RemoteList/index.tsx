@@ -62,7 +62,7 @@ const DatasourceList = (props: IProps) => {
   const { type } = props;
   const { datasource } = useStore();
   const { intl } = useI18n();
-  const { getDatasourceList, datasourceList, getDatasourceDetail, previewFile, deleteDataSource, batchDeleteDatasource } = datasource;
+  const { getDatasourceList, datasourceList, deleteDataSource, batchDeleteDatasource } = datasource;
   const [data, setData] = useState<any[]>([]);
   const [editData, setEditData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -85,7 +85,7 @@ const DatasourceList = (props: IProps) => {
     title: intl.get('common.operation'),
     key: 'operation',
     render: (_, item) => (<div className={styles.operation}>
-      <Button onClick={() => editItem(item)}>
+      <Button className="primaryBtn" onClick={() => editItem(item)}>
         <Icon type="icon-studio-btn-detail" />
       </Button>
       <Popconfirm

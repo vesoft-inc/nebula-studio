@@ -100,7 +100,7 @@ const service = {
   },
   updateDatasource: (params, config?) => {
     const { id, ...restParams } = params;
-    return put(`/api/datasources/${id}`)(restParams, config);
+    return post(`/api/datasources/${id}`)(restParams, config);
   },
   deleteDatasource: (id: number, config?) => {
     return _delete(`/api/datasources/${id}`)(undefined, config);

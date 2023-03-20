@@ -22,6 +22,10 @@ export class DatasourceStore {
     const { code } = await service.addDatasource(payload);
     return code === 0;
   };
+  updateDataSource = async (payload) => {
+    const { code } = await service.updateDatasource(payload);
+    return code === 0;
+  };
   getDatasourceList = async (payload?: { type?: string }) => {
     const { code, data } = await service.getDatasourceList(payload);
     if(code === 0) {

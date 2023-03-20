@@ -1,7 +1,8 @@
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Modal, Form, Select, message } from 'antd';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { IDatasourceType } from '@app/interfaces/datasource';
+import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@app/stores';
 import { observer } from 'mobx-react-lite';
 import UploadLocalBtn from '../FileUploadBtn';
@@ -26,29 +27,49 @@ const fomrItemLayout = {
 const DatasourceConfigModal = (props: IProps) => {
   const { visible, type, onCancel, onConfirm, data } = props;
   const { datasource } = useStore();
-  const { addDataSource } = datasource;
+  const { addDataSource, updateDataSource } = datasource;
   const { intl } = useI18n();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-
+  const tempPwd = useMemo(() => uuidv4() + Date.now(), []);
+  const mode = useMemo(() => (data ? 'edit' : 'create'), [data]);
   const submit = async (values: any) => {
     const { platform, ...rest } = values;
+    const _type = values.type || type;
     setLoading(true);
-    const flag = await addDataSource({
-      type: values.type,
-      name: '',
-      ...rest
-    });
-    setLoading(false);
-    flag && (message.success(intl.get('schema.createSuccess')), onConfirm());
+    if(mode === 'create') {
+      const flag = await addDataSource({
+        type: _type,
+        name: '',
+        ...rest
+      });
+      setLoading(false);
+      flag && (message.success(intl.get('schema.createSuccess')), onConfirm());
+    } else {
+      const _config = _type === IDatasourceType.s3 ? 's3Config' : 'sftpConfig';
+      if(_type === IDatasourceType.s3 && rest[_config].accessSecret === tempPwd) {
+        delete rest[_config].accessSecret;
+      } else if (_type === IDatasourceType.sftp && rest[_config].password === tempPwd) {
+        delete rest[_config].password;
+      }
+      const flag = await updateDataSource({
+        id: data.id,
+        type: _type,
+        name: '',
+        ...rest
+      });
+      setLoading(false);
+      flag && (message.success(intl.get('common.updateSuccess')), onConfirm());
+    }
   };
   
   return (
     <Modal
-      title={intl.get('import.newDataSource')}
+      title={intl.get(mode === 'edit' ? 'import.editDataSource' : 'import.newDataSource')}
       open={visible}
       width={700}
       onCancel={onCancel}
+      destroyOnClose
       className={styles.dataSourceModal}
       footer={false}
     >
@@ -74,9 +95,9 @@ const DatasourceConfigModal = (props: IProps) => {
             const configType = type || getFieldValue('type');
             switch (configType) {
               case IDatasourceType.s3:
-                return <S3ConfigForm formRef={form} />;
+                return <S3ConfigForm formRef={form} mode={mode} tempPwd={tempPwd} />;
               case IDatasourceType.sftp:
-                return <SftpConfigForm formRef={form} />;
+                return <SftpConfigForm formRef={form} mode={mode} tempPwd={tempPwd} />;
               default:
                 return null;
             }
@@ -96,7 +117,7 @@ const DatasourceConfigModal = (props: IProps) => {
             } else {
               return <div className={styles.btns}>
                 <Button className={styles.btnSubmit} type="primary" htmlType="submit" loading={loading}>
-                  {intl.get('common.add')}
+                  {intl.get(mode === 'edit' ? 'common.update' : 'common.add')}
                 </Button>
               </div>;
             }

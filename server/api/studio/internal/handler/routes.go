@@ -213,6 +213,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: datasource.DatasourceAddHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodPost,
+				Path:    "/api/datasources/:id",
+				Handler: datasource.DatasourceUpdateHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodDelete,
 				Path:    "/api/datasources/:id",
 				Handler: datasource.DatasourceRemoveHandler(serverCtx),
