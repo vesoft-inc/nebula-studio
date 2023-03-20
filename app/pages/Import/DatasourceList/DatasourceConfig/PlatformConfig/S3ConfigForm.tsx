@@ -1,18 +1,32 @@
 import { useI18n } from '@vesoft-inc/i18n';
 import { Input, Form, Select, FormInstance } from 'antd';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import styles from './index.module.less';
-
 const FormItem = Form.Item;
 interface IProps {
-  formRef: FormInstance
+  formRef: FormInstance;
+  mode: 'create' | 'edit';
+  tempPwd: string;
 }
-
 const S3ConfigForm = (props: IProps) => {
-  const { formRef } = props;
+  const { formRef, mode, tempPwd } = props;
   const { intl } = useI18n();
+  const [flag, setFlag] = useState(false);
+  useEffect(() => {
+    if(mode === 'edit') {
+      formRef.setFieldValue(['s3Config', 'accessSecret'], tempPwd);
+      formRef.setFieldValue('platform', 'aws');
+    }
+  }, [mode]);
 
+  const handleUpdatePassword = () => {
+    if(mode !== 'edit') return;
+    if(!flag) {
+      formRef.setFieldValue(['s3Config', 'accessSecret'], '');
+      setFlag(true);
+    }
+  };
   return (
     <FormItem noStyle>
       <FormItem label={intl.get('import.endpoint')} className={styles.mixedItem}>
@@ -36,7 +50,7 @@ const S3ConfigForm = (props: IProps) => {
         <Input placeholder={intl.get('import.accessKeyId')} />
       </FormItem>
       <FormItem name={['s3Config', 'accessSecret']} label={intl.get('import.accessKeySecret')} rules={[{ required: true, message: intl.get('formRules.accessKeySecretRequired') } ]}>
-        <Input type="password" placeholder={intl.get('import.accessKeySecret')} />
+        <Input type="password" placeholder={intl.get('import.accessKeySecret')} onChange={handleUpdatePassword} />
       </FormItem>
     </FormItem>
   );

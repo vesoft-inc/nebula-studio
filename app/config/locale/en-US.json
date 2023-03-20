@@ -61,7 +61,8 @@
     "src": "Source",
     "dst": "Destination",
     "value": "Value",
-    "continue": "Continue"
+    "continue": "Continue",
+    "update": "Update"
   },
   "doc": {
     "welcome": "Welcome to",
@@ -226,11 +227,14 @@
     "srcVidColumn": "Source VID column",
     "dstVidColumn": "Destination VID column",
     "vidFunction": "VID function",
+    "vidPrefix": "VID prefix",
+    "vidSuffix": "VID suffix",
     "concurrencyTip": "Number of NebulaGraph client concurrency.",
     "batchSizeTip": "The number of statements inserting data in a batch.",
     "retryTip": "Retry times of nGQL statement execution failures.",
     "vidFunctionTip": "Function to generate VID. Currently only hash functions are supported.",
     "vidPrefixTip": "prefix added to the original vid.",
+    "vidSuffixTip": "suffix added to the original vid.",
     "selectCsvColumn": "Select CSV Index",
     "graphAddress": "Graph service address",
     "concurrency": "Concurrency",
@@ -264,6 +268,7 @@
     "s3": "Cloud storage",
     "sftp": "SFTP",
     "newDataSource": "New Data Source",
+    "editDataSource": "Edit Data Source",
     "deleteDataSource": "Delete Data Source",
     "datasourceList": "{type} list",
     "ipAddress": "IP Address:Port",

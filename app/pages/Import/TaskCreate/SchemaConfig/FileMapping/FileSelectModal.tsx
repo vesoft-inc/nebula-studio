@@ -68,12 +68,10 @@ const FileSelect = observer((props: IFileSelect) => {
     init();
   }, []);
   const handleSelectFile = useCallback(async (item) => {
+    if (item.type !== 'directory') return;
     setState({ loading: true });
     const newPath = `${path === '/' ? '' : path}${item.name}${item.type === 'directory' ? '/' : ''}`;
-    if (item.type !== 'directory') return;
-    if(item.type === 'directory') {
-      getDatasourceDirectory(activeId, newPath);
-    }
+    getDatasourceDirectory(activeId, newPath);
   }, [path]);
 
   const handlePathBack = useCallback(async () => {
@@ -119,7 +117,13 @@ const FileSelect = observer((props: IFileSelect) => {
         withHeader: false,
         delimiter: ',',
         sample: data.contents.join('\r\n'),
-      };
+        path: _path,
+      } as any;
+      if(activeId !== IDatasourceType.local) {
+        const { sftpConfig, s3Config } = options.find((item) => item.id === activeId);
+        item.sftpConfig = sftpConfig;
+        item.s3Config = s3Config;
+      }
       setState({ loading: false });
       onConfirm(item, state);
     }

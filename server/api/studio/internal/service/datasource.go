@@ -28,6 +28,7 @@ import (
 type (
 	DatasourceService interface {
 		Add(request types.DatasourceAddRequest) (*types.DatasourceAddData, error)
+		Update(request types.DatasourceUpdateRequest) error
 		List(request types.DatasourceListRequest) (*types.DatasourceData, error)
 		Remove(request types.DatasourceRemoveRequest) error
 		BatchRemove(request types.DatasourceBatchRemoveRequest) error
@@ -98,6 +99,58 @@ func (d *datasourceService) Add(request types.DatasourceAddRequest) (*types.Data
 		}, nil
 	}
 	return nil, ecode.WithErrorMessage(ecode.ErrBadRequest, nil, "datasource type can't support'")
+}
+
+func (d *datasourceService) Update(request types.DatasourceUpdateRequest) error {
+	datasourceId := request.ID
+	dbs, err := d.findOne(datasourceId)
+	if err != nil {
+		return ecode.WithErrorMessage(ecode.ErrBadRequest, err, "find data error")
+	}
+	switch request.Type {
+	case "s3":
+		c := request.S3Config
+		if c.AccessSecret == "" {
+			c.AccessSecret = dbs.Secret
+		}
+		if err := d.testConnectionS3(c.Endpoint, c.Region, c.Bucket, c.AccessKey, c.AccessSecret); err != nil {
+			return err
+		}
+		secret := c.AccessSecret
+		c.AccessSecret = ""
+		cstr, err := json.Marshal(c)
+		if err != nil {
+			return ecode.WithErrorMessage(ecode.ErrBadRequest, err, "json stringify error")
+		}
+		crypto, err := utils.Encrypt([]byte(secret), []byte(cipher))
+		err = d.update(datasourceId, request.Type, request.Name, string(cstr), crypto)
+		if err != nil {
+			return err
+		}
+		return nil
+	case "sftp":
+		c := request.SFTPConfig
+		if c.Password == "" {
+			c.Password = dbs.Secret
+		}
+		if err := d.testConnectionSFTP(c.Host, c.Port, c.Username, c.Password); err != nil {
+			return err
+		}
+		pwd := c.Password
+		c.Password = ""
+		cstr, err := json.Marshal(c)
+		if err != nil {
+			d.Logger.Errorf("json stringify error", c)
+			return ecode.WithErrorMessage(ecode.ErrBadRequest, err, "json stringify error")
+		}
+		crypto, err := utils.Encrypt([]byte(pwd), []byte(cipher))
+		err = d.update(datasourceId, request.Type, request.Name, string(cstr), crypto)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	return ecode.WithErrorMessage(ecode.ErrBadRequest, nil, "datasource type can't support'")
 }
 
 func (d *datasourceService) List(request types.DatasourceListRequest) (*types.DatasourceData, error) {
@@ -259,6 +312,22 @@ func (d *datasourceService) save(typ, name, config, secret string) (id int, err 
 		return 0, d.gormErrorWrapper(result.Error)
 	}
 	return int(dbs.ID), nil
+}
+func (d *datasourceService) update(id int, typ, name, config, secret string) (err error) {
+	user := d.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+	host := user.Address + ":" + strconv.Itoa(user.Port)
+	result := db.CtxDB.Model(&db.Datasource{ID: id}).Updates(map[string]interface{}{
+		"type":     typ,
+		"name":     name,
+		"config":   config,
+		"secret":   secret,
+		"host":     host,
+		"username": user.Username,
+	})
+	if result.Error != nil {
+		return d.gormErrorWrapper(result.Error)
+	}
+	return nil
 }
 
 // TODO: cache the store connection to improve the request handle speed by the go-zero session

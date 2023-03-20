@@ -1,26 +1,29 @@
 import { Button, Popover, Table } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
 import { v4 as uuidv4 } from 'uuid';
 import cls from 'classnames';
 import { usePapaParse } from 'react-papaparse';
 import { StudioFile } from '@app/interfaces/import';
+import { CheckOutlined } from '@ant-design/icons';
 import styles from './index.module.less';
 
 interface IProps {
   file: StudioFile;
   children: any;
-  onMapping?: (index: number) => void;
+  onMapping?: (index: number[] | number) => void;
   btnType?: string
   selected?: boolean
+  multipleMode?: boolean
 }
 
 const CSVPreviewLink = (props: IProps) => {
-  const { onMapping, file, children, btnType, selected } = props;
+  const { onMapping, file, children, btnType, selected, multipleMode } = props;
   const [visible, setVisible] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const { intl } = useI18n();
   const { readString } = usePapaParse();
+  const [indexes, setIndexes] = useState<number[]>([]);
   useEffect(() => {
     if(!file) return;
     const { delimiter, sample } = file;
@@ -37,25 +40,48 @@ const CSVPreviewLink = (props: IProps) => {
       } 
     });
   }, [file]);
-  const handleLinkClick = e => {
+  const handleLinkClick = useCallback(e => {
     e.stopPropagation();
     setVisible(true);
-  };
-  const handleMapping = (index: number, e: React.MouseEvent) => {
+  }, []);
+  const handleMapping = useCallback((e) => {
     e.stopPropagation();
-    onMapping?.(index);
+    onMapping?.(multipleMode ? indexes : indexes[0]);
     setVisible(false);
-  };
+  }, [indexes, onMapping]);
+  const handleClear = useCallback((e) => {
+    e.stopPropagation();
+    onMapping?.(null);
+    setVisible(false);
+    setIndexes([]);
+  }, [onMapping]);
+
+  const toggleMapping = useCallback((index: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if(!multipleMode) {
+      setIndexes([index]);
+      return;
+    }
+    const _indexes = [...indexes];
+    if(indexes.indexOf(index) > -1) {
+      _indexes.splice(indexes.indexOf(index), 1);
+    } else {
+      _indexes.push(index);
+    }
+    setIndexes(_indexes);
+  }, [multipleMode, indexes]);
+
   const columns = data[0]?.map((header, index) => {
     const textIndex = index;
     const _header = file?.withHeader ? header : `Column ${textIndex}`;
+    const isSelected = indexes.indexOf(textIndex) > -1;
     return {
       title: onMapping ? (
         <Button
-          type="primary"
+          type={isSelected ? 'primary' : 'default'}
           className={styles.csvSelectIndex}
-          onClick={(e) => handleMapping(textIndex, e)}
-        >{_header}</Button>
+          onClick={(e) => toggleMapping(textIndex, e)}
+        >{isSelected && <CheckOutlined />}{_header}</Button>
       ) : (
         _header
       ),
@@ -63,10 +89,10 @@ const CSVPreviewLink = (props: IProps) => {
       render: value => <span className={styles.limitWidth}>{value}</span>,
     };
   }) || [];
-  const handleOpen = (visible) => {
+  const handleOpen = useCallback((visible) => {
     if(!file) return;
     setVisible(visible);
-  };
+  }, [file]);
   return (
     <Popover
       destroyTooltipOnHide={true}
@@ -87,9 +113,14 @@ const CSVPreviewLink = (props: IProps) => {
         />
         <div className={styles.operation}>
           {onMapping && (
-            <Button onClick={(e) => handleMapping(null, e)} className="primaryBtn studioAddBtn">
-              {intl.get('import.ignore')}
-            </Button>
+            <>
+              <Button onClick={handleClear} className="primaryBtn studioAddBtn">
+                {intl.get('import.ignore')}
+              </Button>
+              <Button type="primary" onClick={handleMapping}>
+                {intl.get('common.confirm')}
+              </Button>
+            </>
           )}
         </div>
       </div>}

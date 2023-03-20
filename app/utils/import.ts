@@ -56,6 +56,25 @@ export function configToJson(payload: IConfig) {
   return configJson;
 }
 
+const getIdConfig = (payload: {
+  indexes, 
+  prefix, 
+  suffix,
+  vidFunction,
+  type
+}) => {
+  const { indexes, prefix, suffix, vidFunction, type } = payload;
+  const id = {
+    type,
+    function: vidFunction,
+  } as any;
+  if(indexes.length > 1 || !!prefix || !!suffix) {
+    id.concatItems = [prefix, ...indexes, suffix];
+  } else {
+    id.index = indexes[0];
+  }
+  return id;
+};
 export function edgeDataToJSON(
   configs: IEdgeItem[],
   spaceVidType: string,
@@ -63,7 +82,7 @@ export function edgeDataToJSON(
   const result = configs.reduce((acc: any, cur) => {
     const { name, files } = cur;
     const _config = files.map(item => {
-      const { file, props, srcIdIndex, srcIdFunction, dstIdIndex, dstIdFunction } = item;
+      const { file, props, srcIdIndex, srcIdFunction, dstIdIndex, dstIdFunction, srcIdPrefix, srcIdSuffix, dstIdPrefix, dstIdSuffix } = item;
       const vidType = spaceVidType === 'INT64' ? 'int' : 'string';
       // rank is the last prop
       const rank = props[props.length - 1];
@@ -81,30 +100,56 @@ export function edgeDataToJSON(
       const edges = [{
         name: handleEscape(name),
         src: {
-          id: {
+          id: getIdConfig({
+            indexes: srcIdIndex,
+            prefix: srcIdPrefix,
+            suffix: srcIdSuffix,
+            vidFunction: srcIdFunction,
             type: vidType,
-            index: srcIdIndex,
-            function: srcIdFunction,
-          }
+          })
         },
         dst: {
-          id: {
+          id: getIdConfig({
+            indexes: dstIdIndex,
+            prefix: dstIdPrefix,
+            suffix: dstIdSuffix,
+            vidFunction: dstIdFunction,
             type: vidType,
-            index: dstIdIndex,
-            function: dstIdFunction,
-          }
+          })
         },
         rank: typeof rank.mapping == 'number' ? { index: rank.mapping } : null,
         props: edgeProps,
       }];
       const edgeConfig = {
-        path: file.name,
         csv: {
           withHeader: file.withHeader || false,
           delimiter: file.delimiter
         },
         edges,
-      };
+      } as any;
+      const { sftpConfig, s3Config } = file;
+      if(s3Config) {
+        const { accessKey, accessSecret, bucket, endpoint, region } = s3Config;
+        edgeConfig.s3 = {
+          accessKey,
+          secretKey: accessSecret,
+          endpoint,
+          bucket,
+          region,
+          key: file.path
+        };
+      } else if(sftpConfig) {
+        const { host, port, username, password } = sftpConfig;
+        edgeConfig.sftp = {
+          host,
+          port,
+          username,
+          password,
+          path: file.path
+        };
+      } else {
+        edgeConfig.path = file.name;
+      }
       return edgeConfig;
     });
     acc.push(..._config);
@@ -120,7 +165,7 @@ export function tagDataToJSON(
   const result = configs.reduce((acc: any, cur) => {
     const { name, files } = cur;
     const _config = files.map(item => {
-      const { file, props, vidIndex, vidFunction } = item;
+      const { file, props, vidIndex, vidFunction, vidPrefix, vidSuffix } = item;
       const _props = props.reduce((acc: any, cur) => {
         if (isEmpty(cur.mapping) && (cur.allowNull || cur.isDefault)) {
           return acc;
@@ -132,24 +177,48 @@ export function tagDataToJSON(
         });
         return acc;
       }, []);
-
       const tags = [{
         name: handleEscape(name),
-        id: {
+        id: getIdConfig({
+          indexes: vidIndex,
+          prefix: vidPrefix,
+          suffix: vidSuffix,
+          vidFunction,
           type: spaceVidType === 'INT64' ? 'int' : 'string',
-          index: vidIndex,
-          function: vidFunction,
-        },
+        }),
         props: _props.filter(prop => prop),
       }];
-      return {
-        path: file.name,
+      const result = {
         csv: {
           withHeader: file.withHeader || false,
           delimiter: file.delimiter
         },
         tags
-      };
+      } as any;
+      const { sftpConfig, s3Config } = file;
+      if(s3Config) {
+        const { accessKey, accessSecret, bucket, endpoint, region } = s3Config;
+        result.s3 = {
+          accessKey,
+          secretKey: accessSecret,
+          endpoint,
+          bucket,
+          region,
+          key: file.path
+        };
+      } else if(sftpConfig) {
+        const { host, port, username, password } = sftpConfig;
+        result.sftp = {
+          host,
+          port,
+          username,
+          password,
+          path: file.path
+        };
+      } else {
+        result.path = file.name;
+      }
+      return result;
     });
     acc.push(..._config);
     return acc;

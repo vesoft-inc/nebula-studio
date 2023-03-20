@@ -21,9 +21,10 @@ const handlePropertyMap = (item, defaultValueFields) => {
 export class TagFileItem {
   file: IImportFile;
   props = observable.array<IPropertyProps>([]);
-  vidIndex?: number;
+  vidIndex = observable.array<number>([]);
   vidFunction?: string;
-
+  vidPrefix?: string;
+  vidSuffix?: string;
   constructor({ file, props }: { file?: IImportFile; props?: IPropertyProps[] }) {
     makeAutoObservable(this);
     file && (this.file = file);
@@ -44,11 +45,14 @@ export class TagFileItem {
 export class EdgeFileItem {
   file: IImportFile;
   props = observable.array<IPropertyProps>([]);
-  srcIdIndex?: number;
-  dstIdIndex?: number;
+  srcIdIndex = observable.array<IPropertyProps>([]);
+  dstIdIndex = observable.array<IPropertyProps>([]);
   srcIdFunction?: string;
   dstIdFunction?: string;
-
+  srcIdPrefix?: string;
+  dstIdPrefix?: string;
+  srcIdSuffix?: string;
+  dstIdSuffix?: string;
   constructor({ file, props }: { file?: IImportFile; props?: IPropertyProps[] }) {
     makeAutoObservable(this);
     file && (this.file = file);

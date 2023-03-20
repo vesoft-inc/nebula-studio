@@ -1,4 +1,4 @@
-import { Button, Collapse, Select, Table, Tooltip } from 'antd';
+import { Button, Collapse, Input, Select, Table, Tooltip } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import cls from 'classnames';
@@ -30,10 +30,11 @@ const VIDSetting = observer((props: {
     idKey: string,
     idFunction?: string,
     idPrefix?: string,
+    idSuffix?: string,
     label: string
   }
 }) => {
-  const { keyMap: { idKey, idFunction, idPrefix, label }, data } = props;
+  const { keyMap: { idKey, idFunction, idPrefix, idSuffix, label }, data } = props;
   const { intl } = useI18n();
   const { schema } = useStore();
   const { spaceVidType } = schema;
@@ -45,14 +46,23 @@ const VIDSetting = observer((props: {
           <CSVPreviewLink
             onMapping={(index) => data.update({ [idKey]: index })}
             file={data.file}
+            multipleMode={true}
           >
-            {!data[idKey] && data[idKey] !== 0 ? intl.get('import.selectCsvColumn') : `Column ${data[idKey]}`}
+            {(!data[idKey] || data[idKey].length === 0) ? intl.get('import.selectCsvColumn') : `Column ${data[idKey]}`}
           </CSVPreviewLink>
         </div>
         <Instruction description={<>
           <div>
             <span className={styles.title}>{intl.get('import.vidFunction')}</span>
             <span>{intl.get('import.vidFunctionTip')}</span>
+          </div>
+          <div>
+            <span className={styles.title}>{intl.get('import.vidPrefix')}</span>
+            <span>{intl.get('import.vidPrefixTip')}</span>
+          </div>
+          <div>
+            <span className={styles.title}>{intl.get('import.vidSuffix')}</span>
+            <span>{intl.get('import.vidSuffixTip')}</span>
           </div>
         </>} />
       </div>} key="default">
@@ -72,6 +82,22 @@ const VIDSetting = observer((props: {
             <Option value="hash">Hash</Option>
           </Select>
         </div>}
+        {idPrefix && <div className={styles.rowItem}>
+          <span className={styles.label}>{intl.get('import.vidPrefix')}</span>
+          <Input className={styles.prefixInput} bordered={false} placeholder="Input prefix" value={data[idPrefix]} onChange={e => data.update({ [idPrefix]: e.target.value })} />
+        </div>}
+        {idSuffix && <div className={styles.rowItem}>
+          <span className={styles.label}>{intl.get('import.vidSuffix')}</span>
+          <Input className={styles.prefixInput} bordered={false} placeholder="Input suffix" value={data[idSuffix]} onChange={e => data.update({ [idSuffix]: e.target.value })} />
+        </div>}
+        {(data[idKey]?.length > 1 || data[idPrefix] || data[idSuffix]) && <div className={styles.concatPreview}>
+          <span className={styles.label}>{intl.get('import.preview')}</span>
+          <div className={styles.concatItems}>
+            {data[idPrefix] && <span className={styles.tagItem}>{data[idPrefix]}</span>}
+            {data[idKey].map(i => <span key={i} className={styles.tagItem}>{`Column ${i}`}</span>)}
+            {data[idSuffix] && <span className={styles.tagItem}>{data[idSuffix]}</span>}
+          </div>
+        </div>}
       </Panel>
     </Collapse>
   </div>;
@@ -81,16 +107,22 @@ const idMap = {
   [ISchemaEnum.Tag]: [{
     idKey: 'vidIndex',
     idFunction: 'vidFunction',
+    idPrefix: 'vidPrefix',
+    idSuffix: 'vidSuffix',
     label: 'vidColumn'
   }],
   [ISchemaEnum.Edge]: [{
     idKey: 'srcIdIndex',
     idFunction: 'srcIdFunction',
-    label: 'srcVidColumn'
+    label: 'srcVidColumn',
+    idPrefix: 'srcIdPrefix',
+    idSuffix: 'srcIdSuffix',
   }, {
     idKey: 'dstIdIndex',
     idFunction: 'dstIdFunction',
-    label: 'dstVidColumn'
+    label: 'dstVidColumn',
+    idPrefix: 'dstIdPrefix',
+    idSuffix: 'dstIdSuffix',
   }],
 };
 
@@ -127,7 +159,7 @@ const FileMapping = (props: IProps) => {
       dataIndex: 'mapping',
       render: (mappingIndex, _, propIndex) => (
         <CSVPreviewLink
-          onMapping={columnIndex => updateFilePropMapping(propIndex, columnIndex)}
+          onMapping={columnIndex => updateFilePropMapping(propIndex, columnIndex as number)}
           file={file}
         >
           {!mappingIndex && mappingIndex !== 0 ? intl.get('import.choose') : `Column ${mappingIndex}`}
