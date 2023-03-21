@@ -45,8 +45,8 @@ export class TagFileItem {
 export class EdgeFileItem {
   file: IImportFile;
   props = observable.array<IPropertyProps>([]);
-  srcIdIndex = observable.array<IPropertyProps>([]);
-  dstIdIndex = observable.array<IPropertyProps>([]);
+  srcIdIndex = observable.array<number>([]);
+  dstIdIndex = observable.array<number>([]);
   srcIdFunction?: string;
   dstIdFunction?: string;
   srcIdPrefix?: string;

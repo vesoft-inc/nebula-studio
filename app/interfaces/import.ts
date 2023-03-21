@@ -51,6 +51,8 @@ export interface IImportFile {
   delimiter?: string;
   s3Config?: IS3Config;
   sftpConfig?: ISftpConfig;
+  /** remote config id */
+  datasourceId?: number;
   /** remote path */
   path?: string;
 }
@@ -60,7 +62,7 @@ export interface IS3Config {
   endpoint: string;
   accessKey: string;
   accessSecret: string;
-  bucket?: string;
+  bucket: string;
   token?: string;
   key: string;
 }

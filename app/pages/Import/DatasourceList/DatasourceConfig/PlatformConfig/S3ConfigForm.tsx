@@ -33,14 +33,15 @@ const S3ConfigForm = (props: IProps) => {
         <FormItem name="platform" rules={[{ required: true, message: intl.get('formRules.platformRequired') } ]}>
           <Select placeholder={intl.get('import.selectPlatform')}>
             <Select.Option value="aws">AWS S3</Select.Option>
-            <Select.Option value="aliyun">OSS</Select.Option>
+            <Select.Option value="aliyun">Aliyun OSS</Select.Option>
+            <Select.Option value="tecent">Tecent COS</Select.Option>
           </Select>
         </FormItem>
         <FormItem name={['s3Config', 'region']} rules={[{ required: true, message: intl.get('formRules.regionRequired') } ]}>
           <Input placeholder={intl.get('import.enterRegion')} />
         </FormItem>
         <FormItem name={['s3Config', 'endpoint']} rules={[{ required: true, message: intl.get('formRules.endpointRequired') } ]}>
-          <Input placeholder={intl.get('import.enterAddress')} />
+          <Input placeholder="https://s3.<region>.amazonaws.com" />
         </FormItem>
       </FormItem>
       <FormItem name={['s3Config', 'bucket']} label={intl.get('import.bucketName')} rules={[{ required: true, message: intl.get('formRules.bucketRequired') } ]}>

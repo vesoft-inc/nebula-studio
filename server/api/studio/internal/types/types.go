@@ -124,7 +124,7 @@ type LocalConfig struct {
 type ImportTaskConfig struct {
 	Client  Client    `json:"client" validate:"required"`
 	Manager Manager   `json:"manager" validate:"required"`
-	Sources []Sources `json:"sources" validate:"required"`
+	Sources []*Source `json:"sources" validate:"required"`
 	Log     *Log      `json:"log,omitempty,optional"`
 }
 
@@ -147,13 +147,15 @@ type Manager struct {
 	StatsInterval       *string `json:"statsInterval,omitempty,optional"`
 }
 
-type Sources struct {
-	CSV   ImportTaskCSV `json:"csv" validate:"required"`
-	Path  string        `json:"path,optional,omitempty"`
-	S3    *S3Config     `json:"s3,optional,omitempty"`
-	SFTP  *SFTPConfig   `json:"sftpConfig,optional,omitempty"`
-	Tags  []Tag         `json:"tags,optional"`
-	Edges []Edge        `json:"edges,optional"`
+type Source struct {
+	CSV                ImportTaskCSV `json:"csv" validate:"required"`
+	Path               string        `json:"path,optional,omitempty"`
+	S3                 *S3Config     `json:"s3,optional,omitempty"`
+	SFTP               *SFTPConfig   `json:"sftp,optional,omitempty"`
+	DatasourceId       *int64        `json:"datasourceId,optional,omitempty"`
+	DatasourceFilePath *string       `json:"datasourceFilePath,optional,omitempty"`
+	Tags               []Tag         `json:"tags,optional"`
+	Edges              []Edge        `json:"edges,optional"`
 }
 
 type Log struct {

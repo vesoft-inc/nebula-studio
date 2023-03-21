@@ -4,9 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"strconv"
-	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -60,6 +58,14 @@ func (d *datasourceService) Add(request types.DatasourceAddRequest) (*types.Data
 	switch request.Type {
 	case "s3":
 		c := request.S3Config
+		endpoint, parsedBucket, err := utils.ParseEndpoint(c.Endpoint)
+		if err != nil {
+			return nil, ecode.WithErrorMessage(ecode.ErrBadRequest, err)
+		}
+		if parsedBucket != "" && c.Bucket != parsedBucket {
+			return nil, ecode.WithErrorMessage(ecode.ErrBadRequest, err, "The bucket name does not match the bucket in the endpoint")
+		}
+		c.Endpoint = endpoint
 		if err := d.testConnectionS3(c.Endpoint, c.Region, c.Bucket, c.AccessKey, c.AccessSecret); err != nil {
 			return nil, err
 		}
@@ -113,6 +119,14 @@ func (d *datasourceService) Update(request types.DatasourceUpdateRequest) error 
 		if c.AccessSecret == "" {
 			c.AccessSecret = dbs.Secret
 		}
+		endpoint, parsedBucket, err := utils.ParseEndpoint(c.Endpoint)
+		if err != nil {
+			return ecode.WithErrorMessage(ecode.ErrBadRequest, err)
+		}
+		if parsedBucket != "" && c.Bucket != parsedBucket {
+			return ecode.WithErrorMessage(ecode.ErrBadRequest, err, "The bucket name does not match the bucket in the endpoint")
+		}
+		c.Endpoint = endpoint
 		if err := d.testConnectionS3(c.Endpoint, c.Region, c.Bucket, c.AccessKey, c.AccessSecret); err != nil {
 			return err
 		}
@@ -345,52 +359,7 @@ func (d *datasourceService) getFileStore(dbs *db.Datasource) (filestore.FileStor
 	return store, nil
 }
 
-func parseEndpoint(rawEndpoint string) (string, string, error) {
-	// endpointURL := "https://s3.<region>.amazonaws.com"
-	// endpointURL := "https://my-bucket.s3.<region>.amazonaws.com"
-	// endpointURL := "https://s3.<region>.amazonaws.com/my-bucket"
-	if !strings.HasPrefix(rawEndpoint, "https://") && !strings.HasPrefix(rawEndpoint, "http://") {
-		rawEndpoint = fmt.Sprintf("https://%s", rawEndpoint)
-	}
-	u, err := url.Parse(rawEndpoint)
-	if err != nil {
-		return "", "", err
-	}
-	host := u.Hostname()
-	parts := strings.SplitN(host, ".", 2)
-	var (
-		bucket   string
-		endpoint string
-	)
-	if parts[0] == "s3" {
-		// Format: https://s3.<region>.amazonaws.com
-		endpoint = u.Host
-		if u.Path != "" {
-			pathParts := strings.SplitN(u.Path, "/", 3)
-			bucket = pathParts[1]
-		}
-	} else {
-		// Format: https://<bucket-name>.s3.<region>.amazonaws.com or https://s3.amazonaws.com/<bucket-name>
-		if parts[0] == "s3.amazonaws" {
-			// Format: https://s3.amazonaws.com/<bucket-name>
-			endpoint = fmt.Sprintf("https://%s", u.Host)
-			if u.Path != "" {
-				pathParts := strings.SplitN(u.Path, "/", 3)
-				bucket = pathParts[1]
-			}
-		} else {
-			// Format: https://<bucket-name>.s3.<region>.amazonaws.com
-			bucket = parts[0]
-			endpoint = fmt.Sprintf("https://%s", parts[1])
-		}
-	}
-	return endpoint, bucket, nil
-}
 func (d *datasourceService) testConnectionS3(endpoint, region, bucket, key, secret string) error {
-	endpoint, parsedBucket, err := parseEndpoint(endpoint)
-	if err != nil {
-		return ecode.WithErrorMessage(ecode.ErrBadRequest, err)
-	}
 	sess, err := session.NewSession(&aws.Config{
 		Region:      aws.String(region),
 		Endpoint:    aws.String(endpoint),
@@ -401,9 +370,6 @@ func (d *datasourceService) testConnectionS3(endpoint, region, bucket, key, secr
 	}
 
 	svc := s3.New(sess)
-	if bucket != parsedBucket {
-		return ecode.WithErrorMessage(ecode.ErrBadRequest, err, "The bucket name does not match the bucket in the endpoint")
-	}
 	_, err = svc.HeadBucket(&s3.HeadBucketInput{
 		Bucket: aws.String(bucket),
 	})

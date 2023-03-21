@@ -57,11 +57,11 @@ export function configToJson(payload: IConfig) {
 }
 
 const getIdConfig = (payload: {
-  indexes, 
-  prefix, 
-  suffix,
-  vidFunction,
-  type
+  indexes: number[], 
+  prefix?: string, 
+  suffix?: string,
+  vidFunction?: string,
+  type: string
 }) => {
   const { indexes, prefix, suffix, vidFunction, type } = payload;
   const id = {
@@ -127,26 +127,9 @@ export function edgeDataToJSON(
         },
         edges,
       } as any;
-      const { sftpConfig, s3Config } = file;
-      if(s3Config) {
-        const { accessKey, accessSecret, bucket, endpoint, region } = s3Config;
-        edgeConfig.s3 = {
-          accessKey,
-          secretKey: accessSecret,
-          endpoint,
-          bucket,
-          region,
-          key: file.path
-        };
-      } else if(sftpConfig) {
-        const { host, port, username, password } = sftpConfig;
-        edgeConfig.sftp = {
-          host,
-          port,
-          username,
-          password,
-          path: file.path
-        };
+      if(file.datasourceId) {
+        edgeConfig.datasourceId = file.datasourceId;
+        edgeConfig.datasourceFilePath = file.path;
       } else {
         edgeConfig.path = file.name;
       }
@@ -195,26 +178,9 @@ export function tagDataToJSON(
         },
         tags
       } as any;
-      const { sftpConfig, s3Config } = file;
-      if(s3Config) {
-        const { accessKey, accessSecret, bucket, endpoint, region } = s3Config;
-        result.s3 = {
-          accessKey,
-          secretKey: accessSecret,
-          endpoint,
-          bucket,
-          region,
-          key: file.path
-        };
-      } else if(sftpConfig) {
-        const { host, port, username, password } = sftpConfig;
-        result.sftp = {
-          host,
-          port,
-          username,
-          password,
-          path: file.path
-        };
+      if(file.datasourceId) {
+        result.datasourceId = file.datasourceId;
+        result.datasourceFilePath = file.path;
       } else {
         result.path = file.name;
       }

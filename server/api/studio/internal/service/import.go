@@ -13,6 +13,9 @@ import (
 	"strconv"
 	"sync"
 
+	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
+
 	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/vesoft-inc/nebula-importer/v4/pkg/config"
 	configv3 "github.com/vesoft-inc/nebula-importer/v4/pkg/config/v3"
@@ -50,8 +53,9 @@ type (
 
 	importService struct {
 		logx.Logger
-		ctx    context.Context
-		svcCtx *svc.ServiceContext
+		ctx              context.Context
+		svcCtx           *svc.ServiceContext
+		gormErrorWrapper utils.GormErrorWrapper
 	}
 )
 
@@ -62,6 +66,57 @@ func NewImportService(ctx context.Context, svcCtx *svc.ServiceContext) ImportSer
 		svcCtx: svcCtx,
 	}
 }
+
+func (i *importService) updateDatasourceConfig(conf *types.CreateImportTaskRequest) (*types.ImportTaskConfig, error) {
+	config := conf.Config
+	for _, source := range config.Sources {
+		if source.DatasourceId != nil {
+			var dbs db.Datasource
+			result := db.CtxDB.Where("id = ?", source.DatasourceId).First(&dbs)
+			if result.Error != nil {
+				return nil, i.gormErrorWrapper(result.Error)
+			}
+			if result.RowsAffected == 0 {
+				return nil, ecode.WithErrorMessage(ecode.ErrBadRequest, nil, "datasource don't exist")
+			}
+
+			secret, err := utils.Decrypt(dbs.Secret, []byte(cipher))
+			if err != nil {
+				return nil, err
+			}
+			switch dbs.Type {
+			case "s3":
+				s3Config := &types.DatasourceS3Config{}
+				jsonConfig := dbs.Config
+				if err := json.Unmarshal([]byte(jsonConfig), s3Config); err != nil {
+					return nil, ecode.WithInternalServer(err, "get datasource config failed")
+				}
+				source.S3 = &types.S3Config{
+					AccessKey: s3Config.AccessKey,
+					SecretKey: string(secret),
+					Bucket:    s3Config.Bucket,
+					Region:    s3Config.Region,
+					Key:       *source.DatasourceFilePath,
+				}
+
+			case "sftp":
+				sftpConfig := &types.DatasourceSFTPConfig{}
+				jsonConfig := dbs.Config
+				if err := json.Unmarshal([]byte(jsonConfig), sftpConfig); err != nil {
+					return nil, ecode.WithInternalServer(err, "get datasource config failed")
+				}
+				source.SFTP = &types.SFTPConfig{
+					Host:     sftpConfig.Host,
+					Port:     sftpConfig.Port,
+					User:     sftpConfig.Username,
+					Password: string(secret),
+					Path:     *source.DatasourceFilePath,
+				}
+			}
+		}
+	}
+	return &config, nil
+}
 func updateConfig(conf config.Configurator, taskDir, uploadDir string) {
 	confv3 := conf.(*configv3.Config)
 	if confv3.Log == nil {
@@ -71,16 +126,21 @@ func updateConfig(conf config.Configurator, taskDir, uploadDir string) {
 
 	confv3.Log.Files = append(confv3.Log.Files, filepath.Join(taskDir, importLogName))
 	for _, source := range confv3.Sources {
-		source.SourceConfig.Local.Path = filepath.Join(uploadDir, source.SourceConfig.Local.Path)
+		if source.SourceConfig.Local != nil {
+			source.SourceConfig.Local.Path = filepath.Join(uploadDir, source.SourceConfig.Local.Path)
+		}
 	}
 }
 
 func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*types.CreateImportTaskData, error) {
-	jsons, err := json.Marshal(req.Config)
+	_config, err := i.updateDatasourceConfig(req)
+	if err != nil {
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+	}
+	jsons, err := json.Marshal(_config)
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrParam, err)
 	}
-
 	conf, err := config.FromBytes(jsons)
 
 	if err != nil {
