@@ -1,5 +1,5 @@
 import { useI18n } from '@vesoft-inc/i18n';
-import { Input, Form, FormInstance } from 'antd';
+import { Input, Form, FormInstance, InputNumber } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
@@ -33,7 +33,7 @@ const SftpConfigForm = (props: IProps) => {
         <Input />
       </FormItem>
       <FormItem name={['sftpConfig', 'port']} label={intl.get('import.port')} rules={[{ required: true, message: intl.get('formRules.formPortRequired') } ]}>
-        <Input type="number" />
+        <InputNumber />
       </FormItem>
       <FormItem name={['sftpConfig', 'username']}label={intl.get('configServer.username')} rules={[{ required: true, message: intl.get('formRules.usernameRequired') } ]}>
         <Input />

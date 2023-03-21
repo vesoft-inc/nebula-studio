@@ -51,10 +51,21 @@ func CreateConfigFile(taskdir string, cfgBytes []byte) error {
 
 	// erase user information
 	_config := confv3
-	_config.Client.User = "YOUR_NEBULA_NAME"
-	_config.Client.Password = "YOUR_NEBULA_PASSWORD"
-	_config.Client.Address = ""
-	// TODO hide data source access key and so on
+	_config.Client.User = "${YOUR_NEBULA_NAME}"
+	_config.Client.Password = "${YOUR_NEBULA_PASSWORD}"
+	_config.Client.Address = "${YOUR_NEBULA_ADDRESS}"
+	for _, source := range _config.Sources {
+		S3Config := source.SourceConfig.S3
+		SFTPConfig := source.SourceConfig.SFTP
+		if S3Config != nil {
+			S3Config.AccessKey = "${YOUR_S3_ACCESS_KEY}"
+			S3Config.SecretKey = "${YOUR_S3_SECRET_KEY}"
+		}
+		if SFTPConfig != nil {
+			SFTPConfig.User = "${YOUR_SFTP_USER}"
+			SFTPConfig.Password = "${YOUR_SFTP_PASSWORD}"
+		}
+	}
 	outYaml, err := yaml.Marshal(confv3)
 	if err != nil {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)

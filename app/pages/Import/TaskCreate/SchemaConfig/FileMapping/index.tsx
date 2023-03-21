@@ -46,6 +46,7 @@ const VIDSetting = observer((props: {
           <CSVPreviewLink
             onMapping={(index) => data.update({ [idKey]: index })}
             file={data.file}
+            data={data[idKey]}
             multipleMode={true}
           >
             {(!data[idKey] || data[idKey].length === 0) ? intl.get('import.selectCsvColumn') : `Column ${data[idKey]}`}
@@ -161,6 +162,7 @@ const FileMapping = (props: IProps) => {
         <CSVPreviewLink
           onMapping={columnIndex => updateFilePropMapping(propIndex, columnIndex as number)}
           file={file}
+          data={item[propIndex]?.mapping}
         >
           {!mappingIndex && mappingIndex !== 0 ? intl.get('import.choose') : `Column ${mappingIndex}`}
         </CSVPreviewLink>

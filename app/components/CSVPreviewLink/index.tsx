@@ -14,13 +14,14 @@ interface IProps {
   onMapping?: (index: number[] | number) => void;
   btnType?: string
   selected?: boolean
-  multipleMode?: boolean
+  multipleMode?: boolean,
+  data: number[] | number
 }
 
 const CSVPreviewLink = (props: IProps) => {
-  const { onMapping, file, children, btnType, selected, multipleMode } = props;
+  const { onMapping, file, children, btnType, selected, multipleMode, data } = props;
   const [visible, setVisible] = useState(false);
-  const [data, setData] = useState<any[]>([]);
+  const [datasource, setDatasource] = useState<any[]>([]);
   const { intl } = useI18n();
   const { readString } = usePapaParse();
   const [indexes, setIndexes] = useState<number[]>([]);
@@ -36,10 +37,14 @@ const CSVPreviewLink = (props: IProps) => {
         data = [...data, row.data];
       },
       complete: () => {
-        setData(data);
+        setDatasource(data);
       } 
     });
   }, [file]);
+
+  useEffect(() => {
+    setIndexes(data ? (Array.isArray(data) ? data : [data]) : []);
+  }, [data]);
   const handleLinkClick = useCallback(e => {
     e.stopPropagation();
     setVisible(true);
@@ -71,7 +76,7 @@ const CSVPreviewLink = (props: IProps) => {
     setIndexes(_indexes);
   }, [multipleMode, indexes]);
 
-  const columns = data[0]?.map((header, index) => {
+  const columns = datasource[0]?.map((header, index) => {
     const textIndex = index;
     const _header = file?.withHeader ? header : `Column ${textIndex}`;
     const isSelected = indexes.indexOf(textIndex) > -1;
@@ -106,7 +111,7 @@ const CSVPreviewLink = (props: IProps) => {
         <Table
           bordered={false}
           className={cls({ [styles.noBackground]: !!onMapping })}
-          dataSource={file?.withHeader ? data.slice(1) : data}
+          dataSource={file?.withHeader ? datasource.slice(1) : datasource}
           columns={columns}
           pagination={false}
           rowKey={() => uuidv4()}
