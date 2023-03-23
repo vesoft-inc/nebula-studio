@@ -91,15 +91,10 @@ func (i *importService) updateDatasourceConfig(conf *types.CreateImportTaskReque
 				if err := json.Unmarshal([]byte(jsonConfig), cfg); err != nil {
 					return nil, ecode.WithInternalServer(err, "get datasource config failed")
 				}
-				if dbs.Platform == "oss" {
-					source.OSS = &types.OSSConfig{
-						AccessKey: cfg.AccessKey,
-						SecretKey: string(secret),
-						Bucket:    cfg.Bucket,
-						Endpoint:  cfg.Endpoint,
-						Key:       *source.DatasourceFilePath,
-					}
-				} else {
+				switch dbs.Platform {
+				case "aws":
+					// endpoint is not required in importer aws config
+					// some format of endpoint will cause error, for example: https://s3.amazonaws.com
 					source.S3 = &types.S3Config{
 						AccessKey: cfg.AccessKey,
 						SecretKey: string(secret),
@@ -107,7 +102,24 @@ func (i *importService) updateDatasourceConfig(conf *types.CreateImportTaskReque
 						Region:    cfg.Region,
 						Key:       *source.DatasourceFilePath,
 					}
-					if dbs.Platform == "customize" && cfg.Region == "" {
+				case "oss":
+					source.OSS = &types.OSSConfig{
+						AccessKey: cfg.AccessKey,
+						SecretKey: string(secret),
+						Bucket:    cfg.Bucket,
+						Endpoint:  cfg.Endpoint,
+						Key:       *source.DatasourceFilePath,
+					}
+				case "customize":
+					source.S3 = &types.S3Config{
+						AccessKey: cfg.AccessKey,
+						SecretKey: string(secret),
+						Bucket:    cfg.Bucket,
+						Region:    cfg.Region,
+						Endpoint:  cfg.Endpoint,
+						Key:       *source.DatasourceFilePath,
+					}
+					if cfg.Region == "" {
 						source.S3.Region = "us-east-1"
 					}
 				}

@@ -42,9 +42,9 @@ const S3ConfigForm = (props: IProps) => {
           const platform = getFieldValue('platform');
           return (
             <>
-              {platform === IS3Platform.aws && <FormItem name={['s3Config', 'region']} label={intl.get('import.region')} rules={[{ required: true, message: intl.get('formRules.regionRequired') } ]}>
+              <FormItem name={['s3Config', 'region']} label={intl.get('import.region')} rules={[platform === IS3Platform.aws && { required: true, message: intl.get('formRules.regionRequired') } ]}>
                 <Input placeholder={intl.get('import.enterRegion')} />
-              </FormItem>}
+              </FormItem>
               <FormItem name={['s3Config', 'endpoint']} label={intl.get('import.endpoint')} rules={[{ required: true, message: intl.get('formRules.endpointRequired') } ]}>
                 <Input placeholder={platform === IS3Platform.aws ? 'https://s3.<region>.amazonaws.com' : intl.get('import.enterAddress')} />
               </FormItem>

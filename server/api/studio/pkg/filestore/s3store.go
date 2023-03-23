@@ -30,8 +30,12 @@ func NewS3Store(platform, endpoint, region, bucket, accessKey, accessSecret stri
 			Credentials: credentials.NewStaticCredentials(accessKey, accessSecret, ""),
 		})
 	} else {
+		r := aws.String(region)
+		if region == "" {
+			r = aws.String("us-east-1")
+		}
 		sess, err = session.NewSession(&aws.Config{
-			Region:           aws.String("us-east-1"),
+			Region:           r,
 			Credentials:      credentials.NewStaticCredentials(accessKey, accessSecret, ""),
 			S3ForcePathStyle: aws.Bool(true),
 			Endpoint:         aws.String(endpoint),
