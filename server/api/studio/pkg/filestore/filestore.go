@@ -33,14 +33,18 @@ type (
 	}
 )
 
-func NewFileStore(typ, config, secret string) (FileStore, error) {
+func NewFileStore(typ, config, secret, platform string) (FileStore, error) {
 	switch typ {
 	case "s3":
 		var c S3Config
 		if err := json.Unmarshal([]byte(config), &c); err != nil {
 			return nil, errors.New("parse the s3 config error")
 		}
-		return NewS3Store(c.Endpoint, c.Region, c.Bucket, c.AccessKey, secret)
+		if platform == "oss" {
+			return NewOssStore(c.Endpoint, c.Bucket, c.AccessKey, secret)
+		} else {
+			return NewS3Store(platform, c.Endpoint, c.Region, c.Bucket, c.AccessKey, secret)
+		}
 	case "sftp":
 		var c SftpConfig
 		if err := json.Unmarshal([]byte(config), &c); err != nil {

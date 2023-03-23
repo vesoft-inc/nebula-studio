@@ -69,6 +69,14 @@ type (
 		Path       string `json:"path,omitempty"`
 	}
 
+	OSSConfig {
+		Endpoint  string `json:"endpoint,omitempty"`
+		AccessKey string `json:"accessKey,omitempty"`
+		SecretKey string `json:"secretKey,omitempty"`
+		Bucket    string `json:"bucket,omitempty"`
+		Key       string `json:"key,omitempty"`
+	}
+
 	LocalConfig {
 		Path string `json:"path,omitempty"`
 	}
@@ -104,6 +112,7 @@ type (
 		Path               string        `json:"path,optional,omitempty"`
 		S3                 *S3Config     `json:"s3,optional,omitempty"`
 		SFTP               *SFTPConfig   `json:"sftp,optional,omitempty"`
+		OSS                *OSSConfig    `json:"oss,optional,omitempty"`
 		DatasourceId       *int64        `json:"datasourceId,optional,omitempty"`
 		DatasourceFilePath *string       `json:"datasourceFilePath,optional,omitempty"`
 		Tags               []Tag         `json:"tags,optional"`

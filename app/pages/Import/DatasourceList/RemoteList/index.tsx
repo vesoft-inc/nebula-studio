@@ -69,10 +69,14 @@ const DatasourceList = (props: IProps) => {
   const [visible, setVisible] = useState(false);
   const [selectItems, setSelectItems] = useState<number[]>([]);
 
-  const editItem = (item) => {
+  const create = useCallback(() => {
+    setEditData(null);
+    setVisible(true);
+  }, []);
+  const editItem = useCallback((item) => {
     setEditData(item);
     setVisible(true);
-  };
+  }, []);
   const deleteItem = useCallback(async id => {
     const flag = await deleteDataSource(id);
     flag && (getList(), message.success(intl.get('common.deleteSuccess')));
@@ -129,7 +133,7 @@ const DatasourceList = (props: IProps) => {
   return (
     <div className={styles.fileUpload}>
       <div className={styles.fileOperations}>
-        <Button className={cls('studioAddBtn', styles.uploadBtn)} type="primary" onClick={() => setVisible(true)}>
+        <Button className={cls('studioAddBtn', styles.uploadBtn)} type="primary" onClick={create}>
           <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('import.newDataSource')}
         </Button>
         <Popconfirm

@@ -1,5 +1,6 @@
 import { makeAutoObservable, observable } from 'mobx';
 import service from '@app/config/service';
+import { IDatasourceAdd, IDatasourceType, IDatasourceUpdate } from '@app/interfaces/datasource';
 import { getRootStore } from '.';
 
 export class DatasourceStore {
@@ -18,15 +19,15 @@ export class DatasourceStore {
     Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
   };
 
-  addDataSource = async (payload) => {
+  addDataSource = async (payload: IDatasourceAdd) => {
     const { code } = await service.addDatasource(payload);
     return code === 0;
   };
-  updateDataSource = async (payload) => {
+  updateDataSource = async (payload: IDatasourceUpdate) => {
     const { code } = await service.updateDatasource(payload);
     return code === 0;
   };
-  getDatasourceList = async (payload?: { type?: string }) => {
+  getDatasourceList = async (payload?: { type?: IDatasourceType }) => {
     const { code, data } = await service.getDatasourceList(payload);
     if(code === 0) {
       return data.list;
@@ -51,7 +52,7 @@ export class DatasourceStore {
     }
   };
   previewFile = async (payload: {
-    id: string,
+    id: number,
     path?: string,
   }) => {
     const { id, path } = payload;

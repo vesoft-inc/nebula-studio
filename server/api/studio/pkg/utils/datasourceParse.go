@@ -6,7 +6,10 @@ import (
 	"strings"
 )
 
-func ParseEndpoint(rawEndpoint string) (string, string, error) {
+func ParseEndpoint(platform, rawEndpoint string) (string, string, error) {
+	if platform != "aws" {
+		return rawEndpoint, "", nil
+	}
 	// endpointURL := "https://s3.<region>.amazonaws.com"
 	// endpointURL := "https://my-bucket.s3.<region>.amazonaws.com"
 	// endpointURL := "https://s3.<region>.amazonaws.com/my-bucket"
@@ -19,6 +22,7 @@ func ParseEndpoint(rawEndpoint string) (string, string, error) {
 	}
 	host := u.Hostname()
 	parts := strings.SplitN(host, ".", 2)
+	fmt.Println("host", host, parts)
 	var (
 		bucket   string
 		endpoint string
