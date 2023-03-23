@@ -13,6 +13,7 @@ require (
 
 require (
 	github.com/agiledragon/gomonkey/v2 v2.9.0
+	github.com/aliyun/aliyun-oss-go-sdk v2.2.6+incompatible
 	github.com/aws/aws-sdk-go v1.44.217
 	github.com/pkg/sftp v1.13.5
 	github.com/stretchr/testify v1.8.0
@@ -28,7 +29,6 @@ require (
 )
 
 require (
-	github.com/aliyun/aliyun-oss-go-sdk v2.2.6+incompatible // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/colinmarc/hdfs/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

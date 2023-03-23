@@ -298,7 +298,9 @@
     "datasourceType": "数据源类型",
     "filePath": "文件路径",
     "directory": "目录",
-    "preview": "预览"
+    "preview": "预览",
+    "customize": "自定义",
+    "s3Platform": "S3 平台"
   },
   "schema": {
     "spaceList": "图空间列表",

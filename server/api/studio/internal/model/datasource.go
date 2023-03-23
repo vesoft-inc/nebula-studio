@@ -6,6 +6,7 @@ type Datasource struct {
 	ID         int       `json:"id" gorm:"primaryKey;autoIncrement"`
 	Name       string    `json:"name"`
 	Type       string    `json:"type"`
+	Platform   string    `json:"platform"`
 	Config     string    `json:"config"`
 	Secret     string    `json:"secret"`
 	Host       string    `json:"host"`

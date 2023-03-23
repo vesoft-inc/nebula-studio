@@ -86,19 +86,31 @@ func (i *importService) updateDatasourceConfig(conf *types.CreateImportTaskReque
 			}
 			switch dbs.Type {
 			case "s3":
-				s3Config := &types.DatasourceS3Config{}
+				cfg := &types.DatasourceS3Config{}
 				jsonConfig := dbs.Config
-				if err := json.Unmarshal([]byte(jsonConfig), s3Config); err != nil {
+				if err := json.Unmarshal([]byte(jsonConfig), cfg); err != nil {
 					return nil, ecode.WithInternalServer(err, "get datasource config failed")
 				}
-				source.S3 = &types.S3Config{
-					AccessKey: s3Config.AccessKey,
-					SecretKey: string(secret),
-					Bucket:    s3Config.Bucket,
-					Region:    s3Config.Region,
-					Key:       *source.DatasourceFilePath,
+				if dbs.Platform == "oss" {
+					source.OSS = &types.OSSConfig{
+						AccessKey: cfg.AccessKey,
+						SecretKey: string(secret),
+						Bucket:    cfg.Bucket,
+						Endpoint:  cfg.Endpoint,
+						Key:       *source.DatasourceFilePath,
+					}
+				} else {
+					source.S3 = &types.S3Config{
+						AccessKey: cfg.AccessKey,
+						SecretKey: string(secret),
+						Bucket:    cfg.Bucket,
+						Region:    cfg.Region,
+						Key:       *source.DatasourceFilePath,
+					}
+					if dbs.Platform == "customize" && cfg.Region == "" {
+						source.S3.Region = "us-east-1"
+					}
 				}
-
 			case "sftp":
 				sftpConfig := &types.DatasourceSFTPConfig{}
 				jsonConfig := dbs.Config

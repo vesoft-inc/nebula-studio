@@ -34,29 +34,28 @@ const DatasourceConfigModal = (props: IProps) => {
   const tempPwd = useMemo(() => uuidv4() + Date.now(), []);
   const mode = useMemo(() => (data ? 'edit' : 'create'), [data]);
   const submit = async (values: any) => {
-    const { platform, ...rest } = values;
     const _type = values.type || type;
     setLoading(true);
     if(mode === 'create') {
       const flag = await addDataSource({
         type: _type,
         name: '',
-        ...rest
+        ...values
       });
       setLoading(false);
       flag && (message.success(intl.get('schema.createSuccess')), onConfirm());
     } else {
       const _config = _type === IDatasourceType.s3 ? 's3Config' : 'sftpConfig';
-      if(_type === IDatasourceType.s3 && rest[_config].accessSecret === tempPwd) {
-        delete rest[_config].accessSecret;
-      } else if (_type === IDatasourceType.sftp && rest[_config].password === tempPwd) {
-        delete rest[_config].password;
+      if(_type === IDatasourceType.s3 && values[_config].accessSecret === tempPwd) {
+        delete values[_config].accessSecret;
+      } else if (_type === IDatasourceType.sftp && values[_config].password === tempPwd) {
+        delete values[_config].password;
       }
       const flag = await updateDataSource({
         id: data.id,
         type: _type,
         name: '',
-        ...rest
+        ...values
       });
       setLoading(false);
       flag && (message.success(intl.get('common.updateSuccess')), onConfirm());
@@ -74,7 +73,6 @@ const DatasourceConfigModal = (props: IProps) => {
       footer={false}
     >
       <Form form={form} 
-        requiredMark={false}
         layout="horizontal" {...fomrItemLayout} onFinish={submit} initialValues={{ ...data }}>
         <FormItem noStyle shouldUpdate>
           {({ getFieldValue }) => {

@@ -297,7 +297,10 @@
     "datasourceType": "Data Source Type",
     "filePath": "File Path",
     "directory": "Directory",
-    "preview": "Preview"
+    "preview": "Preview",
+    "customize": "Customize",
+    "s3Platform": "S3 Platform",
+    "account": "Account"
   },
   "schema": {
     "spaceList": "Graph Space List",

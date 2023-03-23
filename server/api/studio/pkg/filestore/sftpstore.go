@@ -31,12 +31,12 @@ func NewSftpStore(host string, port int, username string, password string) (*Sft
 	addr := fmt.Sprintf("%s:%d", host, port)
 	conn, err := ssh.Dial("tcp", addr, config)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to dial SSH server: %s", err)
 	}
 
 	client, err := sftp.NewClient(conn)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create SFTP client: %s", err)
 	}
 
 	return &SftpStore{
@@ -109,7 +109,7 @@ func (s *SftpStore) ListFiles(dir string) ([]FileConfig, error) {
 		isDir := file.IsDir()
 		name := file.Name()
 		var fileType string
-		if isDir {
+		if isDir && !strings.HasPrefix(name, ".") {
 			fileType = "directory"
 		} else if strings.HasSuffix(name, ".csv") {
 			fileType = "csv"

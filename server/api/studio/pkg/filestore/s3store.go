@@ -3,8 +3,10 @@ package filestore
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"strings"
 
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 
@@ -18,16 +20,39 @@ type S3Store struct {
 	Bucket   string
 }
 
-func NewS3Store(endpoint, region, bucket, accessKey, accessSecret string) (*S3Store, error) {
-	sess, err := session.NewSession(&aws.Config{
-		Region:      aws.String(region),
-		Credentials: credentials.NewStaticCredentials(accessKey, accessSecret, ""),
-	})
+func NewS3Store(platform, endpoint, region, bucket, accessKey, accessSecret string) (*S3Store, error) {
+	var sess *session.Session
+	var err error
+
+	if platform == "aws" {
+		sess, err = session.NewSession(&aws.Config{
+			Region:      aws.String(region),
+			Credentials: credentials.NewStaticCredentials(accessKey, accessSecret, ""),
+		})
+	} else {
+		sess, err = session.NewSession(&aws.Config{
+			Region:           aws.String("us-east-1"),
+			Credentials:      credentials.NewStaticCredentials(accessKey, accessSecret, ""),
+			S3ForcePathStyle: aws.Bool(true),
+			Endpoint:         aws.String(endpoint),
+		})
+	}
 	if err != nil {
 		return nil, errors.New("failed to create session")
 	}
 
 	svc := s3.New(sess)
+	_, err = svc.HeadBucket(&s3.HeadBucketInput{
+		Bucket: aws.String(bucket),
+	})
+	if err != nil {
+		if awsErr, ok := err.(awserr.Error); ok {
+			if awsErr.Code() == "NotFound" {
+				return nil, fmt.Errorf("bucket does not exist: %v", err)
+			}
+		}
+		return nil, fmt.Errorf("failed to head bucket: %v", err)
+	}
 	return &S3Store{
 		S3Client: svc,
 		Bucket:   bucket,
