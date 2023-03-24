@@ -67,7 +67,7 @@ const VIDSetting = observer((props: {
           </div>
         </>} />
       </div>} key="default">
-        {spaceVidType === 'INT64' && idFunction && <div className={styles.rowItem}>
+        {spaceVidType === 'INT64' && idFunction && <div className={styles.funcItem}>
           <span className={styles.label}>{intl.get('import.vidFunction')}</span>
           <Select
             bordered={false}

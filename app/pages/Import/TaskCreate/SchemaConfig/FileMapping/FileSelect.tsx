@@ -4,7 +4,7 @@ import { useStore } from '@app/stores';
 import { useBatchState } from '@app/utils';
 import { getFileSize } from '@app/utils/file';
 import { useI18n } from '@vesoft-inc/i18n';
-import { Button, Select, Spin } from 'antd';
+import { Button, Select, Spin, Tooltip } from 'antd';
 import cls from 'classnames';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect } from 'react';
@@ -156,7 +156,9 @@ const FileSelect = observer((props: IFileSelect) => {
         >
           {item.type === 'directory' ? <FolderFilled className={styles.icon} /> : <FileTextFilled className={styles.icon} />}
           <div className={styles.content}>
-            <span className={styles.title}>{item.name}</span>
+            <Tooltip title={item.name}>
+              <span className={styles.title}>{item.name}</span>
+            </Tooltip>
             <span className={styles.desc}>{item.type === 'directory' ? intl.get('import.directory') : getFileSize(item.size)}</span>
           </div>
         </div>    
