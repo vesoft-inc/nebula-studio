@@ -21,26 +21,22 @@ type S3Store struct {
 }
 
 func NewS3Store(platform, endpoint, region, bucket, accessKey, accessSecret string) (*S3Store, error) {
-	var sess *session.Session
-	var err error
-
-	if platform == "aws" {
-		sess, err = session.NewSession(&aws.Config{
-			Region:      aws.String(region),
-			Credentials: credentials.NewStaticCredentials(accessKey, accessSecret, ""),
-		})
-	} else {
-		r := aws.String(region)
-		if region == "" {
-			r = aws.String("us-east-1")
-		}
-		sess, err = session.NewSession(&aws.Config{
-			Region:           r,
-			Credentials:      credentials.NewStaticCredentials(accessKey, accessSecret, ""),
-			S3ForcePathStyle: aws.Bool(true),
-			Endpoint:         aws.String(endpoint),
-		})
+	cfg := &aws.Config{
+		Region:      aws.String(region),
+		Credentials: credentials.NewStaticCredentials(accessKey, accessSecret, ""),
 	}
+	switch platform {
+	case "oss":
+		cfg.S3ForcePathStyle = aws.Bool(false)
+		cfg.Endpoint = aws.String(endpoint)
+	case "cos", "customize":
+		cfg.S3ForcePathStyle = aws.Bool(true)
+		cfg.Endpoint = aws.String(endpoint)
+	}
+	if region == "" {
+		cfg.Region = aws.String("us-east-1")
+	}
+	sess, err := session.NewSession(cfg)
 	if err != nil {
 		return nil, errors.New("failed to create session")
 	}
@@ -134,9 +130,10 @@ func (s *S3Store) ListFiles(s3path string) ([]FileConfig, error) {
 		} else if strings.HasSuffix(key, ".csv") {
 			objType = "csv"
 		}
-		if objType != "" {
+		name := strings.TrimPrefix(key, s3path)
+		if objType != "" && name != "" {
 			s3Object := FileConfig{
-				Name: strings.TrimPrefix(key, s3path),
+				Name: name,
 				Type: objType,
 				Size: *obj.Size,
 			}

@@ -40,11 +40,7 @@ func NewFileStore(typ, config, secret, platform string) (FileStore, error) {
 		if err := json.Unmarshal([]byte(config), &c); err != nil {
 			return nil, errors.New("parse the s3 config error")
 		}
-		if platform == "oss" {
-			return NewOssStore(c.Endpoint, c.Bucket, c.AccessKey, secret)
-		} else {
-			return NewS3Store(platform, c.Endpoint, c.Region, c.Bucket, c.AccessKey, secret)
-		}
+		return NewS3Store(platform, c.Endpoint, c.Region, c.Bucket, c.AccessKey, secret)
 	case "sftp":
 		var c SftpConfig
 		if err := json.Unmarshal([]byte(config), &c); err != nil {

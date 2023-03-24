@@ -5,7 +5,7 @@ import { trackPageView } from '@app/utils/stat';
 import { Button, message, Popconfirm, Table } from 'antd';
 import Icon from '@app/components/Icon';
 import cls from 'classnames';
-import { IDatasourceType } from '@app/interfaces/datasource';
+import { IDatasourceType, IDatasourceItem } from '@app/interfaces/datasource';
 import { useI18n } from '@vesoft-inc/i18n';
 
 import dayjs from 'dayjs';
@@ -62,18 +62,18 @@ const DatasourceList = (props: IProps) => {
   const { type } = props;
   const { datasource } = useStore();
   const { intl } = useI18n();
-  const { getDatasourceList, datasourceList, deleteDataSource, batchDeleteDatasource } = datasource;
-  const [data, setData] = useState<any[]>([]);
-  const [editData, setEditData] = useState<any>(null);
+  const { getDatasourceList, deleteDataSource, batchDeleteDatasource } = datasource;
+  const [data, setData] = useState<IDatasourceItem[]>([]);
+  const [editData, setEditData] = useState<IDatasourceItem>(null);
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [selectItems, setSelectItems] = useState<number[]>([]);
+  const [selectIds, setSelectIds] = useState<number[]>([]);
 
   const create = useCallback(() => {
     setEditData(null);
     setVisible(true);
   }, []);
-  const editItem = useCallback((item) => {
+  const editItem = useCallback((item: IDatasourceItem) => {
     setEditData(item);
     setVisible(true);
   }, []);
@@ -88,7 +88,7 @@ const DatasourceList = (props: IProps) => {
   })).concat(({
     title: intl.get('common.operation'),
     key: 'operation',
-    render: (_, item) => (<div className={styles.operation}>
+    render: (_, item: IDatasourceItem) => (<div className={styles.operation}>
       <Button className="primaryBtn" onClick={() => editItem(item)}>
         <Icon type="icon-studio-btn-detail" />
       </Button>
@@ -113,12 +113,12 @@ const DatasourceList = (props: IProps) => {
     setLoading(false);
   };
   const handleDeleteDatasource = useCallback(async () => {
-    const flag = await batchDeleteDatasource(selectItems);
+    const flag = await batchDeleteDatasource(selectIds);
     if (!flag) return;
     message.success(intl.get('common.deleteSuccess'));
     getList();
-    setSelectItems([]);
-  }, [selectItems]);
+    setSelectIds([]);
+  }, [selectIds]);
 
   const handleRefresh = () => {
     getList();
@@ -141,21 +141,22 @@ const DatasourceList = (props: IProps) => {
           title={intl.get('common.ask')}
           okText={intl.get('common.confirm')}
           cancelText={intl.get('common.cancel')}
-          disabled={!selectItems.length}
+          disabled={!selectIds.length}
         >
-          <Button className={styles.deleteBtn} disabled={!selectItems.length}>
+          <Button className={styles.deleteBtn} disabled={!selectIds.length}>
             {intl.get('import.deleteDataSource')}
           </Button>
         </Popconfirm>
       </div>
       <div className={styles.fileList}>
-        <h3>{intl.get('import.datasourceList', { type: intl.get(`import.${type}`) })} ({datasourceList.length})</h3>
+        <h3>{intl.get('import.datasourceList', { type: intl.get(`import.${type}`) })} ({data.length})</h3>
         <Table
           loading={!!loading}
           dataSource={data}
           rowSelection={{
             type: 'checkbox',
-            onChange: (selectedRowKeys) => setSelectItems(selectedRowKeys as number[]),
+            selectedRowKeys: selectIds,
+            onChange: (selectedRowKeys) => setSelectIds(selectedRowKeys as number[]),
           }}
           columns={columns}
           rowKey="id"

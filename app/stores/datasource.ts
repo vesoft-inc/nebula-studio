@@ -1,15 +1,8 @@
-import { makeAutoObservable, observable } from 'mobx';
 import service from '@app/config/service';
 import { IDatasourceAdd, IDatasourceType, IDatasourceUpdate } from '@app/interfaces/datasource';
 import { getRootStore } from '.';
 
 export class DatasourceStore {
-  datasourceList = [];
-  constructor() {
-    makeAutoObservable(this, {
-      datasourceList: observable,
-    });
-  }
 
   get rootStore() {
     return getRootStore();

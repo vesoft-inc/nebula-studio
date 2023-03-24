@@ -7,7 +7,7 @@ export enum IS3Platform {
   'aws' = 'aws',
   'oss' = 'oss',
   'customize' = 'customize',
-  'tecent' = 'tecent'
+  'tecent' = 'cos'
 }
 
 export interface IDatasourceAdd {
@@ -30,4 +30,25 @@ export interface IDatasourceAdd {
 }
 export interface IDatasourceUpdate extends IDatasourceAdd {
   id: number;
+}
+
+export interface IDatasourceItem {
+  id?: number;
+  name: string;
+  type: IDatasourceType;
+  platform?: string;
+  createTime?: string;
+  s3Config?: {
+    accessKey: string;
+    accessSecret?: string;
+    endpoint: string;
+    bucket: string;
+    region?: string;
+  };
+  sftpConfig?: {
+    host: string;
+    port: number;
+    username: string;
+    password: string;
+  };
 }
