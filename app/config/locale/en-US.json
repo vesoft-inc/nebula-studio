@@ -300,7 +300,12 @@
     "preview": "Preview",
     "customize": "Customize",
     "s3Platform": "S3 Platform",
-    "account": "Account"
+    "account": "Account",
+    "endpointTip": "Please use an endpoint without a bucket name in the domain name, e.g. {sample}",
+    "awsTip": "https://s3.us-east-2.amazonaws.com",
+    "ossTip": "https://oss-cn-hangzhou.aliyuncs.com",
+    "cosTip": "https://cos.ap-shanghai.myqcloud.com",
+    "customizeTip": "http://127.0.0.1:9000"
   },
   "schema": {
     "spaceList": "Graph Space List",

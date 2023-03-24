@@ -110,7 +110,7 @@ func (i *importService) updateDatasourceConfig(conf *types.CreateImportTaskReque
 						Endpoint:  cfg.Endpoint,
 						Key:       *source.DatasourceFilePath,
 					}
-				case "customize":
+				case "cos", "customize":
 					source.S3 = &types.S3Config{
 						AccessKey: cfg.AccessKey,
 						SecretKey: string(secret),

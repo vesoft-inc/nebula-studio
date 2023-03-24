@@ -330,35 +330,23 @@ func formatDatasourceConfig(config interface{}, password string) (string, string
 func validate(typ string, platform string, config interface{}) (string, string, error) {
 	switch typ {
 	case "s3":
-		if platform == "oss" {
-			cfg := config.(*types.DatasourceS3Config)
-			err := validateOss(cfg)
-			if err != nil {
-				return "", "", err
-			}
-			secret := cfg.AccessSecret
-			cfg.AccessSecret = ""
-			cfgStr, crypto, err := formatDatasourceConfig(config, secret)
-			return cfgStr, crypto, err
-		} else {
-			cfg := config.(*types.DatasourceS3Config)
-			endpoint, parsedBucket, err := utils.ParseEndpoint(platform, cfg.Endpoint)
-			if err != nil {
-				return "", "", err
-			}
-			if parsedBucket != "" && cfg.Bucket != parsedBucket {
-				return "", "", errors.New("bucket name in endpoint and bucket name in config are different")
-			}
-			cfg.Endpoint = endpoint
-			err = validateS3(platform, cfg)
-			if err != nil {
-				return "", "", err
-			}
-			secret := cfg.AccessSecret
-			cfg.AccessSecret = ""
-			cfgStr, crypto, err := formatDatasourceConfig(config, secret)
-			return cfgStr, crypto, err
+		cfg := config.(*types.DatasourceS3Config)
+		endpoint, parsedBucket, err := utils.ParseEndpoint(platform, cfg.Endpoint)
+		if err != nil {
+			return "", "", err
 		}
+		if parsedBucket != "" && cfg.Bucket != parsedBucket {
+			return "", "", errors.New("bucket name in endpoint and bucket name in config are different")
+		}
+		cfg.Endpoint = endpoint
+		err = validateS3(platform, cfg)
+		if err != nil {
+			return "", "", err
+		}
+		secret := cfg.AccessSecret
+		cfg.AccessSecret = ""
+		cfgStr, crypto, err := formatDatasourceConfig(config, secret)
+		return cfgStr, crypto, err
 	case "sftp":
 		cfg := config.(*types.DatasourceSFTPConfig)
 		err := validateSftp(cfg)
@@ -372,14 +360,6 @@ func validate(typ string, platform string, config interface{}) (string, string, 
 	default:
 		return "", "", errors.New("unsupported datasource type")
 	}
-}
-
-func validateOss(cfg *types.DatasourceS3Config) error {
-	_, err := filestore.NewOssStore(cfg.Endpoint, cfg.Bucket, cfg.AccessKey, cfg.AccessSecret)
-	if err != nil {
-		return fmt.Errorf("connect the oss client error: %s", err)
-	}
-	return nil
 }
 
 func validateSftp(cfg *types.DatasourceSFTPConfig) error {

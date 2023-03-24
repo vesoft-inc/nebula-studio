@@ -1,7 +1,7 @@
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Modal, Form, Select, message } from 'antd';
 import React, { useMemo, useState } from 'react';
-import { IDatasourceType } from '@app/interfaces/datasource';
+import { IDatasourceItem, IDatasourceType } from '@app/interfaces/datasource';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@app/stores';
 import { observer } from 'mobx-react-lite';
@@ -16,7 +16,7 @@ interface IProps {
   onConfirm: () => void;
   onCancel: () => void;
   type?: IDatasourceType;
-  data?: any;
+  data?: IDatasourceItem;
 }
 
 const fomrItemLayout = {
@@ -33,7 +33,7 @@ const DatasourceConfigModal = (props: IProps) => {
   const [loading, setLoading] = useState(false);
   const tempPwd = useMemo(() => uuidv4() + Date.now(), []);
   const mode = useMemo(() => (data ? 'edit' : 'create'), [data]);
-  const submit = async (values: any) => {
+  const submit = async (values: IDatasourceItem) => {
     const _type = values.type || type;
     setLoading(true);
     if(mode === 'create') {
@@ -45,11 +45,18 @@ const DatasourceConfigModal = (props: IProps) => {
       setLoading(false);
       flag && (message.success(intl.get('schema.createSuccess')), onConfirm());
     } else {
-      const _config = _type === IDatasourceType.s3 ? 's3Config' : 'sftpConfig';
-      if(_type === IDatasourceType.s3 && values[_config].accessSecret === tempPwd) {
-        delete values[_config].accessSecret;
-      } else if (_type === IDatasourceType.sftp && values[_config].password === tempPwd) {
-        delete values[_config].password;
+      let _config;
+      switch (_type) {
+        case IDatasourceType.s3:
+          _config = values.s3Config;
+          _config.accessSecret === tempPwd && delete _config.accessSecret;
+          break;
+        case IDatasourceType.sftp:
+          _config = values.sftpConfig;
+          _config.password === tempPwd && delete _config.password;
+          break;
+        default:
+          break;
       }
       const flag = await updateDataSource({
         id: data.id,
