@@ -62,7 +62,8 @@
     "dst": "Destination",
     "value": "Value",
     "continue": "Continue",
-    "update": "Update"
+    "update": "Update",
+    "prev": "Previous"
   },
   "doc": {
     "welcome": "Welcome to",

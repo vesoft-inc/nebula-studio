@@ -39,6 +39,7 @@ const TaskList = (props: IProps) => {
   const [sourceModalVisible, setSourceModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const { showTemplateModal = true, showConfigDownload = true, showLogDownload = true } = props;
+  const modalKey = useMemo(() => Math.random(), [sourceModalVisible ]);
   const [logDimension, setLogDimension] = useState<ILogDimension>({} as ILogDimension);
   const handleTaskStop = useCallback(async (id: number) => {
     clearTimeout(timer.current);
@@ -181,7 +182,7 @@ const TaskList = (props: IProps) => {
         host={host}
         onImport={getTaskList}
         visible={importModalVisible} />}
-      {sourceModalVisible && <DatasourceConfigModal visible={sourceModalVisible} onCancel={() => setSourceModalVisible(false)} onConfirm={() => setSourceModalVisible(false)} />}
+      <DatasourceConfigModal key={modalKey} visible={sourceModalVisible} onCancel={() => setSourceModalVisible(false)} onConfirm={() => setSourceModalVisible(false)} />
     </div>
   );
 };

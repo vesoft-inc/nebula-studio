@@ -278,7 +278,7 @@ const FileConfigSetting = (props: IProps) => {
       </div>
       <div className={styles.btns}>
         <Button disabled={uploading} onClick={() => handleCancel()}>
-          {intl.get('common.cancel')}
+          {intl.get('common.prev')}
         </Button>
         <Button
           type="primary"

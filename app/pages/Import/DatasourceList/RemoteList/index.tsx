@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
@@ -68,7 +68,7 @@ const DatasourceList = (props: IProps) => {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [selectIds, setSelectIds] = useState<number[]>([]);
-
+  const modalKey = useMemo(() => visible ? Math.random() : undefined, [visible]);
   const create = useCallback(() => {
     setEditData(null);
     setVisible(true);
@@ -125,7 +125,6 @@ const DatasourceList = (props: IProps) => {
     setVisible(false);
   };
 
-  
   useEffect(() => {
     getList();
     trackPageView('/import/datasources');
@@ -163,7 +162,7 @@ const DatasourceList = (props: IProps) => {
           pagination={false}
         />
       </div>
-      {visible && <DatasourceConfigModal data={editData} type={type} visible={visible} onCancel={() => setVisible(false)} onConfirm={handleRefresh} />}
+      <DatasourceConfigModal key={modalKey} data={editData} type={type} visible={visible} onCancel={() => setVisible(false)} onConfirm={handleRefresh} />
     </div>
   );
 };

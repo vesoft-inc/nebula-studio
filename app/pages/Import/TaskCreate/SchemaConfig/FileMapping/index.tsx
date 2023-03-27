@@ -1,5 +1,5 @@
 import { Button, Collapse, Input, Select, Table, Tooltip } from 'antd';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import cls from 'classnames';
 import { useStore } from '@app/stores';
@@ -10,6 +10,7 @@ import Instruction from '@app/components/Instruction';
 import { ISchemaEnum } from '@app/interfaces/schema';
 import { IEdgeFileItem, ITagFileItem } from '@app/stores/import';
 import { IImportFile } from '@app/interfaces/import';
+import { ICachedStore } from '@app/stores/datasource';
 import styles from '../index.module.less';
 import FileSelectModal from './FileSelectModal';
 
@@ -130,6 +131,7 @@ const idMap = {
 const FileMapping = (props: IProps) => {
   const { item, onRemove, type, onReset } = props;
   const { file, props: mappingProps } = item;
+  const { datasource: { cachedStore, update } } = useStore();
   const { intl } = useI18n();
   const [visible, setVisible] = useState(false);
   const [selectFile, setSelectFile] = useState({
@@ -137,6 +139,12 @@ const FileMapping = (props: IProps) => {
     cachedState: null,
   });
 
+  useEffect(() => {
+    cachedStore && setSelectFile({
+      file: null,
+      cachedState: cachedStore,
+    });
+  }, []);
   const updateFilePropMapping = (index: number, value: number) => item.updatePropItem(index, { mapping: value });
   const columns = [
     {
@@ -174,10 +182,17 @@ const FileMapping = (props: IProps) => {
     },
   ];
 
-  const handleUpdateFile = (file, cachedState) => {
+  const handleUpdateFile = (file, cachedState: ICachedStore) => {
     setSelectFile({ file, cachedState });
     onReset(item, file);
     setVisible(false);
+    const { directory, path, activeId } = cachedState;
+    // update cached store, so that we can use it when initializing other file configurations
+    update({ cachedStore: {
+      directory,
+      path,
+      activeId,
+    } });
   };
 
   const idConfig = useMemo(() => type === ISchemaEnum.Tag ? idMap[ISchemaEnum.Tag] : idMap[ISchemaEnum.Edge], [type]);

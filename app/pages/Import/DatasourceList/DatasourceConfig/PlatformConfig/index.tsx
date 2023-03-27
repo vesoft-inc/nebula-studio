@@ -45,15 +45,14 @@ const DatasourceConfigModal = (props: IProps) => {
       setLoading(false);
       flag && (message.success(intl.get('schema.createSuccess')), onConfirm());
     } else {
-      let _config;
       switch (_type) {
         case IDatasourceType.s3:
-          _config = values.s3Config;
-          _config.accessSecret === tempPwd && delete _config.accessSecret;
+          const s3Cfg = values.s3Config;
+          s3Cfg.accessSecret === tempPwd && (s3Cfg.accessSecret = undefined);
           break;
         case IDatasourceType.sftp:
-          _config = values.sftpConfig;
-          _config.password === tempPwd && delete _config.password;
+          const sftpCfg = values.sftpConfig;
+          sftpCfg.password === tempPwd && (sftpCfg.password = undefined);
           break;
         default:
           break;
@@ -68,6 +67,8 @@ const DatasourceConfigModal = (props: IProps) => {
       flag && (message.success(intl.get('common.updateSuccess')), onConfirm());
     }
   };
+
+  if(!visible) return null;
   
   return (
     <Modal

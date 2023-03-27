@@ -3,13 +3,14 @@ import { Modal } from 'antd';
 import { observer } from 'mobx-react-lite';
 import React, { useMemo, useState } from 'react';
 import FileConfigSetting from '@app/components/FileConfigSetting';
+import { ICachedStore } from '@app/stores/datasource';
 import FileSelect from './FileSelect';
 import styles from './index.module.less';
 interface IModalProps {
   visible: boolean;
-  onConfirm: (file, cachedDatasourceState) => void
+  onConfirm: (file, cachedDatasourceState: ICachedStore) => void
   onCancel: () => void;
-  cachedDatasourceState?: any;
+  cachedDatasourceState?: ICachedStore;
 }
 const FileSelectModal = (props: IModalProps) => {
   const { visible, onConfirm, onCancel, cachedDatasourceState } = props;

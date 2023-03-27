@@ -1,6 +1,7 @@
 import { ArrowLeftOutlined, FileTextFilled, FolderFilled, SyncOutlined } from '@ant-design/icons';
 import { IDatasourceType } from '@app/interfaces/datasource';
 import { useStore } from '@app/stores';
+import { ICachedStore } from '@app/stores/datasource';
 import { useBatchState } from '@app/utils';
 import { getFileSize } from '@app/utils/file';
 import { useI18n } from '@vesoft-inc/i18n';
@@ -12,7 +13,7 @@ import styles from './index.module.less';
 const Option = Select.Option;
 interface IFileSelect {
   onConfirm: (file, cachedState) => void,
-  cachedState?: any
+  cachedState?: ICachedStore
 }
 const FileSelect = observer((props: IFileSelect) => {
   const { intl } = useI18n();
@@ -27,7 +28,7 @@ const FileSelect = observer((props: IFileSelect) => {
     path: cachedState?.path || '',
     activeId: cachedState?.activeId,
     activeItem: cachedState?.activeItem,
-  });
+  } as ICachedStore);
   const { options, directory, path, activeItem, activeId, loading } = state;
   const init = useCallback(async () => {
     setState({ loading: true });
@@ -90,7 +91,7 @@ const FileSelect = observer((props: IFileSelect) => {
   }, []);
   const handleRefresh = useCallback(async () => {
     setState({ loading: true });
-    if (!activeId) {
+    if (!activeId || activeId === IDatasourceType.local) {
       getLocalFiles();
       return;
     }
@@ -104,7 +105,7 @@ const FileSelect = observer((props: IFileSelect) => {
     } else {
       setState({ loading: true });
       const _path = `${path === '/' ? '' : path}${activeItem.name}`;
-      const data = await previewFile({ id: activeId, path: _path });
+      const data = await previewFile({ id: activeId as number, path: _path });
       const item = {
         name: activeItem.name,
         withHeader: false,

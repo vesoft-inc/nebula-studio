@@ -50,7 +50,7 @@ const TemplateModal = (props: IProps) => {
           throw new Error(intl.get('import.templateMatchError', { type: 'username' }));
         }
         parseContent.sources?.forEach(file => {
-          if(!files.includes(file.path)) {
+          if(file.path && !files.includes(file.path)) {
             throw new Error(intl.get('import.fileNotExist', { name: file.path }));
           }
         });

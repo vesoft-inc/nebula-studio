@@ -57,7 +57,7 @@ type ImportTaskCSV struct {
 type NodeId struct {
 	Name        string        `json:"name,optional"`
 	Type        string        `json:"type" validate:"required"`
-	Index       int64         `json:"index" validate:"required"`
+	Index       int64         `json:"index,optional,omitempty"`
 	ConcatItems []interface{} `json:"concatItems,optional,omitempty"`
 	Function    string        `json:"function,optional,omitempty"`
 }
@@ -97,11 +97,11 @@ type EdgeRank struct {
 }
 
 type S3Config struct {
-	Endpoint  string `json:"endpoint,omitempty"`
+	Endpoint  string `json:"endpoint,optional,omitempty"`
 	Region    string `json:"region,omitempty"`
 	AccessKey string `json:"accessKey,omitempty"`
 	SecretKey string `json:"secretKey,omitempty"`
-	Token     string `json:"token,omitempty"`
+	Token     string `json:"token,optional,omitempty"`
 	Bucket    string `json:"bucket,omitempty"`
 	Key       string `json:"key,omitempty"`
 }
@@ -111,9 +111,9 @@ type SFTPConfig struct {
 	Port       int    `json:"port,omitempty"`
 	User       string `json:"user,omitempty"`
 	Password   string `json:"password,omitempty"`
-	KeyFile    string `json:"keyFile,omitempty"`
-	KeyData    string `json:"keyData,omitempty"`
-	Passphrase string `json:"passphrase,omitempty"`
+	KeyFile    string `json:"keyFile,optional,omitempty"`
+	KeyData    string `json:"keyData,optional,omitempty"`
+	Passphrase string `json:"passphrase,optional,omitempty"`
 	Path       string `json:"path,omitempty"`
 }
 

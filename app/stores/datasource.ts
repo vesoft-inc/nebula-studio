@@ -1,9 +1,21 @@
 import service from '@app/config/service';
 import { IDatasourceAdd, IDatasourceType, IDatasourceUpdate } from '@app/interfaces/datasource';
+import { makeAutoObservable } from 'mobx';
 import { getRootStore } from '.';
 
+export interface ICachedStore {
+  loading?: boolean,
+  options?: any[],
+  directory?: any[],
+  path?: string, 
+  activeId?: number | string,
+  activeItem?: any,
+}
 export class DatasourceStore {
-
+  cachedStore: ICachedStore = null;
+  constructor() {
+    makeAutoObservable(this);
+  }
   get rootStore() {
     return getRootStore();
   }
