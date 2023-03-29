@@ -3,7 +3,7 @@ import React from 'react';
 import { AlterType, IProperty } from '@app/interfaces/schema';
 import { useI18n } from '@vesoft-inc/i18n';
 import { nameRulesFn, numberRulesFn, stringByteRulesFn } from '@app/config/rules';
-import { DATA_TYPE, EXPLAIN_DATA_TYPE } from '@app/utils/constant';
+import { DataTypeTransformMap, DATA_TYPE, EXPLAIN_DATA_TYPE } from '@app/utils/constant';
 
 import styles from './index.module.less';
 const Option = Select.Option;
@@ -102,8 +102,11 @@ export const EditRow = (props: IEditProps) => {
                     message: intl.get('formRules.dataTypeRequired'),
                   },
                 ]}>
-                <Select showSearch={true} onChange={onUpdateType} dropdownMatchSelectWidth={false}>
+                <Select disabled={!Object.keys(DataTypeTransformMap).includes(type)} showSearch={true} onChange={onUpdateType} dropdownMatchSelectWidth={false}>
                   {DATA_TYPE.map(item => {
+                    if(!DataTypeTransformMap[type]?.includes(item.value) || item.value !== type) {
+                      return null;
+                    }
                     return (
                       <Option value={item.value} key={item.value}>
                         {item.label}

@@ -103,6 +103,14 @@ export const ENUM_OF_COMPARE = {
   ],
 };
 
+export const DataTypeTransformMap = {
+  int8: ['int16', 'int32', 'int'],
+  int16: ['int32', 'int'],
+  int32: ['int'],
+  fixed_string: ['string'],
+  float: ['double'],
+};
+
 export const DATA_TYPE = [
   {
     value: 'int',

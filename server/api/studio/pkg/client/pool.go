@@ -479,6 +479,9 @@ func parseExecuteData(response SingleResponse) (ParsedResult, error) {
 		return result, nil
 	}
 
+	if !res.IsSucceed() {
+		return result, errors.New(res.GetErrorMsg())
+	}
 	if res.IsSetPlanDesc() {
 		resp := response.Result
 		if response.Result == nil {
@@ -509,9 +512,6 @@ func parseExecuteData(response SingleResponse) (ParsedResult, error) {
 			result.Tables = append(result.Tables, rowValue)
 			return result, nil
 		}
-	}
-	if !res.IsSucceed() {
-		return result, errors.New(res.GetErrorMsg())
 	}
 	if !res.IsEmpty() {
 		rows := res.GetRows()
