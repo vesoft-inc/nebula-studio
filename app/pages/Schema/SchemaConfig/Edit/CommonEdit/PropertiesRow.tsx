@@ -102,7 +102,7 @@ export const EditRow = (props: IEditProps) => {
                     message: intl.get('formRules.dataTypeRequired'),
                   },
                 ]}>
-                <Select disabled={!Object.keys(DataTypeTransformMap).includes(type)} showSearch={true} onChange={onUpdateType} dropdownMatchSelectWidth={false}>
+                <Select disabled={!(type in DataTypeTransformMap)} showSearch={true} onChange={onUpdateType} dropdownMatchSelectWidth={false}>
                   {DATA_TYPE.map(item => {
                     if(!DataTypeTransformMap[type]?.includes(item.value) || item.value !== type) {
                       return null;

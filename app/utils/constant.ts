@@ -109,7 +109,7 @@ export const DataTypeTransformMap = {
   int32: ['int'],
   fixed_string: ['string'],
   float: ['double'],
-};
+} as const;
 
 export const DATA_TYPE = [
   {
