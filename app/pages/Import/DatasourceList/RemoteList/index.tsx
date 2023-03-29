@@ -2,11 +2,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
-import { Button, message, Popconfirm, Table } from 'antd';
+import { Button, message, Popconfirm, Table, TableColumnType } from 'antd';
 import Icon from '@app/components/Icon';
 import cls from 'classnames';
 import { IDatasourceType, IDatasourceItem } from '@app/interfaces/datasource';
-import { useI18n } from '@vesoft-inc/i18n';
+import { Translation, useI18n } from '@vesoft-inc/i18n';
 
 import dayjs from 'dayjs';
 import DatasourceConfigModal from '../DatasourceConfig/PlatformConfig';
@@ -15,53 +15,51 @@ import styles from './index.module.less';
 interface IProps {
   type: IDatasourceType;
 }
-const cloudKeys = [
+const s3Columns: TableColumnType<IDatasourceItem>[] = [
   {
-    title: 'ipAddress',
-    key: ['s3Config', 'endpoint']
+    title: <Translation>{(i) => i.get('import.ipAddress')}</Translation>,
+    dataIndex: ['s3Config', 'endpoint'],
   },
   {
-    title: 'bucketName',
-    key: ['s3Config', 'bucket']
+    title: <Translation>{(i) => i.get('import.bucketName')}</Translation>,
+    dataIndex: ['s3Config', 'bucket'],
   },
   {
-    title: 'accessKeyId',
-    key: ['s3Config', 'accessKey']
+    title: <Translation>{(i) => i.get('import.accessKeyId')}</Translation>,
+    dataIndex: ['s3Config', 'accessKey'],
   },
   {
-    title: 'region',
-    key: ['s3Config', 'region']
+    title: <Translation>{(i) => i.get('import.region')}</Translation>,
+    dataIndex: ['s3Config', 'region'],
   },
   {
-    title: 'createTime',
-    key: 'createTime',
-    render: data => data && dayjs(data).format('YYYY-MM-DD HH:mm:ss')
+    title: <Translation>{(i) => i.get('import.createTime')}</Translation>,
+    dataIndex: 'createTime',
+    render: (data) => data && dayjs(data).format('YYYY-MM-DD HH:mm:ss'),
   },
 ];
-const sftpKeys = [{
-  title: 'ipAddress',
-  key: ['sftpConfig', 'host'],
-  render: (_, row) => `${row.sftpConfig.host}:${row.sftpConfig.port}`
-},
-{
-  title: 'account',
-  key: ['sftpConfig', 'username']
-},
-{
-  title: 'createTime',
-  key: 'createTime',
-  render: data => data && dayjs(data).format('YYYY-MM-DD HH:mm:ss')
-}
+
+const sftpColumns: TableColumnType<IDatasourceItem>[] = [
+  {
+    title: <Translation>{(i) => i.get('import.ipAddress')}</Translation>,
+    dataIndex: ['sftpConfig', 'host'],
+    render: (_, row) => `${row.sftpConfig.host}:${row.sftpConfig.port}`,
+  },
+  {
+    title: <Translation>{(i) => i.get('import.account')}</Translation>,
+    dataIndex: ['sftpConfig', 'username'],
+  },
+  {
+    title: <Translation>{(i) => i.get('import.createTime')}</Translation>,
+    dataIndex: 'createTime',
+    render: (data) => data && dayjs(data).format('YYYY-MM-DD HH:mm:ss'),
+  },
 ];
-const columnKeys = {
-  [IDatasourceType.s3]: cloudKeys,
-  [IDatasourceType.sftp]: sftpKeys,
-};
 
 const DatasourceList = (props: IProps) => {
   const { type } = props;
   const { datasource } = useStore();
-  const { intl } = useI18n();
+  const { intl, currentLocale } = useI18n();
   const { getDatasourceList, deleteDataSource, batchDeleteDatasource } = datasource;
   const [data, setData] = useState<IDatasourceItem[]>([]);
   const [editData, setEditData] = useState<IDatasourceItem>(null);
@@ -81,29 +79,30 @@ const DatasourceList = (props: IProps) => {
     const flag = await deleteDataSource(id);
     flag && (getList(), message.success(intl.get('common.deleteSuccess')));
   }, []);  
-  const columns = columnKeys[type].map(item => ({
-    title: intl.get(`import.${item.title}`),
-    dataIndex: item.key,
-    render: item.render
-  })).concat(({
-    title: intl.get('common.operation'),
-    key: 'operation',
-    render: (_, item: IDatasourceItem) => (<div className={styles.operation}>
-      <Button className="primaryBtn" onClick={() => editItem(item)}>
-        <Icon type="icon-studio-btn-detail" />
-      </Button>
-      <Popconfirm
-        onConfirm={() => deleteItem(item.id)}
-        title={intl.get('common.ask')}
-        okText={intl.get('common.confirm')}
-        cancelText={intl.get('common.cancel')}
-      >
-        <Button className="warningBtn">
-          <Icon type="icon-studio-btn-delete" />
-        </Button>
-      </Popconfirm>
-    </div>)
-  } as any));
+  const tableColumns: TableColumnType<IDatasourceItem>[] = useMemo(() => {
+    const columns = type === IDatasourceType.S3 ? s3Columns : sftpColumns;
+    return columns.concat({
+      title: intl.get('common.operation'),
+      key: 'operation',
+      render: (_, item) => (
+        <div className={styles.operation}>
+          <Button className="primaryBtn" onClick={() => editItem(item)}>
+            <Icon type="icon-studio-btn-detail" />
+          </Button>
+          <Popconfirm
+            onConfirm={() => deleteItem(item.id)}
+            title={intl.get('common.ask')}
+            okText={intl.get('common.confirm')}
+            cancelText={intl.get('common.cancel')}
+          >
+            <Button className="warningBtn">
+              <Icon type="icon-studio-btn-delete" />
+            </Button>
+          </Popconfirm>
+        </div>
+      ),
+    }); 
+  }, [type, currentLocale]);
 
 
   const getList = async () => {
@@ -157,7 +156,7 @@ const DatasourceList = (props: IProps) => {
             selectedRowKeys: selectIds,
             onChange: (selectedRowKeys) => setSelectIds(selectedRowKeys as number[]),
           }}
-          columns={columns}
+          columns={tableColumns}
           rowKey="id"
           pagination={false}
         />

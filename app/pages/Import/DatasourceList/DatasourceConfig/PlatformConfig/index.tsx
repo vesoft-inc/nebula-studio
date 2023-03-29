@@ -44,28 +44,28 @@ const DatasourceConfigModal = (props: IProps) => {
       });
       setLoading(false);
       flag && (message.success(intl.get('schema.createSuccess')), onConfirm());
-    } else {
-      switch (_type) {
-        case IDatasourceType.s3:
-          const s3Cfg = values.s3Config;
-          s3Cfg.accessSecret === tempPwd && (s3Cfg.accessSecret = undefined);
-          break;
-        case IDatasourceType.sftp:
-          const sftpCfg = values.sftpConfig;
-          sftpCfg.password === tempPwd && (sftpCfg.password = undefined);
-          break;
-        default:
-          break;
-      }
-      const flag = await updateDataSource({
-        id: data.id,
-        type: _type,
-        name: '',
-        ...values
-      });
-      setLoading(false);
-      flag && (message.success(intl.get('common.updateSuccess')), onConfirm());
+      return;
+    } 
+    switch (_type) {
+      case IDatasourceType.S3:
+        const s3Cfg = values.s3Config;
+        s3Cfg.accessSecret === tempPwd && (s3Cfg.accessSecret = undefined);
+        break;
+      case IDatasourceType.SFTP:
+        const sftpCfg = values.sftpConfig;
+        sftpCfg.password === tempPwd && (sftpCfg.password = undefined);
+        break;
+      default:
+        break;
     }
+    const flag = await updateDataSource({
+      id: data.id,
+      type: _type,
+      name: '',
+      ...values
+    });
+    setLoading(false);
+    flag && (message.success(intl.get('common.updateSuccess')), onConfirm());
   };
 
   if(!visible) return null;
@@ -85,24 +85,24 @@ const DatasourceConfigModal = (props: IProps) => {
         <FormItem noStyle shouldUpdate>
           {({ getFieldValue }) => {
             const configType = type || getFieldValue('type');
-            if (configType !== IDatasourceType.s3) return;
+            if (configType !== IDatasourceType.S3) return;
             return <p className={styles.tip}>{intl.get('import.s3Tip')}</p>;
           }}
         </FormItem>
-        {!type && <FormItem label={intl.get('import.dataSourceType')} name="type" initialValue={type || IDatasourceType.s3}>
+        {!type && <FormItem label={intl.get('import.dataSourceType')} name="type" initialValue={type || IDatasourceType.S3}>
           <Select>
-            <Select.Option value={IDatasourceType.s3}>{intl.get('import.s3')}</Select.Option>
-            <Select.Option value={IDatasourceType.sftp}>{intl.get('import.sftp')}</Select.Option>
-            <Select.Option value={IDatasourceType.local}>{intl.get('import.localFiles')}</Select.Option>
+            <Select.Option value={IDatasourceType.S3}>{intl.get('import.s3')}</Select.Option>
+            <Select.Option value={IDatasourceType.SFTP}>{intl.get('import.sftp')}</Select.Option>
+            <Select.Option value={IDatasourceType.Local}>{intl.get('import.localFiles')}</Select.Option>
           </Select>
         </FormItem>}
         <FormItem noStyle shouldUpdate>
           {({ getFieldValue }) => {
             const configType = type || getFieldValue('type');
             switch (configType) {
-              case IDatasourceType.s3:
+              case IDatasourceType.S3:
                 return <S3ConfigForm formRef={form} mode={mode} tempPwd={tempPwd} />;
-              case IDatasourceType.sftp:
+              case IDatasourceType.SFTP:
                 return <SftpConfigForm formRef={form} mode={mode} tempPwd={tempPwd} />;
               default:
                 return null;

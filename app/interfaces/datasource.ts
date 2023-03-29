@@ -1,43 +1,24 @@
 export enum IDatasourceType {
-  's3' = 's3',
-  'sftp' = 'sftp',
-  'local' = 'local'
+  'S3' = 's3',
+  'SFTP' = 'sftp',
+  'Local' = 'local'
 }
 export enum IS3Platform {
-  'aws' = 'aws',
-  'oss' = 'oss',
-  'customize' = 'customize',
-  'tecent' = 'cos'
+  'AWS' = 'aws',
+  'OSS' = 'oss',
+  'Customize' = 'customize',
+  'Tecent' = 'cos'
 }
 
-export interface IDatasourceAdd {
-  name: string;
-  type: IDatasourceType;
-  platform?: string;
-  s3Config?: {
-    accessKey: string;
-    accessSecret?: string;
-    endpoint: string;
-    bucket: string;
-    region?: string;
-  };
-  sftpConfig?: {
-    host: string;
-    port: number;
-    username: string;
-    password: string;
-  };
-}
-export interface IDatasourceUpdate extends IDatasourceAdd {
-  id: number;
-}
+export type IDatasourceAdd = Omit<IDatasourceItem, 'id' | 'createTime'>;
+export type IDatasourceUpdate = Omit<IDatasourceItem, 'createTime'>;
 
 export interface IDatasourceItem {
-  id?: number;
+  id: number;
   name: string;
   type: IDatasourceType;
   platform?: string;
-  createTime?: string;
+  createTime: string;
   s3Config?: {
     accessKey: string;
     accessSecret?: string;

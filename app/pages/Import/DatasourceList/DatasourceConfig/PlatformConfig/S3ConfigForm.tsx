@@ -36,10 +36,10 @@ const S3ConfigForm = (props: IProps) => {
     <FormItem noStyle>
       <FormItem name="platform" label={intl.get('import.s3Platform')} rules={[{ required: true, message: intl.get('formRules.platformRequired') }]}>
         <Select placeholder={intl.get('import.selectPlatform')} onChange={handleReset}>
-          <Select.Option value={IS3Platform.aws}>AWS S3</Select.Option>
-          <Select.Option value={IS3Platform.oss}>Aliyun OSS</Select.Option>
-          <Select.Option value={IS3Platform.tecent}>Tecent COS</Select.Option>
-          <Select.Option value={IS3Platform.customize}>{intl.get('import.customize')}</Select.Option>
+          <Select.Option value={IS3Platform.AWS}>AWS S3</Select.Option>
+          <Select.Option value={IS3Platform.OSS}>Aliyun OSS</Select.Option>
+          <Select.Option value={IS3Platform.Tecent}>Tecent COS</Select.Option>
+          <Select.Option value={IS3Platform.Customize}>{intl.get('import.customize')}</Select.Option>
         </Select>
       </FormItem>
       <FormItem noStyle shouldUpdate>
@@ -47,13 +47,13 @@ const S3ConfigForm = (props: IProps) => {
           const platform = getFieldValue('platform');
           return (
             <>
-              <FormItem name={['s3Config', 'region']} label={intl.get('import.region')} rules={[platform === IS3Platform.aws && { required: true, message: intl.get('formRules.regionRequired') } ]}>
+              <FormItem name={['s3Config', 'region']} label={intl.get('import.region')} rules={[platform === IS3Platform.AWS && { required: true, message: intl.get('formRules.regionRequired') } ]}>
                 <Input placeholder={intl.get('import.enterRegion')} />
               </FormItem>
               <FormItem noStyle>
                 <div className={styles.endpointFormItem}>
                   <FormItem name={['s3Config', 'endpoint']} label={intl.get('import.endpoint')} rules={[{ required: true, message: intl.get('formRules.endpointRequired') } ]}>
-                    <Input placeholder={platform === IS3Platform.aws ? 'https://s3.<region>.amazonaws.com' : intl.get('import.enterAddress')} />
+                    <Input placeholder={platform === IS3Platform.AWS ? 'https://s3.<region>.amazonaws.com' : intl.get('import.enterAddress')} />
                   </FormItem>
                   {platform && <Instruction description={intl.get('import.endpointTip', { sample: intl.get(`import.${platform}Tip`) })} />}
                 </div>
@@ -64,7 +64,7 @@ const S3ConfigForm = (props: IProps) => {
               <FormItem name={['s3Config', 'accessKey']} label={intl.get('import.accessKeyId')} rules={[{ required: true, message: intl.get('formRules.accessKeyIdRequired') } ]}>
                 <Input placeholder={intl.get('import.accessKeyId')} />
               </FormItem>
-              <FormItem name={['s3Config', 'accessSecret']} label={intl.get('import.accessKeySecret')} rules={[platform !== IS3Platform.customize && { required: true, message: intl.get('formRules.accessKeySecretRequired') } ]}>
+              <FormItem name={['s3Config', 'accessSecret']} label={intl.get('import.accessKeySecret')} rules={[platform !== IS3Platform.Customize && { required: true, message: intl.get('formRules.accessKeySecretRequired') } ]}>
                 <Input type="password" placeholder={intl.get('import.accessKeySecret')} onChange={handleUpdatePassword} />
               </FormItem>
             </>

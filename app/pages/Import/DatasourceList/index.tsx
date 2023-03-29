@@ -11,24 +11,24 @@ const DatasourceList = () => {
   const { intl } = useI18n();
   const items: TabsProps['items'] = [
     {
-      key: IDatasourceType.local,
+      key: IDatasourceType.Local,
       label: intl.get('import.localFiles'),
       children: <LocalFileList />
     },
     {
-      key: IDatasourceType.s3,
+      key: IDatasourceType.S3,
       label: intl.get('import.s3'),
-      children: <RemoteList type={IDatasourceType.s3} />
+      children: <RemoteList type={IDatasourceType.S3} />
     },
     {
-      key: IDatasourceType.sftp,
+      key: IDatasourceType.SFTP,
       label: intl.get('import.sftp'),
-      children: <RemoteList type={IDatasourceType.sftp} />
+      children: <RemoteList type={IDatasourceType.SFTP} />
     },
   ];
   return (
     <div className={styles.dataSourceContainer}>
-      <Tabs defaultActiveKey={IDatasourceType.local} items={items} className={styles.sourceTabs} />
+      <Tabs defaultActiveKey={IDatasourceType.Local} items={items} className={styles.sourceTabs} />
     </div>
   );
 };

@@ -45,7 +45,7 @@ const FileSelect = observer((props: IFileSelect) => {
       directory: files,
       path: '/',
       loading: false,
-      activeId: IDatasourceType.local
+      activeId: IDatasourceType.Local
     });
   }, []);
   const getDatasourceDirectory = useCallback(async (id, path?) => {
@@ -71,10 +71,13 @@ const FileSelect = observer((props: IFileSelect) => {
   const handlePathBack = useCallback(async () => {
     if(!path || path === '/') return;
     setState({ loading: true });
-    const _path = path.slice(0, -1).split('/');
-    _path.pop();
-    const newPath = _path.join('/').length ? _path.join('/') + '/' : '';
-    getDatasourceDirectory(activeId, newPath);
+    /**
+     * - `/a/b/c/?` => `/a/b/`
+     * - `a/b/?` => `a`
+     * - `a/?` => ``
+     */
+    const parentPath = path.replace(/(\/|^)[^/]+\/?$/, '$1');
+    getDatasourceDirectory(activeId, parentPath);
   }, [path, activeId]);
   const handleTypeChange = useCallback(async (value) => {
     setState({ 
@@ -83,7 +86,7 @@ const FileSelect = observer((props: IFileSelect) => {
       activeItem: null,
       path: '',
     });
-    if(value === IDatasourceType.local) {
+    if(value === IDatasourceType.Local) {
       getLocalFiles();
     } else {
       getDatasourceDirectory(value);
@@ -91,7 +94,7 @@ const FileSelect = observer((props: IFileSelect) => {
   }, []);
   const handleRefresh = useCallback(async () => {
     setState({ loading: true });
-    if (!activeId || activeId === IDatasourceType.local) {
+    if (!activeId || activeId === IDatasourceType.Local) {
       getLocalFiles();
       return;
     }
@@ -99,24 +102,24 @@ const FileSelect = observer((props: IFileSelect) => {
     getDatasourceDirectory(activeId, _path);
   }, [activeId, path]);
   const handleConfirm = useCallback(async () => {
-    if(activeItem && activeId === IDatasourceType.local) {
+    if(activeItem && activeId === IDatasourceType.Local) {
       // select local file
       onConfirm(activeItem, state);
-    } else {
-      setState({ loading: true });
-      const _path = `${path === '/' ? '' : path}${activeItem.name}`;
-      const data = await previewFile({ id: activeId as number, path: _path });
-      const item = {
-        name: activeItem.name,
-        withHeader: false,
-        delimiter: ',',
-        sample: data.contents.join('\r\n'),
-        path: _path,
-        datasourceId: activeId === IDatasourceType.local ? null : activeId,
-      } as any;
-      setState({ loading: false });
-      onConfirm(item, state);
+      return;
     }
+    setState({ loading: true });
+    const _path = `${path === '/' ? '' : path}${activeItem.name}`;
+    const data = await previewFile({ id: activeId as number, path: _path });
+    const item = {
+      name: activeItem.name,
+      withHeader: false,
+      delimiter: ',',
+      sample: data.contents.join('\r\n'),
+      path: _path,
+      datasourceId: activeId === IDatasourceType.Local ? null : activeId,
+    } as any;
+    setState({ loading: false });
+    onConfirm(item, state);
   }, [activeItem, activeId, path]);
   return <Spin spinning={loading}>
     <div className={styles.row}>
@@ -128,13 +131,21 @@ const FileSelect = observer((props: IFileSelect) => {
         optionLabelProp="label"
         defaultValue={activeId}
         dropdownMatchSelectWidth={false}>
-        <Option value={IDatasourceType.local}>{intl.get('import.localFiles')}</Option>
+        <Option value={IDatasourceType.Local}>{intl.get('import.localFiles')}</Option>
         {options.map((item) => {
-          const endpoint = item.type === IDatasourceType.s3 ? item.s3Config.endpoint : item.sftpConfig.host + ':' + item.sftpConfig.port;
+          let endpoint = '';
+          let label = '';
+          if (item.type === IDatasourceType.S3) {
+            endpoint = item.s3Config.endpoint;
+            label = intl.get('import.s3');
+          } else {
+            endpoint = item.sftpConfig.host + ':' + item.sftpConfig.port;
+            label = intl.get('import.sftp');
+          }
           return <Option value={item.id} key={item.id} label={endpoint}>
             <span className={styles.typeItem} aria-label={endpoint}>
               <span className={styles.value}>{endpoint}</span>
-              <span className={styles.type}>{intl.get(`import.${IDatasourceType[item.type]}`)}</span>
+              <span className={styles.type}>{label}</span>
             </span>
           </Option>;
         })}
@@ -149,7 +160,7 @@ const FileSelect = observer((props: IFileSelect) => {
       </div>
     </div>
     <div className={styles.fileDirectory}>
-      {directory.map((item) => (
+      {directory?.map((item) => (
         <div key={item.name} 
           className={cls(styles.item, activeItem === item && styles.actived)} 
           onClick={() => setState({ activeItem: item })}
