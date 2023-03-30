@@ -218,7 +218,7 @@
     "reUpload": "重新上传",
     "fileNotExist": "文件 {name} 不存在",
     "importYaml": "导入 YAML 文件",
-    "templateMatchError": "配置中的{type}与当前登录账号/地址不匹配",
+    "templateMatchError": "配置中的用户姓名与当前登录账号不一致",
     "uploadSuccessfully": "上传文件成功",
     "fileSizeLimit": "文件过大，超过上传限制({size})，请将文件通过 scp 的方式上传到安装目录下的 data/upload 目录",
     "noHttp": "配置文件中的 address 不支持携带 http 协议，请去除 http(s)://",
@@ -306,7 +306,16 @@
     "awsTip": "https://s3.us-east-2.amazonaws.com",
     "ossTip": "https://oss-cn-hangzhou.aliyuncs.com",
     "cosTip": "https://cos.ap-shanghai.myqcloud.com",
-    "customizeTip": "http://127.0.0.1:9000"
+    "customizeTip": "http://127.0.0.1:9000",
+    "addressRequired": "请在配置文件中输入导入地址",
+    "usernameRequired": "请在配置文件中输入用户名",
+    "passwordRequired": "请在配置文件中输入密码",
+    "s3AccessKeyRequired": "请在配置文件中输入 s3 的 accessKey",
+    "s3SecretKeyRequired": "请在配置文件中输入 s3 的 secretKey",
+    "sftpUsernameRequired": "请在配置文件中输入 sftp 的用户名",
+    "sftpPasswordRequired": "请在配置文件中输入 sftp 的密码",
+    "ossAccessKeyRequired": "请在配置文件中输入 oss 的 accessKey",
+    "ossSecretKeyRequired": "请在配置文件中输入 oss 的 secretKey"
   },
   "schema": {
     "spaceList": "图空间列表",

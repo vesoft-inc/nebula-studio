@@ -218,7 +218,7 @@
     "reUpload": "Re-upload",
     "fileNotExist": "{name} file does not exist！",
     "importYaml": "Import the YAML file",
-    "templateMatchError": "The {type} in the configuration does not match the current login account/host",
+    "templateMatchError": "The user in the configuration does not match the current login account",
     "uploadSuccessfully": "Upload files successfully.",
     "fileSizeLimit": "The file is too large and exceeds the upload limit({size}), please upload the file to the data/upload directory under the installation directory via scp",
     "noHttp": "The address in the configuration file does not support http protocol, please remove http(s)://",
@@ -306,7 +306,16 @@
     "awsTip": "https://s3.us-east-2.amazonaws.com",
     "ossTip": "https://oss-cn-hangzhou.aliyuncs.com",
     "cosTip": "https://cos.ap-shanghai.myqcloud.com",
-    "customizeTip": "http://127.0.0.1:9000"
+    "customizeTip": "http://127.0.0.1:9000",
+    "addressRequired": "Please enter the import address in the configuration file",
+    "usernameRequired": "Please enter the username in the configuration file",
+    "passwordRequired": "Please enter the password in the configuration file",
+    "s3AccessKeyRequired": "Please enter the s3 accessKey in the configuration file",
+    "s3SecretKeyRequired": "Please enter the s3 secretKey in the configuration file",
+    "sftpUsernameRequired": "Please enter the sftp username in the configuration file",
+    "sftpPasswordRequired": "Please enter the sftp password in the configuration file",
+    "ossAccessKeyRequired": "Please enter the oss accessKey in the configuration file",
+    "ossSecretKeyRequired": "Please enter the oss secretKey in the configuration file"
   },
   "schema": {
     "spaceList": "Graph Space List",
