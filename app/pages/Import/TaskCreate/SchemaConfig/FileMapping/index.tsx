@@ -1,5 +1,5 @@
 import { Button, Collapse, Input, Select, Table, Tooltip } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import cls from 'classnames';
 import { useStore } from '@app/stores';
@@ -39,18 +39,24 @@ const VIDSetting = observer((props: {
   const { intl } = useI18n();
   const { schema } = useStore();
   const { spaceVidType } = schema;
+  const [key, setKey] = useState(null);
+  const handleChange = useCallback(v => setKey(v), []);
+  const handleMapping = useCallback(index => {
+    data.update({ [idKey]: index });
+    index.length > 1 && setKey(['default']);
+  }, [data]);
   return <div className={styles.row}>
-    <Collapse bordered={false} ghost className={styles.vidCollapse}>
+    <Collapse bordered={false} ghost className={styles.vidCollapse} onChange={handleChange} activeKey={key}>
       <Panel header={<div className={cls(styles.panelTitle, styles.spaceBetween)}>
         <div>
           <span className={cls(styles.label, styles.required)}>{intl.get(`import.${label}`)}</span>
           <CSVPreviewLink
-            onMapping={(index) => data.update({ [idKey]: index })}
+            onMapping={(index) => handleMapping(index)}
             file={data.file}
             data={data[idKey]}
             multipleMode={true}
           >
-            {(!data[idKey] || data[idKey].length === 0) ? intl.get('import.selectCsvColumn') : `Column ${data[idKey]}`}
+            {(!data[idKey] || data[idKey].length === 0) ? intl.get('import.selectCsvColumn') : data[idKey].map(i => `Column ${i}`).join(', ')}
           </CSVPreviewLink>
         </div>
         <Instruction description={<>

@@ -1,7 +1,7 @@
 import { useI18n } from '@vesoft-inc/i18n';
 import { Modal } from 'antd';
 import { observer } from 'mobx-react-lite';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import FileConfigSetting from '@app/components/FileConfigSetting';
 import { ICachedStore } from '@app/stores/datasource';
 import FileSelect from './FileSelect';
@@ -24,14 +24,14 @@ const FileSelectModal = (props: IModalProps) => {
     }
     return intl.get('import.preview');
   }, [step]);
-  const handlePreview = (file, cachedState) => {
+  const handlePreview = useCallback((file, cachedState) => {
     setPreUploadList([file]);
     setcachedState(cachedState);
     setStep(1);
-  };
-  const handleConfirm = (file) => {
+  }, []);
+  const handleConfirm = useCallback((file) => {
     onConfirm(file[0], cachedState);
-  };
+  }, [cachedState]);
   return (
     <Modal
       title={title}

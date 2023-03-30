@@ -60,7 +60,7 @@ const FileConfigSetting = (props: IProps) => {
     if(!activeItem) return;
     setState({ loading: true });
     let content = [];
-    if(activeItem.sample) {
+    if(activeItem.sample !== undefined) {
       readString(activeItem.sample, { 
         delimiter: activeItem.delimiter || ',',
         worker: true, 

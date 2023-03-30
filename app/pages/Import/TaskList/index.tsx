@@ -81,7 +81,7 @@ const TaskList = (props: IProps) => {
     };
   }, []);
   useEffect(() => {
-    const loadingStatus = [ITaskStatus.StatusProcessing, ITaskStatus.StatusPending];
+    const loadingStatus = [ITaskStatus.Processing, ITaskStatus.Pending];
     const needRefresh = taskList.filter(item => loadingStatus.includes(item.status)).length > 0;
     if(logDimension.id !== undefined && loadingStatus.includes(logDimension.status)) {
       const status = taskList.filter(item => item.id === logDimension.id)[0].status;

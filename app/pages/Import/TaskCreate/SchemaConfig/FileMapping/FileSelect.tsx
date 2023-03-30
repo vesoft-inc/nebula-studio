@@ -1,5 +1,5 @@
 import { ArrowLeftOutlined, FileTextFilled, FolderFilled, SyncOutlined } from '@ant-design/icons';
-import { IDatasourceType } from '@app/interfaces/datasource';
+import { IDatasourceType, IS3Platform } from '@app/interfaces/datasource';
 import { useStore } from '@app/stores';
 import { ICachedStore } from '@app/stores/datasource';
 import { useBatchState } from '@app/utils';
@@ -133,19 +133,19 @@ const FileSelect = observer((props: IFileSelect) => {
         dropdownMatchSelectWidth={false}>
         <Option value={IDatasourceType.Local}>{intl.get('import.localFiles')}</Option>
         {options.map((item) => {
-          let endpoint = '';
           let label = '';
+          let platform = '';
           if (item.type === IDatasourceType.S3) {
-            endpoint = item.s3Config.endpoint;
-            label = intl.get('import.s3');
+            label = item.s3Config.bucket;
+            platform = item.platform !== IS3Platform.Customize ? item.platform.toUpperCase() : intl.get('import.s3');
           } else {
-            endpoint = item.sftpConfig.host + ':' + item.sftpConfig.port;
-            label = intl.get('import.sftp');
+            label = item.sftpConfig.host + ':' + item.sftpConfig.port;
+            platform = intl.get('import.sftp');
           }
-          return <Option value={item.id} key={item.id} label={endpoint}>
-            <span className={styles.typeItem} aria-label={endpoint}>
-              <span className={styles.value}>{endpoint}</span>
-              <span className={styles.type}>{label}</span>
+          return <Option value={item.id} key={item.id} label={label}>
+            <span className={styles.typeItem} aria-label={label}>
+              <span className={styles.value}>{label}</span>
+              <span className={styles.type}>{platform}</span>
             </span>
           </Option>;
         })}

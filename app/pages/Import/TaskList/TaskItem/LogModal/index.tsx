@@ -77,7 +77,7 @@ const LogModal = (props: IProps) => {
       if(isMounted) {
         timer.current = setTimeout(readLog, 2000);
       }
-    } else if ([ITaskStatus.StatusProcessing, ITaskStatus.StatusPending].includes(_status.current)) {
+    } else if ([ITaskStatus.Processing, ITaskStatus.Pending].includes(_status.current)) {
       if(isMounted) {
         timer.current = setTimeout(readLog, 2000);
       }
@@ -126,7 +126,7 @@ const LogModal = (props: IProps) => {
       title={<>
         <div className={styles.importModalTitle}>
           <span>{`${space} ${intl.get('import.task')} - ${intl.get('common.log')}`}</span>
-          {(loading || [ITaskStatus.StatusProcessing, ITaskStatus.StatusPending].includes(status)) && <Button type="text" loading={true} />}
+          {(loading || [ITaskStatus.Processing, ITaskStatus.Pending].includes(status)) && <Button type="text" loading={true} />}
         </div>
         {showLogDownload && <Button className="studioAddBtn primaryBtn" onClick={handleLogDownload}>
           <Icon type="icon-studio-btn-download" />
