@@ -105,6 +105,12 @@ const SchemaConfig: React.FC = () => {
     return null;
   }
 
+  const handleCheck = (changedValues) => {
+    const { properties } = changedValues;
+    if (properties && properties.some(i => i.name !== undefined)) {
+      form.validateFields([['properties']]);
+    }
+  };
   const { type, name, comment, properties } = active;
 
   return (
@@ -123,6 +129,7 @@ const SchemaConfig: React.FC = () => {
         form={form}
         className={styles.configForm}
         initialValues={{ name, comment, properties }}
+        onValuesChange={handleCheck}
         onFieldsChange={handleUpdate}
         name="form"
         layout="vertical"

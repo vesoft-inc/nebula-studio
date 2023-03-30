@@ -58,8 +58,18 @@ const PropertiesForm = (props: IProps) => {
             const properties = getFieldValue('properties') || [];
             return (
               <div>
-                <Form.List name="properties">
-                  {(fields, { add, remove }) => {
+                <Form.List name="properties" rules={[
+                  {
+                    validator: (_, properties) => {
+                      const names = properties.map((item) => item.name);
+                      if(names.length !== new Set(names).size) {
+                        return Promise.reject(intl.get('schema.uniqProperty'));
+                      }
+                      return Promise.resolve();
+                    },
+                  },
+                ]}>
+                  {(fields, { add, remove }, { errors }) => {
                     return (
                       <Form.Item noStyle>
                         <div className={styles.propertyAction}>
@@ -90,12 +100,7 @@ const PropertiesForm = (props: IProps) => {
                                   name={[name, 'name']}
                                   {...restField}
                                   {...itemLayout}
-                                  rules={[...nameRulesFn(), () => ({ validator: (_, value) => {
-                                    if (!value || properties.filter((item, i) => item.name === value && i !== index).length === 0) {
-                                      return Promise.resolve();
-                                    }
-                                    return Promise.reject(intl.get('schema.uniqProperty'));
-                                  } })]}
+                                  rules={[...nameRulesFn()]}
                                 >
                                   <Input />
                                 </Form.Item>
@@ -153,6 +158,7 @@ const PropertiesForm = (props: IProps) => {
                                   />
                                 </Form.Item>
                               </Col>
+                              <Form.ErrorList className={styles.errors} errors={errors} />
                             </Row>
                           </React.Fragment>
                         ))}
