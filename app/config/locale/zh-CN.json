@@ -301,7 +301,7 @@
     "directory": "目录",
     "preview": "预览",
     "customize": "自定义",
-    "s3Platform": "S3 平台",
+    "s3Platform": "S3 服务提供商",
     "endpointTip": "请使用域名中不含 bucket 名称的节点，例如 {sample}",
     "awsTip": "https://s3.us-east-2.amazonaws.com",
     "ossTip": "https://oss-cn-hangzhou.aliyuncs.com",
