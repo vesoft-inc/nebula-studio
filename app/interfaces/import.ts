@@ -1,12 +1,12 @@
 import { RcFile } from 'antd/lib/upload';
 
 export enum ITaskStatus {
-  'StatusFinished' = 'Success',
-  'StatusStoped' = 'Stopped',
-  'StatusProcessing' = 'Running',
-  'StatusNotExisted' = 'NotExisted',
-  'StatusAborted' = 'Failed',
-  'StatusPending' = 'Pending',
+  'Finished' = 'Success',
+  'Stoped' = 'Stopped',
+  'Processing' = 'Running',
+  'NotExisted' = 'NotExisted',
+  'Aborted' = 'Failed',
+  'Pending' = 'Pending',
 }
 
 export interface ITaskStats {
@@ -18,8 +18,10 @@ export interface ITaskStats {
   totalRequest: number;
   totalLatency: number;
   totalRespTime: number;
-  failedProcessed: number; // The number of nodes and edges that have failed to be processed.
-  totalProcessed: number; // The number of nodes and edges that have been processed.
+  /* The number of nodes and edges that have failed to be processed. */
+  failedProcessed: number; 
+  /* 123. */
+  totalProcessed: number; 
 }
 export interface ITaskItem {
   id: number;
@@ -47,14 +49,42 @@ export interface IImportFile {
   content: string[];
   withHeader?: boolean;
   delimiter?: string;
+  s3Config?: IS3Config;
+  sftpConfig?: ISftpConfig;
+  /** remote config id */
+  datasourceId?: number;
+  /** remote path */
+  path?: string;
 }
 
+export interface IS3Config {
+  region: string;
+  endpoint: string;
+  accessKey: string;
+  accessSecret: string;
+  bucket: string;
+  token?: string;
+  key: string;
+}
+
+export interface ISftpConfig {
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  path: string;
+  keyFile?: string;
+  keyData?: string;
+  passPhrase?: string;
+}
 export interface IBasicConfig {
   taskName: string;
   address: string[];
   batchSize?: string;
   concurrency?: string;
   retry?: string;
+  readerConcurrency?: string;
+  importerConcurrency?: string;
 }
 
 export interface ILogDimension {

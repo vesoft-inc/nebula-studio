@@ -24,6 +24,8 @@ export function configToJson(payload: IConfig) {
     address,
     concurrency,
     retry,
+    readerConcurrency,
+    importerConcurrency
   } = payload;
   const vertexToJSON = tagDataToJSON(
     tagConfig,
@@ -46,12 +48,33 @@ export function configToJson(payload: IConfig) {
     manager: {
       spaceName: handleEscape(space),
       batch: Number(batchSize) || DEFAULT_IMPORT_CONFIG.batchSize,
+      readerConcurrency: Number(readerConcurrency ?? DEFAULT_IMPORT_CONFIG.readerConcurrency),
+      importerConcurrency: Number(importerConcurrency ?? DEFAULT_IMPORT_CONFIG.importerConcurrency),
     },
     sources
   };
   return configJson;
 }
 
+const getIdConfig = (payload: {
+  indexes: number[], 
+  prefix?: string, 
+  suffix?: string,
+  vidFunction?: string,
+  type: string
+}) => {
+  const { indexes, prefix, suffix, vidFunction, type } = payload;
+  const id = {
+    type,
+    function: vidFunction,
+  } as any;
+  if(indexes.length > 1 || !!prefix || !!suffix) {
+    id.concatItems = [prefix, ...indexes, suffix];
+  } else {
+    id.index = indexes[0];
+  }
+  return id;
+};
 export function edgeDataToJSON(
   configs: IEdgeItem[],
   spaceVidType: string,
@@ -59,7 +82,7 @@ export function edgeDataToJSON(
   const result = configs.reduce((acc: any, cur) => {
     const { name, files } = cur;
     const _config = files.map(item => {
-      const { file, props, srcIdIndex, srcIdFunction, dstIdIndex, dstIdFunction } = item;
+      const { file, props, srcIdIndex, srcIdFunction, dstIdIndex, dstIdFunction, srcIdPrefix, srcIdSuffix, dstIdPrefix, dstIdSuffix } = item;
       const vidType = spaceVidType === 'INT64' ? 'int' : 'string';
       // rank is the last prop
       const rank = props[props.length - 1];
@@ -77,30 +100,39 @@ export function edgeDataToJSON(
       const edges = [{
         name: handleEscape(name),
         src: {
-          id: {
+          id: getIdConfig({
+            indexes: srcIdIndex,
+            prefix: srcIdPrefix,
+            suffix: srcIdSuffix,
+            vidFunction: srcIdFunction,
             type: vidType,
-            index: srcIdIndex,
-            function: srcIdFunction,
-          }
+          })
         },
         dst: {
-          id: {
+          id: getIdConfig({
+            indexes: dstIdIndex,
+            prefix: dstIdPrefix,
+            suffix: dstIdSuffix,
+            vidFunction: dstIdFunction,
             type: vidType,
-            index: dstIdIndex,
-            function: dstIdFunction,
-          }
+          })
         },
         rank: typeof rank.mapping == 'number' ? { index: rank.mapping } : null,
         props: edgeProps,
       }];
       const edgeConfig = {
-        path: file.name,
         csv: {
           withHeader: file.withHeader || false,
           delimiter: file.delimiter
         },
         edges,
-      };
+      } as any;
+      if(file.datasourceId) {
+        edgeConfig.datasourceId = file.datasourceId;
+        edgeConfig.datasourceFilePath = file.path;
+      } else {
+        edgeConfig.path = file.name;
+      }
       return edgeConfig;
     });
     acc.push(..._config);
@@ -116,7 +148,7 @@ export function tagDataToJSON(
   const result = configs.reduce((acc: any, cur) => {
     const { name, files } = cur;
     const _config = files.map(item => {
-      const { file, props, vidIndex, vidFunction } = item;
+      const { file, props, vidIndex, vidFunction, vidPrefix, vidSuffix } = item;
       const _props = props.reduce((acc: any, cur) => {
         if (isEmpty(cur.mapping) && (cur.allowNull || cur.isDefault)) {
           return acc;
@@ -128,24 +160,31 @@ export function tagDataToJSON(
         });
         return acc;
       }, []);
-
       const tags = [{
         name: handleEscape(name),
-        id: {
+        id: getIdConfig({
+          indexes: vidIndex,
+          prefix: vidPrefix,
+          suffix: vidSuffix,
+          vidFunction,
           type: spaceVidType === 'INT64' ? 'int' : 'string',
-          index: vidIndex,
-          function: vidFunction,
-        },
+        }),
         props: _props.filter(prop => prop),
       }];
-      return {
-        path: file.name,
+      const result = {
         csv: {
           withHeader: file.withHeader || false,
           delimiter: file.delimiter
         },
         tags
-      };
+      } as any;
+      if(file.datasourceId) {
+        result.datasourceId = file.datasourceId;
+        result.datasourceFilePath = file.path;
+      } else {
+        result.path = file.name;
+      }
+      return result;
     });
     acc.push(..._config);
     return acc;

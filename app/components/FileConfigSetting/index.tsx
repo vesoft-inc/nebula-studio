@@ -1,22 +1,21 @@
 import Icon from '@app/components/Icon';
 import { useI18n } from '@vesoft-inc/i18n';
-import { Button, Input, Modal, Table, Popconfirm, Dropdown, message } from 'antd';
+import { Button, Input, Modal, Table, Popconfirm, Dropdown } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useState } from 'react';
 import { usePapaParse } from 'react-papaparse';
 import cls from 'classnames';
 import { StudioFile } from '@app/interfaces/import';
-import { useStore } from '@app/stores';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import { observable } from 'mobx';
 import Checkbox, { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import styles from './index.module.less';
 interface IProps {
-  visible: boolean;
-  onConfirm: () => void;
+  onConfirm: (data) => void;
   onCancel: () => void;
-  uploadList: StudioFile[];
+  preUploadList: StudioFile[];
+  duplicateCheckList?: StudioFile[];
 }
 
 const DelimiterConfigModal = (props: { onConfirm: (string) => void }) => {
@@ -30,10 +29,8 @@ const DelimiterConfigModal = (props: { onConfirm: (string) => void }) => {
     </div>
   );
 };
-const UploadConfigModal = (props: IProps) => {
-  const { visible, onConfirm, onCancel, uploadList } = props;
-  const { files } = useStore();
-  const { fileList, uploadFile } = files;
+const FileConfigSetting = (props: IProps) => {
+  const { onConfirm, onCancel, preUploadList, duplicateCheckList } = props;
   const { intl } = useI18n();
   const state = useLocalObservable(() => ({
     data: [],
@@ -44,12 +41,17 @@ const UploadConfigModal = (props: IProps) => {
     loading: false,
     uploading: false,
     setState: (obj) => Object.assign(state, obj),
-  }), { data: observable.ref });
-  const { readRemoteFile } = usePapaParse();
+  }), { data: observable.ref, activeItem: observable.ref });
+  const { readRemoteFile, readString } = usePapaParse();
   useEffect(() => {
     const { setState } = state;
-    visible && setState({ data: uploadList, activeItem: uploadList[0] });
-  }, [visible]);
+    setState({
+      data: preUploadList, 
+      activeItem: preUploadList[0], 
+      checkAll: preUploadList.every((item) => item.withHeader),
+      indeterminate: preUploadList.some((item) => item.withHeader) && !preUploadList.every((item) => item.withHeader),
+    });
+  }, []);
   useEffect(() => {
     state.activeItem && readFile();
   }, [state.activeItem]);
@@ -57,21 +59,36 @@ const UploadConfigModal = (props: IProps) => {
     const { activeItem, setState } = state;
     if(!activeItem) return;
     setState({ loading: true });
-    const url = URL.createObjectURL(activeItem);
     let content = [];
-    readRemoteFile(url, { 
-      delimiter: activeItem.delimiter, 
-      download: true, 
-      preview: 5,
-      worker: true, 
-      skipEmptyLines: true,
-      step: (row) => {
-        content = [...content, row.data];
-      },
-      complete: () => {
-        setState({ loading: false, previewContent: content });
-      } 
-    });
+    if(activeItem.sample !== undefined) {
+      readString(activeItem.sample, { 
+        delimiter: activeItem.delimiter || ',',
+        worker: true, 
+        skipEmptyLines: true,
+        step: (row) => {
+          content = [...content, row.data];
+        },
+        complete: () => {
+          setState({ loading: false, previewContent: content });
+        } 
+      });
+    } else {
+      const url = URL.createObjectURL(activeItem);
+      readRemoteFile(url, { 
+        delimiter: activeItem.delimiter, 
+        download: true, 
+        preview: 5,
+        worker: true, 
+        skipEmptyLines: true,
+        step: (row) => {
+          content = [...content, row.data];
+        },
+        complete: () => {
+          setState({ loading: false, previewContent: content });
+        } 
+      });
+    }
+    
   }, []);
 
   const onCheckAllChange = useCallback((e: CheckboxChangeEvent) => {
@@ -80,7 +97,7 @@ const UploadConfigModal = (props: IProps) => {
     setState({
       checkAll: checked,
       indeterminate: false,
-      data: data.map(i => (i.withHeader = checked, i))
+      data: data.map(i => (i.withHeader = checked, i)),
     });
   }, []);
 
@@ -127,7 +144,7 @@ const UploadConfigModal = (props: IProps) => {
 
   const handleConfirm = useCallback(() => {
     const { data } = state;
-    const existFileName = fileList.map((file) => file.name);
+    const existFileName = duplicateCheckList?.map((file) => file.name) || [];
     const repeatFiles = data.filter((file) => existFileName.includes(file.name));
     if(!repeatFiles.length) {
       startImport();
@@ -152,15 +169,11 @@ const UploadConfigModal = (props: IProps) => {
         startImport();
       },
     });
-  }, [fileList]);
+  }, [duplicateCheckList]);
   const startImport = useCallback(async () => {
     const { data, setState } = state;
     setState({ uploading: true });
-    const res = await uploadFile(data);
-    if(res.code === 0) {
-      onConfirm();
-      message.success(intl.get('import.uploadSuccessfully'));
-    }
+    await onConfirm(data);
     setState({ uploading: false });
   }, []);
   const handleCancel = useCallback(() => {
@@ -168,9 +181,6 @@ const UploadConfigModal = (props: IProps) => {
     !uploading && onCancel();
   }, []);
 
-  if(!visible) {
-    return null;
-  }
   const { uploading, data, activeItem, previewContent, loading, setState, checkAll, indeterminate } = state;
   const parseColumns = previewContent.length
     ? previewContent[0].map((header, index) => {
@@ -229,16 +239,8 @@ const UploadConfigModal = (props: IProps) => {
       ),
     },
   ];
-
   return (
-    <Modal
-      title={intl.get('import.previewFiles')}
-      open={visible}
-      width={920}
-      onCancel={() => handleCancel()}
-      className={styles.uploadModal}
-      footer={false}
-    >
+    <div>
       <div className={styles.container}>
         <div className={styles.left}>
           <Table
@@ -254,7 +256,7 @@ const UploadConfigModal = (props: IProps) => {
             className={styles.previewTable}
             dataSource={data}
             columns={columns}
-            rowKey="uid"
+            rowKey={() => uuidv4()}
             pagination={false}
           />
         </div>
@@ -276,7 +278,7 @@ const UploadConfigModal = (props: IProps) => {
       </div>
       <div className={styles.btns}>
         <Button disabled={uploading} onClick={() => handleCancel()}>
-          {intl.get('common.cancel')}
+          {intl.get('common.prev')}
         </Button>
         <Button
           type="primary"
@@ -286,8 +288,9 @@ const UploadConfigModal = (props: IProps) => {
           {intl.get('common.confirm')}
         </Button>
       </div>
-    </Modal>
+    </div>
   );
 };
 
-export default observer(UploadConfigModal);
+
+export default observer(FileConfigSetting);

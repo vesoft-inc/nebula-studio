@@ -41,7 +41,7 @@ export const getModuleList = (): ModuleItem[] => {
       icon: 'icon-studio-nav-import',
       title: intl.get('import.importData'),
       tip: intl.get('doc.importIntro'),
-      startLink: '/import/files',
+      startLink: '/import/tasks',
       docLink: intl.get('welcome.importModuleLink'),
     },
     {

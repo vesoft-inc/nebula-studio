@@ -3,12 +3,10 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/pkg/sftp"
+	"strconv"
+
 	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
@@ -17,15 +15,15 @@ import (
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/filestore"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/core/logx"
-	"golang.org/x/crypto/ssh"
-	"strconv"
 )
 
 type (
 	DatasourceService interface {
 		Add(request types.DatasourceAddRequest) (*types.DatasourceAddData, error)
-		List() (*types.DatasourceData, error)
+		Update(request types.DatasourceUpdateRequest) error
+		List(request types.DatasourceListRequest) (*types.DatasourceData, error)
 		Remove(request types.DatasourceRemoveRequest) error
+		BatchRemove(request types.DatasourceBatchRemoveRequest) error
 		ListContents(request types.DatasourceListContentsRequest) (*types.DatasourceListContentsData, error)
 		PreviewFile(request types.DatasourcePreviewFileRequest) (*types.DatasourcePreviewFileData, error)
 	}
@@ -51,60 +49,87 @@ func NewDatasourceService(ctx context.Context, svcCtx *svc.ServiceContext) Datas
 }
 
 func (d *datasourceService) Add(request types.DatasourceAddRequest) (*types.DatasourceAddData, error) {
-	switch request.Type {
+	typ := request.Type
+	platform := request.Platform
+	var cfg interface{}
+	switch typ {
 	case "s3":
-		c := request.S3Config
-		if err := d.testConnectionS3(c.Endpoint, c.Region, c.AccessKey, c.AccessSecret); err != nil {
-			return nil, err
-		}
-		secret := c.AccessSecret
-		c.AccessSecret = ""
-		cstr, err := json.Marshal(c)
-		if err != nil {
-			return nil, ecode.WithBadRequest(err, "json stringify error")
-		}
-		crypto, err := utils.Encrypt([]byte(secret), []byte(cipher))
-		id, err := d.save(request.Type, request.Name, string(cstr), crypto)
-		if err != nil {
-			return nil, err
-		}
-		return &types.DatasourceAddData{
-			ID: id,
-		}, nil
-		break
+		cfg = request.S3Config
 	case "sftp":
-		c := request.SFTPConfig
-		if err := d.testConnectionSFTP(c.Host, c.Port, c.Username, c.Password); err != nil {
-			return nil, err
-		}
-		pwd := c.Password
-		c.Password = ""
-		cstr, err := json.Marshal(c)
-		if err != nil {
-			d.Logger.Errorf("json stringify error", c)
-			return nil, ecode.WithBadRequest(err, "json stringify error")
-		}
-		crypto, err := utils.Encrypt([]byte(pwd), []byte(cipher))
-		id, err := d.save(request.Type, request.Name, string(cstr), crypto)
-		if err != nil {
-			return nil, err
-		}
-		return &types.DatasourceAddData{
-			ID: id,
-		}, nil
-		break
+		cfg = request.SFTPConfig
+	default:
+		return nil, ecode.WithErrorMessage(ecode.ErrBadRequest, nil, "Invalid datasource type")
 	}
-	return nil, ecode.WithErrorMessage(ecode.ErrBadRequest, nil, "datasource type can't support'")
+	cfgStr, crypto, err := validate(typ, platform, cfg)
+	if err != nil {
+		return nil, ecode.WithErrorMessage(ecode.ErrBadRequest, err)
+	}
+	id, err := d.save(request.Type, request.Name, request.Platform, cfgStr, crypto)
+	if err != nil {
+		return nil, ecode.WithErrorMessage(ecode.ErrBadRequest, err)
+	}
+	return &types.DatasourceAddData{
+		ID: id,
+	}, nil
 }
 
-func (d *datasourceService) List() (*types.DatasourceData, error) {
+func (d *datasourceService) Update(request types.DatasourceUpdateRequest) error {
+	datasourceId := request.ID
+	dbs, err := d.findOne(datasourceId)
+	if err != nil {
+		return ecode.WithErrorMessage(ecode.ErrBadRequest, err, "find data error")
+	}
+	typ := request.Type
+	platform := request.Platform
+	var cfg interface{}
+	switch typ {
+	case "s3":
+		s3Config := request.S3Config
+		if s3Config.AccessSecret == "" {
+			s3Config.AccessSecret = dbs.Secret
+		}
+		cfg = &types.DatasourceS3Config{
+			AccessKey:    s3Config.AccessKey,
+			AccessSecret: s3Config.AccessSecret,
+			Endpoint:     s3Config.Endpoint,
+			Bucket:       s3Config.Bucket,
+			Region:       s3Config.Region,
+		}
+	case "sftp":
+		sftpCfg := request.SFTPConfig
+		if sftpCfg.Password == "" {
+			sftpCfg.Password = dbs.Secret
+		}
+		cfg = &types.DatasourceSFTPConfig{
+			Host:     sftpCfg.Host,
+			Port:     sftpCfg.Port,
+			Username: sftpCfg.Username,
+			Password: sftpCfg.Password,
+		}
+	default:
+		return ecode.WithErrorMessage(ecode.ErrBadRequest, nil, "Invalid datasource type")
+	}
+	cfgStr, crypto, err := validate(typ, platform, cfg)
+	if err != nil {
+		return err
+	}
+	err = d.update(datasourceId, request.Type, request.Platform, request.Name, cfgStr, crypto)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *datasourceService) List(request types.DatasourceListRequest) (*types.DatasourceData, error) {
 	user := d.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	host := user.Address + ":" + strconv.Itoa(user.Port)
 	var dbsList []db.Datasource
 	result := db.CtxDB.Where("host = ?", host).
-		Where("username = ?", user.Username).
-		Order("create_time desc").
-		Find(&dbsList)
+		Where("username = ?", user.Username)
+	if request.Type != "" {
+		result = result.Where("type = ?", request.Type)
+	}
+	result = result.Order("create_time desc").Find(&dbsList)
 	if result.Error != nil {
 		return nil, d.gormErrorWrapper(result.Error)
 	}
@@ -113,24 +138,23 @@ func (d *datasourceService) List() (*types.DatasourceData, error) {
 		config := types.DatasourceConfig{
 			ID:         item.ID,
 			Type:       item.Type,
+			Platform:   item.Platform,
 			Name:       item.Name,
 			CreateTime: item.CreateTime.UnixMilli(),
 		}
 		switch config.Type {
 		case "s3":
-			config.S3Config = types.DatasourceS3Config{}
+			config.S3Config = &types.DatasourceS3Config{}
 			jsonConfig := item.Config
 			if err := json.Unmarshal([]byte(jsonConfig), &config.S3Config); err != nil {
 				return nil, ecode.WithInternalServer(err, "parse json failed")
 			}
-			break
 		case "sftp":
-			config.SFTPConfig = types.DatasourceSFTPConfig{}
+			config.SFTPConfig = &types.DatasourceSFTPConfig{}
 			jsonConfig := item.Config
 			if err := json.Unmarshal([]byte(jsonConfig), &config.SFTPConfig); err != nil {
 				return nil, ecode.WithInternalServer(err, "parse json failed")
 			}
-			break
 		}
 		items = append(items, config)
 	}
@@ -152,7 +176,22 @@ func (d *datasourceService) Remove(request types.DatasourceRemoveRequest) error 
 	}
 
 	if result.RowsAffected == 0 {
-		return ecode.WithBadRequest(fmt.Errorf("test"), "there is available item to delete")
+		return ecode.WithErrorMessage(ecode.ErrBadRequest, fmt.Errorf("test"), "there is available item to delete")
+	}
+
+	return nil
+}
+
+func (d *datasourceService) BatchRemove(request types.DatasourceBatchRemoveRequest) error {
+	user := d.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+	result := db.CtxDB.Where("id IN (?) AND username = ?", request.IDs, user.Username).Delete(&db.Datasource{})
+
+	if result.Error != nil {
+		return d.gormErrorWrapper(result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return ecode.WithErrorMessage(ecode.ErrBadRequest, fmt.Errorf("test"), "there is available item to delete")
 	}
 
 	return nil
@@ -169,11 +208,19 @@ func (d *datasourceService) ListContents(request types.DatasourceListContentsReq
 		return nil, err
 	}
 	fileList, err := store.ListFiles(request.Path)
+	list := make([]types.FileConfig, 0)
+	for _, item := range fileList {
+		list = append(list, types.FileConfig{
+			Name: item.Name,
+			Size: item.Size,
+			Type: item.Type,
+		})
+	}
 	if err != nil {
-		return nil, ecode.WithBadRequest(err, "listFiles failed")
+		return nil, ecode.WithErrorMessage(ecode.ErrBadRequest, err, "listFiles failed")
 	}
 	return &types.DatasourceListContentsData{
-		List: fileList,
+		List: list,
 	}, nil
 }
 
@@ -189,7 +236,7 @@ func (d *datasourceService) PreviewFile(request types.DatasourcePreviewFileReque
 	// read three lines
 	contents, err := store.ReadFile(request.Path, 0, 4)
 	if err != nil {
-		return nil, ecode.WithBadRequest(err, "readFiles failed")
+		return nil, ecode.WithErrorMessage(ecode.ErrBadRequest, err, "readFiles failed")
 	}
 
 	return &types.DatasourcePreviewFileData{
@@ -205,7 +252,7 @@ func (d *datasourceService) findOne(datasourceId int) (*db.Datasource, error) {
 		return nil, d.gormErrorWrapper(result.Error)
 	}
 	if result.RowsAffected == 0 {
-		return nil, ecode.WithBadRequest(nil, "datasource don't exist")
+		return nil, ecode.WithErrorMessage(ecode.ErrBadRequest, nil, "datasource don't exist")
 	}
 
 	secret, err := utils.Decrypt(dbs.Secret, []byte(cipher))
@@ -217,11 +264,12 @@ func (d *datasourceService) findOne(datasourceId int) (*db.Datasource, error) {
 	return &dbs, nil
 }
 
-func (d *datasourceService) save(typ, name, config, secret string) (id int, err error) {
+func (d *datasourceService) save(typ, name, platform, config, secret string) (id int, err error) {
 	user := d.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	host := user.Address + ":" + strconv.Itoa(user.Port)
 	dbs := &db.Datasource{
 		Type:     typ,
+		Platform: platform,
 		Name:     name,
 		Config:   config,
 		Secret:   secret,
@@ -234,6 +282,23 @@ func (d *datasourceService) save(typ, name, config, secret string) (id int, err 
 	}
 	return int(dbs.ID), nil
 }
+func (d *datasourceService) update(id int, typ, platform, name, config, secret string) (err error) {
+	user := d.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+	host := user.Address + ":" + strconv.Itoa(user.Port)
+	result := db.CtxDB.Model(&db.Datasource{ID: id}).Updates(map[string]interface{}{
+		"type":     typ,
+		"name":     name,
+		"platform": platform,
+		"config":   config,
+		"secret":   secret,
+		"host":     host,
+		"username": user.Username,
+	})
+	if result.Error != nil {
+		return d.gormErrorWrapper(result.Error)
+	}
+	return nil
+}
 
 // TODO: cache the store connection to improve the request handle speed by the go-zero session
 func (d *datasourceService) getFileStore(dbs *db.Datasource) (filestore.FileStore, error) {
@@ -241,7 +306,7 @@ func (d *datasourceService) getFileStore(dbs *db.Datasource) (filestore.FileStor
 	if err := json.Unmarshal([]byte(dbs.Config), &config); err != nil {
 		return nil, ecode.WithInternalServer(err, "parse the datasource config error")
 	}
-	store, err := filestore.NewFileStore(dbs.Type, dbs.Config, dbs.Secret)
+	store, err := filestore.NewFileStore(dbs.Type, dbs.Config, dbs.Secret, dbs.Platform)
 	if err != nil {
 		d.Logger.Errorf("create the file store error")
 		return nil, ecode.WithInternalServer(err, "create the file store error")
@@ -250,54 +315,66 @@ func (d *datasourceService) getFileStore(dbs *db.Datasource) (filestore.FileStor
 	return store, nil
 }
 
-func (d *datasourceService) testConnectionS3(endpoint, region, key, secret string) error {
-	sess, err := session.NewSession(&aws.Config{
-		Region:      aws.String(region),
-		Endpoint:    aws.String(endpoint),
-		Credentials: credentials.NewStaticCredentials(key, secret, ""),
-	})
+func formatDatasourceConfig(config interface{}, password string) (string, string, error) {
+	cfgStr, err := json.Marshal(config)
 	if err != nil {
-		return ecode.WithErrorMessage(ecode.ErrBadRequest, err, "failed to create session")
+		return "", "", fmt.Errorf("json stringify config error: %v", err)
 	}
-
-	svc := s3.New(sess)
-	_, err = svc.ListBuckets(nil)
+	crypto, err := utils.Encrypt([]byte(password), []byte(cipher))
 	if err != nil {
-		return ecode.WithErrorMessage(ecode.ErrBadRequest, err, "Failed to list buckets")
+		return "", "", fmt.Errorf("encrypt password error: %v", err)
 	}
+	return string(cfgStr), crypto, nil
+}
 
+func validate(typ string, platform string, config interface{}) (string, string, error) {
+	switch typ {
+	case "s3":
+		cfg := config.(*types.DatasourceS3Config)
+		endpoint, parsedBucket, err := utils.ParseEndpoint(platform, cfg.Endpoint)
+		if err != nil {
+			return "", "", err
+		}
+		if parsedBucket != "" && cfg.Bucket != parsedBucket {
+			return "", "", errors.New("bucket name in endpoint and bucket name in config are different")
+		}
+		cfg.Endpoint = endpoint
+		err = validateS3(platform, cfg)
+		if err != nil {
+			return "", "", err
+		}
+		secret := cfg.AccessSecret
+		cfg.AccessSecret = ""
+		cfgStr, crypto, err := formatDatasourceConfig(config, secret)
+		return cfgStr, crypto, err
+	case "sftp":
+		cfg := config.(*types.DatasourceSFTPConfig)
+		err := validateSftp(cfg)
+		if err != nil {
+			return "", "", err
+		}
+		secret := cfg.Password
+		cfg.Password = ""
+		cfgStr, crypto, err := formatDatasourceConfig(config, secret)
+		return cfgStr, crypto, err
+	default:
+		return "", "", errors.New("unsupported datasource type")
+	}
+}
+
+func validateSftp(cfg *types.DatasourceSFTPConfig) error {
+	store, err := filestore.NewSftpStore(cfg.Host, cfg.Port, cfg.Username, cfg.Password)
+	if err != nil {
+		return fmt.Errorf("connect the sftp client error: %s", err)
+	}
+	store.SftpClient.Close()
 	return nil
 }
 
-func (d *datasourceService) testConnectionSFTP(host string, port int, username string, password string) error {
-	// create an SSH client config
-	config := &ssh.ClientConfig{
-		User: username,
-		Auth: []ssh.AuthMethod{
-			ssh.Password(password),
-		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-	}
-
-	// connect to the remote SSH server
-	conn, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", host, port), config)
+func validateS3(platform string, cfg *types.DatasourceS3Config) error {
+	_, err := filestore.NewS3Store(platform, cfg.Endpoint, cfg.Region, cfg.Bucket, cfg.AccessKey, cfg.AccessSecret)
 	if err != nil {
-		return ecode.WithBadRequest(err, "failed to dial SSH server")
+		return fmt.Errorf("connect the s3 client error: %s", err)
 	}
-	defer conn.Close()
-
-	// create an SFTP client session
-	client, err := sftp.NewClient(conn)
-	if err != nil {
-		return ecode.WithBadRequest(err, "failed to create SFTP session")
-	}
-	defer client.Close()
-
-	// test the SFTP connection by listing the remote directory
-	_, err = client.ReadDir("/")
-	if err != nil {
-		return ecode.WithBadRequest(err, "failed to list remote directory")
-	}
-
 	return nil
 }

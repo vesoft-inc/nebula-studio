@@ -54,7 +54,7 @@ require (
 	golang.org/x/time v0.3.0 // indirect
 )
 
-replace github.com/vesoft-inc/nebula-importer/v4 => github.com/veezhang/nebula-importer/v4 v4.0.0-20230308102652-ade042e5c324
+replace github.com/vesoft-inc/nebula-importer/v4 => github.com/veezhang/nebula-importer/v4 v4.0.0-20230327073838-1faf638e9c88
 
 require (
 	github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394

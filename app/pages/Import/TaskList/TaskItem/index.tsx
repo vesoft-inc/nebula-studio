@@ -36,7 +36,7 @@ const COLOR_MAP = {
     to: '#2F80ED',
   },
 };
-const loadingStatus = [ITaskStatus.StatusPending, ITaskStatus.StatusProcessing];
+const loadingStatus = [ITaskStatus.Pending, ITaskStatus.Processing];
 const TaskItem = (props: IProps) => {
   const { 
     data: { 
@@ -60,17 +60,11 @@ const TaskItem = (props: IProps) => {
   const { processedBytes, totalBytes, failedProcessed } = stats || {};
   const time = useRef('');
   const timeoutId = useRef<number>(null);
-  const addMsg = () => {
-    const info: string[] = [];
-    if(failedProcessed > 0) {
-      info.push(intl.get('import.notImported', { total: failedProcessed }));
-    }
-    info.length > 0 && setExtraMsg(info.join(', '));
-  };
+  const addMsg = () => failedProcessed > 0 && setExtraMsg(intl.get('import.notImported', { total: failedProcessed }));
   useEffect(() => {
     window.clearTimeout(timeoutId.current);
     refreshTime();
-    if(status === ITaskStatus.StatusFinished) {
+    if(status === ITaskStatus.Finished) {
       setStatus('success');
       addMsg();
     } else if(loadingStatus.includes(status)) {
@@ -87,7 +81,7 @@ const TaskItem = (props: IProps) => {
     };
   }, [status]);
   const refreshTime = () => {
-    if(status === ITaskStatus.StatusProcessing) {
+    if(status === ITaskStatus.Processing) {
       time.current = dayjs.duration(dayjs(Date.now()).diff(dayjs(createTime))).format('HH:mm:ss');
       timeoutId.current = window.setTimeout(refreshTime, 1000);
     } else {
@@ -108,28 +102,28 @@ const TaskItem = (props: IProps) => {
           <div className={styles.progressInfo}>
             <span className={styles.taskName}>
               {name}
-              {status === ITaskStatus.StatusFinished && <span className={styles.completeInfo}>
+              {status === ITaskStatus.Finished && <span className={styles.completeInfo}>
                 <CheckCircleFilled />
                 {intl.get('import.importCompleted')}
                 <span className={styles.red}>{extraMsg && ` (${extraMsg})`}</span>
               </span>}
-              {!stats && status === ITaskStatus.StatusPending && <span className={styles.completeInfo}>
+              {!stats && status === ITaskStatus.Pending && <span className={styles.completeInfo}>
                 {intl.get('import.importPending')}
               </span>}
-              {!stats && status === ITaskStatus.StatusProcessing && <span className={styles.completeInfo}>
+              {!stats && status === ITaskStatus.Processing && <span className={styles.completeInfo}>
                 {intl.get('import.importRunning')}
               </span>}
-              {status === ITaskStatus.StatusAborted && <span className={styles.errInfo}>
+              {status === ITaskStatus.Aborted && <span className={styles.errInfo}>
                 {intl.get('import.importFailed')}
                 {extraMsg && ` (${extraMsg})`}
               </span>}
-              {status === ITaskStatus.StatusStoped && <span className={styles.errInfo}>
+              {status === ITaskStatus.Stoped && <span className={styles.errInfo}>
                 {intl.get('import.importStopped')}
               </span>}
             </span>
             <div className={styles.moreInfo}>
               {processedBytes > 0 && <span>
-                {status !== ITaskStatus.StatusFinished && `${getFileSize(processedBytes)} / `}
+                {status !== ITaskStatus.Finished && `${getFileSize(processedBytes)} / `}
                 {getFileSize(totalBytes)}{' '}
               </span>}
               <span>{time.current}</span>
@@ -138,12 +132,12 @@ const TaskItem = (props: IProps) => {
           {stats && <Progress 
             format={percent => `${percent}%`}
             status={progressStatus} 
-            percent={status !== ITaskStatus.StatusFinished ? floor(processedBytes / totalBytes * 100, 2) : 100} 
+            percent={status !== ITaskStatus.Finished ? floor(processedBytes / totalBytes * 100, 2) : 100} 
             strokeColor={progressStatus && COLOR_MAP[progressStatus]} />}
         </div>
         <div className={styles.operations}>
           <Button className="primaryBtn" onClick={() => onViewLog(id, space, status)}>{intl.get('import.viewLogs')}</Button>
-          {status === ITaskStatus.StatusProcessing && 
+          {status === ITaskStatus.Processing && 
           <Popconfirm
             placement="left"
             title={intl.get('import.endImport')}

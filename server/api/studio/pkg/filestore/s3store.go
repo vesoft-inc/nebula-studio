@@ -3,9 +3,12 @@ package filestore
 import (
 	"bufio"
 	"errors"
+	"fmt"
+	"strings"
+
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -14,31 +17,51 @@ import (
 
 type S3Store struct {
 	S3Client s3iface.S3API
+	Bucket   string
 }
 
-func NewS3Store(endpoint, region, accessKey, accessSecret string) (*S3Store, error) {
-	sess, err := session.NewSession(&aws.Config{
+func NewS3Store(platform, endpoint, region, bucket, accessKey, accessSecret string) (*S3Store, error) {
+	cfg := &aws.Config{
 		Region:      aws.String(region),
-		Endpoint:    aws.String(endpoint),
 		Credentials: credentials.NewStaticCredentials(accessKey, accessSecret, ""),
-	})
+	}
+	switch platform {
+	case "oss":
+		cfg.S3ForcePathStyle = aws.Bool(false)
+		cfg.Endpoint = aws.String(endpoint)
+	case "cos", "customize":
+		cfg.S3ForcePathStyle = aws.Bool(true)
+		cfg.Endpoint = aws.String(endpoint)
+	}
+	if region == "" {
+		cfg.Region = aws.String("us-east-1")
+	}
+	sess, err := session.NewSession(cfg)
 	if err != nil {
 		return nil, errors.New("failed to create session")
 	}
 
 	svc := s3.New(sess)
+	_, err = svc.HeadBucket(&s3.HeadBucketInput{
+		Bucket: aws.String(bucket),
+	})
+	if err != nil {
+		if awsErr, ok := err.(awserr.Error); ok {
+			if awsErr.Code() == "NotFound" {
+				return nil, fmt.Errorf("bucket does not exist: %v", err)
+			}
+		}
+		return nil, fmt.Errorf("failed to head bucket: %v", err)
+	}
 	return &S3Store{
 		S3Client: svc,
+		Bucket:   bucket,
 	}, nil
 }
 
 func (s *S3Store) ReadFile(s3path string, startLine ...int) ([]string, error) {
 	var numLines int
 	var start int
-	bucketName, prefix, err := s.parsePath(s3path)
-	if err != nil {
-		return nil, err
-	}
 	if len(startLine) == 0 {
 		start = 0
 		numLines = -1
@@ -51,8 +74,8 @@ func (s *S3Store) ReadFile(s3path string, startLine ...int) ([]string, error) {
 	}
 
 	resp, err := s.S3Client.GetObject(&s3.GetObjectInput{
-		Bucket: aws.String(bucketName),
-		Key:    aws.String(prefix),
+		Bucket: aws.String(s.Bucket),
+		Key:    aws.String(s3path),
 	})
 	if err != nil {
 		return nil, err
@@ -82,27 +105,40 @@ func (s *S3Store) ReadFile(s3path string, startLine ...int) ([]string, error) {
 	return lines, nil
 }
 
-func (s *S3Store) ListFiles(s3path string) ([]string, error) {
-	bucketName, prefix, err := s.parsePath(s3path)
-	if err != nil {
-		return nil, err
-	}
-
+func (s *S3Store) ListFiles(s3path string) ([]FileConfig, error) {
 	resp, err := s.S3Client.ListObjectsV2(&s3.ListObjectsV2Input{
-		Bucket:    aws.String(bucketName),
-		Prefix:    aws.String(prefix),
+		Bucket:    aws.String(s.Bucket),
+		Prefix:    aws.String(s3path),
 		Delimiter: aws.String("/"),
 	})
 	if err != nil {
 		return nil, err
 	}
-
-	var files []string
+	var files []FileConfig
 	for _, obj := range resp.CommonPrefixes {
-		files = append(files, *obj.Prefix)
+		name := (*obj.Prefix)[:len(*obj.Prefix)-1] // remove trailing slash
+		files = append(files, FileConfig{
+			Name: strings.TrimPrefix(name, s3path),
+			Type: "directory",
+		})
 	}
 	for _, obj := range resp.Contents {
-		files = append(files, *obj.Key)
+		var objType string
+		key := *obj.Key
+		if key[len(*obj.Key)-1:] == "/" {
+			objType = "directory"
+		} else if strings.HasSuffix(key, ".csv") {
+			objType = "csv"
+		}
+		name := strings.TrimPrefix(key, s3path)
+		if objType != "" && name != "" {
+			s3Object := FileConfig{
+				Name: name,
+				Type: objType,
+				Size: *obj.Size,
+			}
+			files = append(files, s3Object)
+		}
 	}
 
 	return files, nil
@@ -119,17 +155,4 @@ func (s *S3Store) ListBuckets() ([]string, error) {
 	}
 
 	return buckets, nil
-}
-
-func (s3 *S3Store) parsePath(s3path string) (bucketName string, prefix string, err error) {
-	if len(s3path) == 0 {
-		return "", "", errors.New("the s3path is invalid")
-	}
-	parts := strings.SplitN(s3path, "/", 2)
-
-	if len(parts) == 1 {
-		return parts[0], "", nil
-	}
-
-	return parts[0], parts[1], nil
 }

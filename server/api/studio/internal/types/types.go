@@ -57,7 +57,7 @@ type ImportTaskCSV struct {
 type NodeId struct {
 	Name        string        `json:"name,optional"`
 	Type        string        `json:"type" validate:"required"`
-	Index       int64         `json:"index" validate:"required"`
+	Index       int64         `json:"index,optional,omitempty"`
 	ConcatItems []interface{} `json:"concatItems,optional,omitempty"`
 	Function    string        `json:"function,optional,omitempty"`
 }
@@ -97,11 +97,11 @@ type EdgeRank struct {
 }
 
 type S3Config struct {
-	Endpoint  string `json:"endpoint,omitempty"`
+	Endpoint  string `json:"endpoint,optional,omitempty"`
 	Region    string `json:"region,omitempty"`
 	AccessKey string `json:"accessKey,omitempty"`
 	SecretKey string `json:"secretKey,omitempty"`
-	Token     string `json:"token,omitempty"`
+	Token     string `json:"token,optional,omitempty"`
 	Bucket    string `json:"bucket,omitempty"`
 	Key       string `json:"key,omitempty"`
 }
@@ -111,10 +111,18 @@ type SFTPConfig struct {
 	Port       int    `json:"port,omitempty"`
 	User       string `json:"user,omitempty"`
 	Password   string `json:"password,omitempty"`
-	KeyFile    string `json:"keyFile,omitempty"`
-	KeyData    string `json:"keyData,omitempty"`
-	Passphrase string `json:"passphrase,omitempty"`
+	KeyFile    string `json:"keyFile,optional,omitempty"`
+	KeyData    string `json:"keyData,optional,omitempty"`
+	Passphrase string `json:"passphrase,optional,omitempty"`
 	Path       string `json:"path,omitempty"`
+}
+
+type OSSConfig struct {
+	Endpoint  string `json:"endpoint,omitempty"`
+	AccessKey string `json:"accessKey,omitempty"`
+	SecretKey string `json:"secretKey,omitempty"`
+	Bucket    string `json:"bucket,omitempty"`
+	Key       string `json:"key,omitempty"`
 }
 
 type LocalConfig struct {
@@ -124,7 +132,7 @@ type LocalConfig struct {
 type ImportTaskConfig struct {
 	Client  Client    `json:"client" validate:"required"`
 	Manager Manager   `json:"manager" validate:"required"`
-	Sources []Sources `json:"sources" validate:"required"`
+	Sources []*Source `json:"sources" validate:"required"`
 	Log     *Log      `json:"log,omitempty,optional"`
 }
 
@@ -147,13 +155,16 @@ type Manager struct {
 	StatsInterval       *string `json:"statsInterval,omitempty,optional"`
 }
 
-type Sources struct {
-	CSV   ImportTaskCSV `json:"csv" validate:"required"`
-	Path  string        `json:"path,optional,omitempty"`
-	S3    *S3Config     `json:"s3,optional,omitempty"`
-	SFTP  *SFTPConfig   `json:"sftpConfig,optional,omitempty"`
-	Tags  []Tag         `json:"tags,optional"`
-	Edges []Edge        `json:"edges,optional"`
+type Source struct {
+	CSV                ImportTaskCSV `json:"csv" validate:"required"`
+	Path               string        `json:"path,optional,omitempty"`
+	S3                 *S3Config     `json:"s3,optional,omitempty"`
+	SFTP               *SFTPConfig   `json:"sftp,optional,omitempty"`
+	OSS                *OSSConfig    `json:"oss,optional,omitempty"`
+	DatasourceId       *int64        `json:"datasourceId,optional,omitempty"`
+	DatasourceFilePath *string       `json:"datasourceFilePath,optional,omitempty"`
+	Tags               []Tag         `json:"tags,optional"`
+	Edges              []Edge        `json:"edges,optional"`
 }
 
 type Log struct {
@@ -343,9 +354,10 @@ type FavoriteIDResult struct {
 
 type DatasourceS3Config struct {
 	Endpoint     string `json:"endpoint"`
-	Region       string `json:"region"`
+	Region       string `json:"region,optional"`
+	Bucket       string `json:"bucket"`
 	AccessKey    string `json:"accessKey"`
-	AccessSecret string `json:"accessSecret"`
+	AccessSecret string `json:"accessSecret,optional"`
 }
 
 type DatasourceSFTPConfig struct {
@@ -355,28 +367,62 @@ type DatasourceSFTPConfig struct {
 	Password string `json:"password"`
 }
 
+type DatasourceS3UpdateConfig struct {
+	Endpoint     string `json:"endpoint,optional,omitempty"`
+	Region       string `json:"region,optional,omitempty"`
+	Bucket       string `json:"bucket,optional,omitempty"`
+	AccessKey    string `json:"accessKey,optional,omitempty"`
+	AccessSecret string `json:"accessSecret,optional,omitempty"`
+}
+
+type DatasourceSFTPUpdateConfig struct {
+	Host     string `json:"host,optional,omitempty"`
+	Port     int    `json:"port,optional,omitempty"`
+	Username string `json:"username,optional,omitempty"`
+	Password string `json:"password,optional,omitempty"`
+}
+
 type DatasourceAddRequest struct {
-	Type       string               `json:"type"`
-	Name       string               `json:"name"`
-	S3Config   DatasourceS3Config   `json:"s3Config,optional"`
-	SFTPConfig DatasourceSFTPConfig `json:"sftpConfig,optional"`
+	Type       string                `json:"type"`
+	Platform   string                `json:"platform,optional,omitempty"`
+	Name       string                `json:"name"`
+	S3Config   *DatasourceS3Config   `json:"s3Config,optional"`
+	SFTPConfig *DatasourceSFTPConfig `json:"sftpConfig,optional"`
+}
+
+type DatasourceUpdateRequest struct {
+	ID         int                         `path:"id"`
+	Platform   string                      `json:"platform,optional,omitempty"`
+	Type       string                      `json:"type"`
+	Name       string                      `json:"name"`
+	S3Config   *DatasourceS3UpdateConfig   `json:"s3Config,optional"`
+	SFTPConfig *DatasourceSFTPUpdateConfig `json:"sftpConfig,optional"`
 }
 
 type DatasourceAddData struct {
 	ID int `json:"id"`
 }
 
+type DatasourceListRequest struct {
+	Type string `form:"type,optional"`
+}
+
 type DatasourceRemoveRequest struct {
 	ID int `path:"id"`
 }
 
+type DatasourceBatchRemoveRequest struct {
+	IDs []int `json:"ids"`
+}
+
 type DatasourceConfig struct {
-	ID         int                  `json:"id"`
-	Type       string               `json:"type"`
-	Name       string               `json:"name"`
-	S3Config   DatasourceS3Config   `json:"s3Config,optional"`
-	SFTPConfig DatasourceSFTPConfig `json:"sftpConfig,optional"`
-	CreateTime int64                `json:"createTime,optional"`
+	ID         int                   `json:"id"`
+	Type       string                `json:"type"`
+	Name       string                `json:"name"`
+	Platform   string                `json:"platform"`
+	S3Config   *DatasourceS3Config   `json:"s3Config,optional"`
+	SFTPConfig *DatasourceSFTPConfig `json:"sftpConfig,optional"`
+	CreateTime int64                 `json:"createTime,optional"`
 }
 
 type DatasourceListContentsRequest struct {
@@ -384,8 +430,14 @@ type DatasourceListContentsRequest struct {
 	Path         string `form:"path,optional"`
 }
 
+type FileConfig struct {
+	Size int64  `json:"size"`
+	Type string `json:"type"`
+	Name string `json:"name"`
+}
+
 type DatasourceListContentsData struct {
-	List []string `json:"list"`
+	List []FileConfig `json:"list"`
 }
 
 type DatasourceData struct {

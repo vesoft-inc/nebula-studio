@@ -4,6 +4,9 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"os/user"
+	"strings"
+
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 )
@@ -28,12 +31,12 @@ func NewSftpStore(host string, port int, username string, password string) (*Sft
 	addr := fmt.Sprintf("%s:%d", host, port)
 	conn, err := ssh.Dial("tcp", addr, config)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to dial SSH server: %s", err)
 	}
 
 	client, err := sftp.NewClient(conn)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create SFTP client: %s", err)
 	}
 
 	return &SftpStore{
@@ -88,16 +91,37 @@ func (s *SftpStore) ReadFile(path string, startLine ...int) ([]string, error) {
 	return lines, nil
 }
 
-func (s *SftpStore) ListFiles(dir string) ([]string, error) {
-	var files []string
-	walker := s.SftpClient.Walk(dir)
-	for walker.Step() {
-		if err := walker.Err(); err != nil {
+func (s *SftpStore) ListFiles(dir string) ([]FileConfig, error) {
+	var files []FileConfig
+	if dir == "" {
+		user, err := user.Lookup(s.Username)
+		if err != nil {
 			return nil, err
 		}
-		if !walker.Stat().IsDir() {
-			files = append(files, walker.Path())
+		dir = user.HomeDir
+	}
+
+	_files, err := s.SftpClient.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+	for _, file := range _files {
+		isDir := file.IsDir()
+		name := file.Name()
+		var fileType string
+		if isDir && !strings.HasPrefix(name, ".") {
+			fileType = "directory"
+		} else if strings.HasSuffix(name, ".csv") {
+			fileType = "csv"
 		}
+		if fileType != "" {
+			files = append(files, FileConfig{
+				Name: name,
+				Size: file.Size(),
+				Type: fileType,
+			})
+		}
+
 	}
 	return files, nil
 }

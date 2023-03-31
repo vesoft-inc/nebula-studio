@@ -19,6 +19,9 @@ type Task struct {
 }
 
 func (t *Task) UpdateQueryStats() error {
+	if (t.Client == nil) || (t.Client.Manager == nil) {
+		return nil
+	}
 	stats := t.Client.Manager.Stats()
 	t.TaskInfo.Stats = *stats
 	return nil

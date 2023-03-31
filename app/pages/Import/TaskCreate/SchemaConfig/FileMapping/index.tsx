@@ -1,5 +1,5 @@
-import { Collapse, Select, Table, Tooltip } from 'antd';
-import React, { useMemo } from 'react';
+import { Button, Collapse, Input, Select, Table, Tooltip } from 'antd';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import cls from 'classnames';
 import { useStore } from '@app/stores';
@@ -10,7 +10,9 @@ import Instruction from '@app/components/Instruction';
 import { ISchemaEnum } from '@app/interfaces/schema';
 import { IEdgeFileItem, ITagFileItem } from '@app/stores/import';
 import { IImportFile } from '@app/interfaces/import';
+import { ICachedStore } from '@app/stores/datasource';
 import styles from '../index.module.less';
+import FileSelectModal from './FileSelectModal';
 
 const Option = Select.Option;
 const Panel = Collapse.Panel;
@@ -29,23 +31,32 @@ const VIDSetting = observer((props: {
     idKey: string,
     idFunction?: string,
     idPrefix?: string,
+    idSuffix?: string,
     label: string
   }
 }) => {
-  const { keyMap: { idKey, idFunction, idPrefix, label }, data } = props;
+  const { keyMap: { idKey, idFunction, idPrefix, idSuffix, label }, data } = props;
   const { intl } = useI18n();
   const { schema } = useStore();
   const { spaceVidType } = schema;
+  const [key, setKey] = useState(null);
+  const handleChange = useCallback(v => setKey(v), []);
+  const handleMapping = useCallback(index => {
+    data.update({ [idKey]: index });
+    index.length > 1 && setKey(['default']);
+  }, [data]);
   return <div className={styles.row}>
-    <Collapse bordered={false} ghost className={styles.vidCollapse}>
+    <Collapse bordered={false} ghost className={styles.vidCollapse} onChange={handleChange} activeKey={key}>
       <Panel header={<div className={cls(styles.panelTitle, styles.spaceBetween)}>
         <div>
           <span className={cls(styles.label, styles.required)}>{intl.get(`import.${label}`)}</span>
           <CSVPreviewLink
-            onMapping={(index) => data.update({ [idKey]: index })}
+            onMapping={(index) => handleMapping(index)}
             file={data.file}
+            data={data[idKey]}
+            multipleMode={true}
           >
-            {!data[idKey] && data[idKey] !== 0 ? intl.get('import.selectCsvColumn') : `Column ${data[idKey]}`}
+            {(!data[idKey] || data[idKey].length === 0) ? intl.get('import.selectCsvColumn') : data[idKey].map(i => `Column ${i}`).join(', ')}
           </CSVPreviewLink>
         </div>
         <Instruction description={<>
@@ -53,9 +64,17 @@ const VIDSetting = observer((props: {
             <span className={styles.title}>{intl.get('import.vidFunction')}</span>
             <span>{intl.get('import.vidFunctionTip')}</span>
           </div>
+          <div>
+            <span className={styles.title}>{intl.get('import.vidPrefix')}</span>
+            <span>{intl.get('import.vidPrefixTip')}</span>
+          </div>
+          <div>
+            <span className={styles.title}>{intl.get('import.vidSuffix')}</span>
+            <span>{intl.get('import.vidSuffixTip')}</span>
+          </div>
         </>} />
       </div>} key="default">
-        {spaceVidType === 'INT64' && idFunction && <div className={styles.rowItem}>
+        {spaceVidType === 'INT64' && idFunction && <div className={styles.funcItem}>
           <span className={styles.label}>{intl.get('import.vidFunction')}</span>
           <Select
             bordered={false}
@@ -71,6 +90,22 @@ const VIDSetting = observer((props: {
             <Option value="hash">Hash</Option>
           </Select>
         </div>}
+        {idPrefix && <div className={styles.rowItem}>
+          <span className={styles.label}>{intl.get('import.vidPrefix')}</span>
+          <Input className={styles.prefixInput} bordered={false} placeholder="Input prefix" value={data[idPrefix]} onChange={e => data.update({ [idPrefix]: e.target.value })} />
+        </div>}
+        {idSuffix && <div className={styles.rowItem}>
+          <span className={styles.label}>{intl.get('import.vidSuffix')}</span>
+          <Input className={styles.prefixInput} bordered={false} placeholder="Input suffix" value={data[idSuffix]} onChange={e => data.update({ [idSuffix]: e.target.value })} />
+        </div>}
+        {(data[idKey]?.length > 1 || data[idPrefix] || data[idSuffix]) && <div className={styles.concatPreview}>
+          <span className={styles.label}>{intl.get('import.preview')}</span>
+          <div className={styles.concatItems}>
+            {data[idPrefix] && <span className={styles.tagItem}>{data[idPrefix]}</span>}
+            {data[idKey].map(i => <span key={i} className={styles.tagItem}>{`Column ${i}`}</span>)}
+            {data[idSuffix] && <span className={styles.tagItem}>{data[idSuffix]}</span>}
+          </div>
+        </div>}
       </Panel>
     </Collapse>
   </div>;
@@ -80,30 +115,42 @@ const idMap = {
   [ISchemaEnum.Tag]: [{
     idKey: 'vidIndex',
     idFunction: 'vidFunction',
+    idPrefix: 'vidPrefix',
+    idSuffix: 'vidSuffix',
     label: 'vidColumn'
   }],
   [ISchemaEnum.Edge]: [{
     idKey: 'srcIdIndex',
     idFunction: 'srcIdFunction',
-    label: 'srcVidColumn'
+    label: 'srcVidColumn',
+    idPrefix: 'srcIdPrefix',
+    idSuffix: 'srcIdSuffix',
   }, {
     idKey: 'dstIdIndex',
     idFunction: 'dstIdFunction',
-    label: 'dstVidColumn'
+    label: 'dstVidColumn',
+    idPrefix: 'dstIdPrefix',
+    idSuffix: 'dstIdSuffix',
   }],
 };
 
 const FileMapping = (props: IProps) => {
   const { item, onRemove, type, onReset } = props;
-  const { files } = useStore();
-  const { fileList, getFiles } = files;
   const { file, props: mappingProps } = item;
+  const { datasource: { cachedStore, update } } = useStore();
   const { intl } = useI18n();
-  const handleFileChange = (value: string) => {
-    const file = fileList.find(item => item.name === value);
-    onReset(item, file);
-  };
+  const [visible, setVisible] = useState(false);
+  const [selectFile, setSelectFile] = useState({
+    file: null,
+    cachedState: null,
+  });
 
+  useEffect(() => {
+    cachedStore && setSelectFile({
+      file: null,
+      cachedState: cachedStore,
+    });
+  }, []);
   const updateFilePropMapping = (index: number, value: number) => item.updatePropItem(index, { mapping: value });
   const columns = [
     {
@@ -127,8 +174,9 @@ const FileMapping = (props: IProps) => {
       dataIndex: 'mapping',
       render: (mappingIndex, _, propIndex) => (
         <CSVPreviewLink
-          onMapping={columnIndex => updateFilePropMapping(propIndex, columnIndex)}
+          onMapping={columnIndex => updateFilePropMapping(propIndex, columnIndex as number)}
           file={file}
+          data={item[propIndex]?.mapping}
         >
           {!mappingIndex && mappingIndex !== 0 ? intl.get('import.choose') : `Column ${mappingIndex}`}
         </CSVPreviewLink>
@@ -139,10 +187,18 @@ const FileMapping = (props: IProps) => {
       dataIndex: 'type',
     },
   ];
-  const handleGetFiles = () => {
-    if(fileList.length === 0) {
-      getFiles();
-    }
+
+  const handleUpdateFile = (file, cachedState: ICachedStore) => {
+    setSelectFile({ file, cachedState });
+    onReset(item, file);
+    setVisible(false);
+    const { directory, path, activeId } = cachedState;
+    // update cached store, so that we can use it when initializing other file configurations
+    update({ cachedStore: {
+      directory,
+      path,
+      activeId,
+    } });
   };
 
   const idConfig = useMemo(() => type === ISchemaEnum.Tag ? idMap[ISchemaEnum.Tag] : idMap[ISchemaEnum.Edge], [type]);
@@ -151,20 +207,11 @@ const FileMapping = (props: IProps) => {
       <div className={cls(styles.row, styles.spaceBetween)}>
         <div className={styles.operation}>
           <span className={cls(styles.label, styles.required)}>{intl.get('import.dataSourceFile')}</span>
-          <Select 
-            bordered={false}
-            placeholder={intl.get('import.selectFile')}
-            showSearch={true} 
-            className={styles.fileSelect}
-            onDropdownVisibleChange={handleGetFiles} 
-            onChange={handleFileChange}
-            dropdownMatchSelectWidth={false}>
-            {fileList.map((file: any) => (
-              <Option value={file.name} key={file.name}>
-                {file.name}
-              </Option>
-            ))}
-          </Select>
+          <Button type="link" onClick={() => setVisible(true)}>{selectFile.file ? selectFile.file.name : intl.get('import.selectFile')}</Button>
+          {selectFile.file && <div className={styles.pathRow}>
+            <span className={styles.pathLabel}>{intl.get('import.filePath')}</span>
+            <span className={styles.pathValue}>{selectFile.cachedState.path + selectFile.file.name}</span>
+          </div>}
         </div>
         <CloseOutlined className={styles.btnClose} onClick={() => onRemove(item)} />
       </div>
@@ -176,6 +223,11 @@ const FileMapping = (props: IProps) => {
         rowKey="name"
         pagination={false}
       />
+      {visible && <FileSelectModal 
+        visible={visible}
+        cachedDatasourceState={selectFile.cachedState}
+        onCancel={() => setVisible(false)} 
+        onConfirm={handleUpdateFile} />}
     </div>
   );
 };

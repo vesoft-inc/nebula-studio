@@ -106,8 +106,28 @@
     border-bottom: 1px solid @gray;
   }
   .operation {
-    max-width: 100%;
+    width: 100%;
+    .pathRow {
+      margin: 16px 0;
+      display: flex;
+      align-items: center;
+    }
+    .pathLabel {
+      font-weight: 400;
+      font-size: 14px;
+      &::after {
+        content: ':';
+      }
+    }
+    .pathValue {
+      flex: 1;
+      margin-left: 10px;
+      background: #F3F6F9;
+      padding: 6px 0 6px 8px;
+      word-break: break-word;
+    }
   }
+ 
   .fileSelect {
     :global {
       .ant-select-selection-placeholder, .anticon, .ant-select-selection-item {
@@ -117,10 +137,32 @@
   }
   .vidCollapse {
     width: 100%;
-    
+    .funcItem {
+      width: 100%;
+      margin-bottom: 15px;
+    }
     .rowItem {
       width: 45%;
       display: inline-block;
+    }
+    .concatPreview {
+      display: flex;
+      margin-top: 15px;
+      align-items: center;
+    }
+    .concatItems {
+      background: #F3F6F9;
+      padding: 8px;
+      flex: 1;
+      .tagItem {
+        background: #8697B0;
+        border-radius: 3px;
+        padding: 6px;
+        color: #fff;
+        &:not(:last-child) {
+          margin-right: 10px;
+        }
+      }
     }
     .functionSelect {
       width: 60%;
@@ -144,6 +186,7 @@
   .spaceBetween {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
   }
   :global(.ant-select) {
     width: fit-content;
