@@ -61,7 +61,7 @@ const PropertiesForm = (props: IProps) => {
                 <Form.List name="properties" rules={[
                   {
                     validator: (_, properties) => {
-                      const names = properties.map((item) => item.name);
+                      const names = properties.map((item) => item.name).filter(Boolean);
                       if(names.length !== new Set(names).size) {
                         return Promise.reject(intl.get('schema.uniqProperty'));
                       }
@@ -92,76 +92,79 @@ const PropertiesForm = (props: IProps) => {
                             </Row>
                           </Form.Item>
                         )}
-                        {fields.map(({ key, name, ...restField }, index) => (
-                          <React.Fragment key={key}>
-                            <Row className={styles.fieldsItem}>
-                              <Col span={9}>
-                                <Form.Item
-                                  name={[name, 'name']}
-                                  {...restField}
-                                  {...itemLayout}
-                                  rules={[...nameRulesFn()]}
-                                >
-                                  <Input />
-                                </Form.Item>
-                              </Col>
-                              <Col span={12} className={styles.propertyItem}>
-                                <Form.Item
-                                  name={[name, 'type']}
-                                  {...restField}
-                                  {...itemLayout}
-                                  wrapperCol={{ span: properties[index].type === 'fixed_string' ? 15 : 23 }}
-                                  rules={[
-                                    {
-                                      required: true,
-                                      message: intl.get('formRules.dataTypeRequired'),
-                                    },
-                                  ]}
-                                >
-                                  <Select
-                                    showSearch={true}
-                                    onChange={() => handleResetValue(index)}
-                                    dropdownMatchSelectWidth={false}
-                                  >
-                                    {DATA_TYPE.map((item) => {
-                                      return (
-                                        <Option value={item.value} key={item.value}>
-                                          {item.label}
-                                        </Option>
-                                      );
-                                    })}
-                                  </Select>
-                                </Form.Item>
-                                {fields?.[index] && properties[index].type === 'fixed_string' && (
+                        {fields.map(({ key, name, ...restField }, index) => {
+                          const hasSameName = properties.some((item, i) => item.name && item.name === properties[index].name && i !== index);
+                          return (
+                            <React.Fragment key={key}>
+                              <Row className={styles.fieldsItem}>
+                                <Col span={9}>
                                   <Form.Item
+                                    name={[name, 'name']}
                                     {...restField}
-                                    className={styles.itemStringLength}
-                                    name={[name, 'fixedLength']}
+                                    {...itemLayout}
+                                    rules={[...nameRulesFn()]}
+                                  >
+                                    <Input />
+                                  </Form.Item>
+                                </Col>
+                                <Col span={12} className={styles.propertyItem}>
+                                  <Form.Item
+                                    name={[name, 'type']}
+                                    {...restField}
+                                    {...itemLayout}
+                                    wrapperCol={{ span: properties[index].type === 'fixed_string' ? 15 : 23 }}
                                     rules={[
-                                      ...numberRulesFn(),
                                       {
                                         required: true,
-                                        message: intl.get('formRules.numberRequired'),
+                                        message: intl.get('formRules.dataTypeRequired'),
                                       },
                                     ]}
                                   >
-                                    <Input className={styles.inputStringLength} />
+                                    <Select
+                                      showSearch={true}
+                                      onChange={() => handleResetValue(index)}
+                                      dropdownMatchSelectWidth={false}
+                                    >
+                                      {DATA_TYPE.map((item) => {
+                                        return (
+                                          <Option value={item.value} key={item.value}>
+                                            {item.label}
+                                          </Option>
+                                        );
+                                      })}
+                                    </Select>
                                   </Form.Item>
-                                )}
-                              </Col>
-                              <Col span={2}>
-                                <Form.Item noStyle>
-                                  <Button
-                                    className={styles.removeBtn}
-                                    icon={<Icon type="icon-list-close" />}
-                                    onClick={() => remove(index)}
-                                  />
-                                </Form.Item>
-                              </Col>
-                              <Form.ErrorList className={styles.errors} errors={errors} />
-                            </Row>
-                          </React.Fragment>
-                        ))}
+                                  {fields?.[index] && properties[index].type === 'fixed_string' && (
+                                    <Form.Item
+                                      {...restField}
+                                      className={styles.itemStringLength}
+                                      name={[name, 'fixedLength']}
+                                      rules={[
+                                        ...numberRulesFn(),
+                                        {
+                                          required: true,
+                                          message: intl.get('formRules.numberRequired'),
+                                        },
+                                      ]}
+                                    >
+                                      <Input className={styles.inputStringLength} />
+                                    </Form.Item>
+                                  )}
+                                </Col>
+                                <Col span={2}>
+                                  <Form.Item noStyle>
+                                    <Button
+                                      className={styles.removeBtn}
+                                      icon={<Icon type="icon-list-close" />}
+                                      onClick={() => remove(index)}
+                                    />
+                                  </Form.Item>
+                                </Col>
+                                {hasSameName && <Form.ErrorList className={styles.errors} errors={errors} />}
+                              </Row>
+                            </React.Fragment>
+                          );
+                        })}
                       </Form.Item>
                     );
                   }}
