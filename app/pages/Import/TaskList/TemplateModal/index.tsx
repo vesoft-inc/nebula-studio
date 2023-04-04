@@ -176,7 +176,7 @@ const TemplateModal = (props: IProps) => {
 
   const handleImport = async (values) => {
     const code = await importTask({
-      config: JSON.parse(values.content), 
+      config: values.content, 
       name: values.name
     });
     if(code === 0) {

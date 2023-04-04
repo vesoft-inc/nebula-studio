@@ -21,9 +21,9 @@ const UploadBtn = (props: IUploadBtnProps) => {
   const { fileList, uploadFile } = files;
   const [visible, setVisible] = useState(false);
   const transformFile = async (_file: StudioFile, fileList: StudioFile[]) => {
-    const size = fileList.reduce((acc, cur) => acc + cur.size, 0);
-    if(size > SizeLimit) {
-      message.error(intl.get('import.fileSizeLimit', { size: getFileSize(SizeLimit) }));
+    const bigFiles = fileList.filter(file => file.size > SizeLimit);
+    if(bigFiles.length > 0) {
+      message.error(intl.get('import.fileSizeLimit', { name: bigFiles.map(i => i.name).join(', '), size: getFileSize(SizeLimit) }));
       return false;
     }
     fileList.forEach(file => {

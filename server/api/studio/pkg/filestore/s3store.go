@@ -156,3 +156,7 @@ func (s *S3Store) ListBuckets() ([]string, error) {
 
 	return buckets, nil
 }
+
+func (s *S3Store) Close() error {
+	return nil
+}

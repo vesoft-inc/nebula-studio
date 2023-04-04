@@ -180,8 +180,8 @@ type LogField struct {
 }
 
 type CreateImportTaskRequest struct {
-	Name   string           `json:"name" validate:"required"`
-	Config ImportTaskConfig `json:"config" validate:"required"`
+	Name   string `json:"name" validate:"required"`
+	Config string `json:"config" validate:"required"`
 }
 
 type CreateImportTaskData struct {

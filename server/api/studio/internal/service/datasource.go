@@ -208,6 +208,7 @@ func (d *datasourceService) ListContents(request types.DatasourceListContentsReq
 		return nil, err
 	}
 	fileList, err := store.ListFiles(request.Path)
+	defer store.Close()
 	list := make([]types.FileConfig, 0)
 	for _, item := range fileList {
 		list = append(list, types.FileConfig{
@@ -235,6 +236,7 @@ func (d *datasourceService) PreviewFile(request types.DatasourcePreviewFileReque
 	}
 	// read three lines
 	contents, err := store.ReadFile(request.Path, 0, 4)
+	defer store.Close()
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrBadRequest, err, "readFiles failed")
 	}

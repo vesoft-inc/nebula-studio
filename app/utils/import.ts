@@ -53,7 +53,7 @@ export function configToJson(payload: IConfig) {
     },
     sources
   };
-  return configJson;
+  return JSON.stringify(configJson);
 }
 
 const getIdConfig = (payload: {
@@ -69,7 +69,9 @@ const getIdConfig = (payload: {
     function: vidFunction,
   } as any;
   if(indexes.length > 1 || !!prefix || !!suffix) {
-    id.concatItems = [prefix, ...indexes, suffix];
+    id.concatItems = [...indexes];
+    prefix && id.concatItems.unshift(prefix);
+    suffix && id.concatItems.push(suffix);
   } else {
     id.index = indexes[0];
   }

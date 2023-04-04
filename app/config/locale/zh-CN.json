@@ -220,7 +220,7 @@
     "importYaml": "导入 YAML 文件",
     "templateMatchError": "配置中的用户姓名与当前登录账号不一致",
     "uploadSuccessfully": "上传文件成功",
-    "fileSizeLimit": "文件过大，超过上传限制({size})，请将文件通过 scp 的方式上传到安装目录下的 data/upload 目录",
+    "fileSizeLimit": "{name}文件过大，超过上传限制({size})，请将文件通过 scp 的方式上传到安装目录下的 data/upload 目录",
     "noHttp": "配置文件中的 address 不支持携带 http 协议，请去除 http(s)://",
     "addressMatch": "配置文件中的 address 字段必须包含当前登录的 Graph 地址。多个地址用“,”隔开。",
     "dataSourceFile": "文件源",

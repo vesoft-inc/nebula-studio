@@ -220,7 +220,7 @@
     "importYaml": "Import the YAML file",
     "templateMatchError": "The user in the configuration does not match the current login account",
     "uploadSuccessfully": "Upload files successfully.",
-    "fileSizeLimit": "The file is too large and exceeds the upload limit({size}), please upload the file to the data/upload directory under the installation directory via scp",
+    "fileSizeLimit": "{name} is too large and exceeds the upload limit({size}), please upload the file to the data/upload directory under the installation directory via scp",
     "noHttp": "The address in the configuration file does not support http protocol, please remove http(s)://",
     "addressMatch": "The address in the configuration file must contain the Graph address of current login connection. Separate multiple addresses with ",
     "dataSourceFile": "Data source file",
