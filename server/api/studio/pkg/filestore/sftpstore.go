@@ -125,3 +125,7 @@ func (s *SftpStore) ListFiles(dir string) ([]FileConfig, error) {
 	}
 	return files, nil
 }
+
+func (s *SftpStore) Close() error {
+	return s.SftpClient.Close()
+}

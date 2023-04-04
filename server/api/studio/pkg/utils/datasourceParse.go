@@ -22,7 +22,6 @@ func ParseEndpoint(platform, rawEndpoint string) (string, string, error) {
 	}
 	host := u.Hostname()
 	parts := strings.SplitN(host, ".", 2)
-	fmt.Println("host", host, parts)
 	var (
 		bucket   string
 		endpoint string

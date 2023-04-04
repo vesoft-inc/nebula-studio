@@ -9,6 +9,7 @@ type (
 	FileStore interface {
 		ReadFile(path string, startLine ...int) ([]string, error)
 		ListFiles(dir string) ([]FileConfig, error)
+		Close() error
 	}
 
 	FileConfig struct {

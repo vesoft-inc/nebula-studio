@@ -93,8 +93,9 @@ const FileSelect = observer((props: IFileSelect) => {
     }
   }, []);
   const handleRefresh = useCallback(async () => {
+    if (!activeId) return;
     setState({ loading: true });
-    if (!activeId || activeId === IDatasourceType.Local) {
+    if (activeId === IDatasourceType.Local) {
       getLocalFiles();
       return;
     }
