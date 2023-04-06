@@ -68,7 +68,6 @@ func NewImportService(ctx context.Context, svcCtx *svc.ServiceContext) ImportSer
 }
 
 func (i *importService) updateDatasourceConfig(conf *types.CreateImportTaskRequest) (*types.ImportTaskConfig, error) {
-	// config := conf.Config
 	var config types.ImportTaskConfig
 	if err := json.Unmarshal([]byte(conf.Config), &config); err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrBadRequest, err)

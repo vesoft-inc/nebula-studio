@@ -39,7 +39,7 @@ const AddMappingBtn = (props: { type: ISchemaType }) => {
 };
 
 const TaskCreate = (props: IProps) => {
-  const { dataImport, schema, files, global } = useStore();
+  const { dataImport, schema, files, global, datasource } = useStore();
   const { intl, currentLocale } = useI18n();
   const { basicConfig, tagConfig, edgeConfig, updateBasicConfig, importTask } = dataImport;
   const { spaces, getSpaces, updateSpaceInfo, currentSpace } = schema;
@@ -70,7 +70,10 @@ const TaskCreate = (props: IProps) => {
       updateSpaceInfo(currentSpace);
     }
     trackPageView('/import/create');
-    return () => clearConfig('all');
+    return () => {
+      clearConfig('all');
+      datasource.update({ cachedStore: null });
+    };
   }, []);
 
   const checkConfig = () => {

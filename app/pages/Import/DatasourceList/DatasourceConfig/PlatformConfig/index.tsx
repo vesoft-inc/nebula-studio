@@ -20,7 +20,7 @@ interface IProps {
 }
 
 const fomrItemLayout = {
-  labelCol: { span: 7, offset: 2 },
+  labelCol: { span: 8, offset: 1 },
   wrapperCol: { span: 10 },
 };
 
