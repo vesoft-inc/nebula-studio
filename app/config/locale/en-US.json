@@ -63,7 +63,8 @@
     "value": "Value",
     "continue": "Continue",
     "update": "Update",
-    "prev": "Previous"
+    "prev": "Previous",
+    "createTime": "Create Time"
   },
   "doc": {
     "welcome": "Welcome to",
