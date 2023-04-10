@@ -117,7 +117,7 @@ const FileConfigSetting = (props: IProps) => {
     e.stopPropagation();
     const isActive = activeItem?.uid === data[index].uid;
     const newData = data.filter((_, i) => i !== index);
-    const checkedNum = data.reduce((n, file) => n + (file.withHeader & 1), 0);
+    const checkedNum = newData.reduce((n, file) => n + (file.withHeader & 1), 0);
     setState({
       checkAll: checkedNum === newData.length && newData.length > 0,
       indeterminate: !!checkedNum && checkedNum < newData.length,
