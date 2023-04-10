@@ -150,7 +150,7 @@ const TaskCreate = (props: IProps) => {
       edgeConfig: []
     } as any;
     if(type === 'all') {
-      params.basicConfig = { taskName: '', address: address.map(i => i.value) };
+      params.basicConfig = { taskName: '', address: [] };
     }
     dataImport.update(params);
   }, []);
