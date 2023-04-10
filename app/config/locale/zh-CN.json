@@ -63,7 +63,8 @@
     "value": "值",
     "continue": "继续",
     "update": "更新",
-    "prev": "上一步"
+    "prev": "上一步",
+    "createTime": "创建时间"
   },
   "doc": {
     "welcome": "欢迎使用",

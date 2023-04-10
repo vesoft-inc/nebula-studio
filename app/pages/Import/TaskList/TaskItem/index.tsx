@@ -92,10 +92,13 @@ const TaskItem = (props: IProps) => {
     <div className={styles.taskItem}>
       <div className={styles.row}>
         <span>{intl.get('common.space')}: {space}</span>
-        {showConfigDownload && <Button type="link" size="small" onClick={() => onConfigDownload(id)}>
-          <Icon type="icon-studio-btn-download" />
-          {intl.get('import.downloadConfig')}
-        </Button>}
+        <div>
+          <span className={styles.createTime}>{intl.get('common.createTime')}: {dayjs(createTime).format('YYYY-MM-DD HH:mm:ss')}</span>
+          {showConfigDownload && <Button type="link" size="small" onClick={() => onConfigDownload(id)}>
+            <Icon type="icon-studio-btn-download" />
+            {intl.get('import.downloadConfig')}
+          </Button>}
+        </div>
       </div>
       <div className={styles.row}>
         <div className={styles.progress}>
