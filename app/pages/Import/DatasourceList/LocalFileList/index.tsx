@@ -43,7 +43,9 @@ const FileList = () => {
       title: intl.get('common.operation'),
       key: 'operation',
       render: (_, file) => {
-        if(!file.sample) {
+        // sample could be '' if file is empty
+        // eslint-disable-next-line eqeqeq
+        if(file.sample == undefined) {
           return null;
         }
         return (

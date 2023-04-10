@@ -99,7 +99,7 @@ const TemplateModal = (props: IProps) => {
   }, [currentLocale, username]);
   const validatePassword = useCallback((client) => validateEmpty('password', client.password), []);
   const validateS3 = useCallback((s3) => validateEmpty('s3AccessKey', s3.accessKey) || validateEmpty('s3SecretKey', s3.secretKey), []);
-  const validateSftp = useCallback((sftp) => validateEmpty('sftpUsername', sftp.username) || validateEmpty('sftpPassword', sftp.password), []);
+  const validateSftp = useCallback((sftp) => validateEmpty('sftpUsername', sftp.user) || validateEmpty('sftpPassword', sftp.password), []);
   const validateOSS = useCallback((oss) => validateEmpty('ossAccessKey', oss.accessKey) || validateEmpty('ossSecretKey', oss.secretKey), []);
   const validateClient = useCallback((content) => {
     const client = content.client || {};

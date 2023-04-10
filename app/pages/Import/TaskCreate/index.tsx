@@ -12,6 +12,7 @@ import { ISchemaEnum, ISchemaType } from '@app/interfaces/schema';
 import Icon from '@app/components/Icon';
 import Instruction from '@app/components/Instruction';
 import { isEmpty } from '@app/utils/function';
+import { ImportStore } from '@app/stores/import';
 import styles from './index.module.less';
 import ConfigConfirmModal from './ConfigConfirmModal';
 import SchemaConfig from './SchemaConfig';
@@ -39,7 +40,7 @@ const AddMappingBtn = (props: { type: ISchemaType }) => {
 };
 
 const TaskCreate = (props: IProps) => {
-  const { dataImport, schema, files, global } = useStore();
+  const { dataImport, schema, files, global, datasource } = useStore();
   const { intl, currentLocale } = useI18n();
   const { basicConfig, tagConfig, edgeConfig, updateBasicConfig, importTask } = dataImport;
   const { spaces, getSpaces, updateSpaceInfo, currentSpace } = schema;
@@ -70,7 +71,10 @@ const TaskCreate = (props: IProps) => {
       updateSpaceInfo(currentSpace);
     }
     trackPageView('/import/create');
-    return () => clearConfig('all');
+    return () => {
+      clearConfig('all');
+      datasource.update({ cachedStore: null });
+    };
   }, []);
 
   const checkConfig = () => {
@@ -145,9 +149,9 @@ const TaskCreate = (props: IProps) => {
     const params = {
       tagConfig: [],
       edgeConfig: []
-    } as any;
+    } as Partial<ImportStore>;
     if(type === 'all') {
-      params.basicConfig = { taskName: '', address: address.map(i => i.value) };
+      params.basicConfig = { taskName: '', address: [] };
     }
     dataImport.update(params);
   }, []);
