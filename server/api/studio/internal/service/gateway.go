@@ -56,7 +56,9 @@ func (s *gatewayService) ConnectDB(request *types.ConnectDBParams) error {
 
 	// tokenString, err := auth.ParseConnectDBParams(request, &s.svcCtx.Config)
 	username, password, err := auth.ParseConnectDBParams(request, &s.svcCtx.Config)
-
+	if err != nil {
+		return s.withErrorMessage(ecode.ErrBadRequest, err)
+	}
 	address := request.Address
 	port := request.Port
 	// set Graph Service connect timeout 8h, which is 0s default(means no timeout)
@@ -67,7 +69,6 @@ func (s *gatewayService) ConnectDB(request *types.ConnectDBParams) error {
 	if err != nil {
 		return s.withErrorMessage(ecode.ErrBadRequest, err, "connect to nebula failed")
 	}
-	result, _ := client.GetClusters(clientInfo.ClientID)
 	tokenString, err := auth.CreateToken(
 		&auth.AuthData{
 			Address:  address,
@@ -75,7 +76,6 @@ func (s *gatewayService) ConnectDB(request *types.ConnectDBParams) error {
 			Username: username,
 			Password: password,
 			NSID:     clientInfo.ClientID,
-			Cluster:  result,
 		},
 		&s.svcCtx.Config,
 	)

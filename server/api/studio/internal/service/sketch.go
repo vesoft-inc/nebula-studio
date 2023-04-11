@@ -9,6 +9,7 @@ import (
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/client"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -81,7 +82,11 @@ func (s *sketchService) Update(request types.UpdateSketchRequest) error {
 
 func (s *sketchService) GetList(request types.GetSketchesRequest) (*types.SketchList, error) {
 	auth := s.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
-	cluster := auth.Cluster
+	nsid := auth.NSID
+	cluster, err := client.GetClientCluster(nsid)
+	if err != nil {
+		cluster = []string{auth.Address + ":" + strconv.Itoa(auth.Port)}
+	}
 	var sketchList []db.Sketch
 	filters := db.CtxDB.Where("host in (?)", cluster)
 	filters = filters.Where("username = ?", auth.Username)

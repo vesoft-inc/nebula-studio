@@ -56,6 +56,7 @@ type Client struct {
 	parameterMap   ParameterMap
 	account        *Account
 	sessionPool    *SessionPool
+	cluster        []string
 }
 
 type ClientInfo struct {
@@ -108,6 +109,7 @@ func NewClient(address string, port int, username string, password string, conf 
 			activeSessions: make([]*nebula.Session, 0),
 			ildeSessions:   make([]*nebula.Session, 0),
 		},
+		cluster: []string{},
 	}
 
 	session, err := client.getSession()
@@ -119,9 +121,13 @@ func NewClient(address string, port int, username string, password string, conf 
 	client.sessionPool.addSession(session)
 
 	clientPool.Set(nsid, client)
-
 	go client.handleRequest(nsid)
-
+	cluster, err := GetClusters(nsid)
+	if err != nil {
+		logx.Errorf("get clusters failed: %s", err.Error())
+	} else {
+		client.cluster = cluster
+	}
 	info := &ClientInfo{
 		ClientID: nsid,
 	}
@@ -161,4 +167,12 @@ func recycleClients() {
 			client.CloseChannel <- true
 		}
 	})
+}
+
+func GetClientCluster(nsid string) ([]string, error) {
+	client, err := GetClient(nsid)
+	if err != nil {
+		return nil, err
+	}
+	return client.cluster, nil
 }

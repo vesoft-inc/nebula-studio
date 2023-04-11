@@ -24,12 +24,11 @@ type (
 	CtxKeyUserInfo struct{}
 
 	AuthData struct {
-		Address  string   `json:"address"`
-		Port     int      `json:"port"`
-		Username string   `json:"username"`
-		Password string   `json:"password"`
-		NSID     string   `json:"nsid"`
-		Cluster  []string `json:"cluster"`
+		Address  string `json:"address"`
+		Port     int    `json:"port"`
+		Username string `json:"username"`
+		Password string `json:"password"`
+		NSID     string `json:"nsid"`
 	}
 
 	authClaims struct {

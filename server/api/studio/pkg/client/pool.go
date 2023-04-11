@@ -592,7 +592,7 @@ func GetClusters(nsid string) ([]string, error) {
 	}
 	res := executes[0]
 	if res.Error != nil {
-		return nil, nil
+		return nil, res.Error
 	}
 	var clusters []string
 	for _, item := range res.Result.Tables {
