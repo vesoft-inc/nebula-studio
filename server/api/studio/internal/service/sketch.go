@@ -81,9 +81,9 @@ func (s *sketchService) Update(request types.UpdateSketchRequest) error {
 
 func (s *sketchService) GetList(request types.GetSketchesRequest) (*types.SketchList, error) {
 	auth := s.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
-	host := auth.Address + ":" + strconv.Itoa(auth.Port)
+	cluster := auth.Cluster
 	var sketchList []db.Sketch
-	filters := db.CtxDB.Where("host = ?", host)
+	filters := db.CtxDB.Where("host in (?)", cluster)
 	filters = filters.Where("username = ?", auth.Username)
 	if request.Keyword != "" {
 		filters = filters.Where("name LIKE ?", "%"+request.Keyword+"%")
@@ -99,6 +99,7 @@ func (s *sketchService) GetList(request types.GetSketchesRequest) (*types.Sketch
 			Name:       sketch.Name,
 			Schema:     sketch.Schema,
 			Snapshot:   sketch.Snapshot,
+			Host:       sketch.Host,
 			CreateTime: sketch.CreateTime.UnixMilli(),
 			UpdateTime: sketch.UpdateTime.UnixMilli(),
 		})

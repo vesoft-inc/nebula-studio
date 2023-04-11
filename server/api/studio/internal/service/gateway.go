@@ -3,9 +3,11 @@ package service
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/vesoft-inc/go-pkg/response"
+	nebula "github.com/vesoft-inc/nebula-go/v3"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
@@ -16,6 +18,11 @@ import (
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
+
+// set the timeout for the graph service: 8 hours
+// once the timeout is reached, the connection will be closed
+// all requests running ngql will be failed, so keepping a long timeout is necessary, make the connection alive
+const GraphServiceTimeout = 8 * time.Hour
 
 var _ GatewayService = (*gatewayService)(nil)
 
@@ -47,7 +54,32 @@ func NewGatewayService(ctx context.Context, svcCtx *svc.ServiceContext) GatewayS
 func (s *gatewayService) ConnectDB(request *types.ConnectDBParams) error {
 	httpRes, _ := middleware.GetResponseWriter(s.ctx)
 
-	tokenString, err := auth.ParseConnectDBParams(request, &s.svcCtx.Config)
+	// tokenString, err := auth.ParseConnectDBParams(request, &s.svcCtx.Config)
+	username, password, err := auth.ParseConnectDBParams(request, &s.svcCtx.Config)
+
+	address := request.Address
+	port := request.Port
+	// set Graph Service connect timeout 8h, which is 0s default(means no timeout)
+	poolCfg := nebula.GetDefaultConf()
+	poolCfg.TimeOut = GraphServiceTimeout
+	poolCfg.MaxConnPoolSize = 200
+	clientInfo, err := client.NewClient(address, port, username, password, poolCfg)
+	if err != nil {
+		return s.withErrorMessage(ecode.ErrBadRequest, err, "connect to nebula failed")
+	}
+	result, _ := client.GetClusters(clientInfo.ClientID)
+	tokenString, err := auth.CreateToken(
+		&auth.AuthData{
+			Address:  address,
+			Port:     port,
+			Username: username,
+			Password: password,
+			NSID:     clientInfo.ClientID,
+			Cluster:  result,
+		},
+		&s.svcCtx.Config,
+	)
+
 	if err != nil {
 		return s.withErrorMessage(ecode.ErrBadRequest, err, "parse request failed")
 	}

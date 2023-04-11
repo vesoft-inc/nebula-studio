@@ -3,6 +3,7 @@ package client
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -581,4 +582,26 @@ func parseExecuteData(response SingleResponse) (ParsedResult, error) {
 	}
 	result.TimeCost = res.GetLatency()
 	return result, nil
+}
+
+func GetClusters(nsid string) ([]string, error) {
+	ipRegex := regexp.MustCompile(`^(\d{1,3}\.){3}\d{1,3}$`)
+	executes, err := Execute(nsid, "", []string{"show hosts graph;"})
+	if err != nil {
+		return nil, err
+	}
+	res := executes[0]
+	if res.Error != nil {
+		return nil, nil
+	}
+	var clusters []string
+	for _, item := range res.Result.Tables {
+		host := item["Host"]
+		port := item["Port"]
+		if ipRegex.MatchString(host.(string)) {
+			address := fmt.Sprintf("%s:%d", host, port)
+			clusters = append(clusters, address)
+		}
+	}
+	return clusters, nil
 }

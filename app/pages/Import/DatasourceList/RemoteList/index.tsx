@@ -158,7 +158,7 @@ const DatasourceList = (props: IProps) => {
           }}
           columns={tableColumns}
           rowKey="id"
-          pagination={false}
+          pagination={{ hideOnSinglePage: true }}
         />
       </div>
       <DatasourceConfigModal key={modalKey} data={editData} type={type} visible={visible} onCancel={() => setVisible(false)} onConfirm={handleRefresh} />

@@ -288,6 +288,7 @@ type Sketch struct {
 	Name       string `json:"name"`
 	Schema     string `json:"schema"`
 	Snapshot   string `json:"snapshot"`
+	Host       string `json:"host"`
 	CreateTime int64  `json:"createTime"`
 	UpdateTime int64  `json:"updateTime"`
 }

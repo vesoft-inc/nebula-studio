@@ -111,7 +111,7 @@ const FileList = () => {
           }}
           columns={columns}
           rowKey="name"
-          pagination={false}
+          pagination={{ hideOnSinglePage: true }}
         />
       </div>
     </div>

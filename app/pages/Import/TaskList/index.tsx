@@ -1,4 +1,4 @@
-import { Button, message, Spin } from 'antd';
+import { Button, message, Pagination, Spin } from 'antd';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
@@ -29,6 +29,7 @@ interface IProps {
 
 const TaskList = (props: IProps) => {
   const timer = useRef<any>(null);
+  const [page, setPage] = useState(1);
   const { dataImport, global } = useStore();
   const { intl } = useI18n();
   const history = useHistory();
@@ -159,7 +160,7 @@ const TaskList = (props: IProps) => {
           })}
         </div>
         : <Spin spinning={loading}>
-          {taskList.map(item => (
+          {taskList.slice((page - 1) * 10, (page - 1) * 10 + 10).map(item => (
             <TaskItem key={item.id} 
               data={item}
               onViewLog={handleLogView} 
@@ -169,6 +170,11 @@ const TaskList = (props: IProps) => {
               showConfigDownload={showConfigDownload}
             />
           ))}
+          <Pagination className={styles.taskPagination} 
+            hideOnSinglePage 
+            total={taskList.length} 
+            current={page} 
+            onChange={page => setPage(page)} />
         </Spin>
       }
       {modalVisible && <LogModal

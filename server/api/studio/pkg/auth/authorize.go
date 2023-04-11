@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	nebula "github.com/vesoft-inc/nebula-go/v3"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
@@ -25,11 +24,12 @@ type (
 	CtxKeyUserInfo struct{}
 
 	AuthData struct {
-		Address  string `json:"address"`
-		Port     int    `json:"port"`
-		Username string `json:"username"`
-		Password string `json:"password"`
-		NSID     string `json:"nsid"`
+		Address  string   `json:"address"`
+		Port     int      `json:"port"`
+		Username string   `json:"username"`
+		Password string   `json:"password"`
+		NSID     string   `json:"nsid"`
+		Cluster  []string `json:"cluster"`
 	}
 
 	authClaims struct {
@@ -37,11 +37,6 @@ type (
 		jwt.RegisteredClaims
 	}
 )
-
-// set the timeout for the graph service: 8 hours
-// once the timeout is reached, the connection will be closed
-// all requests running ngql will be failed, so keepping a long timeout is necessary, make the connection alive
-const GraphServiceTimeout = 8 * time.Hour
 
 func IsSessionError(err error) bool {
 	subErrMsgStr := []string{
@@ -104,49 +99,30 @@ func Decode(tokenString, secret string) (*AuthData, error) {
 	return auth.AuthData, nil
 }
 
-func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) (string, error) {
+func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) (string, string, error) {
 	tokenSplit := strings.Split(params.Authorization, " ")
 	if len(tokenSplit) != 2 {
-		return "", fmt.Errorf("invalid authorization")
+		return "", "", fmt.Errorf("invalid authorization")
 	}
 
 	decode, err := base64.StdEncoding.DecodeString(tokenSplit[1])
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	loginInfo := []string{}
 	err = json.Unmarshal(decode, &loginInfo)
 
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	if len(loginInfo) < 2 {
-		return "", fmt.Errorf("len of account is less than two")
+		return "", "", fmt.Errorf("len of account is less than two")
 	}
 
 	username, password := loginInfo[0], loginInfo[1]
-	// set Graph Service connect timeout 8h, which is 0s default(means no timeout)
-	poolCfg := nebula.GetDefaultConf()
-	poolCfg.TimeOut = GraphServiceTimeout
-	poolCfg.MaxConnPoolSize = 200
-	clientInfo, err := client.NewClient(params.Address, params.Port, username, password, poolCfg)
-	if err != nil {
-		return "", err
-	}
-
-	tokenString, err := CreateToken(
-		&AuthData{
-			Address:  params.Address,
-			Port:     params.Port,
-			Username: username,
-			Password: password,
-			NSID:     clientInfo.ClientID,
-		},
-		config,
-	)
-	return tokenString, nil
+	return username, password, nil
 }
 
 func AuthMiddlewareWithCtx(svcCtx *svc.ServiceContext) rest.Middleware {
