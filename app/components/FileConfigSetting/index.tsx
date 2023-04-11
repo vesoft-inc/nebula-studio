@@ -36,8 +36,6 @@ const FileConfigSetting = (props: IProps) => {
     data: [],
     activeItem: null,
     previewContent: [],
-    checkAll: false,
-    indeterminate: false,
     loading: false,
     uploading: false,
     setState: (obj) => Object.assign(state, obj),
@@ -48,8 +46,6 @@ const FileConfigSetting = (props: IProps) => {
     setState({
       data: preUploadList, 
       activeItem: preUploadList[0], 
-      checkAll: preUploadList.every((item) => item.withHeader),
-      indeterminate: preUploadList.some((item) => item.withHeader) && !preUploadList.every((item) => item.withHeader),
     });
   }, []);
   useEffect(() => {
@@ -95,8 +91,6 @@ const FileConfigSetting = (props: IProps) => {
     const { data, setState } = state;
     const { checked } = e.target;
     setState({
-      checkAll: checked,
-      indeterminate: false,
       data: data.map(i => (i.withHeader = checked, i)),
     });
   }, []);
@@ -105,10 +99,7 @@ const FileConfigSetting = (props: IProps) => {
     const { data, setState } = state;
     const { checked } = e.target;
     const nextData = data.map(i => (i === item && (i.withHeader = checked), i));
-    const checkedNum = data.reduce((n, file) => n + (file.withHeader & 1), 0);
     setState({
-      checkAll: checkedNum === data.length,
-      indeterminate: !!checkedNum && checkedNum < data.length,
       data: nextData
     });
   }, []);
@@ -117,10 +108,7 @@ const FileConfigSetting = (props: IProps) => {
     e.stopPropagation();
     const isActive = activeItem?.uid === data[index].uid;
     const newData = data.filter((_, i) => i !== index);
-    const checkedNum = newData.reduce((n, file) => n + (file.withHeader & 1), 0);
     setState({
-      checkAll: checkedNum === newData.length && newData.length > 0,
-      indeterminate: !!checkedNum && checkedNum < newData.length,
       data: newData,
       activeItem: isActive ? null : activeItem,
       previewContent: isActive ? [] : previewContent,
@@ -181,7 +169,7 @@ const FileConfigSetting = (props: IProps) => {
     !uploading && onCancel();
   }, []);
 
-  const { uploading, data, activeItem, previewContent, loading, setState, checkAll, indeterminate } = state;
+  const { uploading, data, activeItem, previewContent, loading, setState } = state;
   const parseColumns = previewContent.length
     ? previewContent[0].map((header, index) => {
       const textIndex = index;
@@ -193,6 +181,8 @@ const FileConfigSetting = (props: IProps) => {
       };
     })
     : [];
+  const checkAll = data.length > 0 && data.every((item) => item.withHeader);
+  const indeterminate = data.some((item) => item.withHeader) && !checkAll;
   const columns = [
     {
       title: intl.get('import.fileName'),
