@@ -2,6 +2,7 @@ package importer
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -102,9 +103,10 @@ func (mgr *TaskMgr) NewTask(host string, user string, taskName string, cfg impor
 
 	task := &Task{
 		Client: &Client{
-			Cfg:     cfg,
-			Manager: nil,
-			Logger:  nil,
+			Cfg:        cfg,
+			Manager:    nil,
+			Logger:     nil,
+			HasStarted: false,
 		},
 		TaskInfo: taskInfo,
 	}
@@ -214,12 +216,23 @@ and then call FinishTask
 */
 func (mgr *TaskMgr) StopTask(taskID int) error {
 	if task, ok := mgr.getTaskFromMap(taskID); ok {
+		var err error
 		manager := task.Client.Manager
-		task.TaskInfo.TaskStatus = StatusStoped.String()
-		err := manager.Stop()
-		if err != nil {
-			return errors.New("stop task fail")
+		if manager != nil {
+			if task.Client.HasStarted {
+				err = manager.Stop()
+			} else {
+				// hack import not support stop before start()
+				err = errors.New("task has not started, please try later")
+			}
+		} else {
+			err = errors.New("manager is nil, please try later")
 		}
+
+		if err != nil {
+			return fmt.Errorf("stop task failed: %w", err)
+		}
+		task.TaskInfo.TaskStatus = StatusStoped.String()
 		if err := mgr.FinishTask(taskID); err != nil {
 			return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 		}

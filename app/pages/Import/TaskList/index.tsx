@@ -47,6 +47,8 @@ const TaskList = (props: IProps) => {
     if(code === 0) {
       message.success(intl.get('import.stopImportingSuccess'));
       getTaskList();
+    } else {
+      getTaskList();
     }
   }, []);
   const handleTaskDelete = useCallback(async (id: number) => {

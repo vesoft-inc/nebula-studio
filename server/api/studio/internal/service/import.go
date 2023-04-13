@@ -199,6 +199,7 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 	// start import
 	if err = importer.StartImport(taskID); err != nil {
 		task.TaskInfo.TaskStatus = importer.StatusAborted.String()
+		task.TaskInfo.TaskMessage = err.Error()
 		importer.GetTaskMgr().AbortTask(taskID)
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
