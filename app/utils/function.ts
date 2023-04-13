@@ -11,11 +11,7 @@ export const handleVidStringName = (name: string, spaceVidType?: string) => {
   if (spaceVidType && spaceVidType === 'INT64') {
     return convertBigNumberToString(name);
   }
-  if (name.indexOf(`"`) > -1 && name.indexOf(`'`) === -1) {
-    return `'${name}'`;
-  } else {
-    return `"${name}"`;
-  }
+  return JSON.stringify(name);
 };
 
 export const convertBigNumberToString = (value: any) => {
