@@ -182,15 +182,6 @@ func (d *datasourceService) Remove(request types.DatasourceRemoveRequest) error 
 	return nil
 }
 
-func contains(s []int, e int) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
-
 func (d *datasourceService) BatchRemove(request types.DatasourceBatchRemoveRequest) error {
 	user := d.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	var existingIDs []int
@@ -198,7 +189,7 @@ func (d *datasourceService) BatchRemove(request types.DatasourceBatchRemoveReque
 	if len(existingIDs) != len(request.IDs) {
 		var missingIDs []int
 		for _, id := range request.IDs {
-			if !contains(existingIDs, id) {
+			if !utils.Contains(existingIDs, id) {
 				missingIDs = append(missingIDs, id)
 			}
 		}

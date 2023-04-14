@@ -11,6 +11,8 @@ export const handleVidStringName = (name: string, spaceVidType?: string) => {
   if (spaceVidType && spaceVidType === 'INT64') {
     return convertBigNumberToString(name);
   }
+  // Add quotes to a string
+  // If there is '\n' in the string, it needs to be escaped 
   return JSON.stringify(name);
 };
 
