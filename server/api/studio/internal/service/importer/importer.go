@@ -57,6 +57,7 @@ func StartImport(taskID int) (err error) {
 			abort()
 			return
 		}
+		task.Client.HasStarted = true
 		err = mgr.Wait()
 		if err != nil {
 			task.TaskInfo.TaskStatus = StatusAborted.String()

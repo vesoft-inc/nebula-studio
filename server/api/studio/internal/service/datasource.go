@@ -111,11 +111,11 @@ func (d *datasourceService) Update(request types.DatasourceUpdateRequest) error 
 	}
 	cfgStr, crypto, err := validate(typ, platform, cfg)
 	if err != nil {
-		return err
+		return ecode.WithErrorMessage(ecode.ErrBadRequest, err)
 	}
 	err = d.update(datasourceId, request.Type, request.Platform, request.Name, cfgStr, crypto)
 	if err != nil {
-		return err
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	return nil
 }
@@ -184,14 +184,24 @@ func (d *datasourceService) Remove(request types.DatasourceRemoveRequest) error 
 
 func (d *datasourceService) BatchRemove(request types.DatasourceBatchRemoveRequest) error {
 	user := d.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+	var existingIDs []int
+	db.CtxDB.Model(&db.Datasource{}).Where("id in (?)", request.IDs).Pluck("id", &existingIDs)
+	if len(existingIDs) != len(request.IDs) {
+		var missingIDs []int
+		for _, id := range request.IDs {
+			if !utils.Contains(existingIDs, id) {
+				missingIDs = append(missingIDs, id)
+			}
+		}
+		return ecode.WithErrorMessage(ecode.ErrBadRequest, fmt.Errorf("some data are not found: %v", missingIDs))
+	}
 	result := db.CtxDB.Where("id IN (?) AND username = ?", request.IDs, user.Username).Delete(&db.Datasource{})
-
 	if result.Error != nil {
 		return d.gormErrorWrapper(result.Error)
 	}
 
 	if result.RowsAffected == 0 {
-		return ecode.WithErrorMessage(ecode.ErrBadRequest, fmt.Errorf("test"), "there is available item to delete")
+		return ecode.WithErrorMessage(ecode.ErrBadRequest, fmt.Errorf("no data found"))
 	}
 
 	return nil

@@ -9,9 +9,10 @@ import (
 )
 
 type Client struct {
-	Cfg     config.Configurator `json:"cfg,omitempty"`
-	Logger  logger.Logger       `json:"logger,omitempty"`
-	Manager manager.Manager     `json:"manager,omitempty"`
+	Cfg        config.Configurator `json:"cfg,omitempty"`
+	Logger     logger.Logger       `json:"logger,omitempty"`
+	Manager    manager.Manager     `json:"manager,omitempty"`
+	HasStarted bool                `json:"has_started,omitempty"`
 }
 type Task struct {
 	Client   *Client      `json:"client,omitempty"`

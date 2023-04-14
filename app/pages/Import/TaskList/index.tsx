@@ -44,10 +44,8 @@ const TaskList = (props: IProps) => {
   const handleTaskStop = useCallback(async (id: number) => {
     clearTimeout(timer.current);
     const { code } = await stopTask(id);
-    if(code === 0) {
-      message.success(intl.get('import.stopImportingSuccess'));
-      getTaskList();
-    }
+    code === 0 && message.success(intl.get('import.stopImportingSuccess'));
+    getTaskList();
   }, []);
   const handleTaskDelete = useCallback(async (id: number) => {
     clearTimeout(timer.current);

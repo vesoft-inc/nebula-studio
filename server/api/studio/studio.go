@@ -37,9 +37,7 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c, conf.UseEnv())
 
-	var lc logx.LogConf
-	conf.MustLoad(*configFile, &lc)
-	logx.MustSetup(lc)
+	logx.MustSetup(c.Log)
 	defer logx.Close()
 
 	// init logger

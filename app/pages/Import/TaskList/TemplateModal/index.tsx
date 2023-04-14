@@ -79,7 +79,6 @@ const TemplateModal = (props: IProps) => {
 
   const validateAddress = useCallback((client) => {
     const msg = validateEmpty('address', client.address);
-    console.log('msg', msg);
     if(msg) return msg;
     const address = client.address.split(',');
     if(address.some(i => i.startsWith('http'))) {
