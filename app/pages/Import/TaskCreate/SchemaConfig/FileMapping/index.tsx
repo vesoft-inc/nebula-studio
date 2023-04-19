@@ -11,6 +11,7 @@ import { ISchemaEnum } from '@app/interfaces/schema';
 import { IEdgeFileItem, ITagFileItem } from '@app/stores/import';
 import { IImportFile } from '@app/interfaces/import';
 import { ICachedStore } from '@app/stores/datasource';
+import { trackEvent } from '@app/utils/stat';
 import styles from '../index.module.less';
 import FileSelectModal from './FileSelectModal';
 
@@ -85,18 +86,27 @@ const VIDSetting = observer((props: {
             dropdownMatchSelectWidth={false}
             popupClassName={styles.selectItems}
             onClick={e => e.stopPropagation()}
-            onChange={value => data.update({ [idFunction]: value })}
+            onChange={value => {
+              data.update({ [idFunction]: value });
+              trackEvent('import', 'add_vidFunction');
+            }}
           >
             <Option value="hash">Hash</Option>
           </Select>
         </div>}
         {idPrefix && <div className={styles.rowItem}>
           <span className={styles.label}>{intl.get('import.vidPrefix')}</span>
-          <Input className={styles.prefixInput} bordered={false} placeholder="Input prefix" value={data[idPrefix]} onChange={e => data.update({ [idPrefix]: e.target.value })} />
+          <Input className={styles.prefixInput} bordered={false} placeholder="Input prefix" value={data[idPrefix]} onChange={e => {
+            data.update({ [idPrefix]: e.target.value });
+            trackEvent('import', 'add_vidPrefix');
+          }} />
         </div>}
         {idSuffix && <div className={styles.rowItem}>
           <span className={styles.label}>{intl.get('import.vidSuffix')}</span>
-          <Input className={styles.prefixInput} bordered={false} placeholder="Input suffix" value={data[idSuffix]} onChange={e => data.update({ [idSuffix]: e.target.value })} />
+          <Input className={styles.prefixInput} bordered={false} placeholder="Input suffix" value={data[idSuffix]} onChange={e => {
+            data.update({ [idSuffix]: e.target.value });
+            trackEvent('import', 'add_vidSuffix');
+          }} />
         </div>}
         {(data[idKey]?.length > 1 || data[idPrefix] || data[idSuffix]) && <div className={styles.concatPreview}>
           <span className={styles.label}>{intl.get('import.preview')}</span>
