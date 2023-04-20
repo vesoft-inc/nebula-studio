@@ -5,6 +5,7 @@ import { IBasicConfig, ITaskItem, IImportFile, IPropertyProps } from '@app/inter
 import { ISchemaEnum } from '@app/interfaces/schema';
 import { configToJson } from '@app/utils/import';
 import { isEmpty } from '@app/utils/function';
+import { trackEvent } from '@app/utils/stat';
 import { getRootStore } from '.';
 
 const handlePropertyMap = (item, defaultValueFields) => {
@@ -168,17 +169,26 @@ export class ImportStore {
     const { code } = (await service.importData({
       config: _config,
       name
+    }, {
+      trackEventConfig: 'import',
+      action: config ? 'template_import' : 'import',
     })) as any;
     return code;
   };
 
   stopTask = async (id: number) => {
-    const res = await service.stopImportTask(id);
+    const res = await service.stopImportTask(id, {
+      trackEventConfig: 'import',
+      action: 'stop_task',
+    });
     return res;
   };
 
   deleteTask = async (id: number) => {
-    const res = await service.deleteImportTask(id);
+    const res = await service.deleteImportTask(id, {
+      trackEventConfig: 'import',
+      action: 'delete_task',
+    });
     return res;
   };
 
@@ -187,6 +197,7 @@ export class ImportStore {
     link.href = service.getTaskConfig(id);
     link.download = `config.yml`;
     link.click();
+    trackEvent('import', 'download_task_config');
   };
 
   downloadTaskLog = async (params: {
@@ -198,6 +209,7 @@ export class ImportStore {
     link.href = service.getTaskLog(id) + `?name=${name}`;
     link.download = `log.yml`;
     link.click();
+    trackEvent('import', 'download_task_log');
   };
 
   getLogDetail = async (params: {
@@ -226,7 +238,7 @@ export class ImportStore {
     });
   };
 
-  updateBasicConfig = <T extends keyof IBasicConfig>(payload: { [K in T]?: Person[K] }) => {
+  updateBasicConfig = <T extends keyof IBasicConfig>(payload: { [K in T]?: IBasicConfig[K] }) => {
     Object.keys(payload).forEach(key => {
       if(isEmpty(payload[key])) {
         delete this.basicConfig[key];

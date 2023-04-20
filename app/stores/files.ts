@@ -42,6 +42,10 @@ export class FilesStore {
       headers: {
         'content-type': 'multipart/form-data',
       },
+      trackEventConfig: {
+        category: 'import',
+        action: 'upload_file',
+      },
     };
     const data = new FormData();
     files.forEach(file => {
@@ -59,6 +63,11 @@ export class FilesStore {
   deleteFile = async (names: string[]) => {
     const res: any = await service.deteleFile({
       names
+    }, {
+      trackEventConfig: {
+        category: 'import',
+        action: 'delete_file',
+      },
     });
     if (res.code === 0) {
       message.success(intl.get('common.deleteSuccess'));
@@ -74,7 +83,12 @@ export class FilesStore {
     delimiter?: string;
     withHeader?: boolean;
   }) => {
-    const res: any = await service.updateFileConfig(payload);
+    const res: any = await service.updateFileConfig(payload, {
+      trackEventConfig: {
+        category: 'import',
+        action: 'update_file_config',
+      },
+    });
     return res;
   };
 }

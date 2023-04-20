@@ -25,11 +25,21 @@ export class DatasourceStore {
   };
 
   addDataSource = async (payload: IDatasourceAdd) => {
-    const { code } = await service.addDatasource(payload);
+    const { code } = await service.addDatasource(payload, {
+      trackEventConfig: {
+        category: 'datasource',
+        action: `add_${payload.type}_datasource`,
+      },
+    });
     return code === 0;
   };
   updateDataSource = async (payload: IDatasourceUpdate) => {
-    const { code } = await service.updateDatasource(payload);
+    const { code } = await service.updateDatasource(payload, {
+      trackEventConfig: {
+        category: 'datasource',
+        action: `update_${payload.type}_config`,
+      },
+    });
     return code === 0;
   };
   getDatasourceList = async (payload?: { type?: IDatasourceType }) => {
@@ -39,11 +49,21 @@ export class DatasourceStore {
     }
   };
   deleteDataSource = async (id: number) => {
-    const { code } = await service.deleteDatasource(id);
+    const { code } = await service.deleteDatasource(id, {
+      trackEventConfig: {
+        category: 'datasource',
+        action: 'delete_datasource',
+      },
+    });
     return code === 0;
   };
   batchDeleteDatasource = async (ids: number[]) => {
-    const { code } = await service.batchDeleteDatasource({ ids });
+    const { code } = await service.batchDeleteDatasource({ ids }, {
+      trackEventConfig: {
+        category: 'datasource',
+        action: 'batch_delete_datasources',
+      },
+    });
     return code === 0;
   };
   getDatasourceDetail = async (payload: {

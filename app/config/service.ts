@@ -26,11 +26,11 @@ const service = {
   importData: (params, config?) => {
     return post('/api/import-tasks')(params, config);
   },
-  stopImportTask: (id: number) => {
-    return get(`/api/import-tasks/${id}/stop`)();
+  stopImportTask: (id: number, config?) => {
+    return get(`/api/import-tasks/${id}/stop`)(undefined, config);
   },
-  deleteImportTask: (id: number) => {
-    return _delete(`/api/import-tasks/${id}`)();
+  deleteImportTask: (id: number, config) => {
+    return _delete(`/api/import-tasks/${id}`)(undefined, config);
   },
   getTaskList: (params?, config?) => {
     return get('/api/import-tasks')(params, config);
@@ -46,8 +46,8 @@ const service = {
   getTaskConfig: (id: string | number) => `/api/import-tasks/${id}/download-config`,
   getTaskLog: (id: string | number) => `/api/import-tasks/${id}/download-logs`,
   // files
-  deteleFile: params => {
-    return _delete(`/api/files`)(undefined, { data: params });
+  deteleFile: (params, config?) => {
+    return _delete(`/api/files`)(undefined, { data: params, ...config });
   },
   getFiles: () => {
     return get('/api/files')();

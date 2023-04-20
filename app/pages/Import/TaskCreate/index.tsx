@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Breadcrumb from '@app/components/Breadcrumb';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
-import { trackPageView } from '@app/utils/stat';
+import { trackEvent, trackPageView } from '@app/utils/stat';
 import cls from 'classnames';
 import { useHistory } from 'react-router-dom';
 import { DEFAULT_IMPORT_CONFIG, POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
@@ -272,7 +272,7 @@ const TaskCreate = (props: IProps) => {
                       className={styles.addressCheckbox}
                       options={address}
                       value={basicConfig.address}
-                      onChange={value => updateBasicConfig({ 'address': value })}
+                      onChange={value => updateBasicConfig({ 'address': value as string[] })}
                     />
                   </Form.Item>
                 </Col>
@@ -284,7 +284,10 @@ const TaskCreate = (props: IProps) => {
                       <span className={styles.label}>{item.label}</span>
                       <Instruction description={item.description} />
                     </>} name={item.key} rules={item.rules}>
-                      <Input placeholder={item.placeholder.toString()} value={basicConfig[item.key]} onChange={e => updateBasicConfig(item.key, e.target.value)} />
+                      <Input placeholder={item.placeholder.toString()} value={basicConfig[item.key]} onChange={e => {
+                        updateBasicConfig({ [item.key]: e.target.value });
+                        trackEvent('import', `update_config_${item.key}`);
+                      }} />
                     </Form.Item>
                   </Col>
                 ))}
