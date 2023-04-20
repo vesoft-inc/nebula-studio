@@ -137,6 +137,9 @@
   }
   .vidCollapse {
     width: 100%;
+    :global(.ant-collapse-header-text) {
+      max-width: 95%;
+    }
     .funcItem {
       width: 100%;
       margin-bottom: 15px;
@@ -154,6 +157,7 @@
       background: #F3F6F9;
       padding: 8px 8px 0;
       flex: 1;
+      max-width: 100%;
       .tagItem {
         background: #8697B0;
         border-radius: 3px;
@@ -161,6 +165,7 @@
         color: #fff;
         margin-bottom: 10px;
         display: inline-block;
+        word-break: break-all;
         &:not(:last-child) {
           margin-right: 10px;
         }
