@@ -180,8 +180,17 @@ type LogField struct {
 }
 
 type CreateImportTaskRequest struct {
-	Name   string `json:"name" validate:"required"`
-	Config string `json:"config" validate:"required"`
+	Id        *int   `json:"id,optional,omitempty"`
+	Name      string `json:"name" validate:"required"`
+	Config    string `json:"config" validate:"required"`
+	RawConfig string `json:"rawConfig" validate:"required"`
+}
+
+type CreateTaskDraftRequest struct {
+	Id        *int   `json:"id,optional,omitempty"`
+	Name      string `json:"name" validate:"required"`
+	Space     string `json:"space" validate:"required"`
+	RawConfig string `json:"rawConfig" validate:"required"`
 }
 
 type CreateImportTaskData struct {
@@ -204,6 +213,7 @@ type GetImportTaskData struct {
 	CreateTime    int64           `json:"createTime"`
 	UpdateTime    int64           `json:"updateTime"`
 	Stats         ImportTaskStats `json:"stats"`
+	RawConfig     string          `json:"rawConfig"`
 }
 
 type ImportTaskStats struct {

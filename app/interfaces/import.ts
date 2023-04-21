@@ -7,6 +7,7 @@ export enum ITaskStatus {
   'NotExisted' = 'NotExisted',
   'Aborted' = 'Failed',
   'Pending' = 'Pending',
+  'Draft' = 'Draft',
 }
 
 export interface ITaskStats {
@@ -34,6 +35,7 @@ export interface ITaskItem {
   status: ITaskStatus;
   message: string;
   stats: ITaskStats;
+  rawConfig: string;
 }
 
 export interface IPropertyProps {
@@ -78,6 +80,7 @@ export interface ISftpConfig {
   passPhrase?: string;
 }
 export interface IBasicConfig {
+  id?: number;
   taskName: string;
   address: string[];
   batchSize?: string;

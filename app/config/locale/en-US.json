@@ -316,7 +316,11 @@
     "sftpUsernameRequired": "Please enter the sftp username in the configuration file",
     "sftpPasswordRequired": "Please enter the sftp password in the configuration file",
     "ossAccessKeyRequired": "Please enter the oss accessKey in the configuration file",
-    "ossSecretKeyRequired": "Please enter the oss secretKey in the configuration file"
+    "ossSecretKeyRequired": "Please enter the oss secretKey in the configuration file",
+    "draft": "Draft",
+    "saveDraft": "Save Draft",
+    "modifyTime": "Modify time",
+    "taskNameRequired": "Please enter the task name and select space"
   },
   "schema": {
     "spaceList": "Graph Space List",

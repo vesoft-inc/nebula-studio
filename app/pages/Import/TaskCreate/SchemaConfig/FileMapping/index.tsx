@@ -46,6 +46,9 @@ const VIDSetting = observer((props: {
     data.update({ [idKey]: index });
     index.length > 1 && setKey(['default']);
   }, [data]);
+  useEffect(() => {
+    ([idPrefix, idSuffix, idFunction].some(i => !!data[i]) || data[idKey].length > 1) && setKey(['default']);
+  }, []);
   return <div className={styles.row}>
     <Collapse bordered={false} ghost className={styles.vidCollapse} onChange={handleChange} activeKey={key}>
       <Panel header={<div className={cls(styles.panelTitle, styles.spaceBetween)}>
@@ -156,6 +159,10 @@ const FileMapping = (props: IProps) => {
   });
 
   useEffect(() => {
+    item.file && setSelectFile({ 
+      file: item.file, 
+      cachedState: null
+    });
     cachedStore && setSelectFile({
       file: null,
       cachedState: cachedStore,
@@ -220,7 +227,10 @@ const FileMapping = (props: IProps) => {
           <Button type="link" onClick={() => setVisible(true)}>{selectFile.file ? selectFile.file.name : intl.get('import.selectFile')}</Button>
           {selectFile.file && <div className={styles.pathRow}>
             <span className={styles.pathLabel}>{intl.get('import.filePath')}</span>
-            <span className={styles.pathValue}>{selectFile.cachedState.path + selectFile.file.name}</span>
+            <span className={styles.pathValue}>{selectFile.cachedState
+              ? selectFile.cachedState.path + selectFile.file.name
+              : selectFile.file.path || selectFile.file.name
+            }</span>
           </div>}
         </div>
         <CloseOutlined className={styles.btnClose} onClick={() => onRemove(item)} />

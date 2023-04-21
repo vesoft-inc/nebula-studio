@@ -29,6 +29,9 @@ const service = {
   stopImportTask: (id: number, config?) => {
     return get(`/api/import-tasks/${id}/stop`)(undefined, config);
   },
+  saveTaskDraft: (params, config?) => {
+    return post('/api/import-tasks/draft')(params, config);
+  },
   deleteImportTask: (id: number, config) => {
     return _delete(`/api/import-tasks/${id}`)(undefined, config);
   },

@@ -7,6 +7,7 @@ import { floor } from 'lodash';
 import { getFileSize } from '@app/utils/file';
 import Icon from '@app/components/Icon';
 import { useI18n } from '@vesoft-inc/i18n';
+import { useHistory } from 'react-router-dom';
 import styles from './index.module.less';
 interface IProps {
   data: ITaskItem;
@@ -14,6 +15,7 @@ interface IProps {
   onTaskDelete: (id: number) => void;
   onConfigDownload: (id: number) => void;
   onViewLog: (id: number, space: string, status: ITaskStatus) => void;
+  onDraftEdit: (id: number, space: string, cfg: string) => void;
   showConfigDownload: boolean;
 }
 
@@ -47,14 +49,17 @@ const TaskItem = (props: IProps) => {
       status, 
       message,
       updateTime, 
-      createTime 
+      createTime,
+      rawConfig
     }, 
     showConfigDownload,
     onViewLog,
+    onDraftEdit,
     onConfigDownload,
     onTaskStop, 
     onTaskDelete } = props;
   const { intl } = useI18n();
+  const history = useHistory();
   const [progressStatus, setStatus] = useState<'success' | 'active' | 'normal' | 'exception' | undefined>(undefined);
   const [extraMsg, setExtraMsg] = useState('');
   const { processedBytes, totalBytes, failedProcessed } = stats || {};
@@ -93,17 +98,27 @@ const TaskItem = (props: IProps) => {
       <div className={styles.row}>
         <span>{intl.get('common.space')}: {space}</span>
         <div>
-          <span className={styles.createTime}>{intl.get('common.createTime')}: {dayjs(createTime).format('YYYY-MM-DD HH:mm:ss')}</span>
-          {showConfigDownload && <Button type="link" size="small" onClick={() => onConfigDownload(id)}>
-            <Icon type="icon-studio-btn-download" />
-            {intl.get('import.downloadConfig')}
-          </Button>}
+          {status === ITaskStatus.Draft 
+            ? <>
+              <span>{intl.get('import.modifyTime')}: {dayjs(updateTime).format('YYYY-MM-DD HH:mm:ss')}</span>
+            </>
+            : <>
+              <span className={styles.createTime}>{intl.get('common.createTime')}: {dayjs(createTime).format('YYYY-MM-DD HH:mm:ss')}</span>
+              {showConfigDownload && <Button type="link" size="small" onClick={() => onConfigDownload(id)}>
+                <Icon type="icon-studio-btn-download" />
+                {intl.get('import.downloadConfig')}
+              </Button>}
+            </>
+          }
         </div>
       </div>
       <div className={styles.row}>
         <div className={styles.progress}>
           <div className={styles.progressInfo}>
             <span className={styles.taskName}>
+              {status === ITaskStatus.Draft && <span className={styles.draftLabel}>
+                {intl.get('import.draft')}
+              </span>}
               {name}
               {status === ITaskStatus.Finished && <span className={styles.completeInfo}>
                 <CheckCircleFilled />
@@ -129,7 +144,7 @@ const TaskItem = (props: IProps) => {
                 {status !== ITaskStatus.Finished && `${getFileSize(processedBytes)} / `}
                 {getFileSize(totalBytes)}{' '}
               </span>}
-              <span>{time.current}</span>
+              {status !== ITaskStatus.Draft && <span>{time.current}</span>}
             </div>
           </div>
           {stats && <Progress 
@@ -139,17 +154,23 @@ const TaskItem = (props: IProps) => {
             strokeColor={progressStatus && COLOR_MAP[progressStatus]} />}
         </div>
         <div className={styles.operations}>
-          <Button className="primaryBtn" onClick={() => onViewLog(id, space, status)}>{intl.get('import.viewLogs')}</Button>
-          {status === ITaskStatus.Processing && 
-          <Popconfirm
-            placement="left"
-            title={intl.get('import.endImport')}
-            onConfirm={() => onTaskStop(id)}
-            okText={intl.get('common.confirm')}
-            cancelText={intl.get('common.cancel')}
-          >
-            <Button className="cancelBtn">{intl.get('import.endImport')}</Button>
-          </Popconfirm>}
+          {status === ITaskStatus.Draft 
+            ? <Button className="primaryBtn" onClick={() => onDraftEdit(id, space, rawConfig)}>{intl.get('common.edit')}</Button>
+            : <>
+              <Button className="primaryBtn" onClick={() => onViewLog(id, space, status)}>{intl.get('import.viewLogs')}</Button>
+              {status === ITaskStatus.Processing && 
+                <Popconfirm
+                  placement="left"
+                  title={intl.get('import.endImport')}
+                  onConfirm={() => onTaskStop(id)}
+                  okText={intl.get('common.confirm')}
+                  cancelText={intl.get('common.cancel')}
+                >
+                  <Button className="cancelBtn">{intl.get('import.endImport')}</Button>
+                </Popconfirm>}
+            </>
+          }
+          
           {!loadingStatus.includes(status) && 
           <Popconfirm
             placement="left"

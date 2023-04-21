@@ -35,11 +35,20 @@
       margin-bottom: 12px;
       padding-right: calc(2em + 8px);
       .taskName {
+        .draftLabel {
+          background: #DBEFFF;
+          border-radius: 4px;
+          padding: 6px 12px;
+          font-weight: 500;
+          font-size: 14px;
+          color: @darkBlue;
+          margin-right: 10px;
+        }
         font-family: Roboto-Bold, serif;
         font-style: normal;
         font-size: 14px;
         color: @lightBlack;
-        & > span {
+        & > span:not(.draftLabel) {
           margin-left: 12px;
         }
         .completeInfo {

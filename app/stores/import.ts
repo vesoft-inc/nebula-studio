@@ -26,10 +26,14 @@ export class TagFileItem {
   vidFunction?: string;
   vidPrefix?: string;
   vidSuffix?: string;
-  constructor({ file, props }: { file?: IImportFile; props?: IPropertyProps[] }) {
+  constructor({ file, props, vidIndex, vidFunction, vidPrefix, vidSuffix }: Partial<TagFileItem>) {
     makeAutoObservable(this);
-    file && (this.file = file);
-    props && this.props.replace(props);
+    this.file = file;
+    this.props.replace(props);
+    this.vidIndex.replace(vidIndex);
+    this.vidFunction = vidFunction;
+    this.vidPrefix = vidPrefix;
+    this.vidSuffix = vidSuffix;
   }
 
   update = (payload: Partial<TagFileItem>) => {
@@ -54,10 +58,18 @@ export class EdgeFileItem {
   dstIdPrefix?: string;
   srcIdSuffix?: string;
   dstIdSuffix?: string;
-  constructor({ file, props }: { file?: IImportFile; props?: IPropertyProps[] }) {
+  constructor({ file, props, srcIdFunction, srcIdIndex, srcIdSuffix, srcIdPrefix, dstIdFunction, dstIdIndex, dstIdPrefix, dstIdSuffix }: Partial<EdgeFileItem>) {
     makeAutoObservable(this);
-    file && (this.file = file);
-    props && this.props.replace(props);
+    this.file = file;
+    this.props.replace(props);
+    this.srcIdIndex.replace(srcIdIndex);
+    this.dstIdIndex.replace(dstIdIndex);
+    this.srcIdFunction = srcIdFunction;
+    this.dstIdFunction = dstIdFunction;
+    this.srcIdPrefix = srcIdPrefix;
+    this.dstIdPrefix = dstIdPrefix;
+    this.srcIdSuffix = srcIdSuffix;
+    this.dstIdSuffix = dstIdSuffix;
   }
   update = (payload: Partial<EdgeFileItem>) => {
     Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
@@ -77,10 +89,12 @@ class ImportSchemaConfigItem<T extends ISchemaEnum, F = T extends ISchemaEnum.Ed
   props = observable.array<IPropertyProps>([]);
   files = observable.array<F>([]);
 
-  constructor({ name, type }: { type: T; name?: string }) {
+  constructor({ name, type, props, files }: { type: T; name?: string, props?: IPropertyProps[], files?: F[] }) {
     makeAutoObservable(this);
     this.type = type;
     this.name = name;
+    this.props.replace(props);
+    this.files.replace(files);
   }
 
   addFileItem = (item: F) => this.files.push(item);
@@ -143,14 +157,30 @@ export class ImportStore {
     const { code, data } = (await service.getTaskLogs({ id })) as any;
     return { code, data };
   };
-  
+  saveTaskDraft = async (id?: number) => {
+    const { currentSpace } = this.rootStore.schema;
+    const rawConfig = {
+      basicConfig: this.basicConfig,
+      tagConfig: this.tagConfig,
+      edgeConfig: this.edgeConfig,
+    };
+    const { code } = (await service.saveTaskDraft({
+      id,
+      name: this.basicConfig.taskName,
+      space: currentSpace,
+      rawConfig: JSON.stringify(rawConfig)
+    })) as any;
+    return code;
+  };
   importTask = async (params: {
+    id?: number,
     config?: any,
     name: string, 
     password?: string
   }) => {
     let _config;
-    const { config, name, password } = params;
+    let rawConfig;
+    const { config, name, password, id } = params;
     if(config) {
       _config = config;
     } else {
@@ -165,10 +195,17 @@ export class ImportStore {
         password,
         spaceVidType
       });
+      rawConfig = {
+        basicConfig: this.basicConfig,
+        tagConfig: this.tagConfig,
+        edgeConfig: this.edgeConfig,
+      };
     }
     const { code } = (await service.importData({
+      id,
       config: _config,
-      name
+      name,
+      rawConfig: JSON.stringify(rawConfig)
     }, {
       trackEventConfig: 'import',
       action: config ? 'template_import' : 'import',
@@ -223,6 +260,27 @@ export class ImportStore {
       return data.logs;
     }
     return null;
+  };
+
+  setDraft = (cfg: {
+    basicConfig: IBasicConfig,
+    tagConfig: ITagItem[],
+    edgeConfig: IEdgeItem[]
+  }) => {
+    const { basicConfig, tagConfig, edgeConfig } = cfg;
+    this.updateBasicConfig(basicConfig);
+    tagConfig.forEach(item => {
+      const { name, props, files } = item;
+      const _files = files.map(file => new TagFileItem(file));
+      const tagItem = new ImportSchemaConfigItem({ type: ISchemaEnum.Tag, name, props, files: _files });
+      this.tagConfig.push(tagItem);
+    });
+    edgeConfig.forEach(item => {
+      const { name, props, files } = item;
+      const _files = files.map(file => new EdgeFileItem(file));
+      const edgeItem = new ImportSchemaConfigItem({ type: ISchemaEnum.Edge, name, props, files: _files });
+      this.edgeConfig.push(edgeItem);
+    });
   };
 
   addTagConfig = () => this.tagConfig.unshift(new ImportSchemaConfigItem({ type: ISchemaEnum.Tag }));

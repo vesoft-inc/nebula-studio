@@ -18,4 +18,5 @@ type TaskInfo struct {
 	TaskStatus    string      `json:"taskStatus"`
 	TaskMessage   string      `json:"taskMessage"`
 	Stats         stats.Stats `json:"stats" gorm:"embedded"`
+	RawConfig     string      `json:"rawConfig"`
 }

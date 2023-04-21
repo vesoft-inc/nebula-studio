@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { trackEvent, trackPageView } from '@app/utils/stat';
 import cls from 'classnames';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { DEFAULT_IMPORT_CONFIG, POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
 import { useI18n } from '@vesoft-inc/i18n';
 import { ISchemaEnum, ISchemaType } from '@app/interfaces/schema';
@@ -42,12 +42,13 @@ const AddMappingBtn = (props: { type: ISchemaType }) => {
 const TaskCreate = (props: IProps) => {
   const { dataImport, schema, files, global, datasource } = useStore();
   const { intl, currentLocale } = useI18n();
-  const { basicConfig, tagConfig, edgeConfig, updateBasicConfig, importTask } = dataImport;
+  const { basicConfig, tagConfig, edgeConfig, updateBasicConfig, importTask, saveTaskDraft, setDraft } = dataImport;
   const { spaces, getSpaces, updateSpaceInfo, currentSpace } = schema;
   const { getGraphAddress, _host } = global;
   const { getFiles } = files;
   const [modalVisible, setVisible] = useState(false);
   const history = useHistory();
+  const location = useLocation();
   const { needPwdConfirm = true } = props;
   const [address, setAddress] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -64,10 +65,15 @@ const TaskCreate = (props: IProps) => {
   ]), [currentLocale]);
 
   useEffect(() => {
+    const { state } = location;
     initTaskDir();
     getSpaces();
     getFiles();
-    if(currentSpace) {
+    if(state) {
+      setShowMoreConfig(true);
+      updateSpaceInfo(state.space);
+      setDraft(JSON.parse(state.cfg));
+    } else if (currentSpace) {
       updateSpaceInfo(currentSpace);
     }
     trackPageView('/import/create');
@@ -89,6 +95,7 @@ const TaskCreate = (props: IProps) => {
     setVisible(false);
     setLoading(true);
     const code = await importTask({
+      id: location.state?.id,
       name: basicConfig.taskName, 
       password
     });
@@ -159,11 +166,23 @@ const TaskCreate = (props: IProps) => {
     clearConfig();
     updateSpaceInfo(space);
   }, []);
-
+  const saveDraft = async () => {
+    if(!currentSpace || !basicConfig.taskName) {
+      message.error(intl.get('import.taskNameRequired'));
+      return;
+    }
+    const code = await saveTaskDraft(location.state?.id);
+    if(code === 0) {
+      message.success(intl.get('sketch.saveSuccess'));
+      history.push('/import/tasks');
+    }
+  };
   const initTaskDir = useCallback(async () => {
-    updateBasicConfig({ 'taskName': `task-${Date.now()}` });
+    const { state } = location;
     const graphs = await getGraphAddress();
-    updateBasicConfig({ 'address': graphs });
+    if(!state) {
+      updateBasicConfig({ 'taskName': `task-${Date.now()}`, 'address': graphs });
+    }
     setAddress(graphs.map(item => ({
       label: <>
         {item}
@@ -283,7 +302,7 @@ const TaskCreate = (props: IProps) => {
                     <Form.Item label={<>
                       <span className={styles.label}>{item.label}</span>
                       <Instruction description={item.description} />
-                    </>} name={item.key} rules={item.rules}>
+                    </>} name={item.key} rules={item.rules} initialValue={basicConfig[item.key]}>
                       <Input placeholder={item.placeholder.toString()} value={basicConfig[item.key]} onChange={e => {
                         updateBasicConfig({ [item.key]: e.target.value });
                         trackEvent('import', `update_config_${item.key}`);
@@ -327,6 +346,7 @@ const TaskCreate = (props: IProps) => {
       </div>
       <div className="studioFormFooter">
         <Button onClick={() => history.push('/import/tasks')}>{intl.get('common.cancel')}</Button>
+        <Button onClick={saveDraft}>{intl.get('import.saveDraft')}</Button>
         <Button type="primary" disabled={
           basicConfig.taskName === ''
           || (!tagConfig.length && !edgeConfig.length)

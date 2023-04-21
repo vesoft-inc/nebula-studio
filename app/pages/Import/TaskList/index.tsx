@@ -1,4 +1,4 @@
-import { Button, message, Spin } from 'antd';
+import { Button, message, Pagination, Spin } from 'antd';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
@@ -30,6 +30,7 @@ interface IProps {
 const TaskList = (props: IProps) => {
   const timer = useRef<any>(null);
   const { dataImport, global } = useStore();
+  const [page, setPage] = useState(1);
   const { intl } = useI18n();
   const history = useHistory();
   const { taskList, getTaskList, stopTask, deleteTask, downloadTaskConfig } = dataImport;
@@ -67,8 +68,17 @@ const TaskList = (props: IProps) => {
   const initList = async () => {
     setLoading(true);
     await getTaskList();
+    setPage(1);
     setLoading(false);
   };
+
+  const handleEditDraft = useCallback((id, space, cfg) => {
+    history.push(`/import/edit/${id}`, {
+      id,
+      space,
+      cfg
+    });
+  }, []);
   useEffect(() => {
     isMounted = true;
     initList();
@@ -157,9 +167,10 @@ const TaskList = (props: IProps) => {
           })}
         </div>
         : <Spin spinning={loading}>
-          {taskList.map(item => (
+          {taskList.slice((page - 1) * 10, page * 10).map(item => (
             <TaskItem key={item.id} 
               data={item}
+              onDraftEdit={handleEditDraft}
               onViewLog={handleLogView} 
               onTaskStop={handleTaskStop} 
               onTaskDelete={handleTaskDelete} 
@@ -167,6 +178,7 @@ const TaskList = (props: IProps) => {
               showConfigDownload={showConfigDownload}
             />
           ))}
+          <Pagination className={styles.taskPagination} hideOnSinglePage total={taskList.length} current={page} onChange={page => setPage(page)} />
         </Spin>
       }
       {modalVisible && <LogModal

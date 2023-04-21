@@ -109,6 +109,7 @@ const FileList = () => {
           dataSource={fileList}
           rowSelection={{
             type: 'checkbox',
+            selectedRowKeys: selectFiles,
             onChange: (selectedRowKeys) => setSelectFiles(selectedRowKeys as string[]),
           }}
           columns={columns}

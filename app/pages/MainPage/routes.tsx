@@ -36,6 +36,11 @@ export const RoutesList = [
     exact: true,
   },
   {
+    path: '/import/edit/:id',
+    component: TaskCreate,
+    exact: true,
+  },
+  {
     path: '/import/:type?',
     component: Import,
   },
