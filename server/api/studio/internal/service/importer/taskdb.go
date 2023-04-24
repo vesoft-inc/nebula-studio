@@ -81,7 +81,7 @@ func (t *TaskDb) SelectAllIds(address, user string) ([]int, error) {
 }
 
 func (t *TaskDb) UpdateProcessingTasks2Aborted() error {
-	if err := t.Model(&db.TaskInfo{}).Where("task_status = ?", StatusProcessing.String()).Updates(&db.TaskInfo{TaskStatus: StatusAborted.String(), TaskMessage: "Service execption"}).Error; err != nil {
+	if err := t.Model(&db.TaskInfo{}).Where("task_status = ?", Processing.String()).Updates(&db.TaskInfo{TaskStatus: Aborted.String(), TaskMessage: "Service execption"}).Error; err != nil {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	return nil

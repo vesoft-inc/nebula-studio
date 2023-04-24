@@ -147,13 +147,13 @@ func (d *datasourceService) List(request types.DatasourceListRequest) (*types.Da
 			config.S3Config = &types.DatasourceS3Config{}
 			jsonConfig := item.Config
 			if err := json.Unmarshal([]byte(jsonConfig), &config.S3Config); err != nil {
-				return nil, ecode.WithInternalServer(err, "parse json failed")
+				return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err, "parse json failed")
 			}
 		case "sftp":
 			config.SFTPConfig = &types.DatasourceSFTPConfig{}
 			jsonConfig := item.Config
 			if err := json.Unmarshal([]byte(jsonConfig), &config.SFTPConfig); err != nil {
-				return nil, ecode.WithInternalServer(err, "parse json failed")
+				return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err, "parse json failed")
 			}
 		}
 		items = append(items, config)
@@ -316,12 +316,12 @@ func (d *datasourceService) update(id int, typ, platform, name, config, secret s
 func (d *datasourceService) getFileStore(dbs *db.Datasource) (filestore.FileStore, error) {
 	var config interface{}
 	if err := json.Unmarshal([]byte(dbs.Config), &config); err != nil {
-		return nil, ecode.WithInternalServer(err, "parse the datasource config error")
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err, "parse the datasource config error")
 	}
 	store, err := filestore.NewFileStore(dbs.Type, dbs.Config, dbs.Secret, dbs.Platform)
 	if err != nil {
 		d.Logger.Errorf("create the file store error")
-		return nil, ecode.WithInternalServer(err, "create the file store error")
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err, "create the file store error")
 	}
 
 	return store, nil

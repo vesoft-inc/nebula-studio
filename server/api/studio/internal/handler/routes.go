@@ -93,6 +93,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: importtask.CreateImportTaskHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodPost,
+				Path:    "/api/import-tasks/draft",
+				Handler: importtask.CreateTaskDraftHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodGet,
 				Path:    "/api/import-tasks/:id",
 				Handler: importtask.GetImportTaskHandler(serverCtx),

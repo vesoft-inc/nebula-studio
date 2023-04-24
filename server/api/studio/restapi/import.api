@@ -132,8 +132,16 @@ type (
 	}
 
 	CreateImportTaskRequest {
-		Name   string `json:"name" validate:"required"`
-		Config string `json:"config" validate:"required"`
+		Id        *int   `json:"id,optional,omitempty"`
+		Name      string `json:"name" validate:"required"`
+		Config    string `json:"config" validate:"required"`
+		RawConfig string `json:"rawConfig" validate:"required"`
+	}
+	CreateTaskDraftRequest {
+		Id        *int   `json:"id,optional,omitempty"`
+		Name      string `json:"name" validate:"required"`
+		Space     string `json:"space" validate:"required"`
+		RawConfig string `json:"rawConfig" validate:"required"`
 	}
 
 	CreateImportTaskData {
@@ -156,6 +164,7 @@ type (
 		CreateTime    int64           `json:"createTime"`
 		UpdateTime    int64           `json:"updateTime"`
 		Stats         ImportTaskStats `json:"stats"`
+		RawConfig     string          `json:"rawConfig"`
 	}
 
 	ImportTaskStats {
@@ -231,6 +240,10 @@ service studio-api {
 	@doc "Create Import Task"
 	@handler CreateImportTask
 	post /api/import-tasks(CreateImportTaskRequest) returns(CreateImportTaskData)
+	
+	@doc "Create Import Task Draft"
+	@handler CreateTaskDraft
+	post /api/import-tasks/draft(CreateTaskDraftRequest)
 	
 	@doc "Get Import Task"
 	@handler GetImportTask

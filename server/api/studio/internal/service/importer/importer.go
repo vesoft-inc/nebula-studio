@@ -24,7 +24,7 @@ func StartImport(taskID int) (err error) {
 	signal := make(chan struct{}, 1)
 
 	abort := func() {
-		task.TaskInfo.TaskStatus = StatusAborted.String()
+		task.TaskInfo.TaskStatus = Aborted.String()
 		task.TaskInfo.TaskMessage = err.Error()
 		GetTaskMgr().AbortTask(taskID)
 		signal <- struct{}{}
@@ -60,13 +60,13 @@ func StartImport(taskID int) (err error) {
 		task.Client.HasStarted = true
 		err = mgr.Wait()
 		if err != nil {
-			task.TaskInfo.TaskStatus = StatusAborted.String()
+			task.TaskInfo.TaskStatus = Aborted.String()
 			task.TaskInfo.TaskMessage = err.Error()
 			GetTaskMgr().AbortTask(taskID)
 			return
 		}
-		if task.TaskInfo.TaskStatus == StatusProcessing.String() {
-			task.TaskInfo.TaskStatus = StatusFinished.String()
+		if task.TaskInfo.TaskStatus == Processing.String() {
+			task.TaskInfo.TaskStatus = Finished.String()
 			GetTaskMgr().FinishTask(taskID)
 		}
 		signal <- struct{}{}
@@ -112,6 +112,7 @@ func GetImportTask(tasksDir string, taskID int, address, username string) (*type
 		result.User = task.TaskInfo.User
 		result.Name = task.TaskInfo.Name
 		result.Space = task.TaskInfo.Space
+		result.RawConfig = task.TaskInfo.RawConfig
 		result.Stats = types.ImportTaskStats{
 			TotalBytes:      stats.TotalBytes,
 			ProcessedBytes:  stats.ProcessedBytes,
@@ -157,6 +158,7 @@ func GetManyImportTask(tasksDir, address, username string, pageIndex, pageSize i
 			User:          t.User,
 			Name:          t.Name,
 			Space:         t.Space,
+			RawConfig:     t.RawConfig,
 			Stats: types.ImportTaskStats{
 				TotalBytes:      stats.TotalBytes,
 				ProcessedBytes:  stats.ProcessedBytes,

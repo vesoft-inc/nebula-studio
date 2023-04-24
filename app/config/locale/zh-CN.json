@@ -64,7 +64,8 @@
     "continue": "继续",
     "update": "更新",
     "prev": "上一步",
-    "createTime": "创建时间"
+    "createTime": "创建时间",
+    "rerun": "重新导入"
   },
   "doc": {
     "welcome": "欢迎使用",
@@ -316,7 +317,13 @@
     "sftpUsernameRequired": "请在配置文件中输入 sftp 的用户名",
     "sftpPasswordRequired": "请在配置文件中输入 sftp 的密码",
     "ossAccessKeyRequired": "请在配置文件中输入 oss 的 accessKey",
-    "ossSecretKeyRequired": "请在配置文件中输入 oss 的 secretKey"
+    "ossSecretKeyRequired": "请在配置文件中输入 oss 的 secretKey",
+    "draft": "草稿",
+    "saveDraft": "保存草稿",
+    "modifyTime": "编辑时间",
+    "taskNameRequired": "请填写任务名称并选择图空间",
+    "fileMissing": "{files} 文件不存在，请重新上传文件或添加相关数据源",
+    "datasourceMissing": "{files} 所在数据源未找到，请重新添加相关数据源并重新配置任务"
   },
   "schema": {
     "spaceList": "图空间列表",

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"sync"
+	"time"
 
 	importconfig "github.com/vesoft-inc/nebula-importer/v4/pkg/config"
 	configv3 "github.com/vesoft-inc/nebula-importer/v4/pkg/config/v3"
@@ -32,8 +33,15 @@ type TaskMgr struct {
 	db    *TaskDb
 }
 
-func CreateNewTaskDir(rootDir string) (string, error) {
-	taskId, err := GetTaskMgr().NewTaskID()
+func CreateNewTaskDir(rootDir string, id *int) (string, error) {
+	var taskId int
+	var err error
+	if id != nil {
+		taskId = *id
+	} else {
+		taskId, err = GetTaskMgr().NewTaskID()
+	}
+
 	if err != nil {
 		return "", ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
@@ -82,7 +90,7 @@ func CreateConfigFile(taskdir string, cfgBytes []byte) error {
 	return nil
 }
 
-func (mgr *TaskMgr) NewTask(host string, user string, taskName string, cfg importconfig.Configurator) (*Task, int, error) {
+func (mgr *TaskMgr) NewTask(host string, user string, taskName string, rawCfg string, cfg importconfig.Configurator) (*Task, int, error) {
 	mux.Lock()
 	defer mux.Unlock()
 	confv3 := cfg.(*configv3.Config)
@@ -92,9 +100,10 @@ func (mgr *TaskMgr) NewTask(host string, user string, taskName string, cfg impor
 		Name:          taskName,
 		Address:       host,
 		Space:         confv3.Manager.GraphName,
-		TaskStatus:    StatusProcessing.String(),
+		TaskStatus:    Processing.String(),
 		ImportAddress: confv3.Client.Address,
 		User:          user,
+		RawConfig:     rawCfg,
 	}
 
 	if err := mgr.db.InsertTaskInfo(taskInfo); err != nil {
@@ -114,6 +123,76 @@ func (mgr *TaskMgr) NewTask(host string, user string, taskName string, cfg impor
 	id := int(taskInfo.ID)
 	mgr.PutTask(id, task)
 	return task, id, nil
+}
+
+func (mgr *TaskMgr) TurnDraftToTask(id int, taskName string, rawCfg string, cfg importconfig.Configurator) (*Task, int, error) {
+	mux.Lock()
+	defer mux.Unlock()
+	confv3 := cfg.(*configv3.Config)
+
+	// init task db
+	taskInfo := &db.TaskInfo{
+		ID:            id,
+		Name:          taskName,
+		Space:         confv3.Manager.GraphName,
+		TaskStatus:    Processing.String(),
+		ImportAddress: confv3.Client.Address,
+		RawConfig:     rawCfg,
+		CreateTime:    time.Now(),
+	}
+
+	if err := mgr.db.UpdateTaskInfo(taskInfo); err != nil {
+		return nil, 0, err
+	}
+
+	task := &Task{
+		Client: &Client{
+			Cfg:        cfg,
+			Manager:    nil,
+			Logger:     nil,
+			HasStarted: false,
+		},
+		TaskInfo: taskInfo,
+	}
+
+	mgr.PutTask(id, task)
+	return task, id, nil
+}
+
+func (mgr *TaskMgr) NewTaskDraft(host, user, taskName, space, rawCfg string) error {
+	mux.Lock()
+	defer mux.Unlock()
+	// init task db
+	taskInfo := &db.TaskInfo{
+		Name:          taskName,
+		Address:       host,
+		Space:         space,
+		TaskStatus:    Draft.String(),
+		ImportAddress: "",
+		User:          user,
+		RawConfig:     rawCfg,
+	}
+	if err := mgr.db.InsertTaskInfo(taskInfo); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (mgr *TaskMgr) UpdateTaskDraft(id int, taskName, space, rawCfg string) error {
+	mux.Lock()
+	defer mux.Unlock()
+	// init task db
+	taskInfo := &db.TaskInfo{
+		ID:         id,
+		Name:       taskName,
+		Space:      space,
+		TaskStatus: Draft.String(),
+		RawConfig:  rawCfg,
+	}
+	if err := mgr.db.UpdateTaskInfo(taskInfo); err != nil {
+		return err
+	}
+	return nil
 }
 
 func GetTaskMgr() *TaskMgr {
@@ -211,7 +290,7 @@ func (mgr *TaskMgr) UpdateTaskInfo(taskID int) error {
 }
 
 /*
-StopTask will change the task status to `StatusStoped`,
+StopTask will change the task status to `Stoped`,
 and then call FinishTask
 */
 func (mgr *TaskMgr) StopTask(taskID int) error {
@@ -232,7 +311,7 @@ func (mgr *TaskMgr) StopTask(taskID int) error {
 		if err != nil {
 			return fmt.Errorf("stop task failed: %w", err)
 		}
-		task.TaskInfo.TaskStatus = StatusStoped.String()
+		task.TaskInfo.TaskStatus = Stoped.String()
 		if err := mgr.FinishTask(taskID); err != nil {
 			return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 		}
@@ -279,27 +358,30 @@ and the task in local sql has 2 status: finished, stoped;
 */
 const (
 	StatusUnknown TaskStatus = iota
-	StatusFinished
-	StatusStoped
-	StatusProcessing
-	StatusNotExisted
-	StatusAborted
+	Finished
+	Stoped
+	Processing
+	NotExisted
+	Aborted
+	Draft
 )
 
 var taskStatusMap = map[TaskStatus]string{
-	StatusFinished:   "Success",
-	StatusStoped:     "Stopped",
-	StatusProcessing: "Running",
-	StatusNotExisted: "NotExisted",
-	StatusAborted:    "Failed",
+	Finished:   "Success",
+	Stoped:     "Stopped",
+	Processing: "Running",
+	NotExisted: "NotExisted",
+	Aborted:    "Failed",
+	Draft:      "Draft",
 }
 
 var taskStatusRevMap = map[string]TaskStatus{
-	"statusFinished":   StatusFinished,
-	"statusStoped":     StatusStoped,
-	"statusProcessing": StatusProcessing,
-	"statusNotExisted": StatusNotExisted,
-	"statusAborted":    StatusAborted,
+	"finished":   Finished,
+	"stoped":     Stoped,
+	"processing": Processing,
+	"notExisted": NotExisted,
+	"aborted":    Aborted,
+	"draft":      Draft,
 }
 
 func NewTaskStatus(status string) TaskStatus {

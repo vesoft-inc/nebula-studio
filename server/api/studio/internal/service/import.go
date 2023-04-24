@@ -40,6 +40,7 @@ const (
 type (
 	ImportService interface {
 		CreateImportTask(*types.CreateImportTaskRequest) (*types.CreateImportTaskData, error)
+		CreateTaskDraft(*types.CreateTaskDraftRequest) error
 		StopImportTask(request *types.StopImportTaskRequest) error
 		DownloadConfig(*types.DownloadConfigsRequest) error
 		DownloadLogs(request *types.DownloadLogsRequest) error
@@ -175,7 +176,7 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 	}
 
 	// create task dir
-	taskDir, err := importer.CreateNewTaskDir(i.svcCtx.Config.File.TasksDir)
+	taskDir, err := importer.CreateNewTaskDir(i.svcCtx.Config.File.TasksDir, req.Id)
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
@@ -191,14 +192,20 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 	auth := i.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	host := auth.Address + ":" + strconv.Itoa(auth.Port)
 	taskMgr := importer.GetTaskMgr()
-	task, taskID, err := taskMgr.NewTask(host, auth.Username, req.Name, conf)
+	var taskID int
+	var task *importer.Task
+	if req.Id != nil {
+		task, taskID, err = taskMgr.TurnDraftToTask(*req.Id, req.Name, req.RawConfig, conf)
+	} else {
+		task, taskID, err = taskMgr.NewTask(host, auth.Username, req.Name, req.RawConfig, conf)
+	}
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
 	// start import
 	if err = importer.StartImport(taskID); err != nil {
-		task.TaskInfo.TaskStatus = importer.StatusAborted.String()
+		task.TaskInfo.TaskStatus = importer.Aborted.String()
 		task.TaskInfo.TaskMessage = err.Error()
 		importer.GetTaskMgr().AbortTask(taskID)
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
@@ -224,6 +231,25 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 	return &types.CreateImportTaskData{
 		Id: taskID,
 	}, nil
+}
+
+func (i *importService) CreateTaskDraft(req *types.CreateTaskDraftRequest) error {
+	auth := i.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+	host := auth.Address + ":" + strconv.Itoa(auth.Port)
+	taskMgr := importer.GetTaskMgr()
+	if req.Id != nil {
+		err := taskMgr.UpdateTaskDraft(*req.Id, req.Name, req.Space, req.RawConfig)
+		if err != nil {
+			return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+		}
+		return nil
+	} else {
+		err := taskMgr.NewTaskDraft(host, auth.Username, req.Name, req.Space, req.RawConfig)
+		if err != nil {
+			return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+		}
+		return nil
+	}
 }
 
 func (i *importService) StopImportTask(req *types.StopImportTaskRequest) error {

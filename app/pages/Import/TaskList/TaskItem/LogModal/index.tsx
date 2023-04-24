@@ -17,14 +17,14 @@ interface IProps {
   logDimension: ILogDimension;
   visible: boolean;
   onCancel: () => void;
-  showLogDownload: boolean
 }
 
 let isMounted = true;
 
 const LogModal = (props: IProps) => {
-  const { visible, onCancel, showLogDownload, logDimension: { space, id, status } } = props;
-  const { dataImport: { getLogs, downloadTaskLog, getLogDetail } } = useStore();
+  const { visible, onCancel, logDimension: { space, id, status } } = props;
+  const { dataImport: { getLogs, downloadTaskLog, getLogDetail, envCfg } } = useStore();
+  const { supportLogDownload } = envCfg;
   const { intl } = useI18n();
   const logRef = useRef<HTMLDivElement>(null);
   const timer = useRef<any>(null);
@@ -93,7 +93,7 @@ const LogModal = (props: IProps) => {
   };
   useEffect(() => {
     isMounted = true;
-    if(showLogDownload) {
+    if(supportLogDownload) {
       getAllLogs();
     } else {
       initLog();
@@ -128,7 +128,7 @@ const LogModal = (props: IProps) => {
           <span>{`${space} ${intl.get('import.task')} - ${intl.get('common.log')}`}</span>
           {(loading || [ITaskStatus.Processing, ITaskStatus.Pending].includes(status)) && <Button type="text" loading={true} />}
         </div>
-        {showLogDownload && <Button className="studioAddBtn primaryBtn" onClick={handleLogDownload}>
+        {supportLogDownload && <Button className="studioAddBtn primaryBtn" onClick={handleLogDownload}>
           <Icon type="icon-studio-btn-download" />
           {intl.get('import.downloadLog')}
         </Button>}
@@ -140,8 +140,8 @@ const LogModal = (props: IProps) => {
       destroyOnClose={true}
       footer={false}
     >
-      {showLogDownload && <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange} items={items} />}
-      <div className={classnames(styles.logContainer, !showLogDownload && styles.full)} ref={logRef}/>
+      {supportLogDownload && <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange} items={items} />}
+      <div className={classnames(styles.logContainer, !supportLogDownload && styles.full)} ref={logRef}/>
     </Modal>
   );
 };
