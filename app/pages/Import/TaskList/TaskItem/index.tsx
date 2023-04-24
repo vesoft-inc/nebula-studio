@@ -1,22 +1,23 @@
-import { Button, Popconfirm, Progress } from 'antd';
+import { Button, Popconfirm, Progress, Tooltip, message as antMsg } from 'antd';
 import { CheckCircleFilled } from '@ant-design/icons';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { ITaskItem, ITaskStatus } from '@app/interfaces/import';
 import dayjs from 'dayjs';
 import { floor } from 'lodash';
 import { getFileSize } from '@app/utils/file';
 import Icon from '@app/components/Icon';
 import { useI18n } from '@vesoft-inc/i18n';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '@app/stores';
 import { useHistory } from 'react-router-dom';
+import ConfigConfirmModal from '../../TaskCreate/ConfigConfirmModal';
 import styles from './index.module.less';
 interface IProps {
   data: ITaskItem;
   onTaskStop: (id: number) => void;
   onTaskDelete: (id: number) => void;
-  onConfigDownload: (id: number) => void;
   onViewLog: (id: number, space: string, status: ITaskStatus) => void;
-  onDraftEdit: (id: number, space: string, cfg: string) => void;
-  showConfigDownload: boolean;
+  onRerun: () => void;
 }
 
 
@@ -52,19 +53,22 @@ const TaskItem = (props: IProps) => {
       createTime,
       rawConfig
     }, 
-    showConfigDownload,
     onViewLog,
-    onDraftEdit,
-    onConfigDownload,
+    onRerun,
     onTaskStop, 
     onTaskDelete } = props;
   const { intl } = useI18n();
+  const { dataImport: { envCfg, downloadTaskConfig, importTask }, schema } = useStore();
   const history = useHistory();
+  const { supportConfigDownload, needPwdConfirm } = envCfg;
+  const isDraft = useMemo(() => status === ITaskStatus.Draft, [status]);
+  const [visible, setVisible] = useState(false);
   const [progressStatus, setStatus] = useState<'success' | 'active' | 'normal' | 'exception' | undefined>(undefined);
   const [extraMsg, setExtraMsg] = useState('');
   const { processedBytes, totalBytes, failedProcessed } = stats || {};
   const time = useRef('');
   const timeoutId = useRef<number>(null);
+  const [rerunLoading, setRerunLoading] = useState(false);
   const addMsg = () => failedProcessed > 0 && setExtraMsg(intl.get('import.notImported', { total: failedProcessed }));
   useEffect(() => {
     window.clearTimeout(timeoutId.current);
@@ -93,72 +97,116 @@ const TaskItem = (props: IProps) => {
       time.current = dayjs.duration(dayjs(updateTime).diff(dayjs(createTime))).format('HH:mm:ss');
     }
   };
+
+  const handleEdit = () => {
+    history.push(`/import/edit/${id}`, {
+      id,
+      space,
+      cfg: rawConfig,
+      isDraft
+    });
+  };
+
+  const handleRerun = () => {
+    if(needPwdConfirm) {
+      setVisible(true);
+      return;
+    }
+    startRerun();
+  };
+
+  const startRerun = async (password?: string) => {
+    setVisible(false);
+    setRerunLoading(true);
+    const spaceVidType = await schema.getSpaceVidType(space);
+    const { basicConfig, tagConfig, edgeConfig } = JSON.parse(rawConfig);
+    const code = await importTask({
+      name: `task-${Date.now()}`,
+      config: {
+        space,
+        spaceVidType,
+        basicConfig,
+        tagConfig,
+        edgeConfig
+      },
+      password,
+      type: 'rerun'
+    });
+    setRerunLoading(false);
+    if(code === 0) {
+      antMsg.success(intl.get('import.startImporting'));
+      onRerun();
+    }
+  };
   return (
-    <div className={styles.taskItem}>
-      <div className={styles.row}>
-        <span>{intl.get('common.space')}: {space}</span>
-        <div>
-          {status === ITaskStatus.Draft 
-            ? <>
-              <span>{intl.get('import.modifyTime')}: {dayjs(updateTime).format('YYYY-MM-DD HH:mm:ss')}</span>
-            </>
-            : <>
-              <span className={styles.createTime}>{intl.get('common.createTime')}: {dayjs(createTime).format('YYYY-MM-DD HH:mm:ss')}</span>
-              {showConfigDownload && <Button type="link" size="small" onClick={() => onConfigDownload(id)}>
-                <Icon type="icon-studio-btn-download" />
-                {intl.get('import.downloadConfig')}
-              </Button>}
-            </>
-          }
-        </div>
-      </div>
-      <div className={styles.row}>
-        <div className={styles.progress}>
-          <div className={styles.progressInfo}>
-            <span className={styles.taskName}>
-              {status === ITaskStatus.Draft && <span className={styles.draftLabel}>
-                {intl.get('import.draft')}
-              </span>}
-              {name}
-              {status === ITaskStatus.Finished && <span className={styles.completeInfo}>
-                <CheckCircleFilled />
-                {intl.get('import.importCompleted')}
-                <span className={styles.red}>{extraMsg && ` (${extraMsg})`}</span>
-              </span>}
-              {!stats && status === ITaskStatus.Pending && <span className={styles.completeInfo}>
-                {intl.get('import.importPending')}
-              </span>}
-              {!stats && status === ITaskStatus.Processing && <span className={styles.completeInfo}>
-                {intl.get('import.importRunning')}
-              </span>}
-              {status === ITaskStatus.Aborted && <span className={styles.errInfo}>
-                {intl.get('import.importFailed')}
-                {extraMsg && ` (${extraMsg})`}
-              </span>}
-              {status === ITaskStatus.Stoped && <span className={styles.errInfo}>
-                {intl.get('import.importStopped')}
-              </span>}
-            </span>
-            <div className={styles.moreInfo}>
-              {processedBytes > 0 && <span>
-                {status !== ITaskStatus.Finished && `${getFileSize(processedBytes)} / `}
-                {getFileSize(totalBytes)}{' '}
-              </span>}
-              {status !== ITaskStatus.Draft && <span>{time.current}</span>}
-            </div>
+    <>
+      <div className={styles.taskItem}>
+        <div className={styles.row}>
+          <span>{intl.get('common.space')}: {space}</span>
+          <div>
+            {isDraft 
+              ? <>
+                <span>{intl.get('import.modifyTime')}: {dayjs(updateTime).format('YYYY-MM-DD HH:mm:ss')}</span>
+              </>
+              : <>
+                <span className={styles.createTime}>{intl.get('common.createTime')}: {dayjs(createTime).format('YYYY-MM-DD HH:mm:ss')}</span>
+                {supportConfigDownload && <Button type="link" size="small" onClick={() => downloadTaskConfig(id)}>
+                  <Icon type="icon-studio-btn-download" />
+                  {intl.get('import.downloadConfig')}
+                </Button>}
+              </>
+            }
           </div>
-          {stats && <Progress 
-            format={percent => `${percent}%`}
-            status={progressStatus} 
-            percent={status !== ITaskStatus.Finished ? floor(processedBytes / totalBytes * 100, 2) : 100} 
-            strokeColor={progressStatus && COLOR_MAP[progressStatus]} />}
         </div>
-        <div className={styles.operations}>
-          {status === ITaskStatus.Draft 
-            ? <Button className="primaryBtn" onClick={() => onDraftEdit(id, space, rawConfig)}>{intl.get('common.edit')}</Button>
-            : <>
-              <Button className="primaryBtn" onClick={() => onViewLog(id, space, status)}>{intl.get('import.viewLogs')}</Button>
-              {status === ITaskStatus.Processing && 
+        <div className={styles.row}>
+          <div className={styles.progress}>
+            <div className={styles.progressInfo}>
+              <span className={styles.taskName}>
+                {isDraft && <span className={styles.draftLabel}>
+                  {intl.get('import.draft')}
+                </span>}
+                {name}
+                {status === ITaskStatus.Finished && <span className={styles.completeInfo}>
+                  <CheckCircleFilled />
+                  {intl.get('import.importCompleted')}
+                  <span className={styles.red}>{extraMsg && ` (${extraMsg})`}</span>
+                </span>}
+                {!stats && status === ITaskStatus.Pending && <span className={styles.completeInfo}>
+                  {intl.get('import.importPending')}
+                </span>}
+                {!stats && status === ITaskStatus.Processing && <span className={styles.completeInfo}>
+                  {intl.get('import.importRunning')}
+                </span>}
+                {status === ITaskStatus.Aborted && <span className={styles.errInfo}>
+                  {intl.get('import.importFailed')}
+                  {extraMsg && ` (${extraMsg})`}
+                </span>}
+                {status === ITaskStatus.Stoped && <span className={styles.errInfo}>
+                  {intl.get('import.importStopped')}
+                </span>}
+              </span>
+              <div className={styles.moreInfo}>
+                {processedBytes > 0 && <span>
+                  {status !== ITaskStatus.Finished && `${getFileSize(processedBytes)} / `}
+                  {getFileSize(totalBytes)}{' '}
+                </span>}
+                {!isDraft && <span>{time.current}</span>}
+              </div>
+            </div>
+            {stats && <Progress 
+              format={percent => `${percent}%`}
+              status={progressStatus} 
+              percent={status !== ITaskStatus.Finished ? floor(processedBytes / totalBytes * 100, 2) : 100} 
+              strokeColor={progressStatus && COLOR_MAP[progressStatus]} />}
+          </div>
+          <div className={styles.operations}>
+            <Button className="primaryBtn" onClick={handleEdit}>
+              <Tooltip title={intl.get('common.edit')}><Icon type="icon-studio-btn-edit" /></Tooltip>
+            </Button>
+            {!isDraft && <Button className="primaryBtn" onClick={() => onViewLog(id, space, status)}>
+              <Tooltip title={intl.get('import.viewLogs')}><Icon type="icon-studio-btn-ddl" /></Tooltip>
+            </Button>}
+            {status === ITaskStatus.Processing && 
                 <Popconfirm
                   placement="left"
                   title={intl.get('import.endImport')}
@@ -166,25 +214,39 @@ const TaskItem = (props: IProps) => {
                   okText={intl.get('common.confirm')}
                   cancelText={intl.get('common.cancel')}
                 >
-                  <Button className="cancelBtn">{intl.get('import.endImport')}</Button>
+                  <Button className="warningBtn">
+                    <Tooltip title={intl.get('import.endImport')}><Icon type="icon-studio-btn-close" /></Tooltip>
+                  </Button>
                 </Popconfirm>}
-            </>
-          }
           
-          {!loadingStatus.includes(status) && 
-          <Popconfirm
-            placement="left"
-            title={intl.get('common.ask')}
-            onConfirm={() => onTaskDelete(id)}
-            okText={intl.get('common.confirm')}
-            cancelText={intl.get('common.cancel')}
-          >
-            <Button danger={true}>{intl.get('common.delete')}</Button>
-          </Popconfirm>}
+            {!loadingStatus.includes(status) && 
+          <>
+            {!isDraft && <Button className="primaryBtn" loading={rerunLoading} onClick={handleRerun}>
+              <Tooltip title={intl.get('common.rerun')}><Icon type="icon-studio-btn-play" /></Tooltip>
+            </Button>}
+            <Popconfirm
+              placement="left"
+              title={intl.get('common.ask')}
+              onConfirm={() => onTaskDelete(id)}
+              okText={intl.get('common.confirm')}
+              cancelText={intl.get('common.cancel')}
+            >
+              <Button danger={true} className="warningBtn">
+                <Tooltip title={intl.get('common.delete')}><Icon type="icon-studio-btn-delete" /></Tooltip>
+              </Button>
+            </Popconfirm>
+          </>
+            }
+          </div>
         </div>
+        {visible && <ConfigConfirmModal 
+          visible={visible} 
+          config={JSON.parse(rawConfig)}
+          onConfirm={startRerun} 
+          onCancel={() => setVisible(false)} />}
       </div>
-    </div>
+    </>
   );
 };
 
-export default TaskItem;
+export default observer(TaskItem);

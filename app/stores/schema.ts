@@ -89,10 +89,8 @@ export class SchemaStore {
   };
 
   updateVidType = async (space?: string) => {
-    const { code, data } = await this.getSpaceInfo(space || this.currentSpace);
-    if(code === 0) {
-      this.update({ spaceVidType: data?.tables?.[0]?.['Vid Type'] });
-    }
+    const spaceVidType = await this.getSpaceVidType(space || this.currentSpace);
+    this.update({ spaceVidType });
   };
 
   switchSpace = async (space: string) => {
@@ -122,6 +120,11 @@ export class SchemaStore {
   getSpaceInfo = async (space: string) => {
     const { code, data } = await service.execNGQL({ gql: `DESCRIBE SPACE ${handleKeyword(space)}` });
     return { code, data };
+  };
+
+  getSpaceVidType = async (space: string) => {
+    const { data } = await this.getSpaceInfo(space);
+    return data?.tables?.[0]?.['Vid Type'];
   };
 
   getSpaceCreateGQL = async (space: string) => {

@@ -21,25 +21,20 @@ interface ILogDimension {
   status: ITaskStatus;
 }
 
-interface IProps {
-  showTemplateModal?: boolean;
-  showConfigDownload?: boolean;
-  showLogDownload?: boolean;
-}
 
-const TaskList = (props: IProps) => {
+const TaskList = () => {
   const timer = useRef<any>(null);
   const { dataImport, global } = useStore();
   const [page, setPage] = useState(1);
   const { intl } = useI18n();
   const history = useHistory();
-  const { taskList, getTaskList, stopTask, deleteTask, downloadTaskConfig } = dataImport;
+  const { taskList, getTaskList, stopTask, deleteTask, envCfg } = dataImport;
   const { username, host } = global;
   const [modalVisible, setVisible] = useState(false);
   const [importModalVisible, setImportModalVisible] = useState(false);
   const [sourceModalVisible, setSourceModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { showTemplateModal = true, showConfigDownload = true, showLogDownload = true } = props;
+  const { supportTemplate } = envCfg;
   const modalKey = useMemo(() => Math.random(), [sourceModalVisible ]);
   const [logDimension, setLogDimension] = useState<ILogDimension>({} as ILogDimension);
   const handleTaskStop = useCallback(async (id: number) => {
@@ -57,28 +52,24 @@ const TaskList = (props: IProps) => {
     }
   }, []);
 
-  const handleLogView = (id: number, space: string, status: ITaskStatus) => {
+  const handleLogView = useCallback((id: number, space: string, status: ITaskStatus) => {
     setLogDimension({
       space, 
       id,
       status
     });
     setVisible(true);
-  };
-  const initList = async () => {
+  }, []);
+  const initList = useCallback(async () => {
     setLoading(true);
     await getTaskList();
     setPage(1);
     setLoading(false);
-  };
-
-  const handleEditDraft = useCallback((id, space, cfg) => {
-    history.push(`/import/edit/${id}`, {
-      id,
-      space,
-      cfg
-    });
   }, []);
+  const handleRerun = () => {
+    clearTimeout(timer.current);
+    getTaskList();
+  };
   useEffect(() => {
     isMounted = true;
     initList();
@@ -139,7 +130,7 @@ const TaskList = (props: IProps) => {
           >
             <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('import.createTask')}
           </Button>
-          {showTemplateModal && <Button type="default" onClick={() => setImportModalVisible(true)}>
+          {supportTemplate && <Button type="default" onClick={() => setImportModalVisible(true)}>
             {intl.get('import.uploadTemp')}
           </Button>}
         </div>
@@ -170,19 +161,16 @@ const TaskList = (props: IProps) => {
           {taskList.slice((page - 1) * 10, page * 10).map(item => (
             <TaskItem key={item.id} 
               data={item}
-              onDraftEdit={handleEditDraft}
+              onRerun={handleRerun}
               onViewLog={handleLogView} 
               onTaskStop={handleTaskStop} 
               onTaskDelete={handleTaskDelete} 
-              onConfigDownload={downloadTaskConfig} 
-              showConfigDownload={showConfigDownload}
             />
           ))}
           <Pagination className={styles.taskPagination} hideOnSinglePage total={taskList.length} current={page} onChange={page => setPage(page)} />
         </Spin>
       }
       {modalVisible && <LogModal
-        showLogDownload={showLogDownload}
         logDimension={logDimension}
         onCancel={() => setVisible(false)}
         visible={modalVisible} />}

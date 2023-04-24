@@ -23,11 +23,6 @@ const formItemLayout = {
   },
 };
 
-interface IProps {
-  needPwdConfirm?: boolean;
-}
-
-
 const AddMappingBtn = (props: { type: ISchemaType }) => {
   const { intl } = useI18n();
   const { type } = props;
@@ -39,17 +34,17 @@ const AddMappingBtn = (props: { type: ISchemaType }) => {
   </Button>;
 };
 
-const TaskCreate = (props: IProps) => {
+const TaskCreate = () => {
   const { dataImport, schema, files, global, datasource } = useStore();
   const { intl, currentLocale } = useI18n();
-  const { basicConfig, tagConfig, edgeConfig, updateBasicConfig, importTask, saveTaskDraft, setDraft } = dataImport;
-  const { spaces, getSpaces, updateSpaceInfo, currentSpace } = schema;
+  const { basicConfig, tagConfig, edgeConfig, updateBasicConfig, importTask, saveTaskDraft, setDraft, envCfg } = dataImport;
+  const { needPwdConfirm } = envCfg;
+  const { spaces, getSpaces, updateSpaceInfo, currentSpace, spaceVidType } = schema;
   const { getGraphAddress, _host } = global;
   const { getFiles } = files;
   const [modalVisible, setVisible] = useState(false);
   const history = useHistory();
   const location = useLocation();
-  const { needPwdConfirm = true } = props;
   const [address, setAddress] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showMoreConfig, setShowMoreConfig] = useState(false);
@@ -94,11 +89,27 @@ const TaskCreate = (props: IProps) => {
   const handleStartImport = async (password?: string) => {
     setVisible(false);
     setLoading(true);
-    const code = await importTask({
-      id: location.state?.id,
+    const { state } = location;
+    const payload = {
       name: basicConfig.taskName, 
-      password
-    });
+      password,
+      config: {
+        basicConfig,
+        tagConfig,
+        edgeConfig,
+        space: currentSpace,
+        spaceVidType
+      },
+      type: 'create'
+    } as any;
+    if(state?.id !== undefined) {
+      if(state?.isDraft) {
+        payload.id = state.id;
+      } else {
+        payload.type = 'rebuild';
+      }
+    }
+    const code = await importTask(payload);
     setLoading(false);
     if(code === 0) {
       message.success(intl.get('import.startImporting'));
@@ -171,7 +182,10 @@ const TaskCreate = (props: IProps) => {
       message.error(intl.get('import.taskNameRequired'));
       return;
     }
-    const code = await saveTaskDraft(location.state?.id);
+    setLoading(true);
+    const id = location.state?.isDraft ? location.state?.id : undefined;
+    const code = await saveTaskDraft(id);
+    setLoading(false);
     if(code === 0) {
       message.success(intl.get('sketch.saveSuccess'));
       history.push('/import/tasks');
@@ -346,14 +360,13 @@ const TaskCreate = (props: IProps) => {
       </div>
       <div className="studioFormFooter">
         <Button onClick={() => history.push('/import/tasks')}>{intl.get('common.cancel')}</Button>
-        <Button onClick={saveDraft}>{intl.get('import.saveDraft')}</Button>
+        <Button onClick={saveDraft} loading={loading}>{intl.get('import.saveDraft')}</Button>
         <Button type="primary" disabled={
           basicConfig.taskName === ''
           || (!tagConfig.length && !edgeConfig.length)
-        } onClick={checkConfig} loading={!needPwdConfirm && loading}>{intl.get('import.runImport')}</Button>
+        } onClick={checkConfig} loading={loading}>{intl.get('import.runImport')}</Button>
       </div>
       {modalVisible && <ConfigConfirmModal 
-        needPwdConfirm={needPwdConfirm}
         visible={modalVisible} 
         onConfirm={handleStartImport} 
         onCancel={() => setVisible(false)}

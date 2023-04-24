@@ -1,20 +1,21 @@
 import { useStore } from '@app/stores';
+import { ITagItem, IEdgeItem } from '@app/stores/import';
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Input, Modal } from 'antd';
 import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import styles from './index.module.less';
 interface IProps {
   visible: boolean;
   onConfirm: (password: string) => void
   onCancel: () => void;
-  needPwdConfirm?: boolean;
+  config?: { tagConfig: ITagItem[], edgeConfig: IEdgeItem[] }
 }
 const ConfigConfirmModal = (props: IProps) => {
-  const { dataImport: { tagConfig, edgeConfig } } = useStore();
+  const { dataImport } = useStore();
   const [password, setPassword] = useState('');
-  const { visible, onConfirm, onCancel } = props;
+  const { visible, onConfirm, onCancel, config } = props;
   const { intl } = useI18n();
   const handleConfirm = (password?: string) => {
     onConfirm(password);
@@ -24,11 +25,14 @@ const ConfigConfirmModal = (props: IProps) => {
     setPassword('');
     onCancel();
   };
+  const tagConfig = useMemo(() => config ? config.tagConfig : dataImport.tagConfig, [config]);
+  const edgeConfig = useMemo(() => config ? config.edgeConfig : dataImport.edgeConfig, [config]);
   return (
     <Modal
       title={intl.get('import.importConfirm')}
       open={visible}
       onCancel={() => handleCancel()}
+      destroyOnClose
       className={styles.importConfirmModal}
       footer={false}
     >

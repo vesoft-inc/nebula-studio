@@ -6,7 +6,10 @@ import { ISchemaEnum } from '@app/interfaces/schema';
 import { configToJson } from '@app/utils/import';
 import { isEmpty } from '@app/utils/function';
 import { trackEvent } from '@app/utils/stat';
+import { message } from 'antd';
+import { getI18n } from '@vesoft-inc/i18n';
 import { getRootStore } from '.';
+const { intl } = getI18n();
 
 const handlePropertyMap = (item, defaultValueFields) => {
   const type = item.Type.startsWith('fixed_string') ? 'string' : item.Type.startsWith('int') ? 'int' : item.Type;
@@ -120,6 +123,13 @@ class ImportSchemaConfigItem<T extends ISchemaEnum, F = T extends ISchemaEnum.Ed
     Object.keys(payload).forEach((key) => (prop[key] = payload[key]));
 }
 
+interface IPlatformConfig {
+  env: string;
+  supportTemplate: boolean;
+  supportConfigDownload: boolean;
+  supportLogDownload: boolean;
+  needPwdConfirm: boolean;
+}
 export type ITagItem = ImportSchemaConfigItem<ISchemaEnum.Tag>;
 export type IEdgeItem = ImportSchemaConfigItem<ISchemaEnum.Edge>;
 export type ITagFileItem = TagFileItem;
@@ -129,6 +139,13 @@ export class ImportStore {
   tagConfig = observable.array<ITagItem>([], { deep: false });
   edgeConfig = observable.array<IEdgeItem>([], { deep: false });
   basicConfig: IBasicConfig = { taskName: '', address: [] };
+  envCfg: IPlatformConfig = {
+    env: 'local',
+    supportTemplate: true,
+    supportConfigDownload: true,
+    supportLogDownload: true,
+    needPwdConfirm: true
+  };
   constructor() {
     makeAutoObservable(this, {
       taskList: observable,
@@ -172,33 +189,84 @@ export class ImportStore {
     })) as any;
     return code;
   };
+  validateResource = async (resource) => {
+    const cfg = typeof resource === 'string' ? JSON.parse(resource) : resource;
+    const { tagConfig, edgeConfig } = cfg;
+    const files = await this.rootStore.files.getFiles();
+    const datasources = await this.rootStore.datasource.getDatasourceList();
+    const missingResources = [];
+    const missingFiles = [];
+    [tagConfig, edgeConfig].forEach(cfg => {
+      cfg.forEach(item => {
+        item.files.forEach(fileCfg => {
+          const file = fileCfg.file;
+          if(file.datasourceId !== undefined) {
+            if(datasources.filter(i => i.id === file.datasourceId).length === 0) {
+              missingResources.push(file.name);
+            }
+          } else {
+            if(files.filter(i => i.name === file.name).length === 0) {
+              missingFiles.push(file.name);
+            }
+          }
+        });
+      });
+    });
+    if(missingFiles.length > 0) {
+      message.error(intl.get('import.fileMissing', { files: missingFiles.join(',') }));
+      return false;
+    }
+    if(missingResources.length > 0) {
+      message.error(intl.get('import.datasourceMissing', { files: missingResources.join(',') }));
+      return false;
+    }
+  };
   importTask = async (params: {
     id?: number,
-    config?: any,
+    config?: { 
+      basicConfig: IBasicConfig,
+      tagConfig: ITagItem[],
+      edgeConfig: IEdgeItem[],
+      space: string,
+      spaceVidType: string,
+    },
+    template?: any,
     name: string, 
-    password?: string
+    password?: string,
+    type?: 'create' | 'rebuild' | 'rerun'
   }) => {
+    const { template, name, password, id, config, type } = params;
     let _config;
     let rawConfig;
-    const { config, name, password, id } = params;
-    if(config) {
-      _config = config;
+    const { basicConfig, tagConfig, edgeConfig, space, spaceVidType } = config;
+    if(id !== undefined || type === 'rerun' || type === 'rebuild') {
+      // id: import an existed draft task
+      // rebuild: edit old task and save as new task
+      // formData: rerun task directly
+      // validate resource，maybe the resource has been deleted
+      const isValid = await this.validateResource({ tagConfig, edgeConfig });
+      if(isValid === false) {
+        return;
+      }
+    }
+    if(template) {
+      // template import
+      _config = template;
     } else {
-      const { currentSpace, spaceVidType } = this.rootStore.schema;
       const { username } = this.rootStore.global;
       _config = configToJson({
-        ...this.basicConfig,
-        space: currentSpace,
-        tagConfig: this.tagConfig,
-        edgeConfig: this.edgeConfig,
+        ...basicConfig,
+        space,
+        tagConfig,
+        edgeConfig,
         username,
         password,
         spaceVidType
       });
       rawConfig = {
-        basicConfig: this.basicConfig,
-        tagConfig: this.tagConfig,
-        edgeConfig: this.edgeConfig,
+        basicConfig,
+        tagConfig,
+        edgeConfig
       };
     }
     const { code } = (await service.importData({
@@ -208,7 +276,7 @@ export class ImportStore {
       rawConfig: JSON.stringify(rawConfig)
     }, {
       trackEventConfig: 'import',
-      action: config ? 'template_import' : 'import',
+      action: template ? 'template_import' : 'import',
     })) as any;
     return code;
   };
@@ -268,6 +336,7 @@ export class ImportStore {
     edgeConfig: IEdgeItem[]
   }) => {
     const { basicConfig, tagConfig, edgeConfig } = cfg;
+    this.validateResource(cfg);
     this.updateBasicConfig(basicConfig);
     tagConfig.forEach(item => {
       const { name, props, files } = item;

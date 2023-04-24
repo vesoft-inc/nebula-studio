@@ -8,18 +8,11 @@ import DatasourceList from './DatasourceList';
 import styles from './index.module.less';
 import TaskList from './TaskList';
 
-interface IProps {
-  showConfigDownload?: boolean;
-  showLogDownload?: boolean;
-  showTemplateModal?: boolean;
-}
-
-const Import = (props: IProps) => {
+const Import = () => {
   const history = useHistory();
   const location = useLocation();
   const [tab, setTab] = useState('tasks');
   const { intl } = useI18n();
-  const { showConfigDownload, showLogDownload, showTemplateModal } = props;
   useEffect(() => {
     trackPageView('/import');
   }, []);
@@ -54,7 +47,7 @@ const Import = (props: IProps) => {
         <Route
           path={`/import/tasks`}
           exact={true}
-          render={(props) => <TaskList showConfigDownload={showConfigDownload} showLogDownload={showLogDownload} showTemplateModal={showTemplateModal} {...props} />}
+          component={TaskList}
         />
       </div>
     </div>
