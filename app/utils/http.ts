@@ -19,7 +19,8 @@ export enum HttpResCode {
 }
 
 const { intl } = getI18n();
-
+const { CancelToken } = axios;
+let cancelToken = CancelToken.source();
 const service = axios.create({
   transformResponse: [
     data => {
@@ -39,7 +40,7 @@ const service = axios.create({
 
 service.interceptors.request.use(config => {
   config.headers['Content-Type'] = 'application/json';
-
+  config.cancelToken = cancelToken.token;
   return config;
 });
 
@@ -62,7 +63,12 @@ service.interceptors.response.use(
       }
       // relogin
       if (res.code === HttpResCode.ErrSession) {
-        getRootStore().global.logout();
+        // cancel other requests & logout automatically
+        cancelToken.cancel(res.message || 'Operation canceled');
+        setTimeout(() => {
+          cancelToken = CancelToken.source();
+          getRootStore().global.logout();
+        }, 0);
       }
       return res;
     } else {
