@@ -107,7 +107,9 @@ export class GlobalStore {
       message.success(intl.get('configServer.success'));
       cookies.set('nh', _host);
       cookies.set('nu', username);
-      const socketConncted = await this.ngqlRunner.connect(`ws://${location.host}/nebula_ws`);
+      const socketConncted = await this.ngqlRunner.connect(
+        `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/nebula_ws`
+      );
       this.update({ _host, _username: username });
       return socketConncted;
       // return true;
