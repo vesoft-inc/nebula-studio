@@ -122,7 +122,7 @@ const CSVPreviewLink = (props: IProps) => {
               <Button onClick={handleClear} className="primaryBtn studioAddBtn">
                 {intl.get('import.ignore')}
               </Button>
-              <Button type="primary" onClick={handleMapping}>
+              <Button type="primary" onClick={handleMapping} className={styles.confirmBtn}>
                 {intl.get('common.confirm')}
               </Button>
             </>
