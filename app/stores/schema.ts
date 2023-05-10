@@ -86,6 +86,10 @@ export class SchemaStore {
   updateSpaceInfo = async (space: string) => {
     await this.switchSpace(space);
     await this.getSchemaInfo();
+    const consoleStore = this.rootStore.console;
+    if(!consoleStore.currentSpace) {
+      consoleStore.updateCurrentSpace(space);
+    }
   };
 
   updateVidType = async (space?: string) => {

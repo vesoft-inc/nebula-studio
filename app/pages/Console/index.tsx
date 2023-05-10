@@ -139,7 +139,7 @@ const Console = (props: IProps) => {
             <span className={styles.title}>Nebula Console</span>
             <div className={styles.operations}>
               <div className={styles.spaceSelect}>
-                <Select value={currentSpace || null} placeholder={intl.get('console.selectSpace')} onDropdownVisibleChange={handleGetSpaces} onChange={updateCurrentSpace}>
+                <Select allowClear value={currentSpace || null} placeholder={intl.get('console.selectSpace')} onDropdownVisibleChange={handleGetSpaces} onChange={updateCurrentSpace}>
                   {spaces.map(space => (
                     <Option value={space} key={space}>
                       {space}

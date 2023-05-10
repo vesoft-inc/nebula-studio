@@ -1,4 +1,3 @@
-import { getRootStore } from '@app/stores';
 import { message } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import JSONBigint from 'json-bigint';
@@ -73,7 +72,7 @@ export class NgqlRunner {
 
   socketUrl: string | URL | undefined;
   socketProtocols: string | string[] | undefined;
-
+  logoutFun: () => void = undefined;
   product = 'Studio';
 
   socketMessageListeners: ((e: MessageEvent) => void)[] = [];
@@ -110,9 +109,16 @@ export class NgqlRunner {
     this.messageReceiverMap.clear();
   };
 
-  connect = (url: string | URL, protocols?: string | string[]) => {
+  connect = (payload: {
+    config: {
+      url: string | URL,
+      protocols?: string | string[], 
+    },
+    logoutFun?: () => void
+  }) => {
+    const { config: { url, protocols }, logoutFun } = payload;
     if (!url) {
-      getRootStore().global.logout();
+      logoutFun?.();
       message.error('WebSocket URL is empty');
       return Promise.reject('WebSocket URL is empty');
     }
@@ -129,7 +135,7 @@ export class NgqlRunner {
         this.socket = socket;
         this.socketUrl = url;
         this.socketProtocols = protocols;
-
+        this.logoutFun = logoutFun;
         localStorage.setItem('socketUrl', JSON.stringify(url));
         protocols && localStorage.setItem('socketProtocols', JSON.stringify(protocols));
 
@@ -162,7 +168,10 @@ export class NgqlRunner {
   };
 
   reConnect = () => {
-    return this.connect(this.socketUrl, this.socketProtocols);
+    return this.connect({ config: { 
+      url: this.socketUrl, 
+      protocols: this.socketProtocols
+    } });
   };
 
   onMessage = (e: MessageEvent<string>) => {
@@ -172,7 +181,7 @@ export class NgqlRunner {
 
     const msgReceive = safeParse<MessageReceive<NgqlRes>>(e.data, { paser: JSONBigint.parse });
     if (msgReceive?.body?.content?.code === HttpResCode.ErrSession) {
-      getRootStore().global.logout();
+      this.logoutFun?.();
       return;
     }
 
@@ -217,7 +226,7 @@ export class NgqlRunner {
     // disable reconnect
     this.socketUrl = undefined;
     this.socketProtocols = undefined;
-
+    this.logoutFun = undefined;
     this.onDisconnect();
   };
 

@@ -19,7 +19,7 @@ export enum HttpResCode {
 }
 
 const { intl } = getI18n();
-
+let controller = new AbortController();
 const service = axios.create({
   transformResponse: [
     data => {
@@ -39,7 +39,7 @@ const service = axios.create({
 
 service.interceptors.request.use(config => {
   config.headers['Content-Type'] = 'application/json';
-
+  config.signal = controller.signal;
   return config;
 });
 
@@ -62,10 +62,13 @@ service.interceptors.response.use(
       }
       // relogin
       if (res.code === HttpResCode.ErrSession) {
+        // cancel other requests & logout automatically
+        controller.abort();
+        controller = new AbortController();
         getRootStore().global.logout();
       }
       return res;
-    } else {
+    } else if (!axios.isCancel(error)) {
       message.error(`${intl.get('common.requestError')}: ${error}`);
       return error;
     }
