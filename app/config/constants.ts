@@ -1,5 +1,5 @@
-import enUS from './locale/en-US.json';
-import zhCN from './locale/zh-CN.json';
+import enUS from './locale/en-US';
+import zhCN from './locale/zh-CN';
 
 export const INTL_LOCALE_SELECT = {
   EN_US: {
