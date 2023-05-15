@@ -254,7 +254,7 @@ function Welcome(props: IProps) {
     moduleList = getModuleList(),
     docList = getDocList(),
     onDatasetLoad,
-    product = 'NebulaGraph Studio',
+    product = `${window.gConfig.databaseName} Studio`,
     onClosePage,
   } = props;
   const history = useHistory() as History;

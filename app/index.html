@@ -12,9 +12,9 @@
 		<!-- Global Event Tracking -->
 		<script>
 			<% if (initProps.dev) { %>
-				window.gConfig = { maxBytes: <%= JSON.stringify(initProps.maxBytes) %> }
+				window.gConfig = { maxBytes: <%= JSON.stringify(initProps.maxBytes) %>, databaseName: "NebulaGraph" }
 			<% } else { %>
-					window.gConfig = { maxBytes: {{.maxBytes}} }
+				window.gConfig = { maxBytes: {{.maxBytes}}, databaseName: "NebulaGraph" }
 			<% } %>
 		</script>
     <style>
