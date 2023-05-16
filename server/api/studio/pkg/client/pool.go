@@ -17,6 +17,7 @@ type ParsedResult struct {
 	Tables      []map[string]Any `json:"tables"`
 	TimeCost    int64            `json:"timeCost"`
 	LocalParams ParameterMap     `json:"localParams"`
+	Space       string           `json:"space"`
 }
 type ExecuteResult struct {
 	Gql    string
@@ -580,5 +581,6 @@ func parseExecuteData(response SingleResponse) (ParsedResult, error) {
 		}
 	}
 	result.TimeCost = res.GetLatency()
+	result.Space = res.GetSpaceName()
 	return result, nil
 }
