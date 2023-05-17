@@ -71,7 +71,7 @@ export class ConsoleStore {
 
   updateCurrentSpace = (space: string) => {
     this.currentSpace = space;
-    localStorage.setItem('currentSpace', space);
+    localStorage.setItem('currentSpace', space || '');
   };
 
   runGQL = async (payload: { gql: string; editorValue?: string }) => {
@@ -108,7 +108,7 @@ export class ConsoleStore {
       }
       data?.forEach((item) => {
         item.id = uuidv4();
-        item.space = this.currentSpace;
+        item.space = item.data?.space;
         item.spaceVidType = spaceVidType;
       });
       const paramUpdated = gqlList.some((item) => {
