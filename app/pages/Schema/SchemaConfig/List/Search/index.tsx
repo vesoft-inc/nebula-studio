@@ -5,6 +5,8 @@ import { SearchOutlined } from '@ant-design/icons';
 import { useLocation } from 'react-router-dom';
 
 import { debounce } from 'lodash';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '@app/stores';
 import styles from './index.module.less';
 
 interface IProps {
@@ -17,9 +19,10 @@ const Search = (props: IProps) => {
   const { intl } = useI18n();
   const location = useLocation();
   const [value, setValue] = useState('');
+  const { schema: { currentSpace } } = useStore();
   useEffect(() => {
     setValue('');
-  }, [location.pathname]);
+  }, [location.pathname, currentSpace]);
   const onChange = useCallback(e => {
     setValue(e.target.value);
     search(e.target.value);
@@ -44,4 +47,4 @@ const Search = (props: IProps) => {
   );
 };
 
-export default Search;
+export default observer(Search);

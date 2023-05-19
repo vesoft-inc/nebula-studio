@@ -120,11 +120,11 @@ const Console = (props: IProps) => {
     setModalVisible(true);
   };
 
-  const handleExplorer = (data) => {
+  const handleExplorer = async (data) => {
     if(!onExplorer) {
       return;
     }
-    onExplorer!(data);
+    await onExplorer!(data);
     !modalVisible && setModalVisible(false);
     trackEvent('navigation', 'view_explore', 'from_console_btn');
   };

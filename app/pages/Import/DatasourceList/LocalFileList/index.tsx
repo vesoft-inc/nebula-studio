@@ -18,6 +18,10 @@ const FileList = () => {
   const { fileList, deleteFile, getFiles } = files;
   const [loading, setLoading] = useState(false);
   const [selectFiles, setSelectFiles] = useState<string[]>([]);
+  const deleteSingleFile = useCallback(async (name: string) => {
+    const ok = await deleteFile([name]);
+    ok && setSelectFiles(selectFiles.filter(item => item !== name));
+  }, [selectFiles]);
   const columns = [
     {
       title: intl.get('import.fileName'),
@@ -54,7 +58,7 @@ const FileList = () => {
               <Icon type="icon-studio-btn-detail" />
             </PreviewFileModal>
             <Popconfirm
-              onConfirm={() => deleteFile([file.name])}
+              onConfirm={() => deleteSingleFile(file.name)}
               title={intl.get('common.ask')}
               okText={intl.get('common.confirm')}
               cancelText={intl.get('common.cancel')}

@@ -33,6 +33,7 @@ const ExportModal = (props: IProps) => {
   const { intl } = useI18n();
   const [edges, setEdges] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [importLoading, setImportLoading] = useState(false);
   const isExist = useCallback((value) => value !== null && value !== undefined && value !== '', []);
   useEffect(() => {
     init();
@@ -45,7 +46,7 @@ const ExportModal = (props: IProps) => {
     setEdges(_edges);
     setLoading(false);
   };
-  const handleExport = (values) => {
+  const handleExport = async (values) => {
     const { type, vertexIds, srcId, dstId, edgeType, rank } = values;
     const vertexes =
       type === 'vertex'
@@ -83,11 +84,13 @@ const ExportModal = (props: IProps) => {
           return acc;
         }, [])
         : [];
-    onExplorer({
+    setImportLoading(true);
+    await onExplorer({
       space,
       vertexes, 
       edges
     });
+    setImportLoading(false);
   };
   if(!data) {
     return;
@@ -183,6 +186,7 @@ const ExportModal = (props: IProps) => {
           <Button
             htmlType="submit"
             type="primary"
+            loading={importLoading}
           >
             {intl.get('common.import')}
           </Button>
