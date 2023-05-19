@@ -61,11 +61,13 @@ const PropertiesForm = (props: IProps) => {
                 <Form.List name="properties" rules={[
                   {
                     validator: (_, properties) => {
+                      if (!properties) {
+                        return Promise.resolve();
+                      }
                       const names = properties.map((item) => item.name).filter(Boolean);
                       if(names.length !== new Set(names).size) {
                         return Promise.reject(intl.get('schema.uniqProperty'));
                       }
-                      return Promise.resolve();
                     },
                   },
                 ]}>
