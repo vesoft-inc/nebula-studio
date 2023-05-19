@@ -241,7 +241,7 @@ func (c *Client) writePump() {
 			if !ok {
 				// The hub closed the channel.
 				logx.Errorf("[WebSocket UnexpectedClose]: c.send length: %v", len(c.send))
-				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				c.conn.WriteControl(websocket.CloseMessage, []byte{}, time.Now().Add(time.Second))
 				return
 			}
 
@@ -253,11 +253,13 @@ func (c *Client) writePump() {
 			w.Write(message)
 
 			if err := w.Close(); err != nil {
+				logx.Errorf("[WebSocket WriteMessage Close]: %v", err)
 				return
 			}
 		case <-ticker.C:
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				logx.Errorf("[WebSocket ticker error]: %v", err)
 				return
 			}
 		}
