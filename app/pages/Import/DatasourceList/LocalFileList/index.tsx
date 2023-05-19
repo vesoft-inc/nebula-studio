@@ -20,8 +20,8 @@ const FileList = () => {
   const [selectFiles, setSelectFiles] = useState<string[]>([]);
   const deleteSingleFile = useCallback(async (name: string) => {
     const ok = await deleteFile([name]);
-    ok && setSelectFiles(selectFiles.filter(item => item !== name));
-  }, [selectFiles]);
+    ok && setSelectFiles(prev => prev.filter(item => item !== name));
+  }, []);
   const columns = [
     {
       title: intl.get('import.fileName'),
