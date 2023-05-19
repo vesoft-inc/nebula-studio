@@ -77,7 +77,8 @@ const SchemaConfig: React.FC = () => {
       const hasSameName = validateSameName();
       const hasError = allValues.some((item) => item.errors.length > 0);
       // hack delete the row of properties, but allValues is not update immediately, need to validate again
-      if(hasError && allValues.some(item => item.name[0] === 'properties' && item.value === undefined)) {
+      // name.length > 1 means as least 1 row of properties
+      if(hasError && allValues.some(item => item.name.length > 1 && item.name[0] === 'properties' && item.value === undefined)) {
         form.validateFields(changedFileds);
       }
       update({ ...formValues, invalid: hasError || hasSameName });
