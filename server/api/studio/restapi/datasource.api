@@ -5,7 +5,7 @@ type (
 		Endpoint     string `json:"endpoint"`
 		Region       string `json:"region,optional"`
 		Bucket       string `json:"bucket"`
-		AccessKey    string `json:"accessKey"`
+		AccessKeyID  string `json:"accessKeyID"`
 		AccessSecret string `json:"accessSecret,optional"`
 	}
 
@@ -19,7 +19,7 @@ type (
 		Endpoint     string `json:"endpoint,optional,omitempty"`
 		Region       string `json:"region,optional,omitempty"`
 		Bucket       string `json:"bucket,optional,omitempty"`
-		AccessKey    string `json:"accessKey,optional,omitempty"`
+		AccessKeyID  string `json:"accessKeyID,optional,omitempty"`
 		AccessSecret string `json:"accessSecret,optional,omitempty"`
 	}
 

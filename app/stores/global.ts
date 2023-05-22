@@ -33,6 +33,7 @@ export class GlobalStore {
       ngqlRunner: observable.ref,
       update: action,
     });
+    this.ngqlRunner.logoutFun = this.logout;
   }
 
   get rootStore() {

@@ -7,7 +7,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b
 	github.com/vesoft-inc/go-pkg v0.0.0-20230307111816-a43d6a342d23
-	github.com/vesoft-inc/nebula-importer/v4 v4.0.0-20230302074940-d97c824a6225
+	github.com/vesoft-inc/nebula-importer/v4 v4.0.0
 	github.com/zeromicro/go-zero v1.3.3
 )
 
@@ -16,7 +16,7 @@ require (
 	github.com/aws/aws-sdk-go v1.44.217
 	github.com/pkg/sftp v1.13.5
 	github.com/stretchr/testify v1.8.0
-	github.com/vesoft-inc/nebula-go/v3 v3.4.0
+	github.com/vesoft-inc/nebula-go/v3 v3.5.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -54,8 +54,6 @@ require (
 	golang.org/x/time v0.3.0 // indirect
 )
 
-replace github.com/vesoft-inc/nebula-importer/v4 => github.com/veezhang/nebula-importer/v4 v4.0.0-20230327073838-1faf638e9c88
-
 require (
 	github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -88,9 +86,9 @@ require (
 	go.uber.org/automaxprocs v1.4.0 // indirect
 	go.uber.org/zap v1.23.0
 	golang.org/x/crypto v0.5.0
-	golang.org/x/net v0.5.0 // indirect
-	golang.org/x/sys v0.4.0 // indirect
-	golang.org/x/text v0.6.0 // indirect
+	golang.org/x/net v0.10.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
+	golang.org/x/text v0.9.0 // indirect
 	google.golang.org/grpc v1.46.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

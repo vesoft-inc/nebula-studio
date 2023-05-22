@@ -9,7 +9,7 @@ func TestS3Store(t *testing.T) {
 	s3Config := map[string]string{
 		"endpoint":     "s3.us-east-1.amazonaws.com",
 		"region":       "us-east-1",
-		"accessKey":    "",
+		"accessKeyID":  "",
 		"accessSecret": "",
 	}
 	bytes, _ := json.Marshal(s3Config)

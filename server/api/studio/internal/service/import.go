@@ -100,28 +100,28 @@ func (i *importService) updateDatasourceConfig(conf *types.CreateImportTaskReque
 					// endpoint is not required in importer aws config
 					// some format of endpoint will cause error, for example: https://s3.amazonaws.com
 					source.S3 = &types.S3Config{
-						AccessKey: cfg.AccessKey,
-						SecretKey: string(secret),
-						Bucket:    cfg.Bucket,
-						Region:    cfg.Region,
-						Key:       *source.DatasourceFilePath,
+						AccessKeyID:     cfg.AccessKeyID,
+						AccessKeySecret: string(secret),
+						Bucket:          cfg.Bucket,
+						Region:          cfg.Region,
+						Key:             *source.DatasourceFilePath,
 					}
 				case "oss":
 					source.OSS = &types.OSSConfig{
-						AccessKey: cfg.AccessKey,
-						SecretKey: string(secret),
-						Bucket:    cfg.Bucket,
-						Endpoint:  cfg.Endpoint,
-						Key:       *source.DatasourceFilePath,
+						AccessKeyID:     cfg.AccessKeyID,
+						AccessKeySecret: string(secret),
+						Bucket:          cfg.Bucket,
+						Endpoint:        cfg.Endpoint,
+						Key:             *source.DatasourceFilePath,
 					}
 				case "cos", "customize":
 					source.S3 = &types.S3Config{
-						AccessKey: cfg.AccessKey,
-						SecretKey: string(secret),
-						Bucket:    cfg.Bucket,
-						Region:    cfg.Region,
-						Endpoint:  cfg.Endpoint,
-						Key:       *source.DatasourceFilePath,
+						AccessKeyID:     cfg.AccessKeyID,
+						AccessKeySecret: string(secret),
+						Bucket:          cfg.Bucket,
+						Region:          cfg.Region,
+						Endpoint:        cfg.Endpoint,
+						Key:             *source.DatasourceFilePath,
 					}
 					if cfg.Region == "" {
 						source.S3.Region = "us-east-1"

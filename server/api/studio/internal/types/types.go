@@ -97,13 +97,13 @@ type EdgeRank struct {
 }
 
 type S3Config struct {
-	Endpoint  string `json:"endpoint,optional,omitempty"`
-	Region    string `json:"region,omitempty"`
-	AccessKey string `json:"accessKey,omitempty"`
-	SecretKey string `json:"secretKey,omitempty"`
-	Token     string `json:"token,optional,omitempty"`
-	Bucket    string `json:"bucket,omitempty"`
-	Key       string `json:"key,omitempty"`
+	Endpoint        string `json:"endpoint,optional,omitempty"`
+	Region          string `json:"region,omitempty"`
+	AccessKeyID     string `json:"accessKeyID,omitempty"`
+	AccessKeySecret string `json:"accessKeySecret,omitempty"`
+	Token           string `json:"token,optional,omitempty"`
+	Bucket          string `json:"bucket,omitempty"`
+	Key             string `json:"key,omitempty"`
 }
 
 type SFTPConfig struct {
@@ -118,11 +118,11 @@ type SFTPConfig struct {
 }
 
 type OSSConfig struct {
-	Endpoint  string `json:"endpoint,omitempty"`
-	AccessKey string `json:"accessKey,omitempty"`
-	SecretKey string `json:"secretKey,omitempty"`
-	Bucket    string `json:"bucket,omitempty"`
-	Key       string `json:"key,omitempty"`
+	Endpoint        string `json:"endpoint,omitempty"`
+	AccessKeyID     string `json:"accessKeyID,omitempty"`
+	AccessKeySecret string `json:"accessKeySecret,omitempty"`
+	Bucket          string `json:"bucket,omitempty"`
+	Key             string `json:"key,omitempty"`
 }
 
 type LocalConfig struct {
@@ -366,7 +366,7 @@ type DatasourceS3Config struct {
 	Endpoint     string `json:"endpoint"`
 	Region       string `json:"region,optional"`
 	Bucket       string `json:"bucket"`
-	AccessKey    string `json:"accessKey"`
+	AccessKeyID  string `json:"accessKeyID"`
 	AccessSecret string `json:"accessSecret,optional"`
 }
 
@@ -381,7 +381,7 @@ type DatasourceS3UpdateConfig struct {
 	Endpoint     string `json:"endpoint,optional,omitempty"`
 	Region       string `json:"region,optional,omitempty"`
 	Bucket       string `json:"bucket,optional,omitempty"`
-	AccessKey    string `json:"accessKey,optional,omitempty"`
+	AccessKeyID  string `json:"accessKeyID,optional,omitempty"`
 	AccessSecret string `json:"accessSecret,optional,omitempty"`
 }
 
