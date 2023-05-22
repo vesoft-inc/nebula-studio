@@ -62,7 +62,7 @@ export interface IImportFile {
 export interface IS3Config {
   region: string;
   endpoint: string;
-  accessKey: string;
+  accessKeyID: string;
   accessSecret: string;
   bucket: string;
   token?: string;

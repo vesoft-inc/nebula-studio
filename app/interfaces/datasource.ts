@@ -20,7 +20,7 @@ export interface IDatasourceItem {
   platform?: string;
   createTime: string;
   s3Config?: {
-    accessKey: string;
+    accessKeyID: string;
     accessSecret?: string;
     endpoint: string;
     bucket: string;

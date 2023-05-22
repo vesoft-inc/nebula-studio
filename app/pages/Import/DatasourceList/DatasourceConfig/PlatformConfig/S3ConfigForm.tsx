@@ -61,7 +61,7 @@ const S3ConfigForm = (props: IProps) => {
               <FormItem name={['s3Config', 'bucket']} label={intl.get('import.bucketName')} rules={[{ required: true, message: intl.get('formRules.bucketRequired') } ]}>
                 <Input placeholder={intl.get('import.bucketName')} />
               </FormItem>
-              <FormItem name={['s3Config', 'accessKey']} label={intl.get('import.accessKeyId')} rules={[{ required: true, message: intl.get('formRules.accessKeyIdRequired') } ]}>
+              <FormItem name={['s3Config', 'accessKeyID']} label={intl.get('import.accessKeyId')} rules={[{ required: true, message: intl.get('formRules.accessKeyIdRequired') } ]}>
                 <Input placeholder={intl.get('import.accessKeyId')} />
               </FormItem>
               <FormItem name={['s3Config', 'accessSecret']} label={intl.get('import.accessKeySecret')} rules={[platform !== IS3Platform.Customize && { required: true, message: intl.get('formRules.accessKeySecretRequired') } ]}>

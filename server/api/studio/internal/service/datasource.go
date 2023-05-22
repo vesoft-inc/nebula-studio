@@ -89,7 +89,7 @@ func (d *datasourceService) Update(request types.DatasourceUpdateRequest) error 
 			s3Config.AccessSecret = dbs.Secret
 		}
 		cfg = &types.DatasourceS3Config{
-			AccessKey:    s3Config.AccessKey,
+			AccessKeyID:  s3Config.AccessKeyID,
 			AccessSecret: s3Config.AccessSecret,
 			Endpoint:     s3Config.Endpoint,
 			Bucket:       s3Config.Bucket,
@@ -384,7 +384,7 @@ func validateSftp(cfg *types.DatasourceSFTPConfig) error {
 }
 
 func validateS3(platform string, cfg *types.DatasourceS3Config) error {
-	_, err := filestore.NewS3Store(platform, cfg.Endpoint, cfg.Region, cfg.Bucket, cfg.AccessKey, cfg.AccessSecret)
+	_, err := filestore.NewS3Store(platform, cfg.Endpoint, cfg.Region, cfg.Bucket, cfg.AccessKeyID, cfg.AccessSecret)
 	if err != nil {
 		return fmt.Errorf("connect the s3 client error: %s", err)
 	}

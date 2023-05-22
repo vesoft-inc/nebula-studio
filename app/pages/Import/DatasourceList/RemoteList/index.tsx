@@ -26,7 +26,7 @@ const s3Columns: TableColumnType<IDatasourceItem>[] = [
   },
   {
     title: <Translation>{(i) => i.get('import.accessKeyId')}</Translation>,
-    dataIndex: ['s3Config', 'accessKey'],
+    dataIndex: ['s3Config', 'accessKeyID'],
   },
   {
     title: <Translation>{(i) => i.get('import.region')}</Translation>,

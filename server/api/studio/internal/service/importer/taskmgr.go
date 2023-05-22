@@ -68,16 +68,16 @@ func CreateConfigFile(taskdir string, cfgBytes []byte) error {
 		SFTPConfig := source.SourceConfig.SFTP
 		OSSConfig := source.SourceConfig.OSS
 		if S3Config != nil {
-			S3Config.AccessKey = "${YOUR_S3_ACCESS_KEY}"
-			S3Config.SecretKey = "${YOUR_S3_SECRET_KEY}"
+			S3Config.AccessKeyID = "${YOUR_S3_ACCESS_KEY}"
+			S3Config.AccessKeySecret = "${YOUR_S3_SECRET_KEY}"
 		}
 		if SFTPConfig != nil {
 			SFTPConfig.User = "${YOUR_SFTP_USER}"
 			SFTPConfig.Password = "${YOUR_SFTP_PASSWORD}"
 		}
 		if OSSConfig != nil {
-			OSSConfig.AccessKey = "${YOUR_OSS_ACCESS_KEY}"
-			OSSConfig.SecretKey = "${YOUR_OSS_SECRET_KEY}"
+			OSSConfig.AccessKeyID = "${YOUR_OSS_ACCESS_KEY}"
+			OSSConfig.AccessKeySecret = "${YOUR_OSS_SECRET_KEY}"
 		}
 	}
 	outYaml, err := yaml.Marshal(confv3)

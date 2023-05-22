@@ -29,7 +29,7 @@ type (
 		Endpoint     string
 		Region       string
 		Bucket       string
-		AccessKey    string
+		AccessKeyID  string
 		AccessSecret string
 	}
 )
@@ -41,7 +41,7 @@ func NewFileStore(typ, config, secret, platform string) (FileStore, error) {
 		if err := json.Unmarshal([]byte(config), &c); err != nil {
 			return nil, errors.New("parse the s3 config error")
 		}
-		return NewS3Store(platform, c.Endpoint, c.Region, c.Bucket, c.AccessKey, secret)
+		return NewS3Store(platform, c.Endpoint, c.Region, c.Bucket, c.AccessKeyID, secret)
 	case "sftp":
 		var c SftpConfig
 		if err := json.Unmarshal([]byte(config), &c); err != nil {

@@ -20,10 +20,10 @@ type S3Store struct {
 	Bucket   string
 }
 
-func NewS3Store(platform, endpoint, region, bucket, accessKey, accessSecret string) (*S3Store, error) {
+func NewS3Store(platform, endpoint, region, bucket, accessKeyID, accessSecret string) (*S3Store, error) {
 	cfg := &aws.Config{
 		Region:      aws.String(region),
-		Credentials: credentials.NewStaticCredentials(accessKey, accessSecret, ""),
+		Credentials: credentials.NewStaticCredentials(accessKeyID, accessSecret, ""),
 	}
 	switch platform {
 	case "oss":

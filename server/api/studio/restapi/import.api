@@ -49,13 +49,13 @@ type (
 	}
 
 	S3Config {
-		Endpoint  string `json:"endpoint,optional,omitempty"`
-		Region    string `json:"region,omitempty"`
-		AccessKey string `json:"accessKey,omitempty"`
-		SecretKey string `json:"secretKey,omitempty"`
-		Token     string `json:"token,optional,omitempty"`
-		Bucket    string `json:"bucket,omitempty"`
-		Key       string `json:"key,omitempty"`
+		Endpoint        string `json:"endpoint,optional,omitempty"`
+		Region          string `json:"region,omitempty"`
+		AccessKeyID     string `json:"accessKeyID,omitempty"`
+		AccessKeySecret string `json:"accessKeySecret,omitempty"`
+		Token           string `json:"token,optional,omitempty"`
+		Bucket          string `json:"bucket,omitempty"`
+		Key             string `json:"key,omitempty"`
 	}
 
 	SFTPConfig {
@@ -70,11 +70,11 @@ type (
 	}
 
 	OSSConfig {
-		Endpoint  string `json:"endpoint,omitempty"`
-		AccessKey string `json:"accessKey,omitempty"`
-		SecretKey string `json:"secretKey,omitempty"`
-		Bucket    string `json:"bucket,omitempty"`
-		Key       string `json:"key,omitempty"`
+		Endpoint        string `json:"endpoint,omitempty"`
+		AccessKeyID     string `json:"accessKeyID,omitempty"`
+		AccessKeySecret string `json:"accessKeySecret,omitempty"`
+		Bucket          string `json:"bucket,omitempty"`
+		Key             string `json:"key,omitempty"`
 	}
 
 	LocalConfig {

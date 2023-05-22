@@ -135,7 +135,7 @@ export class NgqlRunner {
         this.socket = socket;
         this.socketUrl = url;
         this.socketProtocols = protocols;
-        this.logoutFun = logoutFun;
+        logoutFun && (this.logoutFun = logoutFun);
         localStorage.setItem('socketUrl', JSON.stringify(url));
         protocols && localStorage.setItem('socketProtocols', JSON.stringify(protocols));
 
@@ -181,6 +181,7 @@ export class NgqlRunner {
 
     const msgReceive = safeParse<MessageReceive<NgqlRes>>(e.data, { paser: JSONBigint.parse });
     if (msgReceive?.body?.content?.code === HttpResCode.ErrSession) {
+      msgReceive?.body?.content?.message && message.error(msgReceive.body.content.message);
       this.logoutFun?.();
       return;
     }
