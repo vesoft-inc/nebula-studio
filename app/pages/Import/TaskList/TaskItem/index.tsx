@@ -69,6 +69,7 @@ const TaskItem = (props: IProps) => {
   const time = useRef('');
   const timeoutId = useRef<number>(null);
   const [rerunLoading, setRerunLoading] = useState(false);
+  const fromTemplate = useMemo(() => rawConfig && typeof JSON.parse(rawConfig) === 'string', [rawConfig]);
   const addMsg = () => failedProcessed > 0 && setExtraMsg(intl.get('import.notImported', { total: failedProcessed }));
   useEffect(() => {
     window.clearTimeout(timeoutId.current);
@@ -99,6 +100,14 @@ const TaskItem = (props: IProps) => {
   };
 
   const handleEdit = () => {
+    if (!rawConfig) {
+      antMsg.info(intl.get('import.editTaskError'));
+      return;
+    }
+    if(fromTemplate) {
+      antMsg.info(intl.get('import.templateRerunTip'));
+      return;
+    }
     history.push(`/import/edit/${id}`, {
       id,
       space,
@@ -108,7 +117,11 @@ const TaskItem = (props: IProps) => {
   };
 
   const handleRerun = () => {
-    if(needPwdConfirm) {
+    if(!rawConfig) {
+      antMsg.info(intl.get('import.rerunError'));
+      return;
+    }
+    if(needPwdConfirm && !fromTemplate) {
       setVisible(true);
       return;
     }
@@ -119,19 +132,25 @@ const TaskItem = (props: IProps) => {
     setVisible(false);
     setRerunLoading(true);
     const spaceVidType = await schema.getSpaceVidType(space);
-    const { basicConfig, tagConfig, edgeConfig } = JSON.parse(rawConfig);
-    const code = await importTask({
+    const config = JSON.parse(rawConfig);
+    const payload = {
       name: `task-${Date.now()}`,
-      config: {
+      password,
+      type: 'rerun'
+    } as any;
+    if(fromTemplate) {
+      payload.template = config;
+    } else {
+      const { basicConfig, tagConfig, edgeConfig } = config;
+      payload.config = {
         space,
         spaceVidType,
         basicConfig,
         tagConfig,
         edgeConfig
-      },
-      password,
-      type: 'rerun'
-    });
+      };
+    }
+    const code = await importTask(payload);
     setRerunLoading(false);
     if(code === 0) {
       antMsg.success(intl.get('import.startImporting'));

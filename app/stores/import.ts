@@ -238,21 +238,22 @@ export class ImportStore {
     const { template, name, password, id, config, type } = params;
     let _config;
     let rawConfig;
-    const { basicConfig, tagConfig, edgeConfig, space, spaceVidType } = config;
-    if(id !== undefined || type === 'rerun' || type === 'rebuild') {
+    if(template) {
+      // template import
+      _config = template;
+      rawConfig = template;
+    } else {
+      const { basicConfig, tagConfig, edgeConfig, space, spaceVidType } = config;
+      if(id !== undefined || type === 'rerun' || type === 'rebuild') {
       // id: import an existed draft task
       // rebuild: edit old task and save as new task
       // formData: rerun task directly
       // validate resource，maybe the resource has been deleted
-      const isValid = await this.validateResource({ tagConfig, edgeConfig });
-      if(isValid === false) {
-        return;
+        const isValid = await this.validateResource({ tagConfig, edgeConfig });
+        if(isValid === false) {
+          return;
+        }
       }
-    }
-    if(template) {
-      // template import
-      _config = template;
-    } else {
       const { username } = this.rootStore.global;
       _config = configToJson({
         ...basicConfig,
