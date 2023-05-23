@@ -1,5 +1,5 @@
 import { Button, Popconfirm, Table, message, Popover, Form, Input, Dropdown, Menu, Tooltip } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
 import Icon from '@app/components/Icon';
 import { trackPageView } from '@app/utils/stat';
@@ -102,23 +102,23 @@ const Schema = () => {
     }
   };
 
-  const handleSwitchSpace = async (space: string) => {
-    await switchSpace(space);
-    history.push(`/schema/tag/list`);
-  };
-  const getSpaces = async () => {
+  const viewSpaceDetail = useCallback(async (space: string) => {
+    const ok = await switchSpace(space);
+    ok && history.push(`/schema/tag/list`);
+  }, []);
+  const getSpaces = useCallback(async () => {
     setLoading(true);
     await getSpacesList();
     setLoading(false);
-  };
+  }, []);
 
-  const handleCloneSpace = async (name: string, oldSpace: string) => {
+  const handleCloneSpace = useCallback(async (name: string, oldSpace: string) => {
     const { code } = await cloneSpace(name, oldSpace);
     if(code === 0) {
       message.success(intl.get('schema.createSuccess'));
       getSpaces();
     }
-  };
+  }, []);
   const columns = [
     {
       title: intl.get('schema.No'),
@@ -137,7 +137,7 @@ const Schema = () => {
           <a
             className={styles.cellBtn}
             type="link"
-            onClick={() => handleSwitchSpace(data)}
+            onClick={() => viewSpaceDetail(data)}
             data-track-category="navigation"
             data-track-action="view_space_list"
             data-track-label="from_space_list"
@@ -193,7 +193,7 @@ const Schema = () => {
             <div className={styles.operation}>
               <Button
                 className="primaryBtn"
-                onClick={() => handleSwitchSpace(space.Name)}
+                onClick={() => viewSpaceDetail(space.Name)}
                 data-track-category="navigation"
                 data-track-action="view_space_list"
                 data-track-label="from_space_list"
