@@ -22,6 +22,7 @@ const Search = (props: IProps) => {
   const { schema: { currentSpace } } = useStore();
   useEffect(() => {
     setValue('');
+    onSearch('');
   }, [location.pathname, currentSpace]);
   const onChange = useCallback(e => {
     setValue(e.target.value);

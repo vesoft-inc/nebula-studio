@@ -323,7 +323,10 @@ export default {
     'modifyTime': '编辑时间',
     'taskNameRequired': '请填写任务名称并选择图空间',
     'fileMissing': '{files} 文件不存在，请重新上传文件或添加相关数据源',
-    'datasourceMissing': '{files} 所在数据源未找到，请重新添加相关数据源并重新配置任务'
+    'datasourceMissing': '{files} 所在数据源未找到，请重新添加相关数据源并重新配置任务',
+    'templateRerunTip': '模板导入生成的任务不支持编辑，请直接修改模板文件并导入',
+    'rerunError': '找不到任务配置记录，无法重跑任务',
+    'editTaskError': '找不到任务配置记录，无法继续编辑'
   },
   'schema': {
     'spaceList': '图空间列表',
