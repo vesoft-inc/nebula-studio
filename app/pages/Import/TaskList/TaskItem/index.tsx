@@ -10,6 +10,7 @@ import { useI18n } from '@vesoft-inc/i18n';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { useHistory } from 'react-router-dom';
+import { safeParse } from '@app/utils/function';
 import ConfigConfirmModal from '../../TaskCreate/ConfigConfirmModal';
 import styles from './index.module.less';
 interface IProps {
@@ -69,7 +70,7 @@ const TaskItem = (props: IProps) => {
   const time = useRef('');
   const timeoutId = useRef<number>(null);
   const [rerunLoading, setRerunLoading] = useState(false);
-  const fromTemplate = useMemo(() => rawConfig && typeof JSON.parse(rawConfig) === 'string', [rawConfig]);
+  const fromTemplate = useMemo(() => rawConfig && typeof safeParse(rawConfig) === 'string', [rawConfig]);
   const addMsg = () => failedProcessed > 0 && setExtraMsg(intl.get('import.notImported', { total: failedProcessed }));
   useEffect(() => {
     window.clearTimeout(timeoutId.current);
