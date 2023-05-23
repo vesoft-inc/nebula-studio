@@ -95,12 +95,14 @@ export class SchemaStore {
   updateVidType = async (space?: string) => {
     const spaceVidType = await this.getSpaceVidType(space || this.currentSpace);
     this.update({ spaceVidType });
+    return !!spaceVidType;
   };
 
   switchSpace = async (space: string) => {
     this.update({ currentSpace: space, ...initialSchemaData });
     localStorage.setItem('currentSpace', space);
-    await this.updateVidType(space);
+    const ok = await this.updateVidType(space);
+    return ok;
   };
 
   getSchemaInfo = async () => {
@@ -127,8 +129,8 @@ export class SchemaStore {
   };
 
   getSpaceVidType = async (space: string) => {
-    const { data } = await this.getSpaceInfo(space);
-    return data?.tables?.[0]?.['Vid Type'];
+    const { code, data } = await this.getSpaceInfo(space);
+    return code === 0 ? data?.tables?.[0]?.['Vid Type'] : null;
   };
 
   getSpaceCreateGQL = async (space: string) => {
