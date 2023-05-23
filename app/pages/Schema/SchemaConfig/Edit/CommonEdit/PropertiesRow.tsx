@@ -104,7 +104,7 @@ export const EditRow = (props: IEditProps) => {
                 ]}>
                 <Select disabled={!(type in DataTypeTransformMap) && data.alterType !== 'ADD'} showSearch={true} onChange={onUpdateType} dropdownMatchSelectWidth={false}>
                   {DATA_TYPE.map(item => {
-                    if(data.alterType !== 'ADD' && (!DataTypeTransformMap[type]?.includes(item.value) || item.value !== type)) {
+                    if(data.alterType !== 'ADD' && !DataTypeTransformMap[type]?.includes(item.value) && item.value !== type) {
                       return null;
                     }
                     return (
