@@ -1,4 +1,7 @@
 .helpMenu {
+  &:global(.ant-menu-dark.ant-menu-submenu>.ant-menu) {
+    background-color: #2f3a4a;
+  }
   :global {
     .ant-menu-submenu, .ant-menu-item, .ant-menu-title-content {
       display: flex;
@@ -18,6 +21,9 @@
   }
 }
 .accountMenu {
+  &:global(.ant-menu-dark.ant-menu-submenu>.ant-menu) {
+    background-color: #2f3a4a;
+  }
   :global(.ant-menu-title-content) {
     color: #fff;
   }
@@ -34,7 +40,12 @@
   }
 }
 .langMenu {
-  :global(.ant-menu-title-content) {
-    color: #fff;
+  &:global(.ant-menu-dark.ant-menu-submenu>.ant-menu) {
+    background-color: #2f3a4a;
+  }
+  & :global {
+    .ant-menu-title-content {
+      color: #fff;
+    }
   }
 }

@@ -17,7 +17,7 @@ import AuthorizedRoute from './AuthorizedRoute';
 import rootStore, { StoreProvider } from './stores';
 
 import 'dayjs/locale/zh-cn';
-import './utils/reset.css';
+import 'antd/dist/reset.css';
 import './common.less';
 import './app.less';
 
@@ -72,6 +72,8 @@ const App = () => {
         components: {
           Menu: {
             colorItemBg: '#2f3a4a',
+            colorPrimary: '#2f80ed',
+            margin: 20,
           },
         },
       }}
