@@ -124,13 +124,13 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
   };
 
   codemirrorValueChange = (doc, change) => {
-    const line = change.from.line;
-    const lineInfo = doc?.lineInfo(line);
-    if (lineInfo?.text?.startsWith('//') || lineInfo?.text?.startsWith('#')) {
-      doc.addLineClass(line, 'wrap', 'notes');
-    } else if(lineInfo?.wrapClass === 'notes') {
-      doc.removeLineClass(line, 'wrap', 'notes');
-    }
+    doc.eachLine(line => {
+      if(line.text.startsWith('//') || line.text.startsWith('#')) {
+        doc.addLineClass(line, 'wrap', 'notes');
+      } else if (line.wrapClass === 'notes') {
+        doc.removeLineClass(line, 'wrap', 'notes');
+      }
+    });
     if (change.origin !== 'setValue') {
       if (this.props.onChange) {
         this.props.onChange(doc.getValue());
