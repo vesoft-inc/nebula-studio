@@ -1,5 +1,5 @@
 import { Button, Select, Tooltip, message } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { trackEvent, trackPageView } from '@app/utils/stat';
 import { useStore } from '@app/stores';

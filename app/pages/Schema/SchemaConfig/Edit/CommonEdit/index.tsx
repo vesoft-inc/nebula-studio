@@ -1,5 +1,5 @@
 import { Button, Col, Form, Input, Row, Spin, message } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
 import { observer } from 'mobx-react-lite';
 import { useHistory, useLocation } from 'react-router-dom';

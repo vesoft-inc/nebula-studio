@@ -1,7 +1,7 @@
 import { useI18n } from '@vesoft-inc/i18n';
 import { Modal } from 'antd';
 import { observer } from 'mobx-react-lite';
-import React, { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import FileConfigSetting from '@app/components/FileConfigSetting';
 import { ICachedStore } from '@app/stores/datasource';
 import FileSelect from './FileSelect';

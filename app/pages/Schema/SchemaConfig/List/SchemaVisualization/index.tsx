@@ -1,6 +1,6 @@
 import { Button, message } from 'antd';
 import dayjs from 'dayjs';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
@@ -172,6 +172,7 @@ const SchemaVisualization = () => {
         };
       }).filter(line => line.from && line.to);
       makeLineSort(_lines);
+      // @ts-ignore
       await sketchModel.editor.schema.setData({ nodes, lines: _lines });
       await sketchModel.editor.schema.format();
       await sketchModel.editor.controller.autoFit();
@@ -193,6 +194,7 @@ const SchemaVisualization = () => {
     initEditor({ 
       container: editorRef.current, 
       schema,
+      // @ts-ignore
       options: { 
         mode: 'view',
         dagreOption: {

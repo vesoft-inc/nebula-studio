@@ -1,5 +1,4 @@
 import classnames from 'classnames';
-import React from 'react';
 
 import Icon from '@app/components/Icon';
 import styles from './index.module.less';

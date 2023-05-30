@@ -3,7 +3,7 @@ import { Button, Form, FormProps, Input } from 'antd';
 import { useI18n } from '@vesoft-inc/i18n';
 import { useStore } from '@app/stores';
 import { observer } from 'mobx-react-lite';
-import React, { useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { nameRulesFn, stringByteRulesFn } from '@app/config/rules';
 import { debounce } from 'lodash';
 import { ISchemaEnum } from '@app/interfaces/schema';

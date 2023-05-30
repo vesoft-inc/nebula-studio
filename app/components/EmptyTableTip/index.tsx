@@ -1,4 +1,3 @@
-import React from 'react';
 import emptyImg from '@app/static/images/empty.png';
 import styles from './index.module.less';
 

@@ -1,5 +1,5 @@
 import { Button, Table } from 'antd';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
 import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';

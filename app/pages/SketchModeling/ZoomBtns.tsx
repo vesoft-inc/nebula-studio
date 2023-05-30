@@ -1,7 +1,6 @@
 import Icon from '@app/components/Icon';
 import { useStore } from '@app/stores';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
 import cls from 'classnames';
 import styles from './index.module.less';
 

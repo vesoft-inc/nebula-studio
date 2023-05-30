@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback, PureComponent } from 'react';
 import errorImg from '@app/static/images/errorBoundary.png';
 import { I18nContext, useI18n } from '@vesoft-inc/i18n';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -37,7 +37,7 @@ function ErrorPanel(props: { errInfo: string }) {
   </div>;
 }
 
-class ErrorBoundary extends React.PureComponent<IProps, IState> {
+class ErrorBoundary extends PureComponent<IProps, IState> {
   constructor(props) {
     super(props);
     this.state = {

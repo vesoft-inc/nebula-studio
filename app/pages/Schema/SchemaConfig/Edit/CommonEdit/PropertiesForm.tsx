@@ -1,5 +1,5 @@
 import { Button, Checkbox, Col, Form, Modal, Row, message } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
 import { AlterType, IAlterForm, IProperty, ISchemaType } from '@app/interfaces/schema';

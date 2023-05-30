@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import styles from './index.module.less';

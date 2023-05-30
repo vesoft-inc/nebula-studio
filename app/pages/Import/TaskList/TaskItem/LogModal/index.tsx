@@ -1,5 +1,5 @@
 import { Button, Modal, Tabs } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Icon from '@app/components/Icon';
 import { useStore } from '@app/stores';
 import { ITaskStatus } from '@app/interfaces/import';

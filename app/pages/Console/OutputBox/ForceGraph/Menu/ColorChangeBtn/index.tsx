@@ -1,4 +1,3 @@
-import React from 'react';
 import { observer } from 'mobx-react-lite';
 import MenuButton from '@app/components/Button';
 import { uniq } from 'lodash';

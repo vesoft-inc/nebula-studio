@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import Icon from '@app/components/Icon';
 import { convertBigNumberToString, removeNullCharacters } from '@app/utils/function';

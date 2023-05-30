@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useI18n } from '@vesoft-inc/i18n';
 import { useStore } from '@app/stores';

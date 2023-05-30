@@ -1,5 +1,5 @@
 import { Button, List, Modal, Tooltip } from 'antd';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Icon from '@app/components/Icon';
 import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';

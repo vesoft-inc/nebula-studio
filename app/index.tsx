@@ -1,8 +1,7 @@
-import { hot } from 'react-hot-loader/root';
 import { Spin, message, ConfigProvider } from 'antd';
 import enUS from 'antd/locale/en_US';
 import zhCN from 'antd/locale/zh_CN';
-import React, { Suspense, lazy, useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import ReactDom from 'react-dom';
 import { Route, BrowserRouter as Router, Switch, useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
@@ -88,6 +87,4 @@ const App = () => {
   );
 };
 
-const HotPageRoot = hot(PageRoot);
-
-ReactDom.render(<HotPageRoot />, document.getElementById('studioApp'));
+ReactDom.render(<PageRoot />, document.getElementById('studioApp'));

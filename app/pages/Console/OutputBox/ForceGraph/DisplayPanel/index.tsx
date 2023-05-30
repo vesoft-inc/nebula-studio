@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import cls from 'classnames';
 import Icon from '@app/components/Icon';
 import { LinkObject, NodeObject } from '@vesoft-inc/force-graph';

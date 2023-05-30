@@ -1,4 +1,3 @@
-import React from 'react';
 import { Select } from 'antd';
 import { INTL_LOCALE_SELECT } from '@app/config';
 import Icon from '@app/components/Icon';

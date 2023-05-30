@@ -1,4 +1,3 @@
-import React from 'react';
 import { TwitterPicker } from 'react-color';
 
 import { COLOR_PICK_LIST } from '@app/config/explore';

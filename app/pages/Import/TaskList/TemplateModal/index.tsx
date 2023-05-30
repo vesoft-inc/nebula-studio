@@ -1,6 +1,6 @@
 /* eslint-disable no-template-curly-in-string */
 import { Button, Form, Input, Modal, Spin, Upload, message } from 'antd';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Icon from '@app/components/Icon';
 import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';

@@ -1,6 +1,6 @@
+import { Fragment } from 'react';
 import { Button, Checkbox, Col, Form, Input, Popover, Row, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
-import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { nameRulesFn, numberRulesFn, stringByteRulesFn } from '@app/config/rules';
 import Icon from '@app/components/Icon';
@@ -108,7 +108,7 @@ const PropertiesForm = (props: IProps) => {
                           </Row>
                         </Form.Item>
                         {fields.map(({ key, name, ...restField }, index) => (
-                          <React.Fragment key={key}>
+                          <Fragment key={key}>
                             <Row className={styles.fieldsItem}>
                               <Col span={4}>
                                 <Form.Item 
@@ -198,7 +198,7 @@ const PropertiesForm = (props: IProps) => {
                                 </Form.Item>
                               </Col>
                             </Row>
-                          </React.Fragment>
+                          </Fragment>
                         ))}
                       </Form.Item>
                     );

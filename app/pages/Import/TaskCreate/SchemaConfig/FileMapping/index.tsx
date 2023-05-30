@@ -1,5 +1,5 @@
 import { Button, Collapse, Input, Select, Table, Tooltip } from 'antd';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import cls from 'classnames';
 import { useStore } from '@app/stores';
@@ -56,6 +56,7 @@ const VIDSetting = observer((props: {
           <span className={cls(styles.label, styles.required)}>{intl.get(`import.${label}`)}</span>
           <CSVPreviewLink
             onMapping={(index) => handleMapping(index)}
+            // @ts-ignore
             file={data.file}
             data={data[idKey]}
             multipleMode={true}
@@ -192,6 +193,7 @@ const FileMapping = (props: IProps) => {
       render: (mappingIndex, _, propIndex) => (
         <CSVPreviewLink
           onMapping={columnIndex => updateFilePropMapping(propIndex, columnIndex as number)}
+          // @ts-ignore
           file={file}
           data={item[propIndex]?.mapping}
         >

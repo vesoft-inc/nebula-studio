@@ -1,5 +1,5 @@
 import { Tabs } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LinkObject, NodeObject } from '@vesoft-inc/force-graph';
 import { useI18n } from '@vesoft-inc/i18n';
 import ExpandItem from '../ExpandItem';

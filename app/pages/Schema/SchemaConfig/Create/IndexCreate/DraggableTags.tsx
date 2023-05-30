@@ -1,5 +1,5 @@
 import { Tag } from 'antd';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import styles from './index.module.less';
 

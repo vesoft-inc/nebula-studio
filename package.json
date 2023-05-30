@@ -3,17 +3,21 @@
   "version": "3.7.0",
   "description": "nebula-graph-studio",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vesoft-inc/nebula-studio.git"
+  },
+  "license": "Apache 2.0",
   "scripts": {
-    "dev": "webpack-dev-server --config ./config/webpack.dev.js --mode development --color --progress --hot",
-    "lint": "eslint 'app/**/*.{ts,tsx}' && stylelint **/*.{html,less}",
-    "lint-fix": "eslint 'app/**/*.{ts,tsx}' --fix && stylelint **/*.{html,less} --fix",
-    "build": "webpack --config config/webpack.prod.js",
-    "dev-all": "node ./config/server.js"
+    "start": "vite",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "postinstall": "husky install"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.1.2",
+    "@ant-design/icons": "^5.1.3",
     "@ant-design/pro-layout": "^7.13.5",
-    "@hot-loader/react-dom": "^17.0.1",
     "@vesoft-inc/force-graph": "2.0.7",
     "@vesoft-inc/i18n": "^1.0.0",
     "@vesoft-inc/veditor": "4.4.2",
@@ -38,102 +42,67 @@
     "json2yaml": "^1.1.0",
     "lodash": "^4.17.15",
     "lodash.debounce": "^4.0.8",
-    "mobx": "^6.3.8",
-    "mobx-react-lite": "^3.2.2",
+    "mobx": "^6.9.0",
+    "mobx-react-lite": "^3.4.3",
     "query-string": "^7.1.1",
-    "react": "^17.0.0",
+    "react": "^17.0.2",
     "react-beautiful-dnd": "^13.0.0",
     "react-color": "^2.19.3",
-    "react-copy-to-clipboard": "^5.0.3",
-    "react-dom": "^17.0.0",
-    "react-hot-loader": "^4.12.16",
+    "react-copy-to-clipboard": "^5.1.0",
+    "react-dom": "^17.0.2",
     "react-papaparse": "^4.1.0",
     "react-router-dom": "^5.3.0",
     "uuid": "^8.3.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.5",
-    "@babel/plugin-proposal-class-properties": "^7.14.0",
-    "@babel/plugin-proposal-decorators": "^7.15.0",
-    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
-    "@babel/plugin-transform-runtime": "^7.15.0",
-    "@babel/preset-env": "^7.15.0",
-    "@babel/preset-react": "^7.14.0",
-    "@babel/preset-typescript": "^7.16.7",
-    "@babel/runtime": "^7.15.0",
-    "@commitlint/cli": "^13.1.0",
-    "@commitlint/config-conventional": "^13.1.0",
     "@types/bezier-js": "^4.1.0",
     "@types/d3-color": "^3.0.2",
     "@types/dagre": "^0.7.46",
     "@types/json-bigint": "^1.0.1",
     "@types/lodash": "^4.14.144",
     "@types/node": "^16.7.0",
-    "@types/react": "^17.0.20",
-    "@types/react-redux": "^7.1.22",
+    "@types/react": "^17.0.60",
+    "@types/react-dom": "^17.0.20",
     "@types/react-router-dom": "^5.1.0",
     "@types/supertest": "^2.0.0",
     "@types/uuid": "^8.3.4",
-    "@types/webpack": "^5.28.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
-    "antd-dayjs-webpack-plugin": "^1.0.6",
-    "babel-loader": "^8.2.2",
-    "babel-plugin-import": "^1.13.0",
-    "babel-preset-react": "^6.24.1",
-    "bundle-loader": "^0.5.6",
-    "clean-webpack-plugin": "^4.0.0",
-    "copy-webpack-plugin": "^11.0.0",
-    "css-loader": "^5.0.1",
-    "eslint": "^8.0.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jsdoc": "^38.0.0",
-    "eslint-plugin-jsx-a11y": "^6.1.1",
-    "eslint-plugin-prefer-arrow": "^1.2.2",
-    "eslint-plugin-prettier": "^3.3.0",
-    "eslint-plugin-react": "^7.22.0",
-    "eslint-plugin-unused-imports": "^2.0.0",
-    "file-loader": "^6.2.0",
-    "html-webpack-plugin": "^5.5.0",
-    "husky": "^7.0.0",
+    "@vitejs/plugin-legacy": "^4.0.4",
+    "@vitejs/plugin-react-swc": "^3.3.1",
+    "autoprefixer": "^10.4.14",
+    "eslint": "^8.41.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.1",
+    "husky": "^8.0.3",
     "less": "^4.1.1",
-    "less-loader": "^10.2.0",
-    "mini-css-extract-plugin": "^2.5.0",
     "postcss": "^8.4.12",
-    "postcss-loader": "^6.2.1",
+    "postcss-preset-env": "^8.4.1",
     "prettier": "^2.3.2",
     "react-dev-utils": "^12.0.0",
-    "style-loader": "^2.0.0",
-    "stylelint": "^13.13.1",
-    "stylelint-config-recommended": "^5.0.0",
-    "stylelint-config-standard": "^22.0.0",
-    "typescript": "^4.5.0",
-    "url-loader": "^4.1.1",
-    "webpack": "^5.66.0",
-    "webpack-bundle-analyzer": "^4.5.0",
-    "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.7.3",
-    "webpack-merge": "^5.8.0"
+    "stylelint": "^15.6.2",
+    "stylelint-config-recommended": "^12.0.0",
+    "stylelint-config-standard": "^33.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^4.3.9",
+    "vite-plugin-top-level-await": "^1.3.1"
   },
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=16.8.0"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint",
-      "commit-msg": "commitlint --config ./.commitlint.js -E HUSKY_GIT_PARAMS"
+      "pre-commit": "lint-staged"
     }
+  },
+  "lint-staged": {
+    "./app/**/*.{js,jsx,ts,tsx}": [
+      "npx prettier --write",
+      "eslint './app/**/*.{js,jsx,ts,tsx}' --fix"
+    ]
   },
   "ci": {
     "version": "8"
-  },
-  "repository": {
-    "type": "git",
-    "url": ""
-  },
-  "eslintIgnore": [
-    "coverage"
-  ],
-  "license": "Apache 2.0"
+  }
 }

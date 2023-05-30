@@ -1,6 +1,5 @@
 import { Breadcrumb } from 'antd';
 import { PageHeader } from '@ant-design/pro-layout';
-import React from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '@app/components/Icon';
 

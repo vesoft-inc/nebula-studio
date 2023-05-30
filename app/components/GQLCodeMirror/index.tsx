@@ -1,5 +1,4 @@
 import { Collapse } from 'antd';
-import React from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
 
 import CodeMirror from '@app/components/CodeMirror';

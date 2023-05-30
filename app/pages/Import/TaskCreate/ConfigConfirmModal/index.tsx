@@ -3,7 +3,7 @@ import { ITagItem, IEdgeItem } from '@app/stores/import';
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Input, Modal } from 'antd';
 import { observer } from 'mobx-react-lite';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import styles from './index.module.less';
 interface IProps {

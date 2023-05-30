@@ -1,5 +1,5 @@
 import { Radio, RadioChangeEvent } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Route, useHistory, useLocation } from 'react-router-dom';
 import { trackPageView } from '@app/utils/stat';
 import cls from 'classnames';

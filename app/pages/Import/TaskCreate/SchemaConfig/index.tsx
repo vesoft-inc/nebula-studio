@@ -1,5 +1,5 @@
 import { Button, Collapse, Select } from 'antd';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
@@ -61,12 +61,14 @@ const SchemaConfig = (props: IProps) => {
 
   const addFileSource = useCallback(() => {
     const payload = { file: undefined, props: configItem.props };
+    // @ts-ignore
     configItem.addFileItem(configItem.type === ISchemaEnum.Tag ? new TagFileItem(payload) : new EdgeFileItem(payload));
   }, [configItem]);
 
   const resetFileSource = useCallback((item: ITagFileItem | IEdgeFileItem, file: IImportFile) => {
     const index = configItem.files.findIndex(f => f === item);
     const payload = { file, props: [...configItem.props] };
+    // @ts-ignore
     configItem.resetFileItem(index, configItem.type === ISchemaEnum.Tag ? new TagFileItem(payload) : new EdgeFileItem(payload));
   }, [configItem]);
 
@@ -80,6 +82,7 @@ const SchemaConfig = (props: IProps) => {
     updateConfigItemName(configItem, name);
   }, [configItem]);
 
+  // @ts-ignore
   const clearFileSource = useCallback((item: ITagFileItem | IEdgeFileItem) => configItem.deleteFileItem(item), [configItem]);
   return (
     <Collapse

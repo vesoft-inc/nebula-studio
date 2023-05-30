@@ -1,6 +1,6 @@
 import Icon from '@app/components/Icon';
 import { Input, InputRef } from 'antd';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import styles from './index.module.less';
 
 export default function SketchTitleInput(props: { value?: string; onChange?: (value: string) => void }) {

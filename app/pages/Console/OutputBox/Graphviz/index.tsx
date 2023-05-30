@@ -1,5 +1,5 @@
 import { GraphvizOptions, graphviz } from 'd3-graphviz';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import cls from 'classnames';
 import styles from './index.module.less';
 

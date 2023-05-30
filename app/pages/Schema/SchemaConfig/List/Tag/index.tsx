@@ -1,5 +1,5 @@
 import { Button, Popconfirm, Table, message } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
 import { Link } from 'react-router-dom';
 import Icon from '@app/components/Icon';

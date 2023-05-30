@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Popover, Tabs } from 'antd';
 import ColorPicker from '@app/components/ColorPicker';
 

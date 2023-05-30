@@ -116,7 +116,6 @@ const commonConfig = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        NO_INTL: JSON.stringify(process.env.npm_config_nointl ? '1' : '0'),
         VERSION: JSON.stringify(Package.version),
       },
     }),
