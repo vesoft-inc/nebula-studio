@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { defineConfig, loadEnv } from 'vite';
-import type { PluginOption, ResolvedConfig } from 'vite';
+import type { Plugin, ResolvedConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
 import postCssPresetEnv from 'postcss-preset-env';
@@ -12,7 +12,7 @@ import pkg from './package.json';
 
 const appConfig = getAppConfig();
 
-const htmlPlugin = (data?: Record<string, unknown>): PluginOption => {
+const htmlPlugin = (data?: Record<string, unknown>): Plugin => {
   let viteConfig = undefined as unknown as ResolvedConfig;
   return {
     name: 'html-transform',
@@ -83,7 +83,7 @@ export default defineConfig({
       plugins: [
         autoprefixer(),
         postCssPresetEnv({
-          browsers: ['> 1% in CN', 'last 2 versions', 'ios >= 9', 'Android >= 4.4'],
+          browsers: ['> 1%', 'Chrome >= 89', 'Firefox ESR', 'Safari >= 14'],
         }),
       ],
     },
