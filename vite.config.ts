@@ -1,22 +1,41 @@
 import path from 'node:path';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
+import type { PluginOption, ResolvedConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
 import postCssPresetEnv from 'postcss-preset-env';
+import ejs from 'ejs';
 // import legacy from '@vitejs/plugin-legacy';
-import topLevelAwait from "vite-plugin-top-level-await";
-// import { getAppConfig } from './build/config';
+import topLevelAwait from 'vite-plugin-top-level-await';
+import { getAppConfig } from './build/config';
 import pkg from './package.json';
 
-// const appConfig = getAppConfig();
+const appConfig = getAppConfig();
 
-// console.log('=====appConfig', appConfig);
+const htmlPlugin = (data?: Record<string, unknown>): PluginOption => {
+  let viteConfig = undefined as unknown as ResolvedConfig;
+  return {
+    name: 'html-transform',
+    enforce: 'pre',
+    configResolved(config) {
+      viteConfig = config;
+    },
+    transformIndexHtml(html) {
+      const envConfig = loadEnv(viteConfig.mode, viteConfig.envDir, viteConfig.envPrefix || '');
+      // assign with viteConfig.define['process.env']
+      const defineProcessEnv = viteConfig.define?.['process.env'] || {};
+      const initProps = { ...envConfig, ...defineProcessEnv, ...data };
+      return ejs.render(html, { initProps });
+    },
+  };
+};
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     topLevelAwait(),
+    htmlPlugin({ maxBytes: appConfig.MaxBytes }),
     // legacy({
     //   targets: ['chrome >= 87', 'safari >= 14', 'firefox >= 78'],
     //   polyfills: ['es.promise.finally', 'es/map', 'es/set', 'es/array'],

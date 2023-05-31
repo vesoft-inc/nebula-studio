@@ -1,18 +1,19 @@
-import { SVGProps } from 'react';
+import cls from 'classnames';
 
-import './index.less';
-
-interface IProps extends SVGProps<any> {
+interface IProps {
   type: string;
   className?: string;
+  onClick?: () => void;
 }
 
 const Icon = (props: IProps) => {
-  const { type, className, ...others } = props;
+  const { type, className, onClick } = props;
   return (
-    <svg className={`icon ${className ? className : ''}`} aria-hidden="true" {...others}>
-      <use href={`#${type}`} />
-    </svg>
+    <span role="img" className={cls('anticon', className)} onClick={onClick}>
+      <svg width="1em" height="1em" fill="currentColor" aria-hidden="true">
+        <use href={`#${type}`} />
+      </svg>
+    </span>
   );
 };
 
