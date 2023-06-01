@@ -6,7 +6,7 @@ import autoprefixer from 'autoprefixer';
 import postCssPresetEnv from 'postcss-preset-env';
 import ejs from 'ejs';
 // import legacy from '@vitejs/plugin-legacy';
-import topLevelAwait from 'vite-plugin-top-level-await';
+// import topLevelAwait from 'vite-plugin-top-level-await';
 import { getAppConfig } from './build/config';
 import pkg from './package.json';
 
@@ -32,9 +32,12 @@ const htmlPlugin = (data?: Record<string, unknown>): Plugin => {
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  build: {
+    target: 'esnext',
+  },
   plugins: [
     react(),
-    topLevelAwait(),
+    // topLevelAwait(),
     htmlPlugin({ maxBytes: appConfig.MaxBytes }),
     // legacy({
     //   targets: ['chrome >= 87', 'safari >= 14', 'firefox >= 78'],
