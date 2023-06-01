@@ -1,4 +1,5 @@
 import path from 'node:path';
+import fs from 'node:fs';
 import { defineConfig, loadEnv } from 'vite';
 import type { Plugin, ResolvedConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
@@ -11,6 +12,7 @@ import { getAppConfig } from './build/config';
 import pkg from './package.json';
 
 const appConfig = getAppConfig();
+const SVGElement = fs.readFileSync('./public/icons/iconpark.tpl', 'utf-8');
 
 const htmlPlugin = (data?: Record<string, unknown>): Plugin => {
   let viteConfig = undefined as unknown as ResolvedConfig;
@@ -25,7 +27,7 @@ const htmlPlugin = (data?: Record<string, unknown>): Plugin => {
       // assign with viteConfig.define['process.env']
       const defineProcessEnv = viteConfig.define?.['process.env'] || {};
       const initProps = { ...envConfig, ...defineProcessEnv, ...data };
-      return ejs.render(html, { initProps });
+      return ejs.render(html, { initProps }).replace('<!--SVGElement-->', SVGElement);
     },
   };
 };
