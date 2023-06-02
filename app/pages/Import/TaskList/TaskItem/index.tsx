@@ -1,6 +1,6 @@
 import { Button, Popconfirm, Progress, Tooltip, message as antMsg } from 'antd';
 import { CheckCircleFilled } from '@ant-design/icons';
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { ITaskItem, ITaskStatus } from '@app/interfaces/import';
 import dayjs from 'dayjs';
 import { floor } from 'lodash';

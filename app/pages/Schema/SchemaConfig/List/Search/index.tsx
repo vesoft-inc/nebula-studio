@@ -1,5 +1,5 @@
 import { Input } from 'antd';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
 import { SearchOutlined } from '@ant-design/icons';
 import { useLocation } from 'react-router-dom';

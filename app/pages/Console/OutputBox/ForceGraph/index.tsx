@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { Spin } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { parseSubGraph } from '@app/utils/parseData';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@app/stores';

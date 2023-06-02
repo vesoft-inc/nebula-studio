@@ -2,7 +2,7 @@ import Icon from '@app/components/Icon';
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Input, Modal, Table, Popconfirm, Dropdown } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { usePapaParse } from 'react-papaparse';
 import cls from 'classnames';
 import { StudioFile } from '@app/interfaces/import';

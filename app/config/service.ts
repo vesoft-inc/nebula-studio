@@ -108,7 +108,7 @@ const service = {
   deleteDatasource: (id: number, config?) => {
     return _delete(`/api/datasources/${id}`)(undefined, config);
   },
-  batchDeleteDatasource: (payload, config?) => {
+  batchDeleteDatasource: (payload, _config?) => {
     return _delete(`/api/datasources`)(undefined, { data: payload });
   },
   getDatasourceDetail: (params, config?) => {

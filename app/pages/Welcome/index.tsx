@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Button, Carousel, Checkbox, Col, message, Modal, Progress, Row, Tabs, TabsProps, Tag, Tooltip } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { useI18n, getI18n } from '@vesoft-inc/i18n';

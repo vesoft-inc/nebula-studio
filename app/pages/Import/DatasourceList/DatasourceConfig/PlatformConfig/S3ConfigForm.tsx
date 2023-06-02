@@ -1,6 +1,6 @@
 import { useI18n } from '@vesoft-inc/i18n';
 import { Input, Form, Select, FormInstance } from 'antd';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { IS3Platform } from '@app/interfaces/datasource';
 import Instruction from '@app/components/Instruction';

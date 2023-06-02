@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { GraphStore } from '@app/stores/graph';
 import Icon from '@app/components/Icon';
 

@@ -1,7 +1,7 @@
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Input, Modal, Table, Form, Row, Col, message, Checkbox } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
-import React, { PropsWithChildren, useCallback, useEffect } from 'react';
+import { PropsWithChildren, useCallback, useEffect } from 'react';
 import { usePapaParse } from 'react-papaparse';
 import { StudioFile } from '@app/interfaces/import';
 import { observer } from 'mobx-react-lite';

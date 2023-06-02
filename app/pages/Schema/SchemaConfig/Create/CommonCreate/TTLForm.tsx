@@ -1,6 +1,5 @@
 import { Checkbox, Col, Form, Input, Row, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
-import React from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { useI18n } from '@vesoft-inc/i18n';

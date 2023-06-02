@@ -1,3 +1,4 @@
+import { PureComponent } from 'react';
 import CodeMirror from 'codemirror';
 import 'codemirror/addon/comment/comment';
 import 'codemirror/addon/display/autorefresh';
@@ -8,7 +9,6 @@ import 'codemirror/keymap/sublime';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/meta';
 import 'codemirror/theme/monokai.css';
-import React from 'react';
 
 import { ban, keyWords, operators } from '@app/config/nebulaQL';
 
@@ -26,7 +26,7 @@ interface IProps {
   onChangeLine?: () => void;
 }
 
-export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
+export default class ReactCodeMirror extends PureComponent<IProps, any> {
   codemirror;
   editor;
   textarea;
@@ -161,7 +161,7 @@ export default class ReactCodeMirror extends React.PureComponent<IProps, any> {
     if (typeof options === 'object') {
       const mode = CodeMirror.findModeByName(options.mode);
       if (mode && mode.mode) {
-        await import(`codemirror/mode/${mode.mode}/${mode.mode}.js`);
+        await import(/* @vite-ignore */`codemirror/mode/${mode.mode}/${mode.mode}.js`);
       }
       if (mode) {
         options.mode = mode.mime;

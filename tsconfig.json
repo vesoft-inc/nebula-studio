@@ -2,34 +2,37 @@
   "compileOnSave": true,
   "compilerOptions": {
     "target": "esnext",
-    "strict": true,
-    "noImplicitAny": false,
+    "strict": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "jsx": "react",
-    "charset": "utf8",
+    "jsx": "react-jsx",
     "allowJs": false,
     "pretty": true,
-    "noEmitOnError": false,
+    "noEmit": true,
+    "isolatedModules": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
+    "allowUnusedLabels": true,
     "strictPropertyInitialization": false,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "sourceMap": true,
     "strictNullChecks": false,
     "importHelpers": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "module": "esnext",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "baseUrl": ".",
     "paths": {
       "@public/*": ["public/*"],
       "@app/*": ["app/*"]
     }
-  },
+  }
 }

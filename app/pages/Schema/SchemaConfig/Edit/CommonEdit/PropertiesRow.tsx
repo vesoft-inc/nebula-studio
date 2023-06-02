@@ -1,5 +1,4 @@
 import { Button, Checkbox, Col, Form, Input, Popconfirm, Popover, Row, Select } from 'antd';
-import React from 'react';
 import { AlterType, IProperty } from '@app/interfaces/schema';
 import { useI18n } from '@vesoft-inc/i18n';
 import { nameRulesFn, numberRulesFn, stringByteRulesFn } from '@app/config/rules';

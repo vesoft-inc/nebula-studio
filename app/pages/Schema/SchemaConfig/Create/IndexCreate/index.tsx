@@ -1,5 +1,5 @@
 import { Button, Col, Form, Input, Row, Select, message } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import queryString from 'query-string';
 import { nameRulesFn, stringByteRulesFn } from '@app/config/rules';

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Menu } from 'antd';
 import Icon from '@app/components/Icon';
 import { Link } from 'react-router-dom';

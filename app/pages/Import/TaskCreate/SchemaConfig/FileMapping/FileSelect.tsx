@@ -8,7 +8,7 @@ import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Select, Spin, Tooltip } from 'antd';
 import cls from 'classnames';
 import { observer } from 'mobx-react-lite';
-import React, { useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import styles from './index.module.less';
 const Option = Select.Option;
 interface IFileSelect {

@@ -1,6 +1,6 @@
 import { useI18n } from '@vesoft-inc/i18n';
 import { Input, Form, FormInstance, InputNumber } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
 const FormItem = Form.Item;

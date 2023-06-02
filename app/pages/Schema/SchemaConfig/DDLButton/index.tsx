@@ -1,6 +1,6 @@
 import { Button, message, Modal, Spin } from 'antd';
 import Icon from '@app/components/Icon';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import CodeMirror from '@app/components/CodeMirror';

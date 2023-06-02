@@ -1,5 +1,5 @@
 import { Popover, Radio, Button, Form, Select, message } from 'antd';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useI18n } from '@vesoft-inc/i18n';
 import CreateForm from '@app/pages/Schema/SpaceCreate/CreateForm';

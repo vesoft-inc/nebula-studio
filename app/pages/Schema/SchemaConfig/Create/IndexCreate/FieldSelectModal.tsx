@@ -1,5 +1,5 @@
 import { Button, Input, Modal, Select, message } from 'antd';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { IField } from '@app/interfaces/schema';
 import { POSITIVE_INTEGER_REGEX } from '@app/utils/constant';

@@ -1,6 +1,6 @@
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Modal, Form, Select, message } from 'antd';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { IDatasourceItem, IDatasourceType } from '@app/interfaces/datasource';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@app/stores';

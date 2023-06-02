@@ -1,6 +1,6 @@
 import { useI18n } from '@vesoft-inc/i18n';
 import { message, Modal, Upload } from 'antd';
-import React, { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren, useState } from 'react';
 import { StudioFile } from '@app/interfaces/import';
 import { useStore } from '@app/stores';
 import { observer } from 'mobx-react-lite';

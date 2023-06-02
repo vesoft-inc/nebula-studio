@@ -1,5 +1,5 @@
 import { Button, Col, Form, Input, Row, message } from 'antd';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { nameRulesFn, stringByteRulesFn } from '@app/config/rules';
 import { useHistory } from 'react-router-dom';

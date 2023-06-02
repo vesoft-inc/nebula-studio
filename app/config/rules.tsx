@@ -1,4 +1,3 @@
-import React from 'react';
 import { Translation } from '@vesoft-inc/i18n';
 import { MAX_COMMENT_BYTES, POSITIVE_INTEGER_REGEX } from '@app/utils/constant';
 import { getByteLength } from '@app/utils/function';

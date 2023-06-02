@@ -1,5 +1,5 @@
 import { Radio, Select } from 'antd';
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Route, useHistory, useParams } from 'react-router-dom';
 import { useI18n } from '@vesoft-inc/i18n';
 import { trackPageView } from '@app/utils/stat';

@@ -1,6 +1,6 @@
+import { Fragment } from 'react';
 import { Button, Col, Form, Input, Row, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
-import React from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
 import { observer } from 'mobx-react-lite';
 import { nameRulesFn, numberRulesFn } from '@app/config/rules';
@@ -97,7 +97,7 @@ const PropertiesForm = (props: IProps) => {
                         {fields.map(({ key, name, ...restField }, index) => {
                           const hasSameName = properties.some((item, i) => item.name && item.name === properties[index].name && i !== index);
                           return (
-                            <React.Fragment key={key}>
+                            <Fragment key={key}>
                               <Row className={styles.fieldsItem}>
                                 <Col span={9}>
                                   <Form.Item
@@ -164,7 +164,7 @@ const PropertiesForm = (props: IProps) => {
                                 </Col>
                                 {hasSameName && <Form.ErrorList className={styles.errors} errors={errors} />}
                               </Row>
-                            </React.Fragment>
+                            </Fragment>
                           );
                         })}
                       </Form.Item>

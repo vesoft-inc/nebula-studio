@@ -1,5 +1,5 @@
 import { Button, Popconfirm, Table, message, Popover, Form, Input, Dropdown, Menu, Tooltip } from 'antd';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
 import Icon from '@app/components/Icon';
 import { trackPageView } from '@app/utils/stat';

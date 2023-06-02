@@ -1,5 +1,5 @@
 import { Button, List, Modal, Tooltip, Popconfirm } from 'antd';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
 import { useStore } from '@app/stores';

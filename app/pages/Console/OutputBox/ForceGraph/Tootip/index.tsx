@@ -1,5 +1,4 @@
 import ReactDOM from 'react-dom';
-import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { LinkObject, NodeObject } from '@vesoft-inc/force-graph';
 import { onPointerMove } from '@app/utils';

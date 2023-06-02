@@ -1,7 +1,7 @@
 import Icon from '@app/components/Icon';
 import { Button, Input, Popconfirm, Modal, message } from 'antd';
 import { observer } from 'mobx-react-lite';
-import React, { useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
 import cls from 'classnames';
 import { useStore } from '@app/stores';
@@ -119,6 +119,7 @@ const SketchList: React.FC = () => {
                   <Icon className={styles.closeBtn} type="icon-studio-btn-close" onClick={e => e.stopPropagation()} />
                 </Popconfirm>
               </div>
+              {/* @ts-ignore */}
               <span className={styles.count}>{intl.get('common.tag')} {schema.nodes?.length || 0} | {intl.get('common.edge')} {schema.lines?.length || 0}</span>
               <div className={styles.snapshot} style={{ backgroundImage: `url(${item.snapshot})` }} />
             </div>

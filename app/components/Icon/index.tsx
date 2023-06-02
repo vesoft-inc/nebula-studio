@@ -1,7 +1,19 @@
-import { createFromIconfontCN } from '@ant-design/icons';
-import icon from '@app/static/fonts/iconpark.js';
-const IconFont = createFromIconfontCN({
-  scriptUrl: icon,
-});
+import cls from 'classnames';
 
-export default IconFont;
+interface IProps extends React.HTMLProps<HTMLSpanElement> {
+  type: string;
+  className?: string;
+}
+
+const Icon = (props: IProps) => {
+  const { type, className, ...otherProps } = props;
+  return (
+    <span role="img" className={cls('anticon', className)} {...otherProps}>
+      <svg width="1em" height="1em" fill="currentColor" aria-hidden="true">
+        <use href={`#${type}`} />
+      </svg>
+    </span>
+  );
+};
+
+export default Icon;

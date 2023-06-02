@@ -1,4 +1,3 @@
-import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Tabs, TabsProps } from 'antd';
 import { useI18n } from '@vesoft-inc/i18n';

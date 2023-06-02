@@ -1,5 +1,5 @@
 import { Col, Form, Input, Row, Select, FormProps } from 'antd';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useStore } from '@app/stores';
 import { nameRulesFn, numberRulesFn, replicaRulesFn, stringByteRulesFn } from '@app/config/rules';
 import { useI18n } from '@vesoft-inc/i18n';
