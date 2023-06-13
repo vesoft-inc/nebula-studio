@@ -52,15 +52,15 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api-nebula': {
-        target: 'http://192.168.8.131:7002',
+        target: 'http://127.0.0.1:9000',
         changeOrigin: true,
       },
       '/api': {
-        target: 'http://192.168.8.131:7002',
+        target: 'http://127.0.0.1:9000',
         changeOrigin: true,
       },
       '/nebula_ws': {
-        target: 'ws://192.168.8.131:7002',
+        target: 'ws://127.0.0.1:9000',
         changeOrigin: true,
         secure: false,
         ws: true,

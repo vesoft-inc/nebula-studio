@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"os/user"
 	"strings"
 
 	"github.com/pkg/sftp"
@@ -93,12 +92,12 @@ func (s *SftpStore) ReadFile(path string, startLine ...int) ([]string, error) {
 
 func (s *SftpStore) ListFiles(dir string) ([]FileConfig, error) {
 	var files []FileConfig
+	var err error
 	if dir == "" {
-		user, err := user.Lookup(s.Username)
+		dir, err = s.SftpClient.Getwd()
 		if err != nil {
 			return nil, err
 		}
-		dir = user.HomeDir
 	}
 
 	_files, err := s.SftpClient.ReadDir(dir)
