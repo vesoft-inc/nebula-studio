@@ -36,25 +36,27 @@ const DatasourceConfigModal = (props: IProps) => {
   const submit = async (values: IDatasourceItem) => {
     const _type = values.type || type;
     setLoading(true);
-    if(mode === 'create') {
+    if (mode === 'create') {
       const flag = await addDataSource({
         type: _type,
         name: '',
-        ...values
+        ...values,
       });
       setLoading(false);
       flag && (message.success(intl.get('schema.createSuccess')), onConfirm());
       return;
-    } 
+    }
     switch (_type) {
-      case IDatasourceType.S3:
+      case IDatasourceType.S3: {
         const s3Cfg = values.s3Config;
         s3Cfg.accessSecret === tempPwd && (s3Cfg.accessSecret = undefined);
         break;
-      case IDatasourceType.SFTP:
+      }
+      case IDatasourceType.SFTP: {
         const sftpCfg = values.sftpConfig;
         sftpCfg.password === tempPwd && (sftpCfg.password = undefined);
         break;
+      }
       default:
         break;
     }
@@ -62,14 +64,14 @@ const DatasourceConfigModal = (props: IProps) => {
       id: data.id,
       type: _type,
       name: '',
-      ...values
+      ...values,
     });
     setLoading(false);
     flag && (message.success(intl.get('common.updateSuccess')), onConfirm());
   };
 
-  if(!visible) return null;
-  
+  if (!visible) return null;
+
   return (
     <Modal
       title={intl.get(mode === 'edit' ? 'import.editDataSource' : 'import.newDataSource')}
@@ -80,8 +82,7 @@ const DatasourceConfigModal = (props: IProps) => {
       className={styles.dataSourceModal}
       footer={false}
     >
-      <Form form={form} 
-        layout="horizontal" {...fomrItemLayout} onFinish={submit} initialValues={{ ...data }}>
+      <Form form={form} layout="horizontal" {...fomrItemLayout} onFinish={submit} initialValues={{ ...data }}>
         <FormItem noStyle shouldUpdate>
           {({ getFieldValue }) => {
             const configType = type || getFieldValue('type');
@@ -89,13 +90,15 @@ const DatasourceConfigModal = (props: IProps) => {
             return <p className={styles.tip}>{intl.get('import.s3Tip')}</p>;
           }}
         </FormItem>
-        {!type && <FormItem label={intl.get('import.dataSourceType')} name="type" initialValue={type || IDatasourceType.S3}>
-          <Select>
-            <Select.Option value={IDatasourceType.S3}>{intl.get('import.s3')}</Select.Option>
-            <Select.Option value={IDatasourceType.SFTP}>{intl.get('import.sftp')}</Select.Option>
-            <Select.Option value={IDatasourceType.Local}>{intl.get('import.localFiles')}</Select.Option>
-          </Select>
-        </FormItem>}
+        {!type && (
+          <FormItem label={intl.get('import.dataSourceType')} name="type" initialValue={type || IDatasourceType.S3}>
+            <Select>
+              <Select.Option value={IDatasourceType.S3}>{intl.get('import.s3')}</Select.Option>
+              <Select.Option value={IDatasourceType.SFTP}>{intl.get('import.sftp')}</Select.Option>
+              <Select.Option value={IDatasourceType.Local}>{intl.get('import.localFiles')}</Select.Option>
+            </Select>
+          </FormItem>
+        )}
         <FormItem noStyle shouldUpdate>
           {({ getFieldValue }) => {
             const configType = type || getFieldValue('type');
@@ -113,19 +116,23 @@ const DatasourceConfigModal = (props: IProps) => {
           {({ getFieldValue }) => {
             const configType = getFieldValue('type');
             if (configType === 'local') {
-              return <div className={styles.btns}>
-                <UploadLocalBtn onUpload={onCancel}>
-                  <Button className={styles.btnSubmit} type="primary">
-                    {intl.get('common.add')}
-                  </Button>
-                </UploadLocalBtn>
-              </div>;
+              return (
+                <div className={styles.btns}>
+                  <UploadLocalBtn onUpload={onCancel}>
+                    <Button className={styles.btnSubmit} type="primary">
+                      {intl.get('common.add')}
+                    </Button>
+                  </UploadLocalBtn>
+                </div>
+              );
             } else {
-              return <div className={styles.btns}>
-                <Button className={styles.btnSubmit} type="primary" htmlType="submit" loading={loading}>
-                  {intl.get(mode === 'edit' ? 'common.update' : 'common.add')}
-                </Button>
-              </div>;
+              return (
+                <div className={styles.btns}>
+                  <Button className={styles.btnSubmit} type="primary" htmlType="submit" loading={loading}>
+                    {intl.get(mode === 'edit' ? 'common.update' : 'common.add')}
+                  </Button>
+                </div>
+              );
             }
           }}
         </FormItem>

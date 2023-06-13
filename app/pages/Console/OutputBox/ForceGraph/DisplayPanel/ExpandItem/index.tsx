@@ -14,17 +14,16 @@ interface IProps {
 
 interface IProperty {
   data: {
-    key: string,
-    value: any,
-  }
+    key: string;
+    value: any;
+  };
 }
-
 
 const EXPAND_NUM = 3;
 
 const Property: React.FC<IProperty> = (props: IProperty) => {
   const { data } = props;
-  const handleValueShow = data => {
+  const handleValueShow = (data) => {
     const { key, value } = data;
     if (typeof value === 'string') {
       if (key === 'VID' && data.vidType === 'INT64') {
@@ -39,57 +38,61 @@ const Property: React.FC<IProperty> = (props: IProperty) => {
     } else if (key === 'Tag' && key === 'Tag') {
       return value.join(' | ');
     } else {
-      return convertBigNumberToString(value); 
+      return convertBigNumberToString(value);
     }
   };
-  return <div className={styles.itemContent}>
-    <span className={styles.itemKey}>{data.key} : </span>
-    <span className={styles.itemValue}>{handleValueShow(data)}</span>
-  </div>;
+  return (
+    <div className={styles.itemContent}>
+      <span className={styles.itemKey}>{data.key} : </span>
+      <span className={styles.itemValue}>{handleValueShow(data)}</span>
+    </div>
+  );
 };
-
 
 const RowItem = (props: IProps) => {
   const { data, title, index } = props;
-  if(!data) {
-    return null;
-  }
   const { intl } = useI18n();
   const [dataUnfolded, setDataUnfoldedStatus] = useState(index === 0);
-  const needUnfoldMore = data.length > EXPAND_NUM;
   const [hasUnfoldAll, setUnfoldAllStatus] = useState(false);
-  return <div className={styles.displayRowItem}>
-    <div
-      className={cls(styles.itemHeader, styles.row)}
-      onClick={() => setDataUnfoldedStatus(!dataUnfolded)}
-    >
-      {dataUnfolded ? <Icon type="icon-studio-btn-down" /> : <Icon type="icon-studio-btn-up" />}
-      <span className={styles.displayHeaderTitle}>{title}</span>
-    </div>
-    {dataUnfolded && (
-      <>
-        {data.slice(0, EXPAND_NUM).map(item => <Property key={item.key} data={item} />)}
-        {needUnfoldMore && (
-          <>
-            {hasUnfoldAll && data.slice(EXPAND_NUM).map(item => <Property key={item.key} data={item} />)}
-            <div
-              className={cls(styles.itemOperation, styles.row)}
-              onClick={() => setUnfoldAllStatus(!hasUnfoldAll)}
-            >
-              {hasUnfoldAll ? <div className={styles.btnToggle}>
-                <Icon type="icon-studio-btn-up" />
-                <span>{intl.get('explore.collapseItem')}</span>
-              </div> : <div className={styles.btnToggle}>
-                <Icon type="icon-studio-btn-down" />
-                <span>{intl.get('explore.expandItem')}</span>
-              </div>}
-            </div>
-          </>
-        )}
-      </>
-    )}
-  </div>;
-};
+  const needUnfoldMore = data.length > EXPAND_NUM;
 
+  if (!data) {
+    return null;
+  }
+
+  return (
+    <div className={styles.displayRowItem}>
+      <div className={cls(styles.itemHeader, styles.row)} onClick={() => setDataUnfoldedStatus(!dataUnfolded)}>
+        {dataUnfolded ? <Icon type="icon-studio-btn-down" /> : <Icon type="icon-studio-btn-up" />}
+        <span className={styles.displayHeaderTitle}>{title}</span>
+      </div>
+      {dataUnfolded && (
+        <>
+          {data.slice(0, EXPAND_NUM).map((item) => (
+            <Property key={item.key} data={item} />
+          ))}
+          {needUnfoldMore && (
+            <>
+              {hasUnfoldAll && data.slice(EXPAND_NUM).map((item) => <Property key={item.key} data={item} />)}
+              <div className={cls(styles.itemOperation, styles.row)} onClick={() => setUnfoldAllStatus(!hasUnfoldAll)}>
+                {hasUnfoldAll ? (
+                  <div className={styles.btnToggle}>
+                    <Icon type="icon-studio-btn-up" />
+                    <span>{intl.get('explore.collapseItem')}</span>
+                  </div>
+                ) : (
+                  <div className={styles.btnToggle}>
+                    <Icon type="icon-studio-btn-down" />
+                    <span>{intl.get('explore.expandItem')}</span>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
 
 export default RowItem;

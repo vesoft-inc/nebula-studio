@@ -31,55 +31,33 @@ export const getExploreMatchGQL = (params: {
   } else if (stepsType === 'range' && minStep && maxStep) {
     _step = `*${minStep}..${maxStep}`;
   }
-  const _filters = filters
-    ? filters
-      .map(filter => `${filter.relation || ''} l.${filter.expression}`)
-      .join(`\n`)
-    : '';
+  const _filters = filters ? filters.map((filter) => `${filter.relation || ''} l.${filter.expression}`).join(`\n`) : '';
   const wheres = _filters ? `AND ALL(l IN e WHERE ${_filters})` : '';
-  const gql = `MATCH p=(v)${
-    edgeDirection === 'incoming' ? '<-' : '-'
-  }[e${edgeTypes.map(edge => `:${handleKeyword(edge)}`).join('|')}${_step}]${
-    edgeDirection === 'outgoing' ? '->' : '-'
-  }(v2) 
-WHERE id(v) IN [${selectVertexes
-    .map(i => handleVidStringName(i.name, spaceVidType))
-    .join(', ')}] 
+  const gql = `MATCH p=(v)${edgeDirection === 'incoming' ? '<-' : '-'}[e${edgeTypes
+    .map((edge) => `:${handleKeyword(edge)}`)
+    .join('|')}${_step}]${edgeDirection === 'outgoing' ? '->' : '-'}(v2) 
+WHERE id(v) IN [${selectVertexes.map((i) => handleVidStringName(i.name, spaceVidType)).join(', ')}] 
     ${wheres} RETURN p LIMIT ${quantityLimit ? quantityLimit : 100}`;
   return gql;
 };
 
-export const getExploreGQLWithIndex = (params: {
-  tag: string;
-  filters: any[];
-  quantityLimit: number | null;
-}) => {
+export const getExploreGQLWithIndex = (params: { tag: string; filters: any[]; quantityLimit: number | null }) => {
   const { tag, filters, quantityLimit } = params;
   const tagName = handleKeyword(tag);
   const wheres = filters
-    .filter(
-      filter =>
-        filter.field &&
-        filter.operator &&
-        !['', undefined, null].includes(filter.value),
-    )
-    .map(filter => {
+    .filter((filter) => filter.field && filter.operator && !['', undefined, null].includes(filter.value))
+    .map((filter) => {
       const value =
         filter.type === 'string' || filter.type.startsWith('fixed_string')
           ? handleVidStringName(filter.value)
           : filter.value;
-      return `${filter.relation ? filter.relation : ''} ${tagName}.${
-        filter.field
-      } ${filter.operator} ${value}`;
+      return `${filter.relation ? filter.relation : ''} ${tagName}.${filter.field} ${filter.operator} ${value}`;
     })
     .join(`\n`);
   const gql =
     `LOOKUP ON
   ${handleKeyword(tag)} ${wheres ? `\nWHERE ${wheres}` : ''}
-    ` +
-    ` yield vertex as \`vertex_\` | LIMIT ${
-      quantityLimit ? quantityLimit : 100
-    }`;
+    ` + ` yield vertex as \`vertex_\` | LIMIT ${quantityLimit ? quantityLimit : 100}`;
 
   return gql;
 };
@@ -95,14 +73,14 @@ export const getSpaceCreateGQL = (params: {
 }) => {
   const { name, options, comment } = params;
   const optionsStr = Object.keys(options)
-    .filter(i => options[i] !== undefined && options[i] !== '')
-    .map(i => {
+    .filter((i) => options[i] !== undefined && options[i] !== '')
+    .map((i) => {
       return `${i} = ${options[i]}`;
     })
     .join(', ');
-  const gql = `CREATE SPACE ${handleKeyword(name)} ${
-    optionsStr ? `(${optionsStr})` : ''
-  } ${comment ? `COMMENT = "${comment}"` : ''}`;
+  const gql = `CREATE SPACE ${handleKeyword(name)} ${optionsStr ? `(${optionsStr})` : ''} ${
+    comment ? `COMMENT = "${comment}"` : ''
+  }`;
   return gql;
 };
 
@@ -117,50 +95,36 @@ export const getTagOrEdgeCreateGQL = (params: {
   const { type, name, properties, ttl_col, ttl_duration, comment } = params;
   const propertiesStr = properties
     ? properties
-      .map(item => {
-        let valueStr = '';
-        if (item.value) {
-          switch (item.type) {
-            case 'string':
-            case 'fixed_string':
-              valueStr = `DEFAULT "${item.value}"`;
-              break;
-            case 'timestamp':
-              const timestampReg = /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})$/;
-              valueStr = timestampReg.test(item.value)
-                ? `DEFAULT "${item.value}"`
-                : `DEFAULT ${item.value}`;
-              break;
-            default:
-              valueStr = `DEFAULT ${item.value}`;
+        .map((item) => {
+          let valueStr = '';
+          if (item.value) {
+            switch (item.type) {
+              case 'string':
+              case 'fixed_string':
+                valueStr = `DEFAULT "${item.value}"`;
+                break;
+              case 'timestamp': {
+                const timestampReg = /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})$/;
+                valueStr = timestampReg.test(item.value) ? `DEFAULT "${item.value}"` : `DEFAULT ${item.value}`;
+                break;
+              }
+              default:
+                valueStr = `DEFAULT ${item.value}`;
+            }
           }
-        }
-        const _type =
-            item.type !== 'fixed_string'
-              ? item.type
-              : item.type + `(${item.fixedLength ? item.fixedLength : ''})`;
-        const _null = item.allowNull ? 'NULL' : 'NOT NULL';
-        const _comment = item.comment ? `COMMENT "${item.comment}"` : '';
-        const conbine = [
-          handleKeyword(item.name),
-          _type,
-          _null,
-          valueStr,
-          _comment,
-        ];
-        return conbine.join(' ');
-      })
-      .join(', ')
+          const _type =
+            item.type !== 'fixed_string' ? item.type : item.type + `(${item.fixedLength ? item.fixedLength : ''})`;
+          const _null = item.allowNull ? 'NULL' : 'NOT NULL';
+          const _comment = item.comment ? `COMMENT "${item.comment}"` : '';
+          const conbine = [handleKeyword(item.name), _type, _null, valueStr, _comment];
+          return conbine.join(' ');
+        })
+        .join(', ')
     : '';
-  const ttlStr = ttl_col
-    ? `TTL_DURATION = ${ttl_duration ||
-        ''}, TTL_COL = "${handleEscape(ttl_col)}"`
-    : '';
+  const ttlStr = ttl_col ? `TTL_DURATION = ${ttl_duration || ''}, TTL_COL = "${handleEscape(ttl_col)}"` : '';
   const gql = `CREATE ${type} ${handleKeyword(name)} ${
     propertiesStr.length > 0 ? `(${propertiesStr})` : '()'
-  } ${ttlStr} ${
-    comment ? `${ttlStr.length > 0 ? ', ' : ''}COMMENT = "${comment}"` : ''
-  }`;
+  } ${ttlStr} ${comment ? `${ttlStr.length > 0 ? ', ' : ''}COMMENT = "${comment}"` : ''}`;
   return gql;
 };
 
@@ -169,23 +133,19 @@ export const getAlterGQL = (params: IAlterForm) => {
   const { type, name, action, config } = params;
   if (action === 'TTL' && config.ttl) {
     const { ttl } = config;
-    content = `TTL_DURATION = ${ttl.duration || 0}, TTL_COL = "${
-      ttl.col ? handleEscape(ttl.col) : ''
-    }"`;
+    content = `TTL_DURATION = ${ttl.duration || 0}, TTL_COL = "${ttl.col ? handleEscape(ttl.col) : ''}"`;
   } else if (action === 'COMMENT') {
     content = `COMMENT="${config.comment}"`;
   } else if (config.fields) {
     const date = config.fields
-      .map(item => {
+      .map((item) => {
         const { name, type, value, fixedLength, allowNull, comment } = item;
         const propertyName = handleKeyword(name);
         if (action === 'DROP') {
           return propertyName;
         }
         let str = `${propertyName} ${
-          type !== 'fixed_string'
-            ? type
-            : type + `(${fixedLength ? item.fixedLength : ''})`
+          type !== 'fixed_string' ? type : type + `(${fixedLength ? item.fixedLength : ''})`
         } ${allowNull ? 'NULL' : 'NOT NULL'}`;
         if (value) {
           switch (type) {
@@ -193,12 +153,11 @@ export const getAlterGQL = (params: IAlterForm) => {
             case 'fixed_string':
               str += ` DEFAULT "${value}"`;
               break;
-            case 'timestamp':
+            case 'timestamp': {
               const timestampReg = /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})$/;
-              str += timestampReg.test(value)
-                ? ` DEFAULT "${value}"`
-                : ` DEFAULT ${value}`;
+              str += timestampReg.test(value) ? ` DEFAULT "${value}"` : ` DEFAULT ${value}`;
               break;
+            }
             default:
               str += ` DEFAULT ${value}`;
           }
@@ -223,9 +182,7 @@ export const getIndexCreateGQL = (params: {
   fields?: string[];
 }) => {
   const { type, name, associate, fields, comment } = params;
-  const combine = associate
-    ? `on ${handleKeyword(associate)}(${fields?.join(', ')})`
-    : '';
+  const combine = associate ? `on ${handleKeyword(associate)}(${fields?.join(', ')})` : '';
   const gql = `CREATE ${type.toUpperCase()} INDEX ${handleKeyword(name)} ${combine} ${
     comment ? `COMMENT "${comment}"` : ''
   }`;
@@ -242,22 +199,9 @@ export const getPathGQL = (params: {
   quantityLimit?: number | null;
   spaceVidType: string;
 }) => {
-  const {
-    type,
-    srcId,
-    dstId,
-    relation,
-    direction,
-    stepLimit,
-    quantityLimit,
-    spaceVidType,
-  } = params;
-  const _srcIds = srcId
-    .map(item => handleVidStringName(item, spaceVidType))
-    .join(', ');
-  const _dstIds = dstId
-    .map(item => handleVidStringName(item, spaceVidType))
-    .join(', ');
+  const { type, srcId, dstId, relation, direction, stepLimit, quantityLimit, spaceVidType } = params;
+  const _srcIds = srcId.map((item) => handleVidStringName(item, spaceVidType)).join(', ');
+  const _dstIds = dstId.map((item) => handleVidStringName(item, spaceVidType)).join(', ');
   const _relation = relation && relation.length > 0 ? relation.join(', ') : '*';
   const gql =
     `FIND ${type} PATH FROM ${_srcIds} TO ${_dstIds} over ${_relation}` +

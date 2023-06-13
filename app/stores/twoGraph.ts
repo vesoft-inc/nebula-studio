@@ -14,8 +14,8 @@ class TwoGraph {
   container: HTMLElement;
   canvas: HTMLCanvasElement | null;
   // running status to make renderer render
-  running: boolean = false;
-  progressValue: number = 0;
+  running = false;
+  progressValue = 0;
   transform: ITransform = { k: 1, x: 0, y: 0 };
   instance: ForceGraphInstance;
   autorunDisposer: IReactionDisposer;
@@ -175,7 +175,7 @@ class TwoGraph {
           .forEach((node) =>
             ['x', 'y'].forEach((coord) => {
               node[`f${coord}`] = node[coord] + translate[coord];
-            })
+            }),
           );
       })
       .onNodeDragEnd(() => {
@@ -196,8 +196,7 @@ class TwoGraph {
           if (graphIndex !== 0) {
             const direction = graphIndex % 2 === 0; // link's rank direction
             // (graphIndex / Math.abs(graphIndex)) means different source's direction
-            curvature =
-              (direction ? 1 : -1) * (graphIndex > 0 ? 1 : -1) * (Math.ceil(Math.abs(graphIndex) / 2) * 0.1);
+            curvature = (direction ? 1 : -1) * (graphIndex > 0 ? 1 : -1) * (Math.ceil(Math.abs(graphIndex) / 2) * 0.1);
           }
         }
         link.curvature = curvature;
@@ -304,7 +303,7 @@ class TwoGraph {
       ],
       () => {
         Graph.nodeColor(Graph.nodeColor());
-      }
+      },
     );
   };
 

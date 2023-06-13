@@ -6,7 +6,7 @@ import { Button, message } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import styles from './index.module.less';
 
-interface IProps extends RouteComponentProps {}
+type IProps = RouteComponentProps;
 interface IState {
   errInfo: string;
 }
@@ -17,24 +17,30 @@ function ErrorPanel(props: { errInfo: string }) {
   const handleCopy = useCallback(() => {
     message.success(intl.get('common.copySuccess'));
   }, []);
-  return <div className={styles.errPage}>
-    <img src={errorImg} className={styles.errImg} />
-    <p className={styles.errText}>{intl.get('warning.crashPage')}</p>
-    <p className={styles.errTip}>{intl.get('warning.crashPageTip')}</p>
-    <div className={styles.btns}>
-      <Button type="primary" onClick={() => window.location.reload()}>{intl.get('warning.refreshPage')}</Button>
-      <Button onClick={() => window.open(intl.get('link.forumHref'), '_blank')}>{intl.get('warning.contactStaff')}</Button>
-    </div>
-    <div className={styles.errContainer}>
-      <div className={styles.header}>
-        <span>{intl.get('warning.errorMessage')}</span>
-        <CopyToClipboard key={1} text={errInfo} onCopy={handleCopy}>
-          <Button>{intl.get('common.copy')}</Button>
-        </CopyToClipboard>
+  return (
+    <div className={styles.errPage}>
+      <img src={errorImg} className={styles.errImg} />
+      <p className={styles.errText}>{intl.get('warning.crashPage')}</p>
+      <p className={styles.errTip}>{intl.get('warning.crashPageTip')}</p>
+      <div className={styles.btns}>
+        <Button type="primary" onClick={() => window.location.reload()}>
+          {intl.get('warning.refreshPage')}
+        </Button>
+        <Button onClick={() => window.open(intl.get('link.forumHref'), '_blank')}>
+          {intl.get('warning.contactStaff')}
+        </Button>
       </div>
-      <p className={styles.errMsg}>{errInfo.toString()}</p>
+      <div className={styles.errContainer}>
+        <div className={styles.header}>
+          <span>{intl.get('warning.errorMessage')}</span>
+          <CopyToClipboard key={1} text={errInfo} onCopy={handleCopy}>
+            <Button>{intl.get('common.copy')}</Button>
+          </CopyToClipboard>
+        </div>
+        <p className={styles.errMsg}>{errInfo.toString()}</p>
+      </div>
     </div>
-  </div>;
+  );
 }
 
 class ErrorBoundary extends PureComponent<IProps, IState> {
@@ -51,7 +57,7 @@ class ErrorBoundary extends PureComponent<IProps, IState> {
     });
   }
   componentDidUpdate(prevProps: Readonly<IProps>): void {
-    if(prevProps.location.pathname !== this.props.location.pathname) {
+    if (prevProps.location.pathname !== this.props.location.pathname) {
       this.setState({
         errInfo: null,
       });
@@ -60,7 +66,7 @@ class ErrorBoundary extends PureComponent<IProps, IState> {
 
   render() {
     const { errInfo } = this.state;
-    if(!errInfo) return this.props.children;
+    if (!errInfo) return this.props.children;
     return <ErrorPanel errInfo={errInfo} />;
   }
 }

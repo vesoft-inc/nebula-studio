@@ -37,14 +37,14 @@ export interface NgqlRes<T = any> {
 export const WsHeartbeatReq = '1';
 export const WsHeartbeatRes = '2';
 
-type MessageReceiverProps<R = unknown> = {
+interface MessageReceiverProps<R = unknown> {
   resolve: (res: R) => void;
   reject: () => void;
   content: MessageSend['body']['content'];
   product: string;
   msgType: string;
   config?: Recordable;
-};
+}
 
 export class MessageReceiver<R extends NgqlRes = NgqlRes> {
   resolve: (res: R) => void;
@@ -111,12 +111,15 @@ export class NgqlRunner {
 
   connect = (payload: {
     config: {
-      url: string | URL,
-      protocols?: string | string[], 
-    },
-    logoutFun?: () => void
+      url: string | URL;
+      protocols?: string | string[];
+    };
+    logoutFun?: () => void;
   }) => {
-    const { config: { url, protocols }, logoutFun } = payload;
+    const {
+      config: { url, protocols },
+      logoutFun,
+    } = payload;
     if (!url) {
       logoutFun?.();
       message.error('WebSocket URL is empty');
@@ -168,10 +171,12 @@ export class NgqlRunner {
   };
 
   reConnect = () => {
-    return this.connect({ config: { 
-      url: this.socketUrl, 
-      protocols: this.socketProtocols
-    } });
+    return this.connect({
+      config: {
+        url: this.socketUrl,
+        protocols: this.socketProtocols,
+      },
+    });
   };
 
   onMessage = (e: MessageEvent<string>) => {
@@ -235,10 +240,7 @@ export class NgqlRunner {
     this.socket?.readyState === WebSocket.OPEN && this.socket.send(WsHeartbeatReq);
   };
 
-  runNgql = async (
-    { gql, space }: { gql: string; space?: string },
-    config: Recordable = {},
-  ): Promise<NgqlRes> => {
+  runNgql = async ({ gql, space }: { gql: string; space?: string }, config: Recordable = {}): Promise<NgqlRes> => {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       const flag = await this.reConnect();
       if (!flag) {

@@ -18,32 +18,29 @@ const innerItemLayout = {
 };
 
 interface IProps {
-  editType: ISchemaType
+  editType: ISchemaType;
   initialRequired: boolean;
   editDisabled: boolean;
   onBeforeEdit: (type?: null) => void;
   onEdit: (config: IAlterForm) => void;
   checkIndex: () => Promise<boolean>;
-  data: { 
-    name: string,
-    properties: IProperty[],
+  data: {
+    name: string;
+    properties: IProperty[];
     ttlConfig: {
-      duration: string,
-      col: string
-    }
-  }
+      duration: string;
+      col: string;
+    };
+  };
 }
 
-const formRef = ((props: IProps) => {
-  const { 
-    editType,
-    initialRequired, 
-    editDisabled, 
-    checkIndex,
-    data, 
-    onEdit,
-    onBeforeEdit } = props;
-  const { name, properties, ttlConfig: { col, duration } } = data;
+const FormRef = (props: IProps) => {
+  const { editType, initialRequired, editDisabled, checkIndex, data, onEdit, onBeforeEdit } = props;
+  const {
+    name,
+    properties,
+    ttlConfig: { col, duration },
+  } = data;
   const [ttlRequired, setTtlRequired] = useState(false);
   const [editConfig, setEditConfig] = useState<any>(null);
   const [isEdit, setIsEdit] = useState(false);
@@ -59,19 +56,17 @@ const formRef = ((props: IProps) => {
   }, [data]);
 
   useEffect(() => {
-    if(isEdit) {
-      const list = properties.filter(i =>
-        ['int', 'int64', 'timestamp'].includes(i.type),
-      );
+    if (isEdit) {
+      const list = properties.filter((i) => ['int', 'int64', 'timestamp'].includes(i.type));
       setTtlOptions(list);
     }
   }, [isEdit]);
   useEffect(() => {
     form.resetFields();
   }, [editConfig]);
-  const handleClearTtl = async e => {
+  const handleClearTtl = async (e) => {
     const clear = e.target.checked;
-    if(clear) {
+    if (clear) {
       const hasIndex = await checkIndex();
       if (hasIndex) {
         return message.warning(intl.get('schema.indexExist'));
@@ -115,7 +110,7 @@ const formRef = ((props: IProps) => {
   const handleEditBefore = () => {
     setEditConfig({
       col,
-      duration
+      duration,
     });
     setIsEdit(true);
     onBeforeEdit();
@@ -124,136 +119,122 @@ const formRef = ((props: IProps) => {
   const handleEditCancel = () => {
     onBeforeEdit(null);
     setIsEdit(false);
-    if(!col) {
+    if (!col) {
       setTtlRequired(false);
     }
   };
   return (
-    <Form 
-      form={form}
-      className={styles.formItem} 
-      onFinish={handleTtlUpdate} 
-      {...innerItemLayout} 
-      layout="vertical">
+    <Form form={form} className={styles.formItem} onFinish={handleTtlUpdate} {...innerItemLayout} layout="vertical">
       <Form.Item>
         <Checkbox disabled={editDisabled} checked={ttlRequired} onChange={handleClearTtl}>
           <span className={styles.label}>{intl.get('schema.setTTL')}</span>
         </Checkbox>
       </Form.Item>
-      {!isEdit && <Form.Item noStyle>
-        <div className={styles.boxContainer}>
-          <Row>
-            <Col span={12}>
-              <Form.Item className={styles.inlineItem} label="TTL_COL">
-                {col}
-              </Form.Item>
-            </Col>
-            <Col span={9}>
-              <Form.Item className={styles.inlineItem} label="TTL_DURATION">
-                {duration === '0' && col === '' ? '' : duration }
-              </Form.Item>
-            </Col>
-            {col !== '' && <Col span={3} className={styles.operations}>
-              <Form.Item noStyle>
-                <Button
-                  type="link"
-                  onClick={handleEditBefore}
-                  disabled={editDisabled}
-                >
-                  {intl.get('common.edit')}
-                </Button>
-                <Popconfirm
-                  onConfirm={handleTtlDelete}
-                  title={intl.get('common.ask')}
-                  okText={intl.get('common.ok')}
-                  cancelText={intl.get('common.cancel')}
-                >
-                  <Button
-                    danger
-                    type="link"
-                  >
-                    {intl.get('common.delete')}
-                  </Button>
-                </Popconfirm>
-              </Form.Item>
-            </Col>}
-          </Row>
-        </div>
-      </Form.Item>}
+      {!isEdit && (
+        <Form.Item noStyle>
+          <div className={styles.boxContainer}>
+            <Row>
+              <Col span={12}>
+                <Form.Item className={styles.inlineItem} label="TTL_COL">
+                  {col}
+                </Form.Item>
+              </Col>
+              <Col span={9}>
+                <Form.Item className={styles.inlineItem} label="TTL_DURATION">
+                  {duration === '0' && col === '' ? '' : duration}
+                </Form.Item>
+              </Col>
+              {col !== '' && (
+                <Col span={3} className={styles.operations}>
+                  <Form.Item noStyle>
+                    <Button type="link" onClick={handleEditBefore} disabled={editDisabled}>
+                      {intl.get('common.edit')}
+                    </Button>
+                    <Popconfirm
+                      onConfirm={handleTtlDelete}
+                      title={intl.get('common.ask')}
+                      okText={intl.get('common.ok')}
+                      cancelText={intl.get('common.cancel')}
+                    >
+                      <Button danger type="link">
+                        {intl.get('common.delete')}
+                      </Button>
+                    </Popconfirm>
+                  </Form.Item>
+                </Col>
+              )}
+            </Row>
+          </div>
+        </Form.Item>
+      )}
 
-      {isEdit && <Form.Item noStyle shouldUpdate={true}>
-        <div className={styles.boxContainer}>
-          <Row>
-            <Col span={12}>
-              <Form.Item
-                className={styles.inlineItem} 
-                label="TTL_COL" 
-                name="col" 
-                initialValue={editConfig.col} 
-                rules={[
-                  {
-                    required: true,
-                    message: intl.get('formRules.ttlRequired'),
-                  },
-                ]}>
-                <Select>
-                  {ttlOptions.map(i => (
-                    <Option value={i.name} key={i.name}>
-                      {i.name}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={9}>
-              <Form.Item
-                className={styles.inlineItem} 
-                label="TTL_DURATION"  
-                name="duration"
-                initialValue={editConfig.duration} 
-                rules={[
-                  {
-                    required: true,
-                    message: intl.get('formRules.ttlDurationRequired'),
-                  },
-                  {
-                    message: intl.get('formRules.positiveIntegerRequired'),
-                    pattern: /^\d+$/,
-                    transform(value) {
-                      if (value) {
-                        return Number(value);
-                      }
+      {isEdit && (
+        <Form.Item noStyle shouldUpdate={true}>
+          <div className={styles.boxContainer}>
+            <Row>
+              <Col span={12}>
+                <Form.Item
+                  className={styles.inlineItem}
+                  label="TTL_COL"
+                  name="col"
+                  initialValue={editConfig.col}
+                  rules={[
+                    {
+                      required: true,
+                      message: intl.get('formRules.ttlRequired'),
                     },
-                  },
-                ]}>
-                <Input
-                  disabled={!ttlRequired}
-                  placeholder={intl.get('formRules.ttlDurationRequired')}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={3} className={styles.operations}>
-              <Form.Item noStyle>
-                <Button
-                  type="link"
-                  htmlType="submit"
+                  ]}
                 >
-                  {intl.get('common.ok')}
-                </Button>
-                <Button
-                  type="link"
-                  danger
-                  onClick={handleEditCancel}
+                  <Select>
+                    {ttlOptions.map((i) => (
+                      <Option value={i.name} key={i.name}>
+                        {i.name}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={9}>
+                <Form.Item
+                  className={styles.inlineItem}
+                  label="TTL_DURATION"
+                  name="duration"
+                  initialValue={editConfig.duration}
+                  rules={[
+                    {
+                      required: true,
+                      message: intl.get('formRules.ttlDurationRequired'),
+                    },
+                    {
+                      message: intl.get('formRules.positiveIntegerRequired'),
+                      pattern: /^\d+$/,
+                      transform(value) {
+                        if (value) {
+                          return Number(value);
+                        }
+                      },
+                    },
+                  ]}
                 >
-                  {intl.get('common.cancel')}
-                </Button>
-              </Form.Item>
-            </Col>
-          </Row>
-        </div>
-      </Form.Item>}
+                  <Input disabled={!ttlRequired} placeholder={intl.get('formRules.ttlDurationRequired')} />
+                </Form.Item>
+              </Col>
+              <Col span={3} className={styles.operations}>
+                <Form.Item noStyle>
+                  <Button type="link" htmlType="submit">
+                    {intl.get('common.ok')}
+                  </Button>
+                  <Button type="link" danger onClick={handleEditCancel}>
+                    {intl.get('common.cancel')}
+                  </Button>
+                </Form.Item>
+              </Col>
+            </Row>
+          </div>
+        </Form.Item>
+      )}
     </Form>
   );
-});
+};
 
-export default observer(formRef);
+export default observer(FormRef);
