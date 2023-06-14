@@ -30,17 +30,17 @@ interface IContentProps {
 }
 
 const getSchemaInfo = (data) => {
-  const tags = data.nodes.map(item => ({
+  const tags = data.nodes.map((item) => ({
     name: item.name,
     comment: item.comment,
     properties: item.properties,
-    type: item.type
+    type: item.type,
   }));
-  const edges = data.lines.map(item => ({
+  const edges = data.lines.map((item) => ({
     name: item.name,
     comment: item.comment,
     properties: item.properties,
-    type: item.type
+    type: item.type,
   }));
   return { tags, edges };
 };
@@ -51,7 +51,7 @@ const getCreateGql = (data: ISketchNode | ISketchEdge) => {
     type,
     name,
     comment,
-    properties
+    properties,
   });
 };
 
@@ -63,11 +63,11 @@ const PopoverContent = (props: IContentProps) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const history = useHistory();
-  const {
-    schema,
-    sketchModel
-  } = useStore();
+  const { schema, sketchModel } = useStore();
   const { getMachineNumber, getSpaces, updateSpaceInfo } = schema;
+  useEffect(() => {
+    getMachineNumber();
+  }, []);
   const handleChangeMode = useCallback(async (e: any) => {
     const { value } = e.target;
     setMode(value);
@@ -106,7 +106,7 @@ const PopoverContent = (props: IContentProps) => {
         const { space } = values;
         await updateSpaceInfo(space);
         const hasIntersection = checkSchemaIntersection(schemaInfo);
-        if(hasIntersection) {
+        if (hasIntersection) {
           close();
           return;
         }
@@ -120,20 +120,26 @@ const PopoverContent = (props: IContentProps) => {
   const checkSchemaIntersection = useCallback((schemaInfo) => {
     const { tags, edgeTypes } = schema;
     const { tags: newTags, edges: newEdges } = schemaInfo;
-    const sameTags = intersection(newTags.map(item => item.name), tags);
-    const sameEdges = intersection(newEdges.map(item => item.name), edgeTypes);
-    if(!sameTags.length && !sameEdges.length) {
+    const sameTags = intersection(
+      newTags.map((item) => item.name),
+      tags,
+    );
+    const sameEdges = intersection(
+      newEdges.map((item) => item.name),
+      edgeTypes,
+    );
+    if (!sameTags.length && !sameEdges.length) {
       return false;
     }
     const tagStr = sameTags.join('、');
     const edgeStr = sameEdges.join('、');
     let content = '';
     let hasType = '';
-    if(tagStr) {
+    if (tagStr) {
       content = intl.get('common.tag') + ` (${tagStr}) `;
       hasType = intl.get('common.tag');
     }
-    if(edgeStr) {
+    if (edgeStr) {
       content += `${content ? ' / ' : ''}` + intl.get('common.edge') + ` (${edgeStr}) `;
       hasType += `${hasType ? ' / ' : ''}` + intl.get('common.edge');
     }
@@ -142,14 +148,7 @@ const PopoverContent = (props: IContentProps) => {
   }, []);
 
   const handleCreateSpace = useCallback(async (data) => {
-    const { 
-      name,
-      partitionNum,
-      replicaFactor,
-      vidType,
-      stringLength,
-      comment
-    } = data;
+    const { name, partitionNum, replicaFactor, vidType, stringLength, comment } = data;
     const _vidType = getVidType(vidType, stringLength);
     const options = {
       partition_num: partitionNum || DEFAULT_PARTITION_NUM,
@@ -159,7 +158,7 @@ const PopoverContent = (props: IContentProps) => {
     const gql = getSpaceCreateGQL({
       name,
       options,
-      comment
+      comment,
     });
     const res = await schema.createSpace(gql);
     return res;
@@ -168,9 +167,14 @@ const PopoverContent = (props: IContentProps) => {
   const batchApplySchema = useCallback(async (space, schema) => {
     const { tags, edges } = schema;
     // hack If the space name is the same as the current space recorded on the golang server (refrence client.go) and the space has just been deleted, need to use it manually
-    const gql = `use ${handleKeyword(space)};` + tags.map(tag => getCreateGql(tag)).concat(edges.map(edge => getCreateGql(edge))).join(';');
+    const gql =
+      `use ${handleKeyword(space)};` +
+      tags
+        .map((tag) => getCreateGql(tag))
+        .concat(edges.map((edge) => getCreateGql(edge)))
+        .join(';');
     const { code, message: errMsg } = await sketchModel.batchApply(gql);
-    if(code === 0) {
+    if (code === 0) {
       setLoading(false);
       message.success(intl.get('schema.createSuccess'));
       setTimeout(() => {
@@ -217,7 +221,9 @@ const PopoverContent = (props: IContentProps) => {
         </Form>
       )}
       <div className={styles.formFooter}>
-        <Button disabled={loading} onClick={close}>{intl.get('common.cancel')}</Button>
+        <Button disabled={loading} onClick={close}>
+          {intl.get('common.cancel')}
+        </Button>
         <Button type="primary" onClick={handleConfirm} loading={loading}>
           {intl.get('common.confirm')}
         </Button>
@@ -254,7 +260,7 @@ export default observer(function ApplySpacePopover() {
       arrowPointAtCenter={true}
       trigger="click"
       open={open}
-      onOpenChange={open => !open && setOpen(false)}
+      onOpenChange={(open) => !open && setOpen(false)}
     >
       <Button type="primary" onClick={handleOpen} disabled={disabled}>
         {intl.get('sketch.applyToSpace')}
