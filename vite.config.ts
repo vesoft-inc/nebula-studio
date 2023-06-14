@@ -13,6 +13,7 @@ import pkg from './package.json';
 
 const appConfig = getAppConfig();
 const SVGElement = fs.readFileSync('./public/icons/iconpark.tpl', 'utf-8');
+const proxyHost = '127.0.0.1:9000';
 
 const htmlPlugin = (data?: Record<string, unknown>): Plugin => {
   let viteConfig = undefined as unknown as ResolvedConfig;
@@ -52,15 +53,15 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api-nebula': {
-        target: 'http://127.0.0.1:9000',
+        target: `http://${proxyHost}`,
         changeOrigin: true,
       },
       '/api': {
-        target: 'http://127.0.0.1:9000',
+        target: `http://${proxyHost}`,
         changeOrigin: true,
       },
       '/nebula_ws': {
-        target: 'ws://127.0.0.1:9000',
+        target: `ws://${proxyHost}`,
         changeOrigin: true,
         secure: false,
         ws: true,

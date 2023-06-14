@@ -21,7 +21,7 @@ interface IHoveringItem {
   data: ISketchNode | ISketchEdge;
 }
 export class SketchStore {
-  loading: boolean = false;
+  loading = false;
   editor: VEditor;
   container: HTMLDivElement;
   draggingNewTag: any;
@@ -75,18 +75,20 @@ export class SketchStore {
   };
   update = (payload: Record<string, any>) => {
     Object.keys(payload).forEach(
-      (key) => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key])
+      (key) => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]),
     );
   };
 
   validate = (data, type) => {
     const { name, comment, properties } = data;
-    let isInvalid = !name || (properties as IProperty[])?.some((i) => !i.name || !i.type || (i.type === 'fixed_string' && !i.fixedLength));
+    let isInvalid =
+      !name ||
+      (properties as IProperty[])?.some((i) => !i.name || !i.type || (i.type === 'fixed_string' && !i.fixedLength));
     const uniqProperties = uniqBy(data.properties, 'name');
-    if(properties && data.properties?.length !== uniqProperties.length) {
+    if (properties && data.properties?.length !== uniqProperties.length) {
       isInvalid = true;
     }
-    if(comment) {
+    if (comment) {
       const byteLength = getByteLength(comment);
       byteLength > MAX_COMMENT_BYTES && (isInvalid = true);
     }
@@ -99,9 +101,8 @@ export class SketchStore {
     return !isInvalid;
   };
 
-  updateItemStatus = (params: 
-  { data: ISketchNode, type: 'node', status: boolean } 
-  | { data: ISketchEdge, type: 'edge', status: boolean }
+  updateItemStatus = (
+    params: { data: ISketchNode; type: 'node'; status: boolean } | { data: ISketchEdge; type: 'edge'; status: boolean },
   ) => {
     const { data, type, status } = params;
     const { uuid } = data;
@@ -110,7 +111,7 @@ export class SketchStore {
       this.editor.graph.node.updateNode(this.editor.graph.node.nodes[uuid].data, true);
     } else {
       this.editor.graph.line.updateLine(this.editor.graph.line.lines[uuid].data, true);
-    } 
+    }
   };
 
   validateSchema = async () => {
@@ -119,7 +120,7 @@ export class SketchStore {
     const nodesValid = nodes.reduce((flag, node) => this.validate(node, 'node') && flag, true);
     const edgesValid = lines.reduce((flag, line) => this.validate(line, 'edge') && flag, true);
     const hasSameName = this.checkSameName();
-    if(nodesValid && edgesValid && !hasSameName) {
+    if (nodesValid && edgesValid && !hasSameName) {
       return true;
     }
     hasSameName ? message.error(intl.get('sketch.uniqName')) : message.error(intl.get('sketch.sketchInvalid'));
@@ -129,26 +130,32 @@ export class SketchStore {
   validateSameNameData = () => {
     const nodes = this.editor.graph.node.nodes;
     const lines = this.editor.graph.line.lines;
-    const _nodes = Object.values(nodes).filter(i => !!i.data.invalid);
-    const _lines = Object.values(lines).filter(i => !!i.data.invalid && [i.data.from, i.data.to].every(id => id in Object.keys(nodes)));
-    _nodes.forEach(i => {
+    const _nodes = Object.values(nodes).filter((i) => !!i.data.invalid);
+    const _lines = Object.values(lines).filter(
+      (i) => !!i.data.invalid && [i.data.from, i.data.to].every((id) => id in Object.keys(nodes)),
+    );
+    _nodes.forEach((i) => {
       const data = i.data;
       const isValid = this.validate(data, 'node');
-      if(isValid) {
-        const hasSameName = _nodes.some(node => node.data.uuid !== data.uuid && node.data.name === data.name) || _lines.some(line => line.data.name === data.name);
-        if(!hasSameName) {
+      if (isValid) {
+        const hasSameName =
+          _nodes.some((node) => node.data.uuid !== data.uuid && node.data.name === data.name) ||
+          _lines.some((line) => line.data.name === data.name);
+        if (!hasSameName) {
           this.updateItemStatus({ data: data as ISketchNode, type: 'node', status: false });
         }
       }
     });
-    _lines.forEach(i => {
+    _lines.forEach((i) => {
       const data = i.data;
       const isValid = this.validate(data, 'edge');
-      if(isValid) {
-        const hasSameName = _lines.some(line => line.data.uuid !== data.uuid && line.data.name === data.name) || _nodes.some(node => node.data.name === data.name);
-        if(!hasSameName) {
+      if (isValid) {
+        const hasSameName =
+          _lines.some((line) => line.data.uuid !== data.uuid && line.data.name === data.name) ||
+          _nodes.some((node) => node.data.name === data.name);
+        if (!hasSameName) {
           this.updateItemStatus({ data: data as ISketchEdge, type: 'edge', status: false });
-        } 
+        }
       }
     });
   };
@@ -167,17 +174,29 @@ export class SketchStore {
     const schema = this.editor?.schema?.getData();
     const isEmptySame = !schema.nodes.length && !schema.lines.length && !initialData.schema;
     const newSchema = JSON.stringify({
-      nodes: schema.nodes?.map(node => ({ name: node.name, properties: node.properties, comment: node.comment })),
-      lines: schema.lines?.map(line => ({ name: line.name, from: line.from, to: line.to, properties: line.properties, comment: line.comment })),
+      nodes: schema.nodes?.map((node) => ({ name: node.name, properties: node.properties, comment: node.comment })),
+      lines: schema.lines?.map((line) => ({
+        name: line.name,
+        from: line.from,
+        to: line.to,
+        properties: line.properties,
+        comment: line.comment,
+      })),
     });
     let prevSchema = JSON.parse(initialData.schema || '{}');
     prevSchema = JSON.stringify({
-      nodes: prevSchema.nodes?.map(node => ({ name: node.name, properties: node.properties, comment: node.comment })),
-      lines: prevSchema.lines?.map(line => ({ name: line.name, from: line.from, to: line.to, properties: line.properties, comment: line.comment })),
+      nodes: prevSchema.nodes?.map((node) => ({ name: node.name, properties: node.properties, comment: node.comment })),
+      lines: prevSchema.lines?.map((line) => ({
+        name: line.name,
+        from: line.from,
+        to: line.to,
+        properties: line.properties,
+        comment: line.comment,
+      })),
     });
     return (!isEmptySame && newSchema !== prevSchema) || initialData.name !== this.currentSketch.name;
   };
-  
+
   initSketch = async () => {
     const initData = {
       name: `Schema_${Date.now()}`,
@@ -221,13 +240,13 @@ export class SketchStore {
         action: 'update_sketch',
       },
     });
-    if(code === 0) {
+    if (code === 0) {
       runInAction(() => {
-        const item = this.sketchList.items.find(item => item.id === id);
+        const item = this.sketchList.items.find((item) => item.id === id);
         item.name = _params.name;
         this.currentSketch = {
           ...this.currentSketch,
-          ..._params
+          ..._params,
         };
       });
     }
@@ -253,7 +272,7 @@ export class SketchStore {
     this.update({ loading: false });
     if (res.code === 0) {
       const sketchList = { ...res.data, filter: newFilter };
-      if(this.currentSketch && !sketchList.items.find(i => i.id === this.currentSketch.id)) {
+      if (this.currentSketch && !sketchList.items.find((i) => i.id === this.currentSketch.id)) {
         sketchList.items.push(this.currentSketch);
       }
       const params = { sketchList } as any;
@@ -262,13 +281,13 @@ export class SketchStore {
     }
   };
 
-  initEditor = async (params: {container: HTMLDivElement, schema?: string, options?: VEditorOptions }) => {
+  initEditor = async (params: { container: HTMLDivElement; schema?: string; options?: VEditorOptions }) => {
     const { container, schema, options } = params;
     this.editor = new VEditor({
       dom: container,
       showBackGrid: false,
       disableCopy: true,
-      ...options
+      ...options,
     });
     this.container = container;
     initShapes(this.editor);
@@ -298,7 +317,7 @@ export class SketchStore {
     this.editor.graph.on('line:mouseleave', () => {
       this.update({ hoveringItem: undefined });
     });
-    if(mode !== 'view') {
+    if (mode !== 'view') {
       this.editor.graph.on('node:click', ({ node }) => {
         this.update({ active: node.data });
       });
@@ -397,7 +416,7 @@ export class SketchStore {
       x: x + 40,
       y: y + 40,
       name: `${name || ''}(1)`,
-      uuid: uuidv4()
+      uuid: uuidv4(),
     });
   };
 

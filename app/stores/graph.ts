@@ -30,7 +30,7 @@ export class GraphStore {
   edgesFields: any[] = [];
   showTagFields: string[] = [];
   showEdgeFields: string[] = [];
-  loading: boolean = false;
+  loading = false;
   filterExclusionIds: { [key: string]: boolean } = {};
   pointer: Pointer = {
     top: 0,
@@ -38,12 +38,12 @@ export class GraphStore {
     event: undefined,
     showContextMenu: false,
   };
-  layout: string = 'force';
+  layout = 'force';
   /** not observe */
   twoGraph?: TwoGraph = undefined;
   canvas: HTMLCanvasElement | undefined;
-  width: number = 0;
-  height: number = 0;
+  width = 0;
+  height = 0;
   currentSpace: string | undefined;
   spaceVidType: string | undefined;
   get selectedNodeIds() {
@@ -79,7 +79,7 @@ export class GraphStore {
     return edgeMap;
   }
 
-  constructor(props?: { space: string; spaceVidType?: string; }) {
+  constructor(props?: { space: string; spaceVidType?: string }) {
     makeAutoObservable(this, {
       nodeHovering: observable.ref,
       nodeDragging: observable.ref,
@@ -96,7 +96,7 @@ export class GraphStore {
 
   update = (payload: Record<string, any>) =>
     Object.keys(payload).forEach(
-      (key) => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key])
+      (key) => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]),
     );
 
   // init data & rerender
@@ -182,10 +182,7 @@ export class GraphStore {
    * @param payload vertexes,edges
    * @returns
    */
-  addNodesAndEdges = (payload: {
-    vertexes: NodeObject[];
-    edges: LinkObject[];
-  }) => {
+  addNodesAndEdges = (payload: { vertexes: NodeObject[]; edges: LinkObject[] }) => {
     const { vertexes = [], edges = [] } = payload;
     // filter exsit data and update it
     const nowDataMap = {};
@@ -227,7 +224,6 @@ export class GraphStore {
     // make newest data map
     this.nowDataMap = nowDataMap;
   };
-
 
   // makeLineSort by line's direction & rank to make the same direction be close
   makeLineSort() {
@@ -285,7 +281,7 @@ export class GraphStore {
     _edges = await Promise.all(
       Object.values(_edges).map(async (item) => {
         return this.getExploreEdge(item);
-      })
+      }),
     );
     if (this.nodes.size === 0 && _vertexes.length !== 1) {
       // make round position width init data
@@ -306,7 +302,7 @@ export class GraphStore {
           (i) =>
             `${handleVidStringName(i.srcId, this.spaceVidType)}->${handleVidStringName(i.dstId, this.spaceVidType)}@${
               i.rank
-            }`
+            }`,
         ),
         type: edgeType,
         space: this.currentSpace,
@@ -342,9 +338,9 @@ export class GraphStore {
     const vertexes: any =
       _ids.length > 0
         ? await this.getVertexes({
-          ids: _ids,
-          expand,
-        })
+            ids: _ids,
+            expand,
+          })
         : [];
     return uniqBy(vertexes, (i: NodeObject) => convertBigNumberToString(i.id)).filter((i) => i !== undefined);
   };
@@ -401,7 +397,6 @@ export class GraphStore {
     const vertexIds = res.code === 0 ? getBidrectVertexIds(res.data) : [];
     return vertexIds.filter((id) => ids.includes(id));
   }
-
 
   destroyGraph() {
     this.twoGraph?.destroy();

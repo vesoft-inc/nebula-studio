@@ -20,11 +20,11 @@ interface IProps {
   onUpdate: () => void;
 }
 
-const formRef = ((props: IProps) => {
+const FormRef = (props: IProps) => {
   const { formRef, onUpdate } = props;
   const { intl } = useI18n();
-  const handleClearTtl = e => {
-    if(!e.target.checked) {
+  const handleClearTtl = (e) => {
+    if (!e.target.checked) {
       formRef.resetFields(['ttl_col', '']);
       formRef.resetFields(['ttl_duration', '']);
       setTimeout(onUpdate, 300);
@@ -42,24 +42,30 @@ const formRef = ((props: IProps) => {
           {({ getFieldValue }) => {
             const properties = getFieldValue('properties') || [];
             const ttlRequired = getFieldValue('ttlRequired');
-            const ttlOptions = properties.filter(i =>
-              ['int', 'int64', 'timestamp'].includes(i.type),
-            );
+            const ttlOptions = properties.filter((i) => ['int', 'int64', 'timestamp'].includes(i.type));
             return (
               <div className={styles.boxContainer}>
                 <Row>
                   <Col span={12}>
-                    <Form.Item className={styles.inlineItem} label={<>
-                      <span>TTL_COL</span>
-                      <span className={styles.labelTip}>({intl.get('formRules.ttlLimit')})</span>
-                    </>} {...innerItemLayout} name="ttl_col" rules={[
-                      {
-                        required: ttlRequired,
-                        message: intl.get('formRules.ttlRequired'),
-                      },
-                    ]}>
+                    <Form.Item
+                      className={styles.inlineItem}
+                      label={
+                        <>
+                          <span>TTL_COL</span>
+                          <span className={styles.labelTip}>({intl.get('formRules.ttlLimit')})</span>
+                        </>
+                      }
+                      {...innerItemLayout}
+                      name="ttl_col"
+                      rules={[
+                        {
+                          required: ttlRequired,
+                          message: intl.get('formRules.ttlRequired'),
+                        },
+                      ]}
+                    >
                       <Select disabled={!ttlRequired}>
-                        {ttlOptions.map(i => (
+                        {ttlOptions.map((i) => (
                           <Option value={i.name} key={i.name}>
                             {i.name}
                           </Option>
@@ -68,25 +74,28 @@ const formRef = ((props: IProps) => {
                     </Form.Item>
                   </Col>
                   <Col span={12}>
-                    <Form.Item className={styles.inlineItem} label="TTL_DURATION" {...innerItemLayout} name="ttl_duration" rules={[
-                      {
-                        required: ttlRequired,
-                        message: intl.get('formRules.ttlDurationRequired'),
-                      },
-                      {
-                        message: intl.get('formRules.positiveIntegerRequired'),
-                        pattern: /^\d+$/,
-                        transform(value) {
-                          if (value) {
-                            return Number(value);
-                          }
+                    <Form.Item
+                      className={styles.inlineItem}
+                      label="TTL_DURATION"
+                      {...innerItemLayout}
+                      name="ttl_duration"
+                      rules={[
+                        {
+                          required: ttlRequired,
+                          message: intl.get('formRules.ttlDurationRequired'),
                         },
-                      },
-                    ]}>
-                      <Input
-                        disabled={!ttlRequired}
-                        placeholder={intl.get('formRules.ttlDurationRequired')}
-                      />
+                        {
+                          message: intl.get('formRules.positiveIntegerRequired'),
+                          pattern: /^\d+$/,
+                          transform(value) {
+                            if (value) {
+                              return Number(value);
+                            }
+                          },
+                        },
+                      ]}
+                    >
+                      <Input disabled={!ttlRequired} placeholder={intl.get('formRules.ttlDurationRequired')} />
                     </Form.Item>
                   </Col>
                 </Row>
@@ -97,6 +106,6 @@ const formRef = ((props: IProps) => {
       </div>
     </Form.Item>
   );
-});
+};
 
-export default observer(formRef);
+export default observer(FormRef);

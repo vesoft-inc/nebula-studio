@@ -1,17 +1,23 @@
 import { action, makeAutoObservable, observable } from 'mobx';
 import service from '@app/config/service';
 import { getRootStore } from '@app/stores';
-import { IAlterForm, IEdge, IIndexList, ISchemaType, ISpace, ITag, ITree, IndexType, ISchemaEnum } from '@app/interfaces/schema';
+import {
+  IAlterForm,
+  IEdge,
+  IIndexList,
+  ISchemaType,
+  ISpace,
+  ITag,
+  ITree,
+  IndexType,
+  ISchemaEnum,
+} from '@app/interfaces/schema';
 import { handleKeyword, handleVidStringName, safeParse } from '@app/utils/function';
 import { findIndex } from 'lodash';
 import { getI18n } from '@vesoft-inc/i18n';
-import {
-  getAlterGQL,
-  getIndexCreateGQL,
-} from '@app/utils/gql';
+import { getAlterGQL, getIndexCreateGQL } from '@app/utils/gql';
 import { message } from 'antd';
 const { intl } = getI18n();
-
 
 const initialSchemaData = {
   edgeTypes: [],
@@ -37,7 +43,7 @@ export class SchemaStore {
   tagIndexTree: ITree[] = [];
   edgeIndexTree: ITree[] = [];
   spaceList: ISpace[] = [];
-  activeMachineNum: number = 1;
+  activeMachineNum = 1;
   tagList: ITag[] = [];
   edgeList: IEdge[] = [];
   indexList: IIndexList[] = [];
@@ -79,15 +85,16 @@ export class SchemaStore {
   };
 
   update = (payload: Record<string, any>) =>
-    Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
-
+    Object.keys(payload).forEach(
+      (key) => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]),
+    );
 
   // switch space
   updateSpaceInfo = async (space: string) => {
     await this.switchSpace(space);
     await this.getSchemaInfo();
     const consoleStore = this.rootStore.console;
-    if(!consoleStore.currentSpace) {
+    if (!consoleStore.currentSpace) {
       consoleStore.updateCurrentSpace(space);
     }
   };
@@ -113,7 +120,7 @@ export class SchemaStore {
   getSpaces = async () => {
     const { code, data } = await service.execNGQL({ gql: 'show spaces;' });
     if (code === 0) {
-      const spaces = data.tables.map(item => item.Name);
+      const spaces = data.tables.map((item) => item.Name);
       this.update({
         spaces,
       });
@@ -138,7 +145,6 @@ export class SchemaStore {
     const { code, data } = await service.execNGQL({ gql });
     return code === 0 ? data.tables[0]['Create Space'] : null;
   };
-
 
   getSpacesList = async () => {
     const res = await this.getSpaces();
@@ -200,8 +206,7 @@ export class SchemaStore {
   getMachineNumber = async () => {
     const { code, data } = await service.execNGQL({ gql: `SHOW HOSTS` });
     if (code === 0) {
-      const activeMachineNum = data.tables.filter(i => i.Status === 'ONLINE')
-        .length;
+      const activeMachineNum = data.tables.filter((i) => i.Status === 'ONLINE').length;
       this.update({
         activeMachineNum: activeMachineNum || 1,
       });
@@ -216,7 +221,7 @@ export class SchemaStore {
       space: this.currentSpace,
     });
     if (code === 0) {
-      const edgeTypes = data.tables.map(item => item.Name);
+      const edgeTypes = data.tables.map((item) => item.Name);
       this.update({ edgeTypes });
       return edgeTypes;
     }
@@ -225,10 +230,10 @@ export class SchemaStore {
   getEdgeTypesFields = async (payload: { edgeTypes: any[] }) => {
     const { edgeTypes } = payload;
     await Promise.all(
-      edgeTypes.map(async item => {
+      edgeTypes.map(async (item) => {
         const { code, data } = await this.getTagOrEdgeInfo(ISchemaEnum.Edge, item);
         if (code === 0) {
-          const edgeFields = data.tables.map(item => item.Field);
+          const edgeFields = data.tables.map((item) => item.Field);
           this.addEdgesName({
             edgeType: item,
             edgeFields: ['type', '_rank', ...edgeFields],
@@ -250,7 +255,7 @@ export class SchemaStore {
     if (edgeTypes) {
       const edgeList: IEdge[] = [];
       await Promise.all(
-        edgeTypes.map(async item => {
+        edgeTypes.map(async (item) => {
           const edge: IEdge = {
             name: item,
             fields: [],
@@ -296,24 +301,24 @@ export class SchemaStore {
     });
 
     if (code === 0) {
-      const tags = data.tables.map(item => item.Name);
+      const tags = data.tables.map((item) => item.Name);
       return tags;
     }
   };
 
   addTagsName = (payload: any) => {
     const { tag, tagFields } = payload;
-    const index = findIndex(this.tagsFields, item => item.tag === tag);
+    const index = findIndex(this.tagsFields, (item) => item.tag === tag);
     this.tagsFields[!~index ? this.tagsFields.length : index] = { tag, fields: tagFields };
   };
 
   getTagsFields = async (payload: { tags: any[] }) => {
     const { tags } = payload;
     await Promise.all(
-      tags.map(async item => {
+      tags.map(async (item) => {
         const { code, data } = await this.getTagOrEdgeInfo(ISchemaEnum.Tag, item);
         if (code === 0) {
-          const tagFields = data.tables.map(item => ({
+          const tagFields = data.tables.map((item) => ({
             field: item.Field,
             type: item.Type,
           }));
@@ -328,7 +333,7 @@ export class SchemaStore {
     if (tags) {
       const tagList: ITag[] = [];
       await Promise.all(
-        tags.map(async item => {
+        tags.map(async (item) => {
           const tag: ITag = {
             name: item,
             fields: [],
@@ -360,10 +365,7 @@ export class SchemaStore {
     return { code, data, message };
   };
 
-  createTagOrEdge = async (payload: {
-    type: ISchemaType,
-    gql: string
-  }) => {
+  createTagOrEdge = async (payload: { type: ISchemaType; gql: string }) => {
     const { type, gql } = payload;
     const { code, data, message } = (await service.execNGQL(
       { gql, space: this.currentSpace },
@@ -394,7 +396,7 @@ export class SchemaStore {
   getTagOrEdgeDetail = async (type: ISchemaType, name: string) => {
     const gql = `show create ${type} ${handleKeyword(name)}`;
     const { code, data } = await service.execNGQL({ gql, space: this.currentSpace });
-    if(code === 0) {
+    if (code === 0) {
       const _type = `Create ${type[0].toUpperCase()}${type.slice(1)}`;
       return data.tables[0][_type];
     }
@@ -415,7 +417,7 @@ export class SchemaStore {
     });
     if (code === 0) {
       const key = type === 'tag' ? 'By Tag' : 'By Edge';
-      const indexes = data.tables.map(item => {
+      const indexes = data.tables.map((item) => {
         return {
           name: item['Index Name'],
           owner: item[key],
@@ -479,7 +481,7 @@ export class SchemaStore {
       const tree = [] as ITree[];
       await Promise.all(
         _indexes.map(async (item: any) => {
-          const tag = tree.filter(i => i.name === item.indexOwner);
+          const tag = tree.filter((i) => i.name === item.indexOwner);
           if (tag.length > 0) {
             tag[0].indexes.push(item);
           } else {
@@ -514,7 +516,7 @@ export class SchemaStore {
     if (indexes) {
       const indexList: IIndexList[] = [];
       await Promise.all(
-        indexes.map(async item => {
+        indexes.map(async (item) => {
           const comment = await this.getIndexComment({
             type,
             name: item.name,
@@ -629,27 +631,27 @@ export class SchemaStore {
 
   // schema visualization
   getRandomEdgeData = async () => {
-    const vids:Set<string> = new Set();
+    const vids: Set<string> = new Set();
     const edges = [];
-    const edgeQuery = this.edgeList.map(edge => `MATCH ()-[e:${handleKeyword(edge.name)}]->() RETURN e LIMIT 10;`);
+    const edgeQuery = this.edgeList.map((edge) => `MATCH ()-[e:${handleKeyword(edge.name)}]->() RETURN e LIMIT 10;`);
     const { code, data, message } = await service.batchExecNGQL({
       gqls: edgeQuery,
       space: this.currentSpace,
     });
     let err;
-    if(code !== 0) {
+    if (code !== 0) {
       return {
-        err: message
+        err: message,
       };
     }
-    for(let i = 0; i < data.length; i++) {
+    for (let i = 0; i < data.length; i++) {
       const item = data[i];
-      if(item.code !== 0) {
+      if (item.code !== 0) {
         err = item.message;
         break;
       } else {
         const edgeList = item.data?.tables || [];
-        edgeList.forEach(item => {
+        edgeList.forEach((item) => {
           const { dstID, srcID, edgeName } = item._edgesParsedList[0];
           vids.add(srcID);
           vids.add(dstID);
@@ -657,55 +659,59 @@ export class SchemaStore {
             src: srcID,
             dst: dstID,
             name: edgeName,
-            properties: this.edgeList.find(i => i.name === edgeName).fields.map(field => ({
-              name: field.Field,
-              type: field.Type,
-            }))
+            properties: this.edgeList
+              .find((i) => i.name === edgeName)
+              .fields.map((field) => ({
+                name: field.Field,
+                type: field.Type,
+              })),
           });
         });
       }
     }
-    return { 
-      vids: [...vids], 
-      edges, 
-      err 
+    return {
+      vids: [...vids],
+      edges,
+      err,
     };
   };
 
   getNodeTagMap = async (ids: string[]) => {
     const vidMap = {};
-    const tagSet = new Set(this.tagList.map(i => i.name));
-    if(!this.spaceVidType) {
+    const tagSet = new Set(this.tagList.map((i) => i.name));
+    if (!this.spaceVidType) {
       await this.updateVidType();
     }
-    const gql = `match (v) where id(v) in [${ids.map(id => handleVidStringName(id, this.spaceVidType)).join(',')}] return id(v) as id, tags(v) as \`tags\``;
+    const gql = `match (v) where id(v) in [${ids
+      .map((id) => handleVidStringName(id, this.spaceVidType))
+      .join(',')}] return id(v) as id, tags(v) as \`tags\``;
     const res = await service.execNGQL({ gql, space: this.currentSpace });
-    if(res.code === 0) {
+    if (res.code === 0) {
       const tables = res.data?.tables || [];
-      tables.forEach(item => {
+      tables.forEach((item) => {
         const { id, tags } = item;
         const _tags: string[] = safeParse(tags) || [];
         vidMap[id] = _tags.length > 0 ? _tags : undefined;
-        _tags.forEach(i => tagSet.add(i));
+        _tags.forEach((i) => tagSet.add(i));
       });
       return { vidMap, tags: [...tagSet] };
     }
   };
 
   getSchemaSnapshot = async (space) => {
-    const res = await service.getSchemaSnapshot({ space }, {
-      trackEventConfig: {
-        category: 'schema',
-        action: 'get_schema_visualization',
+    const res = await service.getSchemaSnapshot(
+      { space },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: 'get_schema_visualization',
+        },
       },
-    });
+    );
     return res;
   };
 
-  updateSchemaSnapshot = async (params: {
-    space: string, 
-    snapshot: string
-  }) => {
+  updateSchemaSnapshot = async (params: { space: string; snapshot: string }) => {
     const res = await service.updateSchemaSnapshot(params, {
       trackEventConfig: {
         category: 'sketch',
@@ -731,7 +737,7 @@ export class SchemaStore {
       const edges = await this.getEdges();
       const tagIndexes = await this.getIndexes(ISchemaEnum.Tag);
       const edgeIndexes = await this.getIndexes(ISchemaEnum.Edge);
-      if(!tags || !edges || !tagIndexes || !edgeIndexes) {
+      if (!tags || !edges || !tagIndexes || !edgeIndexes) {
         throw new Error(intl.get('schema.getDDLError'));
       }
       const queryList = [
@@ -761,12 +767,12 @@ export class SchemaStore {
       for await (const item of queryList) {
         const { data, type, isIndex, destination } = item;
         for await (const _item of data) {
-          if(isIndex) {
+          if (isIndex) {
             const gql = await this.getIndexGQL({ type, name: _item.name });
             gql && destination.push(gql);
           } else {
             const gql = await this.getTagOrEdgeDetail(type, _item);
-            if(gql) {
+            if (gql) {
               destination.push(gql);
             } else {
               throw new Error(intl.get('schema.getDDLError'));
