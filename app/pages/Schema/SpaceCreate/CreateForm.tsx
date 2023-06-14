@@ -5,8 +5,8 @@ import { nameRulesFn, numberRulesFn, replicaRulesFn, stringByteRulesFn } from '@
 import { useI18n } from '@vesoft-inc/i18n';
 import { DEFAULT_PARTITION_NUM } from '@app/utils/constant';
 import styles from './index.module.less';
+import { observer } from 'mobx-react-lite';
 const Option = Select.Option;
-
 
 const defaultFormItemLayout = {
   labelCol: {
@@ -28,22 +28,24 @@ const CreateForm = (props: IProps) => {
   const { intl } = useI18n();
   const { schema } = useStore();
   const { activeMachineNum } = schema;
-  const _colSpan = useMemo(() => colSpan === 'full' ? 24 : 12, [colSpan]);
+  const _colSpan = useMemo(() => (colSpan === 'full' ? 24 : 12), [colSpan]);
   const vidColSpans = useMemo(() => {
-    if(colSpan === 'full') {
+    if (colSpan === 'full') {
       return [14, 9];
     } else {
       return [formItemLayout.wrapperCol.span || 11, 11];
     }
   }, [colSpan]);
   return (
-    <Form 
-      className={className || styles.spaceForm} 
-      form={form} 
-      layout="vertical" 
-      onFieldsChange={onFieldsChange} 
-      onFinish={onFinish} 
-      {...defaultFormItemLayout} {...formItemLayout}>
+    <Form
+      className={className || styles.spaceForm}
+      form={form}
+      layout="vertical"
+      onFieldsChange={onFieldsChange}
+      onFinish={onFinish}
+      {...defaultFormItemLayout}
+      {...formItemLayout}
+    >
       <Row>
         <Col span={_colSpan}>
           <Form.Item label={intl.get('common.name')} name="name" rules={nameRulesFn()}>
@@ -54,43 +56,54 @@ const CreateForm = (props: IProps) => {
           <Form.Item noStyle shouldUpdate={true}>
             {({ getFieldValue }) => {
               const vidType = getFieldValue('vidType');
-              return <>
-                <Form.Item
-                  label="Vid Type"
-                  name="vidType"
-                  rules={[{ required: true, message: intl.get('formRules.vidTypeRequired') }]}
-                  wrapperCol={vidType === 'FIXED_STRING' && { span: vidColSpans[0] }}
-                >
-                  <Select placeholder={intl.get('schema.selectVidTypeTip')}>
-                    <Option value="FIXED_STRING">FIXED_STRING</Option>
-                    <Option value="INT64">INT64</Option>
-                  </Select>
-                </Form.Item>
-                {vidType === 'FIXED_STRING' 
-                  ? <Col span={vidColSpans[1]} offset={vidColSpans[0] + 1} className={styles.stringLength}>
-                    <Form.Item label={intl.get('schema.length')} name="stringLength" rules={[
-                      {
-                        required: true,
-                        message: intl.get('formRules.fixStringLengthRequired'),
-                      },
-                      ...numberRulesFn(),
-                    ]}>
-                      <Input />
-                    </Form.Item>
-                  </Col>
-                  : null}
-              </>;
+              return (
+                <>
+                  <Form.Item
+                    label="Vid Type"
+                    name="vidType"
+                    rules={[{ required: true, message: intl.get('formRules.vidTypeRequired') }]}
+                    wrapperCol={vidType === 'FIXED_STRING' && { span: vidColSpans[0] }}
+                  >
+                    <Select placeholder={intl.get('schema.selectVidTypeTip')}>
+                      <Option value="FIXED_STRING">FIXED_STRING</Option>
+                      <Option value="INT64">INT64</Option>
+                    </Select>
+                  </Form.Item>
+                  {vidType === 'FIXED_STRING' ? (
+                    <Col span={vidColSpans[1]} offset={vidColSpans[0] + 1} className={styles.stringLength}>
+                      <Form.Item
+                        label={intl.get('schema.length')}
+                        name="stringLength"
+                        rules={[
+                          {
+                            required: true,
+                            message: intl.get('formRules.fixStringLengthRequired'),
+                          },
+                          ...numberRulesFn(),
+                        ]}
+                      >
+                        <Input />
+                      </Form.Item>
+                    </Col>
+                  ) : null}
+                </>
+              );
             }}
           </Form.Item>
-        
         </Col>
       </Row>
       <Row>
         <Col span={_colSpan}>
-          <Form.Item label={<span>
-            {intl.get('common.comment')}:
-            <span className={styles.optionalItem}>({intl.get('common.optional')})</span>
-          </span>} name="comment" rules={stringByteRulesFn()}>
+          <Form.Item
+            label={
+              <span>
+                {intl.get('common.comment')}:
+                <span className={styles.optionalItem}>({intl.get('common.optional')})</span>
+              </span>
+            }
+            name="comment"
+            rules={stringByteRulesFn()}
+          >
             <Input />
           </Form.Item>
         </Col>
@@ -99,10 +112,12 @@ const CreateForm = (props: IProps) => {
         <Col span={_colSpan}>
           <Form.Item
             colon={false}
-            label={<span>
-              Partition_num:
-              <span className={styles.optionalItem}>({intl.get('common.optional')})</span>
-            </span>}
+            label={
+              <span>
+                Partition_num:
+                <span className={styles.optionalItem}>({intl.get('common.optional')})</span>
+              </span>
+            }
             name="partitionNum"
             rules={numberRulesFn()}
           >
@@ -112,10 +127,12 @@ const CreateForm = (props: IProps) => {
         <Col span={_colSpan}>
           <Form.Item
             colon={false}
-            label={<span>
-              Replica_factor:
-              <span className={styles.optionalItem}>({intl.get('common.optional')})</span>
-            </span>}
+            label={
+              <span>
+                Replica_factor:
+                <span className={styles.optionalItem}>({intl.get('common.optional')})</span>
+              </span>
+            }
             name="replicaFactor"
             rules={replicaRulesFn(activeMachineNum)}
           >
@@ -127,4 +144,4 @@ const CreateForm = (props: IProps) => {
   );
 };
 
-export default CreateForm;
+export default observer(CreateForm);
