@@ -68,6 +68,9 @@ const PopoverContent = (props: IContentProps) => {
     sketchModel
   } = useStore();
   const { getMachineNumber, getSpaces, updateSpaceInfo } = schema;
+  useEffect(() => {
+    getMachineNumber();
+  }, []);
   const handleChangeMode = useCallback(async (e: any) => {
     const { value } = e.target;
     setMode(value);
