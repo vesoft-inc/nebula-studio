@@ -5,6 +5,7 @@ import { nameRulesFn, numberRulesFn, replicaRulesFn, stringByteRulesFn } from '@
 import { useI18n } from '@vesoft-inc/i18n';
 import { DEFAULT_PARTITION_NUM } from '@app/utils/constant';
 import styles from './index.module.less';
+import { observer } from 'mobx-react-lite';
 const Option = Select.Option;
 
 
@@ -127,4 +128,4 @@ const CreateForm = (props: IProps) => {
   );
 };
 
-export default CreateForm;
+export default observer(CreateForm);
