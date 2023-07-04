@@ -1,4 +1,4 @@
-package ws
+package utils
 
 type MessageReceiveHeader struct {
 	MsgId   string `json:"msgId"`

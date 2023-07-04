@@ -2,11 +2,11 @@ package filestore
 
 import (
 	"errors"
-	"github.com/aws/aws-sdk-go/aws"
 	"io/ioutil"
 	"strings"
 	"testing"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/stretchr/testify/assert"
@@ -86,7 +86,7 @@ func TestS3Store_ReadFile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create a new S3Store instance
 			s3Client := &mockS3Client{body: tt.body, statusCode: tt.statusCode}
-			store := &S3Store{BucketName: "test-bucket", S3Client: s3Client}
+			store := &S3Store{Bucket: "test-bucket", S3Client: s3Client}
 
 			// Call the ReadFile method and check the result
 			got, err := store.ReadFile(tt.args.path, tt.args.startLine...)
@@ -99,7 +99,7 @@ func TestS3Store_ReadFile(t *testing.T) {
 func TestS3Store_ListFiles(t *testing.T) {
 	// Create a new S3Store instance
 	s3Client := &mockS3Client{}
-	store := &S3Store{BucketName: "test-bucket", S3Client: s3Client}
+	store := &S3Store{Bucket: "test-bucket", S3Client: s3Client}
 
 	// Define the expected result
 	expected := []string{"path/to/file1.txt", "path/to/file2.txt", "path/to/subdir/"}
@@ -109,4 +109,3 @@ func TestS3Store_ListFiles(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, expected, got)
 }
-
