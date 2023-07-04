@@ -17,6 +17,7 @@ import (
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/server"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ws"
+	wsUtils "github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ws/utils"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/proc"
@@ -77,7 +78,7 @@ func main() {
 	handler.RegisterHandlers(server, svcCtx)
 
 	// websocket
-	hub := ws.NewHub()
+	hub := wsUtils.NewHub()
 	go hub.Run()
 	server.AddRoute(rest.Route{
 		Method: http.MethodGet,

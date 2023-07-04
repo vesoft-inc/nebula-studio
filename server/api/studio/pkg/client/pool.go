@@ -437,6 +437,9 @@ func (client *Client) executeRequest(session *nebula.Session, request ChannelReq
 
 func Execute(nsid string, space string, gqls []string) ([]ExecuteResult, error) {
 	client, _ := clientPool.Get(nsid)
+	if client == nil {
+		return nil, ClientNotExistedError
+	}
 	responseChannel := make(chan ChannelResponse)
 	client.RequestChannel <- ChannelRequest{
 		Gqls:            gqls,

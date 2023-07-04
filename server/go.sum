@@ -455,8 +455,6 @@ github.com/vesoft-inc/go-pkg v0.0.0-20230307111816-a43d6a342d23 h1:uiuSGlc1MTuEO
 github.com/vesoft-inc/go-pkg v0.0.0-20230307111816-a43d6a342d23/go.mod h1:HCAXRhF2io+nPLQnl+RQ6XyVcp1Xdv6NgslXRBBCiEU=
 github.com/vesoft-inc/nebula-go/v3 v3.5.0 h1:2ZSkoBxtIfs15AXJXqrAPDPd0Z9HrzKR7YKXPqlJcR0=
 github.com/vesoft-inc/nebula-go/v3 v3.5.0/go.mod h1:+sXv05jYQBARdTbTcIEsWVXCnF/6ttOlDK35xQ6m54s=
-github.com/vesoft-inc/nebula-importer/v4 v4.0.0-alpha.1 h1:lZ29IUlZrE+hWwMi4VWFadgDFNPY7k724DlsecgNn6Y=
-github.com/vesoft-inc/nebula-importer/v4 v4.0.0-alpha.1/go.mod h1:r7yAWjK9hXfPbPYk0jSFwK2UTUcwA/uqbcaEGp4AP8o=
 github.com/vesoft-inc/nebula-importer/v4 v4.0.0 h1:7BuYynDNf/Vrg34ka/ctGbKlT7INgZgk38ULSWVbPHE=
 github.com/vesoft-inc/nebula-importer/v4 v4.0.0/go.mod h1:r7yAWjK9hXfPbPYk0jSFwK2UTUcwA/uqbcaEGp4AP8o=
 github.com/xdg-go/pbkdf2 v1.0.0/go.mod h1:jrpuAogTd400dnrH08LKmI/xc1MbPOebTwRqcT5RDeI=

@@ -13,7 +13,7 @@ func TestS3Store(t *testing.T) {
 		"accessSecret": "",
 	}
 	bytes, _ := json.Marshal(s3Config)
-	store, err := NewFileStore("s3", string(bytes), s3Config["accessSecret"])
+	store, err := NewFileStore("s3", string(bytes), s3Config["accessSecret"], "aws")
 	if err != nil {
 		t.Log("NewFileStore Error: ", err)
 	}
