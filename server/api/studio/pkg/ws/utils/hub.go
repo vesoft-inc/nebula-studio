@@ -1,10 +1,14 @@
 package utils
 
+import "sync"
+
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
+	mu sync.RWMutex
+
 	// Registered clients.
-	clients map[*Client]bool
+	clients map[string]*Client
 
 	// Inbound messages from the clients.
 	// broadcast chan []byte
@@ -21,7 +25,7 @@ func NewHub() *Hub {
 		// broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		clients:    make(map[*Client]bool),
+		clients:    make(map[string]*Client, 0),
 	}
 }
 
@@ -29,12 +33,16 @@ func (h *Hub) Run() {
 	for {
 		select {
 		case client := <-h.register:
-			h.clients[client] = true
+			h.mu.Lock()
+			h.clients[client.ID] = client
+			h.mu.Unlock()
 		case client := <-h.unregister:
-			if _, ok := h.clients[client]; ok {
-				delete(h.clients, client)
+			h.mu.Lock()
+			if _, ok := h.clients[client.ID]; ok {
+				delete(h.clients, client.ID)
 				close(client.send)
 			}
+			h.mu.Unlock()
 			// case message := <-h.broadcast:
 			// 	for client := range h.clients {
 			// 		select {
@@ -46,4 +54,10 @@ func (h *Hub) Run() {
 			// 	}
 		}
 	}
+}
+
+func (h *Hub) SelectClient(selector func(clients map[string]*Client) *Client) *Client {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	return selector(h.clients)
 }

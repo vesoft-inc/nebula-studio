@@ -41,9 +41,20 @@ func Middleware(next utils.TNext) utils.TNext {
 				}
 			}
 		}
-		executes, err := client.Execute(c.ClientInfo.NSID, space, gqls)
+
+		clientInfo, ok := c.GetClientInfo().(*auth.AuthData)
+		if !ok {
+			logx.Errorf("[WebSocket batch_ngql]: msgReceived.Body.Content(%v); error(%v)", &msgReceived.Body.Content, "invalid client info")
+			msgPost.Body.Content = map[string]any{
+				"code":    base.Error,
+				"message": "invalid client info",
+			}
+			return &msgPost
+		}
+
+		executes, err := client.Execute(clientInfo.NSID, space, gqls)
 		if err != nil {
-			logx.Errorf("[WebSocket runNgql]: msgReceived.Body.Content(%v); error(%v)", &msgReceived.Body.Content, err)
+			logx.Errorf("[WebSocket batch_ngql]: msgReceived.Body.Content(%v); error(%v)", &msgReceived.Body.Content, err)
 			content := map[string]any{
 				"code":    base.Error,
 				"message": err.Error(),

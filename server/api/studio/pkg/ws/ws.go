@@ -9,6 +9,7 @@ import (
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ws/middlewares/logger"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ws/middlewares/ngql"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ws/utils"
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 func ServeWebSocket(hub *utils.Hub, w http.ResponseWriter, r *http.Request, clientInfo *auth.AuthData) {
@@ -25,10 +26,17 @@ func ServeWebSocket(hub *utils.Hub, w http.ResponseWriter, r *http.Request, clie
 	}
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
+		logx.Errorf("[WebSocket Upgrade]: %v", err)
 		return
 	}
 
-	client := utils.NewClient(hub, conn, clientInfo)
+	client, err := utils.NewClient(hub, conn, "browser", clientInfo)
+	if err != nil {
+		logx.Errorf("[WebSocket NewClient]: %v", err)
+		conn.Close()
+		return
+	}
+
 	client.RegisterMiddleware([]utils.TMiddleware{
 		logger.Middleware,
 		batch_ngql.Middleware,

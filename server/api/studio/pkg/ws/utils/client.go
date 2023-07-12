@@ -3,10 +3,11 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
+	uuid "github.com/satori/go.uuid"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -43,8 +44,11 @@ func noopDispatcher(msg *MessageReceive, client *Client) *MessagePost {
 
 // Client is a middleman between the websocket connection and the hub.
 type Client struct {
+	ID         string
+	Type       string
 	Hub        *Hub
-	ClientInfo *auth.AuthData
+	clientInfo any
+	mu         sync.RWMutex
 	// The websocket connection.
 	Conn *websocket.Conn
 	// Buffered channel of outbound messages.
@@ -53,14 +57,32 @@ type Client struct {
 	dispatcher TNext
 }
 
-func NewClient(hub *Hub, conn *websocket.Conn, clientInfo *auth.AuthData) *Client {
+func NewClient(hub *Hub, conn *websocket.Conn, clientType string, clientInfo any) (*Client, error) {
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
 	return &Client{
+		ID:         id.String(),
+		Type:       clientType,
 		Hub:        hub,
 		Conn:       conn,
-		ClientInfo: clientInfo,
+		clientInfo: clientInfo,
 		send:       make(chan []byte, bufSize),
 		dispatcher: noopDispatcher,
-	}
+	}, nil
+}
+
+func (c *Client) GetClientInfo() any {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.clientInfo
+}
+
+func (c *Client) SetClientInfo(clientInfo any) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.clientInfo = clientInfo
 }
 
 func (c *Client) RegisterMiddleware(mds []TMiddleware) {
