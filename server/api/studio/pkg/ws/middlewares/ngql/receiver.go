@@ -36,7 +36,17 @@ func Middleware(next utils.TNext) utils.TNext {
 		if reqGql, ok := msgReceived.Body.Content["gql"].(string); ok {
 			gqls = append(gqls, reqGql)
 		}
-		execute, err := client.Execute(c.ClientInfo.NSID, space, gqls)
+		clientInfo, ok := c.GetClientInfo().(*auth.AuthData)
+		if !ok {
+			logx.Errorf("[WebSocket runNgql]: msgReceived.Body.Content(%v); error(%v)", &msgReceived.Body.Content, "invalid client info")
+			msgPost.Body.Content = map[string]any{
+				"code":    base.Error,
+				"message": "invalid client info",
+			}
+			return &msgPost
+		}
+
+		execute, err := client.Execute(clientInfo.NSID, space, gqls)
 		if err != nil {
 			logx.Errorf("[WebSocket runNgql]: msgReceived.Body.Content(%v); error(%v)", &msgReceived.Body.Content, err)
 			content := map[string]any{

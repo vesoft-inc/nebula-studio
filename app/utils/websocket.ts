@@ -217,7 +217,7 @@ export class NgqlRunner {
     this.closeSocket();
 
     // try reconnect
-    this.socketUrl && setTimeout(this.reConnect, 1000);
+    this.socketUrl && setTimeout(this.reConnect, 3000);
   };
 
   closeSocket = () => {
