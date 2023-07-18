@@ -20,8 +20,9 @@ interface IProps {
   ref?: any;
   width?: string;
   height?: string;
+  onKeyDown?: (change) => void;
   onShiftEnter?: () => void;
-  onChange?: (value: string) => void;
+  onChange?: (value: string, change) => void;
   onBlur?: (value: string) => void;
   onChangeLine?: () => void;
 }
@@ -90,7 +91,7 @@ export default class ReactCodeMirror extends PureComponent<IProps, any> {
       lineWrapping: true,
       // show number of rows
       lineNumbers: true,
-      fullScreen: true,
+      fullScreen: false,
       mode: 'nebula',
       ...this.props.options,
     };
@@ -121,11 +122,12 @@ export default class ReactCodeMirror extends PureComponent<IProps, any> {
       }
       change.preventDefault();
     }
+    this.props.onKeyDown && this.props.onKeyDown(change);
   };
 
   codemirrorValueChange = (doc, change) => {
     doc.eachLine(line => {
-      if(line.text.startsWith('//') || line.text.startsWith('#')) {
+      if (line.text.startsWith('//') || line.text.startsWith('#')) {
         doc.addLineClass(line, 'wrap', 'notes');
       } else if (line.wrapClass === 'notes') {
         doc.removeLineClass(line, 'wrap', 'notes');
@@ -133,13 +135,13 @@ export default class ReactCodeMirror extends PureComponent<IProps, any> {
     });
     if (change.origin !== 'setValue') {
       if (this.props.onChange) {
-        this.props.onChange(doc.getValue());
+        this.props.onChange(doc.getValue(), change);
       }
     }
     if (change.origin === '+input') {
-      CodeMirror.commands.autocomplete(this.editor, null, {
-        completeSingle: false,
-      });
+      // CodeMirror.commands.autocomplete(this.editor, null, {
+      //   completeSingle: false,
+      // });
     }
     if (
       this.props.onChangeLine &&

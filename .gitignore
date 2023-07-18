@@ -26,3 +26,4 @@ server/api/*/data
 server/api/*/assets/*
 !server/api/*/assets/.gitkeep
 bin/
+test

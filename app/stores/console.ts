@@ -6,6 +6,8 @@ import { getI18n } from '@vesoft-inc/i18n';
 import { safeParse } from '@app/utils/function';
 import { NgqlRes } from '@app/utils/websocket';
 import { getRootStore } from '.';
+import { ban, keyWords, operators } from '@app/config/nebulaQL';
+import gpt from './gpt';
 
 const { intl } = getI18n();
 
@@ -44,6 +46,9 @@ export class ConsoleStore {
     id: string;
     content: string;
   }[];
+  showCompletion = false;
+  completionList = [] as { type: string, text: string }[];
+  activeCompletionIndex = 0;
   constructor() {
     makeAutoObservable(this, {
       results: observable.ref,
@@ -52,6 +57,7 @@ export class ConsoleStore {
       currentGQL: observable,
       favorites: observable,
     });
+    this.addKeyboardEvent();
   }
   get rootStore() {
     return getRootStore();
@@ -161,6 +167,79 @@ export class ConsoleStore {
     }
     return res;
   };
+
+  calcCompletions(cm: any) {
+    const cur = cm.getCursor();
+    const token = cm.getTokenAt(cur);
+    const str = token.string;
+    if (str === '') {
+      this.resetCompletion()
+      return;
+    }
+
+    const list = [];
+    keyWords.forEach(item => {
+      if (item.indexOf(str) === 0&&item!==str) {
+        list.push({
+          type: "keyword",
+          text: item,
+        })
+      }
+    });
+    operators.forEach(item => {
+      if (item.indexOf(str) === 0&&item!==str) {
+        list.push({
+          type: "operator",
+          text: item,
+        })
+      }
+    });
+    ban.forEach(item => {
+      if (item.indexOf(str) === 0&&item!==str) {
+        list.push({
+          type: "ban",
+          text: item,
+        })
+      }
+    });
+    this.completionList = list.slice(0, 5);
+    this.showCompletion = !!list.length;
+    this.activeCompletionIndex = 0;
+  }
+
+  insertCompletion(cm,index:number=this.activeCompletionIndex) {
+    const cur = cm.getCursor();
+    const token = cm.getTokenAt(cur);
+    const item = [...this.completionList, ...gpt.completionList][index];
+    const start = item.type === "copilot" ? { ...cur } : { line: cur.line, ch: token.start };
+    const end =  item.type === "copilot" ? cur : { line: cur.line, ch: token.end };
+    cm.replaceRange(item.text,start,end, "complete");
+    cm.scrollIntoView();
+  }
+
+  resetCompletion() {
+     this.update({
+      showCompletion: false,
+      completionList: [],
+      activeCompletionIndex: 0,
+     })
+    gpt.update({
+      completionList: [],
+    })
+  }
+
+  addKeyboardEvent() {
+    document.addEventListener("keyup", (e) => {
+      if (!this.showCompletion) return;
+      e.preventDefault();
+      if (e.key === "ArrowUp" && this.activeCompletionIndex > 0) {
+        this.activeCompletionIndex = this.activeCompletionIndex - 1;
+      }
+      if (e.key === "ArrowDown" && this.activeCompletionIndex < this.completionList.length+gpt.completionList.length - 1) {
+        this.activeCompletionIndex = this.activeCompletionIndex + 1;
+      }
+    })
+  }
 }
 
 const consoleStore = new ConsoleStore();

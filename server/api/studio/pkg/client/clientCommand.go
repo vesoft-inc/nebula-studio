@@ -9,8 +9,10 @@ import (
 	"time"
 )
 
-type ParameterList []string
-type ParameterMap map[string]interface{}
+type (
+	ParameterList []string
+	ParameterMap  map[string]interface{}
+)
 
 // Console side commands
 const (

@@ -179,6 +179,7 @@ func (f *fileService) FileConfigUpdate(request types.FileConfigUpdateRequest) er
 	}
 	return nil
 }
+
 func (f *fileService) FileUpload() error {
 	dir := f.svcCtx.Config.File.UploadDir
 	auth := f.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)

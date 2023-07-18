@@ -52,7 +52,7 @@ type Client struct {
 	// The websocket connection.
 	Conn *websocket.Conn
 	// Buffered channel of outbound messages.
-	send chan []byte
+	Send chan []byte
 	// message received middleware
 	dispatcher TNext
 }
@@ -68,7 +68,7 @@ func NewClient(hub *Hub, conn *websocket.Conn, clientType string, clientInfo any
 		Hub:        hub,
 		Conn:       conn,
 		clientInfo: clientInfo,
-		send:       make(chan []byte, bufSize),
+		Send:       make(chan []byte, bufSize),
 		dispatcher: noopDispatcher,
 	}, nil
 }
@@ -120,8 +120,12 @@ func (c *Client) dispatchMessage(msg *[]byte) (closed bool) {
 	if msgPost == nil {
 		return
 	}
-	msgSend, _ := json.Marshal(msgPost)
-	c.send <- msgSend
+	msgSend, err := json.Marshal(msgPost)
+	if err != nil {
+		logx.Errorf("[WebSocket Marshal]: %v", err)
+		return
+	}
+	c.Send <- msgSend
 	return false
 }
 
@@ -154,7 +158,7 @@ func (c *Client) readPump() {
 
 		// step 0: heartbeat
 		if string(msgReceivedByte) == heartbeatRequest {
-			c.send <- []byte(heartbeatResponse)
+			c.Send <- []byte(heartbeatResponse)
 			continue
 		}
 
@@ -177,11 +181,11 @@ func (c *Client) writePump() {
 
 	for {
 		select {
-		case message, ok := <-c.send:
+		case message, ok := <-c.Send:
 			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				// The hub closed the channel.
-				logx.Errorf("[WebSocket UnexpectedClose]: c.send length: %v", len(c.send))
+				logx.Errorf("[WebSocket UnexpectedClose]: c.send length: %v, %s", len(c.Send), message)
 				c.Conn.WriteControl(websocket.CloseMessage, []byte{}, time.Now().Add(time.Second))
 				return
 			}

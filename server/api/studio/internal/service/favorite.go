@@ -66,6 +66,7 @@ func (s *favoriteService) Delete(request types.DeleteFavoriteRequest) error {
 	}
 	return nil
 }
+
 func (s *favoriteService) DeleteAll() error {
 	auth := s.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	host := auth.Address + ":" + strconv.Itoa(auth.Port)

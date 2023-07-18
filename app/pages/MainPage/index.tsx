@@ -7,6 +7,7 @@ import { MENU_LIST, RoutesList } from './routes';
 import './index.less';
 
 import Header from './Header';
+import GPTBot from '../GPTBot';
 const { Content } = Layout;
 
 const MainPage = () => {
@@ -35,6 +36,7 @@ const MainPage = () => {
           <Redirect from="/" to={{ pathname: redirectPath, search: location.search }} />
         </Switch>
       </ErrorBoundary>
+      <GPTBot />
     </Layout>
   );
 };

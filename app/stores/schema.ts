@@ -328,6 +328,13 @@ export class SchemaStore {
     );
   };
 
+  getTagsAndFields = async () => {
+    const tags = await this.getTags();
+    if (tags) {
+      this.getTagsFields({ tags });
+    }
+  };
+
   getTagList = async () => {
     const tags = await this.getTags();
     if (tags) {

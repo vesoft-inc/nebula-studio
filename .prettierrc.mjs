@@ -1,4 +1,4 @@
-module.exports = {
+export default config = {
   printWidth: 120,
   singleQuote: true,
   semi: true,

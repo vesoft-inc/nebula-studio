@@ -467,3 +467,19 @@ type DatasourcePreviewFileRequest struct {
 type DatasourcePreviewFileData struct {
 	Contents []string `json:"contents"`
 }
+
+type GPTRequest struct {
+	Data map[string]interface{} `json:"data"`
+}
+
+type GPTResponse struct {
+	Data map[string]interface{} `json:"data"`
+}
+
+type GPTConfigRequest struct {
+	URL        string `json:"url"`
+	Key        string `json:"key"`
+	GPTVersion string `json:"gptVersion"`
+	APIType    string `json:"apiType"`
+	Config     string `json:"config,omitempty"`
+}

@@ -62,9 +62,7 @@ type ClientInfo struct {
 	ClientID string
 }
 
-var (
-	clientPool = utils.NewMutexMap[*Client]()
-)
+var clientPool = utils.NewMutexMap[*Client]()
 
 var log = newNebulaLogger()
 
@@ -111,7 +109,6 @@ func NewClient(address string, port int, username string, password string, conf 
 	}
 
 	session, err := client.getSession()
-
 	if err != nil {
 		CloseClient(nsid)
 		return nil, err

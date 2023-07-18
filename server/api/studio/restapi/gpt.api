@@ -1,0 +1,33 @@
+syntax = "v1"
+
+type (
+	GPTRequest {
+		Data map[string]interface{} `json:"data"`
+	}
+	GPTResponse {
+		Data map[string]interface{} `json:"data"`
+	}
+	GPTConfigRequest {
+		URL        string `json:"url"`
+		Key        string `json:"key"`
+		GPTVersion string `json:"gptVersion"`
+		APIType    string `json:"apiType"`
+		Config     string `json:"config,omitempty"`
+	}
+)
+
+@server(
+	group: gpt
+)
+
+service studio-api {
+	@doc "GPTProxy"
+	@handler GPTProxy
+	post /api/gpt/:path (GPTRequest) returns (GPTResponse)
+	@doc "GPTConfig"
+	@handler GPTConfig
+	post /api/config/gpt(GPTConfigRequest)
+	
+	@handler GetGPTConfig
+	get /api/config/gpt returns (GPTConfigRequest)
+}

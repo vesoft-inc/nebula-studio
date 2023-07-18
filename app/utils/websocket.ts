@@ -46,7 +46,7 @@ interface MessageReceiverProps<R = unknown> {
   config?: Recordable;
 }
 
-export class MessageReceiver<R extends NgqlRes = NgqlRes> {
+export class MessageReceiver<R extends NgqlRes|string = NgqlRes> {
   resolve: (res: R) => void;
   reject: () => void;
   onError?: (e: Error) => void;
@@ -76,7 +76,7 @@ export class NgqlRunner {
   product = 'Studio';
 
   socketMessageListeners: ((e: MessageEvent) => void)[] = [];
-  messageReceiverMap = new Map<string, MessageReceiver>();
+  messageReceiverMap = new Map<string, MessageReceiver<any>>();
 
   socketConnectingPromise: Promise<boolean> | undefined;
   socketPingTimeInterval: number | undefined;
@@ -198,7 +198,9 @@ export class NgqlRunner {
         message.error(content.message);
       }
       messageReceiver.resolve(content);
-      this.messageReceiverMap.delete(msgReceive.header.msgId);
+      if (!messageReceiver.config.notClear) {
+        this.messageReceiverMap.delete(msgReceive.header.msgId);
+      }
     }
   };
 
@@ -249,7 +251,7 @@ export class NgqlRunner {
     }
 
     return new Promise((resolve, reject) => {
-      const messageReceiver = new MessageReceiver({
+      const messageReceiver = new MessageReceiver<NgqlRes>({
         resolve,
         reject,
         product: this.product,
@@ -257,6 +259,30 @@ export class NgqlRunner {
         config,
         msgType: 'ngql',
       });
+
+      this.socket.send(JSON.stringify(messageReceiver.messageSend));
+      this.messageReceiverMap.set(messageReceiver.messageSend.header.msgId, messageReceiver);
+    });
+  };
+
+  runChat =  async ({ req,callback }: { req: any ,callback?:(str:any)=>void}, config: Recordable = {}) => {
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+       await this.reConnect();
+    }
+
+    return new Promise((resolve, reject) => {
+      if (req.stream) {
+        resolve(req.stream);
+      }
+      const messageReceiver = new MessageReceiver<string>({
+        resolve: req.stream?callback:resolve,// when stream don't use promise to reveive data
+        reject,
+        product: this.product,
+        content: req,
+        config,
+        msgType: 'gpt',
+      });
+      config["notClear"] = true;
 
       this.socket.send(JSON.stringify(messageReceiver.messageSend));
       this.messageReceiverMap.set(messageReceiver.messageSend.header.msgId, messageReceiver);
@@ -272,7 +298,7 @@ export class NgqlRunner {
     }
 
     return new Promise((resolve, reject) => {
-      const messageReceiver = new MessageReceiver({
+      const messageReceiver = new MessageReceiver<NgqlRes>({
         resolve,
         reject,
         product: this.product,

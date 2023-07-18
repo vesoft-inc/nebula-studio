@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ws/middlewares/batch_ngql"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ws/middlewares/gpt"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ws/middlewares/logger"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ws/middlewares/ngql"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ws/utils"
@@ -41,6 +42,7 @@ func ServeWebSocket(hub *utils.Hub, w http.ResponseWriter, r *http.Request, clie
 		logger.Middleware,
 		batch_ngql.Middleware,
 		ngql.Middleware,
+		gpt.Middleware,
 	})
 	client.Serve()
 }

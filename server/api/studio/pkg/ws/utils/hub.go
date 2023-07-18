@@ -40,18 +40,9 @@ func (h *Hub) Run() {
 			h.mu.Lock()
 			if _, ok := h.clients[client.ID]; ok {
 				delete(h.clients, client.ID)
-				close(client.send)
+				close(client.Send)
 			}
 			h.mu.Unlock()
-			// case message := <-h.broadcast:
-			// 	for client := range h.clients {
-			// 		select {
-			// 		case client.send <- message:
-			// 		default:
-			// 			close(client.send)
-			// 			delete(h.clients, client)
-			// 		}
-			// 	}
 		}
 	}
 }

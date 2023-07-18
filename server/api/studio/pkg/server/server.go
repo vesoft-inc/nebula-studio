@@ -6,6 +6,7 @@ import (
 	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service/importer"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/gpt"
 	"github.com/zeromicro/go-zero/rest"
 	"gorm.io/gorm"
 )
@@ -20,6 +21,7 @@ var NewServiceContext = svc.NewServiceContext
 func InitDB(c *config.Config, d *gorm.DB) {
 	db.InitDB(c, d)
 	importer.InitTaskStatus()
+	gpt.Init()
 }
 
 func RegisterHandlers(server *rest.Server, studioSvcCtx *svc.ServiceContext) {

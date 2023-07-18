@@ -8,6 +8,7 @@ import (
 	favorite "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/favorite"
 	file "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/file"
 	gateway "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/gateway"
+	gpt "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/gpt"
 	health "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/health"
 	importtask "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/importtask"
 	schema "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/schema"
@@ -251,6 +252,26 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/api/datasources/:id/file-preview",
 				Handler: datasource.DatasourcePreviewFileHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/gpt/:path",
+				Handler: gpt.GPTProxyHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/config/gpt",
+				Handler: gpt.GPTConfigHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/config/gpt",
+				Handler: gpt.GetGPTConfigHandler(serverCtx),
 			},
 		},
 	)

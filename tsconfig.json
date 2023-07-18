@@ -31,8 +31,18 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@public/*": ["public/*"],
-      "@app/*": ["app/*"]
+      "@public/*": [
+        "public/*"
+      ],
+      "@app/*": [
+        "app/*"
+      ]
     }
-  }
+  },
+  "include": [
+    "./**/*.ts",
+    "./**/*.tsx",
+    "./**/*.js",
+    "./**/*.json"
+  ]
 }

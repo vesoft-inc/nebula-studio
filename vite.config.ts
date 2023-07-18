@@ -51,6 +51,7 @@ export default defineConfig({
   server: {
     port: 7001,
     open: true,
+    host: "0.0.0.0",
     proxy: {
       '/api-nebula': {
         target: `http://${proxyHost}`,
