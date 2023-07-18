@@ -81,7 +81,9 @@ export class GlobalStore {
     localStorage.removeItem('currentSpace');
   };
   update = (payload: Record<string, any>) => {
-    Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
+    Object.keys(payload).forEach(
+      (key) => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]),
+    );
   };
 
   login = async (payload: { address: string; port: string; username: string; password: string }) => {
@@ -110,9 +112,9 @@ export class GlobalStore {
       cookies.set('nu', username);
       const socketConncted = await this.ngqlRunner.connect({
         config: {
-          url: `ws://${location.host}/nebula_ws`
+          url: `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/nebula_ws`,
         },
-        logoutFun: this.logout
+        logoutFun: this.logout,
       });
       this.update({ _host, _username: username });
       return socketConncted;
@@ -127,13 +129,15 @@ export class GlobalStore {
 
   getGraphAddress = async () => {
     const { code, data } = await service.execNGQL({ gql: 'show hosts graph;' });
-    const list = code !== 0 ? [] : data.tables.reduce((acc, cur) => {
-      if (isValidIP(cur.Host) && cur.Status === 'ONLINE') {
-        acc.push(`${cur.Host}:${cur.Port}`);
-      }
-      return acc;
-    }
-    , []);
+    const list =
+      code !== 0
+        ? []
+        : data.tables.reduce((acc, cur) => {
+            if (isValidIP(cur.Host) && cur.Status === 'ONLINE') {
+              acc.push(`${cur.Host}:${cur.Port}`);
+            }
+            return acc;
+          }, []);
     return list.length ? list : [this.host];
   };
 }
