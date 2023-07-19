@@ -27,17 +27,17 @@ type Config struct {
 	}
 
 	DB struct {
-		LogLevel                  int
-		IgnoreRecordNotFoundError bool
-		AutoMigrate               bool
-		Type                      string
-		Host                      string
-		Name                      string
-		User                      string
-		Password                  string
-		SqliteDbFilePath          string
-		MaxOpenConns              int
-		MaxIdleConns              int
+		LogLevel                  int    `json:",default=4"`
+		IgnoreRecordNotFoundError bool   `json:",default=true"`
+		AutoMigrate               bool   `json:",default=true"`
+		Type                      string `json:",default=sqlite3"`
+		Host                      string `json:",optional"`
+		Name                      string `json:",optional"`
+		User                      string `json:",optional"`
+		Password                  string `json:",optional"`
+		SqliteDbFilePath          string `json:",default=./data/tasks.db"`
+		MaxOpenConns              int    `json:",default=30"`
+		MaxIdleConns              int    `json:",default=10"`
 	}
 }
 
