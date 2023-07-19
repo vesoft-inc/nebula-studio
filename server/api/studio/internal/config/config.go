@@ -21,10 +21,23 @@ type Config struct {
 	}
 
 	File struct {
-		UploadDir        string
-		TasksDir         string
-		SqliteDbFilePath string
-		TaskIdPath       string
+		UploadDir  string
+		TasksDir   string
+		TaskIdPath string
+	}
+
+	DB struct {
+		LogLevel                  int
+		IgnoreRecordNotFoundError bool
+		AutoMigrate               bool
+		Type                      string
+		Host                      string
+		Name                      string
+		User                      string
+		Password                  string
+		SqliteDbFilePath          string
+		MaxOpenConns              int
+		MaxIdleConns              int
 	}
 }
 
