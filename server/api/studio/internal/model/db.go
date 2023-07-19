@@ -19,7 +19,7 @@ import (
 
 var CtxDB *gorm.DB
 
-func parseDSN(opts config.Config) (dsn string, err error) {
+func ParseDSN(opts config.Config) (dsn string, err error) {
 	switch opts.DB.Type {
 	case "mysql":
 		concate := "?"
@@ -44,9 +44,9 @@ func parseDSN(opts config.Config) (dsn string, err error) {
 	return dsn, nil
 }
 
-func openDB(opts config.Config) (*gorm.DB, error) {
+func OpenDB(opts config.Config) (*gorm.DB, error) {
 	logx.Info(opts)
-	dsn, err := parseDSN(opts)
+	dsn, err := ParseDSN(opts)
 	if err != nil {
 		return nil, errors.Wrap(err, "parse DSN")
 	}
@@ -86,7 +86,7 @@ func openDB(opts config.Config) (*gorm.DB, error) {
 func InitDB(config *config.Config, db *gorm.DB) {
 	if db == nil {
 		var err error
-		db, err = openDB(*config)
+		db, err = OpenDB(*config)
 		if err != nil {
 			zap.L().Fatal(fmt.Sprintf("init db fail: %s", err))
 			panic(err)
