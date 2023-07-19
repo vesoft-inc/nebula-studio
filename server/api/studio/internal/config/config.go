@@ -21,10 +21,23 @@ type Config struct {
 	}
 
 	File struct {
-		UploadDir        string
-		TasksDir         string
-		SqliteDbFilePath string
-		TaskIdPath       string
+		UploadDir  string
+		TasksDir   string
+		TaskIdPath string
+	}
+
+	DB struct {
+		LogLevel                  int    `json:",default=4"`
+		IgnoreRecordNotFoundError bool   `json:",default=true"`
+		AutoMigrate               bool   `json:",default=true"`
+		Type                      string `json:",default=sqlite3"`
+		Host                      string `json:",optional"`
+		Name                      string `json:",optional"`
+		User                      string `json:",optional"`
+		Password                  string `json:",optional"`
+		SqliteDbFilePath          string `json:",default=./data/tasks.db"`
+		MaxOpenConns              int    `json:",default=30"`
+		MaxIdleConns              int    `json:",default=10"`
 	}
 }
 

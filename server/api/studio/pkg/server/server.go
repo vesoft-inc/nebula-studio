@@ -7,6 +7,7 @@ import (
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service/importer"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/zeromicro/go-zero/rest"
+	"gorm.io/gorm"
 )
 
 type (
@@ -16,8 +17,8 @@ type (
 
 var NewServiceContext = svc.NewServiceContext
 
-func InitDB(dbFilePath string) {
-	db.InitDB(dbFilePath)
+func InitDB(c *config.Config, d *gorm.DB) {
+	db.InitDB(c, d)
 	importer.InitTaskStatus()
 }
 
