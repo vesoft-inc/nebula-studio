@@ -23,7 +23,7 @@ func ParseDSN(opts config.Config) (dsn string, err error) {
 	switch opts.DB.Type {
 	case "mysql":
 		concate := "?"
-		if strings.Contains(opts.Name, concate) {
+		if strings.Contains(opts.DB.Name, concate) {
 			concate = "&"
 		}
 		if opts.Host[0] == '/' {
