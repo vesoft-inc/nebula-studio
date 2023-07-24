@@ -16,7 +16,6 @@ Auth:
 File:
   UploadDir: "./data/upload/"
   TasksDir: "./data/tasks"
-  TaskIdPath: "./data/taskId.data"
 DB:
   # 1,2,3,4 corresponding to Silent, ERROR, Warn, INFO
   LogLevel: 4
@@ -24,7 +23,7 @@ DB:
   # AutoMigrate run auto migration for given models
   AutoMigrate: true
   # The database backend, either "mysql", "sqlite3".
-  Type: "sqlite3"
+   Type: "sqlite3"
   # Database host
   Host: "127.0.0.1:3306"
   # Database name

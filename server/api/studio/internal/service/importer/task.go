@@ -24,6 +24,17 @@ func (t *Task) UpdateQueryStats() error {
 		return nil
 	}
 	stats := t.Client.Manager.Stats()
-	t.TaskInfo.Stats = *stats
+	t.TaskInfo.Stats = db.Stats{
+		ProcessedBytes:  stats.ProcessedBytes,
+		TotalBytes:      stats.TotalBytes,
+		FailedRecords:   stats.FailedRecords,
+		TotalRecords:    stats.TotalRecords,
+		FailedRequest:   stats.FailedRequest,
+		TotalRequest:    stats.TotalRequest,
+		TotalLatency:    stats.TotalLatency,
+		TotalRespTime:   stats.TotalRespTime,
+		FailedProcessed: stats.FailedProcessed,
+		TotalProcessed:  stats.TotalProcessed,
+	}
 	return nil
 }

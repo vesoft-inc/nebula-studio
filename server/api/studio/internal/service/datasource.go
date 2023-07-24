@@ -136,7 +136,7 @@ func (d *datasourceService) List(request types.DatasourceListRequest) (*types.Da
 	items := make([]types.DatasourceConfig, 0)
 	for _, item := range dbsList {
 		config := types.DatasourceConfig{
-			ID:         item.ID,
+			ID:         item.BID,
 			Type:       item.Type,
 			Platform:   item.Platform,
 			Name:       item.Name,
@@ -167,7 +167,7 @@ func (d *datasourceService) List(request types.DatasourceListRequest) (*types.Da
 func (d *datasourceService) Remove(request types.DatasourceRemoveRequest) error {
 	user := d.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	result := db.CtxDB.Delete(&db.Datasource{
-		ID:       request.ID,
+		BID:      request.ID,
 		Username: user.Username,
 	})
 
@@ -184,10 +184,10 @@ func (d *datasourceService) Remove(request types.DatasourceRemoveRequest) error 
 
 func (d *datasourceService) BatchRemove(request types.DatasourceBatchRemoveRequest) error {
 	user := d.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
-	var existingIDs []int
-	db.CtxDB.Model(&db.Datasource{}).Where("id in (?)", request.IDs).Pluck("id", &existingIDs)
+	var existingIDs []string
+	db.CtxDB.Model(&db.Datasource{}).Where("b_id in (?)", request.IDs).Pluck("b_id", &existingIDs)
 	if len(existingIDs) != len(request.IDs) {
-		var missingIDs []int
+		var missingIDs []string
 		for _, id := range request.IDs {
 			if !utils.Contains(existingIDs, id) {
 				missingIDs = append(missingIDs, id)
@@ -195,7 +195,7 @@ func (d *datasourceService) BatchRemove(request types.DatasourceBatchRemoveReque
 		}
 		return ecode.WithErrorMessage(ecode.ErrBadRequest, fmt.Errorf("some data are not found: %v", missingIDs))
 	}
-	result := db.CtxDB.Where("id IN (?) AND username = ?", request.IDs, user.Username).Delete(&db.Datasource{})
+	result := db.CtxDB.Where("b_id IN (?) AND username = ?", request.IDs, user.Username).Delete(&db.Datasource{})
 	if result.Error != nil {
 		return d.gormErrorWrapper(result.Error)
 	}
@@ -256,9 +256,9 @@ func (d *datasourceService) PreviewFile(request types.DatasourcePreviewFileReque
 	}, nil
 }
 
-func (d *datasourceService) findOne(datasourceId int) (*db.Datasource, error) {
+func (d *datasourceService) findOne(datasourceId string) (*db.Datasource, error) {
 	var dbs db.Datasource
-	result := db.CtxDB.Where("id = ?", datasourceId).
+	result := db.CtxDB.Model(&db.Datasource{}).Where("b_id = ?", datasourceId).
 		First(&dbs)
 	if result.Error != nil {
 		return nil, d.gormErrorWrapper(result.Error)
@@ -276,10 +276,12 @@ func (d *datasourceService) findOne(datasourceId int) (*db.Datasource, error) {
 	return &dbs, nil
 }
 
-func (d *datasourceService) save(typ, name, platform, config, secret string) (id int, err error) {
+func (d *datasourceService) save(typ, name, platform, config, secret string) (id string, err error) {
 	user := d.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	host := user.Address + ":" + strconv.Itoa(user.Port)
+	id = d.svcCtx.IDGenerator.Generate()
 	dbs := &db.Datasource{
+		BID:      id,
 		Type:     typ,
 		Platform: platform,
 		Name:     name,
@@ -290,14 +292,14 @@ func (d *datasourceService) save(typ, name, platform, config, secret string) (id
 	}
 	result := db.CtxDB.Create(dbs)
 	if result.Error != nil {
-		return 0, d.gormErrorWrapper(result.Error)
+		return "", d.gormErrorWrapper(result.Error)
 	}
-	return int(dbs.ID), nil
+	return id, nil
 }
-func (d *datasourceService) update(id int, typ, platform, name, config, secret string) (err error) {
+func (d *datasourceService) update(id, typ, platform, name, config, secret string) (err error) {
 	user := d.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	host := user.Address + ":" + strconv.Itoa(user.Port)
-	result := db.CtxDB.Model(&db.Datasource{ID: id}).Updates(map[string]interface{}{
+	result := db.CtxDB.Model(&db.Datasource{}).Where("b_id = ?", id).Updates(map[string]interface{}{
 		"type":     typ,
 		"name":     name,
 		"platform": platform,

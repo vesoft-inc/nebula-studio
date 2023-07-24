@@ -5,7 +5,7 @@ type (
 	}
 
 	FavoriteItem {
-		ID         int    `json:"id"`
+		ID         string `json:"id"`
 		Content    string `json:"content"`
 		CreateTime int64  `json:"createTime"`
 	}
@@ -19,7 +19,7 @@ type (
 	}
 
 	FavoriteIDResult {
-		ID int `json:"id"`
+		ID string `json:"id"`
 	}
 )
 @server(

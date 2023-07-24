@@ -4,9 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -76,7 +74,7 @@ func (i *importService) updateDatasourceConfig(conf *types.CreateImportTaskReque
 	for _, source := range config.Sources {
 		if source.DatasourceId != nil {
 			var dbs db.Datasource
-			result := db.CtxDB.Where("id = ?", source.DatasourceId).First(&dbs)
+			result := db.CtxDB.Where("b_id = ?", source.DatasourceId).First(&dbs)
 			if result.Error != nil {
 				return nil, i.gormErrorWrapper(result.Error)
 			}
@@ -162,6 +160,7 @@ func updateConfig(conf config.Configurator, taskDir, uploadDir string) {
 
 func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*types.CreateImportTaskData, error) {
 	_config, err := i.updateDatasourceConfig(req)
+
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
@@ -170,17 +169,19 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 		return nil, ecode.WithErrorMessage(ecode.ErrParam, err)
 	}
 	conf, err := config.FromBytes(jsons)
-
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
-
 	// create task dir
-	taskDir, err := importer.CreateNewTaskDir(i.svcCtx.Config.File.TasksDir, req.Id)
+	id := req.Id
+	if id == nil {
+		newId := i.svcCtx.IDGenerator.Generate()
+		id = &newId
+	}
+	taskDir, err := importer.CreateNewTaskDir(i.svcCtx.Config.File.TasksDir, *id)
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
-
 	// create config file
 	if err := importer.CreateConfigFile(taskDir, jsons); err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
@@ -192,44 +193,26 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 	auth := i.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	host := auth.Address + ":" + strconv.Itoa(auth.Port)
 	taskMgr := importer.GetTaskMgr()
-	var taskID int
 	var task *importer.Task
 	if req.Id != nil {
-		task, taskID, err = taskMgr.TurnDraftToTask(*req.Id, req.Name, req.RawConfig, conf)
+		task, err = taskMgr.TurnDraftToTask(*req.Id, req.Name, req.RawConfig, conf)
 	} else {
-		task, taskID, err = taskMgr.NewTask(host, auth.Username, req.Name, req.RawConfig, conf)
+		task, err = taskMgr.NewTask(*id, host, auth.Username, req.Name, req.RawConfig, conf)
 	}
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
 	// start import
-	if err = importer.StartImport(taskID); err != nil {
+	if err = importer.StartImport(*id); err != nil {
 		task.TaskInfo.TaskStatus = importer.Aborted.String()
 		task.TaskInfo.TaskMessage = err.Error()
-		importer.GetTaskMgr().AbortTask(taskID)
+		importer.GetTaskMgr().AbortTask(*id)
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
-
-	// write taskId to file
-	muTaskId.Lock()
-	taskIDBytes, err := ioutil.ReadFile(i.svcCtx.Config.File.TaskIdPath)
-	if err != nil {
-		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-	}
-	taskIdJSON := make(map[string]bool)
-	if len(taskIDBytes) != 0 {
-		if err := json.Unmarshal(taskIDBytes, &taskIdJSON); err != nil {
-			return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-		}
-	}
-	taskIdJSON[strconv.Itoa(taskID)] = true
-	bytes, _ := json.Marshal(taskIdJSON)
-	ioutil.WriteFile(i.svcCtx.Config.File.TaskIdPath, bytes, 777)
-	defer muTaskId.Unlock()
 
 	return &types.CreateImportTaskData{
-		Id: taskID,
+		Id: *id,
 	}, nil
 }
 
@@ -244,7 +227,8 @@ func (i *importService) CreateTaskDraft(req *types.CreateTaskDraftRequest) error
 		}
 		return nil
 	} else {
-		err := taskMgr.NewTaskDraft(host, auth.Username, req.Name, req.Space, req.RawConfig)
+		id := i.svcCtx.IDGenerator.Generate()
+		err := taskMgr.NewTaskDraft(id, host, auth.Username, req.Name, req.Space, req.RawConfig)
 		if err != nil {
 			return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 		}
@@ -269,7 +253,7 @@ func (i *importService) DownloadConfig(req *types.DownloadConfigsRequest) error 
 		return ecode.WithInternalServer(fmt.Errorf("unset KeepResponse Writer"))
 	}
 
-	configPath := filepath.Join(i.svcCtx.Config.File.TasksDir, strconv.Itoa(req.Id), "config.yaml")
+	configPath := filepath.Join(i.svcCtx.Config.File.TasksDir, req.Id, "config.yaml")
 	httpResp.Header().Set("Content-Type", "application/octet-stream")
 	httpResp.Header().Set("Content-Disposition", "attachment;filename="+filepath.Base(configPath))
 	http.ServeFile(httpResp, httpReq, configPath)
@@ -293,9 +277,9 @@ func (i *importService) DownloadLogs(req *types.DownloadLogsRequest) error {
 	filename := req.Name
 	path := ""
 	if filename == importLogName {
-		path = filepath.Join(i.svcCtx.Config.File.TasksDir, strconv.Itoa(id), filename)
+		path = filepath.Join(i.svcCtx.Config.File.TasksDir, id, filename)
 	} else {
-		path = filepath.Join(i.svcCtx.Config.File.TasksDir, strconv.Itoa(id), "err", filename)
+		path = filepath.Join(i.svcCtx.Config.File.TasksDir, id, "err", filename)
 	}
 
 	httpResp.Header().Set("Content-Type", "application/octet-stream")
@@ -313,13 +297,13 @@ func (i *importService) DeleteImportTask(req *types.DeleteImportTaskRequest) err
 func (i *importService) GetImportTask(req *types.GetImportTaskRequest) (*types.GetImportTaskData, error) {
 	auth := i.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	host := fmt.Sprintf("%s:%d", auth.Address, auth.Port)
-	return importer.GetImportTask(i.svcCtx.Config.File.TasksDir, req.Id, host, auth.Username)
+	return importer.GetImportTask(req.Id, host, auth.Username)
 }
 
 func (i *importService) GetManyImportTask(req *types.GetManyImportTaskRequest) (*types.GetManyImportTaskData, error) {
 	auth := i.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	host := fmt.Sprintf("%s:%d", auth.Address, auth.Port)
-	return importer.GetManyImportTask(i.svcCtx.Config.File.TasksDir, host, auth.Username, req.Page, req.PageSize)
+	return importer.GetManyImportTask(host, auth.Username, req.Page, req.PageSize)
 }
 
 // GetImportTaskLogNames :Get all log file's name of a task
@@ -347,40 +331,18 @@ func (i *importService) GetImportTaskLogNames(req *types.GetImportTaskLogNamesRe
 func (i *importService) GetManyImportTaskLog(req *types.GetManyImportTaskLogRequest) (*types.GetManyImportTaskLogData, error) {
 	path := ""
 	if req.File == importLogName {
-		path = filepath.Join(i.svcCtx.Config.File.TasksDir, strconv.Itoa(req.Id), req.File)
+		path = filepath.Join(i.svcCtx.Config.File.TasksDir, req.Id, req.File)
 	} else {
-		path = filepath.Join(i.svcCtx.Config.File.TasksDir, strconv.Itoa(req.Id), errContentDir, req.File)
+		path = filepath.Join(i.svcCtx.Config.File.TasksDir, req.Id, errContentDir, req.File)
 	}
 	lines, err := readFileLines(path, req.Offset, req.Limit)
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
-	muTaskId.RLock()
-	taskIdBytes, err := ioutil.ReadFile(i.svcCtx.Config.File.TaskIdPath)
-	muTaskId.RUnlock()
-	if err != nil {
-		logx.Errorf("read taskId file error", err)
-		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-	}
-	taskIdJSON := make(map[string]bool)
-	if len(taskIdBytes) != 0 {
-		err = json.Unmarshal(taskIdBytes, &taskIdJSON)
-		if err != nil {
-			logx.Errorf("parse taskId file error", err)
-			return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-		}
-	}
 	data := &types.GetManyImportTaskLogData{
 		Logs: lines,
 	}
-	if len(lines) == 0 && taskIdJSON[strconv.Itoa(req.Id)] {
-		return data, nil
-	}
-	if len(lines) == 0 {
-		return data, ecode.WithErrorMessage(ecode.ErrInternalServer, errors.New("no task"))
-	}
-
 	return data, nil
 }
 

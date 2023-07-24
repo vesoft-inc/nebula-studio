@@ -43,7 +43,9 @@ func NewSketchService(ctx context.Context, svcCtx *svc.ServiceContext) SketchSer
 func (s *sketchService) Init(request types.InitSketchRequest) (*types.SketchIDResult, error) {
 	auth := s.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	host := auth.Address + ":" + strconv.Itoa(auth.Port)
+	id := s.svcCtx.IDGenerator.Generate()
 	sketch := &db.Sketch{
+		BID:      id,
 		Host:     host,
 		Username: auth.Username,
 		Name:     request.Name,
@@ -55,12 +57,14 @@ func (s *sketchService) Init(request types.InitSketchRequest) (*types.SketchIDRe
 		return nil, s.gormErrorWrapper(result.Error)
 	}
 	return &types.SketchIDResult{
-		ID: int(sketch.ID),
+		ID: id,
 	}, nil
 }
 
 func (s *sketchService) Delete(request types.DeleteSketchRequest) error {
-	result := db.CtxDB.Delete(&db.Sketch{}, request.ID)
+	result := db.CtxDB.Delete(&db.Sketch{
+		BID: request.ID,
+	})
 	if result.Error != nil {
 		return s.gormErrorWrapper(result.Error)
 	}
@@ -68,7 +72,7 @@ func (s *sketchService) Delete(request types.DeleteSketchRequest) error {
 }
 
 func (s *sketchService) Update(request types.UpdateSketchRequest) error {
-	result := db.CtxDB.Model(&db.Sketch{ID: request.ID}).Updates(map[string]interface{}{
+	result := db.CtxDB.Model(&db.Sketch{BID: request.ID}).Updates(map[string]interface{}{
 		"name":     request.Name,
 		"schema":   request.Schema,
 		"snapshot": request.Snapshot,
@@ -95,7 +99,7 @@ func (s *sketchService) GetList(request types.GetSketchesRequest) (*types.Sketch
 	items := make([]types.Sketch, 0)
 	for _, sketch := range sketchList {
 		items = append(items, types.Sketch{
-			ID:         sketch.ID,
+			ID:         sketch.BID,
 			Name:       sketch.Name,
 			Schema:     sketch.Schema,
 			Snapshot:   sketch.Snapshot,

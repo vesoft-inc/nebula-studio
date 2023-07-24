@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"sync"
 	"time"
 
@@ -33,19 +32,8 @@ type TaskMgr struct {
 	db    *TaskDb
 }
 
-func CreateNewTaskDir(rootDir string, id *int) (string, error) {
-	var taskId int
-	var err error
-	if id != nil {
-		taskId = *id
-	} else {
-		taskId, err = GetTaskMgr().NewTaskID()
-	}
-
-	if err != nil {
-		return "", ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-	}
-	taskDir := filepath.Join(rootDir, strconv.Itoa(taskId))
+func CreateNewTaskDir(rootDir string, id string) (string, error) {
+	taskDir := filepath.Join(rootDir, id)
 	if err := utils.CreateDir(taskDir); err != nil {
 		return "", ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
@@ -90,13 +78,14 @@ func CreateConfigFile(taskdir string, cfgBytes []byte) error {
 	return nil
 }
 
-func (mgr *TaskMgr) NewTask(host string, user string, taskName string, rawCfg string, cfg importconfig.Configurator) (*Task, int, error) {
+func (mgr *TaskMgr) NewTask(id, host, user, taskName, rawCfg string, cfg importconfig.Configurator) (*Task, error) {
 	mux.Lock()
 	defer mux.Unlock()
 	confv3 := cfg.(*configv3.Config)
 
 	// init task db
 	taskInfo := &db.TaskInfo{
+		BID:           id,
 		Name:          taskName,
 		Address:       host,
 		Space:         confv3.Manager.GraphName,
@@ -107,7 +96,7 @@ func (mgr *TaskMgr) NewTask(host string, user string, taskName string, rawCfg st
 	}
 
 	if err := mgr.db.InsertTaskInfo(taskInfo); err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
 	task := &Task{
@@ -120,19 +109,18 @@ func (mgr *TaskMgr) NewTask(host string, user string, taskName string, rawCfg st
 		TaskInfo: taskInfo,
 	}
 
-	id := int(taskInfo.ID)
 	mgr.PutTask(id, task)
-	return task, id, nil
+	return task, nil
 }
 
-func (mgr *TaskMgr) TurnDraftToTask(id int, taskName string, rawCfg string, cfg importconfig.Configurator) (*Task, int, error) {
+func (mgr *TaskMgr) TurnDraftToTask(id, taskName, rawCfg string, cfg importconfig.Configurator) (*Task, error) {
 	mux.Lock()
 	defer mux.Unlock()
 	confv3 := cfg.(*configv3.Config)
 
 	// init task db
 	taskInfo := &db.TaskInfo{
-		ID:            id,
+		BID:           id,
 		Name:          taskName,
 		Space:         confv3.Manager.GraphName,
 		TaskStatus:    Processing.String(),
@@ -142,7 +130,7 @@ func (mgr *TaskMgr) TurnDraftToTask(id int, taskName string, rawCfg string, cfg 
 	}
 
 	if err := mgr.db.UpdateTaskInfo(taskInfo); err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
 	task := &Task{
@@ -156,14 +144,15 @@ func (mgr *TaskMgr) TurnDraftToTask(id int, taskName string, rawCfg string, cfg 
 	}
 
 	mgr.PutTask(id, task)
-	return task, id, nil
+	return task, nil
 }
 
-func (mgr *TaskMgr) NewTaskDraft(host, user, taskName, space, rawCfg string) error {
+func (mgr *TaskMgr) NewTaskDraft(id, host, user, taskName, space, rawCfg string) error {
 	mux.Lock()
 	defer mux.Unlock()
 	// init task db
 	taskInfo := &db.TaskInfo{
+		BID:           id,
 		Name:          taskName,
 		Address:       host,
 		Space:         space,
@@ -178,12 +167,12 @@ func (mgr *TaskMgr) NewTaskDraft(host, user, taskName, space, rawCfg string) err
 	return nil
 }
 
-func (mgr *TaskMgr) UpdateTaskDraft(id int, taskName, space, rawCfg string) error {
+func (mgr *TaskMgr) UpdateTaskDraft(id, taskName, space, rawCfg string) error {
 	mux.Lock()
 	defer mux.Unlock()
 	// init task db
 	taskInfo := &db.TaskInfo{
-		ID:         id,
+		BID:        id,
 		Name:       taskName,
 		Space:      space,
 		TaskStatus: Draft.String(),
@@ -199,18 +188,10 @@ func GetTaskMgr() *TaskMgr {
 	return taskmgr
 }
 
-func (mgr *TaskMgr) NewTaskID() (int, error) {
-	tid, err := mgr.db.LastId()
-	if err != nil {
-		return 0, err
-	}
-	return tid + 1, nil
-}
-
 /*
 GetTask get task from map and local sql
 */
-func (mgr *TaskMgr) GetTask(taskID int) (*Task, bool) {
+func (mgr *TaskMgr) GetTask(taskID string) (*Task, bool) {
 	if task, ok := mgr.getTaskFromMap(taskID); ok {
 		return task, true
 	}
@@ -225,7 +206,7 @@ func (mgr *TaskMgr) GetTask(taskID int) (*Task, bool) {
 /*
 PutTask put task into tasks map
 */
-func (mgr *TaskMgr) PutTask(taskID int, task *Task) {
+func (mgr *TaskMgr) PutTask(taskID string, task *Task) {
 	mgr.tasks.Store(taskID, task)
 }
 
@@ -233,7 +214,7 @@ func (mgr *TaskMgr) PutTask(taskID int, task *Task) {
 FinishTask will query task stats, delete task in the map
 and update the taskInfo in local sql
 */
-func (mgr *TaskMgr) FinishTask(taskID int) (err error) {
+func (mgr *TaskMgr) FinishTask(taskID string) (err error) {
 	task, ok := mgr.getTaskFromMap(taskID)
 	if !ok {
 		return
@@ -249,7 +230,7 @@ func (mgr *TaskMgr) FinishTask(taskID int) (err error) {
 	return
 }
 
-func (mgr *TaskMgr) AbortTask(taskID int) (err error) {
+func (mgr *TaskMgr) AbortTask(taskID string) (err error) {
 	task, ok := mgr.getTaskFromMap(taskID)
 	if !ok {
 		return
@@ -262,7 +243,7 @@ func (mgr *TaskMgr) AbortTask(taskID int) (err error) {
 	return
 }
 
-func (mgr *TaskMgr) DelTask(tasksDir string, taskID int) error {
+func (mgr *TaskMgr) DelTask(tasksDir, taskID string) error {
 	_, ok := mgr.getTaskFromMap(taskID)
 	if ok {
 		mgr.tasks.Delete(taskID)
@@ -270,7 +251,7 @@ func (mgr *TaskMgr) DelTask(tasksDir string, taskID int) error {
 	if err := mgr.db.DelTaskInfo(taskID); err != nil {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
-	taskDir := filepath.Join(tasksDir, strconv.Itoa(taskID))
+	taskDir := filepath.Join(tasksDir, taskID)
 	return os.RemoveAll(taskDir)
 }
 
@@ -278,7 +259,7 @@ func (mgr *TaskMgr) DelTask(tasksDir string, taskID int) error {
 UpdateTaskInfo will query task stats, update task in the map
 and update the taskInfo in local sql
 */
-func (mgr *TaskMgr) UpdateTaskInfo(taskID int) error {
+func (mgr *TaskMgr) UpdateTaskInfo(taskID string) error {
 	task, ok := mgr.getTaskFromMap(taskID)
 	if !ok {
 		return nil
@@ -293,7 +274,7 @@ func (mgr *TaskMgr) UpdateTaskInfo(taskID int) error {
 StopTask will change the task status to `Stoped`,
 and then call FinishTask
 */
-func (mgr *TaskMgr) StopTask(taskID int) error {
+func (mgr *TaskMgr) StopTask(taskID string) error {
 	if task, ok := mgr.getTaskFromMap(taskID); ok {
 		var err error
 		manager := task.Client.Manager
@@ -320,29 +301,14 @@ func (mgr *TaskMgr) StopTask(taskID int) error {
 	return errors.New("task is finished or not exist")
 }
 
-/*
-`GetAllTaskIDs` will return all task ids in map
-*/
-func (mgr *TaskMgr) GetAllTaskIDs(address, username string) ([]string, error) {
-	ids := make([]string, 0)
-	allIds, err := mgr.db.SelectAllIds(address, username)
-	if err != nil {
-		return nil, err
-	}
-	for _, id := range allIds {
-		ids = append(ids, strconv.Itoa(id))
-	}
-	return ids, nil
-}
-
-func (mgr *TaskMgr) getTaskFromMap(taskID int) (*Task, bool) {
+func (mgr *TaskMgr) getTaskFromMap(taskID string) (*Task, bool) {
 	if task, ok := mgr.tasks.Load(taskID); ok {
 		return task.(*Task), true
 	}
 	return nil, false
 }
 
-func (mgr *TaskMgr) getTaskFromSQL(taskID int) *Task {
+func (mgr *TaskMgr) getTaskFromSQL(taskID string) *Task {
 	taskInfo := new(db.TaskInfo)
 	mgr.db.First(taskInfo, taskID)
 	task := new(Task)

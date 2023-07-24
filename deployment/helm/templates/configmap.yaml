@@ -22,5 +22,25 @@ data:
     File:
       UploadDir: "/data/upload/"
       TasksDir: "/data/tasks"
-      SqliteDbFilePath: "/data/tasks.db"
-      TaskIdPath: "/data/taskId.data"
+    DB:
+      # 1,2,3,4 corresponding to Silent, ERROR, Warn, INFO
+      LogLevel: 4
+      IgnoreRecordNotFoundError: false
+      # AutoMigrate run auto migration for given models
+      AutoMigrate: true
+      # The database backend, either "mysql", "sqlite3".
+      Type: "mysql"
+      # Database host
+      Host: "192.168.8.44:3306"
+      # Database name
+      Name: "hetao_test"
+      # Database user
+      User: "root"
+      # Database password
+      Password: "nebula"
+      # For "sqlite3" only, database file path
+      SqliteDbFilePath: "./data/tasks.db"
+      # The maximum open connections of the pool.
+      MaxOpenConns: 30
+      # The maximum idle connections of the pool.
+      MaxIdleConns: 10
