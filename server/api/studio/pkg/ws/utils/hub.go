@@ -61,3 +61,9 @@ func (h *Hub) SelectClient(selector func(clients map[string]*Client) *Client) *C
 	defer h.mu.RUnlock()
 	return selector(h.clients)
 }
+
+func (h *Hub) UseClients(selector func(clients map[string]*Client)) {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	selector(h.clients)
+}
