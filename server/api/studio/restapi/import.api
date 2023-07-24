@@ -132,28 +132,28 @@ type (
 	}
 
 	CreateImportTaskRequest {
-		Id        *int   `json:"id,optional,omitempty"`
-		Name      string `json:"name" validate:"required"`
-		Config    string `json:"config" validate:"required"`
-		RawConfig string `json:"rawConfig" validate:"required"`
+		Id        *string `json:"id,optional,omitempty"`
+		Name      string  `json:"name" validate:"required"`
+		Config    string  `json:"config" validate:"required"`
+		RawConfig string  `json:"rawConfig" validate:"required"`
 	}
 	CreateTaskDraftRequest {
-		Id        *int   `json:"id,optional,omitempty"`
-		Name      string `json:"name" validate:"required"`
-		Space     string `json:"space" validate:"required"`
-		RawConfig string `json:"rawConfig" validate:"required"`
+		Id        *string `json:"id,optional,omitempty"`
+		Name      string  `json:"name" validate:"required"`
+		Space     string  `json:"space" validate:"required"`
+		RawConfig string  `json:"rawConfig" validate:"required"`
 	}
 
 	CreateImportTaskData {
-		Id int `json:"id"`
+		Id string `json:"id"`
 	}
 
 	GetImportTaskRequest {
-		Id int `path:"id" validate:"required"`
+		Id string `path:"id" validate:"required"`
 	}
 
 	GetImportTaskData {
-		Id            int             `json:"id"`
+		Id            string          `json:"id"`
 		Name          string          `json:"name"`
 		User          string          `json:"user"`
 		Address       string          `json:"address"`
@@ -191,7 +191,7 @@ type (
 	}
 
 	GetManyImportTaskLogRequest {
-		Id     int    `path:"id" validate:"required"`
+		Id     string `path:"id" validate:"required"`
 		File   string `form:"file" validate:"required"`
 		Offset int64  `form:"offset" validate:"min=0"`
 		Limit  int64  `form:"limit" validate:"min=1"`
@@ -202,7 +202,7 @@ type (
 	}
 
 	GetImportTaskLogNamesRequest {
-		Id int `path:"id" validate:"required"`
+		Id string `path:"id" validate:"required"`
 	}
 
 	GetImportTaskLogNamesData {
@@ -210,20 +210,20 @@ type (
 	}
 
 	DeleteImportTaskRequest {
-		Id int `path:"id"`
+		Id string `path:"id"`
 	}
 
 	StopImportTaskRequest {
-		Id int `path:"id"`
+		Id string `path:"id"`
 	}
 
 	DownloadLogsRequest {
-		Id   int    `path:"id" validate:"required"`
+		Id   string `path:"id" validate:"required"`
 		Name string `form:"name" validate:"required"`
 	}
 
 	DownloadConfigsRequest {
-		Id int `path:"id" validate:"required"`
+		Id string `path:"id" validate:"required"`
 	}
 
 	GetWorkingDirResult {

@@ -155,7 +155,9 @@ func (f *fileService) FileConfigUpdate(request types.FileConfigUpdateRequest) er
 		// in case user upload file through ftp, without init file record in db
 		auth := f.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 		host := auth.Address + ":" + strconv.Itoa(auth.Port)
+		id := f.svcCtx.IDGenerator.Generate()
 		File = &db.File{
+			BID:        id,
 			Name:       request.Name,
 			WithHeader: request.WithHeader,
 			Delimiter:  request.Delimiter,
@@ -195,7 +197,7 @@ func (f *fileService) FileUpload() error {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, fmt.Errorf("unset KeepRequest"), "upload failed")
 	}
 
-	files, _, err := UploadFormFiles(httpReq, dir, auth, host)
+	files, _, err := f.UploadFormFiles(httpReq, dir, auth, host)
 	if err != nil {
 		logx.Infof("upload file error:%v", err)
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err, "upload failed")
@@ -222,7 +224,7 @@ func (f *fileService) FileUpload() error {
 	return nil
 }
 
-func UploadFormFiles(r *http.Request, destDirectory string, auth *auth.AuthData, host string) (uploaded []*multipart.FileHeader, n int64, err error) {
+func (f *fileService) UploadFormFiles(r *http.Request, destDirectory string, auth *auth.AuthData, host string) (uploaded []*multipart.FileHeader, n int64, err error) {
 	err = r.ParseMultipartForm(defaultMulipartMemory)
 	if err != nil {
 		return nil, 0, err
@@ -246,7 +248,7 @@ func UploadFormFiles(r *http.Request, destDirectory string, auth *auth.AuthData,
 					// save file config in db
 					if _, ok := configMap[file.Filename]; ok {
 						_cfg := configMap[file.Filename]
-						err := SaveFileConfig(auth, host, _cfg)
+						err := f.SaveFileConfig(auth, host, _cfg)
 						if err != nil {
 							return nil, 0, err
 						}
@@ -269,7 +271,7 @@ func UploadFormFiles(r *http.Request, destDirectory string, auth *auth.AuthData,
 	return nil, 0, http.ErrMissingFile
 }
 
-func SaveFileConfig(auth *auth.AuthData, host string, config fileConfig) error {
+func (f *fileService) SaveFileConfig(auth *auth.AuthData, host string, config fileConfig) error {
 	File := &db.File{}
 	result := db.CtxDB.Where("name = ?", config.Name).First(File)
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
@@ -277,6 +279,7 @@ func SaveFileConfig(auth *auth.AuthData, host string, config fileConfig) error {
 	}
 	if result.RowsAffected == 0 {
 		File = &db.File{
+			BID:        f.svcCtx.IDGenerator.Generate(),
 			Name:       config.Name,
 			WithHeader: config.WithHeader,
 			Delimiter:  config.Delimiter,

@@ -43,7 +43,9 @@ func NewFavoriteService(ctx context.Context, svcCtx *svc.ServiceContext) Favorit
 func (s *favoriteService) Create(request types.CreateFavoriteRequest) (*types.FavoriteIDResult, error) {
 	auth := s.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	host := auth.Address + ":" + strconv.Itoa(auth.Port)
+	id := s.svcCtx.IDGenerator.Generate()
 	favoriteItem := &db.Favorite{
+		BID:      id,
 		Host:     host,
 		Username: auth.Username,
 		Content:  request.Content,
@@ -53,12 +55,14 @@ func (s *favoriteService) Create(request types.CreateFavoriteRequest) (*types.Fa
 		return nil, s.gormErrorWrapper(result.Error)
 	}
 	return &types.FavoriteIDResult{
-		ID: int(favoriteItem.ID),
+		ID: id,
 	}, nil
 }
 
 func (s *favoriteService) Delete(request types.DeleteFavoriteRequest) error {
-	result := db.CtxDB.Delete(&db.Favorite{}, request.Id)
+	result := db.CtxDB.Delete(&db.Favorite{
+		BID: request.Id,
+	})
 	if result.Error != nil {
 		return s.gormErrorWrapper(result.Error)
 	}
@@ -87,7 +91,7 @@ func (s *favoriteService) GetList() (*types.FavoriteList, error) {
 	items := make([]types.FavoriteItem, 0)
 	for _, favoriteItem := range favoriteList {
 		items = append(items, types.FavoriteItem{
-			ID:         favoriteItem.ID,
+			ID:         favoriteItem.BID,
 			Content:    favoriteItem.Content,
 			CreateTime: favoriteItem.CreateTime.UnixMilli(),
 		})

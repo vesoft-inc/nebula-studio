@@ -11,18 +11,21 @@ import (
 	"github.com/vesoft-inc/go-pkg/validator"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/idx"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type ServiceContext struct {
 	Config          config.Config
+	IDGenerator     idx.Generator
 	ResponseHandler response.Handler
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
 		Config:          c,
+		IDGenerator:     idx.New(),
 		ResponseHandler: createResponseHandler(c),
 	}
 }

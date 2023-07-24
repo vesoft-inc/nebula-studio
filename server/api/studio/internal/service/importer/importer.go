@@ -19,7 +19,7 @@ type ImportResult struct {
 	}
 }
 
-func StartImport(taskID int) (err error) {
+func StartImport(taskID string) (err error) {
 	task, _ := GetTaskMgr().GetTask(taskID)
 	signal := make(chan struct{}, 1)
 
@@ -74,7 +74,7 @@ func StartImport(taskID int) (err error) {
 	return nil
 }
 
-func DeleteImportTask(tasksDir string, taskID int, address, username string) error {
+func DeleteImportTask(tasksDir, taskID, address, username string) error {
 	_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(taskID, address, username)
 	if err != nil {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
@@ -86,7 +86,7 @@ func DeleteImportTask(tasksDir string, taskID int, address, username string) err
 	return nil
 }
 
-func GetImportTask(tasksDir string, taskID int, address, username string) (*types.GetImportTaskData, error) {
+func GetImportTask(taskID, address, username string) (*types.GetImportTaskData, error) {
 	task := Task{}
 	result := &types.GetImportTaskData{}
 
@@ -102,7 +102,7 @@ func GetImportTask(tasksDir string, taskID int, address, username string) (*type
 			return nil, err
 		}
 		stats := task.TaskInfo.Stats
-		result.Id = t.TaskInfo.ID
+		result.Id = t.TaskInfo.BID
 		result.Status = task.TaskInfo.TaskStatus
 		result.Message = task.TaskInfo.TaskMessage
 		result.CreateTime = task.TaskInfo.CreateTime.UnixMilli()
@@ -130,7 +130,7 @@ func GetImportTask(tasksDir string, taskID int, address, username string) (*type
 	return result, nil
 }
 
-func GetManyImportTask(tasksDir, address, username string, pageIndex, pageSize int) (*types.GetManyImportTaskData, error) {
+func GetManyImportTask(address, username string, pageIndex, pageSize int) (*types.GetManyImportTaskData, error) {
 	result := &types.GetManyImportTaskData{
 		Total: 0,
 		List:  []types.GetImportTaskData{},
@@ -148,7 +148,7 @@ func GetManyImportTask(tasksDir, address, username string, pageIndex, pageSize i
 		}
 		stats := t.Stats
 		data := types.GetImportTaskData{
-			Id:            t.ID,
+			Id:            t.BID,
 			Status:        t.TaskStatus,
 			Message:       t.TaskMessage,
 			CreateTime:    t.CreateTime.UnixMilli(),
@@ -179,7 +179,7 @@ func GetManyImportTask(tasksDir, address, username string, pageIndex, pageSize i
 	return result, nil
 }
 
-func StopImportTask(taskID int, address, username string) error {
+func StopImportTask(taskID, address, username string) error {
 	_, err := taskmgr.db.FindTaskInfoByIdAndAddresssAndUser(taskID, address, username)
 	if err != nil {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
@@ -196,11 +196,7 @@ func StopImportTask(taskID int, address, username string) error {
 func parseImportAddress(address string) ([]string, error) {
 	re := regexp.MustCompile(`,\s*`)
 	split := re.Split(address, -1)
-	importAddress := []string{}
-
-	for i := range split {
-		importAddress = append(importAddress, split[i])
-	}
+	importAddress := append([]string{}, split...)
 
 	return importAddress, nil
 }

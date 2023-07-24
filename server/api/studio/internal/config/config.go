@@ -21,9 +21,8 @@ type Config struct {
 	}
 
 	File struct {
-		UploadDir  string
-		TasksDir   string
-		TaskIdPath string
+		UploadDir string
+		TasksDir  string
 	}
 
 	DB struct {
@@ -56,7 +55,6 @@ func (c *Config) Complete() {
 		{Type: "folder", StructAttr: "UploadDir", DefaultPath: "data/upload"},
 		{Type: "folder", StructAttr: "TasksDir", DefaultPath: "data/tasks"},
 		{Type: "file", StructAttr: "SqliteDbFilePath", DefaultPath: "data/tasks.db"},
-		{Type: "file", StructAttr: "TaskIdPath", DefaultPath: "data/taskId.data"},
 	}
 
 	fileRefVal := reflect.ValueOf(&c.File).Elem()

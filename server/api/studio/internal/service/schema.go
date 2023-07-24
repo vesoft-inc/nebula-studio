@@ -52,6 +52,7 @@ func (s *schemaService) UpdateSchemaSnapshot(request types.UpdateSchemaSnapshotR
 	}
 	if result.RowsAffected == 0 {
 		snapshot := &db.SchemaSnapshot{
+			BID:      s.svcCtx.IDGenerator.Generate(),
 			Host:     host,
 			Username: auth.Username,
 			Space:    request.Space,

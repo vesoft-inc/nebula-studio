@@ -6,7 +6,6 @@ type (
 	}
 
 	FileStat {
-		Id         int    `json:"id"`
 		Sample     string `json:"sample"`
 		WithHeader bool   `json:"withHeader"`
 		Delimiter  string `json:"delimiter"`

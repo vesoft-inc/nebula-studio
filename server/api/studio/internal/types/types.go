@@ -30,7 +30,6 @@ type FileDestroyRequest struct {
 }
 
 type FileStat struct {
-	Id         int    `json:"id"`
 	Sample     string `json:"sample"`
 	WithHeader bool   `json:"withHeader"`
 	Delimiter  string `json:"delimiter"`
@@ -180,29 +179,29 @@ type LogField struct {
 }
 
 type CreateImportTaskRequest struct {
-	Id        *int   `json:"id,optional,omitempty"`
-	Name      string `json:"name" validate:"required"`
-	Config    string `json:"config" validate:"required"`
-	RawConfig string `json:"rawConfig" validate:"required"`
+	Id        *string `json:"id,optional,omitempty"`
+	Name      string  `json:"name" validate:"required"`
+	Config    string  `json:"config" validate:"required"`
+	RawConfig string  `json:"rawConfig" validate:"required"`
 }
 
 type CreateTaskDraftRequest struct {
-	Id        *int   `json:"id,optional,omitempty"`
-	Name      string `json:"name" validate:"required"`
-	Space     string `json:"space" validate:"required"`
-	RawConfig string `json:"rawConfig" validate:"required"`
+	Id        *string `json:"id,optional,omitempty"`
+	Name      string  `json:"name" validate:"required"`
+	Space     string  `json:"space" validate:"required"`
+	RawConfig string  `json:"rawConfig" validate:"required"`
 }
 
 type CreateImportTaskData struct {
-	Id int `json:"id"`
+	Id string `json:"id"`
 }
 
 type GetImportTaskRequest struct {
-	Id int `path:"id" validate:"required"`
+	Id string `path:"id" validate:"required"`
 }
 
 type GetImportTaskData struct {
-	Id            int             `json:"id"`
+	Id            string          `json:"id"`
 	Name          string          `json:"name"`
 	User          string          `json:"user"`
 	Address       string          `json:"address"`
@@ -240,7 +239,7 @@ type GetManyImportTaskData struct {
 }
 
 type GetManyImportTaskLogRequest struct {
-	Id     int    `path:"id" validate:"required"`
+	Id     string `path:"id" validate:"required"`
 	File   string `form:"file" validate:"required"`
 	Offset int64  `form:"offset" validate:"min=0"`
 	Limit  int64  `form:"limit" validate:"min=1"`
@@ -251,7 +250,7 @@ type GetManyImportTaskLogData struct {
 }
 
 type GetImportTaskLogNamesRequest struct {
-	Id int `path:"id" validate:"required"`
+	Id string `path:"id" validate:"required"`
 }
 
 type GetImportTaskLogNamesData struct {
@@ -259,20 +258,20 @@ type GetImportTaskLogNamesData struct {
 }
 
 type DeleteImportTaskRequest struct {
-	Id int `path:"id"`
+	Id string `path:"id"`
 }
 
 type StopImportTaskRequest struct {
-	Id int `path:"id"`
+	Id string `path:"id"`
 }
 
 type DownloadLogsRequest struct {
-	Id   int    `path:"id" validate:"required"`
+	Id   string `path:"id" validate:"required"`
 	Name string `form:"name" validate:"required"`
 }
 
 type DownloadConfigsRequest struct {
-	Id int `path:"id" validate:"required"`
+	Id string `path:"id" validate:"required"`
 }
 
 type GetWorkingDirResult struct {
@@ -294,7 +293,7 @@ type SketchList struct {
 }
 
 type Sketch struct {
-	ID         int    `json:"id"`
+	ID         string `json:"id"`
 	Name       string `json:"name"`
 	Schema     string `json:"schema"`
 	Snapshot   string `json:"snapshot"`
@@ -309,7 +308,7 @@ type InitSketchRequest struct {
 }
 
 type UpdateSketchRequest struct {
-	ID       int    `path:"id" validate:"required"`
+	ID       string `path:"id" validate:"required"`
 	Name     string `json:"name" validate:"required"`
 	Schema   string `json:"schema,optional"`
 	Snapshot string `json:"snapshot,optional"`
@@ -320,7 +319,7 @@ type DeleteSketchRequest struct {
 }
 
 type SketchIDResult struct {
-	ID int `json:"id"`
+	ID string `json:"id"`
 }
 
 type GetSchemaSnapshotRequest struct {
@@ -345,7 +344,7 @@ type FavoriteList struct {
 }
 
 type FavoriteItem struct {
-	ID         int    `json:"id"`
+	ID         string `json:"id"`
 	Content    string `json:"content"`
 	CreateTime int64  `json:"createTime"`
 }
@@ -359,7 +358,7 @@ type DeleteFavoriteRequest struct {
 }
 
 type FavoriteIDResult struct {
-	ID int `json:"id"`
+	ID string `json:"id"`
 }
 
 type DatasourceS3Config struct {
@@ -401,7 +400,7 @@ type DatasourceAddRequest struct {
 }
 
 type DatasourceUpdateRequest struct {
-	ID         int                         `path:"id"`
+	ID         string                      `path:"id"`
 	Platform   string                      `json:"platform,optional,omitempty"`
 	Type       string                      `json:"type"`
 	Name       string                      `json:"name"`
@@ -410,7 +409,7 @@ type DatasourceUpdateRequest struct {
 }
 
 type DatasourceAddData struct {
-	ID int `json:"id"`
+	ID string `json:"id"`
 }
 
 type DatasourceListRequest struct {
@@ -418,15 +417,15 @@ type DatasourceListRequest struct {
 }
 
 type DatasourceRemoveRequest struct {
-	ID int `path:"id"`
+	ID string `path:"id"`
 }
 
 type DatasourceBatchRemoveRequest struct {
-	IDs []int `json:"ids"`
+	IDs []string `json:"ids"`
 }
 
 type DatasourceConfig struct {
-	ID         int                   `json:"id"`
+	ID         string                `json:"id"`
 	Type       string                `json:"type"`
 	Name       string                `json:"name"`
 	Platform   string                `json:"platform"`
@@ -436,7 +435,7 @@ type DatasourceConfig struct {
 }
 
 type DatasourceListContentsRequest struct {
-	DatasourceID int    `path:"id"`
+	DatasourceID string `path:"id"`
 	Path         string `form:"path,optional"`
 }
 
@@ -455,7 +454,7 @@ type DatasourceData struct {
 }
 
 type DatasourcePreviewFileRequest struct {
-	DatasourceID int    `path:"id"`
+	DatasourceID string `path:"id"`
 	Path         string `form:"path"`
 }
 

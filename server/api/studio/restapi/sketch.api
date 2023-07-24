@@ -13,7 +13,7 @@ type (
 	}
 
 	Sketch {
-		ID         int    `json:"id"`
+		ID         string `json:"id"`
 		Name       string `json:"name"`
 		Schema     string `json:"schema"`
 		Snapshot   string `json:"snapshot"`
@@ -28,7 +28,7 @@ type (
 	}
 
 	UpdateSketchRequest {
-		ID       int    `path:"id" validate:"required"`
+		ID       string `path:"id" validate:"required"`
 		Name     string `json:"name" validate:"required"`
 		Schema   string `json:"schema,optional"`
 		Snapshot string `json:"snapshot,optional"`
@@ -37,7 +37,7 @@ type (
 		ID string `path:"id" validate:"required"`
 	}
 	SketchIDResult {
-		ID int `json:"id"`
+		ID string `json:"id"`
 	}
 )
 @server(
