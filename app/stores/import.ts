@@ -40,7 +40,9 @@ export class TagFileItem {
   }
 
   update = (payload: Partial<TagFileItem>) => {
-    Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
+    Object.keys(payload).forEach(
+      (key) => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]),
+    );
   };
 
   updatePropItem = (index: number, payload: Partial<IPropertyProps>) => {
@@ -61,7 +63,18 @@ export class EdgeFileItem {
   dstIdPrefix?: string;
   srcIdSuffix?: string;
   dstIdSuffix?: string;
-  constructor({ file, props, srcIdFunction, srcIdIndex, srcIdSuffix, srcIdPrefix, dstIdFunction, dstIdIndex, dstIdPrefix, dstIdSuffix }: Partial<EdgeFileItem>) {
+  constructor({
+    file,
+    props,
+    srcIdFunction,
+    srcIdIndex,
+    srcIdSuffix,
+    srcIdPrefix,
+    dstIdFunction,
+    dstIdIndex,
+    dstIdPrefix,
+    dstIdSuffix,
+  }: Partial<EdgeFileItem>) {
     makeAutoObservable(this);
     this.file = file;
     this.props.replace(props);
@@ -75,7 +88,9 @@ export class EdgeFileItem {
     this.dstIdSuffix = dstIdSuffix;
   }
   update = (payload: Partial<EdgeFileItem>) => {
-    Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
+    Object.keys(payload).forEach(
+      (key) => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]),
+    );
   };
 
   updatePropItem = (index: number, payload: Partial<IPropertyProps>) => {
@@ -92,7 +107,7 @@ class ImportSchemaConfigItem<T extends ISchemaEnum, F = T extends ISchemaEnum.Ed
   props = observable.array<IPropertyProps>([]);
   files = observable.array<F>([]);
 
-  constructor({ name, type, props, files }: { type: T; name?: string, props?: IPropertyProps[], files?: F[] }) {
+  constructor({ name, type, props, files }: { type: T; name?: string; props?: IPropertyProps[]; files?: F[] }) {
     makeAutoObservable(this);
     this.type = type;
     this.name = name;
@@ -114,7 +129,7 @@ class ImportSchemaConfigItem<T extends ISchemaEnum, F = T extends ISchemaEnum.Ed
     this.props.replace(props);
     this.files.replace([]);
   };
-    
+
   addProp = (item: IPropertyProps) => this.props.push(item);
 
   deleteProp = (prop: IPropertyProps) => this.props.remove(prop);
@@ -144,7 +159,7 @@ export class ImportStore {
     supportTemplate: true,
     supportConfigDownload: true,
     supportLogDownload: true,
-    needPwdConfirm: true
+    needPwdConfirm: true,
   };
   constructor() {
     makeAutoObservable(this, {
@@ -158,7 +173,9 @@ export class ImportStore {
   }
 
   update = (payload: Partial<ImportStore>) => {
-    Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
+    Object.keys(payload).forEach(
+      (key) => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]),
+    );
   };
 
   getTaskList = async () => {
@@ -170,11 +187,11 @@ export class ImportStore {
     }
   };
 
-  getLogs = async (id: number) => {
+  getLogs = async (id: string) => {
     const { code, data } = (await service.getTaskLogs({ id })) as any;
     return { code, data };
   };
-  saveTaskDraft = async (id?: number) => {
+  saveTaskDraft = async (id?: string) => {
     const { currentSpace } = this.rootStore.schema;
     const rawConfig = {
       basicConfig: this.basicConfig,
@@ -185,7 +202,7 @@ export class ImportStore {
       id,
       name: this.basicConfig.taskName,
       space: currentSpace,
-      rawConfig: JSON.stringify(rawConfig)
+      rawConfig: JSON.stringify(rawConfig),
     })) as any;
     return code;
   };
@@ -196,61 +213,61 @@ export class ImportStore {
     const datasources = await this.rootStore.datasource.getDatasourceList();
     const missingResources = [];
     const missingFiles = [];
-    [tagConfig, edgeConfig].forEach(cfg => {
-      cfg.forEach(item => {
-        item.files.forEach(fileCfg => {
+    [tagConfig, edgeConfig].forEach((cfg) => {
+      cfg.forEach((item) => {
+        item.files.forEach((fileCfg) => {
           const file = fileCfg.file;
-          if(file.datasourceId !== undefined) {
-            if(datasources.filter(i => i.id === file.datasourceId).length === 0) {
+          if (file.datasourceId !== undefined) {
+            if (datasources.filter((i) => i.id === file.datasourceId).length === 0) {
               missingResources.push(file.name);
             }
           } else {
-            if(files.filter(i => i.name === file.name).length === 0) {
+            if (files.filter((i) => i.name === file.name).length === 0) {
               missingFiles.push(file.name);
             }
           }
         });
       });
     });
-    if(missingFiles.length > 0) {
+    if (missingFiles.length > 0) {
       message.error(intl.get('import.fileMissing', { files: missingFiles.join(',') }));
       return false;
     }
-    if(missingResources.length > 0) {
+    if (missingResources.length > 0) {
       message.error(intl.get('import.datasourceMissing', { files: missingResources.join(',') }));
       return false;
     }
   };
   importTask = async (params: {
-    id?: number,
-    config?: { 
-      basicConfig: IBasicConfig,
-      tagConfig: ITagItem[],
-      edgeConfig: IEdgeItem[],
-      space: string,
-      spaceVidType: string,
-    },
-    template?: any,
-    name: string, 
-    password?: string,
-    type?: 'create' | 'rebuild' | 'rerun'
+    id?: string;
+    config?: {
+      basicConfig: IBasicConfig;
+      tagConfig: ITagItem[];
+      edgeConfig: IEdgeItem[];
+      space: string;
+      spaceVidType: string;
+    };
+    template?: any;
+    name: string;
+    password?: string;
+    type?: 'create' | 'rebuild' | 'rerun';
   }) => {
     const { template, name, password, id, config, type } = params;
     let _config;
     let rawConfig;
-    if(template) {
+    if (template) {
       // template import
       _config = template;
       rawConfig = template;
     } else {
       const { basicConfig, tagConfig, edgeConfig, space, spaceVidType } = config;
-      if(id !== undefined || type === 'rerun' || type === 'rebuild') {
-      // id: import an existed draft task
-      // rebuild: edit old task and save as new task
-      // formData: rerun task directly
-      // validate resource，maybe the resource has been deleted
+      if (id !== undefined || type === 'rerun' || type === 'rebuild') {
+        // id: import an existed draft task
+        // rebuild: edit old task and save as new task
+        // formData: rerun task directly
+        // validate resource，maybe the resource has been deleted
         const isValid = await this.validateResource({ tagConfig, edgeConfig });
-        if(isValid === false) {
+        if (isValid === false) {
           return;
         }
       }
@@ -262,27 +279,30 @@ export class ImportStore {
         edgeConfig,
         username,
         password,
-        spaceVidType
+        spaceVidType,
       });
       rawConfig = {
         basicConfig,
         tagConfig,
-        edgeConfig
+        edgeConfig,
       };
     }
-    const { code } = (await service.importData({
-      id,
-      config: _config,
-      name,
-      rawConfig: JSON.stringify(rawConfig)
-    }, {
-      trackEventConfig: 'import',
-      action: template ? 'template_import' : 'import',
-    })) as any;
+    const { code } = (await service.importData(
+      {
+        id,
+        config: _config,
+        name,
+        rawConfig: JSON.stringify(rawConfig),
+      },
+      {
+        trackEventConfig: 'import',
+        action: template ? 'template_import' : 'import',
+      },
+    )) as any;
     return code;
   };
 
-  stopTask = async (id: number) => {
+  stopTask = async (id: string) => {
     const res = await service.stopImportTask(id, {
       trackEventConfig: 'import',
       action: 'stop_task',
@@ -290,7 +310,7 @@ export class ImportStore {
     return res;
   };
 
-  deleteTask = async (id: number) => {
+  deleteTask = async (id: string) => {
     const res = await service.deleteImportTask(id, {
       trackEventConfig: 'import',
       action: 'delete_task',
@@ -298,7 +318,7 @@ export class ImportStore {
     return res;
   };
 
-  downloadTaskConfig = async (id: number) => {
+  downloadTaskConfig = async (id: string) => {
     const link = document.createElement('a');
     link.href = service.getTaskConfig(id);
     link.download = `config.yml`;
@@ -306,10 +326,7 @@ export class ImportStore {
     trackEvent('import', 'download_task_config');
   };
 
-  downloadTaskLog = async (params: {
-    id: string | number,
-    name: string,
-  }) => {
+  downloadTaskLog = async (params: { id: string; name: string }) => {
     const { id, name } = params;
     const link = document.createElement('a');
     link.href = service.getTaskLog(id) + `?name=${name}`;
@@ -318,36 +335,27 @@ export class ImportStore {
     trackEvent('import', 'download_task_log');
   };
 
-  getLogDetail = async (params: {
-    offset: number;
-    limit?: number;
-    id: string | number;
-    file: string
-  }) => {
+  getLogDetail = async (params: { offset: number; limit?: number; id: string; file: string }) => {
     const { code, data } = await service.getLogDetail(params);
-    if(code === 0) {
+    if (code === 0) {
       return data.logs;
     }
     return null;
   };
 
-  setDraft = (cfg: {
-    basicConfig: IBasicConfig,
-    tagConfig: ITagItem[],
-    edgeConfig: IEdgeItem[]
-  }) => {
+  setDraft = (cfg: { basicConfig: IBasicConfig; tagConfig: ITagItem[]; edgeConfig: IEdgeItem[] }) => {
     const { basicConfig, tagConfig, edgeConfig } = cfg;
     this.validateResource(cfg);
     this.updateBasicConfig(basicConfig);
-    tagConfig.forEach(item => {
+    tagConfig.forEach((item) => {
       const { name, props, files } = item;
-      const _files = files.map(file => new TagFileItem(file));
+      const _files = files.map((file) => new TagFileItem(file));
       const tagItem = new ImportSchemaConfigItem({ type: ISchemaEnum.Tag, name, props, files: _files });
       this.tagConfig.push(tagItem);
     });
-    edgeConfig.forEach(item => {
+    edgeConfig.forEach((item) => {
       const { name, props, files } = item;
-      const _files = files.map(file => new EdgeFileItem(file));
+      const _files = files.map((file) => new EdgeFileItem(file));
       const edgeItem = new ImportSchemaConfigItem({ type: ISchemaEnum.Edge, name, props, files: _files });
       this.edgeConfig.push(edgeItem);
     });
@@ -367,8 +375,8 @@ export class ImportStore {
   };
 
   updateBasicConfig = <T extends keyof IBasicConfig>(payload: { [K in T]?: IBasicConfig[K] }) => {
-    Object.keys(payload).forEach(key => {
-      if(isEmpty(payload[key])) {
+    Object.keys(payload).forEach((key) => {
+      if (isEmpty(payload[key])) {
         delete this.basicConfig[key];
       } else {
         this.basicConfig[key] = payload[key];
@@ -384,7 +392,7 @@ export class ImportStore {
     const defaultValueFields: any[] = [];
     if (createTagGQL) {
       const fields = createTagGQL.split(/\n|\r\n/);
-      fields.forEach(field => {
+      fields.forEach((field) => {
         const fieldArr = field.trim().split(/\s|\s+/);
         if (fieldArr.includes('default') || fieldArr.includes('DEFAULT')) {
           let defaultField = fieldArr[0];
@@ -395,11 +403,9 @@ export class ImportStore {
         }
       });
     }
-    return code === 0 
-      ? data.tables.map(attr => handlePropertyMap(attr, defaultValueFields))
-      : [];
+    return code === 0 ? data.tables.map((attr) => handlePropertyMap(attr, defaultValueFields)) : [];
   };
-  
+
   getEdgeProps = async (edgeType: string) => {
     const { schema } = this.rootStore;
     const { getTagOrEdgeInfo, getTagOrEdgeDetail } = schema;
@@ -408,7 +414,7 @@ export class ImportStore {
     const defaultValueFields: any[] = [];
     if (createEdgeGQL) {
       const fields = createEdgeGQL.split(/\n|\r\n/);
-      fields.forEach(field => {
+      fields.forEach((field) => {
         const fieldArr = field.trim().split(/\s|\s+/);
         if (field.includes('default') || fieldArr.includes('DEFAULT')) {
           let defaultField = fieldArr[0];
@@ -419,21 +425,20 @@ export class ImportStore {
         }
       });
     }
-    return code !== 0 
+    return code !== 0
       ? []
       : [
-        ...data.tables.map(item => handlePropertyMap(item, defaultValueFields)),
-        {
-          name: 'rank',
-          type: 'int',
-          allowNull: true,
-          mapping: null,
-        },
-      ];
+          ...data.tables.map((item) => handlePropertyMap(item, defaultValueFields)),
+          {
+            name: 'rank',
+            type: 'int',
+            allowNull: true,
+            mapping: null,
+          },
+        ];
   };
 }
 
 const importStore = new ImportStore();
 
 export default importStore;
-

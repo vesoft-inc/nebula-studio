@@ -9,7 +9,7 @@ import styles from './index.module.less';
 
 interface ILogDimension {
   space: string;
-  id: number;
+  id: string;
   status: ITaskStatus;
 }
 
@@ -22,8 +22,14 @@ interface IProps {
 let isMounted = true;
 
 const LogModal = (props: IProps) => {
-  const { visible, onCancel, logDimension: { space, id, status } } = props;
-  const { dataImport: { getLogs, downloadTaskLog, getLogDetail, envCfg } } = useStore();
+  const {
+    visible,
+    onCancel,
+    logDimension: { space, id, status },
+  } = props;
+  const {
+    dataImport: { getLogs, downloadTaskLog, getLogDetail, envCfg },
+  } = useStore();
   const { supportLogDownload } = envCfg;
   const { intl } = useI18n();
   const logRef = useRef<HTMLDivElement>(null);
@@ -34,12 +40,12 @@ const LogModal = (props: IProps) => {
   const [loading, setLoading] = useState(false);
   const [currentLog, setCurrentLog] = useState<string | null>(null);
   const handleTabChange = (key: string) => {
-    setCurrentLog(logs.filter(item => item === key)[0]);
+    setCurrentLog(logs.filter((item) => item === key)[0]);
   };
 
   const getAllLogs = async () => {
     const { code, data } = await getLogs(id);
-    if(code === 0) {
+    if (code === 0) {
       const logs = data.names || [];
       setLogs(logs);
       setCurrentLog(logs[0]);
@@ -47,10 +53,10 @@ const LogModal = (props: IProps) => {
   };
 
   const handleLogDownload = () => {
-    if(currentLog) {
+    if (currentLog) {
       downloadTaskLog({
         id,
-        name: currentLog
+        name: currentLog,
       });
     }
   };
@@ -60,25 +66,25 @@ const LogModal = (props: IProps) => {
       offset: offset.current,
       id,
       limit: 500,
-      file: currentLog
+      file: currentLog,
     });
     isMounted && handleLogData(data);
   };
 
   const handleLogData = (data) => {
-    if(!logRef.current) {
+    if (!logRef.current) {
       timer.current = setTimeout(readLog, 2000);
-      return; 
+      return;
     }
     if (data && data.length > 0) {
       logRef.current.innerHTML += data.join('<br/>') + '<br/>';
       logRef.current.scrollTop = logRef.current.scrollHeight;
       offset.current += data.length;
-      if(isMounted) {
+      if (isMounted) {
         timer.current = setTimeout(readLog, 2000);
       }
     } else if ([ITaskStatus.Processing, ITaskStatus.Pending].includes(_status.current)) {
-      if(isMounted) {
+      if (isMounted) {
         timer.current = setTimeout(readLog, 2000);
       }
     } else {
@@ -93,7 +99,7 @@ const LogModal = (props: IProps) => {
   };
   useEffect(() => {
     isMounted = true;
-    if(supportLogDownload) {
+    if (supportLogDownload) {
       getAllLogs();
     } else {
       initLog();
@@ -109,30 +115,36 @@ const LogModal = (props: IProps) => {
   }, [status]);
   useEffect(() => {
     clearTimeout(timer.current);
-    if(logRef.current) {
+    if (logRef.current) {
       logRef.current.innerHTML = '';
     }
     offset.current = 0;
-    if(currentLog && isMounted) {
+    if (currentLog && isMounted) {
       readLog();
     }
   }, [currentLog]);
-  const items = logs.map(log => ({
+  const items = logs.map((log) => ({
     key: log,
-    label: log
+    label: log,
   }));
   return (
     <Modal
-      title={<>
-        <div className={styles.importModalTitle}>
-          <span>{`${space} ${intl.get('import.task')} - ${intl.get('common.log')}`}</span>
-          {(loading || [ITaskStatus.Processing, ITaskStatus.Pending].includes(status)) && <Button type="text" loading={true} />}
-        </div>
-        {supportLogDownload && <Button className="studioAddBtn primaryBtn" onClick={handleLogDownload}>
-          <Icon type="icon-studio-btn-download" />
-          {intl.get('import.downloadLog')}
-        </Button>}
-      </>}
+      title={
+        <>
+          <div className={styles.importModalTitle}>
+            <span>{`${space} ${intl.get('import.task')} - ${intl.get('common.log')}`}</span>
+            {(loading || [ITaskStatus.Processing, ITaskStatus.Pending].includes(status)) && (
+              <Button type="text" loading={true} />
+            )}
+          </div>
+          {supportLogDownload && (
+            <Button className="studioAddBtn primaryBtn" onClick={handleLogDownload}>
+              <Icon type="icon-studio-btn-download" />
+              {intl.get('import.downloadLog')}
+            </Button>
+          )}
+        </>
+      }
       width="80%"
       open={visible}
       onCancel={onCancel}
@@ -140,8 +152,10 @@ const LogModal = (props: IProps) => {
       destroyOnClose={true}
       footer={false}
     >
-      {supportLogDownload && <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange} items={items} />}
-      <div className={classnames(styles.logContainer, !supportLogDownload && styles.full)} ref={logRef}/>
+      {supportLogDownload && (
+        <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange} items={items} />
+      )}
+      <div className={classnames(styles.logContainer, !supportLogDownload && styles.full)} ref={logRef} />
     </Modal>
   );
 };

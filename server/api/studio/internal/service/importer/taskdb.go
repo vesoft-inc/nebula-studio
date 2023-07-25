@@ -54,9 +54,7 @@ func (t *TaskDb) UpdateTaskInfo(info *db.TaskInfo) error {
 }
 
 func (t *TaskDb) DelTaskInfo(ID string) error {
-	return t.Delete(&db.TaskInfo{
-		BID: ID,
-	}).Error
+	return t.Delete(&db.TaskInfo{}, "b_id = ?", ID).Error
 }
 
 func (t *TaskDb) UpdateProcessingTasks2Aborted() error {

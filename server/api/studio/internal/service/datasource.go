@@ -166,10 +166,7 @@ func (d *datasourceService) List(request types.DatasourceListRequest) (*types.Da
 
 func (d *datasourceService) Remove(request types.DatasourceRemoveRequest) error {
 	user := d.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
-	result := db.CtxDB.Delete(&db.Datasource{
-		BID:      request.ID,
-		Username: user.Username,
-	})
+	result := db.CtxDB.Delete(&db.Datasource{}, "b_id = ? AND username = ?", request.ID, user.Username)
 
 	if result.Error != nil {
 		return d.gormErrorWrapper(result.Error)

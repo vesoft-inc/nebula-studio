@@ -1,20 +1,20 @@
 export enum IDatasourceType {
   'S3' = 's3',
   'SFTP' = 'sftp',
-  'Local' = 'local'
+  'Local' = 'local',
 }
 export enum IS3Platform {
   'AWS' = 'aws',
   'OSS' = 'oss',
   'Customize' = 'customize',
-  'Tecent' = 'cos'
+  'Tecent' = 'cos',
 }
 
 export type IDatasourceAdd = Omit<IDatasourceItem, 'id' | 'createTime'>;
 export type IDatasourceUpdate = Omit<IDatasourceItem, 'createTime'>;
 
 export interface IDatasourceItem {
-  id: number;
+  id: string;
   name: string;
   type: IDatasourceType;
   platform?: string;

@@ -60,9 +60,7 @@ func (s *favoriteService) Create(request types.CreateFavoriteRequest) (*types.Fa
 }
 
 func (s *favoriteService) Delete(request types.DeleteFavoriteRequest) error {
-	result := db.CtxDB.Delete(&db.Favorite{
-		BID: request.Id,
-	})
+	result := db.CtxDB.Delete(&db.Favorite{}, "b_id = ?", request.Id)
 	if result.Error != nil {
 		return s.gormErrorWrapper(result.Error)
 	}
