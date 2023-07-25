@@ -5,7 +5,7 @@ MaxBytes: 1073741824
 Timeout: 60000
 Log: 
   Mode: file
-  Level: error
+  Level: info
   KeepDays: 7
 Debug:
   Enable: false

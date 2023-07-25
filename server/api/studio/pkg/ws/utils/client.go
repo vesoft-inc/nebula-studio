@@ -93,6 +93,30 @@ func (c *Client) RegisterMiddleware(mds []TMiddleware) {
 	c.dispatcher = next
 }
 
+func (c *Client) SendMessage(msgSend []byte) (closed bool) {
+	defer func() {
+		if err := recover(); err != nil {
+			logx.Errorf("[WebSocket SendMessage panic]: %+v", err)
+			closed = true
+		}
+	}()
+
+	curClient := c.Hub.SelectClient(func(clients map[string]*Client) *Client {
+		if client, ok := clients[c.ID]; ok {
+			return client
+		}
+		return nil
+	})
+
+	if curClient != nil {
+		c.send <- msgSend
+	} else {
+		logx.Infof("[WebSocket SendMessage]: client has been closed, ID: %s", c.ID)
+		closed = true
+	}
+	return false
+}
+
 func (c *Client) Serve() {
 	go c.writePump()
 	go c.readPump()
@@ -100,14 +124,7 @@ func (c *Client) Serve() {
 	c.Hub.register <- c
 }
 
-func (c *Client) dispatchMessage(msg *[]byte) (closed bool) {
-	defer func() {
-		if err := recover(); err != nil {
-			logx.Errorf("[WebSocket dispatchMessage panic]: %+v", err)
-			closed = true
-		}
-	}()
-
+func (c *Client) dispatchMessage(msg *[]byte) {
 	msgReceived := &MessageReceive{}
 
 	err := json.Unmarshal(*msg, msgReceived)
@@ -120,9 +137,15 @@ func (c *Client) dispatchMessage(msg *[]byte) (closed bool) {
 	if msgPost == nil {
 		return
 	}
+
 	msgSend, _ := json.Marshal(msgPost)
-	c.send <- msgSend
-	return false
+	c.SendMessage(msgSend)
+}
+
+// Destroy will unregister client from hub and close connection
+func (c *Client) Destroy() {
+	c.Conn.Close()
+	c.Hub.unregister <- c
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -131,10 +154,7 @@ func (c *Client) dispatchMessage(msg *[]byte) (closed bool) {
 // ensures that there is at most one reader on a connection by executing all
 // reads from this goroutine.
 func (c *Client) readPump() {
-	defer func() {
-		c.Hub.unregister <- c
-		c.Conn.Close()
-	}()
+	defer c.Destroy()
 
 	c.Conn.SetReadLimit(maxMessageSize)
 	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
@@ -144,6 +164,9 @@ func (c *Client) readPump() {
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				logx.Errorf("[WebSocket UnexpectedClose]: %v", err)
+			} else if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
+				// e.g. websocket: close 1001 (going away)
+				logx.Infof("[WebSocket NormalClose]: %v", err)
 			} else {
 				logx.Errorf("[WebSocket ReadMessage]: %v", err)
 			}
@@ -154,7 +177,7 @@ func (c *Client) readPump() {
 
 		// step 0: heartbeat
 		if string(msgReceivedByte) == heartbeatRequest {
-			c.send <- []byte(heartbeatResponse)
+			c.SendMessage([]byte(heartbeatResponse))
 			continue
 		}
 
