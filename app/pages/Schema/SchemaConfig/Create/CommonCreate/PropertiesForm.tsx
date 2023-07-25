@@ -10,7 +10,6 @@ const Option = Select.Option;
 import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 
-
 const itemLayout = {
   wrapperCol: {
     span: 20,
@@ -25,13 +24,13 @@ interface IProps {
 const PropertiesForm = (props: IProps) => {
   const { formRef, onUpdate } = props;
   const { intl } = useI18n();
-  const handleClearProperties = e => {
-    if(!e.target.checked) {
-      formRef.setFieldsValue({ 'properties': [] });
+  const handleClearProperties = (e) => {
+    if (!e.target.checked) {
+      formRef.setFieldsValue({ properties: [] });
       setTimeout(onUpdate, 300);
     }
   };
-  const handlePropertyAdd = callback => {
+  const handlePropertyAdd = (callback) => {
     const properties = formRef.getFieldValue('properties');
     if (properties && properties.length > 0) {
       callback({
@@ -58,7 +57,7 @@ const PropertiesForm = (props: IProps) => {
   const handlePropertyDelete = (rowIndex, callback) => {
     const properties = formRef.getFieldValue('properties');
     const ttl_col = formRef.getFieldValue('ttl_col');
-    if(properties[rowIndex].name === ttl_col) {
+    if (properties[rowIndex].name === ttl_col) {
       formRef.resetFields(['ttl_col', '']);
     }
     callback(rowIndex);
@@ -68,7 +67,7 @@ const PropertiesForm = (props: IProps) => {
     const properties = formRef.getFieldValue('properties');
     const _properties = [...properties];
     _properties[index].value = '';
-    formRef.setFieldsValue({ 'properties': _properties });
+    formRef.setFieldsValue({ properties: _properties });
   };
   return (
     <Form.Item noStyle>
@@ -89,19 +88,24 @@ const PropertiesForm = (props: IProps) => {
                     return (
                       <Form.Item noStyle>
                         <Form.Item noStyle>
-                          <Button 
-                            type="primary" 
-                            className="studioAddBtn" 
+                          <Button
+                            type="primary"
+                            className="studioAddBtn"
                             disabled={!propertiesRequired}
-                            onClick={() => handlePropertyAdd(add)}>
+                            onClick={() => handlePropertyAdd(add)}
+                          >
                             <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
                             {intl.get('common.addProperty')}
                           </Button>
                         </Form.Item>
                         <Form.Item noStyle>
                           <Row className={styles.formHeader}>
-                            <Col span={4} className={styles.requiredItem}>{intl.get('common.propertyName')}</Col>
-                            <Col span={6} className={styles.requiredItem}>{intl.get('common.dataType')}</Col>
+                            <Col span={4} className={styles.requiredItem}>
+                              {intl.get('common.propertyName')}
+                            </Col>
+                            <Col span={6} className={styles.requiredItem}>
+                              {intl.get('common.dataType')}
+                            </Col>
                             <Col span={3}>{intl.get('common.allowNull')}</Col>
                             <Col span={5}>{intl.get('common.defaults')}</Col>
                             <Col span={4}>{intl.get('common.comment')}</Col>
@@ -111,28 +115,29 @@ const PropertiesForm = (props: IProps) => {
                           <Fragment key={key}>
                             <Row className={styles.fieldsItem}>
                               <Col span={4}>
-                                <Form.Item 
-                                  name={[name, 'name']} 
-                                  {...restField} 
-                                  {...itemLayout} 
-                                  rules={nameRulesFn()}>
+                                <Form.Item name={[name, 'name']} {...restField} {...itemLayout} rules={nameRulesFn()}>
                                   <Input />
                                 </Form.Item>
                               </Col>
                               <Col span={6}>
-                                <Form.Item 
-                                  name={[name, 'type']} 
-                                  {...restField} 
-                                  {...itemLayout} 
-                                  wrapperCol={{ span: 14 }} 
+                                <Form.Item
+                                  name={[name, 'type']}
+                                  {...restField}
+                                  {...itemLayout}
+                                  wrapperCol={{ span: 14 }}
                                   rules={[
                                     {
                                       required: true,
                                       message: intl.get('formRules.dataTypeRequired'),
                                     },
-                                  ]}>
-                                  <Select showSearch={true} onChange={() => handleResetValue(index)} dropdownMatchSelectWidth={false}>
-                                    {DATA_TYPE.map(item => {
+                                  ]}
+                                >
+                                  <Select
+                                    showSearch={true}
+                                    onChange={() => handleResetValue(index)}
+                                    popupMatchSelectWidth={false}
+                                  >
+                                    {DATA_TYPE.map((item) => {
                                       return (
                                         <Option value={item.value} key={item.value}>
                                           {item.label}
@@ -143,58 +148,67 @@ const PropertiesForm = (props: IProps) => {
                                 </Form.Item>
                                 {fields && fields[index] && properties[index].type === 'fixed_string' && (
                                   <Col offset={14} className={styles.itemStringLength}>
-                                    <Form.Item {...restField} 
-                                      className={styles.itemStringLength} 
-                                      name={[name, 'fixedLength']} 
+                                    <Form.Item
+                                      {...restField}
+                                      className={styles.itemStringLength}
+                                      name={[name, 'fixedLength']}
                                       rules={[
                                         ...numberRulesFn(),
                                         {
                                           required: true,
                                           message: intl.get('formRules.numberRequired'),
                                         },
-                                      ]}>
+                                      ]}
+                                    >
                                       <Input className={styles.inputStringLength} />
                                     </Form.Item>
                                   </Col>
                                 )}
                               </Col>
                               <Col span={3}>
-                                <Form.Item 
-                                  name={[name, 'allowNull']} 
-                                  {...restField} {...itemLayout} 
-                                  valuePropName="checked">
+                                <Form.Item
+                                  name={[name, 'allowNull']}
+                                  {...restField}
+                                  {...itemLayout}
+                                  valuePropName="checked"
+                                >
                                   <Checkbox />
                                 </Form.Item>
                               </Col>
                               <Col span={5}>
                                 <Form.Item noStyle>
-                                  {fields &&
-                                  fields[index] &&
-                                  EXPLAIN_DATA_TYPE.includes(properties[index].type) ? (
-                                      <Popover
-                                        trigger="focus"
-                                        placement="right"
-                                        content={intl.getHTML(`schema.${properties[index].type}Format`)}
-                                      >
-                                        <Form.Item {...restField} {...itemLayout} name={[name, 'value']}>
-                                          <Input />
-                                        </Form.Item>
-                                      </Popover>
-                                    ) : (
+                                  {fields && fields[index] && EXPLAIN_DATA_TYPE.includes(properties[index].type) ? (
+                                    <Popover
+                                      trigger="focus"
+                                      placement="right"
+                                      content={intl.getHTML(`schema.${properties[index].type}Format`)}
+                                    >
                                       <Form.Item {...restField} {...itemLayout} name={[name, 'value']}>
                                         <Input />
                                       </Form.Item>
-                                    )}
+                                    </Popover>
+                                  ) : (
+                                    <Form.Item {...restField} {...itemLayout} name={[name, 'value']}>
+                                      <Input />
+                                    </Form.Item>
+                                  )}
                                 </Form.Item>
                               </Col>
                               <Col span={4}>
-                                <Form.Item {...restField} {...itemLayout} name={[name, 'comment']} rules={stringByteRulesFn()}>
+                                <Form.Item
+                                  {...restField}
+                                  {...itemLayout}
+                                  name={[name, 'comment']}
+                                  rules={stringByteRulesFn()}
+                                >
                                   <Input />
                                 </Form.Item>
                               </Col>
                               <Col span={2}>
                                 <Form.Item noStyle>
-                                  <Button type="link" danger={true} onClick={() => handlePropertyDelete(name, remove)}>{intl.get('common.delete')}</Button>
+                                  <Button type="link" danger={true} onClick={() => handlePropertyDelete(name, remove)}>
+                                    {intl.get('common.delete')}
+                                  </Button>
                                 </Form.Item>
                               </Col>
                             </Row>

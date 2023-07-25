@@ -1,4 +1,4 @@
-import { Button, Popconfirm, Table, message, Popover, Form, Input, Dropdown, Menu, Tooltip } from 'antd';
+import { Button, Popconfirm, Table, message, Popover, Form, Input, Dropdown, Menu, Tooltip, MenuProps } from 'antd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
 import Icon from '@app/components/Icon';
@@ -11,14 +11,13 @@ import styles from './index.module.less';
 import Search from './SchemaConfig/List/Search';
 import DDLButton from './SchemaConfig/DDLButton';
 
-interface IOperations {
+interface ICloneOperations {
   space: string;
-  onClone: (name: string, oldSpace: string) => void
-  onDelete: (name: string) => void;
+  onClone: (name: string, oldSpace: string) => void;
 }
 
-const Operations = (props: IOperations) => {
-  const { space, onClone, onDelete } = props;
+const CloneSpacePopover = (props: ICloneOperations) => {
+  const { space, onClone } = props;
   const [visible, setVisible] = useState(false);
   const { intl } = useI18n();
   const handleClone = (values) => {
@@ -26,22 +25,21 @@ const Operations = (props: IOperations) => {
     onClone(name, space);
     setVisible(false);
   };
-  const items = [
-    {
-      key: 'ddl',
-      label: <DDLButton space={space} />
-    },
-    {
-      key: 'clone',
-      label: <Popover
-        overlayClassName={styles.clonePopover}
-        destroyTooltipOnHide={true}
-        placement="leftTop"
-        open={visible}
-        trigger="click"
-        onOpenChange={visible => setVisible(visible)}
-        content={<Form onFinish={handleClone} layout="inline">
-          <Form.Item label={intl.get('schema.spaceName')} name="name" rules={[{ required: true, message: intl.get('formRules.nameRequired') }]}>
+  return (
+    <Popover
+      overlayClassName={styles.clonePopover}
+      destroyTooltipOnHide={true}
+      placement="leftTop"
+      open={visible}
+      trigger="click"
+      onOpenChange={(visible) => setVisible(visible)}
+      content={
+        <Form onFinish={handleClone} layout="inline">
+          <Form.Item
+            label={intl.get('schema.spaceName')}
+            name="name"
+            rules={[{ required: true, message: intl.get('formRules.nameRequired') }]}
+          >
             <Input />
           </Form.Item>
           <Form.Item>
@@ -49,28 +47,14 @@ const Operations = (props: IOperations) => {
               {intl.get('common.confirm')}
             </Button>
           </Form.Item>
-        </Form>}
-      >
-        <Button type="link" onClick={() => setVisible(true)}>
-          {intl.get('schema.cloneSpace')}
-        </Button>
-      </Popover>
-    },
-    {
-      key: 'delete',
-      label: <Popconfirm
-        onConfirm={() => onDelete(space)}
-        title={intl.get('common.ask')}
-        okText={intl.get('common.ok')}
-        cancelText={intl.get('common.cancel')}
-      >
-        <Button type="link" danger>
-          {intl.get('schema.deleteSpace')}
-        </Button>
-      </Popconfirm>
-    },
-  ];
-  return <Menu className={styles.operationsSpace} items={items} />;
+        </Form>
+      }
+    >
+      <Button type="link" onClick={() => setVisible(true)}>
+        {intl.get('schema.cloneSpace')}
+      </Button>
+    </Popover>
+  );
 };
 
 const Schema = () => {
@@ -95,7 +79,7 @@ const Schema = () => {
       await getSpaces();
       if (currentSpace === name) {
         schema.update({
-          currentSpace: ''
+          currentSpace: '',
         });
         localStorage.removeItem('currentSpace');
       }
@@ -114,7 +98,7 @@ const Schema = () => {
 
   const handleCloneSpace = useCallback(async (name: string, oldSpace: string) => {
     const { code } = await cloneSpace(name, oldSpace);
-    if(code === 0) {
+    if (code === 0) {
       message.success(intl.get('schema.createSuccess'));
       getSpaces();
     }
@@ -132,7 +116,7 @@ const Schema = () => {
       ellipsis: {
         showTitle: false,
       },
-      render: data => (
+      render: (data) => (
         <Tooltip placement="topLeft" title={data}>
           <a
             className={styles.cellBtn}
@@ -177,7 +161,7 @@ const Schema = () => {
       ellipsis: {
         showTitle: false,
       },
-      render: data => (
+      render: (data) => (
         <Tooltip placement="topLeft" title={data}>
           {data}
         </Tooltip>
@@ -200,7 +184,36 @@ const Schema = () => {
               >
                 {intl.get('common.schema')}
               </Button>
-              <Dropdown overlay={<Operations space={space.Name} onDelete={handleDeleteSpace} onClone={handleCloneSpace} />} placement="bottomLeft">
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: 'ddl',
+                      label: <DDLButton space={space.Name} />,
+                    },
+                    {
+                      key: 'clone',
+                      label: <CloneSpacePopover space={space.Name} onClone={handleCloneSpace} />,
+                    },
+                    {
+                      key: 'delete',
+                      label: (
+                        <Popconfirm
+                          onConfirm={() => handleDeleteSpace(space.Name)}
+                          title={intl.get('common.ask')}
+                          okText={intl.get('common.ok')}
+                          cancelText={intl.get('common.cancel')}
+                        >
+                          <Button type="link" danger>
+                            {intl.get('schema.deleteSpace')}
+                          </Button>
+                        </Popconfirm>
+                      ),
+                    },
+                  ],
+                }}
+                placement="bottomLeft"
+              >
                 <Icon className={styles.btnMore} type="icon-studio-more" />
               </Dropdown>
             </div>
@@ -209,35 +222,36 @@ const Schema = () => {
       },
     },
   ];
-  const data = useMemo(() => spaceList.filter(item => item.Name.includes(searchVal)), [spaceList, searchVal]);
-  return <div className={cls(styles.schemaPage, 'studioCenterLayout')}>
-    <div className={styles.schemaHeader}>
-      {intl.get('schema.spaceList')}
-    </div>
-    <div className={styles.schemaContainer}>
-      <div className={styles.row}>
-        <Button className={cls(styles.btnCreate, 'studioAddBtn')} type="primary">
-          <Link
-            to="/schema/space/create"
-            data-track-category="navigation"
-            data-track-action="view_space_create"
-            data-track-label="from_space_list"
-          >
-            <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('schema.createSpace')}
-          </Link>
-        </Button>
-        <Search type={intl.get('common.space')} onSearch={setSearchVal} />
+  const data = useMemo(() => spaceList.filter((item) => item.Name.includes(searchVal)), [spaceList, searchVal]);
+  return (
+    <div className={cls(styles.schemaPage, 'studioCenterLayout')}>
+      <div className={styles.schemaHeader}>{intl.get('schema.spaceList')}</div>
+      <div className={styles.schemaContainer}>
+        <div className={styles.row}>
+          <Button className={cls(styles.btnCreate, 'studioAddBtn')} type="primary">
+            <Link
+              to="/schema/space/create"
+              data-track-category="navigation"
+              data-track-action="view_space_create"
+              data-track-label="from_space_list"
+            >
+              <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
+              {intl.get('schema.createSpace')}
+            </Link>
+          </Button>
+          <Search type={intl.get('common.space')} onSearch={setSearchVal} />
+        </div>
+        <Table
+          className={styles.tableSpaceList}
+          dataSource={data}
+          columns={columns}
+          loading={!!loading}
+          rowKey="ID"
+          rowClassName={(item) => (item.Name === activeSpace ? styles.active : '')}
+        />
       </div>
-      <Table
-        className={styles.tableSpaceList}
-        dataSource={data}
-        columns={columns}
-        loading={!!loading}
-        rowKey="ID"
-        rowClassName={(item) => item.Name === activeSpace ? styles.active : ''}
-      />
     </div>
-  </div>;
+  );
 };
 
 export default observer(Schema);

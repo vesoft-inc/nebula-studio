@@ -8,14 +8,14 @@ import styles from './index.module.less';
 const Option = Select.Option;
 
 interface IEditProperty extends IProperty {
-  alterType: AlterType
+  alterType: AlterType;
 }
 
 interface IProps {
   data: IProperty;
   onEditBefore: (data: IProperty) => void;
   onDelete: (data: IProperty[]) => void;
-  disabled: boolean
+  disabled: boolean;
 }
 interface IEditProps {
   data: IEditProperty | null;
@@ -26,53 +26,40 @@ interface IEditProps {
 export const DisplayRow = (props: IProps) => {
   const { data, onEditBefore, onDelete, disabled } = props;
   const { intl } = useI18n();
-  return <Row className={styles.fieldsItem}>
-    <Col span={4}>
-      {data.name}
-    </Col>
-    <Col span={6}>
-      {data.showType}
-    </Col>
-    <Col span={2}>
-      <Checkbox checked={data.allowNull} disabled={true} />
-    </Col>
-    <Col span={5}>
-      {data.value?.toString()}
-    </Col>
-    <Col span={4}>
-      {data.comment}
-    </Col>
-    <Col span={3} className={styles.operations}>
-      <Button
-        type="link"
-        onClick={() => onEditBefore(data)}
-        disabled={disabled}
-      >
-        {intl.get('common.edit')}
-      </Button>
-      <Popconfirm
-        onConfirm={() => {
-          onDelete([data]);
-        }}
-        title={intl.get('common.ask')}
-        okText={intl.get('common.ok')}
-        cancelText={intl.get('common.cancel')}
-      >
-        <Button
-          danger
-          type="link"
-        >
-          {intl.get('common.delete')}
+  return (
+    <Row className={styles.fieldsItem}>
+      <Col span={4}>{data.name}</Col>
+      <Col span={6}>{data.showType}</Col>
+      <Col span={2}>
+        <Checkbox checked={data.allowNull} disabled={true} />
+      </Col>
+      <Col span={5}>{data.value?.toString()}</Col>
+      <Col span={4}>{data.comment}</Col>
+      <Col span={3} className={styles.operations}>
+        <Button type="link" onClick={() => onEditBefore(data)} disabled={disabled}>
+          {intl.get('common.edit')}
         </Button>
-      </Popconfirm>
-    </Col>
-  </Row>;
+        <Popconfirm
+          onConfirm={() => {
+            onDelete([data]);
+          }}
+          title={intl.get('common.ask')}
+          okText={intl.get('common.ok')}
+          cancelText={intl.get('common.cancel')}
+        >
+          <Button danger type="link">
+            {intl.get('common.delete')}
+          </Button>
+        </Popconfirm>
+      </Col>
+    </Row>
+  );
 };
 
 export const EditRow = (props: IEditProps) => {
   const { data, onEditCancel, onUpdateType } = props;
   const { intl } = useI18n();
-  if(!data) {
+  if (!data) {
     return null;
   }
   const { alterType, name, type, fixedLength, allowNull, value, comment } = data;
@@ -83,27 +70,34 @@ export const EditRow = (props: IEditProps) => {
         return (
           <Row className={styles.fieldsItem}>
             <Col span={4}>
-              <Form.Item 
-                name="name"
-                initialValue={name} 
-                rules={nameRulesFn()}>
+              <Form.Item name="name" initialValue={name} rules={nameRulesFn()}>
                 <Input disabled={alterType !== 'ADD'} />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item 
+              <Form.Item
                 name="type"
                 wrapperCol={{ span: 14 }}
-                initialValue={type}  
+                initialValue={type}
                 rules={[
                   {
                     required: true,
                     message: intl.get('formRules.dataTypeRequired'),
                   },
-                ]}>
-                <Select disabled={!(type in DataTypeTransformMap) && data.alterType !== 'ADD'} showSearch={true} onChange={onUpdateType} dropdownMatchSelectWidth={false}>
-                  {DATA_TYPE.map(item => {
-                    if(data.alterType !== 'ADD' && !DataTypeTransformMap[type]?.includes(item.value) && item.value !== type) {
+                ]}
+              >
+                <Select
+                  disabled={!(type in DataTypeTransformMap) && data.alterType !== 'ADD'}
+                  showSearch={true}
+                  onChange={onUpdateType}
+                  popupMatchSelectWidth={false}
+                >
+                  {DATA_TYPE.map((item) => {
+                    if (
+                      data.alterType !== 'ADD' &&
+                      !DataTypeTransformMap[type]?.includes(item.value) &&
+                      item.value !== type
+                    ) {
                       return null;
                     }
                     return (
@@ -115,37 +109,33 @@ export const EditRow = (props: IEditProps) => {
                 </Select>
               </Form.Item>
               <Col offset={14} className={styles.itemStringLength}>
-                {currentType === 'fixed_string' && <Form.Item  
-                  className={styles.itemStringLength} 
-                  name="fixedLength"
-                  initialValue={fixedLength}
-                  rules={[
-                    ...numberRulesFn(),
-                    {
-                      required: true,
-                      message: intl.get('formRules.numberRequired'),
-                    },
-                  ]}>
-                  <Input className={styles.inputStringLength} />
-                </Form.Item>}
+                {currentType === 'fixed_string' && (
+                  <Form.Item
+                    className={styles.itemStringLength}
+                    name="fixedLength"
+                    initialValue={fixedLength}
+                    rules={[
+                      ...numberRulesFn(),
+                      {
+                        required: true,
+                        message: intl.get('formRules.numberRequired'),
+                      },
+                    ]}
+                  >
+                    <Input className={styles.inputStringLength} />
+                  </Form.Item>
+                )}
               </Col>
             </Col>
             <Col span={2}>
-              <Form.Item 
-                name="allowNull"
-                initialValue={allowNull}
-                valuePropName="checked">
+              <Form.Item name="allowNull" initialValue={allowNull} valuePropName="checked">
                 <Checkbox />
               </Form.Item>
             </Col>
             <Col span={5}>
               <Form.Item noStyle>
                 {EXPLAIN_DATA_TYPE.includes(type) ? (
-                  <Popover
-                    trigger="focus"
-                    placement="right"
-                    content={intl.getHTML(`schema.${type}Format`)}
-                  >
+                  <Popover trigger="focus" placement="right" content={intl.getHTML(`schema.${type}Format`)}>
                     <Form.Item name="value" initialValue={value}>
                       <Input />
                     </Form.Item>
@@ -164,17 +154,10 @@ export const EditRow = (props: IEditProps) => {
             </Col>
             <Col span={3} className={styles.operations}>
               <Form.Item noStyle>
-                <Button
-                  type="link"
-                  htmlType="submit"
-                >
+                <Button type="link" htmlType="submit">
                   {intl.get('common.ok')}
                 </Button>
-                <Button
-                  type="link"
-                  danger
-                  onClick={onEditCancel}
-                >
+                <Button type="link" danger onClick={onEditCancel}>
                   {intl.get('common.cancel')}
                 </Button>
               </Form.Item>
