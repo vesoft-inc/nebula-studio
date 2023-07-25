@@ -113,7 +113,7 @@ const FileSelect = observer((props: IFileSelect) => {
     }
     setState({ loading: true });
     const _path = `${path === '/' ? '' : path}${activeItem.name}`;
-    const data = await previewFile({ id: activeId as number, path: _path });
+    const data = await previewFile({ id: activeId, path: _path });
     const item = {
       name: activeItem.name,
       withHeader: false,

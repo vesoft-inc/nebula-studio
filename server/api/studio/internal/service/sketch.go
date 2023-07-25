@@ -62,9 +62,7 @@ func (s *sketchService) Init(request types.InitSketchRequest) (*types.SketchIDRe
 }
 
 func (s *sketchService) Delete(request types.DeleteSketchRequest) error {
-	result := db.CtxDB.Delete(&db.Sketch{
-		BID: request.ID,
-	})
+	result := db.CtxDB.Delete(&db.Sketch{}, "b_id = ?", request.ID)
 	if result.Error != nil {
 		return s.gormErrorWrapper(result.Error)
 	}
@@ -72,7 +70,7 @@ func (s *sketchService) Delete(request types.DeleteSketchRequest) error {
 }
 
 func (s *sketchService) Update(request types.UpdateSketchRequest) error {
-	result := db.CtxDB.Model(&db.Sketch{BID: request.ID}).Updates(map[string]interface{}{
+	result := db.CtxDB.Model(&db.Sketch{}).Where("b_id = ?", request.ID).Updates(map[string]interface{}{
 		"name":     request.Name,
 		"schema":   request.Schema,
 		"snapshot": request.Snapshot,

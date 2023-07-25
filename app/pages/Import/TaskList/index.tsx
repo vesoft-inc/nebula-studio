@@ -17,10 +17,9 @@ let isMounted = true;
 
 interface ILogDimension {
   space: string;
-  id: number;
+  id: string;
   status: ITaskStatus;
 }
-
 
 const TaskList = () => {
   const timer = useRef<any>(null);
@@ -35,28 +34,28 @@ const TaskList = () => {
   const [sourceModalVisible, setSourceModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const { supportTemplate } = envCfg;
-  const modalKey = useMemo(() => Math.random(), [sourceModalVisible ]);
+  const modalKey = useMemo(() => Math.random(), [sourceModalVisible]);
   const [logDimension, setLogDimension] = useState<ILogDimension>({} as ILogDimension);
-  const handleTaskStop = useCallback(async (id: number) => {
+  const handleTaskStop = useCallback(async (id: string) => {
     clearTimeout(timer.current);
     const { code } = await stopTask(id);
     code === 0 && message.success(intl.get('import.stopImportingSuccess'));
     getTaskList();
   }, []);
-  const handleTaskDelete = useCallback(async (id: number) => {
+  const handleTaskDelete = useCallback(async (id: string) => {
     clearTimeout(timer.current);
     const { code } = await deleteTask(id);
-    if(code === 0) {
+    if (code === 0) {
       message.success(intl.get('import.deleteSuccess'));
       getTaskList();
     }
   }, []);
 
-  const handleLogView = useCallback((id: number, space: string, status: ITaskStatus) => {
+  const handleLogView = useCallback((id: string, space: string, status: ITaskStatus) => {
     setLogDimension({
-      space, 
+      space,
       id,
-      status
+      status,
     });
     setVisible(true);
   }, []);
@@ -81,18 +80,18 @@ const TaskList = () => {
   }, []);
   useEffect(() => {
     const loadingStatus = [ITaskStatus.Processing, ITaskStatus.Pending];
-    const needRefresh = taskList.filter(item => loadingStatus.includes(item.status)).length > 0;
-    if(logDimension.id !== undefined && loadingStatus.includes(logDimension.status)) {
-      const status = taskList.filter(item => item.id === logDimension.id)[0].status;
-      if(!loadingStatus.includes(status)) {
+    const needRefresh = taskList.filter((item) => loadingStatus.includes(item.status)).length > 0;
+    if (logDimension.id !== undefined && loadingStatus.includes(logDimension.status)) {
+      const status = taskList.filter((item) => item.id === logDimension.id)[0].status;
+      if (!loadingStatus.includes(status)) {
         setLogDimension({
           id: logDimension.id,
           space: logDimension.space,
-          status
+          status,
         });
       }
     }
-    if(needRefresh && isMounted) {
+    if (needRefresh && isMounted) {
       clearTimeout(timer.current);
       timer.current = setTimeout(getTaskList, 1000);
     } else {
@@ -101,46 +100,51 @@ const TaskList = () => {
   }, [taskList]);
 
   useEffect(() => {
-    if(modalVisible === false) {
+    if (modalVisible === false) {
       setLogDimension({} as ILogDimension);
     }
   }, [modalVisible]);
-  const emptyTips = useMemo(() => ([
-    {
-      title: intl.get('import.newDataSource'),
-      tip: intl.get('import.newDataSourceTip'),
-      action: () => setSourceModalVisible(true),
-      btnLabel: intl.get('import.start')
-    },
-    {
-      title: intl.get('import.addNewImport'),
-      tip: intl.get('import.addNewImportTip'),
-      action: () => history.push('/import/create'),
-      btnLabel: intl.get('import.start')
-    },
-  ]), []);
+  const emptyTips = useMemo(
+    () => [
+      {
+        title: intl.get('import.newDataSource'),
+        tip: intl.get('import.newDataSourceTip'),
+        action: () => setSourceModalVisible(true),
+        btnLabel: intl.get('import.start'),
+      },
+      {
+        title: intl.get('import.addNewImport'),
+        tip: intl.get('import.addNewImportTip'),
+        action: () => history.push('/import/create'),
+        btnLabel: intl.get('import.start'),
+      },
+    ],
+    [],
+  );
   return (
     <div className={styles.nebulaDataImport}>
       <div className={styles.header}>
         <div className={styles.taskBtns}>
-          <Button
-            className="studioAddBtn"
-            type="primary"
-            onClick={() => history.push('/import/create')}
-          >
-            <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('import.createTask')}
+          <Button className="studioAddBtn" type="primary" onClick={() => history.push('/import/create')}>
+            <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
+            {intl.get('import.createTask')}
           </Button>
-          {supportTemplate && <Button type="default" onClick={() => setImportModalVisible(true)}>
-            {intl.get('import.uploadTemp')}
-          </Button>}
+          {supportTemplate && (
+            <Button type="default" onClick={() => setImportModalVisible(true)}>
+              {intl.get('import.uploadTemp')}
+            </Button>
+          )}
         </div>
         <Button className="studioAddBtn" type="primary" onClick={() => setSourceModalVisible(true)}>
-          <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('import.newDataSource')}
+          <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
+          {intl.get('import.newDataSource')}
         </Button>
       </div>
-      <h3 className={styles.taskHeader}>{intl.get('import.taskList')} ({taskList.length})</h3>
-      {!loading && taskList.length === 0 
-        ? <div className={styles.emptyTip}>
+      <h3 className={styles.taskHeader}>
+        {intl.get('import.taskList')} ({taskList.length})
+      </h3>
+      {!loading && taskList.length === 0 ? (
+        <div className={styles.emptyTip}>
           {emptyTips.map((item, index) => {
             return (
               <div key={index} className={styles.box}>
@@ -150,37 +154,54 @@ const TaskList = () => {
                     <p className={styles.title}>{item.title}</p>
                     <p className={styles.tip}>{item.tip}</p>
                   </div>
-                  <Button className={styles.btn} size="small" type="primary" onClick={item.action}>{item.btnLabel}</Button>
+                  <Button className={styles.btn} size="small" type="primary" onClick={item.action}>
+                    {item.btnLabel}
+                  </Button>
                 </div>
-                {index !== emptyTips.length - 1 && <div className={styles.arrow} /> }
+                {index !== emptyTips.length - 1 && <div className={styles.arrow} />}
               </div>
             );
           })}
         </div>
-        : <Spin spinning={loading}>
-          {taskList.slice((page - 1) * 10, page * 10).map(item => (
-            <TaskItem key={item.id} 
+      ) : (
+        <Spin spinning={loading}>
+          {taskList.slice((page - 1) * 10, page * 10).map((item) => (
+            <TaskItem
+              key={item.id}
               data={item}
               onRerun={handleRerun}
-              onViewLog={handleLogView} 
-              onTaskStop={handleTaskStop} 
-              onTaskDelete={handleTaskDelete} 
+              onViewLog={handleLogView}
+              onTaskStop={handleTaskStop}
+              onTaskDelete={handleTaskDelete}
             />
           ))}
-          <Pagination className={styles.taskPagination} hideOnSinglePage total={taskList.length} current={page} onChange={page => setPage(page)} />
+          <Pagination
+            className={styles.taskPagination}
+            hideOnSinglePage
+            total={taskList.length}
+            current={page}
+            onChange={(page) => setPage(page)}
+          />
         </Spin>
-      }
-      {modalVisible && <LogModal
-        logDimension={logDimension}
-        onCancel={() => setVisible(false)}
-        visible={modalVisible} />}
-      {importModalVisible && <TemplateModal
-        onClose={() => setImportModalVisible(false)}
-        username={username}
-        host={host}
-        onImport={getTaskList}
-        visible={importModalVisible} />}
-      <DatasourceConfigModal key={modalKey} visible={sourceModalVisible} onCancel={() => setSourceModalVisible(false)} onConfirm={() => setSourceModalVisible(false)} />
+      )}
+      {modalVisible && (
+        <LogModal logDimension={logDimension} onCancel={() => setVisible(false)} visible={modalVisible} />
+      )}
+      {importModalVisible && (
+        <TemplateModal
+          onClose={() => setImportModalVisible(false)}
+          username={username}
+          host={host}
+          onImport={getTaskList}
+          visible={importModalVisible}
+        />
+      )}
+      <DatasourceConfigModal
+        key={modalKey}
+        visible={sourceModalVisible}
+        onCancel={() => setSourceModalVisible(false)}
+        onConfirm={() => setSourceModalVisible(false)}
+      />
     </div>
   );
 };

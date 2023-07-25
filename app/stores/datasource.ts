@@ -4,12 +4,12 @@ import { makeAutoObservable } from 'mobx';
 import { getRootStore } from '.';
 
 export interface ICachedStore {
-  loading?: boolean,
-  options?: any[],
-  directory?: any[],
-  path?: string, 
-  activeId?: number | string,
-  activeItem?: any,
+  loading?: boolean;
+  options?: any[];
+  directory?: any[];
+  path?: string;
+  activeId?: string;
+  activeItem?: any;
 }
 export class DatasourceStore {
   cachedStore: ICachedStore = null;
@@ -21,7 +21,9 @@ export class DatasourceStore {
   }
 
   update = (payload: Partial<DatasourceStore>) => {
-    Object.keys(payload).forEach(key => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]));
+    Object.keys(payload).forEach(
+      (key) => Object.prototype.hasOwnProperty.call(this, key) && (this[key] = payload[key]),
+    );
   };
 
   addDataSource = async (payload: IDatasourceAdd) => {
@@ -44,11 +46,11 @@ export class DatasourceStore {
   };
   getDatasourceList = async (payload?: { type?: IDatasourceType }) => {
     const { code, data } = await service.getDatasourceList(payload);
-    if(code === 0) {
+    if (code === 0) {
       return data.list;
     }
   };
-  deleteDataSource = async (id: number) => {
+  deleteDataSource = async (id: string) => {
     const { code } = await service.deleteDatasource(id, {
       trackEventConfig: {
         category: 'datasource',
@@ -57,32 +59,29 @@ export class DatasourceStore {
     });
     return code === 0;
   };
-  batchDeleteDatasource = async (ids: number[]) => {
-    const { code } = await service.batchDeleteDatasource({ ids }, {
-      trackEventConfig: {
-        category: 'datasource',
-        action: 'batch_delete_datasources',
+  batchDeleteDatasource = async (ids: string[]) => {
+    const { code } = await service.batchDeleteDatasource(
+      { ids },
+      {
+        trackEventConfig: {
+          category: 'datasource',
+          action: 'batch_delete_datasources',
+        },
       },
-    });
+    );
     return code === 0;
   };
-  getDatasourceDetail = async (payload: {
-    id: number,
-    path?: string,
-  }) => {
+  getDatasourceDetail = async (payload: { id: string; path?: string }) => {
     const { id, path } = payload;
     const { code, data } = await service.getDatasourceDetail({ id, path });
-    if(code === 0) {
+    if (code === 0) {
       return data.list;
     }
   };
-  previewFile = async (payload: {
-    id: number,
-    path?: string,
-  }) => {
+  previewFile = async (payload: { id: string; path?: string }) => {
     const { id, path } = payload;
     const { code, data } = await service.previewFile({ id, path });
-    if(code === 0) {
+    if (code === 0) {
       return data;
     }
   };
@@ -91,4 +90,3 @@ export class DatasourceStore {
 const datasourceStore = new DatasourceStore();
 
 export default datasourceStore;
-

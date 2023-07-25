@@ -26,13 +26,13 @@ const service = {
   importData: (params, config?) => {
     return post('/api/import-tasks')(params, config);
   },
-  stopImportTask: (id: number, config?) => {
+  stopImportTask: (id: string, config?) => {
     return get(`/api/import-tasks/${id}/stop`)(undefined, config);
   },
   saveTaskDraft: (params, config?) => {
     return post('/api/import-tasks/draft')(params, config);
   },
-  deleteImportTask: (id: number, config) => {
+  deleteImportTask: (id: string, config) => {
     return _delete(`/api/import-tasks/${id}`)(undefined, config);
   },
   getTaskList: (params?, config?) => {
@@ -46,8 +46,8 @@ const service = {
     const { id, ...others } = params;
     return get(`/api/import-tasks/${id}/logs`)(others, config);
   },
-  getTaskConfig: (id: string | number) => `/api/import-tasks/${id}/download-config`,
-  getTaskLog: (id: string | number) => `/api/import-tasks/${id}/download-logs`,
+  getTaskConfig: (id: string) => `/api/import-tasks/${id}/download-config`,
+  getTaskLog: (id: string) => `/api/import-tasks/${id}/download-logs`,
   // files
   deteleFile: (params, config?) => {
     return _delete(`/api/files`)(undefined, { data: params, ...config });
@@ -105,7 +105,7 @@ const service = {
     const { id, ...restParams } = params;
     return post(`/api/datasources/${id}`)(restParams, config);
   },
-  deleteDatasource: (id: number, config?) => {
+  deleteDatasource: (id: string, config?) => {
     return _delete(`/api/datasources/${id}`)(undefined, config);
   },
   batchDeleteDatasource: (payload, _config?) => {
@@ -126,4 +126,3 @@ export const updateService = (partService: any) => {
 };
 
 export default service;
-

@@ -20,12 +20,12 @@ export interface ITaskStats {
   totalLatency: number;
   totalRespTime: number;
   /* The number of nodes and edges that have failed to be processed. */
-  failedProcessed: number; 
+  failedProcessed: number;
   /* 123. */
-  totalProcessed: number; 
+  totalProcessed: number;
 }
 export interface ITaskItem {
-  id: number;
+  id: string;
   address: string;
   space: string;
   name: string;
@@ -43,7 +43,7 @@ export interface IPropertyProps {
   type: string;
   isDefault: boolean;
   allowNull: boolean;
-  mapping?: number
+  mapping?: number;
 }
 
 export interface IImportFile {
@@ -54,7 +54,7 @@ export interface IImportFile {
   s3Config?: IS3Config;
   sftpConfig?: ISftpConfig;
   /** remote config id */
-  datasourceId?: number;
+  datasourceId?: string;
   /** remote path */
   path?: string;
 }
@@ -80,7 +80,7 @@ export interface ISftpConfig {
   passPhrase?: string;
 }
 export interface IBasicConfig {
-  id?: number;
+  id?: string;
   taskName: string;
   address: string[];
   batchSize?: string;
@@ -92,7 +92,7 @@ export interface IBasicConfig {
 
 export interface ILogDimension {
   space: string;
-  id: number;
+  id: string;
   status: ITaskStatus;
 }
 

@@ -65,8 +65,8 @@ const DatasourceList = (props: IProps) => {
   const [editData, setEditData] = useState<IDatasourceItem>(null);
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [selectIds, setSelectIds] = useState<number[]>([]);
-  const modalKey = useMemo(() => visible ? Math.random() : undefined, [visible]);
+  const [selectIds, setSelectIds] = useState<string[]>([]);
+  const modalKey = useMemo(() => (visible ? Math.random() : undefined), [visible]);
   const create = useCallback(() => {
     setEditData(null);
     setVisible(true);
@@ -75,10 +75,10 @@ const DatasourceList = (props: IProps) => {
     setEditData(item);
     setVisible(true);
   }, []);
-  const deleteItem = useCallback(async id => {
+  const deleteItem = useCallback(async (id) => {
     const flag = await deleteDataSource(id);
     flag && (getList(), message.success(intl.get('common.deleteSuccess')));
-  }, []);  
+  }, []);
   const tableColumns: TableColumnType<IDatasourceItem>[] = useMemo(() => {
     const columns = type === IDatasourceType.S3 ? s3Columns : sftpColumns;
     return columns.concat({
@@ -101,9 +101,8 @@ const DatasourceList = (props: IProps) => {
           </Popconfirm>
         </div>
       ),
-    }); 
+    });
   }, [type, currentLocale]);
-
 
   const getList = async () => {
     !loading && setLoading(true);
@@ -132,7 +131,8 @@ const DatasourceList = (props: IProps) => {
     <div className={styles.fileUpload}>
       <div className={styles.fileOperations}>
         <Button className={cls('studioAddBtn', styles.uploadBtn)} type="primary" onClick={create}>
-          <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('import.newDataSource')}
+          <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
+          {intl.get('import.newDataSource')}
         </Button>
         <Popconfirm
           onConfirm={handleDeleteDatasource}
@@ -147,21 +147,30 @@ const DatasourceList = (props: IProps) => {
         </Popconfirm>
       </div>
       <div className={styles.fileList}>
-        <h3>{intl.get('import.datasourceList', { type: intl.get(`import.${type}`) })} ({data.length})</h3>
+        <h3>
+          {intl.get('import.datasourceList', { type: intl.get(`import.${type}`) })} ({data.length})
+        </h3>
         <Table
           loading={!!loading}
           dataSource={data}
           rowSelection={{
             type: 'checkbox',
             selectedRowKeys: selectIds,
-            onChange: (selectedRowKeys) => setSelectIds(selectedRowKeys as number[]),
+            onChange: (selectedRowKeys) => setSelectIds(selectedRowKeys as string[]),
           }}
           columns={tableColumns}
           rowKey="id"
           pagination={false}
         />
       </div>
-      <DatasourceConfigModal key={modalKey} data={editData} type={type} visible={visible} onCancel={() => setVisible(false)} onConfirm={handleRefresh} />
+      <DatasourceConfigModal
+        key={modalKey}
+        data={editData}
+        type={type}
+        visible={visible}
+        onCancel={() => setVisible(false)}
+        onConfirm={handleRefresh}
+      />
     </div>
   );
 };
