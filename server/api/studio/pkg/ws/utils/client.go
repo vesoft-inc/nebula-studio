@@ -55,6 +55,8 @@ type Client struct {
 	send chan []byte
 	// message received middleware
 	dispatcher TNext
+	// after destroy callback
+	AfterDestroy func()
 }
 
 func NewClient(hub *Hub, conn *websocket.Conn, clientType string, clientInfo any) (*Client, error) {

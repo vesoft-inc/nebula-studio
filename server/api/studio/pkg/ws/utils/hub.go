@@ -41,6 +41,10 @@ func (h *Hub) Run() {
 			if _, ok := h.clients[client.ID]; ok {
 				delete(h.clients, client.ID)
 				close(client.send)
+				afterDestroy := client.AfterDestroy
+				if afterDestroy != nil {
+					go afterDestroy()
+				}
 			}
 			h.mu.Unlock()
 			// case message := <-h.broadcast:
