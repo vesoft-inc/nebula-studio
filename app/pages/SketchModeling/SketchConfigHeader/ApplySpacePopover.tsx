@@ -257,7 +257,7 @@ export default observer(function ApplySpacePopover() {
       overlayClassName={styles.applyPopover}
       placement="bottomRight"
       content={<PopoverContent close={close} />}
-      arrowPointAtCenter={true}
+      arrow={true}
       trigger="click"
       open={open}
       onOpenChange={(open) => !open && setOpen(false)}

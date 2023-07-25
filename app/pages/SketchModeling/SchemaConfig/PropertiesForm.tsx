@@ -58,19 +58,22 @@ const PropertiesForm = (props: IProps) => {
             const properties = getFieldValue('properties') || [];
             return (
               <div>
-                <Form.List name="properties" rules={[
-                  {
-                    validator: (_, properties) => {
-                      if (!properties) {
-                        return Promise.resolve();
-                      }
-                      const names = properties.map((item) => item.name).filter(Boolean);
-                      if(names.length !== new Set(names).size) {
-                        return Promise.reject(intl.get('schema.uniqProperty'));
-                      }
+                <Form.List
+                  name="properties"
+                  rules={[
+                    {
+                      validator: (_, properties) => {
+                        if (!properties) {
+                          return Promise.resolve();
+                        }
+                        const names = properties.map((item) => item.name).filter(Boolean);
+                        if (names.length !== new Set(names).size) {
+                          return Promise.reject(intl.get('schema.uniqProperty'));
+                        }
+                      },
                     },
-                  },
-                ]}>
+                  ]}
+                >
                   {(fields, { add, remove }, { errors }) => {
                     return (
                       <Form.Item noStyle>
@@ -95,7 +98,9 @@ const PropertiesForm = (props: IProps) => {
                           </Form.Item>
                         )}
                         {fields.map(({ key, name, ...restField }, index) => {
-                          const hasSameName = properties.some((item, i) => item.name && item.name === properties[index].name && i !== index);
+                          const hasSameName = properties.some(
+                            (item, i) => item.name && item.name === properties[index].name && i !== index,
+                          );
                           return (
                             <Fragment key={key}>
                               <Row className={styles.fieldsItem}>
@@ -125,7 +130,7 @@ const PropertiesForm = (props: IProps) => {
                                     <Select
                                       showSearch={true}
                                       onChange={() => handleResetValue(index)}
-                                      dropdownMatchSelectWidth={false}
+                                      popupMatchSelectWidth={false}
                                     >
                                       {DATA_TYPE.map((item) => {
                                         return (
