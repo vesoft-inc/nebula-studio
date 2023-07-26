@@ -164,11 +164,8 @@ func (c *Client) readPump() {
 	for {
 		_, message, err := c.Conn.ReadMessage()
 		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+			if websocket.IsUnexpectedCloseError(err) {
 				logx.Errorf("[WebSocket UnexpectedClose]: %v", err)
-			} else if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
-				// e.g. websocket: close 1001 (going away)
-				logx.Infof("[WebSocket NormalClose]: %v", err)
 			} else {
 				logx.Errorf("[WebSocket ReadMessage]: %v", err)
 			}
@@ -197,7 +194,7 @@ func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
-		c.Conn.Close()
+		c.Destroy()
 	}()
 
 	for {
@@ -206,7 +203,7 @@ func (c *Client) writePump() {
 			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				// The hub closed the channel.
-				logx.Errorf("[WebSocket UnexpectedClose]: c.send length: %v", len(c.send))
+				logx.Errorf("[WebSocket writePump]: c.send length: %v", len(c.send))
 				c.Conn.WriteControl(websocket.CloseMessage, []byte{}, time.Now().Add(time.Second))
 				return
 			}
