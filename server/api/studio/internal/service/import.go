@@ -39,6 +39,7 @@ type (
 	ImportService interface {
 		CreateImportTask(*types.CreateImportTaskRequest) (*types.CreateImportTaskData, error)
 		CreateTaskDraft(*types.CreateTaskDraftRequest) error
+		UpdateTaskDraft(*types.UpdateTaskDraftRequest) error
 		StopImportTask(request *types.StopImportTaskRequest) error
 		DownloadConfig(*types.DownloadConfigsRequest) error
 		DownloadLogs(request *types.DownloadLogsRequest) error
@@ -220,20 +221,21 @@ func (i *importService) CreateTaskDraft(req *types.CreateTaskDraftRequest) error
 	auth := i.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	host := auth.Address + ":" + strconv.Itoa(auth.Port)
 	taskMgr := importer.GetTaskMgr()
-	if req.Id != nil {
-		err := taskMgr.UpdateTaskDraft(*req.Id, req.Name, req.Space, req.RawConfig)
-		if err != nil {
-			return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-		}
-		return nil
-	} else {
-		id := i.svcCtx.IDGenerator.Generate()
-		err := taskMgr.NewTaskDraft(id, host, auth.Username, req.Name, req.Space, req.RawConfig)
-		if err != nil {
-			return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-		}
-		return nil
+	id := i.svcCtx.IDGenerator.Generate()
+	err := taskMgr.NewTaskDraft(id, host, auth.Username, req.Name, req.Space, req.RawConfig)
+	if err != nil {
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
+	return nil
+}
+
+func (i *importService) UpdateTaskDraft(req *types.UpdateTaskDraftRequest) error {
+	taskMgr := importer.GetTaskMgr()
+	err := taskMgr.UpdateTaskDraft(*req.Id, req.Name, req.Space, req.RawConfig)
+	if err != nil {
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+	}
+	return nil
 }
 
 func (i *importService) StopImportTask(req *types.StopImportTaskRequest) error {

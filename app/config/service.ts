@@ -32,6 +32,9 @@ const service = {
   saveTaskDraft: (params, config?) => {
     return post('/api/import-tasks/draft')(params, config);
   },
+  updateTaskDraft: (params, config?) => {
+    return put(`/api/import-tasks/${params.id}/draft`)(params, config);
+  },
   deleteImportTask: (id: string, config) => {
     return _delete(`/api/import-tasks/${id}`)(undefined, config);
   },
