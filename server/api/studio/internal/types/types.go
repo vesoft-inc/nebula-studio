@@ -186,7 +186,13 @@ type CreateImportTaskRequest struct {
 }
 
 type CreateTaskDraftRequest struct {
-	Id        *string `json:"id,optional,omitempty"`
+	Name      string `json:"name" validate:"required"`
+	Space     string `json:"space" validate:"required"`
+	RawConfig string `json:"rawConfig" validate:"required"`
+}
+
+type UpdateTaskDraftRequest struct {
+	Id        *string `path:"id" validate:"required"`
 	Name      string  `json:"name" validate:"required"`
 	Space     string  `json:"space" validate:"required"`
 	RawConfig string  `json:"rawConfig" validate:"required"`

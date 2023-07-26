@@ -138,7 +138,13 @@ type (
 		RawConfig string  `json:"rawConfig" validate:"required"`
 	}
 	CreateTaskDraftRequest {
-		Id        *string `json:"id,optional,omitempty"`
+		Name      string `json:"name" validate:"required"`
+		Space     string `json:"space" validate:"required"`
+		RawConfig string `json:"rawConfig" validate:"required"`
+	}
+
+	UpdateTaskDraftRequest {
+		Id        *string `path:"id" validate:"required"`
 		Name      string  `json:"name" validate:"required"`
 		Space     string  `json:"space" validate:"required"`
 		RawConfig string  `json:"rawConfig" validate:"required"`
@@ -244,6 +250,10 @@ service studio-api {
 	@doc "Create Import Task Draft"
 	@handler CreateTaskDraft
 	post /api/import-tasks/draft(CreateTaskDraftRequest)
+	
+	@doc "Update Import Task Draft"
+	@handler UpdateTaskDraft
+	put /api/import-tasks/:id/draft(UpdateTaskDraftRequest)
 	
 	@doc "Get Import Task"
 	@handler GetImportTask

@@ -26,18 +26,32 @@ const formItemLayout = {
 const AddMappingBtn = (props: { type: ISchemaType }) => {
   const { intl } = useI18n();
   const { type } = props;
-  const { dataImport: { addTagConfig, addEdgeConfig } } = useStore();
-  const addMapping = useCallback(() => type === ISchemaEnum.Tag ? addTagConfig() : addEdgeConfig(), [type]);
-  return <Button type="primary" className="studioAddBtnIcon" onClick={addMapping}>
-    <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
-    {intl.get(type === ISchemaEnum.Tag ? 'import.addTag' : 'import.addEdge')}
-  </Button>;
+  const {
+    dataImport: { addTagConfig, addEdgeConfig },
+  } = useStore();
+  const addMapping = useCallback(() => (type === ISchemaEnum.Tag ? addTagConfig() : addEdgeConfig()), [type]);
+  return (
+    <Button type="primary" className="studioAddBtnIcon" onClick={addMapping}>
+      <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
+      {intl.get(type === ISchemaEnum.Tag ? 'import.addTag' : 'import.addEdge')}
+    </Button>
+  );
 };
 
 const TaskCreate = () => {
   const { dataImport, schema, files, global, datasource } = useStore();
   const { intl, currentLocale } = useI18n();
-  const { basicConfig, tagConfig, edgeConfig, updateBasicConfig, importTask, saveTaskDraft, setDraft, envCfg } = dataImport;
+  const {
+    basicConfig,
+    tagConfig,
+    edgeConfig,
+    updateBasicConfig,
+    importTask,
+    saveTaskDraft,
+    updateTaskDraft,
+    setDraft,
+    envCfg,
+  } = dataImport;
   const { needPwdConfirm } = envCfg;
   const { spaces, getSpaces, updateSpaceInfo, currentSpace, spaceVidType } = schema;
   const { getGraphAddress, _host } = global;
@@ -48,23 +62,26 @@ const TaskCreate = () => {
   const [address, setAddress] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showMoreConfig, setShowMoreConfig] = useState(false);
-  const routes = useMemo(() => ([
-    {
-      path: '/import/tasks',
-      breadcrumbName: intl.get('import.taskList'),
-    },
-    {
-      path: '#',
-      breadcrumbName: intl.get('import.createTask'),
-    },
-  ]), [currentLocale]);
+  const routes = useMemo(
+    () => [
+      {
+        path: '/import/tasks',
+        breadcrumbName: intl.get('import.taskList'),
+      },
+      {
+        path: '#',
+        breadcrumbName: intl.get('import.createTask'),
+      },
+    ],
+    [currentLocale],
+  );
 
   useEffect(() => {
     const { state } = location;
     initTaskDir();
     getSpaces();
     getFiles();
-    if(state) {
+    if (state) {
       setShowMoreConfig(true);
       updateSpaceInfo(state.space);
       setDraft(JSON.parse(state.cfg));
@@ -91,19 +108,19 @@ const TaskCreate = () => {
     setLoading(true);
     const { state } = location;
     const payload = {
-      name: basicConfig.taskName, 
+      name: basicConfig.taskName,
       password,
       config: {
         basicConfig,
         tagConfig,
         edgeConfig,
         space: currentSpace,
-        spaceVidType
+        spaceVidType,
       },
-      type: 'create'
+      type: 'create',
     } as any;
-    if(state?.id !== undefined) {
-      if(state?.isDraft) {
+    if (state?.id !== undefined) {
+      if (state?.isDraft) {
         payload.id = state.id;
       } else {
         payload.type = 'rebuild';
@@ -111,42 +128,50 @@ const TaskCreate = () => {
     }
     const code = await importTask(payload);
     setLoading(false);
-    if(code === 0) {
+    if (code === 0) {
       message.success(intl.get('import.startImporting'));
       history.push('/import/tasks');
     }
   };
 
   const check = () => {
-    [...tagConfig, ...edgeConfig].forEach(config => {
+    [...tagConfig, ...edgeConfig].forEach((config) => {
       const { type, name, files } = config;
       const _type = type === ISchemaEnum.Tag ? 'tag' : 'edge';
-      if(!name) {
+      if (!name) {
         message.error(intl.get(`import.${_type}Required`));
         throw new Error();
       }
-      if(files.length === 0) {
+      if (files.length === 0) {
         message.error(intl.get(`import.${_type}FileRequired`));
         throw new Error();
       }
       files.forEach((file) => {
-        if(!file.file?.name) {
+        if (!file.file?.name) {
           message.error(intl.get(`import.${_type}FileSelect`));
           throw new Error();
         }
-        if(type === ISchemaEnum.Tag && isEmpty(file.vidIndex)) {
+        if (type === ISchemaEnum.Tag && isEmpty(file.vidIndex)) {
           message.error(`vertexId ${intl.get('import.indexNotEmpty')}`);
           throw new Error();
         } else if (type === ISchemaEnum.Edge) {
-          if(isEmpty(file.srcIdIndex)) {
-            message.error(`${intl.get('common.edge')} ${config.name} ${intl.get('common.src')} id ${intl.get('import.indexNotEmpty')}`);
+          if (isEmpty(file.srcIdIndex)) {
+            message.error(
+              `${intl.get('common.edge')} ${config.name} ${intl.get('common.src')} id ${intl.get(
+                'import.indexNotEmpty',
+              )}`,
+            );
             throw new Error();
           } else if (isEmpty(file.dstIdIndex)) {
-            message.error(`${intl.get('common.edge')} ${config.name} ${intl.get('common.dst')} id ${intl.get('import.indexNotEmpty')}`);
+            message.error(
+              `${intl.get('common.edge')} ${config.name} ${intl.get('common.dst')} id ${intl.get(
+                'import.indexNotEmpty',
+              )}`,
+            );
             throw new Error();
           }
         }
-        file.props.forEach(prop => {
+        file.props.forEach((prop) => {
           if (isEmpty(prop.mapping) && !prop.allowNull && !prop.isDefault) {
             message.error(`${prop.name} ${intl.get('import.indexNotEmpty')}`);
             throw new Error();
@@ -154,9 +179,9 @@ const TaskCreate = () => {
         });
       });
     });
-    extraConfigs.forEach(config => {
+    extraConfigs.forEach((config) => {
       const { key, label } = config;
-      if(basicConfig[key] && !basicConfig[key].match(POSITIVE_INTEGER_REGEX)) {
+      if (basicConfig[key] && !basicConfig[key].match(POSITIVE_INTEGER_REGEX)) {
         message.error(`${label}: ${intl.get('formRules.numberRequired')}`);
         throw new Error();
       }
@@ -166,9 +191,9 @@ const TaskCreate = () => {
   const clearConfig = useCallback((type?: string) => {
     const params = {
       tagConfig: [],
-      edgeConfig: []
+      edgeConfig: [],
     } as Partial<ImportStore>;
-    if(type === 'all') {
+    if (type === 'all') {
       params.basicConfig = { taskName: '', address: [] };
     }
     dataImport.update(params);
@@ -178,15 +203,15 @@ const TaskCreate = () => {
     updateSpaceInfo(space);
   }, []);
   const saveDraft = async () => {
-    if(!currentSpace || !basicConfig.taskName) {
+    if (!currentSpace || !basicConfig.taskName) {
       message.error(intl.get('import.taskNameRequired'));
       return;
     }
     setLoading(true);
     const id = location.state?.isDraft ? location.state?.id : undefined;
-    const code = await saveTaskDraft(id);
+    const code = id !== undefined ? await updateTaskDraft(id) : await saveTaskDraft();
     setLoading(false);
-    if(code === 0) {
+    if (code === 0) {
       message.success(intl.get('sketch.saveSuccess'));
       history.push('/import/tasks');
     }
@@ -194,80 +219,89 @@ const TaskCreate = () => {
   const initTaskDir = useCallback(async () => {
     const { state } = location;
     const graphs = await getGraphAddress();
-    if(!state) {
-      updateBasicConfig({ 'taskName': `task-${Date.now()}`, 'address': graphs });
+    if (!state) {
+      updateBasicConfig({ taskName: `task-${Date.now()}`, address: graphs });
     }
-    setAddress(graphs.map(item => ({
-      label: <>
-        {item}
-        {item === _host ? <span className={styles.currentHost}>&nbsp;({intl.get('import.currentHost')})</span> : null}
-      </>,
-      value: item,
-      disabled: item === _host
-    })));
+    setAddress(
+      graphs.map((item) => ({
+        label: (
+          <>
+            {item}
+            {item === _host ? (
+              <span className={styles.currentHost}>&nbsp;({intl.get('import.currentHost')})</span>
+            ) : null}
+          </>
+        ),
+        value: item,
+        disabled: item === _host,
+      })),
+    );
   }, []);
-  const extraConfigs = useMemo(() => [
-    {
-      label: intl.get('import.concurrency'),
-      key: 'concurrency',
-      rules: [
-        {
-          pattern: POSITIVE_INTEGER_REGEX,
-          message: intl.get('formRules.numberRequired'),
-        },
-      ],
-      placeholder: DEFAULT_IMPORT_CONFIG.concurrency,
-      description: intl.get('import.concurrencyTip'),
-    },
-    {
-      label: intl.get('import.batchSize'),
-      key: 'batchSize',
-      rules: [
-        {
-          pattern: POSITIVE_INTEGER_REGEX,
-          message: intl.get('formRules.numberRequired'),
-        },
-      ],
-      placeholder: DEFAULT_IMPORT_CONFIG.batchSize,
-      description: intl.get('import.batchSizeTip'),
-    },
-    {
-      label: intl.get('import.retry'),
-      key: 'retry',
-      rules: [
-        {
-          pattern: POSITIVE_INTEGER_REGEX,
-          message: intl.get('formRules.numberRequired'),
-        },
-      ],
-      placeholder: DEFAULT_IMPORT_CONFIG.retry,
-      description: intl.get('import.retryTip'),
-    },
-    {
-      label: intl.get('import.readerConcurrency'),
-      key: 'readerConcurrency',
-      rules: [
-        {
-          pattern: POSITIVE_INTEGER_REGEX,
-          message: intl.get('formRules.numberRequired'),
-        },
-      ],
-      placeholder: DEFAULT_IMPORT_CONFIG.readerConcurrency,
-      description: intl.get('import.readerConcurrencyTip'),
-    },
-    {
-      label: intl.get('import.importerConcurrency'),
-      key: 'importerConcurrency',
-      rules: [
-        {
-          pattern: POSITIVE_INTEGER_REGEX,
-          message: intl.get('formRules.numberRequired'),
-        },
-      ],
-      placeholder: DEFAULT_IMPORT_CONFIG.importerConcurrency,
-      description: intl.get('import.importerConcurrencyTip'),
-    },
-  ], [currentLocale]);
+  const extraConfigs = useMemo(
+    () => [
+      {
+        label: intl.get('import.concurrency'),
+        key: 'concurrency',
+        rules: [
+          {
+            pattern: POSITIVE_INTEGER_REGEX,
+            message: intl.get('formRules.numberRequired'),
+          },
+        ],
+        placeholder: DEFAULT_IMPORT_CONFIG.concurrency,
+        description: intl.get('import.concurrencyTip'),
+      },
+      {
+        label: intl.get('import.batchSize'),
+        key: 'batchSize',
+        rules: [
+          {
+            pattern: POSITIVE_INTEGER_REGEX,
+            message: intl.get('formRules.numberRequired'),
+          },
+        ],
+        placeholder: DEFAULT_IMPORT_CONFIG.batchSize,
+        description: intl.get('import.batchSizeTip'),
+      },
+      {
+        label: intl.get('import.retry'),
+        key: 'retry',
+        rules: [
+          {
+            pattern: POSITIVE_INTEGER_REGEX,
+            message: intl.get('formRules.numberRequired'),
+          },
+        ],
+        placeholder: DEFAULT_IMPORT_CONFIG.retry,
+        description: intl.get('import.retryTip'),
+      },
+      {
+        label: intl.get('import.readerConcurrency'),
+        key: 'readerConcurrency',
+        rules: [
+          {
+            pattern: POSITIVE_INTEGER_REGEX,
+            message: intl.get('formRules.numberRequired'),
+          },
+        ],
+        placeholder: DEFAULT_IMPORT_CONFIG.readerConcurrency,
+        description: intl.get('import.readerConcurrencyTip'),
+      },
+      {
+        label: intl.get('import.importerConcurrency'),
+        key: 'importerConcurrency',
+        rules: [
+          {
+            pattern: POSITIVE_INTEGER_REGEX,
+            message: intl.get('formRules.numberRequired'),
+          },
+        ],
+        placeholder: DEFAULT_IMPORT_CONFIG.importerConcurrency,
+        description: intl.get('import.importerConcurrencyTip'),
+      },
+    ],
+    [currentLocale],
+  );
   return (
     <div className={styles.importCreate}>
       <Breadcrumb routes={routes} />
@@ -276,8 +310,12 @@ const TaskCreate = () => {
           <Row>
             <Col span={12}>
               <Form.Item label={intl.get('common.space')} required={true}>
-                <Select value={currentSpace || null} placeholder={intl.get('console.selectSpace')} onChange={value => handleSpaceChange(value)}>
-                  {spaces.map(space => (
+                <Select
+                  value={currentSpace || null}
+                  placeholder={intl.get('console.selectSpace')}
+                  onChange={(value) => handleSpaceChange(value)}
+                >
+                  {spaces.map((space) => (
                     <Option value={space} key={space}>
                       {space}
                     </Option>
@@ -287,7 +325,7 @@ const TaskCreate = () => {
             </Col>
             <Col span={12}>
               <Form.Item label={intl.get('import.taskName')} required={true}>
-                <Input value={basicConfig.taskName} onChange={e => updateBasicConfig({ 'taskName': e.target.value })} />
+                <Input value={basicConfig.taskName} onChange={(e) => updateBasicConfig({ taskName: e.target.value })} />
               </Form.Item>
             </Col>
           </Row>
@@ -295,32 +333,50 @@ const TaskCreate = () => {
             <div className={styles.configContainer}>
               <Row>
                 <Col span={24}>
-                  <Form.Item label={<>
-                    <span className={styles.label}>{intl.get('import.graphAddress')}</span>
-                    <Instruction description={intl.get('import.graphAddressTip')} />
-                  </>} rules={[{
-                    required: true,
-                  }]}>
+                  <Form.Item
+                    label={
+                      <>
+                        <span className={styles.label}>{intl.get('import.graphAddress')}</span>
+                        <Instruction description={intl.get('import.graphAddressTip')} />
+                      </>
+                    }
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                  >
                     <Checkbox.Group
                       className={styles.addressCheckbox}
                       options={address}
                       value={basicConfig.address}
-                      onChange={value => updateBasicConfig({ 'address': value as string[] })}
+                      onChange={(value) => updateBasicConfig({ address: value as string[] })}
                     />
                   </Form.Item>
                 </Col>
               </Row>
-              <Row style={{ 'flexWrap': 'nowrap' }}>
-                {extraConfigs.map(item => (
+              <Row style={{ flexWrap: 'nowrap' }}>
+                {extraConfigs.map((item) => (
                   <Col span={5} key={item.key}>
-                    <Form.Item label={<>
-                      <span className={styles.label}>{item.label}</span>
-                      <Instruction description={item.description} />
-                    </>} name={item.key} rules={item.rules} initialValue={basicConfig[item.key]}>
-                      <Input placeholder={item.placeholder.toString()} value={basicConfig[item.key]} onChange={e => {
-                        updateBasicConfig({ [item.key]: e.target.value });
-                        trackEvent('import', `update_config_${item.key}`);
-                      }} />
+                    <Form.Item
+                      label={
+                        <>
+                          <span className={styles.label}>{item.label}</span>
+                          <Instruction description={item.description} />
+                        </>
+                      }
+                      name={item.key}
+                      rules={item.rules}
+                      initialValue={basicConfig[item.key]}
+                    >
+                      <Input
+                        placeholder={item.placeholder.toString()}
+                        value={basicConfig[item.key]}
+                        onChange={(e) => {
+                          updateBasicConfig({ [item.key]: e.target.value });
+                          trackEvent('import', `update_config_${item.key}`);
+                        }}
+                      />
                     </Form.Item>
                   </Col>
                 ))}
@@ -332,19 +388,23 @@ const TaskCreate = () => {
                 </div>
               </Row>
             </div>
-          ) : <Row justify="center">
-            <div className={styles.toggleConfigBtn} onClick={() => setShowMoreConfig(true)}>
-              <Icon type="icon-list-down" className={styles.toggleIcon} />
-              <span>{intl.get('import.expandMoreConfig')}</span>
-            </div>
-          </Row>}
+          ) : (
+            <Row justify="center">
+              <div className={styles.toggleConfigBtn} onClick={() => setShowMoreConfig(true)}>
+                <Icon type="icon-list-down" className={styles.toggleIcon} />
+                <span>{intl.get('import.expandMoreConfig')}</span>
+              </div>
+            </Row>
+          )}
         </Form>
         <div className={styles.mapConfig}>
           <Form className={styles.configColumn} layout="vertical">
             <Form.Item label={intl.get('import.tag')} required={true}>
               <div className={styles.container}>
                 <AddMappingBtn type={ISchemaEnum.Tag} />
-                {tagConfig.map((item) => <SchemaConfig key={item._id} configItem={item} />)}
+                {tagConfig.map((item) => (
+                  <SchemaConfig key={item._id} configItem={item} />
+                ))}
               </div>
             </Form.Item>
           </Form>
@@ -352,7 +412,9 @@ const TaskCreate = () => {
             <Form.Item label={intl.get('import.edge')} required={true}>
               <div className={styles.container}>
                 <AddMappingBtn type={ISchemaEnum.Edge} />
-                {edgeConfig.map((item) => <SchemaConfig key={item._id} configItem={item} />)}
+                {edgeConfig.map((item) => (
+                  <SchemaConfig key={item._id} configItem={item} />
+                ))}
               </div>
             </Form.Item>
           </Form>
@@ -360,17 +422,21 @@ const TaskCreate = () => {
       </div>
       <div className="studioFormFooter">
         <Button onClick={() => history.push('/import/tasks')}>{intl.get('common.cancel')}</Button>
-        <Button onClick={saveDraft} loading={loading}>{intl.get('import.saveDraft')}</Button>
-        <Button type="primary" disabled={
-          basicConfig.taskName === ''
-          || (!tagConfig.length && !edgeConfig.length)
-        } onClick={checkConfig} loading={loading}>{intl.get('import.runImport')}</Button>
+        <Button onClick={saveDraft} loading={loading}>
+          {intl.get('import.saveDraft')}
+        </Button>
+        <Button
+          type="primary"
+          disabled={basicConfig.taskName === '' || (!tagConfig.length && !edgeConfig.length)}
+          onClick={checkConfig}
+          loading={loading}
+        >
+          {intl.get('import.runImport')}
+        </Button>
       </div>
-      {modalVisible && <ConfigConfirmModal 
-        visible={modalVisible} 
-        onConfirm={handleStartImport} 
-        onCancel={() => setVisible(false)}
-      />}
+      {modalVisible && (
+        <ConfigConfirmModal visible={modalVisible} onConfirm={handleStartImport} onCancel={() => setVisible(false)} />
+      )}
     </div>
   );
 };

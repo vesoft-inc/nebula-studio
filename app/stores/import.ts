@@ -191,7 +191,7 @@ export class ImportStore {
     const { code, data } = (await service.getTaskLogs({ id })) as any;
     return { code, data };
   };
-  saveTaskDraft = async (id?: string) => {
+  saveTaskDraft = async () => {
     const { currentSpace } = this.rootStore.schema;
     const rawConfig = {
       basicConfig: this.basicConfig,
@@ -199,6 +199,20 @@ export class ImportStore {
       edgeConfig: this.edgeConfig,
     };
     const { code } = (await service.saveTaskDraft({
+      name: this.basicConfig.taskName,
+      space: currentSpace,
+      rawConfig: JSON.stringify(rawConfig),
+    })) as any;
+    return code;
+  };
+  updateTaskDraft = async (id: string) => {
+    const { currentSpace } = this.rootStore.schema;
+    const rawConfig = {
+      basicConfig: this.basicConfig,
+      tagConfig: this.tagConfig,
+      edgeConfig: this.edgeConfig,
+    };
+    const { code } = (await service.updateTaskDraft({
       id,
       name: this.basicConfig.taskName,
       space: currentSpace,
