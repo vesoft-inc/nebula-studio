@@ -20,7 +20,7 @@ function Setting({ open, setVisible }) {
       key,
       gptVersion,
       apiType,
-      config: JSON.stringify(config)
+      config: JSON.stringify(config),
     });
     if (res.code === 0) {
       setVisible(false);
@@ -38,18 +38,8 @@ function Setting({ open, setVisible }) {
     form.setFieldsValue(gpt.config);
   }
   return (
-    <Modal
-      title={intl.get('console.setting')}
-      zIndex={1001}
-      open={open}
-      onOk={onOk}
-      onCancel={onClose}
-    >
-      <Form
-        form={form}
-        className={styles.settingForm}
-        layout='vertical'
-      >
+    <Modal title={intl.get('console.setting')} zIndex={1001} open={open} onOk={onOk} onCancel={onClose}>
+      <Form form={form} className={styles.settingForm} layout="vertical">
         <Form.Item>
           <div className={styles.switchWrapper}>
             <div>
@@ -69,15 +59,10 @@ function Setting({ open, setVisible }) {
           </div>
         </Form.Item>
 
-        <Form.Item
-          name="url"
-          tooltip={intl.get('console.gptAPITooltip')}
-          required
-          label="GPT API URL"
-        >
+        <Form.Item name="url" tooltip={intl.get('console.gptAPITooltip')} required label="GPT API URL">
           <Input />
         </Form.Item>
-        <Form.Item name="key" required label="GPT API Key">
+        <Form.Item name="key" rules={[{ required: true }]} required label="GPT API Key">
           <Input type="password" />
         </Form.Item>
         <Form.Item name="gptVersion" required label="GPT API Type">
@@ -93,7 +78,7 @@ function Setting({ open, setVisible }) {
           </Radio.Group>
         </Form.Item>
         <Form.Item name="features" required label={intl.get('console.features')}>
-          <Checkbox.Group >
+          <Checkbox.Group>
             <Checkbox value="spaceSchema">{intl.get('console.useSpaceSchema')}</Checkbox>
             <Checkbox value="useConsoleNGQL">{intl.get('console.useConsoleNGQL')}</Checkbox>
           </Checkbox.Group>

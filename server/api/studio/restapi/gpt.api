@@ -23,7 +23,7 @@ type (
 service studio-api {
 	@doc "GPTProxy"
 	@handler GPTProxy
-	post /api/gpt/:path (GPTRequest) returns (GPTResponse)
+	post /api/gpt (GPTRequest) returns (GPTResponse)
 	@doc "GPTConfig"
 	@handler GPTConfig
 	post /api/config/gpt(GPTConfigRequest)

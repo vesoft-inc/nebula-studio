@@ -5,8 +5,8 @@ import rootStore from '.';
 import ws from '@app/utils/websocket';
 import tck from '../utils/tck';
 import { safeParse } from '@app/utils/function';
-import * as ngqlDoc from '@app/utils/ngql'
- 
+import * as ngqlDoc from '@app/utils/ngql';
+
 export const matchPrompt = `Generate NebulaGraph query from my question.
 Use only the provided relationship types and properties in the schema.
 Do not use any other relationship types or properties that are not provided.
@@ -54,7 +54,7 @@ class GPT {
   widget: HTMLSpanElement;
   editor: any;
   mode = 'text2ngql' as 'text2ngql' | 'text2cypher';
-  completionList: {text:string,type:string}[] = [];
+  completionList: { text: string; type: string }[] = [];
   constructor() {
     makeAutoObservable(this, {
       editor: false,
@@ -65,9 +65,9 @@ class GPT {
 
   fetchConfig() {
     return get('/api/config/gpt')().then((res) => {
-      if (res.code != 0) return;
+      if (res.code != 0 || !res.data) return;
       const { config, ...values } = res.data;
-      const configMap = config?safeParse<GPTConfig>(config):{};
+      const configMap = config ? safeParse<GPTConfig>(config) : {};
       this.setConfig({
         ...configMap,
         ...values,
@@ -77,7 +77,7 @@ class GPT {
   }
 
   setConfig(payload: GPTConfig) {
-    this.config = {  ...this.config,...payload, };
+    this.config = { ...this.config, ...payload };
   }
 
   update(payload: any) {
@@ -87,8 +87,8 @@ class GPT {
   async getSpaceSchema(space: string) {
     let finalPrompt = '';
     if (space) {
-      finalPrompt+='now space: ${space};';
-    } 
+      finalPrompt += 'now space: ${space};';
+    }
     if (this.config.features.includes('spaceSchema')) {
       await schema.switchSpace(space);
       await schema.getTagList();
@@ -97,32 +97,25 @@ class GPT {
       const edgeList = schema.edgeList;
       const tagsSchema = tagList
         .map((item) => {
-          return `${item.name}[${item.fields
-            .map((p) => p.Field + `(${p.Type})`)
-            .join(',')}]`;
+          return `${item.name}[${item.fields.map((p) => p.Field + `(${p.Type})`).join(',')}]`;
         })
         .join('\n');
       const edgeTypesSchema = edgeList
         .map((item) => {
-          return `${item.name}[${item.fields
-            .map((p) => p.Field + `(${p.Type})`)
-            .join(',')}]`;
+          return `${item.name}[${item.fields.map((p) => p.Field + `(${p.Type})`).join(',')}]`;
         })
         .join('\n');
-      finalPrompt += ` tags:\n: ${tagsSchema} \nedges:\n ${edgeTypesSchema} \nspace vid type:"${schema.spaceVidType}"`
+      finalPrompt += ` tags:\n: ${tagsSchema} \nedges:\n ${edgeTypesSchema} \nspace vid type:"${schema.spaceVidType}"`;
     }
     if (this.config.features.includes('useConsoleNGQL')) {
       finalPrompt += `user console ngql context: ${rootStore.console.currentGQL}\n`;
     }
-    return finalPrompt
+    return finalPrompt;
   }
 
   async getDocPrompt(text: string) {
     let prompt = matchPrompt; // default use text2cypher
-    if (
-      text.toLowerCase().indexOf('match') === -1 &&
-      this.mode !== 'text2cypher'
-    ) {
+    if (text.toLowerCase().indexOf('match') === -1 && this.mode !== 'text2cypher') {
       const res = (await ws.runChat({
         req: {
           temperature: 0.2,
@@ -147,21 +140,21 @@ The directories are:`,
           let doc = ngqlDoc.ngqlMap[paths[0]].content;
           const doc2 = ngqlDoc.ngqlMap[paths[1]].content;
           if (doc2) {
-            doc += (doc2);
+            doc += doc2;
           }
           if (doc.length) {
             console.log('docString:', doc);
-            prompt = `learn the below nGQL doc, and use it to help user ,the user space schema is "{schema}" the doc is: \n${doc.slice(0,this.config.docLength)} the question is "{query_str}"`;
+            prompt = `learn the below nGQL doc, and use it to help user ,the user space schema is "{schema}" the doc is: \n${doc.slice(
+              0,
+              this.config.docLength,
+            )} the question is "{query_str}"`;
           }
         }
       }
     }
     prompt = prompt.replace('{query_str}', text);
     const pathname = window.location.pathname;
-    const space =
-      pathname.indexOf('schema') > -1
-        ? rootStore.schema.currentSpace
-        : rootStore.console.currentSpace;
+    const space = pathname.indexOf('schema') > -1 ? rootStore.schema.currentSpace : rootStore.console.currentSpace;
     if (!space) {
       return prompt.replace('{schema}', 'no space selected');
     }
@@ -181,10 +174,8 @@ The directories are:`,
       if (cursor.ch < line.length - 1) return;
       if (line.length < 3) return;
       const tokens = line.split(' ');
-      const firstToken = tokens.find(
-        (item) => item.replaceAll(' ', '').length > 0
-      );
-      const hits = tck.allNGQL.filter(each=>each.toLowerCase().indexOf(firstToken.toLowerCase()) === 0)
+      const firstToken = tokens.find((item) => item.replaceAll(' ', '').length > 0);
+      const hits = tck.allNGQL.filter((each) => each.toLowerCase().indexOf(firstToken.toLowerCase()) === 0);
       let doc = '';
       if (this.mode == 'text2cypher' && firstToken.toLowerCase() == 'match') {
         doc += matchPrompt;
@@ -232,14 +223,17 @@ The directories are:`,
       }
       if (snippet) {
         this.update({
-          completionList: snippet.split('\n').map(each => ({
-            type: 'copilot',
-            text: each
-          })).filter((item) => item.text !== '')
-        })
+          completionList: snippet
+            .split('\n')
+            .map((each) => ({
+              type: 'copilot',
+              text: each,
+            }))
+            .filter((item) => item.text !== ''),
+        });
         rootStore.console.update({
-          showCompletion:true
-        })
+          showCompletion: true,
+        });
       }
       this.running = false;
     }, 3000);
