@@ -47,7 +47,7 @@ func (g *gptService) GetGPTConfig() (resp *types.GPTConfigRequest, err error) {
 	config := db.GPTConfig{}
 	res := db.CtxDB.First(&config)
 	if res.RowsAffected == 0 {
-		return nil, res.Error
+		return nil, nil
 	}
 	resp = &types.GPTConfigRequest{
 		URL:        config.URL,
