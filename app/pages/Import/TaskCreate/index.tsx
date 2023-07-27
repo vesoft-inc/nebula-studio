@@ -39,7 +39,7 @@ const AddMappingBtn = (props: { type: ISchemaType }) => {
 };
 
 const TaskCreate = () => {
-  const { dataImport, schema, files, global, datasource } = useStore();
+  const { dataImport, schema, files, global, datasource, moduleConfiguration } = useStore();
   const { intl, currentLocale } = useI18n();
   const {
     basicConfig,
@@ -50,9 +50,8 @@ const TaskCreate = () => {
     saveTaskDraft,
     updateTaskDraft,
     setDraft,
-    envCfg,
   } = dataImport;
-  const { needPwdConfirm, supportMoreConfig } = envCfg;
+  const { needPwdConfirm, supportMoreConfig } = moduleConfiguration.dataImport;
   const { spaces, getSpaces, updateSpaceInfo, currentSpace, spaceVidType } = schema;
   const { getGraphAddress, _host } = global;
   const { getFiles } = files;

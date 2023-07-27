@@ -159,16 +159,6 @@ export class ImportStore {
   tagConfig = observable.array<ITagItem>([], { deep: false });
   edgeConfig = observable.array<IEdgeItem>([], { deep: false });
   basicConfig: IBasicConfig = { taskName: '', address: [] };
-  envCfg: IPlatformConfig = {
-    env: 'local',
-    supportTemplate: true,
-    supportConfigDownload: true,
-    supportLogDownload: true,
-    needPwdConfirm: true,
-    supportDatasourceType: [IDatasourceType.Local, IDatasourceType.S3, IDatasourceType.SFTP],
-    supportS3Platform: [ES3Platform.AWS, ES3Platform.OSS, ES3Platform.Tecent, ES3Platform.Customize],
-    supportMoreConfig: true,
-  };
   constructor() {
     makeAutoObservable(this, {
       taskList: observable,

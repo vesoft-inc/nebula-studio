@@ -58,15 +58,18 @@ const getCreateGql = (data: ISketchNode | ISketchEdge) => {
 const PopoverContent = (props: IContentProps) => {
   const { close } = props;
   const { intl } = useI18n();
-  const [mode, setMode] = useState('create' as 'create' | 'apply');
+  const { schema, sketchModel, moduleConfiguration } = useStore();
+  const { getMachineNumber, getSpaces, updateSpaceInfo } = schema;
+  const { supportCreateSpace } = moduleConfiguration.schema;
+  const [mode, setMode] = useState(supportCreateSpace ? 'create' : 'apply');
   const [spaces, setSpaces] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const history = useHistory();
-  const { schema, sketchModel } = useStore();
-  const { getMachineNumber, getSpaces, updateSpaceInfo } = schema;
+
   useEffect(() => {
     getMachineNumber();
+    getSpaces();
   }, []);
   const handleChangeMode = useCallback(async (e: any) => {
     const { value } = e.target;
@@ -191,10 +194,12 @@ const PopoverContent = (props: IContentProps) => {
   }, []);
   return (
     <>
-      <Radio.Group className={styles.radioTabs} onChange={handleChangeMode} value={mode} buttonStyle="solid">
-        <Radio.Button value="create">{intl.get('sketch.createSpace')}</Radio.Button>
-        <Radio.Button value="apply">{intl.get('sketch.selectSpace')}</Radio.Button>
-      </Radio.Group>
+      {supportCreateSpace && (
+        <Radio.Group className={styles.radioTabs} onChange={handleChangeMode} value={mode} buttonStyle="solid">
+          <Radio.Button value="create">{intl.get('sketch.createSpace')}</Radio.Button>
+          <Radio.Button value="apply">{intl.get('sketch.selectSpace')}</Radio.Button>
+        </Radio.Group>
+      )}
       {mode === 'create' ? (
         <CreateForm form={form} activeMachineNum={1} colSpan="full" formItemLayout={formItemLayout} />
       ) : (

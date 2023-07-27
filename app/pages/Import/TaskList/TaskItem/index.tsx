@@ -50,11 +50,12 @@ const TaskItem = (props: IProps) => {
   } = props;
   const { intl } = useI18n();
   const {
-    dataImport: { envCfg, downloadTaskConfig, importTask },
+    dataImport: { downloadTaskConfig, importTask },
     schema,
+    moduleConfiguration,
   } = useStore();
   const history = useHistory();
-  const { supportConfigDownload, needPwdConfirm } = envCfg;
+  const { supportConfigDownload, needPwdConfirm } = moduleConfiguration.dataImport;
   const isDraft = useMemo(() => status === ITaskStatus.Draft, [status]);
   const [visible, setVisible] = useState(false);
   const [progressStatus, setStatus] = useState<'success' | 'active' | 'normal' | 'exception' | undefined>(undefined);

@@ -15,8 +15,9 @@ interface IProps {
 const S3ConfigForm = (props: IProps) => {
   const { formRef, mode, tempPwd } = props;
   const { intl, currentLocale } = useI18n();
-  const { dataImport } = useStore();
-  const { envCfg } = dataImport;
+  const {
+    moduleConfiguration: { dataImport },
+  } = useStore();
   const [flag, setFlag] = useState(false);
   useEffect(() => {
     if (mode === 'edit') {
@@ -50,8 +51,8 @@ const S3ConfigForm = (props: IProps) => {
         value: ES3Platform.Customize,
       },
     ];
-    return options.filter((item) => envCfg.supportS3Platform.includes(item.value));
-  }, [envCfg.supportS3Platform, currentLocale]);
+    return options.filter((item) => dataImport.supportS3Platform.includes(item.value));
+  }, [dataImport.supportS3Platform, currentLocale]);
   const handleReset = useCallback(() => {
     formRef.resetFields(['s3Config']);
   }, []);
