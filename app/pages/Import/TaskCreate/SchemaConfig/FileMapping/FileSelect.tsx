@@ -1,5 +1,5 @@
 import { ArrowLeftOutlined, FileTextFilled, FolderFilled, SyncOutlined } from '@ant-design/icons';
-import { IDatasourceType, IS3Platform } from '@app/interfaces/datasource';
+import { IDatasourceType, ES3Platform } from '@app/interfaces/datasource';
 import { useStore } from '@app/stores';
 import { ICachedStore } from '@app/stores/datasource';
 import { useBatchState } from '@app/utils';
@@ -146,7 +146,7 @@ const FileSelect = observer((props: IFileSelect) => {
             let platform = '';
             if (item.type === IDatasourceType.S3) {
               label = item.s3Config.bucket;
-              platform = item.platform !== IS3Platform.Customize ? item.platform.toUpperCase() : intl.get('import.s3');
+              platform = item.platform !== ES3Platform.Customize ? item.platform.toUpperCase() : intl.get('import.s3');
             } else {
               label = item.sftpConfig.host + ':' + item.sftpConfig.port;
               platform = intl.get('import.sftp');

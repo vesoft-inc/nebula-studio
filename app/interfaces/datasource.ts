@@ -3,7 +3,7 @@ export enum IDatasourceType {
   'SFTP' = 'sftp',
   'Local' = 'local',
 }
-export enum IS3Platform {
+export enum ES3Platform {
   'AWS' = 'aws',
   'OSS' = 'oss',
   'Customize' = 'customize',

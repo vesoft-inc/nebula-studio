@@ -329,8 +329,8 @@ const TaskCreate = () => {
               </Form.Item>
             </Col>
           </Row>
-          {supportMoreConfig ? (
-            showMoreConfig ? (
+          {supportMoreConfig &&
+            (showMoreConfig ? (
               <div className={styles.configContainer}>
                 <Row>
                   <Col span={24}>
@@ -396,8 +396,7 @@ const TaskCreate = () => {
                   <span>{intl.get('import.expandMoreConfig')}</span>
                 </div>
               </Row>
-            )
-          ) : null}
+            ))}
         </Form>
         <div className={styles.mapConfig}>
           <Form className={styles.configColumn} layout="vertical">

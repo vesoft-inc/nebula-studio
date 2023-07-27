@@ -9,7 +9,7 @@ import { trackEvent } from '@app/utils/stat';
 import { message } from 'antd';
 import { getI18n } from '@vesoft-inc/i18n';
 import { getRootStore } from '.';
-import { IDatasourceType, IS3Platform } from '@app/interfaces/datasource';
+import { IDatasourceType, ES3Platform } from '@app/interfaces/datasource';
 const { intl } = getI18n();
 
 const handlePropertyMap = (item, defaultValueFields) => {
@@ -146,7 +146,7 @@ interface IPlatformConfig {
   supportLogDownload: boolean;
   needPwdConfirm: boolean;
   supportDatasourceType: IDatasourceType[];
-  supportS3Platform?: IS3Platform[];
+  supportS3Platform?: ES3Platform[];
   supportMoreConfig?: boolean;
 }
 
@@ -166,7 +166,7 @@ export class ImportStore {
     supportLogDownload: true,
     needPwdConfirm: true,
     supportDatasourceType: [IDatasourceType.Local, IDatasourceType.S3, IDatasourceType.SFTP],
-    supportS3Platform: [IS3Platform.AWS, IS3Platform.OSS, IS3Platform.Tecent, IS3Platform.Customize],
+    supportS3Platform: [ES3Platform.AWS, ES3Platform.OSS, ES3Platform.Tecent, ES3Platform.Customize],
     supportMoreConfig: true,
   };
   constructor() {

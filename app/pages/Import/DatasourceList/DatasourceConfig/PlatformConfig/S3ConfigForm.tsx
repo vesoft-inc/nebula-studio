@@ -2,7 +2,7 @@ import { useI18n } from '@vesoft-inc/i18n';
 import { Input, Form, Select, FormInstance } from 'antd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { IS3Platform } from '@app/interfaces/datasource';
+import { ES3Platform } from '@app/interfaces/datasource';
 import Instruction from '@app/components/Instruction';
 import styles from './index.module.less';
 import { useStore } from '@app/stores';
@@ -35,19 +35,19 @@ const S3ConfigForm = (props: IProps) => {
     const options = [
       {
         label: 'AWS S3',
-        value: IS3Platform.AWS,
+        value: ES3Platform.AWS,
       },
       {
         label: 'Aliyun OSS',
-        value: IS3Platform.OSS,
+        value: ES3Platform.OSS,
       },
       {
         label: 'Tecent COS',
-        value: IS3Platform.Tecent,
+        value: ES3Platform.Tecent,
       },
       {
         label: intl.get('import.customize'),
-        value: IS3Platform.Customize,
+        value: ES3Platform.Customize,
       },
     ];
     return options.filter((item) => envCfg.supportS3Platform.includes(item.value));
@@ -79,7 +79,7 @@ const S3ConfigForm = (props: IProps) => {
                 name={['s3Config', 'region']}
                 label={intl.get('import.region')}
                 rules={[
-                  platform === IS3Platform.AWS && { required: true, message: intl.get('formRules.regionRequired') },
+                  platform === ES3Platform.AWS && { required: true, message: intl.get('formRules.regionRequired') },
                 ]}
               >
                 <Input placeholder={intl.get('import.enterRegion')} />
@@ -93,7 +93,7 @@ const S3ConfigForm = (props: IProps) => {
                   >
                     <Input
                       placeholder={
-                        platform === IS3Platform.AWS
+                        platform === ES3Platform.AWS
                           ? 'https://s3.<region>.amazonaws.com'
                           : intl.get('import.enterAddress')
                       }
@@ -124,13 +124,13 @@ const S3ConfigForm = (props: IProps) => {
                 name={['s3Config', 'accessSecret']}
                 label={intl.get('import.accessKeySecret')}
                 rules={[
-                  platform !== IS3Platform.Customize && {
+                  platform !== ES3Platform.Customize && {
                     required: true,
                     message: intl.get('formRules.accessKeySecretRequired'),
                   },
                 ]}
               >
-                <Input
+                <Input.Password
                   type="password"
                   placeholder={intl.get('import.accessKeySecret')}
                   onChange={handleUpdatePassword}

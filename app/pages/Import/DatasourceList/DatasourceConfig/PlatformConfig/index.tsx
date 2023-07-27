@@ -1,7 +1,7 @@
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Modal, Form, Select, message } from 'antd';
 import { useMemo, useState } from 'react';
-import { IDatasourceItem, IDatasourceType, IS3Platform } from '@app/interfaces/datasource';
+import { IDatasourceItem, IDatasourceType, ES3Platform } from '@app/interfaces/datasource';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@app/stores';
 import { observer } from 'mobx-react-lite';
@@ -105,7 +105,7 @@ const DatasourceConfigModal = (props: IProps) => {
         layout="horizontal"
         {...fomrItemLayout}
         onFinish={submit}
-        initialValues={{ type: type || IDatasourceType.S3, platform: IS3Platform.AWS, ...data }}
+        initialValues={{ type: type || IDatasourceType.S3, platform: ES3Platform.AWS, ...data }}
       >
         <FormItem noStyle shouldUpdate>
           {({ getFieldValue }) => {
