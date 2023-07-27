@@ -1,12 +1,12 @@
 import {
   Popover,
   Switch,
-} from "antd";
-import styles from "./index.module.less";
-import Chat from "./chat";
-import Icon from "@app/components/Icon";
-import { observer } from "mobx-react-lite";
-import rootStore from "@app/stores";
+} from 'antd';
+import styles from './index.module.less';
+import Chat from './chat';
+import Icon from '@app/components/Icon';
+import { observer } from 'mobx-react-lite';
+import rootStore from '@app/stores';
 // float gpt bot window
 function GPTBot() {
   const gpt = rootStore.gpt;
@@ -29,23 +29,23 @@ function GPTBot() {
         title={
           <div className={styles.gptBotTitle}>
             <div className={styles.gptBotTitleInner}>
-              GPT2nGQL{" "}
+              GPT2nGQL{' '}
             </div>
             <div className={styles.gptBotHandler}>
               text2cypher
               <Switch
-                style={{ margin: "0 5px" }}
+                style={{ margin: '0 5px' }}
                 onChange={(checked) => {
                   gpt.update({
-                    mode: checked ? "text2cypher" : "text2ngql",
+                    mode: checked ? 'text2cypher' : 'text2ngql',
                   });
                 }}
-                checked={gpt.mode == "text2cypher"}
+                checked={gpt.mode == 'text2cypher'}
               />
             </div>
           </div>
         }
-        trigger={"click"}
+        trigger={'click'}
       >
         <div className={styles.gptBot}>
           <div className={styles.ball}>

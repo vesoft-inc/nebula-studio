@@ -181,7 +181,7 @@ export class ConsoleStore {
     keyWords.forEach(item => {
       if (item.indexOf(str) === 0&&item!==str) {
         list.push({
-          type: "keyword",
+          type: 'keyword',
           text: item,
         })
       }
@@ -189,7 +189,7 @@ export class ConsoleStore {
     operators.forEach(item => {
       if (item.indexOf(str) === 0&&item!==str) {
         list.push({
-          type: "operator",
+          type: 'operator',
           text: item,
         })
       }
@@ -197,7 +197,7 @@ export class ConsoleStore {
     ban.forEach(item => {
       if (item.indexOf(str) === 0&&item!==str) {
         list.push({
-          type: "ban",
+          type: 'ban',
           text: item,
         })
       }
@@ -211,9 +211,9 @@ export class ConsoleStore {
     const cur = cm.getCursor();
     const token = cm.getTokenAt(cur);
     const item = [...this.completionList, ...gpt.completionList][index];
-    const start = item.type === "copilot" ? { ...cur } : { line: cur.line, ch: token.start };
-    const end =  item.type === "copilot" ? cur : { line: cur.line, ch: token.end };
-    cm.replaceRange(item.text,start,end, "complete");
+    const start = item.type === 'copilot' ? { ...cur } : { line: cur.line, ch: token.start };
+    const end =  item.type === 'copilot' ? cur : { line: cur.line, ch: token.end };
+    cm.replaceRange(item.text,start,end, 'complete');
     cm.scrollIntoView();
   }
 
@@ -229,13 +229,13 @@ export class ConsoleStore {
   }
 
   addKeyboardEvent() {
-    document.addEventListener("keyup", (e) => {
+    document.addEventListener('keyup', (e) => {
       if (!this.showCompletion) return;
       e.preventDefault();
-      if (e.key === "ArrowUp" && this.activeCompletionIndex > 0) {
+      if (e.key === 'ArrowUp' && this.activeCompletionIndex > 0) {
         this.activeCompletionIndex = this.activeCompletionIndex - 1;
       }
-      if (e.key === "ArrowDown" && this.activeCompletionIndex < this.completionList.length+gpt.completionList.length - 1) {
+      if (e.key === 'ArrowDown' && this.activeCompletionIndex < this.completionList.length+gpt.completionList.length - 1) {
         this.activeCompletionIndex = this.activeCompletionIndex + 1;
       }
     })

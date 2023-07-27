@@ -1,10 +1,10 @@
-import { Radio, Form, Input, Modal, Checkbox, InputNumber, Switch } from "antd";
-import { useEffect } from "react";
-import { post } from "@app/utils/http";
-import gpt from "@app/stores/gpt";
-import { observer } from "mobx-react-lite";
-import { useI18n } from "@vesoft-inc/i18n";
-import styles from "./index.module.less";
+import { Radio, Form, Input, Modal, Checkbox, InputNumber, Switch } from 'antd';
+import { useEffect } from 'react';
+import { post } from '@app/utils/http';
+import gpt from '@app/stores/gpt';
+import { observer } from 'mobx-react-lite';
+import { useI18n } from '@vesoft-inc/i18n';
+import styles from './index.module.less';
 
 function Setting({ open, setVisible }) {
   const [form] = Form.useForm();
@@ -15,7 +15,7 @@ function Setting({ open, setVisible }) {
   const onOk = async () => {
     const values = await form.validateFields();
     const { url, key, gptVersion, apiType, ...config } = values;
-    const res = await post("/api/config/gpt")({
+    const res = await post('/api/config/gpt')({
       url,
       key,
       gptVersion,
@@ -39,7 +39,7 @@ function Setting({ open, setVisible }) {
   }
   return (
     <Modal
-      title={intl.get("console.setting")}
+      title={intl.get('console.setting')}
       zIndex={1001}
       open={open}
       onOk={onOk}
@@ -86,19 +86,19 @@ function Setting({ open, setVisible }) {
             <Radio value="openai">openai</Radio>
           </Radio.Group>
         </Form.Item>
-        <Form.Item name="apiType" required label={intl.get("console.gptModelVersion")}>
+        <Form.Item name="apiType" required label={intl.get('console.gptModelVersion')}>
           <Radio.Group>
             <Radio value="gpt3.5-turbo">gpt3.5-turbo</Radio>
             <Radio value="gpt4">gpt4</Radio>
           </Radio.Group>
         </Form.Item>
-        <Form.Item name="features" required label={intl.get("console.features")}>
+        <Form.Item name="features" required label={intl.get('console.features')}>
           <Checkbox.Group >
             <Checkbox value="spaceSchema">{intl.get('console.useSpaceSchema')}</Checkbox>
             <Checkbox value="useConsoleNGQL">{intl.get('console.useConsoleNGQL')}</Checkbox>
           </Checkbox.Group>
         </Form.Item>
-        <Form.Item name="docLength" required label={intl.get("console.docLength")}>
+        <Form.Item name="docLength" required label={intl.get('console.docLength')}>
           <InputNumber />
         </Form.Item>
       </Form>

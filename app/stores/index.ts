@@ -1,14 +1,14 @@
-import { createContext, useContext } from "react";
-import global from "./global";
-import files from "./files";
-import console from "./console";
-import dataImport from "./import";
-import schema from "./schema";
-import graphInstances from "./graphInstances";
-import sketchModel from "./sketchModel";
-import welcome from "./welcome";
-import datasource from "./datasource";
-import gpt from "./gpt";
+import { createContext, useContext } from 'react';
+import global from './global';
+import files from './files';
+import console from './console';
+import dataImport from './import';
+import schema from './schema';
+import graphInstances from './graphInstances';
+import sketchModel from './sketchModel';
+import welcome from './welcome';
+import datasource from './datasource';
+import gpt from './gpt';
 
 const rootStore = {
   global,
