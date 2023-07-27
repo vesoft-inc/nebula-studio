@@ -26,9 +26,9 @@ const fomrItemLayout = {
 
 const DatasourceConfigModal = (props: IProps) => {
   const { visible, type, onCancel, onConfirm, data } = props;
-  const { datasource, dataImport } = useStore();
+  const { datasource, moduleConfiguration } = useStore();
   const { addDataSource, updateDataSource } = datasource;
-  const { envCfg } = dataImport;
+  const { dataImport } = moduleConfiguration;
   const { intl, currentLocale } = useI18n();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -49,8 +49,8 @@ const DatasourceConfigModal = (props: IProps) => {
         value: IDatasourceType.Local,
       },
     ];
-    return options.filter((item) => envCfg.supportDatasourceType.includes(item.value));
-  }, [envCfg.supportDatasourceType, currentLocale]);
+    return options.filter((item) => dataImport.supportDatasourceType.includes(item.value));
+  }, [dataImport.supportDatasourceType, currentLocale]);
   const submit = async (values: IDatasourceItem) => {
     const _type = values.type || type;
     setLoading(true);

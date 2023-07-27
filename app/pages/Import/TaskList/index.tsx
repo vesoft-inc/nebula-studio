@@ -23,17 +23,17 @@ interface ILogDimension {
 
 const TaskList = () => {
   const timer = useRef<any>(null);
-  const { dataImport, global } = useStore();
+  const { dataImport, global, moduleConfiguration } = useStore();
   const [page, setPage] = useState(1);
   const { intl } = useI18n();
   const history = useHistory();
-  const { taskList, getTaskList, stopTask, deleteTask, envCfg } = dataImport;
+  const { taskList, getTaskList, stopTask, deleteTask } = dataImport;
   const { username, host } = global;
   const [modalVisible, setVisible] = useState(false);
   const [importModalVisible, setImportModalVisible] = useState(false);
   const [sourceModalVisible, setSourceModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { supportTemplate } = envCfg;
+  const { supportTemplate } = moduleConfiguration.dataImport;
   const modalKey = useMemo(() => Math.random(), [sourceModalVisible]);
   const [logDimension, setLogDimension] = useState<ILogDimension>({} as ILogDimension);
   const handleTaskStop = useCallback(async (id: string) => {

@@ -47,7 +47,6 @@ export class SchemaStore {
   tagList: ITag[] = [];
   edgeList: IEdge[] = [];
   indexList: IIndexList[] = [];
-
   get rootStore() {
     return getRootStore();
   }

@@ -28,9 +28,10 @@ const LogModal = (props: IProps) => {
     logDimension: { space, id, status },
   } = props;
   const {
-    dataImport: { getLogs, downloadTaskLog, getLogDetail, envCfg },
+    dataImport: { getLogs, downloadTaskLog, getLogDetail },
+    moduleConfiguration,
   } = useStore();
-  const { supportLogDownload } = envCfg;
+  const { supportLogDownload } = moduleConfiguration.dataImport;
   const { intl } = useI18n();
   const logRef = useRef<HTMLDivElement>(null);
   const timer = useRef<any>(null);

@@ -9,8 +9,8 @@ import { useStore } from '@app/stores';
 
 const DatasourceList = () => {
   const { intl } = useI18n();
-  const { dataImport } = useStore();
-  const envCfg = dataImport.envCfg;
+  const { moduleConfiguration } = useStore();
+  const { dataImport } = moduleConfiguration;
   const items: TabsProps['items'] = [
     {
       key: IDatasourceType.Local,
@@ -27,7 +27,7 @@ const DatasourceList = () => {
       label: intl.get('import.sftp'),
       children: <RemoteList type={IDatasourceType.SFTP} />,
     },
-  ].filter((item) => envCfg.supportDatasourceType.includes(item.key));
+  ].filter((item) => dataImport.supportDatasourceType.includes(item.key));
   return (
     <div className={styles.dataSourceContainer}>
       <Tabs defaultActiveKey={IDatasourceType.Local} items={items} className={styles.sourceTabs} />

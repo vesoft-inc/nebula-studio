@@ -58,7 +58,7 @@ const CloneSpacePopover = (props: ICloneOperations) => {
 };
 
 const Schema = () => {
-  const { schema } = useStore();
+  const { schema, moduleConfiguration } = useStore();
   const [loading, setLoading] = useState(false);
   const [searchVal, setSearchVal] = useState('');
   const history = useHistory();
@@ -228,18 +228,20 @@ const Schema = () => {
       <div className={styles.schemaHeader}>{intl.get('schema.spaceList')}</div>
       <div className={styles.schemaContainer}>
         <div className={styles.row}>
-          <Button className={cls(styles.btnCreate, 'studioAddBtn')} type="primary">
-            <Link
-              to="/schema/space/create"
-              data-track-category="navigation"
-              data-track-action="view_space_create"
-              data-track-label="from_space_list"
-            >
-              <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
-              {intl.get('schema.createSpace')}
-            </Link>
-          </Button>
           <Search type={intl.get('common.space')} onSearch={setSearchVal} />
+          {moduleConfiguration.schema.supportCreateSpace && (
+            <Button className={cls(styles.btnCreate, 'studioAddBtn')} type="primary">
+              <Link
+                to="/schema/space/create"
+                data-track-category="navigation"
+                data-track-action="view_space_create"
+                data-track-label="from_space_list"
+              >
+                <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
+                {intl.get('schema.createSpace')}
+              </Link>
+            </Button>
+          )}
         </div>
         <Table
           className={styles.tableSpaceList}
