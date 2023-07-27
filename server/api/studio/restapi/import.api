@@ -113,7 +113,7 @@ type (
 		S3                 *S3Config     `json:"s3,optional,omitempty"`
 		SFTP               *SFTPConfig   `json:"sftp,optional,omitempty"`
 		OSS                *OSSConfig    `json:"oss,optional,omitempty"`
-		DatasourceId       *int64        `json:"datasourceId,optional,omitempty"`
+		DatasourceId       *string       `json:"datasourceId,optional,omitempty"`
 		DatasourceFilePath *string       `json:"datasourceFilePath,optional,omitempty"`
 		Tags               []Tag         `json:"tags,optional"`
 		Edges              []Edge        `json:"edges,optional"`

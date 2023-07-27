@@ -17,9 +17,10 @@ interface IFileSelect {
 }
 const FileSelect = observer((props: IFileSelect) => {
   const { intl } = useI18n();
-  const { datasource, files } = useStore();
+  const { datasource, files, dataImport } = useStore();
   const { onConfirm, cachedState } = props;
   const { getDatasourceList, getDatasourceDetail, previewFile } = datasource;
+  const { envCfg } = dataImport;
   const { getFiles } = files;
   const { state, setState } = useBatchState({
     loading: false,
@@ -137,7 +138,9 @@ const FileSelect = observer((props: IFileSelect) => {
           defaultValue={activeId}
           popupMatchSelectWidth={false}
         >
-          <Option value={IDatasourceType.Local}>{intl.get('import.localFiles')}</Option>
+          {envCfg.supportDatasourceType.includes(IDatasourceType.Local) && (
+            <Option value={IDatasourceType.Local}>{intl.get('import.localFiles')}</Option>
+          )}
           {options.map((item) => {
             let label = '';
             let platform = '';

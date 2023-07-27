@@ -9,6 +9,7 @@ import { trackEvent } from '@app/utils/stat';
 import { message } from 'antd';
 import { getI18n } from '@vesoft-inc/i18n';
 import { getRootStore } from '.';
+import { IDatasourceType, IS3Platform } from '@app/interfaces/datasource';
 const { intl } = getI18n();
 
 const handlePropertyMap = (item, defaultValueFields) => {
@@ -144,7 +145,11 @@ interface IPlatformConfig {
   supportConfigDownload: boolean;
   supportLogDownload: boolean;
   needPwdConfirm: boolean;
+  supportDatasourceType: IDatasourceType[];
+  supportS3Platform?: IS3Platform[];
+  supportMoreConfig?: boolean;
 }
+
 export type ITagItem = ImportSchemaConfigItem<ISchemaEnum.Tag>;
 export type IEdgeItem = ImportSchemaConfigItem<ISchemaEnum.Edge>;
 export type ITagFileItem = TagFileItem;
@@ -160,6 +165,9 @@ export class ImportStore {
     supportConfigDownload: true,
     supportLogDownload: true,
     needPwdConfirm: true,
+    supportDatasourceType: [IDatasourceType.Local, IDatasourceType.S3, IDatasourceType.SFTP],
+    supportS3Platform: [IS3Platform.AWS, IS3Platform.OSS, IS3Platform.Tecent, IS3Platform.Customize],
+    supportMoreConfig: true,
   };
   constructor() {
     makeAutoObservable(this, {
