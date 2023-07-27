@@ -52,7 +52,7 @@ const TaskCreate = () => {
     setDraft,
     envCfg,
   } = dataImport;
-  const { needPwdConfirm } = envCfg;
+  const { needPwdConfirm, supportMoreConfig } = envCfg;
   const { spaces, getSpaces, updateSpaceInfo, currentSpace, spaceVidType } = schema;
   const { getGraphAddress, _host } = global;
   const { getFiles } = files;
@@ -329,73 +329,74 @@ const TaskCreate = () => {
               </Form.Item>
             </Col>
           </Row>
-          {showMoreConfig ? (
-            <div className={styles.configContainer}>
-              <Row>
-                <Col span={24}>
-                  <Form.Item
-                    label={
-                      <>
-                        <span className={styles.label}>{intl.get('import.graphAddress')}</span>
-                        <Instruction description={intl.get('import.graphAddressTip')} />
-                      </>
-                    }
-                    rules={[
-                      {
-                        required: true,
-                      },
-                    ]}
-                  >
-                    <Checkbox.Group
-                      className={styles.addressCheckbox}
-                      options={address}
-                      value={basicConfig.address}
-                      onChange={(value) => updateBasicConfig({ address: value as string[] })}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row style={{ flexWrap: 'nowrap' }}>
-                {extraConfigs.map((item) => (
-                  <Col span={5} key={item.key}>
+          {supportMoreConfig &&
+            (showMoreConfig ? (
+              <div className={styles.configContainer}>
+                <Row>
+                  <Col span={24}>
                     <Form.Item
                       label={
                         <>
-                          <span className={styles.label}>{item.label}</span>
-                          <Instruction description={item.description} />
+                          <span className={styles.label}>{intl.get('import.graphAddress')}</span>
+                          <Instruction description={intl.get('import.graphAddressTip')} />
                         </>
                       }
-                      name={item.key}
-                      rules={item.rules}
-                      initialValue={basicConfig[item.key]}
+                      rules={[
+                        {
+                          required: true,
+                        },
+                      ]}
                     >
-                      <Input
-                        placeholder={item.placeholder.toString()}
-                        value={basicConfig[item.key]}
-                        onChange={(e) => {
-                          updateBasicConfig({ [item.key]: e.target.value });
-                          trackEvent('import', `update_config_${item.key}`);
-                        }}
+                      <Checkbox.Group
+                        className={styles.addressCheckbox}
+                        options={address}
+                        value={basicConfig.address}
+                        onChange={(value) => updateBasicConfig({ address: value as string[] })}
                       />
                     </Form.Item>
                   </Col>
-                ))}
-              </Row>
+                </Row>
+                <Row style={{ flexWrap: 'nowrap' }}>
+                  {extraConfigs.map((item) => (
+                    <Col span={5} key={item.key}>
+                      <Form.Item
+                        label={
+                          <>
+                            <span className={styles.label}>{item.label}</span>
+                            <Instruction description={item.description} />
+                          </>
+                        }
+                        name={item.key}
+                        rules={item.rules}
+                        initialValue={basicConfig[item.key]}
+                      >
+                        <Input
+                          placeholder={item.placeholder.toString()}
+                          value={basicConfig[item.key]}
+                          onChange={(e) => {
+                            updateBasicConfig({ [item.key]: e.target.value });
+                            trackEvent('import', `update_config_${item.key}`);
+                          }}
+                        />
+                      </Form.Item>
+                    </Col>
+                  ))}
+                </Row>
+                <Row justify="center">
+                  <div className={styles.toggleConfigBtn} onClick={() => setShowMoreConfig(false)}>
+                    <Icon type="icon-list-up" className={styles.toggleIcon} />
+                    <span>{intl.get('import.pickUpConfig')}</span>
+                  </div>
+                </Row>
+              </div>
+            ) : (
               <Row justify="center">
-                <div className={styles.toggleConfigBtn} onClick={() => setShowMoreConfig(false)}>
-                  <Icon type="icon-list-up" className={styles.toggleIcon} />
-                  <span>{intl.get('import.pickUpConfig')}</span>
+                <div className={styles.toggleConfigBtn} onClick={() => setShowMoreConfig(true)}>
+                  <Icon type="icon-list-down" className={styles.toggleIcon} />
+                  <span>{intl.get('import.expandMoreConfig')}</span>
                 </div>
               </Row>
-            </div>
-          ) : (
-            <Row justify="center">
-              <div className={styles.toggleConfigBtn} onClick={() => setShowMoreConfig(true)}>
-                <Icon type="icon-list-down" className={styles.toggleIcon} />
-                <span>{intl.get('import.expandMoreConfig')}</span>
-              </div>
-            </Row>
-          )}
+            ))}
         </Form>
         <div className={styles.mapConfig}>
           <Form className={styles.configColumn} layout="vertical">

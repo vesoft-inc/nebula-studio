@@ -1,7 +1,7 @@
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Modal, Form, Select, message } from 'antd';
 import { useMemo, useState } from 'react';
-import { IDatasourceItem, IDatasourceType } from '@app/interfaces/datasource';
+import { IDatasourceItem, IDatasourceType, ES3Platform } from '@app/interfaces/datasource';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@app/stores';
 import { observer } from 'mobx-react-lite';
@@ -26,13 +26,31 @@ const fomrItemLayout = {
 
 const DatasourceConfigModal = (props: IProps) => {
   const { visible, type, onCancel, onConfirm, data } = props;
-  const { datasource } = useStore();
+  const { datasource, dataImport } = useStore();
   const { addDataSource, updateDataSource } = datasource;
-  const { intl } = useI18n();
+  const { envCfg } = dataImport;
+  const { intl, currentLocale } = useI18n();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const tempPwd = useMemo(() => uuidv4() + Date.now(), []);
   const mode = useMemo(() => (data ? 'edit' : 'create'), [data]);
+  const typeOptions = useMemo(() => {
+    const options = [
+      {
+        label: intl.get('import.s3'),
+        value: IDatasourceType.S3,
+      },
+      {
+        label: intl.get('import.sftp'),
+        value: IDatasourceType.SFTP,
+      },
+      {
+        label: intl.get('import.localFiles'),
+        value: IDatasourceType.Local,
+      },
+    ];
+    return options.filter((item) => envCfg.supportDatasourceType.includes(item.value));
+  }, [envCfg.supportDatasourceType, currentLocale]);
   const submit = async (values: IDatasourceItem) => {
     const _type = values.type || type;
     setLoading(true);
@@ -82,7 +100,13 @@ const DatasourceConfigModal = (props: IProps) => {
       className={styles.dataSourceModal}
       footer={false}
     >
-      <Form form={form} layout="horizontal" {...fomrItemLayout} onFinish={submit} initialValues={{ ...data }}>
+      <Form
+        form={form}
+        layout="horizontal"
+        {...fomrItemLayout}
+        onFinish={submit}
+        initialValues={{ type: type || IDatasourceType.S3, platform: ES3Platform.AWS, ...data }}
+      >
         <FormItem noStyle shouldUpdate>
           {({ getFieldValue }) => {
             const configType = type || getFieldValue('type');
@@ -91,11 +115,13 @@ const DatasourceConfigModal = (props: IProps) => {
           }}
         </FormItem>
         {!type && (
-          <FormItem label={intl.get('import.dataSourceType')} name="type" initialValue={type || IDatasourceType.S3}>
+          <FormItem label={intl.get('import.dataSourceType')} name="type">
             <Select>
-              <Select.Option value={IDatasourceType.S3}>{intl.get('import.s3')}</Select.Option>
-              <Select.Option value={IDatasourceType.SFTP}>{intl.get('import.sftp')}</Select.Option>
-              <Select.Option value={IDatasourceType.Local}>{intl.get('import.localFiles')}</Select.Option>
+              {typeOptions.map((item) => (
+                <Select.Option key={item.value} value={item.value}>
+                  {item.label}
+                </Select.Option>
+              ))}
             </Select>
           </FormItem>
         )}

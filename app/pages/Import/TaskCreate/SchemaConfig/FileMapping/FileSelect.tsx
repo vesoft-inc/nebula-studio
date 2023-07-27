@@ -1,5 +1,5 @@
 import { ArrowLeftOutlined, FileTextFilled, FolderFilled, SyncOutlined } from '@ant-design/icons';
-import { IDatasourceType, IS3Platform } from '@app/interfaces/datasource';
+import { IDatasourceType, ES3Platform } from '@app/interfaces/datasource';
 import { useStore } from '@app/stores';
 import { ICachedStore } from '@app/stores/datasource';
 import { useBatchState } from '@app/utils';
@@ -17,9 +17,10 @@ interface IFileSelect {
 }
 const FileSelect = observer((props: IFileSelect) => {
   const { intl } = useI18n();
-  const { datasource, files } = useStore();
+  const { datasource, files, dataImport } = useStore();
   const { onConfirm, cachedState } = props;
   const { getDatasourceList, getDatasourceDetail, previewFile } = datasource;
+  const { envCfg } = dataImport;
   const { getFiles } = files;
   const { state, setState } = useBatchState({
     loading: false,
@@ -137,13 +138,15 @@ const FileSelect = observer((props: IFileSelect) => {
           defaultValue={activeId}
           popupMatchSelectWidth={false}
         >
-          <Option value={IDatasourceType.Local}>{intl.get('import.localFiles')}</Option>
+          {envCfg.supportDatasourceType.includes(IDatasourceType.Local) && (
+            <Option value={IDatasourceType.Local}>{intl.get('import.localFiles')}</Option>
+          )}
           {options.map((item) => {
             let label = '';
             let platform = '';
             if (item.type === IDatasourceType.S3) {
               label = item.s3Config.bucket;
-              platform = item.platform !== IS3Platform.Customize ? item.platform.toUpperCase() : intl.get('import.s3');
+              platform = item.platform !== ES3Platform.Customize ? item.platform.toUpperCase() : intl.get('import.s3');
             } else {
               label = item.sftpConfig.host + ':' + item.sftpConfig.port;
               platform = intl.get('import.sftp');
