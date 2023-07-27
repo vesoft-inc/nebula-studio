@@ -5,7 +5,7 @@ export class ModuleConfigurationStore {
   schema = {
     supportCreateSpace: true,
   };
-  import = {
+  dataImport = {
     supportTemplate: true,
     supportConfigDownload: true,
     supportLogDownload: true,
