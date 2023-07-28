@@ -5,6 +5,11 @@ import { Recordable } from '@app/interfaces/tools';
 import { safeParse } from './function';
 import { HttpResCode } from './http';
 
+export enum MsgType {
+  NGQL = 'ngql',
+  BatchNGQL = 'batch_ngql',
+}
+
 export interface MessageSend<T extends unknown = Recordable> {
   header: {
     msgId: string;
@@ -17,7 +22,7 @@ export interface MessageSend<T extends unknown = Recordable> {
   };
 }
 
-export interface MessageReceive<T extends unknown = Recordable> {
+export interface MessageReceive<T extends unknown = unknown> {
   header: {
     msgId: string;
     sendTime: number;
@@ -26,6 +31,12 @@ export interface MessageReceive<T extends unknown = Recordable> {
     msgType: string;
     content: T;
   };
+}
+
+export interface MsgReceivedProcessor {
+  // e.g. (msgReceive: MessageReceive) => msgReceive.body.msgType === MsgType.Definition
+  condetion: (msgReceive: MessageReceive) => boolean;
+  execute: (msgReceive: MessageReceive) => void;
 }
 
 export interface NgqlRes<T = any> {
@@ -80,6 +91,8 @@ export class NgqlRunner {
 
   socketConnectingPromise: Promise<boolean> | undefined;
   socketPingTimeInterval: number | undefined;
+
+  msgReceivedProcessors: MsgReceivedProcessor[] = [];
 
   constructor() {
     const urlItem = localStorage.getItem('socketUrl');
@@ -184,7 +197,14 @@ export class NgqlRunner {
       return;
     }
 
-    const msgReceive = safeParse<MessageReceive<NgqlRes>>(e.data, { paser: JSONBigint.parse });
+    const msgReceive = safeParse<MessageReceive<any>>(e.data, { paser: JSONBigint.parse });
+
+    const processor = this.msgReceivedProcessors.find((p) => p.condetion(msgReceive));
+    if (typeof processor?.execute === 'function') {
+      processor.execute(msgReceive);
+      return;
+    }
+
     if (msgReceive?.body?.content?.code === HttpResCode.ErrSession) {
       msgReceive?.body?.content?.message && message.error(msgReceive.body.content.message);
       this.logoutFun?.();
@@ -255,7 +275,7 @@ export class NgqlRunner {
         product: this.product,
         content: { gql, space },
         config,
-        msgType: 'ngql',
+        msgType: MsgType.NGQL,
       });
 
       this.socket.send(JSON.stringify(messageReceiver.messageSend));
@@ -278,7 +298,7 @@ export class NgqlRunner {
         product: this.product,
         content: { gqls, space },
         config,
-        msgType: 'batch_ngql',
+        msgType: MsgType.BatchNGQL,
       });
 
       this.socket.send(JSON.stringify(messageReceiver.messageSend));
