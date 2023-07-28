@@ -229,7 +229,7 @@ const Schema = () => {
       <div className={styles.schemaContainer}>
         <div className={styles.row}>
           <Search type={intl.get('common.space')} onSearch={setSearchVal} />
-          {moduleConfiguration.schema.supportCreateSpace && (
+          {!moduleConfiguration.schema?.disableCreateSpace && (
             <Button className={cls(styles.btnCreate, 'studioAddBtn')} type="primary">
               <Link
                 to="/schema/space/create"
