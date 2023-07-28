@@ -2,16 +2,24 @@ import { ES3Platform, IDatasourceType } from '@app/interfaces/datasource';
 
 export interface IModuleConfiguration {
   readonly schema?: {
-    supportCreateSpace?: boolean; // if support create space in studio
+    /** if support create space in studio */
+    supportCreateSpace?: boolean;
   };
   readonly dataImport?: {
-    supportTemplate?: boolean; // if support template import
-    supportConfigDownload?: boolean; // if support task config download
-    supportLogDownload?: boolean; // if support task log download
-    needPwdConfirm?: boolean; // if need password confirm before import
-    supportDatasourceType?: IDatasourceType[]; // support datasource type list
-    supportS3Platform?: ES3Platform[]; // support s3 platform list
-    supportMoreConfig?: boolean; // if support more config when import
+    /** if support template import */
+    supportTemplate?: boolean;
+    /** if support task config download */
+    supportConfigDownload?: boolean;
+    /** if support task log download */
+    supportLogDownload?: boolean;
+    /** if need password confirm before import */
+    needPwdConfirm?: boolean;
+    /** support datasource type list */
+    supportDatasourceType?: IDatasourceType[];
+    /** support s3 platform list */
+    supportS3Platform?: ES3Platform[];
+    /** if support more config when import */
+    supportMoreConfig?: boolean;
   };
 }
 
