@@ -1,21 +1,21 @@
 import { ES3Platform, IDatasourceType } from '@app/interfaces/datasource';
 
-export interface IModuleConfigurationStore {
+export interface IModuleConfiguration {
   readonly schema?: {
-    supportCreateSpace?: boolean;
+    supportCreateSpace?: boolean; // if support create space in studio
   };
   readonly dataImport?: {
-    supportTemplate?: boolean;
-    supportConfigDownload?: boolean;
-    supportLogDownload?: boolean;
-    needPwdConfirm?: boolean;
-    supportDatasourceType?: IDatasourceType[];
-    supportS3Platform?: ES3Platform[];
-    supportMoreConfig?: boolean;
+    supportTemplate?: boolean; // if support template import
+    supportConfigDownload?: boolean; // if support task config download
+    supportLogDownload?: boolean; // if support task log download
+    needPwdConfirm?: boolean; // if need password confirm before import
+    supportDatasourceType?: IDatasourceType[]; // support datasource type list
+    supportS3Platform?: ES3Platform[]; // support s3 platform list
+    supportMoreConfig?: boolean; // if support more config when import
   };
 }
 
-export class ModuleConfigurationStore implements IModuleConfigurationStore {
+export class ModuleConfigurationStore implements IModuleConfiguration {
   schema = {
     supportCreateSpace: true,
   };
