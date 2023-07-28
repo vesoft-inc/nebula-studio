@@ -9,7 +9,6 @@ import { trackEvent } from '@app/utils/stat';
 import { message } from 'antd';
 import { getI18n } from '@vesoft-inc/i18n';
 import { getRootStore } from '.';
-import { IDatasourceType, ES3Platform } from '@app/interfaces/datasource';
 const { intl } = getI18n();
 
 const handlePropertyMap = (item, defaultValueFields) => {
@@ -137,17 +136,6 @@ class ImportSchemaConfigItem<T extends ISchemaEnum, F = T extends ISchemaEnum.Ed
 
   updateProp = (prop: IPropertyProps, payload: Partial<IPropertyProps>) =>
     Object.keys(payload).forEach((key) => (prop[key] = payload[key]));
-}
-
-interface IPlatformConfig {
-  env: string;
-  supportTemplate: boolean;
-  supportConfigDownload: boolean;
-  supportLogDownload: boolean;
-  needPwdConfirm: boolean;
-  supportDatasourceType: IDatasourceType[];
-  supportS3Platform?: ES3Platform[];
-  supportMoreConfig?: boolean;
 }
 
 export type ITagItem = ImportSchemaConfigItem<ISchemaEnum.Tag>;

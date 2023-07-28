@@ -31,7 +31,7 @@ const LogModal = (props: IProps) => {
     dataImport: { getLogs, downloadTaskLog, getLogDetail },
     moduleConfiguration,
   } = useStore();
-  const { supportLogDownload } = moduleConfiguration.dataImport;
+  const { disableLogDownload } = moduleConfiguration.dataImport;
   const { intl } = useI18n();
   const logRef = useRef<HTMLDivElement>(null);
   const timer = useRef<any>(null);
@@ -100,7 +100,7 @@ const LogModal = (props: IProps) => {
   };
   useEffect(() => {
     isMounted = true;
-    if (supportLogDownload) {
+    if (disableLogDownload) {
       getAllLogs();
     } else {
       initLog();
@@ -138,7 +138,7 @@ const LogModal = (props: IProps) => {
               <Button type="text" loading={true} />
             )}
           </div>
-          {supportLogDownload && (
+          {!disableLogDownload && (
             <Button className="studioAddBtn primaryBtn" onClick={handleLogDownload}>
               <Icon type="icon-studio-btn-download" />
               {intl.get('import.downloadLog')}
@@ -153,10 +153,8 @@ const LogModal = (props: IProps) => {
       destroyOnClose={true}
       footer={false}
     >
-      {supportLogDownload && (
-        <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange} items={items} />
-      )}
-      <div className={classnames(styles.logContainer, !supportLogDownload && styles.full)} ref={logRef} />
+      <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange} items={items} />
+      <div className={classnames(styles.logContainer, !disableLogDownload && styles.full)} ref={logRef} />
     </Modal>
   );
 };

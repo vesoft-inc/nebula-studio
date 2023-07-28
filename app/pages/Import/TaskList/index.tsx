@@ -33,7 +33,7 @@ const TaskList = () => {
   const [importModalVisible, setImportModalVisible] = useState(false);
   const [sourceModalVisible, setSourceModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { supportTemplate } = moduleConfiguration.dataImport;
+  const { disableTemplateImport } = moduleConfiguration.dataImport;
   const modalKey = useMemo(() => Math.random(), [sourceModalVisible]);
   const [logDimension, setLogDimension] = useState<ILogDimension>({} as ILogDimension);
   const handleTaskStop = useCallback(async (id: string) => {
@@ -129,7 +129,7 @@ const TaskList = () => {
             <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
             {intl.get('import.createTask')}
           </Button>
-          {supportTemplate && (
+          {!disableTemplateImport && (
             <Button type="default" onClick={() => setImportModalVisible(true)}>
               {intl.get('import.uploadTemp')}
             </Button>

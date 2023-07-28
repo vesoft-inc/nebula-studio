@@ -55,7 +55,7 @@ const TaskItem = (props: IProps) => {
     moduleConfiguration,
   } = useStore();
   const history = useHistory();
-  const { supportConfigDownload, needPwdConfirm } = moduleConfiguration.dataImport;
+  const { disableConfigDownload, needPwdConfirm } = moduleConfiguration.dataImport;
   const isDraft = useMemo(() => status === ITaskStatus.Draft, [status]);
   const [visible, setVisible] = useState(false);
   const [progressStatus, setStatus] = useState<'success' | 'active' | 'normal' | 'exception' | undefined>(undefined);
@@ -171,7 +171,7 @@ const TaskItem = (props: IProps) => {
                 <span className={styles.createTime}>
                   {intl.get('common.createTime')}: {dayjs(createTime).format('YYYY-MM-DD HH:mm:ss')}
                 </span>
-                {supportConfigDownload && (
+                {!disableConfigDownload && (
                   <Button type="link" size="small" onClick={() => downloadTaskConfig(id)}>
                     <Icon type="icon-studio-btn-download" />
                     {intl.get('import.downloadConfig')}

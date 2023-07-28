@@ -51,7 +51,7 @@ const TaskCreate = () => {
     updateTaskDraft,
     setDraft,
   } = dataImport;
-  const { needPwdConfirm, supportMoreConfig } = moduleConfiguration.dataImport;
+  const { needPwdConfirm, disableConfigMore } = moduleConfiguration.dataImport;
   const { spaces, getSpaces, updateSpaceInfo, currentSpace, spaceVidType } = schema;
   const { getGraphAddress, _host } = global;
   const { getFiles } = files;
@@ -328,7 +328,7 @@ const TaskCreate = () => {
               </Form.Item>
             </Col>
           </Row>
-          {supportMoreConfig &&
+          {!disableConfigMore &&
             (showMoreConfig ? (
               <div className={styles.configContainer}>
                 <Row>

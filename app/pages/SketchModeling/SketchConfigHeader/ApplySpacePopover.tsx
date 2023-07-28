@@ -60,8 +60,8 @@ const PopoverContent = (props: IContentProps) => {
   const { intl } = useI18n();
   const { schema, sketchModel, moduleConfiguration } = useStore();
   const { getMachineNumber, getSpaces, updateSpaceInfo } = schema;
-  const { supportCreateSpace } = moduleConfiguration.schema;
-  const [mode, setMode] = useState(supportCreateSpace ? 'create' : 'apply');
+  const { disableCreateSpace } = moduleConfiguration.schema;
+  const [mode, setMode] = useState(!disableCreateSpace ? 'create' : 'apply');
   const [spaces, setSpaces] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
@@ -194,7 +194,7 @@ const PopoverContent = (props: IContentProps) => {
   }, []);
   return (
     <>
-      {supportCreateSpace && (
+      {!disableCreateSpace && (
         <Radio.Group className={styles.radioTabs} onChange={handleChangeMode} value={mode} buttonStyle="solid">
           <Radio.Button value="create">{intl.get('sketch.createSpace')}</Radio.Button>
           <Radio.Button value="apply">{intl.get('sketch.selectSpace')}</Radio.Button>
