@@ -64,9 +64,11 @@ const LogModal = (props: IProps) => {
 
   const readLog = async () => {
     const data = await getLogDetail({
-      offset: offset.current,
+      start: offset.current,
       id,
-      limit: 500,
+      end: [ITaskStatus.Finished, ITaskStatus.Aborted, ITaskStatus.Stoped].includes(_status.current)
+        ? 0
+        : offset.current + 4096, // 4kb content per request, if task is finished, read all logs
       file: currentLog,
     });
     isMounted && handleLogData(data);
@@ -77,10 +79,11 @@ const LogModal = (props: IProps) => {
       timer.current = setTimeout(readLog, 2000);
       return;
     }
-    if (data && data.length > 0) {
-      logRef.current.innerHTML += data.join('<br/>') + '<br/>';
+    const { logs, endPosition } = data;
+    if (logs.length > 0) {
+      logRef.current.innerHTML += logs.split('\n').join('<br/>');
       logRef.current.scrollTop = logRef.current.scrollHeight;
-      offset.current += data.length;
+      offset.current = endPosition;
       if (isMounted) {
         timer.current = setTimeout(readLog, 2000);
       }
@@ -100,7 +103,7 @@ const LogModal = (props: IProps) => {
   };
   useEffect(() => {
     isMounted = true;
-    if (disableLogDownload) {
+    if (!disableLogDownload) {
       getAllLogs();
     } else {
       initLog();
