@@ -19,8 +19,6 @@ interface IProps {
   onCancel: () => void;
 }
 
-let isMounted = true;
-
 const LogModal = (props: IProps) => {
   const {
     visible,
@@ -36,6 +34,7 @@ const LogModal = (props: IProps) => {
   const logRef = useRef<HTMLDivElement>(null);
   const timer = useRef<any>(null);
   const offset = useRef(0);
+  const isMounted = useRef(true);
   const _status = useRef(status);
   const [logs, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -71,7 +70,7 @@ const LogModal = (props: IProps) => {
         : offset.current + 4096, // 4kb content per request, if task is finished, read all logs
       file: currentLog,
     });
-    isMounted && handleLogData(data);
+    isMounted.current && handleLogData(data);
   };
 
   const handleLogData = (data) => {
@@ -84,11 +83,11 @@ const LogModal = (props: IProps) => {
       logRef.current.innerHTML += logs.split('\n').join('<br/>');
       logRef.current.scrollTop = logRef.current.scrollHeight;
       offset.current = endPosition;
-      if (isMounted) {
+      if (isMounted.current) {
         timer.current = setTimeout(readLog, 2000);
       }
     } else if ([ITaskStatus.Processing, ITaskStatus.Pending].includes(_status.current)) {
-      if (isMounted) {
+      if (isMounted.current) {
         timer.current = setTimeout(readLog, 2000);
       }
     } else {
@@ -102,14 +101,13 @@ const LogModal = (props: IProps) => {
     setLoading(false);
   };
   useEffect(() => {
-    isMounted = true;
     if (!disableLogDownload) {
       getAllLogs();
     } else {
       initLog();
     }
     return () => {
-      isMounted = false;
+      isMounted.current = false;
       clearTimeout(timer.current);
     };
   }, []);
@@ -123,7 +121,7 @@ const LogModal = (props: IProps) => {
       logRef.current.innerHTML = '';
     }
     offset.current = 0;
-    if (currentLog && isMounted) {
+    if (currentLog && isMounted.current) {
       readLog();
     }
   }, [currentLog]);
