@@ -335,10 +335,10 @@ export class ImportStore {
     trackEvent('import', 'download_task_log');
   };
 
-  getLogDetail = async (params: { offset: number; limit?: number; id: string; file: string }) => {
+  getLogDetail = async (params: { start: number; end: number; id: string; file: string }) => {
     const { code, data } = await service.getLogDetail(params);
     if (code === 0) {
-      return data.logs;
+      return data;
     }
     return null;
   };

@@ -245,14 +245,15 @@ type GetManyImportTaskData struct {
 }
 
 type GetManyImportTaskLogRequest struct {
-	Id     string `path:"id" validate:"required"`
-	File   string `form:"file" validate:"required"`
-	Offset int64  `form:"offset" validate:"min=0"`
-	Limit  int64  `form:"limit" validate:"min=1"`
+	Id    string `path:"id" validate:"required"`
+	File  string `form:"file" validate:"required"`
+	Start int64  `form:"start" validate:"min=0"`
+	End   int64  `form:"end" validate:"min=0"`
 }
 
 type GetManyImportTaskLogData struct {
-	Logs []string `json:"logs"`
+	Logs        string `json:"logs"`
+	EndPosition int64  `json:"endPosition"`
 }
 
 type GetImportTaskLogNamesRequest struct {

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -337,13 +336,14 @@ func (i *importService) GetManyImportTaskLog(req *types.GetManyImportTaskLogRequ
 	} else {
 		path = filepath.Join(i.svcCtx.Config.File.TasksDir, req.Id, errContentDir, req.File)
 	}
-	lines, err := readFileLines(path, req.Offset, req.Limit)
+	lines, endPosition, err := readFile(path, req.Start, req.End)
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 
 	data := &types.GetManyImportTaskLogData{
-		Logs: lines,
+		Logs:        lines,
+		EndPosition: endPosition,
 	}
 	return data, nil
 }
@@ -355,26 +355,26 @@ func (i *importService) GetWorkingDir() (*types.GetWorkingDirResult, error) {
 	}, nil
 }
 
-func readFileLines(path string, offset int64, limit int64) ([]string, error) {
+func readFile(path string, start int64, end int64) (string, int64, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+		return "", 0, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	defer file.Close()
-	scanner := bufio.NewScanner(file)
-	res := make([]string, 0)
-	if limit != -1 {
-		for lineIndex := int64(0); scanner.Scan() && lineIndex < offset+limit; lineIndex++ {
-			if lineIndex >= offset {
-				res = append(res, scanner.Text())
-			}
-		}
-	} else {
-		for lineIndex := int64(0); scanner.Scan(); lineIndex++ {
-			if lineIndex >= offset {
-				res = append(res, scanner.Text())
-			}
-		}
+	fileInfo, err := file.Stat()
+	if err != nil {
+		return "", 0, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
-	return res, nil
+	if start > fileInfo.Size() {
+		return "", 0, nil
+	}
+	if end == 0 || end > fileInfo.Size() {
+		end = fileInfo.Size()
+	}
+	bytes := make([]byte, end-start)
+	_, err = file.ReadAt(bytes, start)
+	if err != nil {
+		return "", 0, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+	}
+	return string(bytes), end, nil
 }

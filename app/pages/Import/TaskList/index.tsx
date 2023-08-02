@@ -13,8 +13,6 @@ import TemplateModal from './TemplateModal';
 import styles from './index.module.less';
 import TaskItem from './TaskItem';
 
-let isMounted = true;
-
 interface ILogDimension {
   space: string;
   id: string;
@@ -24,6 +22,7 @@ interface ILogDimension {
 const TaskList = () => {
   const timer = useRef<any>(null);
   const { dataImport, global, moduleConfiguration } = useStore();
+  const isMounted = useRef(true);
   const [page, setPage] = useState(1);
   const { intl } = useI18n();
   const history = useHistory();
@@ -70,11 +69,10 @@ const TaskList = () => {
     getTaskList();
   };
   useEffect(() => {
-    isMounted = true;
     initList();
     trackPageView('/import/tasks');
     return () => {
-      isMounted = false;
+      isMounted.current = false;
       clearTimeout(timer.current);
     };
   }, []);
@@ -91,7 +89,7 @@ const TaskList = () => {
         });
       }
     }
-    if (needRefresh && isMounted) {
+    if (needRefresh && isMounted.current) {
       clearTimeout(timer.current);
       timer.current = setTimeout(getTaskList, 1000);
     } else {
