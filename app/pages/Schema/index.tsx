@@ -1,4 +1,4 @@
-import { Button, Popconfirm, Table, message, Popover, Form, Input, Dropdown, Menu, Tooltip, MenuProps } from 'antd';
+import { Button, Popconfirm, Table, message, Popover, Form, Input, Dropdown, Tooltip } from 'antd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useI18n } from '@vesoft-inc/i18n';
 import Icon from '@app/components/Icon';

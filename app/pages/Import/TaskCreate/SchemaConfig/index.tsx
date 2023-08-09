@@ -75,7 +75,7 @@ const SchemaConfig = (props: IProps) => {
   const resetFileSource = useCallback(
     (item: ITagFileItem | IEdgeFileItem, file: IImportFile) => {
       const index = configItem.files.findIndex((f) => f === item);
-      const payload = { file, props: [...configItem.props] };
+      const payload = { file, props: [...configItem.props] } as any;
       // @ts-ignore
       configItem.resetFileItem(
         index,
@@ -102,7 +102,7 @@ const SchemaConfig = (props: IProps) => {
 
   // @ts-ignore
   const clearFileSource = useCallback(
-    (item: ITagFileItem | IEdgeFileItem) => configItem.deleteFileItem(item),
+    (item: ITagFileItem | IEdgeFileItem) => configItem.deleteFileItem(item as any),
     [configItem],
   );
   return (

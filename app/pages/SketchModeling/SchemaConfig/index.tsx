@@ -35,13 +35,13 @@ const SchemaConfig: React.FC = () => {
     const prevName = sketchModel.active?.name;
     const name = form.getFieldValue('name');
     const data = sketchModel.editor?.schema.getData();
-    if(!data || name === prevName) return false;
+    if (!data || name === prevName) return false;
     let invalid = false;
     data.nodes.forEach((item) => {
-      if(item.uuid === sketchModel.active?.uuid || !item.name) {
+      if (item.uuid === sketchModel.active?.uuid || !item.name) {
         return;
       }
-      if(item.name === name) {
+      if (item.name === name) {
         invalid = true;
         item.invalid = true;
         sketchModel.editor.graph.node.updateNode(item, true);
@@ -51,10 +51,10 @@ const SchemaConfig: React.FC = () => {
       }
     });
     data.lines.forEach((item) => {
-      if(item.uuid === sketchModel.active?.uuid || !item.name) {
+      if (item.uuid === sketchModel.active?.uuid || !item.name) {
         return;
       }
-      if(item.name === name) {
+      if (item.name === name) {
         invalid = true;
         item.invalid = true;
         sketchModel.editor.graph.line.updateLine(item, true);
@@ -66,24 +66,38 @@ const SchemaConfig: React.FC = () => {
     invalid && form.setFields([{ name: 'name', errors: [intl.get('sketch.uniqName')] }]);
     return invalid;
   };
-  const handleUpdate:FormProps['onFieldsChange'] = useCallback(
+  const handleUpdate: FormProps['onFieldsChange'] = useCallback(
     debounce((changed, allValues) => {
       const changedFileds = changed.map((item) => item.name[0]);
       const formValues = form.getFieldsValue();
-      if(!flag && sketchModel.active?.invalid) {
+      if (!flag && sketchModel.active?.invalid) {
         form.validateFields(changedFileds);
         flag = !flag;
       }
       const hasSameName = validateSameName();
-      const hasError = allValues.some((item) => item.errors.length > 0);
+      let hasError;
+      const validatedValues = allValues.filter((item) => item.validated);
+      if (validatedValues.length > 0) {
+        hasError = validatedValues.some((item) => item.errors.length > 0);
+      }
+      // const hasError = allValues.some((item) => item.errors.length > 0);
       // hack delete the row of properties, but allValues is not update immediately, need to validate again
       // name.length > 1 means as least 1 row of properties
-      if(hasError && allValues.some(item => item.name.length > 1 && item.name[0] === 'properties' && item.value === undefined)) {
+      if (
+        hasError &&
+        allValues.some((item) => item.name.length > 1 && item.name[0] === 'properties' && item.value === undefined)
+      ) {
         form.validateFields(changedFileds);
       }
-      update({ ...formValues, invalid: hasError || hasSameName });
+      let invalid = sketchModel.active?.invalid;
+      if (hasError !== undefined) {
+        invalid = hasSameName || hasError;
+      } else {
+        invalid = invalid || hasSameName;
+      }
+      update({ ...formValues, invalid });
     }, 300),
-    []
+    [],
   );
   const handleDelete = useCallback(() => {
     deleteElement(active.type);
@@ -93,10 +107,9 @@ const SchemaConfig: React.FC = () => {
     if (!active) {
       return;
     }
-
     const { name, comment, properties, invalid } = active;
     form.setFieldsValue({ name, comment, properties });
-    if(invalid) {
+    if (invalid) {
       validateSameName();
       form.validateFields();
     }
@@ -108,7 +121,7 @@ const SchemaConfig: React.FC = () => {
 
   const handleCheck = (changedValues) => {
     const { properties } = changedValues;
-    if (properties && properties.some(i => i.name !== undefined)) {
+    if (properties && properties.some((i) => i.name !== undefined)) {
       form.validateFields([['properties']]);
     }
   };
