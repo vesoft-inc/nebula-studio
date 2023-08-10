@@ -24,7 +24,7 @@ const TaskList = () => {
   const { dataImport, global, moduleConfiguration } = useStore();
   const isMounted = useRef(true);
   const [page, setPage] = useState(1);
-  const { intl } = useI18n();
+  const { intl, currentLocale } = useI18n();
   const history = useHistory();
   const { taskList, getTaskList, stopTask, deleteTask } = dataImport;
   const { username, host } = global;
@@ -117,7 +117,7 @@ const TaskList = () => {
         btnLabel: intl.get('import.start'),
       },
     ],
-    [],
+    [currentLocale],
   );
   return (
     <div className={styles.nebulaDataImport}>

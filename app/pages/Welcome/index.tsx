@@ -305,7 +305,10 @@ function Welcome(props: IProps) {
       const gql = await fetch(`${process.env.CDN_PATH || '/'}datasets/${space.fileName}.ngql`).then((r) => r.text());
       setSpaceLoading({ spaceName: space.spaceName, leftTime: initLoadingTime, progressModalOpen: true });
       const downloadRes = await service.batchExecNGQL({
-        gqls: gql.split('\n').map(line => line.startsWith(':') ? line.replace(/;$/gm, '') : line).filter(Boolean)
+        gqls: gql
+          .split('\n')
+          .map((line) => (line.startsWith(':') ? line.replace(/;$/gm, '') : line))
+          .filter(Boolean),
       });
       setSpaceLoading({ spaceName: undefined, leftTime: 0, progressModalOpen: false });
       clearSpaceLoadingTimeout();
@@ -479,10 +482,8 @@ function Welcome(props: IProps) {
                           <p className={styles.docTitle}>{doc.title}</p>
                           <p className={styles.docTip}>{doc.tip}</p>
                         </div>
-                        <Button type="primary" block>
-                          <a href={doc.link} target="_blank" rel="noreferrer">
-                            {intl.get('doc.start')}
-                          </a>
+                        <Button className={styles.docLink} type="primary" block href={doc.link} target="_blank">
+                          {intl.get('doc.start')}
                         </Button>
                       </div>
                     </Col>

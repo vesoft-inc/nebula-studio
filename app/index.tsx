@@ -70,7 +70,7 @@ const App = () => {
         },
         components: {
           Menu: {
-            colorItemBg: '#2f3a4a',
+            itemBg: '#2f3a4a',
             colorPrimary: '#2f80ed',
             margin: 20,
           },

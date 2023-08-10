@@ -8,6 +8,7 @@ import EmptyTableTip from '@app/components/EmptyTableTip';
 import { IndexType } from '@app/interfaces/schema';
 import Search from '../Search';
 import styles from './index.module.less';
+import cls from 'classnames';
 
 interface IProps {
   onSearch: (value) => void;
@@ -23,7 +24,7 @@ const CommonLayout = (props: IProps) => {
   const { onSearch, data, columns, loading, renderExpandInfo, children, type, indexType } = props;
   const [expandKeys, setExpandKeys] = useState<any[]>([]);
   const { intl } = useI18n();
-  const handleRowClick = row => {
+  const handleRowClick = (row) => {
     const { name: key } = row;
     const keys = expandKeys.includes(key) ? [] : [key];
     setExpandKeys(keys);
@@ -31,14 +32,15 @@ const CommonLayout = (props: IProps) => {
   return (
     <div className={styles.schemaConfigList}>
       <div className={styles.header}>
-        <Button type="primary" className="studioAddBtn">
+        <Button type="primary" className={cls('studioAddBtn', styles.btnCreate)}>
           <Link
             to={`/schema/${type}/create${indexType ? `?type=${indexType}` : ''}`}
             data-track-category="navigation"
             data-track-action={`view_${type}_create`}
             data-track-label={`from_${type}_list`}
           >
-            <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />{intl.get('common.create')}
+            <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
+            {intl.get('common.create')}
           </Link>
         </Button>
         <Search onSearch={onSearch} type={type.toLowerCase()} />
@@ -48,10 +50,10 @@ const CommonLayout = (props: IProps) => {
         dataSource={data}
         columns={columns}
         expandable={{
-          expandedRowRender: record => renderExpandInfo(record, intl),
+          expandedRowRender: (record) => renderExpandInfo(record, intl),
           expandRowByClick: true,
           expandedRowKeys: expandKeys,
-          onExpand: (_, record) => handleRowClick(record)
+          onExpand: (_, record) => handleRowClick(record),
         }}
         loading={loading}
         rowKey="name"

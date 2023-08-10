@@ -119,7 +119,7 @@ class ImportSchemaConfigItem<T extends ISchemaEnum, F = T extends ISchemaEnum.Ed
 
   deleteFileItem = (fileItem: F) => this.files.remove(fileItem);
 
-  resetFileItem = (index: number, item: F) => {
+  resetFileItem = (index: number, item: any) => {
     // this.files.
     this.files.splice(index, 1, item);
   };

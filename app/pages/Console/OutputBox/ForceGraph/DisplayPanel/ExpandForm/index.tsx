@@ -1,4 +1,5 @@
 import { Tabs } from 'antd';
+import { v4 as uuidv4 } from 'uuid';
 import { useEffect, useState } from 'react';
 import { LinkObject, NodeObject } from '@vesoft-inc/force-graph';
 import { useI18n } from '@vesoft-inc/i18n';
@@ -9,7 +10,7 @@ interface IProps {
   data: {
     nodes: NodeObject[];
     links: LinkObject[];
-  },
+  };
   spaceVidType: string;
 }
 
@@ -23,17 +24,17 @@ const DisplayComponent = (props: IProps) => {
     links: LinkObject[];
   }>({
     nodes: [],
-    links: []
+    links: [],
   });
   useEffect(() => {
     setList({
       nodes: flattenVertex(nodes),
-      links: flattenEdge(links)
+      links: flattenEdge(links),
     });
   }, [data]);
 
   const flattenVertex = (data) => {
-    return data.map(item => {
+    return data.map((item) => {
       const _data = [
         {
           key: 'Tag',
@@ -46,9 +47,9 @@ const DisplayComponent = (props: IProps) => {
         },
       ] as any;
       const properties = item.properties;
-      Object.keys(properties).forEach(property => {
+      Object.keys(properties).forEach((property) => {
         const valueObj = properties[property];
-        Object.keys(valueObj).forEach(field => {
+        Object.keys(valueObj).forEach((field) => {
           _data.push({
             key: `${property}.${field}`,
             value: valueObj[field],
@@ -59,8 +60,8 @@ const DisplayComponent = (props: IProps) => {
     });
   };
 
-  const flattenEdge = data => {
-    return data.map(item => {
+  const flattenEdge = (data) => {
+    return data.map((item) => {
       const _data = [
         {
           key: 'id',
@@ -69,7 +70,7 @@ const DisplayComponent = (props: IProps) => {
       ];
       const name = item.edgeType;
       const properties = item.properties;
-      Object.keys(properties).forEach(property => {
+      Object.keys(properties).forEach((property) => {
         const value = properties[property];
         _data.push({
           key: `${name}.${property}`,
@@ -82,25 +83,21 @@ const DisplayComponent = (props: IProps) => {
   const items = [
     {
       label: intl.get('import.vertexText') + `(${nodes.length})`,
-      key: 'nodes'
+      key: 'nodes',
     },
     {
       label: intl.get('import.edgeText') + `(${links.length})`,
-      key: 'links'
+      key: 'links',
     },
   ];
   return (
     <div className={styles.displayExpand}>
       <Tabs className={styles.headerTab} onChange={setTab} defaultActiveKey={tab} items={items} />
       <div className={styles.content}>
-        {list[tab].length > 0 && list[tab].map((item: NodeObject | LinkObject, index) => (
-          <ExpandItem
-            key={index}
-            data={item}
-            title={`${tab} ${index + 1}`}
-            index={index}
-          />
-        ))}
+        {list[tab].length > 0 &&
+          list[tab].map((item: NodeObject | LinkObject, index) => (
+            <ExpandItem key={uuidv4()} data={item} title={`${tab} ${index + 1}`} index={index} />
+          ))}
       </div>
     </div>
   );
