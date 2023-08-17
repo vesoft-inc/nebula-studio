@@ -53,7 +53,14 @@ func main() {
 	server.InitDB(&c, nil)
 
 	svcCtx := svc.NewServiceContext(c)
-	server := rest.MustNewServer(c.RestConf, rest.WithNotFoundHandler(studioMiddleware.AssetsMiddlewareWithCtx(svcCtx, embedAssets)))
+	opts := []rest.RunOption{
+		rest.WithNotFoundHandler(studioMiddleware.AssetsMiddlewareWithCtx(svcCtx, embedAssets)),
+	}
+	if len(c.CorsOrigins) > 0 {
+		opts = append(opts, rest.WithCors(c.CorsOrigins...))
+	}
+
+	server := rest.MustNewServer(c.RestConf, opts...)
 
 	defer server.Stop()
 	waitForCalled := proc.AddWrapUpListener(func() {

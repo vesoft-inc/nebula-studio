@@ -19,8 +19,8 @@ type Config struct {
 		AccessSecret string
 		AccessExpire int64
 	}
-
-	File struct {
+	CorsOrigins []string `json:",optional"`
+	File        struct {
 		UploadDir string
 		TasksDir  string
 	}
