@@ -16,6 +16,7 @@ Auth:
 File:
   UploadDir: "./data/upload/"
   TasksDir: "./data/tasks"
+CorsOrigins: []
 DB:
   # 1,2,3,4 corresponding to Silent, ERROR, Warn, INFO
   LogLevel: 4
