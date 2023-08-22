@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import rootStore from '@app/stores';
 
 import { useI18n } from '@vesoft-inc/i18n';
@@ -20,7 +20,7 @@ const Tooltip = observer(function Tooltip() {
   const [finalPos, setFinalPos] = useState({ left: 0, top: 0 });
   const { hoveringItem, tooltip, container } = rootStore.sketchModel;
   useEffect(() => {
-    if(hoveringItem) {
+    if (hoveringItem) {
       setData(hoveringItem);
       setTimeout(() => {
         setVisible(true);
@@ -32,14 +32,14 @@ const Tooltip = observer(function Tooltip() {
       data && setFinalPos({ left: tooltip.left, top: tooltip.top });
     }
   }, [hoveringItem]);
-  if(!data) {
+  if (!data) {
     return null;
   }
 
   const {
     data: { type, name, properties = [], fill, strokeColor },
   } = data;
-  if(!container || (!name && !properties.length)) {
+  if (!container || (!name && !properties.length)) {
     return null;
   }
   const { left, top } = tooltip;
@@ -50,12 +50,12 @@ const Tooltip = observer(function Tooltip() {
     style.left = left + OFFSET + TOOLTIP_WIDTH > container.clientWidth ? left - OFFSET - TOOLTIP_WIDTH : left + OFFSET;
     style.top = top + OFFSET + TOOLTIP_HEIGHT > container.clientHeight ? top - OFFSET - TOOLTIP_HEIGHT : top + OFFSET;
   };
-  if(hoveringItem) {
+  if (hoveringItem) {
     calculatePosition(tooltip);
   } else {
     calculatePosition(finalPos);
   }
-  
+
   const renderLabel = () => {
     return type === ISchemaEnum.Tag ? (
       <span className={styles.tag} style={{ backgroundColor: fill as string, border: `3px solid ${strokeColor}` }}>
@@ -90,13 +90,14 @@ export function initTooltip({ container }: { container: HTMLElement }) {
 
   const dom = document.createElement('div');
   const disposer = onAbsolutePositionMove(container, setTooltip);
+  const root = createRoot(dom);
 
-  ReactDOM.render(<Tooltip />, dom);
+  root.render(<Tooltip />);
   container.appendChild(dom);
 
   return () => {
     disposer();
+    root.unmount();
     container.removeChild(dom);
-    ReactDOM.unmountComponentAtNode(container);
   };
 }

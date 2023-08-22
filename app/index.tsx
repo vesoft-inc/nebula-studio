@@ -2,7 +2,7 @@ import { Spin, message, ConfigProvider } from 'antd';
 import enUS from 'antd/locale/en_US';
 import zhCN from 'antd/locale/zh_CN';
 import { Suspense, lazy, useEffect } from 'react';
-import ReactDom from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Route, BrowserRouter as Router, Switch, useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import dayjs from 'dayjs';
@@ -87,4 +87,5 @@ const App = () => {
   );
 };
 
-ReactDom.render(<PageRoot />, document.getElementById('studioApp'));
+const root = createRoot(document.getElementById('studioApp'));
+root.render(<PageRoot />);
