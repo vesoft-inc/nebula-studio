@@ -1,7 +1,7 @@
 import { ISketchNode } from '@app/interfaces/sketch';
 import VEditor, { DefaultNode } from '@vesoft-inc/veditor';
 import { InstanceNode } from '@vesoft-inc/veditor/types/Shape/Node';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { ISchemaEnum } from '@app/interfaces/schema';
 import { NODE_RADIUS } from '@app/config/sketch';
 import Path from './Path';
@@ -20,9 +20,16 @@ export default function initShapes(editor: VEditor) {
       const data = node.data as ISketchNode;
       // popOver
       node.shape = node.shape ? node.shape : document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      ReactDOM.render(
+      // @ts-ignore
+      const root = node.shape.__reactRoot || createRoot(node.shape);
+      // @ts-ignore
+      // keep the root, avoid `react createroot multiple times` warning
+      node.shape.__reactRoot = root;
+      root.render(
         <>
-          {!data.hideActive && <circle className={styles.activeNode} r={NODE_RADIUS + 8} cx={NODE_RADIUS} cy={NODE_RADIUS} />}
+          {!data.hideActive && (
+            <circle className={styles.activeNode} r={NODE_RADIUS + 8} cx={NODE_RADIUS} cy={NODE_RADIUS} />
+          )}
           <circle
             className="svg-item"
             r={NODE_RADIUS - 1}
@@ -69,7 +76,6 @@ export default function initShapes(editor: VEditor) {
             </>
           )}
         </>,
-        node.shape
       );
 
       return node.shape;
@@ -81,7 +87,8 @@ export default function initShapes(editor: VEditor) {
 
 export const initShadowFilter = (svg: SVGElement) => {
   const filter = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  ReactDOM.render(
+  const root = createRoot(filter);
+  root.render(
     <>
       <filter id="whiteShadow">
         <feColorMatrix
@@ -104,7 +111,6 @@ export const initShadowFilter = (svg: SVGElement) => {
         <feGaussianBlur stdDeviation="1" />
       </filter>
     </>,
-    filter
   );
   svg.querySelector('defs').appendChild(filter);
 };

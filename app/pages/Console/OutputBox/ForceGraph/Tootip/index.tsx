@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { observer } from 'mobx-react-lite';
 import { LinkObject, NodeObject } from '@vesoft-inc/force-graph';
 import { onPointerMove } from '@app/utils';
@@ -6,15 +6,15 @@ import { convertBigNumberToString, removeNullCharacters } from '@app/utils/funct
 import rootStore, { useStore } from '@app/stores';
 import styles from './index.module.less';
 
-function NodeTooltip({ node, style, show }: { node: NodeObject; style: React.CSSProperties, show: boolean }) {
-  if(!show) {
+function NodeTooltip({ node, style, show }: { node: NodeObject; style: React.CSSProperties; show: boolean }) {
+  if (!show) {
     return null;
   }
   const { id = '', spaceVidType, properties = {}, tags = [], style: nodeStyle } = node || {};
 
   const propertyElement = Object.keys(properties).reduce((ret, property) => {
     const valueObj = properties[property];
-    Object.keys(valueObj).forEach(fields => {
+    Object.keys(valueObj).forEach((fields) => {
       const fildValue = valueObj[fields]?.toString();
       const key = `${property}.${fields}`;
       ret.push(
@@ -46,15 +46,16 @@ function NodeTooltip({ node, style, show }: { node: NodeObject; style: React.CSS
   );
 }
 
-function LinkTooltipo({ link, style, show }: { link: LinkObject; style: React.CSSProperties, show: boolean }) {
-  if(!show) {
+function LinkTooltipo({ link, style, show }: { link: LinkObject; style: React.CSSProperties; show: boolean }) {
+  if (!show) {
     return null;
   }
-  const { properties = {}, id, edgeType } = link || {};
-  if(!edgeType) {
+  const { properties = {}, id } = link || {};
+  const edgeType = link?.edgeType as string;
+  if (!edgeType) {
     return null;
   }
-  const propertyElement = Object.keys(properties).map(property => (
+  const propertyElement = Object.keys(properties).map((property) => (
     <div key={property?.toString()}>
       <span>{`${edgeType}.${property}: `}</span>
       <span>{properties[property]?.toString()}</span>
@@ -81,8 +82,10 @@ let visible = '';
 let style = {};
 let hovering;
 const Tooltip = observer(function Tooltip(props: { id: string }) {
-  const { graphInstances: { graphs } } = useStore();
-  if(!graphs[props.id]) {
+  const {
+    graphInstances: { graphs },
+  } = useStore();
+  if (!graphs[props.id]) {
     return null;
   }
   const { nodeHovering, linkHovering, pointer } = graphs[props.id];
@@ -100,27 +103,36 @@ const Tooltip = observer(function Tooltip(props: { id: string }) {
   }
   return (
     <>
-      <NodeTooltip show={visible === 'node'} node={hovering} style={{ ...style, display: visible === 'node' ? 'block' : 'none' }} />
-      <LinkTooltipo show={visible === 'link'} link={hovering} style={{ ...style, display: visible === 'link' ? 'block' : 'none' }} />
+      <NodeTooltip
+        show={visible === 'node'}
+        node={hovering}
+        style={{ ...style, display: visible === 'node' ? 'block' : 'none' }}
+      />
+      <LinkTooltipo
+        show={visible === 'link'}
+        link={hovering}
+        style={{ ...style, display: visible === 'link' ? 'block' : 'none' }}
+      />
     </>
   );
 });
 
 export default Tooltip;
 
-export function initTooltip({ container, id }: { container: HTMLElement, id: string}) {
+export function initTooltip({ container, id }: { container: HTMLElement; id: string }) {
   const { graphs } = rootStore.graphInstances;
   const { setPointer } = graphs[id];
 
   const dom = document.createElement('div');
   const disposer = onPointerMove(container, setPointer);
+  const root = createRoot(dom);
 
-  ReactDOM.render(<Tooltip id={id} />, dom);
+  root.render(<Tooltip id={id} />);
   container.appendChild(dom);
 
   return () => {
     disposer();
+    root.unmount();
     container.removeChild(dom);
-    ReactDOM.unmountComponentAtNode(container);
   };
 }

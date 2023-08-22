@@ -3,7 +3,7 @@
  *
  * @interface DefaultLine
  */
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { ISketchEdge } from '@app/interfaces/sketch';
 import { LineRender } from '@vesoft-inc/veditor/types/Shape/Lines/Line';
 import { DefaultLine } from '@vesoft-inc/veditor';
@@ -15,7 +15,7 @@ import { InstanceNodePoint } from '@vesoft-inc/veditor/types/Shape/Node';
 import { mat2d } from 'gl-matrix';
 import styles from './index.module.less';
 
-// get Angle for point in svg coordinate system 
+// get Angle for point in svg coordinate system
 const getPointAngle = (pointNode: InstanceNodePoint, graph): number => {
   const node = graph.node.nodes[pointNode.nodeId];
   const p = [pointNode.data.x, pointNode.data.y];
@@ -29,9 +29,9 @@ const getPointAngle = (pointNode: InstanceNodePoint, graph): number => {
 
   if (angle > -Math.PI / 4 && angle < Math.PI / 4) {
     return 0;
-  } else if (angle > Math.PI / 4 && angle < Math.PI * 3 / 4) {
+  } else if (angle > Math.PI / 4 && angle < (Math.PI * 3) / 4) {
     return Math.PI / 2;
-  } else if (angle > Math.PI * 5 / 4 && angle < Math.PI * 7 / 4 || (angle < -Math.PI / 4)) {
+  } else if ((angle > (Math.PI * 5) / 4 && angle < (Math.PI * 7) / 4) || angle < -Math.PI / 4) {
     return -Math.PI / 2;
   } else {
     return Math.PI;
@@ -42,7 +42,12 @@ const getSelfLoopLineIndex = (line: InstanceLine, graph) => {
   let index = 0;
   for (const lineId in graph.line.lines) {
     const each = graph.line.lines[lineId].data;
-    if (each.from === each.to && each.from === from.nodeId && each.fromPoint === from.index && each.toPoint === to.index) {
+    if (
+      each.from === each.to &&
+      each.from === from.nodeId &&
+      each.fromPoint === from.index &&
+      each.toPoint === to.index
+    ) {
       if (lineId === line.data.uuid) {
         break;
       }
@@ -57,27 +62,23 @@ const Path: LineRender = {
   arcRatio: 4,
   ...DefaultLine,
 
-  makePath(
-    from,
-    to,
-    line
-  ) {
+  makePath(from, to, line) {
     const fromNode = this.graph.node.nodes[from.nodeId];
     const src = {
-      x: fromNode.data.x + NODE_RADIUS, 
-      y: fromNode.data.y + NODE_RADIUS
+      x: fromNode.data.x + NODE_RADIUS,
+      y: fromNode.data.y + NODE_RADIUS,
     };
     const toNode = this.graph.node.nodes[to.nodeId];
     const dst = {
       x: toNode.data.x + NODE_RADIUS,
-      y: toNode.data.y + NODE_RADIUS
+      y: toNode.data.y + NODE_RADIUS,
     };
     const curvature = getLinkCurvature(line);
     const l = Math.sqrt(Math.pow(dst.x - src.x, 2) + Math.pow(dst.y - src.y, 2));
     let startControlPoint;
     let endControlPoint;
     let path;
-    if(l >= NODE_RADIUS * 2) {
+    if (l >= NODE_RADIUS * 2) {
       const a = Math.atan2(dst.y - src.y, dst.x - src.x);
       const d = l * curvature;
       const cp = {
@@ -92,16 +93,23 @@ const Path: LineRender = {
         x: cp.x + (dst.x - cp.x) * 0.3,
         y: cp.y + (dst.y - cp.y) * 0.3,
       };
-      const bzLine = new Bezier(src.x, src.y, startControlPoint.x, startControlPoint.y, endControlPoint.x, endControlPoint.y, dst.x, dst.y);
-      const lineLen = bzLine
-        ? bzLine.length()
-        : Math.sqrt(Math.pow(dst.x - src.x, 2) + Math.pow(dst.y - src.y, 2));
+      const bzLine = new Bezier(
+        src.x,
+        src.y,
+        startControlPoint.x,
+        startControlPoint.y,
+        endControlPoint.x,
+        endControlPoint.y,
+        dst.x,
+        dst.y,
+      );
+      const lineLen = bzLine ? bzLine.length() : Math.sqrt(Math.pow(dst.x - src.x, 2) + Math.pow(dst.y - src.y, 2));
       const getCoordsAlongLine = bzLine
-        ? (t) => bzLine.get(t) 
+        ? (t) => bzLine.get(t)
         : (t) => ({
-          x: src.x + (dst.x - src.x) * t || 0,
-          y: src.y + (dst.y - src.y) * t || 0,
-        });
+            x: src.x + (dst.x - src.x) * t || 0,
+            y: src.y + (dst.y - src.y) * t || 0,
+          });
       const startPos = getCoordsAlongLine((NODE_RADIUS + 8) / lineLen);
       const endPos = getCoordsAlongLine((lineLen - NODE_RADIUS - 8) / lineLen);
       const pathString = `M${startPos.x} ${startPos.y}`;
@@ -117,10 +125,10 @@ const Path: LineRender = {
           y: dst.y,
         },
         startControlPoint,
-        endControlPoint
+        endControlPoint,
       };
     } else if (l <= 0 && from.nodeId === to.nodeId) {
-      // from.nodeId === to.nodeId Avoid two circles completely coincident 
+      // from.nodeId === to.nodeId Avoid two circles completely coincident
       const selfLoopRadius = 30;
       const startSpace = 8;
       const endSpace = 8;
@@ -133,9 +141,9 @@ const Path: LineRender = {
       end.x += endSpace * Math.cos(endAngle);
       end.y += endSpace * Math.sin(endAngle);
       const selfLoopIndex = getSelfLoopLineIndex(line, this.graph);
-      const angle = (from.index === to.index) ? 0 : (Math.PI / (selfLoopRadius / 10 + selfLoopIndex));
+      const angle = from.index === to.index ? 0 : Math.PI / (selfLoopRadius / 10 + selfLoopIndex);
       const dis = Math.sqrt(Math.pow(from.x - to.x, 2) + Math.pow(from.y - to.y, 2));
-      const radius = (dis / 2) / Math.sin(angle / 2);
+      const radius = dis / 2 / Math.sin(angle / 2);
       path = `M${from.x} ${from.y} A ${radius} ${radius} 0 1 0 ${end.x} ${end.y} L${to.x} ${to.y}`;
     } else {
       path = `M${from.x} ${from.y} L${to.x} ${to.y}`;
@@ -174,28 +182,52 @@ const Path: LineRender = {
     let { x, y } = pointLen || {};
     const fromPoint = line.bezierData ? line.bezierData.from : line.from;
     const toPoint = line.bezierData ? line.bezierData.to : line.to;
-    const angle = Math.atan((fromPoint.y - toPoint.y) / (fromPoint.x - toPoint.x)) * 180 / Math.PI;
-    if(name || invalid) {
+    const angle = (Math.atan((fromPoint.y - toPoint.y) / (fromPoint.x - toPoint.x)) * 180) / Math.PI;
+    if (name || invalid) {
       const width = totalLen ? totalLen * 0.4 : 15;
-      ReactDOM.render(
+      // @ts-ignore
+      const root = line.label.labelGroup.__reactRoot || createRoot(line.label.labelGroup);
+      // @ts-ignore
+      // keep the root, avoid `react createroot multiple times` warning
+      line.label.labelGroup.__reactRoot = root;
+      root.render(
         <>
-          <foreignObject x={x - width / 2} y={y - 10}
-            width={width} height={20} 
-            textAnchor="middle" transform-origin={`${x} ${y}`}
-            style={{ transform: `rotate(${angle}deg)` }}>
+          <foreignObject
+            x={x - width / 2}
+            y={y - 10}
+            width={width}
+            height={20}
+            textAnchor="middle"
+            transform-origin={`${x} ${y}`}
+            style={{ transform: `rotate(${angle}deg)` }}
+          >
             <div className={styles.edgeLabel}>
-              <span style={{ paddingRight: invalid ? '10px' : undefined, maxWidth: width, backgroundColor: (textBackgroundColor) as string }}>
+              <span
+                style={{
+                  paddingRight: invalid ? '10px' : undefined,
+                  maxWidth: width,
+                  backgroundColor: textBackgroundColor as string,
+                }}
+              >
                 {name}
-                {invalid && <span className={styles.invalid} style={ !name ? {
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)'
-                } : undefined} />}
+                {invalid && (
+                  <span
+                    className={styles.invalid}
+                    style={
+                      !name
+                        ? {
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                          }
+                        : undefined
+                    }
+                  />
+                )}
               </span>
             </div>
           </foreignObject>
         </>,
-        line.label.labelGroup
       );
     }
     return line.label.labelGroup;
@@ -203,28 +235,23 @@ const Path: LineRender = {
   renderArrow(line: InstanceLine): SVGElement {
     const { from, to } = line;
     let path;
-    const svgEl = line.arrow ? line.arrow : window.document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'g'
-    );
-    const arrow = line.arrow ? line.arrow.children[0] : window.document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'path'
-    );
-    const arrowShadow = line.arrow ? line.arrow.children[1] : window.document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'path'
-    );
-    if(from.nodeId !== to.nodeId) {
+    const svgEl = line.arrow ? line.arrow : window.document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    const arrow = line.arrow
+      ? line.arrow.children[0]
+      : window.document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const arrowShadow = line.arrow
+      ? line.arrow.children[1]
+      : window.document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    if (from.nodeId !== to.nodeId) {
       const fromNode = this.graph.node.nodes[from.nodeId];
       const src = {
-        x: fromNode.data.x + NODE_RADIUS, 
-        y: fromNode.data.y + NODE_RADIUS
+        x: fromNode.data.x + NODE_RADIUS,
+        y: fromNode.data.y + NODE_RADIUS,
       };
       const toNode = this.graph.node.nodes[to.nodeId];
       const dst = {
         x: toNode.data.x + NODE_RADIUS,
-        y: toNode.data.y + NODE_RADIUS
+        y: toNode.data.y + NODE_RADIUS,
       };
       const ARROW_WH_RATIO = 0.5;
       const ARROW_LENGTH = 6;
@@ -234,17 +261,26 @@ const Path: LineRender = {
       const arrowRelPos = 1;
       const arrowHalfWidth = ARROW_LENGTH / ARROW_WH_RATIO / 2;
       const { from: bezierFrom, to: bezierTo, startControlPoint, endControlPoint } = line.bezierData || {};
-      const bzLine = line.bezierData && new Bezier(bezierFrom.x, bezierFrom.y, startControlPoint.x, startControlPoint.y, endControlPoint.x, endControlPoint.y, bezierTo.x, bezierTo.y);
+      const bzLine =
+        line.bezierData &&
+        new Bezier(
+          bezierFrom.x,
+          bezierFrom.y,
+          startControlPoint.x,
+          startControlPoint.y,
+          endControlPoint.x,
+          endControlPoint.y,
+          bezierTo.x,
+          bezierTo.y,
+        );
       const getCoordsAlongLine = bzLine
-        ? (t) => bzLine.get(t) 
+        ? (t) => bzLine.get(t)
         : (t) => ({
-          x: src.x + (dst.x - src.x) * t || 0,
-          y: src.y + (dst.y - src.y) * t || 0,
-        });
+            x: src.x + (dst.x - src.x) * t || 0,
+            y: src.y + (dst.y - src.y) * t || 0,
+          });
 
-      const lineLen = bzLine
-        ? bzLine.length()
-        : Math.sqrt(Math.pow(dst.x - src.x, 2) + Math.pow(dst.y - src.y, 2));
+      const lineLen = bzLine ? bzLine.length() : Math.sqrt(Math.pow(dst.x - src.x, 2) + Math.pow(dst.y - src.y, 2));
 
       const posAlongLine = startR + ARROW_LENGTH + (lineLen - startR - endR - ARROW_LENGTH - 7) * arrowRelPos;
       const arrowHead = getCoordsAlongLine(posAlongLine / lineLen);
@@ -254,7 +290,9 @@ const Path: LineRender = {
 
       const cosVal = arrowHalfWidth * Math.cos(arrowTailAngle);
       const sinVal = arrowHalfWidth * Math.sin(arrowTailAngle);
-      path = `M${arrowTail.x + cosVal} ${arrowTail.y + sinVal} L${arrowHead.x} ${arrowHead.y} L${arrowTail.x - cosVal} ${arrowTail.y - sinVal}`;
+      path = `M${arrowTail.x + cosVal} ${arrowTail.y + sinVal} L${arrowHead.x} ${arrowHead.y} L${
+        arrowTail.x - cosVal
+      } ${arrowTail.y - sinVal}`;
     } else {
       const angle = getPointAngle(to, this.graph);
       path = `M${10} ${5}L${0} ${0}L${10} ${-5}`;
@@ -266,7 +304,7 @@ const Path: LineRender = {
     }
     arrow.setAttribute('d', path);
     arrowShadow.setAttribute('d', path);
-    if(!line.arrow) {
+    if (!line.arrow) {
       arrow.setAttribute('class', styles.arrow);
       arrowShadow.setAttribute('class', styles.arrowShadow);
       svgEl.appendChild(arrow);
