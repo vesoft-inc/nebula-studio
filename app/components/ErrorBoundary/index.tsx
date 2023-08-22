@@ -6,7 +6,7 @@ import { Button, message } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import styles from './index.module.less';
 
-type IProps = RouteComponentProps;
+type IProps = RouteComponentProps & { children: React.ReactNode };
 interface IState {
   errInfo: string;
 }
