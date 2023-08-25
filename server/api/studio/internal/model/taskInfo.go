@@ -27,7 +27,7 @@ type TaskInfo struct {
 	TaskStatus    string `gorm:"column:task_status;"`
 	TaskMessage   string `gorm:"column:task_message;"`
 	Stats         Stats  `gorm:"embedded"`
-	RawConfig     string `gorm:"column:raw_config;type:text;"`
+	RawConfig     string `gorm:"column:raw_config;type:mediumtext;"`
 
 	CreateTime time.Time `gorm:"column:create_time;type:datetime;autoCreateTime"`
 	UpdateTime time.Time `gorm:"column:update_time;type:datetime;autoUpdateTime"`

@@ -22,13 +22,14 @@ const DelimiterConfigModal = (props: { onConfirm: (string) => void }) => {
   const { intl } = useI18n();
   const [value, setValue] = useState('');
   return (
-    <div className={styles.configForm} onClick={(e) => e.stopPropagation()}>
+    <div>
       <span className={styles.title}>{intl.get('common.value')}</span>
       <Input
         className={styles.input}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={intl.get('import.enterDelimiter')}
+        onClick={(e) => e.stopPropagation()}
       />
       <Button className={cls('primaryBtn', styles.btn)} onClick={() => props.onConfirm(value)}>
         {intl.get('import.applicateToAll')}
@@ -47,25 +48,17 @@ const FileConfigSetting = (props: IProps) => {
       previewContent: [],
       loading: false,
       uploading: false,
-      modalOpen: false,
       setState: (obj) => Object.assign(state, obj),
     }),
     { data: observable.ref, activeItem: observable.ref },
   );
   const { readRemoteFile, readString } = usePapaParse();
-  const closeDelimiterConfigModal = useCallback((e: MouseEvent) => {
-    state.modalOpen && setState({ modalOpen: false });
-  }, []);
   useEffect(() => {
     const { setState } = state;
     setState({
       data: preUploadList,
       activeItem: preUploadList[0],
     });
-    window.document.addEventListener('click', closeDelimiterConfigModal);
-    return () => {
-      window.document.removeEventListener('click', closeDelimiterConfigModal);
-    };
   }, []);
   useEffect(() => {
     state.activeItem && readFile();
@@ -144,7 +137,6 @@ const FileConfigSetting = (props: IProps) => {
     const { data, setState } = state;
     setState({
       data: data.map((item) => ((item.delimiter = value), item)),
-      modalOpen: false,
     });
     readFile();
   }, []);
@@ -192,7 +184,7 @@ const FileConfigSetting = (props: IProps) => {
     !uploading && onCancel();
   }, []);
 
-  const { modalOpen, uploading, data, activeItem, previewContent, loading, setState } = state;
+  const { uploading, data, activeItem, previewContent, loading, setState } = state;
   const parseColumns = previewContent.length
     ? previewContent[0].map((header, index) => {
         const textIndex = index;
@@ -212,10 +204,6 @@ const FileConfigSetting = (props: IProps) => {
       label: <DelimiterConfigModal onConfirm={updateAllDelimiter} />,
     },
   ];
-  const openModal = useCallback((e) => {
-    e.stopPropagation();
-    setState({ modalOpen: true });
-  }, []);
   const columns = [
     {
       title: intl.get('import.fileName'),
@@ -243,13 +231,12 @@ const FileConfigSetting = (props: IProps) => {
         <>
           <span>{intl.get('import.delimiter')}</span>
           <Dropdown
-            trigger={['click']}
-            open={modalOpen}
+            trigger={['hover']}
             menu={{ items: dropMenus }}
             overlayClassName={styles.delimiterConfigContainer}
             placement="bottomLeft"
           >
-            <Icon className={styles.btnMore} type="icon-studio-more" onClick={openModal} />
+            <Icon className={styles.btnMore} type="icon-studio-more" />
           </Dropdown>
         </>
       ),
