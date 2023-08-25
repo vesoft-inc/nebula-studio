@@ -37,6 +37,7 @@ const htmlPlugin = (data?: Record<string, unknown>): Plugin => {
 export default defineConfig({
   build: {
     target: 'esnext',
+    sourcemap: true,
   },
   plugins: [
     react(),

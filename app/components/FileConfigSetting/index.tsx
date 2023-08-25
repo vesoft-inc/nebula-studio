@@ -29,6 +29,7 @@ const DelimiterConfigModal = (props: { onConfirm: (string) => void }) => {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={intl.get('import.enterDelimiter')}
+        onClick={(e) => e.stopPropagation()}
       />
       <Button className={cls('primaryBtn', styles.btn)} onClick={() => props.onConfirm(value)}>
         {intl.get('import.applicateToAll')}
