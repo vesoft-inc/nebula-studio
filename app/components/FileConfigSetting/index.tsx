@@ -2,7 +2,7 @@ import Icon from '@app/components/Icon';
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Input, Modal, Table, Popconfirm, Dropdown, MenuProps } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { usePapaParse } from 'react-papaparse';
 import cls from 'classnames';
 import { StudioFile } from '@app/interfaces/import';
@@ -40,7 +40,6 @@ const DelimiterConfigModal = (props: { onConfirm: (string) => void }) => {
 const FileConfigSetting = (props: IProps) => {
   const { onConfirm, onCancel, preUploadList, duplicateCheckList } = props;
   const { intl } = useI18n();
-  const ref = useRef(null);
   const state = useLocalObservable(
     () => ({
       data: [],
@@ -266,7 +265,7 @@ const FileConfigSetting = (props: IProps) => {
     },
   ];
   return (
-    <div ref={ref}>
+    <div>
       <div className={styles.container}>
         <div className={styles.left}>
           <Table
