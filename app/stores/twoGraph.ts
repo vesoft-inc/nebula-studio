@@ -77,8 +77,10 @@ class TwoGraph {
     this.canvas = this.container.querySelector('canvas');
     Graph.d3Force('link')!.distance((d) => {
       return d.lineLength || LINE_LENGTH;
-    });
-    Graph.d3Force('charge')!.strength(-150);
+    }).strength(0.05);
+    Graph.d3Force('x', forceX().strength(0.0085));
+    Graph.d3Force('y', forceY().strength(0.0085));
+    Graph.d3Force('charge')!.strength(-100);
     Graph.width(1100).height(400);
     Graph.onZoom((v) => {
       this.setTransform(v);
@@ -87,7 +89,7 @@ class TwoGraph {
       });
       Graph.linkVisibility(() => false);
     })
-      .d3AlphaDecay(0.05)
+      .d3AlphaDecay(0.01)
       .onZoomEnd(() => Graph.linkVisibility(() => true))
       .minZoom(0.1)
       .nodeVal((node) => {
