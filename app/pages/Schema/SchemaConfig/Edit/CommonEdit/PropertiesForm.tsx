@@ -9,16 +9,16 @@ import styles from './index.module.less';
 const confirm = Modal.confirm;
 
 interface IProps {
-  editType: ISchemaType
+  editType: ISchemaType;
   initialRequired: boolean;
   data: any;
   editDisabled: boolean;
   onBeforeEdit: (index: number | null) => void;
-  onEdit: (config: IAlterForm) => void;
+  onEdit: (config: IAlterForm) => boolean;
 }
 
 interface IEditProperty extends IProperty {
-  alterType: AlterType
+  alterType: AlterType;
 }
 const itemLayout = {
   wrapperCol: {
@@ -27,13 +27,14 @@ const itemLayout = {
 };
 
 const PropertiesForm = (props: IProps) => {
-  const { 
-    editType, 
-    initialRequired, 
-    data: { name, properties, ttlConfig }, 
+  const {
+    editType,
+    initialRequired,
+    data: { name, properties, ttlConfig },
     editDisabled,
-    onEdit, 
-    onBeforeEdit } = props;
+    onEdit,
+    onBeforeEdit,
+  } = props;
   const { intl } = useI18n();
   const [list, setList] = useState<IProperty[]>(properties);
   const [editField, setEditField] = useState<IEditProperty | null>(null);
@@ -48,13 +49,13 @@ const PropertiesForm = (props: IProps) => {
   useEffect(() => {
     setPropertyRequired(initialRequired);
   }, [initialRequired]);
-  
+
   useEffect(() => {
     form.resetFields();
   }, [editField]);
-  const handleClearProperties = e => {
+  const handleClearProperties = (e) => {
     const clear = e.target.checked;
-    if(clear) {
+    if (clear) {
       setPropertyRequired(clear);
       handlePropertyAdd();
     } else {
@@ -63,10 +64,12 @@ const PropertiesForm = (props: IProps) => {
         content: intl.get('schema.cancelPropmt'),
         okText: intl.get('common.yes'),
         cancelText: intl.get('common.no'),
-        onOk: () => {
-          setPropertyRequired(clear);
+        onOk: async () => {
           if (properties.length > 0) {
-            handlePropertyDelete(properties);
+            const isSuccess = await handlePropertyDelete(properties);
+            isSuccess && setPropertyRequired(clear);
+          } else {
+            setPropertyRequired(clear);
           }
         },
       });
@@ -89,9 +92,8 @@ const PropertiesForm = (props: IProps) => {
     onBeforeEdit(list.length);
   };
 
-
   const handlePropertyDelete = async (fields: IProperty[]) => {
-    onEdit({
+    const isSuccess = await onEdit({
       type: editType,
       name,
       action: 'DROP',
@@ -99,6 +101,7 @@ const PropertiesForm = (props: IProps) => {
         fields,
       },
     });
+    return isSuccess;
   };
 
   const handleEditBefore = (data: IProperty, index: number) => {
@@ -120,12 +123,12 @@ const PropertiesForm = (props: IProps) => {
     onBeforeEdit(null);
     if (editField?.alterType === 'ADD') {
       setList(list.slice(0, -1));
-      if(list.length === 1) {
+      if (list.length === 1) {
         setPropertyRequired(false);
       }
     }
   };
-  
+
   const handlePropertyUpdate = (values) => {
     const { name: propertyName, type, value, comment, allowNull, fixedLength } = values;
     const { alterType } = editField!;
@@ -134,14 +137,16 @@ const PropertiesForm = (props: IProps) => {
       name,
       action: alterType,
       config: {
-        fields: [{
-          name: propertyName,
-          type,
-          value,
-          comment,
-          allowNull,
-          fixedLength
-        }],
+        fields: [
+          {
+            name: propertyName,
+            type,
+            value,
+            comment,
+            allowNull,
+            fixedLength,
+          },
+        ],
       },
     });
   };
@@ -150,11 +155,7 @@ const PropertiesForm = (props: IProps) => {
     form.setFieldsValue({ value: '' });
   };
   return (
-    <Form 
-      form={form} 
-      className={styles.formItem}
-      {...itemLayout}
-      onFinish={handlePropertyUpdate}>
+    <Form form={form} className={styles.formItem} {...itemLayout} onFinish={handlePropertyUpdate}>
       <Form.Item>
         <Checkbox disabled={editDisabled} checked={propertyRequired} onChange={handleClearProperties}>
           <span className={styles.label}>{intl.get('schema.defineFields')}</span>
@@ -163,34 +164,41 @@ const PropertiesForm = (props: IProps) => {
       <Form.Item noStyle shouldUpdate={true}>
         <div className={styles.boxContainer}>
           <Form.Item noStyle>
-            <Button 
-              type="primary" 
-              className="studioAddBtn" 
+            <Button
+              type="primary"
+              className="studioAddBtn"
               disabled={!propertyRequired || editDisabled || editField !== null}
-              onClick={handlePropertyAdd}>
+              onClick={handlePropertyAdd}
+            >
               <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
               {intl.get('common.addProperty')}
             </Button>
           </Form.Item>
           <Form.Item noStyle>
             <Row className={styles.formHeader}>
-              <Col span={4} className={styles.requiredItem}>{intl.get('common.propertyName')}</Col>
-              <Col span={6} className={styles.requiredItem}>{intl.get('common.dataType')}</Col>
+              <Col span={4} className={styles.requiredItem}>
+                {intl.get('common.propertyName')}
+              </Col>
+              <Col span={6} className={styles.requiredItem}>
+                {intl.get('common.dataType')}
+              </Col>
               <Col span={2}>{intl.get('common.allowNull')}</Col>
               <Col span={5}>{intl.get('common.defaults')}</Col>
               <Col span={4}>{intl.get('common.comment')}</Col>
             </Row>
           </Form.Item>
           {list.map((item, index) => {
-            return editRow === index 
-              ? <EditRow key={index} data={editField} onUpdateType={handleResetValue} onEditCancel={handleEditCancel} /> 
-              : <DisplayRow
+            return editRow === index ? (
+              <EditRow key={index} data={editField} onUpdateType={handleResetValue} onEditCancel={handleEditCancel} />
+            ) : (
+              <DisplayRow
                 key={index}
                 data={item}
                 disabled={editDisabled}
                 onDelete={handlePropertyDelete}
                 onEditBefore={(item) => handleEditBefore(item, index)}
-              />;
+              />
+            );
           })}
         </div>
       </Form.Item>

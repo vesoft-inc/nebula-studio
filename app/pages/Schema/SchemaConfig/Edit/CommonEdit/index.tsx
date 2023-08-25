@@ -32,14 +32,14 @@ interface IPropertyItem {
 interface IData {
   name: string;
   comment: string;
-  properties: IProperty[],
+  properties: IProperty[];
   ttlConfig: {
-    duration: string,
-    col: string
-  }
+    duration: string;
+    col: string;
+  };
 }
 interface IProps {
-  editType: ISchemaType
+  editType: ISchemaType;
 }
 const ConfigEdit = (props: IProps) => {
   const { editType } = props;
@@ -48,7 +48,9 @@ const ConfigEdit = (props: IProps) => {
   const { intl } = useI18n();
   const [editName, setEditName] = useState('');
   const [editKey, setEditKey] = useState<string | null>(null);
-  const { schema: { getTagOrEdgeDetail, getTagOrEdgeInfo, alterField, getIndexTree } } = useStore();
+  const {
+    schema: { getTagOrEdgeDetail, getTagOrEdgeInfo, alterField, getIndexTree },
+  } = useStore();
   const [tempComment, setTempComment] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<IData>({
@@ -57,8 +59,8 @@ const ConfigEdit = (props: IProps) => {
     properties: [],
     ttlConfig: {
       col: '',
-      duration: ''
-    }
+      duration: '',
+    },
   } as IData);
   const [ttlRequired, setTtlRequired] = useState(false);
   const [propertiesRequired, setPropertiesRequired] = useState(false);
@@ -69,16 +71,13 @@ const ConfigEdit = (props: IProps) => {
 
   const getDetails = async () => {
     const _editName = state[editType];
-    if(!_editName) {
+    if (!_editName) {
       history.push(`/schema/${editType}/list`);
     }
     setEditName(_editName);
     setLoading(true);
     const createGql = await getTagOrEdgeDetail(editType, _editName);
-    const { code: propCode, data: propData } = await getTagOrEdgeInfo(
-      editType,
-      _editName,
-    );
+    const { code: propCode, data: propData } = await getTagOrEdgeInfo(editType, _editName);
     setLoading(false);
     if (createGql) {
       const fieldInfo = propCode === 0 ? propData.tables : [];
@@ -90,17 +89,16 @@ const ConfigEdit = (props: IProps) => {
     const reg = /CREATE (?:TAG|EDGE)\s`.+`\s\((.*)\)\s+(ttl_duration = \d+),\s+(ttl_col = ".*?")(, comment = ".*")?/gm;
     const str = data.replace(/[\r\n]/g, ' ');
     const infoList = reg.exec(str) || [];
-    const properties: IProperty[] = fieldInfo.map(i => ({
-      name: i.Field,
-      showType: i.Type,
-      type: i.Type.startsWith('fixed_string') ? 'fixed_string' : i.Type,
-      allowNull: i.Null === 'YES',
-      comment: i.Comment === '_EMPTY_' ? '' : i.Comment,
-      value: i.Default === '_EMPTY_' ? '' : convertBigNumberToString(i.Default),
-      fixedLength: i.Type.startsWith('fixed_string')
-        ? i.Type.replace(/[fixed_string(|)]/g, '')
-        : '',
-    })) || [];
+    const properties: IProperty[] =
+      fieldInfo.map((i) => ({
+        name: i.Field,
+        showType: i.Type,
+        type: i.Type.startsWith('fixed_string') ? 'fixed_string' : i.Type,
+        allowNull: i.Null === 'YES',
+        comment: i.Comment === '_EMPTY_' ? '' : i.Comment,
+        value: i.Default === '_EMPTY_' ? '' : convertBigNumberToString(i.Default),
+        fixedLength: i.Type.startsWith('fixed_string') ? i.Type.replace(/[fixed_string(|)]/g, '') : '',
+      })) || [];
     const duration = infoList[2]?.split(' = ')[1] || '';
     const col = infoList[3]?.split(' = ')[1].replace(/"/g, '') || '';
     const comment = infoList[4]?.split(' = ')[1].slice(1, -1) || '';
@@ -114,8 +112,8 @@ const ConfigEdit = (props: IProps) => {
       properties,
       ttlConfig: {
         col,
-        duration
-      }
+        duration,
+      },
     });
     setTempComment(comment);
   };
@@ -134,6 +132,7 @@ const ConfigEdit = (props: IProps) => {
       await getDetails();
       setEditKey(null);
     }
+    return res.code === 0;
   };
   const handleCommentUpdate = async () => {
     setLoading(true);
@@ -156,15 +155,13 @@ const ConfigEdit = (props: IProps) => {
     setLoading(true);
     const res = (await getIndexTree(editType)) || [];
     setLoading(false);
-    const hasIndex = res.some(i => i.name === editName);
+    const hasIndex = res.some((i) => i.name === editName);
     return hasIndex;
   };
   return (
     <div className={styles.configEditGroup}>
       <Spin delay={400} spinning={loading}>
-        <Form
-          layout="vertical" 
-          {...formItemLayout}>
+        <Form layout="vertical" {...formItemLayout}>
           <Form.Item noStyle shouldUpdate={true}>
             <Row className={styles.formItem}>
               <Col span={12}>
@@ -179,36 +176,24 @@ const ConfigEdit = (props: IProps) => {
                     className={styles.inputComment}
                     defaultValue={data.comment}
                     value={tempComment}
-                    onChange={e => setTempComment(e.target.value)}
+                    onChange={(e) => setTempComment(e.target.value)}
                   />
                   {editKey !== 'comment' ? (
                     <>
-                      <Button
-                        disabled={editKey !== null}
-                        type="link"
-                        onClick={handleCommentEditStart}
-                      >
+                      <Button disabled={editKey !== null} type="link" onClick={handleCommentEditStart}>
                         {intl.get('common.edit')}
                       </Button>
                     </>
                   ) : (
                     <>
-                      <Button
-                        type="link"
-                        onClick={handleCommentUpdate}
-                      >
+                      <Button type="link" onClick={handleCommentUpdate}>
                         {intl.get('common.ok')}
                       </Button>
-                      <Button
-                        type="link"
-                        danger
-                        onClick={handleCommentCancel}
-                      >
+                      <Button type="link" danger onClick={handleCommentCancel}>
                         {intl.get('common.cancel')}
                       </Button>
                     </>
                   )}
-                  
                 </Form.Item>
               </Col>
             </Row>
@@ -219,15 +204,16 @@ const ConfigEdit = (props: IProps) => {
           editDisabled={editKey !== null}
           onBeforeEdit={(index) => setEditKey(index !== null ? `properties[${index}]` : null)}
           initialRequired={propertiesRequired}
-          onEdit={handleAlter} 
-          data={data} />
-        <TTLForm 
+          onEdit={handleAlter}
+          data={data}
+        />
+        <TTLForm
           editType={editType}
           editDisabled={editKey !== null}
-          initialRequired={ttlRequired} 
+          initialRequired={ttlRequired}
           data={data}
           onEdit={handleAlter}
-          checkIndex={checkIndex} 
+          checkIndex={checkIndex}
           onBeforeEdit={(type?: null) => setEditKey(type === null ? null : 'ttl')}
         />
       </Spin>

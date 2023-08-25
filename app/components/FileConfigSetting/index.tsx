@@ -2,7 +2,7 @@ import Icon from '@app/components/Icon';
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Input, Modal, Table, Popconfirm, Dropdown, MenuProps } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePapaParse } from 'react-papaparse';
 import cls from 'classnames';
 import { StudioFile } from '@app/interfaces/import';
@@ -22,7 +22,7 @@ const DelimiterConfigModal = (props: { onConfirm: (string) => void }) => {
   const { intl } = useI18n();
   const [value, setValue] = useState('');
   return (
-    <div>
+    <div className={styles.configForm} onClick={(e) => e.stopPropagation()}>
       <span className={styles.title}>{intl.get('common.value')}</span>
       <Input
         className={styles.input}
@@ -39,6 +39,7 @@ const DelimiterConfigModal = (props: { onConfirm: (string) => void }) => {
 const FileConfigSetting = (props: IProps) => {
   const { onConfirm, onCancel, preUploadList, duplicateCheckList } = props;
   const { intl } = useI18n();
+  const ref = useRef(null);
   const state = useLocalObservable(
     () => ({
       data: [],
@@ -46,17 +47,25 @@ const FileConfigSetting = (props: IProps) => {
       previewContent: [],
       loading: false,
       uploading: false,
+      modalOpen: false,
       setState: (obj) => Object.assign(state, obj),
     }),
     { data: observable.ref, activeItem: observable.ref },
   );
   const { readRemoteFile, readString } = usePapaParse();
+  const closeDelimiterConfigModal = useCallback((e: MouseEvent) => {
+    state.modalOpen && setState({ modalOpen: false });
+  }, []);
   useEffect(() => {
     const { setState } = state;
     setState({
       data: preUploadList,
       activeItem: preUploadList[0],
     });
+    window.document.addEventListener('click', closeDelimiterConfigModal);
+    return () => {
+      window.document.removeEventListener('click', closeDelimiterConfigModal);
+    };
   }, []);
   useEffect(() => {
     state.activeItem && readFile();
@@ -135,6 +144,7 @@ const FileConfigSetting = (props: IProps) => {
     const { data, setState } = state;
     setState({
       data: data.map((item) => ((item.delimiter = value), item)),
+      modalOpen: false,
     });
     readFile();
   }, []);
@@ -182,7 +192,7 @@ const FileConfigSetting = (props: IProps) => {
     !uploading && onCancel();
   }, []);
 
-  const { uploading, data, activeItem, previewContent, loading, setState } = state;
+  const { modalOpen, uploading, data, activeItem, previewContent, loading, setState } = state;
   const parseColumns = previewContent.length
     ? previewContent[0].map((header, index) => {
         const textIndex = index;
@@ -202,6 +212,10 @@ const FileConfigSetting = (props: IProps) => {
       label: <DelimiterConfigModal onConfirm={updateAllDelimiter} />,
     },
   ];
+  const openModal = useCallback((e) => {
+    e.stopPropagation();
+    setState({ modalOpen: true });
+  }, []);
   const columns = [
     {
       title: intl.get('import.fileName'),
@@ -229,12 +243,13 @@ const FileConfigSetting = (props: IProps) => {
         <>
           <span>{intl.get('import.delimiter')}</span>
           <Dropdown
-            trigger={['hover']}
+            trigger={['click']}
+            open={modalOpen}
             menu={{ items: dropMenus }}
             overlayClassName={styles.delimiterConfigContainer}
             placement="bottomLeft"
           >
-            <Icon className={styles.btnMore} type="icon-studio-more" />
+            <Icon className={styles.btnMore} type="icon-studio-more" onClick={openModal} />
           </Dropdown>
         </>
       ),
@@ -264,7 +279,7 @@ const FileConfigSetting = (props: IProps) => {
     },
   ];
   return (
-    <div>
+    <div ref={ref}>
       <div className={styles.container}>
         <div className={styles.left}>
           <Table

@@ -1,4 +1,4 @@
-import { Button, Collapse, Input, Select, Table, Tooltip } from 'antd';
+import { Button, Collapse, CollapseProps, Input, Select, Table, Tooltip } from 'antd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import cls from 'classnames';
@@ -16,7 +16,6 @@ import styles from '../index.module.less';
 import FileSelectModal from './FileSelectModal';
 
 const Option = Select.Option;
-const Panel = Collapse.Panel;
 
 interface IProps {
   item: ITagFileItem | IEdgeFileItem;
@@ -52,51 +51,47 @@ const VIDSetting = observer(
       },
       [data, idKey],
     );
-    useEffect(() => {
-      ([idPrefix, idSuffix, idFunction].some((i) => !!data[i]) || data[idKey].length > 1) && setKey(['default']);
-    }, []);
-    return (
-      <div className={styles.row}>
-        <Collapse bordered={false} ghost className={styles.vidCollapse} onChange={handleChange} activeKey={key}>
-          <Panel
-            header={
-              <div className={cls(styles.panelTitle, styles.spaceBetween)}>
-                <div>
-                  <span className={cls(styles.label, styles.required)}>{intl.get(`import.${label}`)}</span>
-                  <CSVPreviewLink
-                    onMapping={(index) => handleMapping(index)}
-                    // @ts-ignore
-                    file={data.file}
-                    data={data[idKey]}
-                    multipleMode={true}
-                  >
-                    {!data[idKey] || data[idKey].length === 0
-                      ? intl.get('import.selectCsvColumn')
-                      : data[idKey].map((i) => `Column ${i}`).join(', ')}
-                  </CSVPreviewLink>
-                </div>
-                <Instruction
-                  description={
-                    <>
-                      <div>
-                        <span className={styles.title}>{intl.get('import.vidFunction')}</span>
-                        <span>{intl.get('import.vidFunctionTip')}</span>
-                      </div>
-                      <div>
-                        <span className={styles.title}>{intl.get('import.vidPrefix')}</span>
-                        <span>{intl.get('import.vidPrefixTip')}</span>
-                      </div>
-                      <div>
-                        <span className={styles.title}>{intl.get('import.vidSuffix')}</span>
-                        <span>{intl.get('import.vidSuffixTip')}</span>
-                      </div>
-                    </>
-                  }
-                />
-              </div>
-            }
-            key="default"
-          >
+    const items: CollapseProps['items'] = [
+      {
+        key: 'default',
+        label: (
+          <div className={cls(styles.panelTitle, styles.spaceBetween)}>
+            <div>
+              <span className={cls(styles.label, styles.required)}>{intl.get(`import.${label}`)}</span>
+              <CSVPreviewLink
+                onMapping={(index) => handleMapping(index)}
+                // @ts-ignore
+                file={data.file}
+                data={data[idKey]}
+                multipleMode={true}
+              >
+                {!data[idKey] || data[idKey].length === 0
+                  ? intl.get('import.selectCsvColumn')
+                  : data[idKey].map((i) => `Column ${i}`).join(', ')}
+              </CSVPreviewLink>
+            </div>
+            <Instruction
+              description={
+                <>
+                  <div>
+                    <span className={styles.title}>{intl.get('import.vidFunction')}</span>
+                    <span>{intl.get('import.vidFunctionTip')}</span>
+                  </div>
+                  <div>
+                    <span className={styles.title}>{intl.get('import.vidPrefix')}</span>
+                    <span>{intl.get('import.vidPrefixTip')}</span>
+                  </div>
+                  <div>
+                    <span className={styles.title}>{intl.get('import.vidSuffix')}</span>
+                    <span>{intl.get('import.vidSuffixTip')}</span>
+                  </div>
+                </>
+              }
+            />
+          </div>
+        ),
+        children: (
+          <>
             {spaceVidType === 'INT64' && idFunction && (
               <div className={styles.funcItem}>
                 <span className={styles.label}>{intl.get('import.vidFunction')}</span>
@@ -153,15 +148,30 @@ const VIDSetting = observer(
                 <span className={styles.label}>{intl.get('import.preview')}</span>
                 <div className={styles.concatItems}>
                   {data[idPrefix] && <span className={styles.tagItem}>{data[idPrefix]}</span>}
-                  {data[idKey].map((i) => (
+                  {data[idKey]?.map((i) => (
                     <span key={i} className={styles.tagItem}>{`Column ${i}`}</span>
                   ))}
                   {data[idSuffix] && <span className={styles.tagItem}>{data[idSuffix]}</span>}
                 </div>
               </div>
             )}
-          </Panel>
-        </Collapse>
+          </>
+        ),
+      },
+    ];
+    useEffect(() => {
+      ([idPrefix, idSuffix, idFunction].some((i) => !!data[i]) || data[idKey].length > 1) && setKey(['default']);
+    }, []);
+    return (
+      <div className={styles.row}>
+        <Collapse
+          items={items}
+          bordered={false}
+          ghost
+          className={styles.vidCollapse}
+          onChange={handleChange}
+          activeKey={key}
+        />
       </div>
     );
   },

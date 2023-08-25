@@ -46,7 +46,7 @@
     "mobx-react-lite": "^3.4.3",
     "query-string": "^7.1.1",
     "react": "^18.2.0",
-    "react-beautiful-dnd": "^13.0.0",
+    "react-beautiful-dnd": "^13.1.1",
     "react-color": "^2.19.3",
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^18.2.0",

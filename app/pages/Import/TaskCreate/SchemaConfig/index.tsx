@@ -1,4 +1,4 @@
-import { Button, Collapse, Select } from 'antd';
+import { Button, Collapse, CollapseProps, Select } from 'antd';
 import { useCallback } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
@@ -12,7 +12,6 @@ import { ITagItem, IEdgeItem, ITagFileItem, IEdgeFileItem, TagFileItem, EdgeFile
 import { IImportFile } from '@app/interfaces/import';
 import styles from './index.module.less';
 import FileMapping from './FileMapping';
-const { Panel } = Collapse;
 const Option = Select.Option;
 interface IProps {
   configItem: ITagItem | IEdgeItem;
@@ -105,33 +104,35 @@ const SchemaConfig = (props: IProps) => {
     (item: ITagFileItem | IEdgeFileItem) => configItem.deleteFileItem(item as any),
     [configItem],
   );
-  return (
-    <Collapse bordered={false} defaultActiveKey={['default']} className={styles.configCollapse}>
-      <Panel
-        header={<SelectMappingTargetHeader value={name} type={type} onSelect={changeMappingTarget} />}
-        key="default"
-        extra={<CloseOutlined className={styles.btnClose} onClick={handleRemove} />}
-      >
-        {files.map((item: ITagFileItem | IEdgeFileItem, index) => (
-          <FileMapping
-            key={index}
-            type={configItem.type}
-            item={item}
-            onRemove={clearFileSource}
-            onReset={resetFileSource}
-          />
-        ))}
-        {!!name && (
-          <div className={styles.btns}>
-            <Button className="primaryBtn studioAddBtn" onClick={addFileSource}>
-              <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
-              {intl.get('import.bindDatasource')}
-            </Button>
-          </div>
-        )}
-      </Panel>
-    </Collapse>
-  );
+  const items: CollapseProps['items'] = [
+    {
+      key: 'default',
+      label: <SelectMappingTargetHeader value={name} type={type} onSelect={changeMappingTarget} />,
+      extra: <CloseOutlined className={styles.btnClose} onClick={handleRemove} />,
+      children: (
+        <>
+          {files.map((item: ITagFileItem | IEdgeFileItem, index) => (
+            <FileMapping
+              key={index}
+              type={configItem.type}
+              item={item}
+              onRemove={clearFileSource}
+              onReset={resetFileSource}
+            />
+          ))}
+          {!!name && (
+            <div className={styles.btns}>
+              <Button className="primaryBtn studioAddBtn" onClick={addFileSource}>
+                <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
+                {intl.get('import.bindDatasource')}
+              </Button>
+            </div>
+          )}
+        </>
+      ),
+    },
+  ];
+  return <Collapse bordered={false} defaultActiveKey={['default']} className={styles.configCollapse} items={items} />;
 };
 
 export default observer(SchemaConfig);
