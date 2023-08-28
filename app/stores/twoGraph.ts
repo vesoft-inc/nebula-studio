@@ -1,6 +1,7 @@
 import { autorun, makeObservable, observable, reaction, IReactionDisposer } from 'mobx';
 import { FONT_SIZE, LINE_LENGTH, NODE_AREA, NODE_SIZE } from '@app/config/explore';
 import ForceGraph, { ForceGraphInstance, LinkObject, NodeObject } from '@vesoft-inc/force-graph';
+import { forceX, forceY } from 'd3-force-3d';
 import { Bezier } from 'bezier-js';
 import { GraphStore } from './graph';
 import { ITransform } from './types';
@@ -75,9 +76,11 @@ class TwoGraph {
     const { graph } = this;
     const Graph = ForceGraph()(this.container);
     this.canvas = this.container.querySelector('canvas');
-    Graph.d3Force('link')!.distance((d) => {
-      return d.lineLength || LINE_LENGTH;
-    }).strength(0.05);
+    Graph.d3Force('link')!
+      .distance((d) => {
+        return d.lineLength || LINE_LENGTH;
+      })
+      .strength(0.05);
     Graph.d3Force('x', forceX().strength(0.0085));
     Graph.d3Force('y', forceY().strength(0.0085));
     Graph.d3Force('charge')!.strength(-100);
