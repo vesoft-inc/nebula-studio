@@ -14,7 +14,7 @@ interface IProps {
   data: any;
   editDisabled: boolean;
   onBeforeEdit: (index: number | null) => void;
-  onEdit: (config: IAlterForm) => boolean;
+  onEdit: (config: IAlterForm) => Promise<boolean>;
 }
 
 interface IEditProperty extends IProperty {

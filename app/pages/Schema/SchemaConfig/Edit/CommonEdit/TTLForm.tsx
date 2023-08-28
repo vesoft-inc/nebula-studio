@@ -22,7 +22,7 @@ interface IProps {
   initialRequired: boolean;
   editDisabled: boolean;
   onBeforeEdit: (type?: null) => void;
-  onEdit: (config: IAlterForm) => void;
+  onEdit: (config: IAlterForm) => Promise<boolean>;
   checkIndex: () => Promise<boolean>;
   data: {
     name: string;
