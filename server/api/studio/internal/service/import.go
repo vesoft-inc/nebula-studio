@@ -258,7 +258,6 @@ func (i *importService) DownloadConfig(req *types.DownloadConfigsRequest) error 
 	httpResp.Header().Set("Content-Type", "application/octet-stream")
 	httpResp.Header().Set("Content-Disposition", "attachment;filename="+filepath.Base(configPath))
 	http.ServeFile(httpResp, httpReq, configPath)
-
 	return nil
 }
 

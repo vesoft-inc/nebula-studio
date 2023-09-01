@@ -66,7 +66,7 @@ const App = () => {
         token: {
           controlHeight: 38,
           colorPrimary: '#0091ff',
-          fontFamily: 'Robot-Regular, sans-serif',
+          fontFamily: 'Roboto-Regular, sans-serif',
         },
         components: {
           Menu: {
