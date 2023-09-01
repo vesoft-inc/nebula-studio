@@ -20,7 +20,7 @@ var (
 		"/api/import-tasks",
 	}
 	IgnoreHandlerBodyPatterns = []*regexp.Regexp{
-		regexp.MustCompile(`^/api/import-tasks/\d+/download`),
+		regexp.MustCompile(`^/api/import-tasks/\w+/download`),
 	}
 )
 

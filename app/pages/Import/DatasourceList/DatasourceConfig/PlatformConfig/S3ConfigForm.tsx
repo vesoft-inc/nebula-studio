@@ -131,7 +131,7 @@ const S3ConfigForm = (props: IProps) => {
                   },
                 ]}
               >
-                <Input.Password
+                <Input
                   type="password"
                   placeholder={intl.get('import.accessKeySecret')}
                   onChange={handleUpdatePassword}
