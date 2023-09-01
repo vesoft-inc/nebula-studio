@@ -131,7 +131,8 @@ const S3ConfigForm = (props: IProps) => {
                   },
                 ]}
               >
-                <Input
+                <Input.Password
+                  visibilityToggle={mode === 'edit' && !flag ? false : true}
                   type="password"
                   placeholder={intl.get('import.accessKeySecret')}
                   onChange={handleUpdatePassword}

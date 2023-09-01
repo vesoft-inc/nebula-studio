@@ -15,31 +15,51 @@ const SftpConfigForm = (props: IProps) => {
   const { intl } = useI18n();
   const [flag, setFlag] = useState(false);
   useEffect(() => {
-    if(mode === 'edit') {
+    if (mode === 'edit') {
       formRef.setFieldValue(['sftpConfig', 'password'], tempPwd);
     }
   }, [mode]);
 
   const handleUpdatePassword = () => {
-    if(mode !== 'edit') return;
-    if(!flag) {
+    if (mode !== 'edit') return;
+    if (!flag) {
       formRef.setFieldValue(['sftpConfig', 'password'], '');
       setFlag(true);
     }
   };
   return (
     <FormItem noStyle>
-      <FormItem name={['sftpConfig', 'host']} label={intl.get('import.serverAddress')} rules={[{ required: true, message: intl.get('formRules.formHostRequired') } ]}>
+      <FormItem
+        name={['sftpConfig', 'host']}
+        label={intl.get('import.serverAddress')}
+        rules={[{ required: true, message: intl.get('formRules.formHostRequired') }]}
+      >
         <Input />
       </FormItem>
-      <FormItem name={['sftpConfig', 'port']} label={intl.get('import.port')} rules={[{ required: true, message: intl.get('formRules.formPortRequired') } ]}>
+      <FormItem
+        name={['sftpConfig', 'port']}
+        label={intl.get('import.port')}
+        rules={[{ required: true, message: intl.get('formRules.formPortRequired') }]}
+      >
         <InputNumber />
       </FormItem>
-      <FormItem name={['sftpConfig', 'username']}label={intl.get('configServer.username')} rules={[{ required: true, message: intl.get('formRules.usernameRequired') } ]}>
+      <FormItem
+        name={['sftpConfig', 'username']}
+        label={intl.get('configServer.username')}
+        rules={[{ required: true, message: intl.get('formRules.usernameRequired') }]}
+      >
         <Input />
       </FormItem>
-      <FormItem name={['sftpConfig', 'password']} label={intl.get('configServer.password')} rules={[{ required: true, message: intl.get('formRules.passwordRequired') } ]}>
-        <Input type="password" onChange={handleUpdatePassword} />
+      <FormItem
+        name={['sftpConfig', 'password']}
+        label={intl.get('configServer.password')}
+        rules={[{ required: true, message: intl.get('formRules.passwordRequired') }]}
+      >
+        <Input.Password
+          visibilityToggle={mode === 'edit' && !flag ? false : true}
+          type="password"
+          onChange={handleUpdatePassword}
+        />
       </FormItem>
     </FormItem>
   );
