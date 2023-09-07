@@ -234,6 +234,20 @@ const getDatasetList = (): DatasetItem[] => {
       coverImg: `${process.env.CDN_PATH || '/'}images/welcome/fifa2022.png`,
       docLink: intl.get('welcome.fifa2022DocLink'),
     },
+    {
+      type: 'solution',
+      tags: ['solution'],
+      description: intl.get('doc.supplychainIntro'),
+      spaceName: 'demo_supplychain',
+      fileName: 'supplychain',
+      rename: undefined as unknown as string,
+      detail: {
+        vertexCount: 40,
+        edgeCount: 62,
+      },
+      coverImg: `${process.env.CDN_PATH || '/'}images/welcome/supplychain.png`,
+      docLink: intl.get('welcome.supplychainDocLink'),
+    },
   ];
 };
 
