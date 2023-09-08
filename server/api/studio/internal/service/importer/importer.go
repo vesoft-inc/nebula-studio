@@ -130,13 +130,13 @@ func GetImportTask(taskID, address, username string) (*types.GetImportTaskData, 
 	return result, nil
 }
 
-func GetManyImportTask(address, username string, pageIndex, pageSize int) (*types.GetManyImportTaskData, error) {
+func GetManyImportTask(address, username, space string, pageIndex, pageSize int) (*types.GetManyImportTaskData, error) {
 	result := &types.GetManyImportTaskData{
 		Total: 0,
 		List:  []types.GetImportTaskData{},
 	}
 
-	tasks, count, err := taskmgr.db.FindTaskInfoByAddressAndUser(address, username, pageIndex, pageSize)
+	tasks, count, err := taskmgr.db.FindTaskInfoByAddressAndUser(address, username, space, pageIndex, pageSize)
 	if err != nil {
 		return nil, err
 	}

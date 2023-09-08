@@ -32,10 +32,14 @@ func (t *TaskDb) FindTaskInfoByIdAndAddresssAndUser(id, address, user string) (*
 	return taskInfo, nil
 }
 
-func (t *TaskDb) FindTaskInfoByAddressAndUser(address, user string, pageIndex, pageSize int) ([]*db.TaskInfo, int64, error) {
+func (t *TaskDb) FindTaskInfoByAddressAndUser(address, user, space string, pageIndex, pageSize int) ([]*db.TaskInfo, int64, error) {
 	tasks := make([]*db.TaskInfo, 0)
 	var count int64
-	tx := t.Model(&db.TaskInfo{}).Where("address = ? And user = ?", address, user).Order("id desc")
+	tx := t.Model(&db.TaskInfo{}).Where("address = ? And user = ?", address, user)
+	if space != "" {
+		tx = tx.Where("space = ?", space)
+	}
+	tx = tx.Order("id desc")
 	if err := tx.Count(&count).Error; err != nil {
 		return nil, 0, err
 	}

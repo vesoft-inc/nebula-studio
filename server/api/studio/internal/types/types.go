@@ -235,8 +235,9 @@ type ImportTaskStats struct {
 }
 
 type GetManyImportTaskRequest struct {
-	Page     int `form:"page,default=1"`
-	PageSize int `form:"pageSize,default=999"`
+	Page     int    `form:"page,default=1"`
+	PageSize int    `form:"pageSize,default=999"`
+	Space    string `form:"space,optional"`
 }
 
 type GetManyImportTaskData struct {

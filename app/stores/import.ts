@@ -143,7 +143,13 @@ export type IEdgeItem = ImportSchemaConfigItem<ISchemaEnum.Edge>;
 export type ITagFileItem = TagFileItem;
 export type IEdgeFileItem = EdgeFileItem;
 export class ImportStore {
-  taskList: ITaskItem[] = [];
+  taskList: {
+    list: ITaskItem[];
+    total: number;
+  } = {
+    list: [],
+    total: 0,
+  };
   tagConfig = observable.array<ITagItem>([], { deep: false });
   edgeConfig = observable.array<IEdgeItem>([], { deep: false });
   basicConfig: IBasicConfig = { taskName: '', address: [] };
@@ -164,11 +170,11 @@ export class ImportStore {
     );
   };
 
-  getTaskList = async () => {
-    const { code, data } = await service.getTaskList();
+  getTaskList = async (filter: { page: number; pageSize: number; space: string }) => {
+    const { code, data } = await service.getTaskList(filter);
     if (code === 0 && data) {
       this.update({
-        taskList: data.list || [],
+        taskList: data,
       });
     }
   };
