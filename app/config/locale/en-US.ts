@@ -341,7 +341,7 @@ export default {
     rerunError: 'The task configuration record cannot be found, and the task cannot be rerun',
     editTaskError: 'Cannot find task configuration record, cannot continue editing',
     s3SafetyTip:
-      'For your data safety, it is recommended to store only data import-related files in the bucket and configure the bucket to read-only mode.',
+      'For your data safety, it is recommended to store only data import-related files in the Bucket and configure the Bucket to read-only mode.',
   },
   schema: {
     spaceList: 'Graph Space List',

@@ -328,7 +328,7 @@ export default {
     templateRerunTip: '模板导入生成的任务不支持编辑，请直接修改模板文件并导入',
     rerunError: '找不到任务配置记录，无法重跑任务',
     editTaskError: '找不到任务配置记录，无法继续编辑',
-    s3SafetyTip: '出于数据安全考虑，建议bucket中仅放和数据导入相关的文件，且bucket设置为只读。',
+    s3SafetyTip: '出于数据安全考虑，建议 Bucket 中仅放和数据导入相关的文件，且 Bucket 设置为只读。',
   },
   schema: {
     spaceList: '图空间列表',
