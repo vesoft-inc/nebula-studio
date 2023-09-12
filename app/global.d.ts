@@ -6,10 +6,9 @@ declare module '*.gif';
 declare module '*.bmp';
 declare module '*.tiff';
 declare module '*.less';
- 
+
 interface Window {
   gConfig: {
-    maxBytes: number
     databaseName: string;
   };
   __ngqlRunner__: any;
