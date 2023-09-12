@@ -23,7 +23,7 @@ type Config struct {
 	File        struct {
 		UploadDir string
 		TasksDir  string
-	}
+	} `json:",optional"`
 
 	DB struct {
 		LogLevel                  int    `json:",default=4"`

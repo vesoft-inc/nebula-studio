@@ -14,12 +14,25 @@
     align-items: center;
   }
   .taskHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     color: @lightBlack;
     font-weight: bold;
     font-size: 18px;
     padding-bottom: 12px;
     border-bottom: 1px solid @gray;
     margin-bottom: 20px;
+    .label {
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      color: @darkGray;
+      &::after {
+        content: ':';
+        margin-right: 10px;
+      }
+    }
   }
 }
 

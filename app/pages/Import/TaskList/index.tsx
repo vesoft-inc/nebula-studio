@@ -1,4 +1,4 @@
-import { Button, message, Pagination, Spin } from 'antd';
+import { Button, message, Pagination, Select, Spin } from 'antd';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
@@ -13,6 +13,7 @@ import TemplateModal from './TemplateModal';
 import styles from './index.module.less';
 import TaskItem from './TaskItem';
 
+const Option = Select.Option;
 interface ILogDimension {
   space: string;
   id: string;
@@ -21,9 +22,10 @@ interface ILogDimension {
 
 const TaskList = () => {
   const timer = useRef<any>(null);
-  const { dataImport, global, moduleConfiguration } = useStore();
+  const { dataImport, global, moduleConfiguration, schema } = useStore();
+  const { spaces, getSpaces } = schema;
   const isMounted = useRef(true);
-  const [page, setPage] = useState(1);
+  const [filter, setFilter] = useState({ page: 1, pageSize: 10, space: '' });
   const { intl, currentLocale } = useI18n();
   const history = useHistory();
   const { taskList, getTaskList, stopTask, deleteTask } = dataImport;
@@ -35,18 +37,26 @@ const TaskList = () => {
   const { disableTemplateImport } = moduleConfiguration.dataImport;
   const modalKey = useMemo(() => Math.random(), [sourceModalVisible]);
   const [logDimension, setLogDimension] = useState<ILogDimension>({} as ILogDimension);
+  const getData = useCallback(
+    (params?: Partial<typeof filter>) => {
+      const _filter = { ...filter, ...params };
+      setFilter(_filter);
+      getTaskList(_filter);
+    },
+    [filter],
+  );
   const handleTaskStop = useCallback(async (id: string) => {
     clearTimeout(timer.current);
     const { code } = await stopTask(id);
     code === 0 && message.success(intl.get('import.stopImportingSuccess'));
-    getTaskList();
+    getData();
   }, []);
   const handleTaskDelete = useCallback(async (id: string) => {
     clearTimeout(timer.current);
     const { code } = await deleteTask(id);
     if (code === 0) {
       message.success(intl.get('import.deleteSuccess'));
-      getTaskList();
+      getData();
     }
   }, []);
 
@@ -60,15 +70,15 @@ const TaskList = () => {
   }, []);
   const initList = useCallback(async () => {
     setLoading(true);
-    await getTaskList();
-    setPage(1);
+    await getData({ page: 1, space: '' });
     setLoading(false);
   }, []);
   const handleRerun = () => {
     clearTimeout(timer.current);
-    getTaskList();
+    getData();
   };
   useEffect(() => {
+    getSpaces();
     initList();
     trackPageView('/import/tasks');
     return () => {
@@ -78,9 +88,9 @@ const TaskList = () => {
   }, []);
   useEffect(() => {
     const loadingStatus = [ITaskStatus.Processing, ITaskStatus.Pending];
-    const needRefresh = taskList.filter((item) => loadingStatus.includes(item.status)).length > 0;
+    const needRefresh = taskList.list?.filter((item) => loadingStatus.includes(item.status)).length > 0;
     if (logDimension.id !== undefined && loadingStatus.includes(logDimension.status)) {
-      const status = taskList.filter((item) => item.id === logDimension.id)[0].status;
+      const status = taskList.list?.filter((item) => item.id === logDimension.id)[0]?.status;
       if (!loadingStatus.includes(status)) {
         setLogDimension({
           id: logDimension.id,
@@ -91,7 +101,7 @@ const TaskList = () => {
     }
     if (needRefresh && isMounted.current) {
       clearTimeout(timer.current);
-      timer.current = setTimeout(getTaskList, 1000);
+      timer.current = setTimeout(getData, 1000);
     } else {
       clearTimeout(timer.current);
     }
@@ -138,10 +148,28 @@ const TaskList = () => {
           {intl.get('import.newDataSource')}
         </Button>
       </div>
-      <h3 className={styles.taskHeader}>
-        {intl.get('import.taskList')} ({taskList.length})
-      </h3>
-      {!loading && taskList.length === 0 ? (
+      <div className={styles.taskHeader}>
+        <span>
+          {intl.get('import.taskList')} ({taskList.total})
+        </span>
+        <div>
+          <span className={styles.label}>{intl.get('common.currentSpace')}</span>
+          <Select
+            showSearch
+            style={{ minWidth: 200 }}
+            value={filter.space}
+            placeholder={intl.get('console.selectSpace')}
+            onChange={(space) => getData({ space, page: 1 })}
+          >
+            {spaces.map((space) => (
+              <Option value={space} key={space}>
+                {space}
+              </Option>
+            ))}
+          </Select>
+        </div>
+      </div>
+      {!loading && taskList.total === 0 ? (
         <div className={styles.emptyTip}>
           {emptyTips.map((item, index) => {
             return (
@@ -163,7 +191,7 @@ const TaskList = () => {
         </div>
       ) : (
         <Spin spinning={loading}>
-          {taskList.slice((page - 1) * 10, page * 10).map((item) => (
+          {taskList.list.map((item) => (
             <TaskItem
               key={item.id}
               data={item}
@@ -176,9 +204,9 @@ const TaskList = () => {
           <Pagination
             className={styles.taskPagination}
             hideOnSinglePage
-            total={taskList.length}
-            current={page}
-            onChange={(page) => setPage(page)}
+            total={taskList.total}
+            current={filter.page}
+            onChange={(page) => getData({ page })}
           />
         </Spin>
       )}
@@ -190,7 +218,7 @@ const TaskList = () => {
           onClose={() => setImportModalVisible(false)}
           username={username}
           host={host}
-          onImport={getTaskList}
+          onImport={getData}
           visible={importModalVisible}
         />
       )}

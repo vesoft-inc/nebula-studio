@@ -142,6 +142,9 @@ const S3ConfigForm = (props: IProps) => {
           );
         }}
       </FormItem>
+      <FormItem noStyle shouldUpdate={false}>
+        <span className={styles.safeTip}>{intl.get('import.s3SafetyTip')}</span>
+      </FormItem>
     </FormItem>
   );
 };

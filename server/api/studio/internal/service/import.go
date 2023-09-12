@@ -303,7 +303,7 @@ func (i *importService) GetImportTask(req *types.GetImportTaskRequest) (*types.G
 func (i *importService) GetManyImportTask(req *types.GetManyImportTaskRequest) (*types.GetManyImportTaskData, error) {
 	auth := i.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	host := fmt.Sprintf("%s:%d", auth.Address, auth.Port)
-	return importer.GetManyImportTask(host, auth.Username, req.Page, req.PageSize)
+	return importer.GetManyImportTask(host, auth.Username, req.Space, req.Page, req.PageSize)
 }
 
 // GetImportTaskLogNames :Get all log file's name of a task
