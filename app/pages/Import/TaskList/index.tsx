@@ -25,15 +25,7 @@ const TaskList = () => {
   const { dataImport, global, moduleConfiguration, schema } = useStore();
   const { spaces, getSpaces } = schema;
   const isMounted = useRef(true);
-  const [filter, setFilter] = useState<{
-    page: number;
-    pageSize: number;
-    space: string;
-  }>({
-    page: 1,
-    pageSize: 10,
-    space: '',
-  });
+  const [filter, setFilter] = useState({ page: 1, pageSize: 10, space: '' });
   const { intl, currentLocale } = useI18n();
   const history = useHistory();
   const { taskList, getTaskList, stopTask, deleteTask } = dataImport;
@@ -44,9 +36,9 @@ const TaskList = () => {
   const [loading, setLoading] = useState(false);
   const { disableTemplateImport } = moduleConfiguration.dataImport;
   const modalKey = useMemo(() => Math.random(), [sourceModalVisible]);
-  const [logDimension, setLogDimension] = useState<ILogDimension>({} as ILogDimension);
+  const [logDimension, setLogDimension] = useState<Partial<ILogDimension>>({});
   const getData = useCallback(
-    (params?) => {
+    (params?: Partial<typeof filter>) => {
       const _filter = { ...filter, ...params };
       setFilter(_filter);
       getTaskList(_filter);
@@ -167,7 +159,7 @@ const TaskList = () => {
             style={{ minWidth: 200 }}
             value={filter.space}
             placeholder={intl.get('console.selectSpace')}
-            onChange={(space) => getData({ space })}
+            onChange={(space) => getData({ space, page: 1 })}
           >
             {spaces.map((space) => (
               <Option value={space} key={space}>
