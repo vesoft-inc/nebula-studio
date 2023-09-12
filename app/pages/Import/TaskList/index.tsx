@@ -36,7 +36,7 @@ const TaskList = () => {
   const [loading, setLoading] = useState(false);
   const { disableTemplateImport } = moduleConfiguration.dataImport;
   const modalKey = useMemo(() => Math.random(), [sourceModalVisible]);
-  const [logDimension, setLogDimension] = useState<Partial<ILogDimension>>({});
+  const [logDimension, setLogDimension] = useState<ILogDimension>({} as ILogDimension);
   const getData = useCallback(
     (params?: Partial<typeof filter>) => {
       const _filter = { ...filter, ...params };
@@ -90,7 +90,7 @@ const TaskList = () => {
     const loadingStatus = [ITaskStatus.Processing, ITaskStatus.Pending];
     const needRefresh = taskList.list?.filter((item) => loadingStatus.includes(item.status)).length > 0;
     if (logDimension.id !== undefined && loadingStatus.includes(logDimension.status)) {
-      const status = taskList.list?.filter((item) => item.id === logDimension.id)[0].status;
+      const status = taskList.list?.filter((item) => item.id === logDimension.id)[0]?.status;
       if (!loadingStatus.includes(status)) {
         setLogDimension({
           id: logDimension.id,
