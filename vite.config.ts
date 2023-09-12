@@ -42,7 +42,7 @@ export default defineConfig({
   plugins: [
     react(),
     // topLevelAwait(),
-    htmlPlugin({ maxBytes: appConfig.MaxBytes }),
+    htmlPlugin(),
     // legacy({
     //   targets: ['chrome >= 87', 'safari >= 14', 'firefox >= 78'],
     //   polyfills: ['es.promise.finally', 'es/map', 'es/set', 'es/array'],

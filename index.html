@@ -11,9 +11,9 @@
   <script>var global = typeof global !== 'undefined' ? global : window;</script>
   <script>
     <% if (initProps.NODE_ENV === 'development') { %>
-      window.gConfig = { maxBytes: <%= JSON.stringify(initProps.maxBytes) %>, databaseName: "NebulaGraph" }
+      window.gConfig = { databaseName: "NebulaGraph" }
     <% } else { %>
-      window.gConfig = { maxBytes: {{.maxBytes}}, databaseName: "NebulaGraph" }
+      window.gConfig = { databaseName: "NebulaGraph" }
     <% } %>
   </script>
   <style>
