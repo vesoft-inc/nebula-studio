@@ -2,11 +2,13 @@ package importer
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"time"
 
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type ImportResult struct {
@@ -43,6 +45,14 @@ func StartImport(taskID string) (err error) {
 		}
 	}()
 	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				logx.Errorf("[task import error]: &s, %+v", err)
+				task.TaskInfo.TaskStatus = Aborted.String()
+				task.TaskInfo.TaskMessage = fmt.Sprintf("%s", err)
+				GetTaskMgr().AbortTask(taskID)
+			}
+		}()
 		cfg := task.Client.Cfg
 		if err = cfg.Build(); err != nil {
 			abort()
@@ -52,7 +62,6 @@ func StartImport(taskID string) (err error) {
 		logger := cfg.GetLogger()
 		task.Client.Manager = mgr
 		task.Client.Logger = logger
-
 		if err = mgr.Start(); err != nil {
 			abort()
 			return
