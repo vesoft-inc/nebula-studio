@@ -158,26 +158,23 @@
 	height: 80%;
 	overflow: hidden;
 	position: relative;
-  :global {
-    .ant-modal-content {
-      position: relative;
-      height: 100%;
-      overflow: auto;
-    }
-  
-    .ant-modal-body {
-      padding-top: 0px;
-    }
-  
-    .ant-modal-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-right: 20px;
-    }
-  
-    .ant-modal-close {
-      top: 8px;
+  &:global(.ant-modal .ant-modal-content) {
+    position: relative;
+    height: 100%;
+    overflow: auto;
+    :global {
+      .ant-modal-body {
+        padding-top: 0px;
+      }
+      .ant-modal-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-right: 20px;
+      }
+      .ant-modal-close {
+        top: 22px;
+      }
     }
   }
 }
