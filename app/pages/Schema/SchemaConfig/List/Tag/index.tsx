@@ -35,18 +35,15 @@ const renderTagInfo = (tag: ITag, intl) => {
       <p>
         {tag.name} {intl.get('common.relatedProperties')}:
       </p>
-      <Table
-        columns={fieldsColumn}
-        dataSource={tag.fields}
-        rowKey="Field"
-        pagination={false}
-      />
+      <Table columns={fieldsColumn} dataSource={tag.fields} rowKey="Field" pagination={false} />
     </div>
   );
 };
 
 const TagList = () => {
-  const { schema: { tagList, deleteTag, getTagList, currentSpace } } = useStore();
+  const {
+    schema: { tagList, deleteTag, getTagList, currentSpace },
+  } = useStore();
   const { intl } = useI18n();
   const [searchVal, setSearchVal] = useState('');
   const [loading, setLoading] = useState(false);
@@ -65,77 +62,85 @@ const TagList = () => {
     }
   };
 
-  const columns = useMemo(() => [
-    {
-      title: intl.get('common.name'),
-      dataIndex: 'name',
-      width: '33%',
-    },
-    {
-      title: intl.get('schema.propertyCount'),
-      dataIndex: 'count',
-      width: '33%',
-      render: (_, tag) => tag.fields?.length || 0
-    },
-    {
-      title: intl.get('common.operation'),
-      dataIndex: 'operation',
-      render: (_, tag) => {
-        if (!tag.name) {
-          return null;
-        }
-        return (
-          <div className={styles.operation}>
-            <Button type="link" className="primaryBtn">
-              <Link
-                to={{
-                  pathname: '/schema/tag/edit',
-                  state: { tag: tag.name },
-                }}
-                data-track-category="navigation"
-                data-track-action="view_tag_edit"
-                data-track-label="from_tag_list"
-              >
-                <Icon type="icon-studio-btn-edit" />
-              </Link>
-            </Button>
-            <Popconfirm
-              onConfirm={(e) => {
-                e.stopPropagation();
-                handleDeleteTag(tag.name);
-              }}
-              title={intl.get('common.ask')}
-              okText={intl.get('common.ok')}
-              cancelText={intl.get('common.cancel')}
-            >
-              <Button type="link" className="warningBtn" onClick={e => e.stopPropagation()}>
-                <Icon type="icon-studio-btn-delete" />
-              </Button>
-            </Popconfirm>
-          </div>
-        );
+  const columns = useMemo(
+    () => [
+      {
+        title: intl.get('common.name'),
+        dataIndex: 'name',
+        width: '33%',
       },
-    },
-  ], [tagList, Cookie.get('lang')]);
+      {
+        title: intl.get('schema.propertyCount'),
+        dataIndex: 'count',
+        width: '33%',
+        render: (_, tag) => tag.fields?.length || 0,
+      },
+      {
+        title: intl.get('common.operation'),
+        dataIndex: 'operation',
+        render: (_, tag) => {
+          if (!tag.name) {
+            return null;
+          }
+          return (
+            <div className={styles.operation}>
+              <Button type="link" className="primaryBtn">
+                <Link
+                  to={{
+                    pathname: '/schema/tag/edit',
+                    state: { tag: tag.name },
+                  }}
+                  data-track-category="navigation"
+                  data-track-action="view_tag_edit"
+                  data-track-label="from_tag_list"
+                >
+                  <Icon type="icon-studio-btn-edit" />
+                </Link>
+              </Button>
+              <Popconfirm
+                onConfirm={(e) => {
+                  e.stopPropagation();
+                  handleDeleteTag(tag.name);
+                }}
+                title={intl.get('common.ask')}
+                okText={intl.get('common.ok')}
+                cancelText={intl.get('common.cancel')}
+              >
+                <Button type="link" className="warningBtn" onClick={(e) => e.stopPropagation()}>
+                  <Icon type="icon-studio-btn-delete" />
+                </Button>
+              </Popconfirm>
+            </div>
+          );
+        },
+      },
+    ],
+    [tagList, Cookie.get('lang')],
+  );
 
   useEffect(() => {
-    getData();
+    currentSpace && getData();
   }, [currentSpace]);
   useEffect(() => {
-    setData(sortByFieldAndFilter({
-      field: 'name',
-      searchVal,
-      list: tagList,
-    }));
+    setData(
+      sortByFieldAndFilter({
+        field: 'name',
+        searchVal,
+        list: tagList,
+      }),
+    );
   }, [tagList, searchVal]);
 
-  return <CommonLayout 
-    type="tag"
-    loading={loading}
-    data={data}
-    columns={columns}
-    renderExpandInfo={renderTagInfo}
-    onSearch={setSearchVal} />;
+  return (
+    <CommonLayout
+      type="tag"
+      loading={loading}
+      data={data}
+      columns={columns}
+      renderExpandInfo={renderTagInfo}
+      onSearch={setSearchVal}
+    />
+  );
 };
 
 export default observer(TagList);
