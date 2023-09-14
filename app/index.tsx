@@ -9,7 +9,6 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import Cookie from 'js-cookie';
 import { trackPageView } from '@app/utils/stat';
-import { initService } from '@app/utils/http';
 import { I18nProvider, getI18n, useI18n } from '@vesoft-inc/i18n';
 import { INTL_LOCALES } from '@app/config/constants';
 import { useStore } from '@app/stores';
@@ -31,7 +30,6 @@ const defaultLanguage = Cookie.get('lang') || document.documentElement.getAttrib
 const { initI18n } = getI18n();
 initI18n(defaultLanguage, INTL_LOCALES);
 dayjs.locale(defaultLanguage === 'EN_US' ? 'en' : 'zh-cn');
-initService();
 const PageRoot = observer(() => {
   const {
     global: { version },
