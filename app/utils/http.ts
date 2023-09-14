@@ -24,58 +24,58 @@ let serviceInstance = null;
 const initService = (service?) => {
   if (service) {
     serviceInstance = service;
-  } else {
-    serviceInstance = axios.create({
-      transformResponse: [
-        (data) => {
+    return;
+  }
+  serviceInstance = axios.create({
+    transformResponse: [
+      (data) => {
+        try {
+          const _data = JSONBigint.parse(data);
+          return _data;
+        } catch (err) {
           try {
-            const _data = JSONBigint.parse(data);
-            return _data;
-          } catch (err) {
-            try {
-              return JSON.parse(data);
-            } catch (e) {
-              return data;
-            }
+            return JSON.parse(data);
+          } catch (e) {
+            return data;
           }
-        },
-      ],
-    });
-
-    serviceInstance.interceptors.request.use((config) => {
-      config.headers['Content-Type'] = 'application/json';
-      config.signal = controller.signal;
-      return config;
-    });
-
-    serviceInstance.interceptors.response.use(
-      (response: any) => {
-        return response.data;
-      },
-      (error: any) => {
-        if (error.response?.status) {
-          const res = error.response.data || {};
-          if (res.code !== 0 && res.message) {
-            const { hideErrMsg } = error.response.config;
-            !hideErrMsg && message.error(res.message);
-          } else {
-            message.error(`${intl.get('common.requestError')}: ${error.response.status} ${error.response.statusText}`);
-          }
-          // relogin
-          if (res.code === HttpResCode.ErrSession) {
-            // cancel other requests & logout automatically
-            controller.abort();
-            controller = new AbortController();
-            getRootStore().global.logout();
-          }
-          return res;
-        } else if (!axios.isCancel(error)) {
-          message.error(`${intl.get('common.requestError')}: ${error}`);
-          return error;
         }
       },
-    );
-  }
+    ],
+  });
+
+  serviceInstance.interceptors.request.use((config) => {
+    config.headers['Content-Type'] = 'application/json';
+    config.signal = controller.signal;
+    return config;
+  });
+
+  serviceInstance.interceptors.response.use(
+    (response: any) => {
+      return response.data;
+    },
+    (error: any) => {
+      if (error.response?.status) {
+        const res = error.response.data || {};
+        if (res.code !== 0 && res.message) {
+          const { hideErrMsg } = error.response.config;
+          !hideErrMsg && message.error(res.message);
+        } else {
+          message.error(`${intl.get('common.requestError')}: ${error.response.status} ${error.response.statusText}`);
+        }
+        // relogin
+        if (res.code === HttpResCode.ErrSession) {
+          // cancel other requests & logout automatically
+          controller.abort();
+          controller = new AbortController();
+          getRootStore().global.logout();
+        }
+        return res;
+      } else if (!axios.isCancel(error)) {
+        message.error(`${intl.get('common.requestError')}: ${error}`);
+        return error;
+      }
+    },
+  );
 };
 
 const sendRequest = async (type: string, api: string, params?, config?) => {
