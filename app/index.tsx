@@ -30,7 +30,6 @@ const defaultLanguage = Cookie.get('lang') || document.documentElement.getAttrib
 const { initI18n } = getI18n();
 initI18n(defaultLanguage, INTL_LOCALES);
 dayjs.locale(defaultLanguage === 'EN_US' ? 'en' : 'zh-cn');
-
 const PageRoot = observer(() => {
   const {
     global: { version },

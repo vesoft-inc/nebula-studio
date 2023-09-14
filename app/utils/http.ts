@@ -20,76 +20,82 @@ export enum HttpResCode {
 
 const { intl } = getI18n();
 let controller = new AbortController();
-const service = axios.create({
-  transformResponse: [
-    data => {
-      try {
-        const _data = JSONBigint.parse(data);
-        return _data;
-      } catch (err) {
+let serviceInstance = null;
+const initService = (service?) => {
+  if (service) {
+    serviceInstance = service;
+    return;
+  }
+  serviceInstance = axios.create({
+    transformResponse: [
+      (data) => {
         try {
-          return JSON.parse(data);
-        } catch (e) {
-          return data;
+          const _data = JSONBigint.parse(data);
+          return _data;
+        } catch (err) {
+          try {
+            return JSON.parse(data);
+          } catch (e) {
+            return data;
+          }
         }
+      },
+    ],
+  });
+
+  serviceInstance.interceptors.request.use((config) => {
+    config.headers['Content-Type'] = 'application/json';
+    config.signal = controller.signal;
+    return config;
+  });
+
+  serviceInstance.interceptors.response.use(
+    (response: any) => {
+      return response.data;
+    },
+    (error: any) => {
+      if (error.response?.status) {
+        const res = error.response.data || {};
+        if (res.code !== 0 && res.message) {
+          const { hideErrMsg } = error.response.config;
+          !hideErrMsg && message.error(res.message);
+        } else {
+          message.error(`${intl.get('common.requestError')}: ${error.response.status} ${error.response.statusText}`);
+        }
+        // relogin
+        if (res.code === HttpResCode.ErrSession) {
+          // cancel other requests & logout automatically
+          controller.abort();
+          controller = new AbortController();
+          getRootStore().global.logout();
+        }
+        return res;
+      } else if (!axios.isCancel(error)) {
+        message.error(`${intl.get('common.requestError')}: ${error}`);
+        return error;
       }
     },
-  ],
-});
-
-service.interceptors.request.use(config => {
-  config.headers['Content-Type'] = 'application/json';
-  config.signal = controller.signal;
-  return config;
-});
-
-service.interceptors.response.use(
-  (response: any) => {
-    return response.data;
-  },
-  (error: any) => {
-    if (error.response?.status) {
-      const res = error.response.data || {};
-      if(res.code !== 0 && res.message) {
-        const { hideErrMsg } = error.response.config;
-        !hideErrMsg && message.error(res.message);
-      } else {
-        message.error(
-          `${intl.get('common.requestError')}: ${error.response.status} ${
-            error.response.statusText
-          }`,
-        );
-      }
-      // relogin
-      if (res.code === HttpResCode.ErrSession) {
-        // cancel other requests & logout automatically
-        controller.abort();
-        controller = new AbortController();
-        getRootStore().global.logout();
-      }
-      return res;
-    } else if (!axios.isCancel(error)) {
-      message.error(`${intl.get('common.requestError')}: ${error}`);
-      return error;
-    }
-  },
-);
+  );
+};
 
 const sendRequest = async (type: string, api: string, params?, config?) => {
   const { trackEventConfig, ...otherConfig } = config;
+  if (!serviceInstance) {
+    initService();
+  }
   let res;
   switch (type) {
     case 'get':
-      res = (await service.get(api, { params, ...otherConfig })) as any;
+      res = (await serviceInstance.get(api, { params, ...otherConfig })) as any;
       break;
     case 'post':
-      res = (await service.post(api, params, otherConfig)) as any;
+      res = (await serviceInstance.post(api, params, otherConfig)) as any;
       break;
     case 'put':
-      res = (await service.put(api, params, otherConfig)) as any;
+      res = (await serviceInstance.put(api, params, otherConfig)) as any;
       break;
     case 'delete':
-      res = (await service.delete(api, otherConfig)) as any;
+      res = (await serviceInstance.delete(api, otherConfig)) as any;
       break;
     default:
       break;
@@ -106,16 +112,24 @@ const trackService = (res, config) => {
   trackEvent(category, action, res.code === 0 ? 'ajax_success' : 'ajax_failed');
 };
 
-const get = (api: string) => (params?: object, config = {}) =>
-  sendRequest('get', api, params, config);
+const get =
+  (api: string) =>
+  (params?: object, config = {}) =>
+    sendRequest('get', api, params, config);
 
-const post = (api: string) => (params?: object, config = {} as any) =>
-  sendRequest('post', api, params, config);
+const post =
+  (api: string) =>
+  (params?: object, config = {} as any) =>
+    sendRequest('post', api, params, config);
 
-const put = (api: string) => (params?: object, config = {}) =>
-  sendRequest('put', api, params, config);
+const put =
+  (api: string) =>
+  (params?: object, config = {}) =>
+    sendRequest('put', api, params, config);
 
-const _delete = (api: string) => (params?: object, config = {}) =>
-  sendRequest('delete', api, params, config);
+const _delete =
+  (api: string) =>
+  (params?: object, config = {}) =>
+    sendRequest('delete', api, params, config);
 
-export { get, post, put, _delete };
+export { initService, get, post, put, _delete };
