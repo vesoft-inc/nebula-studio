@@ -76,7 +76,6 @@ const SchemaConfig = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const space = params.get('space');
-    console.log('hereeeeee');
     if (space) {
       switchSpace(space);
     }

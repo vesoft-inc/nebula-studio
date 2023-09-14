@@ -156,6 +156,7 @@ const TaskList = () => {
           <span className={styles.label}>{intl.get('common.currentSpace')}</span>
           <Select
             showSearch
+            allowClear
             style={{ minWidth: 200 }}
             value={filter.space}
             placeholder={intl.get('console.selectSpace')}
