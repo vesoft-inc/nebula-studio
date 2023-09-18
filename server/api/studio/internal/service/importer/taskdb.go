@@ -67,3 +67,15 @@ func (t *TaskDb) UpdateProcessingTasks2Aborted() error {
 	}
 	return nil
 }
+
+func (t *TaskDb) InsertTaskEffect(taskEffect *db.TaskEffect) error {
+	return t.Create(taskEffect).Error
+}
+
+func (t *TaskDb) UpdateTaskEffect(taskEffect *db.TaskEffect) error {
+	return t.Model(&db.TaskEffect{}).Where("task_id = ?", taskEffect.BID).Updates(taskEffect).Error
+}
+
+func (t *TaskDb) DelTaskEffect(ID string) error {
+	return t.Delete(&db.TaskEffect{}, "task_id = ?", ID).Error
+}

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 	"sync"
@@ -183,7 +182,8 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	// create config file
-	if err := importer.CreateConfigFile(taskDir, jsons); err != nil {
+	configFile, err := importer.CreateConfigFile(taskDir, jsons)
+	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	// modify source file path & add log config
@@ -199,6 +199,12 @@ func (i *importService) CreateImportTask(req *types.CreateImportTaskRequest) (*t
 	} else {
 		task, err = taskMgr.NewTask(*id, host, auth.Username, req.Name, req.RawConfig, conf)
 	}
+	if err != nil {
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+	}
+
+	// init task effect in db, store config.yaml
+	err = taskMgr.NewTaskEffect(&db.TaskEffect{BID: *id, Config: configFile})
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
@@ -244,47 +250,43 @@ func (i *importService) StopImportTask(req *types.StopImportTaskRequest) error {
 }
 
 func (i *importService) DownloadConfig(req *types.DownloadConfigsRequest) error {
-	httpReq, ok := middleware.GetRequest(i.ctx)
-	if !ok {
-		return ecode.WithInternalServer(fmt.Errorf("unset KeepRequest"))
-	}
-
 	httpResp, ok := middleware.GetResponseWriter(i.ctx)
 	if !ok {
 		return ecode.WithInternalServer(fmt.Errorf("unset KeepResponse Writer"))
 	}
 
-	configPath := filepath.Join(i.svcCtx.Config.File.TasksDir, req.Id, "config.yaml")
+	fileName := "config.yaml"
+	taskId := req.Id
+	var taskEffect db.TaskEffect
+	if err := db.CtxDB.Select("config").Where("task_id = ?", taskId).First(&taskEffect).Error; err != nil {
+		return ecode.WithErrorMessage(ecode.ErrInternalDatabase, err)
+	}
+
+	httpResp.WriteHeader(http.StatusOK)
 	httpResp.Header().Set("Content-Type", "application/octet-stream")
-	httpResp.Header().Set("Content-Disposition", "attachment;filename="+filepath.Base(configPath))
-	http.ServeFile(httpResp, httpReq, configPath)
+	httpResp.Header().Set("Content-Disposition", "attachment;filename="+fileName)
+	httpResp.Write([]byte(taskEffect.Config))
 	return nil
 }
 
 func (i *importService) DownloadLogs(req *types.DownloadLogsRequest) error {
 	id := req.Id
-
-	httpReq, ok := middleware.GetRequest(i.ctx)
-	if !ok {
-		return ecode.WithInternalServer(fmt.Errorf("unset KeepRequest"))
-	}
-
 	httpResp, ok := middleware.GetResponseWriter(i.ctx)
 	if !ok {
 		return ecode.WithInternalServer(fmt.Errorf("unset KeepResponse Writer"))
 	}
 
-	filename := req.Name
-	path := ""
-	if filename == importLogName {
-		path = filepath.Join(i.svcCtx.Config.File.TasksDir, id, filename)
-	} else {
-		path = filepath.Join(i.svcCtx.Config.File.TasksDir, id, "err", filename)
+	fileName := req.Name
+	var taskEffect db.TaskEffect
+	if err := db.CtxDB.Select("log").Where("task_id = ?", id).First(&taskEffect).Error; err != nil {
+		return ecode.WithErrorMessage(ecode.ErrInternalDatabase, err)
 	}
 
+	httpResp.WriteHeader(http.StatusOK)
 	httpResp.Header().Set("Content-Type", "application/octet-stream")
-	httpResp.Header().Set("Content-Disposition", "attachment;filename="+filepath.Base(path))
-	http.ServeFile(httpResp, httpReq, path)
+	httpResp.Header().Set("Content-Disposition", "attachment;filename="+fileName)
+	httpResp.Write([]byte(taskEffect.Log))
+
 	return nil
 }
 
@@ -329,21 +331,12 @@ func (i *importService) GetImportTaskLogNames(req *types.GetImportTaskLogNamesRe
 }
 
 func (i *importService) GetManyImportTaskLog(req *types.GetManyImportTaskLogRequest) (*types.GetManyImportTaskLogData, error) {
-	path := ""
-	if req.File == importLogName {
-		path = filepath.Join(i.svcCtx.Config.File.TasksDir, req.Id, req.File)
-	} else {
-		path = filepath.Join(i.svcCtx.Config.File.TasksDir, req.Id, errContentDir, req.File)
-	}
-	lines, endPosition, err := readFile(path, req.Start, req.End)
-	if err != nil {
-		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+	var taskEffect db.TaskEffect
+	if err := db.CtxDB.Select("log").Where("task_id = ?", req.Id).First(&taskEffect).Error; err != nil {
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalDatabase, err)
 	}
 
-	data := &types.GetManyImportTaskLogData{
-		Logs:        lines,
-		EndPosition: endPosition,
-	}
+	data := &types.GetManyImportTaskLogData{Logs: taskEffect.Log}
 	return data, nil
 }
 
@@ -352,28 +345,4 @@ func (i *importService) GetWorkingDir() (*types.GetWorkingDirResult, error) {
 		TaskDir:   i.svcCtx.Config.File.TasksDir,
 		UploadDir: i.svcCtx.Config.File.UploadDir,
 	}, nil
-}
-
-func readFile(path string, start int64, end int64) (string, int64, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return "", 0, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-	}
-	defer file.Close()
-	fileInfo, err := file.Stat()
-	if err != nil {
-		return "", 0, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-	}
-	if start > fileInfo.Size() {
-		return "", 0, nil
-	}
-	if end == 0 || end > fileInfo.Size() {
-		end = fileInfo.Size()
-	}
-	bytes := make([]byte, end-start)
-	_, err = file.ReadAt(bytes, start)
-	if err != nil {
-		return "", 0, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
-	}
-	return string(bytes), end, nil
 }

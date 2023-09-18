@@ -9,6 +9,12 @@ import (
 	"github.com/zeromicro/go-zero/rest"
 )
 
+var configIns *Config
+
+func GetConfig() *Config {
+	return configIns
+}
+
 type Config struct {
 	rest.RestConf
 	Debug struct {
@@ -87,6 +93,8 @@ func (c *Config) Complete() {
 
 func (c *Config) InitConfig() error {
 	c.Complete()
+
+	configIns = c
 
 	return c.Validate()
 }

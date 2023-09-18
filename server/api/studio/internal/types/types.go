@@ -246,15 +246,11 @@ type GetManyImportTaskData struct {
 }
 
 type GetManyImportTaskLogRequest struct {
-	Id    string `path:"id" validate:"required"`
-	File  string `form:"file" validate:"required"`
-	Start int64  `form:"start" validate:"min=0"`
-	End   int64  `form:"end" validate:"min=0"`
+	Id string `path:"id" validate:"required"`
 }
 
 type GetManyImportTaskLogData struct {
-	Logs        string `json:"logs"`
-	EndPosition int64  `json:"endPosition"`
+	Logs string `json:"logs"`
 }
 
 type GetImportTaskLogNamesRequest struct {

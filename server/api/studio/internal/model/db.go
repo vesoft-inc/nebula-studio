@@ -107,6 +107,7 @@ func InitDB(config *config.Config, db *gorm.DB) {
 		err := db.AutoMigrate(
 			&Datasource{},
 			&TaskInfo{},
+			&TaskEffect{},
 			&Sketch{},
 			&SchemaSnapshot{},
 			&Favorite{},

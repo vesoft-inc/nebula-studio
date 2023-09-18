@@ -32,13 +32,10 @@ const LogModal = (props: IProps) => {
   const { disableLogDownload } = moduleConfiguration.dataImport;
   const { intl } = useI18n();
   const logRef = useRef<HTMLDivElement>(null);
-  const timer = useRef<any>(null);
-  const offset = useRef(0);
-  const isMounted = useRef(true);
-  const _status = useRef(status);
   const [logs, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentLog, setCurrentLog] = useState<string | null>(null);
+
   const handleTabChange = (key: string) => {
     setCurrentLog(logs.filter((item) => item === key)[0]);
   };
@@ -52,47 +49,34 @@ const LogModal = (props: IProps) => {
     }
   };
 
-  const handleLogDownload = () => {
-    if (currentLog) {
-      downloadTaskLog({
-        id,
-        name: currentLog,
-      });
-    }
-  };
+  const handleLogDownload = () => currentLog && downloadTaskLog({ id, name: currentLog });
 
   const readLog = async () => {
-    const data = await getLogDetail({
-      start: offset.current,
-      id,
-      end: [ITaskStatus.Finished, ITaskStatus.Aborted, ITaskStatus.Stoped].includes(_status.current)
-        ? 0
-        : offset.current + 4096, // 4kb content per request, if task is finished, read all logs
-      file: currentLog,
-    });
-    isMounted.current && handleLogData(data);
+    const data = await getLogDetail({ id });
+    handleLogData(data);
   };
 
   const handleLogData = (data) => {
-    if (!logRef.current) {
-      timer.current = setTimeout(readLog, 2000);
+    const logs = data?.logs || '';
+    if (!logs.length) {
       return;
     }
-    const { logs, endPosition } = data;
-    if (logs.length > 0) {
-      logRef.current.innerHTML += logs.split('\n').join('<br/>');
-      logRef.current.scrollTop = logRef.current.scrollHeight;
-      offset.current = endPosition;
-      if (isMounted.current) {
-        timer.current = setTimeout(readLog, 2000);
-      }
-    } else if ([ITaskStatus.Processing, ITaskStatus.Pending].includes(_status.current)) {
-      if (isMounted.current) {
-        timer.current = setTimeout(readLog, 2000);
-      }
-    } else {
-      offset.current = 0;
-    }
+    /**
+     * {"level":"info",...}
+     * {"level":"info",...}
+     *
+     * ...
+     * (200 lines more, original log file path: /.../tasks/nck3vu9b7id2r67lvi1b0/import.log, hostname: xxx)
+     * ...
+     *
+     * {"level":"info",...}
+     * {"level":"info",...}
+     */
+    logRef.current.innerHTML = logs
+      .split('\n')
+      .map((log) => `<code style="color:${/^(\.\.\.)|^\(\d+/.test(log) ? '#fff' : '#e8c18b'}">${log}</code>`)
+      .join('<br/>');
+    logRef.current.scrollTop = logRef.current.scrollHeight;
   };
 
   const initLog = async () => {
@@ -100,35 +84,24 @@ const LogModal = (props: IProps) => {
     await readLog();
     setLoading(false);
   };
+
   useEffect(() => {
     if (!disableLogDownload) {
       getAllLogs();
     } else {
       initLog();
     }
-    return () => {
-      isMounted.current = false;
-      clearTimeout(timer.current);
-    };
   }, []);
 
   useEffect(() => {
-    _status.current = status;
-  }, [status]);
-  useEffect(() => {
-    clearTimeout(timer.current);
     if (logRef.current) {
       logRef.current.innerHTML = '';
     }
-    offset.current = 0;
-    if (currentLog && isMounted.current) {
-      readLog();
-    }
+    currentLog && initLog();
   }, [currentLog]);
-  const items = logs.map((log) => ({
-    key: log,
-    label: log,
-  }));
+
+  const items = logs.map((log) => ({ key: log, label: log }));
+
   return (
     <Modal
       title={

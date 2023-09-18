@@ -235,7 +235,7 @@ const TaskItem = (props: IProps) => {
                 <Icon type="icon-studio-btn-edit" />
               </Tooltip>
             </Button>
-            {!isDraft && (
+            {!isDraft && !loadingStatus.includes(status) && (
               <Button className="primaryBtn" onClick={() => onViewLog(id, space, status)}>
                 <Tooltip title={intl.get('import.viewLogs')}>
                   <Icon type="icon-studio-btn-ddl" />

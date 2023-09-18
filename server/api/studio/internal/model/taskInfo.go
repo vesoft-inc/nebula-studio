@@ -16,6 +16,7 @@ type Stats struct {
 	FailedProcessed int64         `gorm:"column:failed_processed;"`
 	TotalProcessed  int64         `gorm:"column:total_processed;"`
 }
+
 type TaskInfo struct {
 	ID            int    `gorm:"column:id;primaryKey;autoIncrement;"`
 	BID           string `gorm:"column:b_id;not null;type:char(32);uniqueIndex;comment:task id"`
@@ -31,4 +32,14 @@ type TaskInfo struct {
 
 	CreateTime time.Time `gorm:"column:create_time;type:datetime;autoCreateTime"`
 	UpdateTime time.Time `gorm:"column:update_time;type:datetime;autoUpdateTime"`
+}
+
+// storage for task yaml config and partial task log
+type TaskEffect struct {
+	ID     int    `gorm:"column:id;primaryKey;autoIncrement;"`
+	BID    string `gorm:"column:task_id;not null;type:char(32);uniqueIndex;comment:task id"`
+	Log    string `gorm:"column:log;type:mediumtext;comment:partial task log"`
+	Config string `gorm:"column:config;type:mediumtext;comment:task config.yaml"`
+
+	CreateTime time.Time `gorm:"column:create_time;type:datetime;autoCreateTime"`
 }
