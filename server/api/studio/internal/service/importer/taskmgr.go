@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
 	importconfig "github.com/vesoft-inc/nebula-importer/v4/pkg/config"
 	configv3 "github.com/vesoft-inc/nebula-importer/v4/pkg/config/v3"
+	studioConfig "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/utils"
@@ -40,7 +42,7 @@ func CreateNewTaskDir(rootDir string, id string) (string, error) {
 	return taskDir, nil
 }
 
-func CreateConfigFile(taskdir string, cfgBytes []byte) error {
+func CreateConfigFile(taskdir string, cfgBytes []byte) (string, error) {
 	fileName := "config.yaml"
 	path := filepath.Join(taskdir, fileName)
 	config, _ := importconfig.FromBytes(cfgBytes)
@@ -70,12 +72,12 @@ func CreateConfigFile(taskdir string, cfgBytes []byte) error {
 	}
 	outYaml, err := yaml.Marshal(confv3)
 	if err != nil {
-		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+		return "", ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	if err := os.WriteFile(path, outYaml, 0o644); err != nil {
-		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+		return "", ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
-	return nil
+	return string(outYaml), nil
 }
 
 func (mgr *TaskMgr) NewTask(id, host, user, taskName, rawCfg string, cfg importconfig.Configurator) (*Task, error) {
@@ -111,6 +113,15 @@ func (mgr *TaskMgr) NewTask(id, host, user, taskName, rawCfg string, cfg importc
 
 	mgr.PutTask(id, task)
 	return task, nil
+}
+
+func (mgr *TaskMgr) NewTaskEffect(taskEffect *db.TaskEffect) error {
+	mux.Lock()
+	defer mux.Unlock()
+	if err := mgr.db.InsertTaskEffect(taskEffect); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (mgr *TaskMgr) TurnDraftToTask(id, taskName, rawCfg string, cfg importconfig.Configurator) (*Task, error) {
@@ -211,8 +222,10 @@ func (mgr *TaskMgr) PutTask(taskID string, task *Task) {
 }
 
 /*
-FinishTask will query task stats, delete task in the map
-and update the taskInfo in local sql
+FinishTask will query task stats
+  - delete task in the map
+  - update taskInfo in db
+  - update taskEffect in db
 */
 func (mgr *TaskMgr) FinishTask(taskID string) (err error) {
 	task, ok := mgr.getTaskFromMap(taskID)
@@ -227,20 +240,21 @@ func (mgr *TaskMgr) FinishTask(taskID string) (err error) {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	mgr.tasks.Delete(taskID)
-	return
+
+	return mgr.StorePartTaskLog(taskID)
 }
 
 func (mgr *TaskMgr) AbortTask(taskID string) (err error) {
 	task, ok := mgr.getTaskFromMap(taskID)
 	if !ok {
-		return
+		return nil
 	}
 	err = mgr.db.UpdateTaskInfo(task.TaskInfo)
 	if err != nil {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
 	mgr.tasks.Delete(taskID)
-	return
+	return mgr.StorePartTaskLog(taskID)
 }
 
 func (mgr *TaskMgr) DelTask(tasksDir, taskID string) error {
@@ -251,8 +265,28 @@ func (mgr *TaskMgr) DelTask(tasksDir, taskID string) error {
 	if err := mgr.db.DelTaskInfo(taskID); err != nil {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
 	}
+	if err := mgr.db.DelTaskEffect(taskID); err != nil {
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+	}
 	taskDir := filepath.Join(tasksDir, taskID)
 	return os.RemoveAll(taskDir)
+}
+
+func (mgr *TaskMgr) StorePartTaskLog(taskID string) error {
+	filePath := filepath.Join(studioConfig.GetConfig().File.TasksDir, taskID, "import.log")
+	content, err := utils.ReadPartFile(filePath)
+	if err != nil {
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+	}
+	taskEffect := &db.TaskEffect{
+		BID:        taskID,
+		Log:        strings.Join(content, "\n"),
+		CreateTime: time.Now(),
+	}
+	if err := mgr.db.UpdateTaskEffect(taskEffect); err != nil {
+		return ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+	}
+	return nil
 }
 
 /*
