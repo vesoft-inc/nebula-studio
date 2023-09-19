@@ -10,6 +10,7 @@ declare module '*.less';
 interface Window {
   gConfig: {
     databaseName: string;
+    appInstance: 'single' | 'multi';
   };
   __ngqlRunner__: any;
 }

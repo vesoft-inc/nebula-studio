@@ -10,7 +10,11 @@
   <!-- Global Event Tracking -->
   <script>var global = typeof global !== 'undefined' ? global : window;</script>
   <script>
-    window.gConfig = { databaseName: "NebulaGraph" }
+    <% if (initProps.NODE_ENV === 'development') { %>
+      window.gConfig = { appInstance: <%- JSON.stringify(initProps.appInstance) %>, databaseName: "NebulaGraph" }
+    <% } else { %>
+      window.gConfig = { appInstance: "{{.appInstance}}", databaseName: "NebulaGraph" }
+    <% } %>
   </script>
   <style>
     @-webkit-keyframes square-spin {

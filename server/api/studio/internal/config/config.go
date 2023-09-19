@@ -17,7 +17,8 @@ func GetConfig() *Config {
 
 type Config struct {
 	rest.RestConf
-	Debug struct {
+	AppInstance string `json:",default=single"`
+	Debug       struct {
 		Enable bool
 	}
 	Auth struct {

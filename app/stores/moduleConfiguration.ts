@@ -32,7 +32,11 @@ export class ModuleConfigurationStore implements IModuleConfiguration {
     disableConfigDownload: false,
     disableLogDownload: false,
     needPwdConfirm: true,
-    supportDatasourceType: [IDatasourceType.Local, IDatasourceType.S3, IDatasourceType.SFTP],
+    supportDatasourceType: [
+      window.gConfig?.appInstance === 'single' && IDatasourceType.Local,
+      IDatasourceType.S3,
+      IDatasourceType.SFTP,
+    ].filter(Boolean),
     supportS3Platform: [ES3Platform.AWS, ES3Platform.OSS, ES3Platform.Tecent, ES3Platform.Customize],
     disableConfigMore: false,
   };
