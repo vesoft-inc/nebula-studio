@@ -15,7 +15,7 @@ import (
 func AssetsMiddlewareWithCtx(svcCtx *svc.ServiceContext, embedAssets fs.FS) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if filepath.Ext(r.URL.Path) == "" {
-			_, err := template.ParseFS(embedAssets, "assets/index.html")
+			tpl, err := template.ParseFS(embedAssets, "assets/index.html")
 			withErrorMessage := utils.ErrMsgWithLogger(r.Context())
 			if err != nil {
 				svcCtx.ResponseHandler.Handle(w, r, nil, withErrorMessage(ecode.ErrInternalServer, err))
@@ -24,6 +24,7 @@ func AssetsMiddlewareWithCtx(svcCtx *svc.ServiceContext, embedAssets fs.FS) http
 
 			w.Header().Set("Content-Type", "text/html")
 			w.WriteHeader(http.StatusOK)
+			tpl.Execute(w, map[string]any{})
 			return
 		}
 
