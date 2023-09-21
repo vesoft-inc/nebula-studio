@@ -16,6 +16,7 @@ import { ImportStore } from '@app/stores/import';
 import styles from './index.module.less';
 import ConfigConfirmModal from './ConfigConfirmModal';
 import SchemaConfig from './SchemaConfig';
+import { IDatasourceType } from '@app/interfaces/datasource';
 const Option = Select.Option;
 const formItemLayout = {
   wrapperCol: {
@@ -51,7 +52,7 @@ const TaskCreate = () => {
     updateTaskDraft,
     setDraft,
   } = dataImport;
-  const { needPwdConfirm, disableConfigMore } = moduleConfiguration.dataImport;
+  const { needPwdConfirm, disableConfigMore, supportDatasourceType } = moduleConfiguration.dataImport;
   const { spaces, getSpaces, updateSpaceInfo, currentSpace, spaceVidType } = schema;
   const { getGraphAddress, _host } = global;
   const { getFiles } = files;
@@ -79,7 +80,7 @@ const TaskCreate = () => {
     const { state } = location;
     initTaskDir();
     getSpaces();
-    getFiles();
+    supportDatasourceType.includes(IDatasourceType.Local) && getFiles();
     if (state) {
       setShowMoreConfig(true);
       updateSpaceInfo(state.space);
