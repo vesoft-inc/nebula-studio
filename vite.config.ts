@@ -8,9 +8,10 @@ import postCssPresetEnv from 'postcss-preset-env';
 import ejs from 'ejs';
 // import legacy from '@vitejs/plugin-legacy';
 // import topLevelAwait from 'vite-plugin-top-level-await';
-// import { getAppConfig } from './build/config';
+import { getAppConfig } from './build/config';
 import pkg from './package.json';
 
+const appConfig = getAppConfig();
 const SVGElement = fs.readFileSync('./public/icons/iconpark.tpl', 'utf-8');
 const proxyHost = '127.0.0.1:9000';
 
@@ -41,7 +42,7 @@ export default defineConfig({
   plugins: [
     react(),
     // topLevelAwait(),
-    htmlPlugin(),
+    htmlPlugin({ appInstance: appConfig.AppInstance || 'single' }),
     // legacy({
     //   targets: ['chrome >= 87', 'safari >= 14', 'firefox >= 78'],
     //   polyfills: ['es.promise.finally', 'es/map', 'es/set', 'es/array'],

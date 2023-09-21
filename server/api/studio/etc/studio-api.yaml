@@ -3,6 +3,9 @@ Host: 0.0.0.0
 Port: 9000
 MaxBytes: 1073741824
 Timeout: 60000
+# single(single-instance) or multi(multi-instance), default is single
+# multi-instance: local data storage will be prohibited to ensure consistency across multiple instances
+# AppInstance: "multi"
 Log: 
   Mode: file
   Level: info
