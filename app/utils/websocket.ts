@@ -225,16 +225,19 @@ export class NgqlRunner {
   onError = (e: Event) => {
     console.error('=====ngqlSocket error', e);
     message.error('WebSocket error, try to reconnect...');
-    this.onDisconnect();
+    this.onDisconnect(e);
   };
 
-  onDisconnect = () => {
-    console.log('=====onDisconnect');
+  onDisconnect = (e?: CloseEvent | Event) => {
+    console.log('=====onDisconnect', e);
     this.socket?.removeEventListener('close', this.onDisconnect);
     this.socket?.removeEventListener('error', this.onError);
 
     this.clearMessageReceiver();
     this.closeSocket();
+
+    const { code, reason } = (e as CloseEvent) || {};
+    reason && message.error(`WebSocket closed unexpectedly, code: ${code}, reason: \`${reason}\`, try to reconnect...`);
 
     // try reconnect
     this.socketUrl && setTimeout(this.reConnect, 3000);
