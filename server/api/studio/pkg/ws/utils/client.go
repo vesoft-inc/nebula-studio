@@ -136,6 +136,11 @@ func (c *Client) Destroy() {
 	c.Hub.unregister <- c
 }
 
+func (c *Client) SendCloseMessage(closeCode int, reason string) error {
+	msg := websocket.FormatCloseMessage(closeCode, reason)
+	return c.Conn.WriteControl(websocket.CloseMessage, msg, time.Now().Add(time.Second))
+}
+
 // readPump pumps messages from the websocket connection to the hub.
 //
 // The application runs readPump in a per-connection goroutine. The application
@@ -160,7 +165,9 @@ func (c *Client) readPump() {
 			} else {
 				logx.Errorf("[WebSocket ReadMessage]: %v", err)
 			}
-			break
+
+			c.SendCloseMessage(websocket.CloseNormalClosure, err.Error())
+			return
 		}
 
 		msgReceivedByte := bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
@@ -202,7 +209,7 @@ func (c *Client) writePump() {
 			if !ok {
 				// The hub closed the channel.
 				logx.Errorf("[WebSocket writePump]: c.send length: %v", len(c.send))
-				c.Conn.WriteControl(websocket.CloseMessage, []byte{}, time.Now().Add(time.Second))
+				c.SendCloseMessage(websocket.CloseInternalServerErr, "client send channel error")
 				return
 			}
 
@@ -213,19 +220,27 @@ func (c *Client) writePump() {
 
 			msgLen := len(message)
 			if wsConfig.WriteLimit > 0 && int64(msgLen) > wsConfig.WriteLimit {
-				errMsg := websocket.FormatCloseMessage(websocket.CloseMessageTooBig, fmt.Sprintf("message length (%d) exceeds config limit (%d)", msgLen, wsConfig.WriteLimit))
-				c.Conn.WriteControl(websocket.CloseMessage, errMsg, time.Now().Add(time.Second))
+				reason := fmt.Sprintf("message length (%d) exceeds config limit (%d)", msgLen, wsConfig.WriteLimit)
+				c.SendCloseMessage(websocket.CloseMessageTooBig, reason)
 				return
 			}
 
 			w, err := c.Conn.NextWriter(websocket.TextMessage)
 			if err != nil {
+				c.SendCloseMessage(websocket.CloseInternalServerErr, err.Error())
 				logx.Errorf("[WebSocket WriteMessage]: %v", err)
 				return
 			}
-			w.Write(message)
+
+			_, err = w.Write(message)
+			if err != nil {
+				c.SendCloseMessage(websocket.CloseInternalServerErr, err.Error())
+				logx.Errorf("[WebSocket WriteMessage]: %v", err)
+				return
+			}
 
 			if err := w.Close(); err != nil {
+				c.SendCloseMessage(websocket.CloseInternalServerErr, err.Error())
 				logx.Errorf("[WebSocket WriteMessage Close]: %v", err)
 				return
 			}
@@ -235,6 +250,7 @@ func (c *Client) writePump() {
 				c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
 			}
 			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				c.SendCloseMessage(websocket.CloseInternalServerErr, err.Error())
 				logx.Errorf("[WebSocket ticker error]: %v", err)
 				return
 			}
