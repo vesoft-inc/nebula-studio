@@ -32,6 +32,25 @@ type Config struct {
 		TasksDir  string
 	} `json:",optional"`
 
+	WebSocket struct {
+		// The maximum wait time (secend) for the pong message from peer.
+		// If a peer does not respond to the ping message within this time, websocket will close the connection.
+		// default 60s, 0 means no limit
+		WriteDeadline int64 `json:",default=60"`
+		// The maximum wait time (secend) for the ping message from peer.
+		// If a peer does not send a ping message within this time, websocket will close the connection.
+		// default 60s, 0 means no limit
+		ReadDeadline int64 `json:",default=60"`
+		// The maximum message size allowed from peer.
+		// If a peer sends a message larger than this, a `websocket: write limit exceeded` error will be returned.
+		// default: 64MB (32 * 1024 * 1024), 0 means no limit or system limit
+		WriteLimit int64 `json:",default=33554432"`
+		// The maximum message size allowed from peer.
+		// If a peer sends a message larger than this, websocket will close the connection.
+		// default: 8MB (8 * 1024 * 1024), 0 means no limit or system limit
+		ReadLimit int64 `json:",default=8388608"`
+	} `json:",optional"`
+
 	DB struct {
 		LogLevel                  int    `json:",default=4"`
 		IgnoreRecordNotFoundError bool   `json:",default=true"`

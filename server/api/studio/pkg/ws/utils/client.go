@@ -3,33 +3,19 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
 	uuid "github.com/satori/go.uuid"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
 const (
-	// Time allowed to write a message to the peer.
-	writeWait = 10 * time.Second
-
-	// Time allowed to read the next pong message from the peer.
-	pongWait = 60 * time.Second
-
-	// Send pings to peer with this period. Must be less than pongWait.
-	pingPeriod = (pongWait * 9) / 10
-
-	// Maximum message size allowed from peer.
-	// Max ngql length can be executed is 4MB
-	maxMessageSize = 8 * 1024 * 1024
-
-	// send buffer size
-	bufSize = 512
-
-	heartbeatRequest = "1"
-
+	bufSize           = 512 // send buffer size
+	heartbeatRequest  = "1"
 	heartbeatResponse = "2"
 )
 
@@ -157,10 +143,15 @@ func (c *Client) Destroy() {
 // reads from this goroutine.
 func (c *Client) readPump() {
 	defer c.Destroy()
-
-	c.Conn.SetReadLimit(maxMessageSize)
-	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.Conn.SetPongHandler(func(string) error { c.Conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	wsConfig := config.GetConfig().WebSocket
+	if wsConfig.ReadLimit > 0 {
+		c.Conn.SetReadLimit(wsConfig.ReadLimit)
+	}
+	if wsConfig.ReadDeadline > 0 {
+		pongWait := time.Duration(wsConfig.ReadDeadline) * time.Second
+		c.Conn.SetReadDeadline(time.Now().Add(pongWait))
+		c.Conn.SetPongHandler(func(string) error { c.Conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	}
 	for {
 		_, message, err := c.Conn.ReadMessage()
 		if err != nil {
@@ -191,7 +182,15 @@ func (c *Client) readPump() {
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
 func (c *Client) writePump() {
-	ticker := time.NewTicker(pingPeriod)
+	wsConfig := config.GetConfig().WebSocket
+
+	writeWait := 0 * time.Second
+	ticker := time.NewTicker(30 * time.Second)
+
+	if wsConfig.WriteDeadline > 0 {
+		writeWait = time.Duration(wsConfig.WriteDeadline) * time.Second
+	}
+
 	defer func() {
 		ticker.Stop()
 		c.Destroy()
@@ -200,11 +199,22 @@ func (c *Client) writePump() {
 	for {
 		select {
 		case message, ok := <-c.send:
-			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				// The hub closed the channel.
 				logx.Errorf("[WebSocket writePump]: c.send length: %v", len(c.send))
 				c.Conn.WriteControl(websocket.CloseMessage, []byte{}, time.Now().Add(time.Second))
+				return
+			}
+
+			if writeWait > 0 {
+				// no timeout limit if writeWait is 0
+				c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
+			}
+
+			msgLen := len(message)
+			if wsConfig.WriteLimit > 0 && int64(msgLen) > wsConfig.WriteLimit {
+				errMsg := websocket.FormatCloseMessage(websocket.CloseMessageTooBig, fmt.Sprintf("message length (%d) exceeds config limit (%d)", msgLen, wsConfig.WriteLimit))
+				c.Conn.WriteControl(websocket.CloseMessage, errMsg, time.Now().Add(time.Second))
 				return
 			}
 
@@ -220,7 +230,10 @@ func (c *Client) writePump() {
 				return
 			}
 		case <-ticker.C:
-			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if writeWait > 0 {
+				// no timeout limit if writeWait is 0
+				c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
+			}
 			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				logx.Errorf("[WebSocket ticker error]: %v", err)
 				return

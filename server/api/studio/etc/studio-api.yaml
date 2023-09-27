@@ -12,6 +12,23 @@ Log:
   KeepDays: 7
 Debug:
   Enable: false
+WebSocket:
+  # The maximum wait time (secend) for the pong message from peer.
+  # If a peer does not respond to the ping message within this time, websocket connection will be closed.
+  # default 60s, 0 means no limit
+  WriteDeadline: 60
+  # The maximum wait time (secend) for the ping message from peer.
+  # If a peer does not send a ping message within this time, websocket connection will be closed.
+  # default 60s, 0 means no limit
+  ReadDeadline: 60
+  # The maximum message size allowed from peer.
+  # If a peer sends a message larger than this, an error will be thrown and websocket connection will be closed.
+  # default: 64MB (32 * 1024 * 1024), 0 means no limit or system limit
+  WriteLimit: 33554432
+  # The maximum message size allowed from peer.
+  # If a peer sends a message larger than this, websocket connection will be closed.
+  # default: 8MB (8 * 1024 * 1024), 0 means no limit or system limit
+  ReadLimit: 8388608
 Auth:
   TokenName: "studio_token"
   AccessSecret: "login_secret"

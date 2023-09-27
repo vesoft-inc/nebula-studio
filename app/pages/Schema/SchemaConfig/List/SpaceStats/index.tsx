@@ -127,7 +127,6 @@ const SpaceStats = () => {
     }
   };
   const showTime = updateTime && jobId == null && !loading;
-  console.log('=====updateTime', updateTime);
   return (
     <div className={styles.nebulaStats}>
       <div className={styles.row}>
