@@ -104,7 +104,13 @@ func InitDB(config *config.Config, db *gorm.DB) {
 	}
 
 	if config.DB.AutoMigrate {
-		err := db.AutoMigrate(
+		migrateTables := []string{"task_infos", "task_effects", "sketches", "schema_snapshots", "favorites", "files", "datasources"}
+		err := MigrateAlterBID(db, migrateTables)
+		if err != nil {
+			zap.L().Fatal(fmt.Sprintf("migrate tables fail: %s", err))
+			panic(err)
+		}
+		err = db.AutoMigrate(
 			&Datasource{},
 			&TaskInfo{},
 			&TaskEffect{},
