@@ -4,6 +4,7 @@ import { Button, Input, Modal, Table, Popconfirm, Dropdown, MenuProps } from 'an
 import { v4 as uuidv4 } from 'uuid';
 import { useCallback, useEffect, useState } from 'react';
 import { usePapaParse } from 'react-papaparse';
+import { debounce } from 'lodash';
 import cls from 'classnames';
 import { StudioFile } from '@app/interfaces/import';
 import { observer, useLocalObservable } from 'mobx-react-lite';
@@ -62,40 +63,43 @@ const FileConfigSetting = (props: IProps) => {
   useEffect(() => {
     state.activeItem && readFile();
   }, [state.activeItem]);
-  const readFile = useCallback(() => {
-    const { activeItem, setState } = state;
-    if (!activeItem) return;
-    setState({ loading: true });
-    let content = [];
-    if (activeItem.sample !== undefined) {
-      readString(activeItem.sample, {
-        delimiter: activeItem.delimiter || ',',
-        worker: true,
-        skipEmptyLines: true,
-        step: (row) => {
-          content = [...content, row.data];
-        },
-        complete: () => {
-          setState({ loading: false, previewContent: content });
-        },
-      });
-    } else {
-      const url = URL.createObjectURL(activeItem);
-      readRemoteFile(url, {
-        delimiter: activeItem.delimiter,
-        download: true,
-        preview: 5,
-        worker: true,
-        skipEmptyLines: true,
-        step: (row) => {
-          content = [...content, row.data];
-        },
-        complete: () => {
-          setState({ loading: false, previewContent: content });
-        },
-      });
-    }
-  }, []);
+  const readFile = useCallback(
+    debounce(() => {
+      const { activeItem, setState } = state;
+      if (!activeItem) return;
+      setState({ loading: true });
+      let content = [];
+      if (activeItem.sample !== undefined) {
+        readString(activeItem.sample, {
+          delimiter: activeItem.delimiter || ',',
+          worker: true,
+          skipEmptyLines: true,
+          step: (row) => {
+            content = [...content, row.data];
+          },
+          complete: () => {
+            setState({ loading: false, previewContent: content });
+          },
+        });
+      } else {
+        const url = URL.createObjectURL(activeItem);
+        readRemoteFile(url, {
+          delimiter: activeItem.delimiter,
+          download: true,
+          preview: 5,
+          worker: true,
+          skipEmptyLines: true,
+          step: (row) => {
+            content = [...content, row.data];
+          },
+          complete: () => {
+            setState({ loading: false, previewContent: content });
+          },
+        });
+      }
+    }, 300),
+    [],
+  );
 
   const onCheckAllChange = useCallback((e: CheckboxChangeEvent) => {
     const { data, setState } = state;
@@ -126,9 +130,12 @@ const FileConfigSetting = (props: IProps) => {
   }, []);
 
   const updateDelimiter = useCallback((e: React.ChangeEvent<HTMLInputElement>, item: StudioFile) => {
-    const { activeItem } = state;
+    const { activeItem, setState, data } = state;
     e.stopPropagation();
     item.delimiter = e.target.value;
+    setState({
+      data: data.map((i) => (i.path === item.path && (i.delimiter = e.target.value), i)),
+    });
     item === activeItem && readFile();
   }, []);
 
@@ -281,7 +288,7 @@ const FileConfigSetting = (props: IProps) => {
             className={styles.previewTable}
             dataSource={data}
             columns={columns}
-            rowKey={() => uuidv4()}
+            rowKey="path"
             pagination={false}
           />
         </div>
