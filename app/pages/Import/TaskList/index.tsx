@@ -25,7 +25,7 @@ const TaskList = () => {
   const { dataImport, global, moduleConfiguration, schema } = useStore();
   const { spaces, getSpaces } = schema;
   const isMounted = useRef(true);
-  const [filter, setFilter] = useState({ page: 1, pageSize: 10, space: '' });
+  const [filter, setFilter] = useState({ page: 1, pageSize: 10, space: undefined });
   const { intl, currentLocale } = useI18n();
   const history = useHistory();
   const { taskList, getTaskList, stopTask, deleteTask } = dataImport;
@@ -70,7 +70,7 @@ const TaskList = () => {
   }, []);
   const initList = useCallback(async () => {
     setLoading(true);
-    await getData({ page: 1, space: '' });
+    await getData({ page: 1, space: undefined });
     setLoading(false);
   }, []);
   const handleRerun = () => {

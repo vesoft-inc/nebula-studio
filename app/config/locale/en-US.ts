@@ -112,7 +112,6 @@ export default {
     port: 'Port',
     username: 'Username',
     password: 'Password',
-    success: 'succeed',
     clear: 'Log out',
     title: `Connect to ${window.gConfig.databaseName}`,
     tip: "Don't know the address? Docs->",
