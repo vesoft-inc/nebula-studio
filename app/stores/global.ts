@@ -107,7 +107,6 @@ export class GlobalStore {
       },
     )) as any;
     if (code === 0) {
-      message.success(intl.get('configServer.success'));
       cookies.set('nh', _host);
       cookies.set('nu', username);
       const socketConncted = await this.ngqlRunner.connect({

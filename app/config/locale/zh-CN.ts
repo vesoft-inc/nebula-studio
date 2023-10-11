@@ -107,7 +107,6 @@ export default {
     port: 'Port',
     username: '用户名',
     password: '密码',
-    success: '配置成功',
     clear: '登出',
     title: '配置数据库',
     tip: '连接数据库说明文档->',
