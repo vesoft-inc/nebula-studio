@@ -1,9 +1,10 @@
 import { Button, Popconfirm, Table, message, Popover, Form, Input, Dropdown, Tooltip } from 'antd';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { observable } from 'mobx';
 import { useI18n } from '@vesoft-inc/i18n';
 import Icon from '@app/components/Icon';
 import { trackPageView } from '@app/utils/stat';
-import { observer } from 'mobx-react-lite';
+import { observer, useLocalObservable } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import cls from 'classnames';
 import { Link, useHistory } from 'react-router-dom';
@@ -59,24 +60,38 @@ const CloneSpacePopover = (props: ICloneOperations) => {
 
 const Schema = () => {
   const { schema, moduleConfiguration } = useStore();
-  const [loading, setLoading] = useState(false);
-  const [searchVal, setSearchVal] = useState('');
+  const state = useLocalObservable(
+    () => ({
+      loading: false,
+      searchVal: '',
+      spaces: [],
+      data: [],
+      current: 1,
+      pageSize: 10,
+      total: 0,
+      setState: (obj) => Object.assign(state, obj),
+    }),
+    { data: observable.ref, spaces: observable.ref },
+  );
+  const { loading, data, current, pageSize, total } = state;
   const history = useHistory();
   const { intl } = useI18n();
-  const { currentSpace, switchSpace, getSpacesList, deleteSpace, spaceList, cloneSpace } = schema;
+  const { currentSpace, switchSpace, clearSpace, getSpacesList, deleteSpace, cloneSpace, getSpaces } = schema;
   const activeSpace = location.hash.slice(1);
   useEffect(() => {
     trackPageView('/schema');
-    getSpaces();
+    init();
   }, []);
 
   const handleDeleteSpace = async (name: string) => {
-    setLoading(true);
+    const { setState, spaces } = state;
+    setState({ loading: true });
     const res = await deleteSpace(name);
-    setLoading(false);
+    setState({ loading: false });
     if (res.code === 0) {
       message.success(intl.get('common.deleteSuccess'));
-      await getSpaces();
+      const _spaces = spaces.splice(spaces.indexOf(name), 1);
+      await getData({ spaces: _spaces });
       if (currentSpace === name) {
         schema.update({
           currentSpace: '',
@@ -85,16 +100,69 @@ const Schema = () => {
       }
     }
   };
+  const handleClearSpace = async (name: string) => {
+    const { setState } = state;
+    setState({ loading: true });
+    const res = await clearSpace(name);
+    setState({ loading: false });
+    if (res.code === 0) {
+      message.success(intl.get('common.success'));
+    }
+  };
 
   const viewSpaceDetail = useCallback(async (space: string) => {
     const ok = await switchSpace(space);
     ok && history.push(`/schema/tag/list`);
   }, []);
-  const getSpaces = useCallback(async () => {
-    setLoading(true);
-    await getSpacesList();
-    setLoading(false);
+  const init = useCallback(async () => {
+    const { setState } = state;
+    setState({ loading: true });
+    const { code, data } = await getSpaces();
+    const sortData = data.sort();
+    if (code === 0) {
+      const activeSpace = location.hash.slice(1);
+      if (activeSpace) {
+        const index = sortData.indexOf(activeSpace);
+        if (index > -1) {
+          sortData.splice(index, 1);
+          sortData.unshift(activeSpace);
+        }
+      }
+      setState({
+        spaces: data,
+        loading: false,
+        current: 1,
+        pageSize: 10,
+        total: data.length,
+      });
+      await getData({ spaces: data, current: 1 });
+    }
+    setState({ loading: false });
   }, []);
+  const getData = async (params?: Partial<typeof state>) => {
+    const { setState } = state;
+    setState({ loading: true });
+    const {
+      searchVal: _searchVal = state.searchVal,
+      current: _current = state.current,
+      pageSize: _pageSize = state.pageSize,
+      spaces: _spaces = state.spaces,
+    } = params || {};
+    const spaceList = _spaces
+      .filter((i) => i.includes(_searchVal))
+      .slice((_current - 1) * _pageSize, _current * _pageSize);
+    const data = await getSpacesList(spaceList);
+    data.map((item, index) => {
+      item.serialNumber = (_current - 1) * _pageSize + index + 1;
+      return item;
+    });
+    setState({
+      data,
+      loading: false,
+      ...params,
+    });
+  };
+  const onSearch = useCallback((value) => getData({ searchVal: value, current: 1 }), []);
 
   const handleCloneSpace = useCallback(async (name: string, oldSpace: string) => {
     const { code } = await cloneSpace(name, oldSpace);
@@ -196,6 +264,21 @@ const Schema = () => {
                       label: <CloneSpacePopover space={space.Name} onClone={handleCloneSpace} />,
                     },
                     {
+                      key: 'clear',
+                      label: (
+                        <Popconfirm
+                          onConfirm={() => handleClearSpace(space.Name)}
+                          title={intl.get('common.ask')}
+                          okText={intl.get('common.ok')}
+                          cancelText={intl.get('common.cancel')}
+                        >
+                          <Button type="link" danger>
+                            {intl.get('schema.clearSpace')}
+                          </Button>
+                        </Popconfirm>
+                      ),
+                    },
+                    {
                       key: 'delete',
                       label: (
                         <Popconfirm
@@ -222,13 +305,12 @@ const Schema = () => {
       },
     },
   ];
-  const data = useMemo(() => spaceList.filter((item) => item.Name.includes(searchVal)), [spaceList, searchVal]);
   return (
     <div className={cls(styles.schemaPage, 'studioCenterLayout')}>
       <div className={styles.schemaHeader}>{intl.get('schema.spaceList')}</div>
       <div className={styles.schemaContainer}>
         <div className={styles.row}>
-          <Search type={intl.get('common.space')} onSearch={setSearchVal} />
+          <Search type={intl.get('common.space')} onSearch={onSearch} />
           {!moduleConfiguration.schema?.disableCreateSpace && (
             <Button className={cls(styles.btnCreate, 'studioAddBtn')} type="primary">
               <Link
@@ -250,6 +332,12 @@ const Schema = () => {
           loading={!!loading}
           rowKey="ID"
           rowClassName={(item) => (item.Name === activeSpace ? styles.active : '')}
+          pagination={{
+            current,
+            pageSize,
+            total,
+            onChange: (current, pageSize) => getData({ current, pageSize }),
+          }}
         />
       </div>
     </div>
