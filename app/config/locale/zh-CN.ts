@@ -391,6 +391,7 @@ export default {
     statError: '统计失败，请重试',
     statFinished: '统计结束',
     deleteSpace: '删除图空间',
+    clearSpace: '清空图空间',
     cloneSpace: '克隆图空间',
     length: '长度',
     selectVidTypeTip: '选择 Vid 类型',
