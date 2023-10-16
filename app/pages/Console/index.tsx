@@ -5,12 +5,14 @@ import { trackEvent, trackPageView } from '@app/utils/stat';
 import { useStore } from '@app/stores';
 import Icon from '@app/components/Icon';
 import CodeMirror from '@app/components/CodeMirror';
+import cls from 'classnames';
 import { useI18n } from '@vesoft-inc/i18n';
 import OutputBox from './OutputBox';
 import HistoryBtn from './HistoryBtn';
 import FavoriteBtn from './FavoriteBtn';
 import CypherParameterBox from './CypherParameterBox';
 import ExportModal from './ExportModal';
+import SchemaDrawer from './SchemaDrawer';
 import styles from './index.module.less';
 const Option = Select.Option;
 
@@ -26,12 +28,8 @@ const getHistory = () => {
 };
 
 interface IProps {
-  onExplorer?: (params: {
-    space: string;
-    vertexes: any[], 
-    edges: any[]
-  }) => void,
-  templateRender?: (data?) => JSX.Element
+  onExplorer?: (params: { space: string; vertexes: any[]; edges: any[] }) => void;
+  templateRender?: (data?) => JSX.Element;
 }
 const Console = (props: IProps) => {
   const { schema, console } = useStore();
@@ -56,6 +54,7 @@ const Console = (props: IProps) => {
     spaceVidType: string;
     [key: string]: any;
   }>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const editor = useRef<any>(null);
   useEffect(() => {
     trackPageView('/console');
@@ -67,7 +66,7 @@ const Console = (props: IProps) => {
   const checkSwitchSpaceGql = (query: string) => {
     const queryList = query.split(SEMICOLON_REG).filter(Boolean);
     const reg = /^USE `?.+`?(?=[\s*;?]?)/gim;
-    if (queryList.some(sentence => sentence.trim().match(reg))) {
+    if (queryList.some((sentence) => sentence.trim().match(reg))) {
       return intl.get('common.disablesUseToSwitchSpace');
     }
   };
@@ -76,7 +75,7 @@ const Console = (props: IProps) => {
     update({ currentGQL: value, currentSpace: space || currentSpace });
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
   };
 
@@ -89,9 +88,12 @@ const Console = (props: IProps) => {
   };
 
   const handleRun = async () => {
-    if(editor.current) {
+    if (editor.current) {
       const value = editor.current!.editor.getValue();
-      const query = value.split('\n').filter(i => !i.trim().startsWith('//') && !i.trim().startsWith('#')).join('\n');
+      const query = value
+        .split('\n')
+        .filter((i) => !i.trim().startsWith('//') && !i.trim().startsWith('#'))
+        .join('\n');
       if (!query) {
         message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
         return;
@@ -100,7 +102,7 @@ const Console = (props: IProps) => {
       if (errInfo) {
         return message.error(errInfo);
       }
-  
+
       editor.current!.editor.execCommand('goDocEnd');
       handleSaveQuery(query);
       await runGQL({ gql: query, editorValue: value });
@@ -111,17 +113,13 @@ const Console = (props: IProps) => {
     update({ currentGQL: currentGQL + ` $${param}` });
   };
 
-  const handleResultConfig = (data: {
-    space: string;
-    spaceVidType: string;
-    [key: string]: any;
-  }) => {
+  const handleResultConfig = (data: { space: string; spaceVidType: string; [key: string]: any }) => {
     setModalData(data);
     setModalVisible(true);
   };
 
   const handleExplorer = async (data) => {
-    if(!onExplorer) {
+    if (!onExplorer) {
       return;
     }
     await onExplorer!(data);
@@ -133,14 +131,21 @@ const Console = (props: IProps) => {
   };
   return (
     <div className={styles.nebulaConsole}>
-      <div className="studioCenterLayout">
+      <SchemaDrawer open={drawerOpen} setOpen={setDrawerOpen} />
+      <div className={cls('studioCenterLayout', styles.consoleContainer)}>
         <div className={styles.consolePanel}>
           <div className={styles.panelHeader}>
             <span className={styles.title}>{`${window.gConfig.databaseName} ${intl.get('common.console')}`}</span>
             <div className={styles.operations}>
               <div className={styles.spaceSelect}>
-                <Select allowClear value={currentSpace || null} placeholder={intl.get('console.selectSpace')} onDropdownVisibleChange={handleGetSpaces} onChange={updateCurrentSpace}>
-                  {spaces.map(space => (
+                <Select
+                  allowClear
+                  value={currentSpace || null}
+                  placeholder={intl.get('console.selectSpace')}
+                  onDropdownVisibleChange={handleGetSpaces}
+                  onChange={updateCurrentSpace}
+                >
+                  {spaces.map((space) => (
                     <Option value={space} key={space}>
                       {space}
                     </Option>
@@ -152,11 +157,15 @@ const Console = (props: IProps) => {
                 <FavoriteBtn onGqlSelect={updateGql} />
                 <HistoryBtn onGqlSelect={updateGql} />
                 <Tooltip title={intl.get('common.empty')} placement="top">
-                  <Icon className={styles.btnOperations} type="icon-studio-btn-clear" onClick={() => update({ currentGQL: '' })} />
+                  <Icon
+                    className={styles.btnOperations}
+                    type="icon-studio-btn-clear"
+                    onClick={() => update({ currentGQL: '' })}
+                  />
                 </Tooltip>
                 <Button type="primary" onClick={handleRun} loading={runGQLLoading}>
                   <Icon type="icon-studio-btn-play" />
-                  {intl.get('common.run')} 
+                  {intl.get('common.run')}
                 </Button>
               </div>
             </div>
@@ -165,7 +174,7 @@ const Console = (props: IProps) => {
             <CypherParameterBox onSelect={addParam} data={paramsMap} />
             <CodeMirror
               value={currentGQL}
-              onChange={value => update({ currentGQL: value })}
+              onChange={(value) => update({ currentGQL: value })}
               ref={editor}
               height="120px"
               onShiftEnter={handleRun}
@@ -178,29 +187,36 @@ const Console = (props: IProps) => {
           </div>
         </div>
         <div className="result-wrap">
-          {results.length > 0 ? results.map((item, index) => (
+          {results.length > 0 ? (
+            results.map((item, index) => (
+              <OutputBox
+                key={item.id}
+                index={index}
+                result={item}
+                templateRender={templateRender}
+                onExplorer={onExplorer ? handleExplorer : undefined}
+                onHistoryItem={(gql, space) => updateGql(gql, space)}
+                onResultConfig={handleResultConfig}
+              />
+            ))
+          ) : (
             <OutputBox
-              key={item.id}
-              index={index}
-              result={item}
-              templateRender={templateRender}
-              onExplorer={onExplorer ? handleExplorer : undefined}
-              onHistoryItem={(gql, space) => updateGql(gql, space)}
-              onResultConfig={handleResultConfig}
+              key="empty"
+              index={0}
+              result={{ id: 'empty', gql: '', code: 0, data: { headers: [], tables: [] } }}
+              onHistoryItem={(gql) => updateGql(gql)}
             />
-          )) : <OutputBox
-            key="empty"
-            index={0}
-            result={{ id: 'empty', gql: '', code: 0, data: { headers: [], tables: [] } }}
-            onHistoryItem={gql => updateGql(gql)}
-          />}
+          )}
         </div>
       </div>
-      {modalVisible && <ExportModal 
-        visible={modalVisible} 
-        data={modalData} 
-        onClose={() => setModalVisible(false)}
-        onExplorer={handleExplorer} />}
+      {modalVisible && (
+        <ExportModal
+          visible={modalVisible}
+          data={modalData}
+          onClose={() => setModalVisible(false)}
+          onExplorer={handleExplorer}
+        />
+      )}
     </div>
   );
 };

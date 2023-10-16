@@ -223,10 +223,10 @@ export class SchemaStore {
   };
 
   // edges
-  getEdges = async () => {
+  getEdges = async (space?: string) => {
     const { code, data } = await service.execNGQL({
       gql: `show edges;`,
-      space: this.currentSpace,
+      space: space || this.currentSpace,
     });
     if (code === 0) {
       const edgeTypes = data.tables.map((item) => item.Name);
@@ -302,10 +302,10 @@ export class SchemaStore {
   };
 
   // tags
-  getTags = async () => {
+  getTags = async (space?: string) => {
     const { code, data } = await service.execNGQL({
       gql: `SHOW TAGS;`,
-      space: this.currentSpace,
+      space: space || this.currentSpace,
     });
 
     if (code === 0) {
@@ -411,9 +411,9 @@ export class SchemaStore {
     return null;
   };
 
-  getTagOrEdgeInfo = async (type: ISchemaType, name: string) => {
+  getTagOrEdgeInfo = async (type: ISchemaType, name: string, space?: string) => {
     const gql = `desc ${type}  ${handleKeyword(name)}`;
-    const { code, data } = await service.execNGQL({ gql, space: this.currentSpace });
+    const { code, data } = await service.execNGQL({ gql, space: space || this.currentSpace });
     return { code, data };
   };
 
