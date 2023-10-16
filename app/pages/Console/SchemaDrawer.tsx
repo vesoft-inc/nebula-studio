@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Drawer, List, Tabs, Tree } from 'antd';
+import { List, Tabs, Tree } from 'antd';
 import { observer } from 'mobx-react-lite';
 import { useI18n } from '@vesoft-inc/i18n';
 import { useStore } from '@app/stores';
