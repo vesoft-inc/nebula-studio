@@ -1,15 +1,12 @@
 import { action, makeObservable, observable } from 'mobx';
 import cookies from 'js-cookie';
-import { message } from 'antd';
 import { Base64 } from 'js-base64';
-import { getI18n } from '@vesoft-inc/i18n';
 import { BrowserHistory } from 'history';
 import service from '@app/config/service';
 import ngqlRunner from '@app/utils/websocket';
 import { isValidIP } from '@app/utils/function';
 import { getRootStore, resetStore } from '.';
 
-const { intl } = getI18n();
 export class GlobalStore {
   gConfig = window.gConfig;
   appSetting = {
