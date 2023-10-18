@@ -79,7 +79,7 @@ export const getSpaceCreateGQL = (params: {
     })
     .join(', ');
   const gql = `CREATE SPACE ${handleKeyword(name)} ${optionsStr ? `(${optionsStr})` : ''} ${
-    comment ? `COMMENT = "${comment}"` : ''
+    comment ? `COMMENT = "${handleEscape(comment)}"` : ''
   }`;
   return gql;
 };
@@ -101,7 +101,7 @@ export const getTagOrEdgeCreateGQL = (params: {
             switch (item.type) {
               case 'string':
               case 'fixed_string':
-                valueStr = `DEFAULT "${item.value}"`;
+                valueStr = `DEFAULT "${handleEscape(item.value)}"`;
                 break;
               case 'timestamp': {
                 const timestampReg = /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})$/;
@@ -115,7 +115,7 @@ export const getTagOrEdgeCreateGQL = (params: {
           const _type =
             item.type !== 'fixed_string' ? item.type : item.type + `(${item.fixedLength ? item.fixedLength : ''})`;
           const _null = item.allowNull ? 'NULL' : 'NOT NULL';
-          const _comment = item.comment ? `COMMENT "${item.comment}"` : '';
+          const _comment = item.comment ? `COMMENT "${handleEscape(item.comment)}"` : '';
           const conbine = [handleKeyword(item.name), _type, _null, valueStr, _comment];
           return conbine.join(' ');
         })
@@ -124,7 +124,7 @@ export const getTagOrEdgeCreateGQL = (params: {
   const ttlStr = ttl_col ? `TTL_DURATION = ${ttl_duration || ''}, TTL_COL = "${handleEscape(ttl_col)}"` : '';
   const gql = `CREATE ${type} ${handleKeyword(name)} ${
     propertiesStr.length > 0 ? `(${propertiesStr})` : '()'
-  } ${ttlStr} ${comment ? `${ttlStr.length > 0 ? ', ' : ''}COMMENT = "${comment}"` : ''}`;
+  } ${ttlStr} ${comment ? `${ttlStr.length > 0 ? ', ' : ''}COMMENT = "${handleEscape(comment)}"` : ''}`;
   return gql;
 };
 
@@ -135,7 +135,7 @@ export const getAlterGQL = (params: IAlterForm) => {
     const { ttl } = config;
     content = `TTL_DURATION = ${ttl.duration || 0}, TTL_COL = "${ttl.col ? handleEscape(ttl.col) : ''}"`;
   } else if (action === 'COMMENT') {
-    content = `COMMENT="${config.comment}"`;
+    content = `COMMENT="${handleEscape(config.comment)}"`;
   } else if (config.fields) {
     const date = config.fields
       .map((item) => {
@@ -151,7 +151,7 @@ export const getAlterGQL = (params: IAlterForm) => {
           switch (type) {
             case 'string':
             case 'fixed_string':
-              str += ` DEFAULT "${value}"`;
+              str += ` DEFAULT "${handleEscape(value)}"`;
               break;
             case 'timestamp': {
               const timestampReg = /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})$/;
@@ -163,7 +163,7 @@ export const getAlterGQL = (params: IAlterForm) => {
           }
         }
         if (comment) {
-          str += ` COMMENT "${comment}"`;
+          str += ` COMMENT "${handleEscape(comment)}"`;
         }
         return str;
       })
@@ -184,7 +184,7 @@ export const getIndexCreateGQL = (params: {
   const { type, name, associate, fields, comment } = params;
   const combine = associate ? `on ${handleKeyword(associate)}(${fields?.join(', ')})` : '';
   const gql = `CREATE ${type.toUpperCase()} INDEX ${handleKeyword(name)} ${combine} ${
-    comment ? `COMMENT "${comment}"` : ''
+    comment ? `COMMENT "${handleEscape(comment)}"` : ''
   }`;
   return gql;
 };
