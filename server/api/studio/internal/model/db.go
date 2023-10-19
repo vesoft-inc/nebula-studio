@@ -15,6 +15,8 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	dbutil "github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/db"
 )
 
 var CtxDB *gorm.DB
@@ -105,7 +107,7 @@ func InitDB(config *config.Config, db *gorm.DB) {
 
 	if config.DB.AutoMigrate {
 		migrateTables := []string{"task_infos", "task_effects", "sketches", "schema_snapshots", "favorites", "files", "datasources"}
-		err := MigrateAlterBID(db, migrateTables)
+		err := dbutil.MigrateAlterBID(db, migrateTables)
 		if err != nil {
 			zap.L().Fatal(fmt.Sprintf("migrate tables fail: %s", err))
 			panic(err)
