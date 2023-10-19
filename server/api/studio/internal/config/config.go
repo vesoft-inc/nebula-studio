@@ -43,7 +43,7 @@ type Config struct {
 		ReadDeadline int64 `json:",default=60"`
 		// The maximum message size allowed from peer.
 		// If a peer sends a message larger than this, a `websocket: write limit exceeded` error will be returned.
-		// default: 64MB (32 * 1024 * 1024), 0 means no limit or system limit
+		// default: 32MB (32 * 1024 * 1024), 0 means no limit or system limit
 		WriteLimit int64 `json:",default=33554432"`
 		// The maximum message size allowed from peer.
 		// If a peer sends a message larger than this, websocket will close the connection.

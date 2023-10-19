@@ -23,7 +23,7 @@ WebSocket:
   ReadDeadline: 60
   # The maximum message size allowed from peer.
   # If a peer sends a message larger than this, an error will be thrown and websocket connection will be closed.
-  # default: 64MB (32 * 1024 * 1024), 0 means no limit or system limit
+  # default: 32MB (32 * 1024 * 1024), 0 means no limit or system limit
   WriteLimit: 33554432
   # The maximum message size allowed from peer.
   # If a peer sends a message larger than this, websocket connection will be closed.
