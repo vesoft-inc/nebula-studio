@@ -66,6 +66,8 @@ export default {
     prev: '上一步',
     createTime: '创建时间',
     rerun: '重新导入',
+    keyword: '关键字',
+    function: '函数',
   },
   doc: {
     welcome: '欢迎使用',

@@ -258,8 +258,8 @@ export class SchemaStore {
     }
   };
 
-  getEdgeList = async () => {
-    const edgeTypes = await this.getEdges();
+  getEdgeList = async (space?: string) => {
+    const edgeTypes = await this.getEdges(space);
     if (edgeTypes) {
       const edgeList: IEdge[] = [];
       await Promise.all(
@@ -268,7 +268,7 @@ export class SchemaStore {
             name: item,
             fields: [],
           };
-          const { code, data } = await this.getTagOrEdgeInfo(ISchemaEnum.Edge, item);
+          const { code, data } = await this.getTagOrEdgeInfo(ISchemaEnum.Edge, item, space);
           if (code === 0) {
             edge.fields = data.tables;
           }
@@ -276,6 +276,7 @@ export class SchemaStore {
         }),
       );
       this.update({ edgeList });
+      return edgeList;
     }
   };
 
@@ -336,8 +337,8 @@ export class SchemaStore {
     );
   };
 
-  getTagList = async () => {
-    const tags = await this.getTags();
+  getTagList = async (space?: string) => {
+    const tags = await this.getTags(space);
     if (tags) {
       const tagList: ITag[] = [];
       await Promise.all(
@@ -346,7 +347,7 @@ export class SchemaStore {
             name: item,
             fields: [],
           };
-          const { code, data } = await this.getTagOrEdgeInfo(ISchemaEnum.Tag, item);
+          const { code, data } = await this.getTagOrEdgeInfo(ISchemaEnum.Tag, item, space);
           if (code === 0) {
             tag.fields = data.tables;
           }
@@ -354,6 +355,7 @@ export class SchemaStore {
         }),
       );
       this.update({ tagList });
+      return tagList;
     }
   };
 
@@ -792,6 +794,15 @@ export class SchemaStore {
     } catch (err) {
       message.warning(err.toString());
     }
+  };
+
+  getSchemaTree = async (space) => {
+    const [tagList, edgeList] = await Promise.all([this.getTagList(space), this.getEdgeList(space)]);
+    return {
+      space,
+      tagList,
+      edgeList,
+    };
   };
 }
 

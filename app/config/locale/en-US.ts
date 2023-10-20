@@ -66,6 +66,8 @@ export default {
     prev: 'Previous',
     createTime: 'Create Time',
     rerun: 'Rerun',
+    keyword: 'Keyword',
+    function: 'Function',
   },
   doc: {
     welcome: 'Welcome to',

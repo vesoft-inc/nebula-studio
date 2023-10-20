@@ -1,10 +1,10 @@
 import { Button, Select, Tooltip, message } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { trackEvent, trackPageView } from '@app/utils/stat';
 import { useStore } from '@app/stores';
 import Icon from '@app/components/Icon';
-import CodeMirror from '@app/components/CodeMirror';
+import MonacoEditor from '@app/components/MonacoEditor';
 import cls from 'classnames';
 import { useI18n } from '@vesoft-inc/i18n';
 import OutputBox from './OutputBox';
@@ -14,6 +14,8 @@ import CypherParameterBox from './CypherParameterBox';
 import ExportModal from './ExportModal';
 import SchemaDrawer from './SchemaDrawer';
 import styles from './index.module.less';
+import { Monaco } from '@monaco-editor/react';
+
 const Option = Select.Option;
 
 // split from semicolon out of quotation marks
@@ -55,12 +57,14 @@ const Console = (props: IProps) => {
     [key: string]: any;
   }>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [schemaTree, setSchemaTree] = useState({});
   const editor = useRef<any>(null);
   useEffect(() => {
     trackPageView('/console');
     getSpaces();
     getParams();
     getFavoriteList();
+    currentSpace && handleSwitchSpace(currentSpace);
   }, []);
 
   const checkSwitchSpaceGql = (query: string) => {
@@ -88,25 +92,23 @@ const Console = (props: IProps) => {
   };
 
   const handleRun = async () => {
-    if (editor.current) {
-      const value = editor.current!.editor.getValue();
-      const query = value
-        .split('\n')
-        .filter((i) => !i.trim().startsWith('//') && !i.trim().startsWith('#'))
-        .join('\n');
-      if (!query) {
-        message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
-        return;
-      }
-      const errInfo = checkSwitchSpaceGql(query);
-      if (errInfo) {
-        return message.error(errInfo);
-      }
-
-      editor.current!.editor.execCommand('goDocEnd');
-      handleSaveQuery(query);
-      await runGQL({ gql: query, editorValue: value });
+    if (!editor.current) return;
+    const value = editor.current.getValue();
+    const query = value
+      .split('\n')
+      .filter((i) => !i.trim().startsWith('//') && !i.trim().startsWith('#'))
+      .join('\n');
+    if (!query) {
+      message.error(intl.get('common.sorryNGQLCannotBeEmpty'));
+      return;
     }
+    const errInfo = checkSwitchSpaceGql(query);
+    if (errInfo) {
+      return message.error(errInfo);
+    }
+
+    handleSaveQuery(query);
+    await runGQL({ gql: query, editorValue: value });
   };
 
   const addParam = (param: string) => {
@@ -129,6 +131,12 @@ const Console = (props: IProps) => {
   const handleGetSpaces = (open: boolean) => {
     open && getSpaces();
   };
+  const handleEditorChange = useCallback((value) => update({ currentGQL: value }), []);
+  const handleSwitchSpace = useCallback(async (space) => {
+    await updateCurrentSpace(space);
+    const data = await schema.getSchemaTree(space);
+    data && setSchemaTree(data);
+  }, []);
   return (
     <div className={styles.nebulaConsole}>
       <SchemaDrawer open={drawerOpen} setOpen={setDrawerOpen} />
@@ -143,7 +151,7 @@ const Console = (props: IProps) => {
                   value={currentSpace || null}
                   placeholder={intl.get('console.selectSpace')}
                   onDropdownVisibleChange={handleGetSpaces}
-                  onChange={updateCurrentSpace}
+                  onChange={handleSwitchSpace}
                 >
                   {spaces.map((space) => (
                     <Option value={space} key={space}>
@@ -172,17 +180,11 @@ const Console = (props: IProps) => {
           </div>
           <div className={styles.codeInput}>
             <CypherParameterBox onSelect={addParam} data={paramsMap} />
-            <CodeMirror
+            <MonacoEditor
+              onInstanceChange={(instance) => (editor.current = instance)}
+              schemaHint={schemaTree}
               value={currentGQL}
-              onChange={(value) => update({ currentGQL: value })}
-              ref={editor}
-              height="120px"
-              onShiftEnter={handleRun}
-              options={{
-                keyMap: 'sublime',
-                fullScreen: true,
-                mode: 'nebula',
-              }}
+              onChange={handleEditorChange}
             />
           </div>
         </div>

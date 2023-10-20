@@ -3,8 +3,7 @@ import Icon from '@app/components/Icon';
 import { useCallback, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import CodeMirror from '@app/components/CodeMirror';
-
+import MonacoEditor from '@app/components/MonacoEditor';
 
 import { useStore } from '@app/stores';
 import { handleKeyword } from '@app/utils/function';
@@ -14,37 +13,36 @@ import styles from './index.module.less';
 interface IProps {
   space: string;
 }
-const options = {
-  keyMap: 'sublime',
-  fullScreen: true,
-  mode: 'nebula',
-  readOnly: true,
-};
 const sleepGql = `:sleep 20;`;
 const DDLButton = (props: IProps) => {
   const { space } = props;
   const { intl } = useI18n();
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { schema: { getSchemaDDL } } = useStore();
+  const {
+    schema: { getSchemaDDL },
+  } = useStore();
   const [ddl, setDDL] = useState('');
-  const handleJoinGQL = useCallback((data) => data.map(i => i.replaceAll('\n', '')).join(';\n'), []);
+  const handleJoinGQL = useCallback((data) => data.map((i) => i.replaceAll('\n', '')).join(';\n'), []);
   const handleOpen = useCallback(async () => {
     setVisible(true);
     setLoading(true);
     const ddlMap = await getSchemaDDL(space);
-    if(ddlMap) {
+    if (ddlMap) {
       const { tags, edges, indexes } = ddlMap;
-      let content = `# Create Space \n${ddlMap.space.replace(/ON default_zone_(.*)+/gm, '')};\n${sleepGql}\nUSE ${handleKeyword(space)};`;
-      if(tags.length) {
+      let content = `# Create Space \n${ddlMap.space.replace(
+        /ON default_zone_(.*)+/gm,
+        '',
+      )};\n${sleepGql}\nUSE ${handleKeyword(space)};`;
+      if (tags.length) {
         content += `\n\n# Create Tag: \n${handleJoinGQL(tags)};`;
       }
-      if(edges.length) {  
+      if (edges.length) {
         content += `\n\n# Create Edge: \n${handleJoinGQL(edges)};`;
       }
 
-      if(indexes.length) {
-        if((tags.length || edges.length)) {
+      if (indexes.length) {
+        if (tags.length || edges.length) {
           content += `\n${sleepGql}`;
         }
         content += `\n\n# Create Index: \n${handleJoinGQL(indexes)};`;
@@ -89,30 +87,26 @@ const DDLButton = (props: IProps) => {
         onCancel={() => setVisible(false)}
         title={intl.get('schema.showDDL')}
         footer={
-          !loading && <div className={styles.footer}>
-            <Button
-              key="confirm"
-              type="primary"
-              disabled={!ddl}
-              onClick={handleDownload}
-            >
-              {intl.get('schema.downloadNGQL')}
-            </Button>
-          </div>
+          !loading && (
+            <div className={styles.footer}>
+              <Button key="confirm" type="primary" disabled={!ddl} onClick={handleDownload}>
+                {intl.get('schema.downloadNGQL')}
+              </Button>
+            </div>
+          )
         }
       >
         <Spin spinning={loading}>
-          {!loading && <div className={styles.modalItem}>
-            <CopyToClipboard key={1} text={ddl} onCopy={handleCopy} disabled={!ddl}>
-              <Button className={styles.duplicateBtn} key="confirm" icon={<Icon type="icon-Duplicate" />}>
-                {intl.get('common.duplicate')}
-              </Button>
-            </CopyToClipboard>
-            <CodeMirror
-              value={ddl}
-              options={options}
-            />
-          </div>}
+          {!loading && (
+            <div className={styles.modalItem}>
+              <CopyToClipboard key={1} text={ddl} onCopy={handleCopy} disabled={!ddl}>
+                <Button className={styles.duplicateBtn} key="confirm" icon={<Icon type="icon-Duplicate" />}>
+                  {intl.get('common.duplicate')}
+                </Button>
+              </CopyToClipboard>
+              <MonacoEditor value={ddl} readOnly />
+            </div>
+          )}
         </Spin>
       </Modal>
     </>
