@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import Editor, { useMonaco } from '@monaco-editor/react';
 import {
   keyWords,
@@ -19,7 +19,7 @@ interface IProps {
 }
 
 const checkNeedEscape = (str) => {
-  // 判断是否以数字开头或含特殊字符或为关键字
+  // check if it starts with a number or contains special characters or is a keyword
   return /^\d/.test(str) || /[^A-Za-z0-9_]/.test(str) || keyWords.includes(str.toUpperCase());
 };
 
@@ -40,10 +40,24 @@ const getInsertProvideText = (str) => {
   return str;
 };
 
+// create highlight rule regex for tag & edge
+const createSchemaRegex = (patterns, words, type) => {
+  if (words.length === 0) {
+    return [];
+  }
+  const wordPattern = words.join('|');
+  return patterns.map((pattern) => [new RegExp(pattern.replace('WORDS', wordPattern), 'g'), type]);
+};
+
+const patterns = [
+  '\\b(WORDS)\\b',
+  '(^|\\s)(WORDS)(\\s|$)', // There can be spaces before and after the string
+  '(?<=^|\\s|\\.\\s|:\\s)(WORDS)', // There can be a '.' or ':' before the string.
+];
 const MonacoEditor = (props: IProps) => {
   const { intl, currentLocale } = useI18n();
   const monaco = useMonaco();
-  const [providers, setProviders] = useState([]);
+  const providersRef = useRef([]);
   const { schemaHint, value, onChange, readOnly, onInstanceChange } = props;
   const tags = useMemo(() => schemaHint?.tagList?.map((i) => i.name) || [], [schemaHint]);
   const edges = useMemo(() => schemaHint?.edgeList?.map((i) => i.name) || [], [schemaHint]);
@@ -62,32 +76,6 @@ const MonacoEditor = (props: IProps) => {
   );
   const setMonacoProvider = useCallback(() => {
     // register syntax highlighting
-    const rules = [
-      [
-        /[a-zA-Z_$][\w$]*/,
-        {
-          cases: {
-            '@keywords': { token: 'keyword' },
-          },
-        },
-      ],
-      [new RegExp('^\\s*(//|#).*', 'gm'), 'comment'], // start with // or # is comment
-      [/".*?"/, 'string'],
-      [/'.*?'/, 'string'],
-      [/`.*?`/, 'string'],
-    ];
-    tags.length > 0 &&
-      rules.push(
-        [new RegExp(`\\b(${regexFormat(tags).join('|')})\\b`, 'g'), 'tag'],
-        [new RegExp(`(^|\\s)(${regexFormat(tags).join('|')})(\\s|$)`, 'g'), 'tag'], // There can be spaces before and after the string
-        [new RegExp(`(?<=^|\\s|\\.\\s|:\\s)(${regexFormat(tags).join('|')})`, 'g'), 'tag'], // There can be a '.' or ':' before the string.
-      );
-    edges.length > 0 &&
-      rules.push(
-        [new RegExp(`\\b(${regexFormat(edges).join('|')})\\b`, 'g'), 'edge'],
-        [new RegExp(`(^|\\s)(${regexFormat(edges).join('|')})(\\s|$)`, 'g'), 'edge'],
-        [new RegExp(`(?<=^|\\s|\\.\\s|:\\s)(${regexFormat(edges).join('|')})`, 'g'), 'edge'],
-      );
     const highlightProvider = monaco?.languages.setMonarchTokensProvider('ngql', {
       keywords: keyWords,
       operators,
@@ -97,12 +85,8 @@ const MonacoEditor = (props: IProps) => {
       tokenizer: {
         //@ts-ignore
         root: [
-          [new RegExp(`\\b(${regexFormat(tags).join('|')})\\b`, 'g'), 'tag'],
-          [new RegExp(`(^|\\s)(${regexFormat(tags).join('|')})(\\s|$)`, 'g'), 'tag'], // There can be spaces before and after the string
-          [new RegExp(`(?<=^|\\s|\\.\\s|:\\s)(${regexFormat(tags).join('|')})`, 'g'), 'tag'], // There can be a '.' or ':' before the string.
-          [new RegExp(`\\b(${regexFormat(edges).join('|')})\\b`, 'g'), 'edge'],
-          [new RegExp(`(^|\\s)(${regexFormat(edges).join('|')})(\\s|$)`, 'g'), 'edge'],
-          [new RegExp(`(?<=^|\\s|\\.\\s|:\\s)(${regexFormat(edges).join('|')})`, 'g'), 'edge'],
+          ...createSchemaRegex(patterns, regexFormat(tags), 'tag'),
+          ...createSchemaRegex(patterns, regexFormat(edges), 'edge'),
           [new RegExp('^\\s*(//|#).*', 'gm'), 'comment'], // start with // or # is comment
           [
             /[a-zA-Z_$][\w$]*/,
@@ -115,7 +99,7 @@ const MonacoEditor = (props: IProps) => {
           [/".*?"/, 'string'],
           [/'.*?'/, 'string'],
           [/`.*?`/, 'string'],
-        ],
+        ].filter(Boolean),
       },
     });
     // register a completion item provider for keywords
@@ -134,7 +118,7 @@ const MonacoEditor = (props: IProps) => {
         return { suggestions: suggestions };
       },
     });
-    monaco?.languages.registerCompletionItemProvider('ngql', {
+    const parameterProvider = monaco?.languages.registerCompletionItemProvider('ngql', {
       //@ts-ignore
       provideCompletionItems: () => {
         const suggestions = [
@@ -239,18 +223,26 @@ const MonacoEditor = (props: IProps) => {
         return { suggestions };
       },
     });
-    setProviders([
+    providersRef.current = [
       highlightProvider,
+      parameterProvider,
       keywordProvider,
       propertyReferenceProvider,
       schemaInfoProvider,
       schemaInfoTriggerProvider,
       funcProvider,
-    ]);
+    ];
   }, [currentLocale, monaco, tags, edges, fields]);
+  const clearProviders = useCallback(() => {
+    if (providersRef.current.length > 0) {
+      providersRef.current.forEach((provider) => provider?.dispose());
+      providersRef.current = [];
+    }
+  }, []);
   useEffect(() => {
     if (!monaco) return;
-    console.log('update monaco================');
+    const languages = monaco.languages.getLanguages();
+    if (languages.some((i) => i.id == 'ngql')) return;
     monaco?.languages.register({ id: 'ngql' });
     monaco?.editor.defineTheme('studio', {
       base: 'vs',
@@ -283,12 +275,13 @@ const MonacoEditor = (props: IProps) => {
     setMonacoProvider();
   }, [monaco]);
   useEffect(() => {
-    if (!schemaHint?.space) return;
-    console.log('update monaco rule', monaco, providers.length);
-    providers.length > 0 && providers.forEach((provider) => provider?.dispose());
+    if (!schemaHint?.space && !monaco?.editor) return;
+    clearProviders();
     monaco?.editor && setMonacoProvider();
+    return () => {
+      clearProviders();
+    };
   }, [schemaHint]);
-  console.log('render');
   return (
     <Editor
       height="300px"
@@ -298,8 +291,8 @@ const MonacoEditor = (props: IProps) => {
       theme="studio"
       options={{
         cursorStyle: 'block',
-        lineNumbersMinChars: 0,
-        glyphMargin: true,
+        // lineNumbersMinChars: 0,
+        // glyphMargin: true,
         lineDecorationsWidth: 0,
         renderLineHighlight: 'none',
         readOnly,
