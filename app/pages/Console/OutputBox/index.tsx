@@ -1,6 +1,6 @@
 import { Button, Table, Tabs, Tooltip, Popover } from 'antd';
 import { BigNumber } from 'bignumber.js';
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { trackEvent } from '@app/utils/stat';
@@ -37,7 +37,12 @@ const OutputBox = (props: IProps) => {
   const [isFavorited, setIsFavorited] = useState(false);
   const [showGraph, setShowGraph] = useState(false);
   const [graph, setGraph] = useState<GraphStore | null>(null);
+  const [height, setHeight] = useState(null);
   const [tab, setTab] = useState('');
+  const outputBoxRef = useRef<HTMLDivElement>();
+  const headerRef = useRef<HTMLDivElement>();
+  const position: React.MutableRefObject<Record<string, number>> = useRef({});
+
   const initData = useCallback(() => {
     let _columns = [] as any;
     let _dataSource = [] as any;
@@ -99,6 +104,10 @@ const OutputBox = (props: IProps) => {
 
   useEffect(() => {
     initData();
+    return () => {
+      document.removeEventListener('mousemove', onDrag);
+      document.removeEventListener('mouseup', onDragEnd);
+    };
   }, []);
 
   const handleTabChange = useCallback((key) => {
@@ -211,6 +220,33 @@ const OutputBox = (props: IProps) => {
       edges,
     });
   };
+
+  const onDragStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const bbox = outputBoxRef.current.getBoundingClientRect();
+    position.current = {
+      startY: e.pageY,
+      height: bbox.height,
+    };
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', onDragEnd);
+  };
+
+  const onDrag = (e: MouseEvent) => {
+    e.preventDefault();
+    const dy = e.pageY - position.current.startY;
+    const height = dy + position.current.height;
+    const header = headerRef.current.getBoundingClientRect();
+    if (height <= header.height + 70) return;
+    setHeight(height);
+    graph?.resize();
+  };
+
+  const onDragEnd = () => {
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', onDragEnd);
+  };
+
   const resultSuccess = useMemo(() => code === 0, [code]);
   const items = [
     resultSuccess && {
@@ -266,8 +302,15 @@ const OutputBox = (props: IProps) => {
     },
   ].filter(Boolean);
   return (
-    <div className={styles.outputBox}>
-      <div className={styles.outputHeader}>
+    <div
+      className={styles.outputBox}
+      ref={outputBoxRef}
+      style={{
+        height: height ? `${height}px` : undefined,
+        position: 'relative',
+      }}
+    >
+      <div className={styles.outputHeader} ref={headerRef}>
         <p
           className={cls(styles.gql, { [styles.errorInfo]: !resultSuccess })}
           onClick={() => onHistoryItem(gql, space)}
@@ -333,6 +376,9 @@ const OutputBox = (props: IProps) => {
                     {intl.get('common.openInExplore')}
                   </Button>
                 )}
+              </div>
+              <div className={styles.resizeBtn} draggable onMouseDown={onDragStart}>
+                <Icon type="icon-rightclickmenu-fitToSelection" />
               </div>
             </div>
           )}

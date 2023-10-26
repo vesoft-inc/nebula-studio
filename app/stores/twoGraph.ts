@@ -16,7 +16,6 @@ class TwoGraph {
   canvas: HTMLCanvasElement | null;
   // running status to make renderer render
   running = false;
-  progressValue = 0;
   transform: ITransform = { k: 1, x: 0, y: 0 };
   instance: ForceGraphInstance;
   autorunDisposer: IReactionDisposer;
@@ -75,6 +74,7 @@ class TwoGraph {
   init = () => {
     const { graph } = this;
     const Graph = ForceGraph()(this.container);
+    const rect = this.container.getBoundingClientRect();
     this.canvas = this.container.querySelector('canvas');
     Graph.d3Force('link')!
       .distance((d) => {
@@ -84,7 +84,7 @@ class TwoGraph {
     Graph.d3Force('x', forceX().strength(0.0085));
     Graph.d3Force('y', forceY().strength(0.0085));
     Graph.d3Force('charge')!.strength(-100);
-    Graph.width(1100).height(400);
+    Graph.width(rect.width).height(700);
     Graph.onZoom((v) => {
       this.setTransform(v);
       graph.setPointer({
@@ -311,6 +311,11 @@ class TwoGraph {
       },
     );
   };
+
+  resize() {
+    this.instance.width(this.graph.width);
+    this.instance.height(this.graph.height);
+  }
 
   zoom = (type: 'out' | 'in') => {
     const scale = this.instance.zoom();

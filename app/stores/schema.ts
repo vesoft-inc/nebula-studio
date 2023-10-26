@@ -799,9 +799,20 @@ export class SchemaStore {
   getSchemaTree = async (space) => {
     const [tagList, edgeList] = await Promise.all([this.getTagList(space), this.getEdgeList(space)]);
     return {
-      space,
-      tagList,
-      edgeList,
+      name: space,
+      type: 'space',
+      children: [
+        ...tagList.map((item) => ({
+          name: item.name,
+          type: 'tag',
+          children: item.fields,
+        })),
+        ...edgeList.map((item) => ({
+          name: item.name,
+          type: 'edge',
+          children: item.fields,
+        })),
+      ],
     };
   };
 }

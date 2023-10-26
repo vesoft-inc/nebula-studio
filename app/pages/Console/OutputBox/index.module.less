@@ -7,7 +7,6 @@
 	flex-direction: column;
 	margin: 20px 0;
 	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-	border-radius: 6px;
 	.outputHeader {
 		padding: 12px 15px;
 		display: flex;
@@ -17,14 +16,14 @@
 			flex: 1;
 			display: inline-block;
 			margin: 0;
-			background-color: #DFFFDA;
+			background: #00BFA54D;
 			border-radius: 6px;
 			padding: 11px 14px;
 			cursor: pointer;
 			font-family: Roboto-Regular, sans-serif;
 			font-weight: 500;
 			font-size: 18px;
-			color: #27AE60;
+			color: #00BFA5;
 		}
 		.gqlValue {
 			overflow: hidden;
@@ -36,8 +35,8 @@
 			word-break: break-all;
 		}
 		.errorInfo {
-			background-color: #fff2f0;
-			color: #ff4d4f;
+			background-color: #D32F2F4D;
+			color: #D32F2F;
 		}
 		.outputOperations {
 			display: flex;
@@ -71,11 +70,12 @@
 		border-top: 1px solid #E0E0E0;
 		flex: 1;
 		white-space: pre;
+		overflow: auto;
 		.outputTab {
-			min-height: 300px;
-			max-height: 720px;
+			height: 100%;
 			& > :global(.ant-tabs-nav) {
 				width: 80px;
+				height: 100%;
 				:global {
 					.ant-tabs-tab {
 						padding: 0;
@@ -89,7 +89,6 @@
 							flex-direction: column;
 							align-items: center;
 							justify-content: center;
-							color: @darkGray;
 							.anticon {
 								margin-right: 0;
 								svg {
@@ -99,9 +98,9 @@
 							}
 						}
 						&.ant-tabs-tab-active {
-							background: @lightBlue;
+							background: #0D8BFF;
 							.ant-tabs-tab-btn { 
-								color: @blue;
+								color: #fff;
 							}
 						}
 					}
@@ -110,16 +109,17 @@
 			}
 			& > :global(.ant-tabs-content-holder) {
 				position: relative;
-				background-color: @lightBlue;
+				background-color: #fff;
 				overflow: auto;
-				max-height: 700px;
 				:global {
 					.ant-tabs-content {
+						height: 100%;
 						.ant-table, .ant-pagination {
 							margin: 20px;
 						}
 						.ant-tabs-tabpane {
 							padding-left: 0;
+							height: 100%;
 						}
 					}
 				}
@@ -127,6 +127,7 @@
 		
 			.errContainer {
 				padding: 20px;
+				color: #D32F2F;
 			}
 		}
 		table {
@@ -162,6 +163,17 @@
 			}
 			button:not(:last-child) {
 				margin-right: 10px;
+			}
+		}
+		.resizeBtn {
+			position: absolute;
+			bottom: 5px;
+			right: 10px;
+			cursor: ns-resize;
+			transition: none;
+			svg {
+				width: 28px;
+				height: 28px;
 			}
 		}
 	}

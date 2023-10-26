@@ -10,12 +10,17 @@ import {
 } from '@app/config/nebulaQL';
 import { useI18n } from '@vesoft-inc/i18n';
 import { handleEscape } from '@app/utils/function';
+import { SchemaItemOverview } from '@app/stores/console';
+
+import styles from './index.module.less';
 interface IProps {
-  schemaHint?: any;
+  schema?: SchemaItemOverview;
+  height?: string;
   onInstanceChange?: (instance: any) => void;
   value: string;
   readOnly?: boolean;
   onChange?: (value: string) => void;
+  onShiftEnter?: () => void;
 }
 
 const checkNeedEscape = (str) => {
@@ -58,21 +63,34 @@ const MonacoEditor = (props: IProps) => {
   const { intl, currentLocale } = useI18n();
   const monaco = useMonaco();
   const providersRef = useRef([]);
-  const { schemaHint, value, onChange, readOnly, onInstanceChange } = props;
-  const tags = useMemo(() => schemaHint?.tagList?.map((i) => i.name) || [], [schemaHint]);
-  const edges = useMemo(() => schemaHint?.edgeList?.map((i) => i.name) || [], [schemaHint]);
+  const { onShiftEnter, schema, value, onChange, readOnly, onInstanceChange, height } = props;
+  const [tags, edges] = useMemo(
+    () =>
+      schema?.children?.reduce(
+        ([_tags, _edges], i) => {
+          if (i.type === 'tag') {
+            _tags.push(i.name);
+          } else if (i.type === 'edge') {
+            _edges.push(i.name);
+          }
+          return [_tags, _edges];
+        },
+        [[], []],
+      ) || [[], []],
+    [schema],
+  );
   const fields = useMemo(
     () =>
-      [...(schemaHint?.tagList || []), ...(schemaHint?.edgeList || [])]
-        .map((k) =>
-          k.fields.map((f) => ({
+      schema?.children
+        ?.map((k) =>
+          k.children.map((f) => ({
             name: f.Field,
             type: f.Type,
             parent: k.name,
           })),
         )
         .flat(),
-    [schemaHint],
+    [schema],
   );
   const setMonacoProvider = useCallback(() => {
     // register syntax highlighting
@@ -126,7 +144,7 @@ const MonacoEditor = (props: IProps) => {
             label: k,
             kind: monaco.languages.CompletionItemKind.Enum,
             insertText: k.slice(1),
-            sortText: '1', // monaco completion suggestions sort by sortText, 1: keyword 2: tag 3: edge 4: field 5: function
+            sortText: '5',
           })),
         ];
         return { suggestions: suggestions };
@@ -151,6 +169,7 @@ const MonacoEditor = (props: IProps) => {
     });
     // register a completion item provider for tags and edges, can trigger by ':' and '.'
     const schemaInfoProvider = monaco?.languages.registerCompletionItemProvider('ngql', {
+      //@ts-ignore
       provideCompletionItems: () => {
         const suggestions = [
           ...tags.map((k: string) => ({
@@ -256,9 +275,10 @@ const MonacoEditor = (props: IProps) => {
       ],
       colors: {
         'editorGutter.background': '#8383831A', // line number gutter color
-        'editorLineNumber.foreground': '#000000', // line number color
+        'editorLineNumber.foreground': '#A1A1AA', // line number color
+        'editorLineNumber.activeForeground': '#A1A1AA',
         'editor.foreground': '#000000',
-        'editorCursor.foreground': '#00BFA5', // Set cursor color
+        'editorCursor.foreground': '#A1A1AA', // Set cursor color
       },
     });
     monaco?.editor.setTheme('studio');
@@ -274,24 +294,41 @@ const MonacoEditor = (props: IProps) => {
     });
     setMonacoProvider();
   }, [monaco]);
+
+  const onMount = (editor, monaco) => {
+    editor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
+      onShiftEnter?.();
+    });
+    onInstanceChange?.(editor);
+  };
   useEffect(() => {
-    if (!schemaHint?.space && !monaco?.editor) return;
+    if (!schema?.name && !monaco?.editor) return;
     clearProviders();
     monaco?.editor && setMonacoProvider();
     return () => {
       clearProviders();
     };
-  }, [schemaHint]);
+  }, [schema]);
   return (
     <Editor
-      height="300px"
+      height={height || '300px'}
       defaultLanguage="ngql"
+      className={styles.editor}
       value={value}
       onChange={onChange}
       theme="studio"
       options={{
         cursorStyle: 'block',
-        // lineNumbersMinChars: 0,
+        scrollbar: {
+          vertical: 'hidden',
+          horizontal: 'hidden',
+        },
+        roundedSelection: false,
+        scrollBeyondLastLine: false,
+        overviewRulerBorder: false,
+        hideCursorInOverviewRuler: true,
+        overviewRulerLanes: 0,
+        lineNumbersMinChars: 3,
         // glyphMargin: true,
         lineDecorationsWidth: 0,
         renderLineHighlight: 'none',
@@ -300,7 +337,7 @@ const MonacoEditor = (props: IProps) => {
           enabled: false,
         },
       }}
-      onMount={(editor) => onInstanceChange?.(editor)}
+      onMount={onMount}
     />
   );
 };

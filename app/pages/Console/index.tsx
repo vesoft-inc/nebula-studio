@@ -5,15 +5,16 @@ import { trackEvent, trackPageView } from '@app/utils/stat';
 import { useStore } from '@app/stores';
 import Icon from '@app/components/Icon';
 import MonacoEditor from '@app/components/MonacoEditor';
-import cls from 'classnames';
 import { useI18n } from '@vesoft-inc/i18n';
 import OutputBox from './OutputBox';
 import HistoryBtn from './HistoryBtn';
 import FavoriteBtn from './FavoriteBtn';
 import CypherParameterBox from './CypherParameterBox';
 import ExportModal from './ExportModal';
-import SchemaDrawer from './SchemaDrawer';
+import SchemaDrawer from './Drawer/SchemaDrawer';
+import NgqlDrawer from './Drawer/NgqlDrawer';
 import styles from './index.module.less';
+import { SchemaItemOverview } from '@app/stores/console';
 
 const Option = Select.Option;
 
@@ -55,9 +56,9 @@ const Console = (props: IProps) => {
     spaceVidType: string;
     [key: string]: any;
   }>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [schemaTree, setSchemaTree] = useState({});
+  const [schemaTree, setSchemaTree] = useState<SchemaItemOverview>({} as SchemaItemOverview);
   const editor = useRef<any>(null);
+  const ref = useRef(null);
   useEffect(() => {
     trackPageView('/console');
     getSpaces();
@@ -76,10 +77,7 @@ const Console = (props: IProps) => {
 
   const updateGql = (value: string, space?: string) => {
     update({ currentGQL: value, currentSpace: space || currentSpace });
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+    ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const handleSaveQuery = (query: string) => {
@@ -138,9 +136,9 @@ const Console = (props: IProps) => {
   }, []);
   return (
     <div className={styles.nebulaConsole}>
-      <SchemaDrawer open={drawerOpen} setOpen={setDrawerOpen} />
-      <div className={cls('studioCenterLayout', styles.consoleContainer)}>
-        <div className={styles.consolePanel}>
+      <SchemaDrawer />
+      <div className={styles.consoleContainer}>
+        <div className={styles.consolePanel} ref={ref}>
           <div className={styles.panelHeader}>
             <span className={styles.title}>{`${window.gConfig.databaseName} ${intl.get('common.console')}`}</span>
             <div className={styles.operations}>
@@ -181,13 +179,14 @@ const Console = (props: IProps) => {
             <CypherParameterBox onSelect={addParam} data={paramsMap} />
             <MonacoEditor
               onInstanceChange={(instance) => (editor.current = instance)}
-              schemaHint={schemaTree}
+              schema={schemaTree}
               value={currentGQL}
               onChange={handleEditorChange}
+              onShiftEnter={handleRun}
             />
           </div>
         </div>
-        <div className="result-wrap">
+        <div className={styles.resultContainer}>
           {results.length > 0 ? (
             results.map((item, index) => (
               <OutputBox
@@ -210,6 +209,7 @@ const Console = (props: IProps) => {
           )}
         </div>
       </div>
+      <NgqlDrawer onItemClick={(v) => updateGql(currentGQL + v)} />
       {modalVisible && (
         <ExportModal
           visible={modalVisible}

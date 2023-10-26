@@ -27,7 +27,6 @@
     "bezier-js": "^4.1.1",
     "bignumber.js": "^9.0.2",
     "classnames": "^2.3.1",
-    "codemirror": "^5.65.0",
     "core-js": "^3.21.1",
     "d3-force-3d": "^3.0.2",
     "d3-graphviz": "^4.1.1",
