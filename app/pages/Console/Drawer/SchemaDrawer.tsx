@@ -64,7 +64,7 @@ const SchemaDrawer = () => {
         isLeaf: true,
         getTitle: (item) => (
           <>
-            {item.Field}
+            <span className={styles.fieldTypeName}>{item.Field}</span>
             <span className={styles.fieldTypeTag}>{item.Type}</span>
           </>
         ),

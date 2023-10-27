@@ -139,13 +139,17 @@
       text-align: left;
       word-break: break-all;
     }
-    .ant-tree-iconEle {
+    .ant-tree-iconEle:not(:empty) {
       display: inline-flex !important;
       align-items: center;
     }
     .ant-tree-switcher-noop {
       display: none;
     }
+  }
+  .fieldTypeName {
+    max-width: 65%;
+    display: inline-flex;
   }
   .fieldTypeTag {
     margin-left: 5px;
