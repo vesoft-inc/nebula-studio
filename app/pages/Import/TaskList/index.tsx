@@ -157,7 +157,7 @@ const TaskList = () => {
           <Select
             showSearch
             allowClear
-            style={{ minWidth: 200 }}
+            style={{ minWidth: 200, maxWidth: 600 }}
             value={filter.space}
             placeholder={intl.get('console.selectSpace')}
             onChange={(space) => getData({ space, page: 1 })}
