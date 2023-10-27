@@ -166,6 +166,8 @@ export default {
     graphviz: 'Graphviz',
     selectSpace: 'Please select Graph Space',
     historyTip: 'You can directly use the "/" key in the console to quickly select historical query statements.',
+    runSelectionRows: 'Run selected rows',
+    selectEmpty: 'Please select the row',
   },
   explore: {
     vertexStyle: 'Vertex Color',

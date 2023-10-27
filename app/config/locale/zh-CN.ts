@@ -160,6 +160,8 @@ export default {
     graphviz: 'Graphviz',
     selectSpace: '请选择图空间',
     historyTip: '您可以直接输入“/”键快速选择历史查询语句。',
+    runSelectionRows: '运行选中行',
+    selectEmpty: '请先选择要运行的行',
   },
   explore: {
     vertexStyle: '节点颜色',

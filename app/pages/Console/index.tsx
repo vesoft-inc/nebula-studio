@@ -93,18 +93,11 @@ const Console = (props: IProps) => {
     }
   };
 
-  const handleRun = async () => {
+  const handleRun = async (text?: string) => {
     if (!editor.current) return;
     const _editor = editor.current.editor;
-    let value = '';
-    const selection = _editor.getSelection();
-    if (selection.startLineNumber !== selection.endLineNumber || selection.startColumn !== selection.endColumn) {
-      for (let lineNumber = selection.startLineNumber; lineNumber <= selection.endLineNumber; lineNumber++) {
-        value += _editor.getModel().getLineContent(lineNumber) + '\n';
-      }
-    } else {
-      value = _editor.getValue();
-    }
+    const editorValue = _editor.getValue();
+    const value = text || editorValue;
     const query = value
       .split('\n')
       .filter((i) => !i.trim().startsWith('//') && !i.trim().startsWith('#'))
@@ -119,7 +112,7 @@ const Console = (props: IProps) => {
     }
 
     handleSaveQuery(query);
-    await runGQL({ gql: query, editorValue: value });
+    await runGQL({ gql: query, editorValue });
   };
 
   const addParam = (param: string) => {
@@ -181,6 +174,30 @@ const Console = (props: IProps) => {
       editor: instance,
       monaco: monaco,
     };
+    instance.addAction({
+      id: 'my-unique-id',
+      label: intl.get('console.runSelectionRows'),
+      // keybindings: [
+      //   monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_E,
+      // ],
+      contextMenuGroupId: 'myMenu',
+      contextMenuOrder: 1.5,
+      run: function () {
+        const _editor = editor.current.editor;
+        let value = '';
+        const selection = _editor.getSelection();
+        if (selection.startLineNumber !== selection.endLineNumber || selection.startColumn !== selection.endColumn) {
+          for (let lineNumber = selection.startLineNumber; lineNumber <= selection.endLineNumber; lineNumber++) {
+            value += _editor.getModel().getLineContent(lineNumber) + '\n';
+          }
+        }
+        if (value === '') {
+          message.info(intl.get('console.selectEmpty'));
+          return;
+        }
+        handleRun(value);
+      },
+    });
     setHistoryProvider();
   };
   const handleEditorChange = useCallback((value) => update({ currentGQL: value }), []);
@@ -223,7 +240,7 @@ const Console = (props: IProps) => {
                     onClick={() => update({ currentGQL: '' })}
                   />
                 </Tooltip>
-                <Button type="primary" onClick={handleRun} loading={runGQLLoading}>
+                <Button type="primary" onClick={() => handleRun()} loading={runGQLLoading}>
                   <Icon type="icon-studio-btn-play" />
                   {intl.get('common.run')}
                 </Button>
