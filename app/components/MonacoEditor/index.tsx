@@ -16,7 +16,7 @@ import styles from './index.module.less';
 interface IProps {
   schema?: SchemaItemOverview;
   height?: string;
-  onInstanceChange?: (instance: any) => void;
+  onInstanceChange?: (instance, monaco) => void;
   value: string;
   readOnly?: boolean;
   onChange?: (value: string) => void;
@@ -89,7 +89,7 @@ const MonacoEditor = (props: IProps) => {
             parent: k.name,
           })),
         )
-        .flat(),
+        .flat() || [],
     [schema],
   );
   const setMonacoProvider = useCallback(() => {
@@ -213,7 +213,7 @@ const MonacoEditor = (props: IProps) => {
         const words = textUntilPosition.split(' ');
         const lastWord = words[words.length - 1].slice(0, -1); // get the last word and remove the last character '.'
         const suggestions = fields
-          .filter((field) => field.parent === lastWord || regex.test(lastWord))
+          ?.filter((field) => field.parent === lastWord || regex.test(lastWord))
           .map((field) => ({
             label: field.name,
             kind: monaco.languages.CompletionItemKind.Field,
@@ -299,7 +299,7 @@ const MonacoEditor = (props: IProps) => {
     editor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
       onShiftEnter?.();
     });
-    onInstanceChange?.(editor);
+    onInstanceChange?.(editor, monaco);
   };
   useEffect(() => {
     if (!schema?.name && !monaco?.editor) return;

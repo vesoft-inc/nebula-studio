@@ -68,6 +68,7 @@ export default {
     rerun: 'Rerun',
     keyword: 'Keyword',
     function: 'Function',
+    historyRecord: 'History',
   },
   doc: {
     welcome: 'Welcome to',
@@ -164,6 +165,7 @@ export default {
     clearFavorites: 'Clear Favorites',
     graphviz: 'Graphviz',
     selectSpace: 'Please select Graph Space',
+    historyTip: 'You can directly use the "/" key in the console to quickly select historical query statements.',
   },
   explore: {
     vertexStyle: 'Vertex Color',

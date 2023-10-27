@@ -59,12 +59,16 @@ const Console = (props: IProps) => {
   const [schemaTree, setSchemaTree] = useState<SchemaItemOverview>({} as SchemaItemOverview);
   const editor = useRef<any>(null);
   const ref = useRef(null);
+  const historyProviderRef = useRef(null);
   useEffect(() => {
     trackPageView('/console');
     getSpaces();
     getParams();
     getFavoriteList();
     currentSpace && handleSwitchSpace(currentSpace);
+    return () => {
+      historyProviderRef.current?.dispose();
+    };
   }, []);
 
   const checkSwitchSpaceGql = (query: string) => {
@@ -85,12 +89,22 @@ const Console = (props: IProps) => {
       const history = getHistory();
       history.unshift(query);
       localStorage.setItem('history', JSON.stringify(history));
+      setHistoryProvider();
     }
   };
 
   const handleRun = async () => {
     if (!editor.current) return;
-    const value = editor.current.getValue();
+    const _editor = editor.current.editor;
+    let value = '';
+    const selection = _editor.getSelection();
+    if (selection.startLineNumber !== selection.endLineNumber || selection.startColumn !== selection.endColumn) {
+      for (let lineNumber = selection.startLineNumber; lineNumber <= selection.endLineNumber; lineNumber++) {
+        value += _editor.getModel().getLineContent(lineNumber) + '\n';
+      }
+    } else {
+      value = _editor.getValue();
+    }
     const query = value
       .split('\n')
       .filter((i) => !i.trim().startsWith('//') && !i.trim().startsWith('#'))
@@ -127,6 +141,47 @@ const Console = (props: IProps) => {
   };
   const handleGetSpaces = (open: boolean) => {
     open && getSpaces();
+  };
+  const setHistoryProvider = () => {
+    historyProviderRef.current?.dispose();
+    const { monaco } = editor.current;
+    let history = getHistory();
+    history = history.map((i) => `/${i}`);
+    if (!history.length) return;
+    historyProviderRef.current = monaco?.languages.registerCompletionItemProvider('ngql', {
+      provideCompletionItems: (model, position) => {
+        const word = model.getWordUntilPosition(position);
+        if (word.word !== '') return;
+        const suggestions = [
+          ...Array.from(new Set(history)).map((k: string, index) => {
+            const sortText = String(index + 1);
+            return {
+              label: k,
+              kind: monaco.languages.CompletionItemKind.Text,
+              insertText: k.slice(1),
+              detail: intl.get('common.historyRecord'),
+              sortText,
+              range: {
+                startLineNumber: position.lineNumber,
+                endLineNumber: position.lineNumber,
+                startColumn: position.column - 1,
+                endColumn: position.column,
+              },
+            };
+          }),
+        ];
+        return { suggestions: suggestions };
+      },
+      triggerCharacters: ['/'],
+    });
+  };
+
+  const onInstanceMount = (instance, monaco) => {
+    editor.current = {
+      editor: instance,
+      monaco: monaco,
+    };
+    setHistoryProvider();
   };
   const handleEditorChange = useCallback((value) => update({ currentGQL: value }), []);
   const handleSwitchSpace = useCallback(async (space) => {
@@ -178,7 +233,7 @@ const Console = (props: IProps) => {
           <div className={styles.codeInput}>
             <CypherParameterBox onSelect={addParam} data={paramsMap} />
             <MonacoEditor
-              onInstanceChange={(instance) => (editor.current = instance)}
+              onInstanceChange={onInstanceMount}
               schema={schemaTree}
               value={currentGQL}
               onChange={handleEditorChange}

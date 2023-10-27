@@ -68,6 +68,7 @@ export default {
     rerun: '重新导入',
     keyword: '关键字',
     function: '函数',
+    historyRecord: '历史记录',
   },
   doc: {
     welcome: '欢迎使用',
@@ -158,6 +159,7 @@ export default {
     clearFavorites: '清空收藏夹',
     graphviz: 'Graphviz',
     selectSpace: '请选择图空间',
+    historyTip: '您可以直接输入“/”键快速选择历史查询语句。',
   },
   explore: {
     vertexStyle: '节点颜色',

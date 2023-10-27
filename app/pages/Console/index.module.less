@@ -174,11 +174,23 @@
 	height: 80%;
 	overflow: hidden;
 	position: relative;
+  .tips {
+    border-radius: 11px;
+    background: #D4EBFF;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    .tipContent {
+      color: #0D8BFF;
+    }
+  }
   &:global(.ant-modal .ant-modal-content) {
     position: relative;
     height: 100%;
     overflow: auto;
     :global {
+      .ant-modal-header {
+        border-bottom: none;
+      }
       .ant-modal-body {
         padding-top: 0px;
       }

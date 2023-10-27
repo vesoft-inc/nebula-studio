@@ -1,8 +1,15 @@
-import { useState } from 'react';
-import { List } from 'antd';
+import { useMemo, useState } from 'react';
+import { Input, List } from 'antd';
 import { observer } from 'mobx-react-lite';
-import styles from './index.module.less';
 import Icon from '@app/components/Icon';
+import { SearchOutlined } from '@ant-design/icons';
+
+import styles from './index.module.less';
+
+const isIncluded = (a: string, b: string) => {
+  return a.toLowerCase().includes(b.toLowerCase());
+};
+
 //TODO modify the content
 const Doc = [
   {
@@ -38,6 +45,15 @@ interface IProps {
 const NgqlDrawer = (props: IProps) => {
   const [open, setOpen] = useState(false);
   const { onItemClick } = props;
+  const [searchVal, setSearchVal] = useState('');
+  const onSearch = (e) => {
+    const { value } = e.target;
+    setSearchVal(value);
+  };
+  const data = useMemo(
+    () => Doc.filter((i) => isIncluded(i.title, searchVal) || isIncluded(i.description, searchVal)),
+    [searchVal],
+  );
   return (
     <>
       {!open && (
@@ -56,9 +72,15 @@ const NgqlDrawer = (props: IProps) => {
             <Icon type="icon-studio-btn-close" className={styles.closeBtn} onClick={() => setOpen(false)} />
           </div>
           <div className={styles.content}>
+            <Input
+              placeholder="Search..."
+              prefix={<SearchOutlined />}
+              className={styles.inputSearch}
+              onChange={onSearch}
+            />
             <List
               itemLayout="horizontal"
-              dataSource={Doc}
+              dataSource={data}
               className={styles.docList}
               renderItem={(item, index) => (
                 <List.Item className={styles.ngqlItem}>
