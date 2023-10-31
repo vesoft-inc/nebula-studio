@@ -263,7 +263,7 @@ export class NgqlRunner {
     this.socket?.readyState === WebSocket.OPEN && this.socket.send(WsHeartbeatReq);
   };
 
-  runNgql = async ({ gql, space }: { gql: string; space?: string }, config: Recordable = {}): Promise<NgqlRes> => {
+  runNgql = async (params: { gql: string; space?: string }, config: Recordable = {}): Promise<NgqlRes> => {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       const flag = await this.reConnect();
       if (!flag) {
@@ -279,7 +279,7 @@ export class NgqlRunner {
         resolve,
         reject,
         product: this.product,
-        content: { gql, space },
+        content: params,
         config,
         msgType: MsgType.NGQL,
       });
