@@ -6,6 +6,7 @@ import { getI18n } from '@vesoft-inc/i18n';
 import { safeParse } from '@app/utils/function';
 import { NgqlRes } from '@app/utils/websocket';
 import { getRootStore } from '.';
+import { IField } from '@app/interfaces/schema';
 
 const { intl } = getI18n();
 
@@ -32,6 +33,16 @@ export type HistoryResult = NgqlRes & {
   space?: string;
   spaceVidType?: string;
 };
+interface IProperty {
+  name: string;
+  type: string;
+  children: IField[];
+}
+export interface SchemaItemOverview {
+  name: string;
+  type: string;
+  children: IProperty[];
+}
 
 const DEFAULT_GQL = 'SHOW SPACES;';
 export class ConsoleStore {
@@ -44,9 +55,11 @@ export class ConsoleStore {
     id: string;
     content: string;
   }[];
+  schemaOverview = [] as SchemaItemOverview[];
   constructor() {
     makeAutoObservable(this, {
       results: observable.ref,
+      schemaOverview: observable.ref,
       currentSpace: observable,
       paramsMap: observable,
       currentGQL: observable,

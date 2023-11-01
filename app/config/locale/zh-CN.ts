@@ -66,6 +66,9 @@ export default {
     prev: '上一步',
     createTime: '创建时间',
     rerun: '重新导入',
+    keyword: '关键字',
+    function: '函数',
+    historyRecord: '历史记录',
   },
   doc: {
     welcome: '欢迎使用',
@@ -156,6 +159,9 @@ export default {
     clearFavorites: '清空收藏夹',
     selectSpace: '请选择图空间',
     planTree: '执行计划',
+    historyTip: '您可以直接输入“/”键快速选择历史查询语句。',
+    runSelectionRows: '运行选中行',
+    selectEmpty: '请先选择要运行的行',
   },
   explore: {
     vertexStyle: '节点颜色',

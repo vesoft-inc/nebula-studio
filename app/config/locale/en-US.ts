@@ -66,6 +66,9 @@ export default {
     prev: 'Previous',
     createTime: 'Create Time',
     rerun: 'Rerun',
+    keyword: 'Keyword',
+    function: 'Function',
+    historyRecord: 'History',
   },
   doc: {
     welcome: 'Welcome to',
@@ -162,6 +165,9 @@ export default {
     clearFavorites: 'Clear Favorites',
     selectSpace: 'Please select Graph Space',
     planTree: 'Plan',
+    historyTip: 'You can directly use the "/" key in the console to quickly select historical query statements.',
+    runSelectionRows: 'Run selected rows',
+    selectEmpty: 'Please select the row',
   },
   explore: {
     vertexStyle: 'Vertex Color',

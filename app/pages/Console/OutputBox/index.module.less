@@ -8,7 +8,6 @@
   flex-direction: column;
   margin: 20px 0;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 6px;
 
   .outputHeader {
     padding: 12px 15px;
@@ -20,14 +19,14 @@
       flex: 1;
       display: inline-block;
       margin: 0;
-      background-color: #DFFFDA;
+      background: #00bfa54d;
       border-radius: 6px;
       padding: 11px 14px;
       cursor: pointer;
       font-family: Roboto-Regular, sans-serif;
       font-weight: 500;
       font-size: 18px;
-      color: #27AE60;
+      color: #00bfa5;
     }
 
     .gqlValue {
@@ -41,8 +40,8 @@
     }
 
     .errorInfo {
-      background-color: #fff2f0;
-      color: #ff4d4f;
+      background-color: #d32f2f4d;
+      color: #d32f2f;
     }
 
     .outputOperations {
@@ -62,7 +61,7 @@
         }
 
         &.btnYellow svg {
-          color: #F2C94C;
+          color: #f2c94c;
         }
       }
 
@@ -78,16 +77,17 @@
 
   .tabContainer {
     position: relative;
-    border-top: 1px solid #E0E0E0;
+    border-top: 1px solid #e0e0e0;
     flex: 1;
     white-space: pre;
+    overflow: auto;
 
     .outputTab {
-      min-height: 300px;
-      max-height: 720px;
+      height: 100%;
 
       &> :global(.ant-tabs-nav) {
         width: 80px;
+        height: 100%;
 
         :global {
           .ant-tabs-tab {
@@ -103,7 +103,6 @@
               flex-direction: column;
               align-items: center;
               justify-content: center;
-              color: @darkGray;
 
               .anticon {
                 margin-right: 0;
@@ -116,21 +115,24 @@
             }
 
             &.ant-tabs-tab-active {
-              background: @lightBlue;
+              background: #0d8bff;
 
               .ant-tabs-tab-btn {
-                color: @blue;
+                color: #fff;
               }
             }
           }
         }
-
       }
 
       &> :global(.ant-tabs-content-holder) {
+        position: relative;
+        background-color: #fff;
+        overflow: auto;
+        
         :global {
           .ant-tabs-content {
-
+            height: 100%;
             .ant-table,
             .ant-pagination {
               margin: 20px;
@@ -142,6 +144,7 @@
               background-color: @lightBlue;
               max-height: 700px;
               overflow: auto;
+              height: 100%;
             }
           }
         }
@@ -149,6 +152,7 @@
 
       .errContainer {
         padding: 20px;
+        color: #d32f2f;
       }
     }
 
@@ -170,7 +174,7 @@
     padding: 15px 18px;
     width: 100%;
     height: 65px;
-    border-top: 1px solid #E0E0E0;
+    border-top: 1px solid #e0e0e0;
     font-family: Roboto-Regular, sans-serif;
     font-size: 16px;
     color: @darkBlue;
@@ -188,6 +192,19 @@
 
       button:not(:last-child) {
         margin-right: 10px;
+      }
+    }
+
+    .resizeBtn {
+      position: absolute;
+      bottom: 5px;
+      right: 10px;
+      cursor: ns-resize;
+      transition: none;
+
+      svg {
+        width: 28px;
+        height: 28px;
       }
     }
   }

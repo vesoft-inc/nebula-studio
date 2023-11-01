@@ -4,7 +4,6 @@ import Icon from '@app/components/Icon';
 import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 
-
 interface IProps {
   onGqlSelect: (gql: string) => void;
 }
@@ -46,22 +45,13 @@ const HistoryBtn = (props: IProps) => {
 
   return (
     <>
-      <Tooltip
-        title={intl.get('common.seeTheHistory')}
-        placement="top"
-      >
-        <Icon
-          className={styles.btnOperations}
-          type="icon-studio-btn-history"
-          onClick={handleView}
-        />
+      <Tooltip title={intl.get('common.seeTheHistory')} placement="top">
+        <Icon className={styles.btnOperations} type="icon-studio-btn-history" onClick={handleView} />
       </Tooltip>
       <Modal
         title={
           <>
-            <span>
-              {intl.get('common.NGQLHistoryList')}
-            </span>
+            <span>{intl.get('common.NGQLHistoryList')}</span>
             <Button type="link" onClick={handleClear}>
               {intl.get('console.deleteHistory')}
             </Button>
@@ -72,15 +62,15 @@ const HistoryBtn = (props: IProps) => {
         footer={null}
         onCancel={() => setVisible(false)}
       >
+        <div className={styles.tips}>
+          <span className={styles.tipContent}>{intl.get('console.historyTip')}</span>
+        </div>
         {
           <List
             itemLayout="horizontal"
             dataSource={data}
             renderItem={(item: string) => (
-              <List.Item
-                style={{ cursor: 'pointer', wordBreak: 'break-all' }}
-                onClick={() => handleSelect(item)}
-              >
+              <List.Item style={{ cursor: 'pointer', wordBreak: 'break-all' }} onClick={() => handleSelect(item)}>
                 {renderStr(item)}
               </List.Item>
             )}
