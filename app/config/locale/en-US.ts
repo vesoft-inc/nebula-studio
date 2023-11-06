@@ -410,6 +410,7 @@ export default {
     statError: 'Stat failed, Please try again.',
     statFinished: 'Statistics end',
     deleteSpace: 'Delete Graph Space',
+    clearSpace: 'Clear Graph Space',
     cloneSpace: 'Clone Graph Space',
     length: 'Length',
     selectVidTypeTip: 'Please select the type',

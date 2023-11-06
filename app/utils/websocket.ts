@@ -267,6 +267,9 @@ export class NgqlRunner {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       const flag = await this.reConnect();
       if (!flag) {
+        if (config.noTip !== true) {
+          message.error('WebSocket reconnect failed');
+        }
         return Promise.resolve({ code: -1, message: 'WebSocket reconnect failed' });
       }
     }

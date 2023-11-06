@@ -1,15 +1,17 @@
-import { Button, Popconfirm, Table, message, Popover, Form, Input, Dropdown, Tooltip } from 'antd';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button, Popconfirm, Table, message, Popover, Form, Input, Dropdown, Tooltip, TableColumnType } from 'antd';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { observable } from 'mobx';
 import { useI18n } from '@vesoft-inc/i18n';
 import Icon from '@app/components/Icon';
 import { trackPageView } from '@app/utils/stat';
-import { observer } from 'mobx-react-lite';
+import { observer, useLocalObservable } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
+import { ISpace } from '@app/interfaces/schema';
 import cls from 'classnames';
 import { Link, useHistory } from 'react-router-dom';
 import styles from './index.module.less';
 import Search from './SchemaConfig/List/Search';
-import DDLButton from './SchemaConfig/DDLButton';
+import DDLModal from './SchemaConfig/DDLModal';
 
 interface ICloneOperations {
   space: string;
@@ -25,64 +27,152 @@ const CloneSpacePopover = (props: ICloneOperations) => {
     onClone(name, space);
     setVisible(false);
   };
+  const stopPropagation = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+  const onCloneClick = useCallback((e: React.MouseEvent) => {
+    stopPropagation(e);
+    setVisible(true);
+  }, []);
   return (
     <Popover
       overlayClassName={styles.clonePopover}
-      destroyTooltipOnHide={true}
-      placement="leftTop"
+      destroyTooltipOnHide
       open={visible}
       trigger="click"
+      placement="left"
       onOpenChange={(visible) => setVisible(visible)}
       content={
-        <Form onFinish={handleClone} layout="inline">
-          <Form.Item
-            label={intl.get('schema.spaceName')}
-            name="name"
-            rules={[{ required: true, message: intl.get('formRules.nameRequired') }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item>
-            <Button htmlType="submit" type="primary">
-              {intl.get('common.confirm')}
-            </Button>
-          </Form.Item>
-        </Form>
+        <div>
+          <Form onFinish={handleClone} layout="inline">
+            <Form.Item
+              label={intl.get('schema.spaceName')}
+              name="name"
+              rules={[{ required: true, message: intl.get('formRules.nameRequired') }]}
+            >
+              <Input onClick={stopPropagation} />
+            </Form.Item>
+            <Form.Item>
+              <Button htmlType="submit" type="primary">
+                {intl.get('common.confirm')}
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
       }
     >
-      <Button type="link" onClick={() => setVisible(true)}>
+      <Button type="link" onClick={onCloneClick}>
         {intl.get('schema.cloneSpace')}
       </Button>
     </Popover>
   );
 };
 
+const DangerButton = (props: { onConfirm: () => void; text: React.ReactNode }) => {
+  const { text, onConfirm } = props;
+  const [open, setOpen] = useState(false);
+  const { intl } = useI18n();
+  const domRef = useRef<HTMLElement>();
+
+  const onClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
+  return (
+    <Popconfirm
+      onConfirm={onConfirm}
+      title={intl.get('common.ask')}
+      okText={intl.get('common.ok')}
+      cancelText={intl.get('common.cancel')}
+      getPopupContainer={() => domRef.current}
+      trigger={['click']}
+      open={open}
+      onOpenChange={setOpen}
+      placement="left"
+    >
+      <span ref={domRef} onClick={onClick}>
+        <Button type="text" danger>
+          {text}
+        </Button>
+      </span>
+    </Popconfirm>
+  );
+};
+
 const Schema = () => {
   const { schema, moduleConfiguration } = useStore();
-  const [loading, setLoading] = useState(false);
-  const [searchVal, setSearchVal] = useState('');
+  const state = useLocalObservable(
+    () => {
+      const initState = {
+        loading: false,
+        searchVal: '',
+        spaces: [] as ISpace[],
+        current: 1,
+        pageSize: 10,
+        ddlModal: {
+          open: false,
+          space: '',
+        },
+      };
+      return {
+        ...initState,
+        setState(obj: Partial<typeof initState>) {
+          Object.assign(this, obj);
+        },
+        get spacesFiltered(): ISpace[] {
+          const { searchVal, spaces } = this;
+          return searchVal ? spaces.filter((i) => i.Name.includes(searchVal)) : spaces;
+        },
+      };
+    },
+    { spaces: observable.ref },
+  );
+  const { loading, current, pageSize, spacesFiltered, ddlModal, setState } = state;
   const history = useHistory();
   const { intl } = useI18n();
-  const { currentSpace, switchSpace, getSpacesList, deleteSpace, spaceList, cloneSpace } = schema;
+  const { currentSpace, switchSpace, clearSpace, deleteSpace, cloneSpace, getSpaces, getSpaceInfo } = schema;
   const activeSpace = location.hash.slice(1);
   useEffect(() => {
     trackPageView('/schema');
-    getSpaces();
+    init();
   }, []);
 
   const handleDeleteSpace = async (name: string) => {
-    setLoading(true);
+    const { setState, spaces, current, spacesFiltered } = state;
+    setState({ loading: true });
     const res = await deleteSpace(name);
-    setLoading(false);
+    setState({ loading: false });
+
+    if (res.code !== 0) {
+      return;
+    }
+
+    const nextSpaces = spaces.filter((s) => s.Name !== name);
+    const nextState = { current, spaces: nextSpaces };
+    if (spacesFiltered.at(-1)?.Name === name && spacesFiltered.length % pageSize === 1) {
+      nextState.current = current > 1 ? current - 1 : current;
+    }
+    const spaces2Render = getSpaces2Render(nextState);
+    await fillSpaces(spaces2Render);
+
+    message.success(intl.get('common.deleteSuccess'));
+    if (currentSpace === name) {
+      schema.update({ currentSpace: '' });
+      localStorage.removeItem('currentSpace');
+    }
+
+    setState(nextState);
+  };
+
+  const handleClearSpace = async (name: string) => {
+    const { setState } = state;
+    setState({ loading: true });
+    const res = await clearSpace(name);
+    setState({ loading: false });
     if (res.code === 0) {
-      message.success(intl.get('common.deleteSuccess'));
-      await getSpaces();
-      if (currentSpace === name) {
-        schema.update({
-          currentSpace: '',
-        });
-        localStorage.removeItem('currentSpace');
-      }
+      message.success(intl.get('common.success'));
     }
   };
 
@@ -90,24 +180,87 @@ const Schema = () => {
     const ok = await switchSpace(space);
     ok && history.push(`/schema/tag/list`);
   }, []);
-  const getSpaces = useCallback(async () => {
-    setLoading(true);
-    await getSpacesList();
-    setLoading(false);
+
+  const init = useCallback(async () => {
+    const { setState } = state;
+    setState({ loading: true });
+    const { code, data } = await getSpaces();
+    if (code !== 0) {
+      setState({ loading: false });
+      return;
+    }
+
+    const spaceNames: string[] = data?.sort() || [];
+    const activeSpace = location.hash.slice(1);
+    if (activeSpace) {
+      const index = spaceNames.indexOf(activeSpace);
+      if (index > -1) {
+        spaceNames.splice(index, 1);
+        spaceNames.unshift(activeSpace);
+      }
+    }
+    const spaces: ISpace[] = spaceNames.map((Name) => ({ Name }));
+    const nextState = { spaces, current: 1, searchVal: '' };
+    const spaces2Render = getSpaces2Render(nextState);
+    await fillSpaces(spaces2Render);
+    setState({ ...nextState, loading: false });
+  }, []);
+
+  const fillSpaces = useCallback(async (spaces: ISpace[]) => {
+    setState({ loading: true });
+    await Promise.all(
+      spaces.map(
+        (s) =>
+          !s.ID &&
+          getSpaceInfo(s.Name).then((res) => {
+            res.code === 0 && Object.assign(s, res?.data?.tables?.[0]);
+          }),
+      ),
+    );
+    setState({ loading: false });
+    return spaces;
+  }, []);
+
+  const onSearch = useCallback(async (searchVal: string) => {
+    const spaces2Render = getSpaces2Render({ searchVal, current: 1 });
+    await fillSpaces(spaces2Render);
+    state.setState({ searchVal, current: 1 });
+  }, []);
+
+  const onPageChange = useCallback(async (current: number) => {
+    const spaces2Render = getSpaces2Render({ current });
+    await fillSpaces(spaces2Render);
+    state.setState({ current });
+  }, []);
+
+  const getSpaces2Render = useCallback((params?: Partial<typeof state>) => {
+    const {
+      searchVal: _searchVal = state.searchVal,
+      current: _current = state.current,
+      pageSize: _pageSize = state.pageSize,
+      spaces: _spaces = state.spaces,
+    } = params || {};
+    const nextSpaces = _searchVal ? _spaces.filter((i) => i.Name.includes(_searchVal)) : _spaces;
+    const spaceList = nextSpaces.slice((_current - 1) * _pageSize, _current * _pageSize);
+    return spaceList;
   }, []);
 
   const handleCloneSpace = useCallback(async (name: string, oldSpace: string) => {
     const { code } = await cloneSpace(name, oldSpace);
     if (code === 0) {
       message.success(intl.get('schema.createSuccess'));
-      getSpaces();
+      init();
     }
   }, []);
-  const columns = [
+
+  const closeDDLModal = useCallback(() => setState({ ddlModal: { open: false, space: '' } }), []);
+
+  const columns: TableColumnType<ISpace>[] = [
     {
       title: intl.get('schema.No'),
-      dataIndex: 'serialNumber',
-      align: 'center' as const,
+      dataIndex: 'index',
+      align: 'center',
+      render: (_value, _record, index) => (current - 1) * pageSize + index + 1,
     },
     {
       title: intl.get('schema.spaceName'),
@@ -172,63 +325,74 @@ const Schema = () => {
       dataIndex: 'operation',
       width: 180,
       render: (_, space) => {
-        if (space.ID) {
-          return (
-            <div className={styles.operation}>
-              <Button
-                className="primaryBtn"
-                onClick={() => viewSpaceDetail(space.Name)}
-                data-track-category="navigation"
-                data-track-action="view_space_list"
-                data-track-label="from_space_list"
-              >
-                {intl.get('common.schema')}
-              </Button>
-              <Dropdown
-                menu={{
-                  items: [
-                    {
-                      key: 'ddl',
-                      label: <DDLButton space={space.Name} />,
-                    },
-                    {
-                      key: 'clone',
-                      label: <CloneSpacePopover space={space.Name} onClone={handleCloneSpace} />,
-                    },
-                    {
-                      key: 'delete',
-                      label: (
-                        <Popconfirm
-                          onConfirm={() => handleDeleteSpace(space.Name)}
-                          title={intl.get('common.ask')}
-                          okText={intl.get('common.ok')}
-                          cancelText={intl.get('common.cancel')}
-                        >
-                          <Button type="link" danger>
-                            {intl.get('schema.deleteSpace')}
-                          </Button>
-                        </Popconfirm>
-                      ),
-                    },
-                  ],
-                }}
-                placement="bottomLeft"
-              >
-                <Icon className={styles.btnMore} type="icon-studio-more" />
-              </Dropdown>
-            </div>
-          );
+        if (!space.ID) {
+          return null;
         }
+        return (
+          <div className={styles.operation}>
+            <Button
+              className="primaryBtn"
+              onClick={() => viewSpaceDetail(space.Name)}
+              data-track-category="navigation"
+              data-track-action="view_space_list"
+              data-track-label="from_space_list"
+            >
+              {intl.get('common.schema')}
+            </Button>
+            <Dropdown
+              destroyPopupOnHide
+              menu={{
+                items: [
+                  {
+                    key: 'ddl',
+                    label: (
+                      <Button type="link" onClick={() => setState({ ddlModal: { open: true, space: space.Name } })}>
+                        {intl.get('schema.showDDL')}
+                      </Button>
+                    ),
+                  },
+                  {
+                    key: 'clone',
+                    label: <CloneSpacePopover space={space.Name} onClone={handleCloneSpace} />,
+                  },
+                  {
+                    key: 'clear',
+                    label: (
+                      <DangerButton
+                        onConfirm={() => handleClearSpace(space.Name)}
+                        text={intl.get('schema.clearSpace')}
+                      />
+                    ),
+                  },
+                  {
+                    key: 'delete',
+                    label: (
+                      <DangerButton
+                        onConfirm={() => handleDeleteSpace(space.Name)}
+                        text={intl.get('schema.deleteSpace')}
+                      />
+                    ),
+                  },
+                ],
+              }}
+              placement="bottomRight"
+            >
+              <Icon className={styles.btnMore} type="icon-studio-more" />
+            </Dropdown>
+          </div>
+        );
       },
     },
   ];
-  const data = useMemo(() => spaceList.filter((item) => item.Name.includes(searchVal)), [spaceList, searchVal]);
+
+  const spaces2Render = spacesFiltered.slice((current - 1) * pageSize, current * pageSize);
+
   return (
     <div className={cls(styles.schemaPage, 'studioCenterLayout')}>
       <div className={styles.schemaHeader}>{intl.get('schema.spaceList')}</div>
       <div className={styles.schemaContainer}>
         <div className={styles.row}>
-          <Search type={intl.get('common.space')} onSearch={setSearchVal} />
+          <Search type={intl.get('common.space')} onSearch={onSearch} />
           {!moduleConfiguration.schema?.disableCreateSpace && (
             <Button className={cls(styles.btnCreate, 'studioAddBtn')} type="primary">
               <Link
@@ -245,13 +409,20 @@ const Schema = () => {
         </div>
         <Table
           className={styles.tableSpaceList}
-          dataSource={data}
+          dataSource={spaces2Render}
           columns={columns}
           loading={!!loading}
           rowKey="ID"
           rowClassName={(item) => (item.Name === activeSpace ? styles.active : '')}
+          pagination={{
+            current,
+            pageSize,
+            total: spacesFiltered.length,
+            onChange: onPageChange,
+          }}
         />
       </div>
+      <DDLModal {...ddlModal} onCancel={closeDDLModal} />
     </div>
   );
 };

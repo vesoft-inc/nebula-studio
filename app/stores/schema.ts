@@ -145,23 +145,18 @@ export class SchemaStore {
     return code === 0 ? data.tables[0]['Create Space'] : null;
   };
 
-  getSpacesList = async () => {
-    const res = await this.getSpaces();
-    const activeSpace = location.hash.slice(1);
-    if (res.data) {
-      const spaces: ISpace[] = [];
-      await Promise.all(
-        res.data.map(async (item, i) => {
-          const { code, data } = await this.getSpaceInfo(item);
-          if (code === 0) {
-            const space = (data.tables && data.tables[0]) || {};
-            space.serialNumber = space.Name === activeSpace ? 0 : i + 1;
-            spaces.push(space);
-          }
-        }),
-      );
-      this.update({ spaceList: spaces.sort((a, b) => a.serialNumber - b.serialNumber) });
-    }
+  getSpacesList = async (spaces: string[]) => {
+    const result: ISpace[] = [];
+    await Promise.all(
+      spaces.map(async (item, index) => {
+        const { code, data } = await this.getSpaceInfo(item);
+        if (code === 0) {
+          const space = (data.tables && data.tables[0]) || {};
+          result[index] = space;
+        }
+      }),
+    );
+    return result;
   };
 
   deleteSpace = async (space: string) => {
@@ -188,6 +183,20 @@ export class SchemaStore {
         trackEventConfig: {
           category: 'schema',
           action: 'clone_space',
+        },
+      },
+    )) as any;
+    return { code, data };
+  };
+  clearSpace = async (space: string) => {
+    const { code, data } = (await service.execNGQL(
+      {
+        gql: `CLEAR SPACE IF EXISTS ${handleKeyword(space)}`,
+      },
+      {
+        trackEventConfig: {
+          category: 'schema',
+          action: 'clear_space',
         },
       },
     )) as any;
