@@ -101,8 +101,7 @@
 }
 
 .clonePopover {
-  :global(.ant-popover-content) {
-    position: relative;
-    top: -100px;
+  &:global(.ant-popover) {
+    z-index: 1050;
   }
 }

@@ -10,7 +10,7 @@ import { useStore } from '@app/stores';
 import styles from './index.module.less';
 
 interface IProps {
-  onSearch: (value) => void;
+  onSearch: (value: string) => void;
   type: string;
 }
 
@@ -30,12 +30,7 @@ const Search = (props: IProps) => {
     setValue(e.target.value);
     search(e.target.value);
   }, []);
-  const search = useCallback(
-    debounce((value) => {
-      onSearch(value);
-    }, 500),
-    [onSearch],
-  );
+  const search = useCallback(debounce(onSearch, 500), [onSearch]);
 
   return (
     <div className={styles.schemaSearch}>

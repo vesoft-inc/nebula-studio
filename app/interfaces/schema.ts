@@ -13,13 +13,14 @@ export interface IField {
 }
 
 export interface ISpace {
-  serialNumber: number;
+  Charset?: string;
+  Collate?: string;
+  Comment?: string;
+  ID?: number;
   Name: string;
-  ID: number;
-  Charset: string;
-  Collate: string;
-  'Partition Number': string;
-  'Replica Factor': string;
+  'Partition Number'?: number;
+  'Replica Factor'?: number;
+  'Vid Type'?: string;
 }
 
 export interface ITag {
@@ -68,7 +69,7 @@ export interface IAlterForm {
 
 export enum ISchemaEnum {
   Tag = 'tag',
-  Edge ='edge',
+  Edge = 'edge',
 }
 export enum IJobStatus {
   Queue = 'QUEUE',
