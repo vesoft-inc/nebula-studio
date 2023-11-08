@@ -80,6 +80,14 @@
     </div>
   </div>
   <script type="module" src="./app/index.tsx"></script>
+  <script type="module">
+    import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+    self.MonacoEnvironment = {
+      getWorker(_, _label) {
+        return new editorWorker();
+      },
+    };
+  </script>
 </body>
 
 </html>

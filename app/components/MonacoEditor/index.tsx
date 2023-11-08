@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import Editor, { useMonaco } from '@monaco-editor/react';
+import * as monaco from 'monaco-editor';
+import Editor, { useMonaco, loader } from '@monaco-editor/react';
 import {
   keyWords,
   operators,
@@ -11,8 +12,14 @@ import {
 import { useI18n } from '@vesoft-inc/i18n';
 import { handleEscape } from '@app/utils/function';
 import { SchemaItemOverview } from '@app/stores/console';
-
 import styles from './index.module.less';
+
+// avoid loading monaco twice
+if (!loader.__getMonacoInstance()) {
+  loader.config({ monaco });
+  loader.init();
+}
+
 interface IProps {
   schema?: SchemaItemOverview;
   height?: string;
@@ -252,12 +259,14 @@ const MonacoEditor = (props: IProps) => {
       funcProvider,
     ];
   }, [currentLocale, monaco, tags, edges, fields]);
+
   const clearProviders = useCallback(() => {
     if (providersRef.current.length > 0) {
       providersRef.current.forEach((provider) => provider?.dispose());
       providersRef.current = [];
     }
   }, []);
+
   useEffect(() => {
     if (!monaco) return;
     const languages = monaco.languages.getLanguages();
@@ -274,7 +283,7 @@ const MonacoEditor = (props: IProps) => {
         { token: 'keyword', foreground: '770088' }, // keyword color
       ],
       colors: {
-        'editorGutter.background': '#8383831A', // line number gutter color
+        'editorGutter.background': '#83838316', // line number gutter color
         'editorLineNumber.foreground': '#A1A1AA', // line number color
         'editorLineNumber.activeForeground': '#A1A1AA',
         'editor.foreground': '#000000',
@@ -301,6 +310,7 @@ const MonacoEditor = (props: IProps) => {
     });
     onInstanceChange?.(editor, monaco);
   };
+
   useEffect(() => {
     if (!schema?.name && !monaco?.editor) return;
     clearProviders();
@@ -309,6 +319,7 @@ const MonacoEditor = (props: IProps) => {
       clearProviders();
     };
   }, [schema]);
+
   return (
     <Editor
       height={height || '300px'}
@@ -318,7 +329,7 @@ const MonacoEditor = (props: IProps) => {
       onChange={onChange}
       theme="studio"
       options={{
-        cursorStyle: 'block',
+        // cursorStyle: 'block',
         scrollbar: {
           vertical: 'hidden',
           horizontal: 'hidden',
@@ -333,9 +344,7 @@ const MonacoEditor = (props: IProps) => {
         lineDecorationsWidth: 0,
         renderLineHighlight: 'none',
         readOnly,
-        minimap: {
-          enabled: false,
-        },
+        minimap: { enabled: false },
       }}
       onMount={onMount}
     />
