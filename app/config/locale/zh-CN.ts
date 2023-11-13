@@ -154,8 +154,8 @@ export default {
     addToFavorites: '添加到收藏夹',
     unfavorite: '取消收藏',
     clearFavorites: '清空收藏夹',
-    graphviz: 'Graphviz',
     selectSpace: '请选择图空间',
+    planTree: '执行计划',
   },
   explore: {
     vertexStyle: '节点颜色',
