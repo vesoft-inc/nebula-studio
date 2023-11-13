@@ -11,7 +11,8 @@ import cls from 'classnames';
 import { GraphStore } from '@app/stores/graph';
 import { useI18n } from '@vesoft-inc/i18n';
 import type { HistoryResult } from '@app/stores/console';
-import Graphviz from './Graphviz';
+import Explain, { convertExplainData } from '@vesoft-inc/nebula-explain-graph';
+import '@vesoft-inc/nebula-explain-graph/dist/Explain.css';
 import ForceGraph from './ForceGraph';
 
 import styles from './index.module.less';
@@ -212,6 +213,22 @@ const OutputBox = (props: IProps) => {
     });
   };
   const resultSuccess = useMemo(() => code === 0, [code]);
+  const isDot = data.headers[0] === 'format';
+  const isExplainRaw =
+    gql
+      ?.trim()
+      .toLowerCase()
+      .match(/^explain(\s+|\{)/) &&
+    dataSource.length &&
+    !isDot;
+  const isProfileRaw =
+    gql
+      ?.trim()
+      .toLowerCase()
+      .match(/^profile(\s+|\{)/) &&
+    dataSource.length &&
+    !isDot;
+
   const items = [
     resultSuccess && {
       key: 'table',
@@ -234,15 +251,27 @@ const OutputBox = (props: IProps) => {
       ),
     },
     resultSuccess &&
-      data.headers[0] === 'format' && {
-        key: 'graphViz',
+      isExplainRaw && {
+        key: 'explain',
         label: (
           <>
             <Icon type="icon-studio-console-graphviz" />
-            {intl.get('console.graphviz')}
+            {intl.get('console.planTree')}
           </>
         ),
-        children: <Graphviz graph={dataSource[0]?.format} index={index} />,
+        children: <Explain style={{ height: 600 }} data={dataSource.map((item) => convertExplainData(item))} />,
+      },
+
+    resultSuccess &&
+      isProfileRaw && {
+        key: 'profile',
+        label: (
+          <>
+            <Icon type="icon-studio-console-graphviz" />
+            {intl.get('console.planTree')}
+          </>
+        ),
+        children: <Explain style={{ height: 600 }} data={dataSource.map((item) => convertExplainData(item))} />,
       },
     showGraph && {
       key: 'graph',

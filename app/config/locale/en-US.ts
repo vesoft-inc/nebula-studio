@@ -160,8 +160,8 @@ export default {
     addToFavorites: 'Add to favorites',
     unfavorite: 'Unfavorite',
     clearFavorites: 'Clear Favorites',
-    graphviz: 'Graphviz',
     selectSpace: 'Please select Graph Space',
+    planTree: 'Plan',
   },
   explore: {
     vertexStyle: 'Vertex Color',

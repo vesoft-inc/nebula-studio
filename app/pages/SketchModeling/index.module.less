@@ -1,17 +1,23 @@
 @import '@app/common.less';
+@shadowBlue: rgba(0, 194, 255, 0.6) !important;
+@pathBlue: rgba(0, 145, 255, 0.7);
+
 @keyframes panelOut {
-  0%{
+  0% {
     left: calc(100% - 92px);
   }
-  100%{
+
+  100% {
     left: max(calc(50% + 150px), calc(100% - 430px));
   }
 }
+
 @keyframes tagPanelOut {
-  0%{
+  0% {
     right: 50%;
   }
-  100%{
+
+  100% {
     right: min(calc(100% - 320px), calc(50% + 350px));
   }
 }
@@ -19,24 +25,71 @@
 .sketchModeling {
   display: flex;
   height: 100%;
+
   .sketchCanvas {
     position: relative;
     display: flex;
     flex-direction: column;
     height: 100%;
     flex: 1;
+
+    :global {
+      .ve-line-label {
+        rect {
+          fill: transparent;
+        }
+
+        text {
+          font-size: 14px;
+          font-weight: 600;
+        }
+      }
+
+      .ve-line.active,
+      .ve-line:hover {
+        .ve-line-shape {
+          opacity: 1 !important;
+        }
+
+        .ve-line-path {
+          stroke: @pathBlue !important;
+        }
+
+        .ve-shdow-path {
+          stroke-width: 4.5px !important;
+          stroke: @shadowBlue;
+          filter: drop-shadow(0px 0px 3px rgba(0, 194, 255, 1));
+        }
+
+        .ve-line-label {
+          text {
+            fill: @blue;
+          }
+        }
+
+        // .ve-line-arrow{
+        //   fill:transparent!important;
+        //   opacity: 1 !important;
+        //   stroke: rgba(0, 145, 255, 0.5) !important;
+        //   filter: drop-shadow(0px 0px 5px rgba(0, 194, 255, 1));
+        // }
+      }
+    }
   }
+
   .content {
     flex: 1;
     position: relative;
   }
 }
+
 .tagBar {
   position: absolute;
   bottom: 33px;
   right: 50%;
   transform: translateX(50%);
   height: 86px;
+
   .tags {
     display: flex;
     align-items: center;
@@ -46,28 +99,33 @@
     background: #FFFFFF;
     box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.25);
     border-radius: 6px;
+
     .tagLabel {
       user-select: none;
       font-weight: 500;
       font-size: 18px;
       margin-right: 20px;
     }
+
     .tagList {
       display: flex;
       align-items: center;
     }
   }
+
   .tip {
     position: absolute;
     right: 4px;
     top: 4px;
     color: @darkGray;
+
     svg {
       width: 16px;
       height: 16px;
     }
   }
 }
+
 .tagItem {
   width: 48px;
   height: 48px;
@@ -76,17 +134,20 @@
   padding: 0 2px;
   user-select: none;
   cursor: move;
+
   &:not(:last-child) {
     margin-right: 15px;
   }
 }
+
 .shadowItem {
   opacity: 0.5;
   position: fixed;
   z-index: 9999;
   pointer-events: none;
-  margin:0;
+  margin: 0;
 }
+
 .scaleBtns {
   position: absolute;
   width: 42px;
@@ -100,11 +161,13 @@
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.25);
   border-radius: 6px;
   height: 86px;
+
   .btn {
     svg {
       width: 38px;
       height: 38px;
     }
+
     padding: 0 2px;
     user-select: none;
     cursor: pointer;
@@ -127,17 +190,19 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
   img {
     width: 140px;
     height: 140px;
   }
+
   .emptyText {
     font-weight: 500;
     font-size: 18px;
     line-height: 25px;
     margin: 20px 0 15px;
   }
-  
+
   .emptyTips {
     font-weight: 400;
     font-size: 12px;
