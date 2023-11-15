@@ -212,88 +212,89 @@ const OutputBox = (props: IProps) => {
       edges,
     });
   };
-  const resultSuccess = useMemo(() => code === 0, [code]);
-  const isDot = data.headers[0] === 'format';
-  const isExplainRaw =
-    gql
-      ?.trim()
-      .toLowerCase()
-      .match(/^explain(\s+|\{)/) &&
-    dataSource.length &&
-    !isDot;
-  const isProfileRaw =
-    gql
-      ?.trim()
-      .toLowerCase()
-      .match(/^profile(\s+|\{)/) &&
-    dataSource.length &&
-    !isDot;
-
-  const items = [
-    resultSuccess && {
-      key: 'table',
-      label: (
-        <>
-          <Icon type="icon-studio-console-table" />
-          {intl.get('common.table')}
-        </>
-      ),
-      children: (
-        <Table
-          bordered={true}
-          columns={columns}
-          dataSource={dataSource}
-          pagination={{
-            showTotal: () => `${intl.get('common.total')} ${dataSource.length}`,
-          }}
-          rowKey={() => uuidv4()}
-        />
-      ),
-    },
-    resultSuccess &&
-      isExplainRaw && {
-        key: 'explain',
+  const resultSuccess = code === 0;
+  const items = useMemo(() => {
+    const isDot = data.headers[0] === 'format';
+    const isExplainRaw =
+      gql
+        ?.trim()
+        .toLowerCase()
+        .match(/^explain(\s+|\{)/) &&
+      dataSource.length &&
+      !isDot;
+    const isProfileRaw =
+      gql
+        ?.trim()
+        .toLowerCase()
+        .match(/^profile(\s+|\{)/) &&
+      dataSource.length &&
+      !isDot;
+    return [
+      resultSuccess && {
+        key: 'table',
         label: (
           <>
-            <Icon type="icon-studio-console-graphviz" />
-            {intl.get('console.planTree')}
+            <Icon type="icon-studio-console-table" />
+            {intl.get('common.table')}
           </>
         ),
-        children: <Explain style={{ height: 600 }} data={dataSource.map((item) => convertExplainData(item))} />,
+        children: (
+          <Table
+            bordered={true}
+            columns={columns}
+            dataSource={dataSource}
+            pagination={{
+              showTotal: () => `${intl.get('common.total')} ${dataSource.length}`,
+            }}
+            rowKey={() => uuidv4()}
+          />
+        ),
       },
+      resultSuccess &&
+        isExplainRaw && {
+          key: 'explain',
+          label: (
+            <>
+              <Icon type="icon-studio-console-graphviz" />
+              {intl.get('console.planTree')}
+            </>
+          ),
+          children: <Explain style={{ height: 600 }} data={dataSource.map((item) => convertExplainData(item))} />,
+        },
 
-    resultSuccess &&
-      isProfileRaw && {
-        key: 'profile',
+      resultSuccess &&
+        isProfileRaw && {
+          key: 'profile',
+          label: (
+            <>
+              <Icon type="icon-studio-console-graphviz" />
+              {intl.get('console.planTree')}
+            </>
+          ),
+          children: <Explain style={{ height: 600 }} data={dataSource.map((item) => convertExplainData(item))} />,
+        },
+      showGraph && {
+        key: 'graph',
         label: (
           <>
-            <Icon type="icon-studio-console-graphviz" />
-            {intl.get('console.planTree')}
+            <Icon type="icon-studio-console-graph" />
+            {intl.get('common.graph')}
           </>
         ),
-        children: <Explain style={{ height: 600 }} data={dataSource.map((item) => convertExplainData(item))} />,
+        children: <ForceGraph space={space} data={dataSource} spaceVidType={spaceVidType} onGraphInit={setGraph} />,
       },
-    showGraph && {
-      key: 'graph',
-      label: (
-        <>
-          <Icon type="icon-studio-console-graph" />
-          {intl.get('common.graph')}
-        </>
-      ),
-      children: <ForceGraph space={space} data={dataSource} spaceVidType={spaceVidType} onGraphInit={setGraph} />,
-    },
-    !resultSuccess && {
-      key: 'log',
-      label: (
-        <>
-          <Icon type="icon-studio-console-logs" />
-          {intl.get('common.log')}
-        </>
-      ),
-      children: <div className={styles.errContainer}>{message}</div>,
-    },
-  ].filter(Boolean);
+      !resultSuccess && {
+        key: 'log',
+        label: (
+          <>
+            <Icon type="icon-studio-console-logs" />
+            {intl.get('common.log')}
+          </>
+        ),
+        children: <div className={styles.errContainer}>{message}</div>,
+      },
+    ].filter(Boolean);
+  }, [gql, data]);
   return (
     <div className={styles.outputBox}>
       <div className={styles.outputHeader}>
