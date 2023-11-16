@@ -291,7 +291,7 @@ export class SketchStore {
     });
     this.container = container;
     initShapes(this.editor);
-    initShadowFilter(this.editor.svg);
+    initShadowFilter(this.editor);
     if (schema) {
       const _schema = JSON.parse(schema);
       makeLineSort(_schema.lines);

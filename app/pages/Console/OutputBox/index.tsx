@@ -294,7 +294,7 @@ const OutputBox = (props: IProps) => {
         children: <div className={styles.errContainer}>{message}</div>,
       },
     ].filter(Boolean);
-  }, [gql, data]);
+  }, [gql, data, dataSource, columns]);
   return (
     <div className={styles.outputBox}>
       <div className={styles.outputHeader}>

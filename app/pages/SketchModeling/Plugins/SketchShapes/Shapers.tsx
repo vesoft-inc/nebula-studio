@@ -79,7 +79,7 @@ export default function initShapes(editor: VEditor) {
             )}
           </>,
         );
-      })
+      });
       return node.shape;
     },
   };
@@ -87,7 +87,9 @@ export default function initShapes(editor: VEditor) {
   editor.graph.line.registeLine(ISchemaEnum.Edge, Path);
 }
 
-export const initShadowFilter = (svg: SVGElement) => {
+export const initShadowFilter = (editor: VEditor) => {
+  const shadow = editor.graph.shadow?.querySelector('defs');
+  if (!shadow) return;
   const filter = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   const root = createRoot(filter);
   root.render(
@@ -114,5 +116,5 @@ export const initShadowFilter = (svg: SVGElement) => {
       </filter>
     </>,
   );
-  svg.querySelector('defs').appendChild(filter);
+  shadow.appendChild(filter);
 };
