@@ -1,18 +1,17 @@
 import path from 'node:path';
-import fs from 'node:fs';
 import { defineConfig, loadEnv } from 'vite';
 import type { Plugin, ResolvedConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
 import postCssPresetEnv from 'postcss-preset-env';
 import ejs from 'ejs';
+import SVGElement from '@vesoft-inc/icons/lib/NebulaGraph-Explorer/svg-tpl.cjs';
 // import legacy from '@vitejs/plugin-legacy';
 // import topLevelAwait from 'vite-plugin-top-level-await';
 import { getAppConfig } from './build/config';
 import pkg from './package.json';
 
 const appConfig = getAppConfig();
-const SVGElement = fs.readFileSync('./public/icons/iconpark.tpl', 'utf-8');
 const proxyHost = '127.0.0.1:9000';
 
 const htmlPlugin = (data?: Record<string, unknown>): Plugin => {
