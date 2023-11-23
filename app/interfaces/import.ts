@@ -1,3 +1,4 @@
+import { ILLMStatus } from '@app/pages/Import/TaskList/TaskItem/AIImportItem';
 import { RcFile } from 'antd/lib/upload';
 
 export enum ITaskStatus {
@@ -36,6 +37,30 @@ export interface ITaskItem {
   message: string;
   stats: ITaskStats;
   rawConfig: string;
+  llmJob?: ILLMJob;
+}
+
+export interface ILLMJob {
+  user_name: string;
+  host: string;
+  job_id: string;
+  space: string;
+  space_schema_string: string;
+  file?: string;
+  file_path?: string;
+  job_type: string;
+  status: ILLMStatus;
+  prompt_template: string;
+  process: {
+    total: number;
+    current: number;
+    ratio: number;
+    failed_reason: string;
+    prompt_tokens: number;
+    completion_tokens: number;
+  };
+  update_time: string;
+  create_time: string;
 }
 
 export interface IPropertyProps {

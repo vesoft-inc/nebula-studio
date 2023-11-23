@@ -6,8 +6,10 @@ import (
 	"regexp"
 	"time"
 
+	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/llm"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -156,6 +158,17 @@ func GetManyImportTask(address, username, space string, pageIndex, pageSize int)
 			return nil, err
 		}
 		stats := t.Stats
+		var llmJob interface{}
+		if t.LLMJobID != 0 {
+			err = db.CtxDB.First(&t.LLMJob, t.LLMJobID).Error
+			if err == nil {
+				if runningJob := llm.GetRunningJob(t.LLMJob.JobID); runningJob != nil {
+					t.LLMJob.Process = runningJob.Process
+				}
+				llmJob = t.LLMJob
+			}
+			t.TaskStatus = string(t.LLMJob.Status)
+		}
 		data := types.GetImportTaskData{
 			Id:            t.BID,
 			Status:        t.TaskStatus,
@@ -180,6 +193,7 @@ func GetManyImportTask(address, username, space string, pageIndex, pageSize int)
 				FailedProcessed: stats.FailedProcessed,
 				TotalProcessed:  stats.TotalProcessed,
 			},
+			LLMJob: llmJob,
 		}
 		result.List = append(result.List, data)
 	}

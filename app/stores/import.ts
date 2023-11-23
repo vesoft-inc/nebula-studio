@@ -341,7 +341,7 @@ export class ImportStore {
     trackEvent('import', 'download_task_log');
   };
 
-  getLogDetail = async (params: { id: string }) => {
+  getLogDetail = async (params: ITaskItem) => {
     const { code, data } = await service.getLogDetail(params);
     if (code === 0) {
       return data;

@@ -17,7 +17,7 @@ interface IProps {
   data: ITaskItem;
   onTaskStop: (id: string) => void;
   onTaskDelete: (id: string) => void;
-  onViewLog: (id: string, space: string, status: ITaskStatus) => void;
+  onViewLog: (task: ITaskItem) => void;
   onRerun: () => void;
 }
 
@@ -236,7 +236,7 @@ const TaskItem = (props: IProps) => {
               </Tooltip>
             </Button>
             {!isDraft && !loadingStatus.includes(status) && (
-              <Button className="primaryBtn" onClick={() => onViewLog(id, space, status)}>
+              <Button className="primaryBtn" onClick={() => onViewLog(props.data)}>
                 <Tooltip title={intl.get('import.viewLogs')}>
                   <Icon type="icon-studio-btn-ddl" />
                 </Tooltip>

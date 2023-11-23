@@ -179,6 +179,7 @@ func (f *fileService) FileConfigUpdate(request types.FileConfigUpdateRequest) er
 	}
 	return nil
 }
+
 func (f *fileService) FileUpload() error {
 	dir := f.svcCtx.Config.File.UploadDir
 	auth := f.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
@@ -203,9 +204,10 @@ func (f *fileService) FileUpload() error {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err, "upload failed")
 	}
 	for _, file := range files {
-		if file.Size == 0 {
+		if file.Size == 0 || file.Header.Get("Content-Type") != "text/csv" {
 			continue
 		}
+		//csv file charset check for importer
 		charSet, err := checkCharset(file)
 		if err != nil {
 			logx.Infof("upload file error, check charset fail:%v", err)

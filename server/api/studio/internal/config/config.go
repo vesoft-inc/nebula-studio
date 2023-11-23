@@ -1,7 +1,6 @@
 package config
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -64,6 +63,12 @@ type Config struct {
 		MaxOpenConns              int    `json:",default=30"`
 		MaxIdleConns              int    `json:",default=10"`
 	}
+
+	LLM struct {
+		GQLPath      string `json:",default=./data/llm"`
+		GQLBatchSize int    `json:",default=100"`
+		MaxBlockSize int    `json:",default=0"`
+	}
 }
 
 type PathValidator struct {
@@ -105,9 +110,12 @@ func (c *Config) Complete() {
 				if _, err := os.Stat(filepath.Dir(abs)); os.IsNotExist(err) {
 					os.MkdirAll(filepath.Dir(abs), os.ModePerm)
 				}
-				ioutil.WriteFile(abs, []byte(""), os.ModePerm)
+				os.WriteFile(abs, []byte(""), os.ModePerm)
 			}
 		}
+	}
+	if c.LLM.MaxBlockSize == 0 {
+		c.LLM.MaxBlockSize = 1024 * 1024 * 1024
 	}
 }
 

@@ -59,3 +59,7 @@ DB:
   MaxOpenConns: 30
   # The maximum idle connections of the pool.
   MaxIdleConns: 10
+LLM:
+  GQLPath: "./data/llm"
+  GQLBatchSize: 1
+  MaxBlockSize: 1

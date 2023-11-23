@@ -1,4 +1,5 @@
 @import '@app/common.less';
+
 .taskItem {
   background: #FFFFFF;
   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15);
@@ -6,6 +7,7 @@
   min-height: 125px;
   margin-top: 20px;
   padding: 20px 30px;
+
   .row {
     display: flex;
     justify-content: space-between;
@@ -14,6 +16,7 @@
     color: @darkGray;
     margin-bottom: 15px;
     align-items: center;
+
     .createTime {
       font-weight: 600;
       font-size: 14px;
@@ -21,63 +24,77 @@
       font-family: Roboto-Light, serif;
       margin-right: 15px;
     }
+
     :global(.ant-btn-link) {
       color: @darkGray;
       font-weight: 800;
     }
   }
+
   .progress {
     flex: 1;
     margin-right: 30px;
+
     .progressInfo {
       display: flex;
       justify-content: space-between;
       margin-bottom: 12px;
       padding-right: calc(2em + 8px);
+
       .taskName {
         .draftLabel {
           background: #DBEFFF;
           border-radius: 4px;
           padding: 6px 12px;
-          font-weight: 500;
           font-size: 14px;
           color: @darkBlue;
           margin-right: 10px;
         }
-        font-family: Roboto-Bold, serif;
+
+        font-family: Roboto-Bold,
+        serif;
         font-style: normal;
         font-size: 14px;
         color: @lightBlack;
-        & > span:not(.draftLabel) {
+
+        &>span:not(.draftLabel) {
           margin-left: 12px;
         }
+
         .completeInfo {
           color: #27AE60;
-          & > span {
+
+          &>span {
             margin-right: 6px
           }
+
           .red {
             color: @red
           }
         }
+
         .errInfo {
           color: @red
         }
-      } 
+      }
+
       .moreInfo {
-        & > span:not(:last-child) {
+        &>span:not(:last-child) {
           margin-right: 30px;
         }
       }
     }
+
     :global(.ant-progress-text) {
       color: @lightBlack;
     }
   }
+
   .operations {
     :global {
       .ant-btn {
         height: 38px;
+
         &:not(:last-child) {
           margin-right: 15px;
         }

@@ -128,6 +128,14 @@ const HelpMenu = () => {
         ],
       },
       {
+        key: 'setting',
+        label: (
+          <Link className={styles.nebulaLink} to="/setting">
+            <Icon className={styles.navIcon} style={{ fontSize: 20 }} type="icon-navbar-setting" />
+          </Link>
+        ),
+      },
+      {
         key: 'user',
         popupClassName: styles.accountMenu,
         popupOffset: [0, 20],

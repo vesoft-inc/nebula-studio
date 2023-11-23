@@ -38,6 +38,8 @@ type (
 	}
 )
 
+var CtxUserInfoMap map[string]AuthData = make(map[string]AuthData)
+
 // set the timeout for the graph service: 8 hours
 // once the timeout is reached, the connection will be closed
 // all requests running ngql will be failed, so keepping a long timeout is necessary, make the connection alive
@@ -135,6 +137,14 @@ func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) 
 	if err != nil {
 		return "", err
 	}
+	// cache auth info key for llm import use
+	key := fmt.Sprintf("%s:%d:%s", params.Address, params.Port, username)
+	CtxUserInfoMap[key] = AuthData{
+		Address:  params.Address,
+		Port:     params.Port,
+		Username: username,
+		Password: password,
+	}
 
 	tokenString, err := CreateToken(
 		&AuthData{
@@ -146,7 +156,7 @@ func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) 
 		},
 		config,
 	)
-	return tokenString, nil
+	return tokenString, err
 }
 
 func AuthMiddlewareWithCtx(svcCtx *svc.ServiceContext) rest.Middleware {

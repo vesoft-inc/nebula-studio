@@ -21,6 +21,8 @@ type TaskInfo struct {
 	ID            int    `gorm:"column:id;primaryKey;autoIncrement;"`
 	BID           string `gorm:"column:b_id;not null;type:char(32);uniqueIndex;comment:task id"`
 	Address       string `gorm:"column:address;type:varchar(255);"`
+	LLMJobID      int    `gorm:"column:llm_job_id;"`
+	LLMJob        LLMJob `gorm:"foreignKey:LLMJobID;"`
 	Name          string `gorm:"column:name;type:varchar(255);"`
 	Space         string `gorm:"column:space;type:varchar(255);"`
 	ImportAddress string `gorm:"column:import_address;"`

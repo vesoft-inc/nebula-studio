@@ -1,9 +1,10 @@
 package filestore
 
 import (
-	"github.com/agiledragon/gomonkey/v2"
 	"reflect"
 	"testing"
+
+	"github.com/agiledragon/gomonkey/v2"
 
 	"github.com/pkg/sftp"
 )

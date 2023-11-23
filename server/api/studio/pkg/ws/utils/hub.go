@@ -47,15 +47,6 @@ func (h *Hub) Run() {
 				}
 			}
 			h.mu.Unlock()
-			// case message := <-h.broadcast:
-			// 	for client := range h.clients {
-			// 		select {
-			// 		case client.send <- message:
-			// 		default:
-			// 			close(client.send)
-			// 			delete(h.clients, client)
-			// 		}
-			// 	}
 		}
 	}
 }

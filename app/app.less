@@ -1,227 +1,237 @@
 @import './common.less';
 
 @font-face {
-	font-family: 'Roboto-Black';
-	src: url('@app/static/fonts/Roboto-Black.ttf') format('truetype');
+  font-family: 'Roboto-Black';
+  src: url('@app/static/fonts/Roboto-Black.ttf') format('truetype');
 }
 
 @font-face {
-	font-family: 'Roboto-Bold';
-	src: url('@app/static/fonts/Roboto-Bold.ttf') format('truetype');
+  font-family: 'Roboto-Bold';
+  src: url('@app/static/fonts/Roboto-Bold.ttf') format('truetype');
 }
 
 @font-face {
-	font-family: 'Roboto-Light';
-	src: url('@app/static/fonts/Roboto-Light.ttf') format('truetype');
+  font-family: 'Roboto-Light';
+  src: url('@app/static/fonts/Roboto-Light.ttf') format('truetype');
 }
 
 @font-face {
-	font-family: 'Roboto-Medium';
-	src: url('@app/static/fonts/Roboto-Medium.ttf') format('truetype');
+  font-family: 'Roboto-Medium';
+  src: url('@app/static/fonts/Roboto-Medium.ttf') format('truetype');
 }
 
 @font-face {
-	font-family: 'Roboto-Regular';
-	src: url('@app/static/fonts/Roboto-Regular.ttf') format('truetype');
+  font-family: 'Roboto-Regular';
+  src: url('@app/static/fonts/Roboto-Regular.ttf') format('truetype');
 }
 
 @font-face {
-	font-family: 'Roboto-Mono';
-	src: url('@app/static/fonts/Roboto-Mono.ttf') format('truetype');
+  font-family: 'Roboto-Mono';
+  src: url('@app/static/fonts/Roboto-Mono.ttf') format('truetype');
 }
 
 #studioApp {
-	font-family: Roboto-Regular, sans-serif;
+  font-family: Roboto-Regular, sans-serif;
 }
 
 .studioCenterLayout {
-	width: @containerWidth;
-	margin: 0 auto;
+  width: @containerWidth;
+  margin: 0 auto;
 }
 
 .studioTabHeader {
-	display: flex;
-	justify-content: center;
-	padding-bottom: 16px;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 16px;
 }
 
 .ant-radio-group.studioTabGroup {
-	background: @lightGray;
-	border-radius: 20px;
-	padding: 4px;
-	min-width: 400px;
-	display: flex;
-	justify-content: center;
+  background: @lightGray;
+  border-radius: 20px;
+  padding: 4px;
+  min-width: 400px;
+  display: flex;
+  justify-content: center;
 
-	.ant-radio-button-wrapper {
-		border-radius: 20px;
-		flex: 1;
-		text-align: center;
-		border: none;
-		white-space: nowrap;
-		color: @darkBlue;
+  .ant-radio-button-wrapper {
+    border-radius: 20px;
+    flex: 1;
+    text-align: center;
+    border: none;
+    white-space: nowrap;
+    color: @darkBlue;
 
-		&.ant-radio-button-wrapper-checked {
-			color: #fff;
-		}
+    &.ant-radio-button-wrapper-checked {
+      color: #fff;
+    }
 
-		&:not(.ant-radio-button-wrapper-checked) {
-			background: none;
-		}
+    &:not(.ant-radio-button-wrapper-checked) {
+      background: none;
+    }
 
-		&::before {
-			width: 0;
-		}
-	}
+    &::before {
+      width: 0;
+    }
+  }
 }
 
 .ant-btn {
-	font-family: Roboto-Regular, sans-serif;
+  font-family: Roboto-Regular, sans-serif;
 }
 
 .ant-btn.warningBtn {
-	color: @red;
-	border-color: @red;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 3px;
+  color: @red;
+  border-color: @red;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
 
-	svg {
-		width: 20px;
-		height: 20px;
-	}
+  svg {
+    width: 20px;
+    height: 20px;
+  }
 
-	&.ant-btn-link {
-		border: none;
-	}
+  &.ant-btn-link {
+    border: none;
+  }
 
-	&:hover {
-		color: @red;
-		border-color: @red;
-	}
+  &:hover {
+    color: @red;
+    border-color: @red;
+  }
 }
 
 .ant-btn.primaryBtn {
-	color: @blue;
-	border-color: @blue;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 3px;
+  color: @blue;
+  border-color: @blue;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
 
-	svg {
-		width: 20px;
-		height: 20px;
-	}
+  svg {
+    width: 20px;
+    height: 20px;
+  }
 
-	&.ant-btn-link {
-		border: none;
-	}
+  &.ant-btn-link {
+    border: none;
+  }
 
-	&:hover {
-		color: @blue;
-		border-color: @blue;
-	}
+  &:hover {
+    color: @blue;
+    border-color: @blue;
+  }
 }
 
 .ant-btn.cancelBtn {
-	color: @darkGray;
-	border-color: @darkGray;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 3px;
+  color: @darkGray;
+  border-color: @darkGray;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
 
-	svg {
-		width: 20px;
-		height: 20px;
-	}
+  svg {
+    width: 20px;
+    height: 20px;
+  }
 
-	&.ant-btn-link {
-		border: none;
-	}
+  &.ant-btn-link {
+    border: none;
+  }
 
-	&:hover {
-		color: @darkGray;
-		border-color: @darkGray;
-	}
+  &:hover {
+    color: @darkGray;
+    border-color: @darkGray;
+  }
 }
 
 .ant-btn.studioAddBtn {
-	border-radius: 3px;
-	display: inline-flex;
-	align-items: center;
-	padding: 0 29px;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 29px;
 
-	a {
-		display: flex;
-		align-items: center;
-	}
+  a {
+    display: flex;
+    align-items: center;
+  }
 
-	.studioAddBtnIcon {
-		display: inline-flex;
-		margin-right: 10px;
-		height: 22px;
+  .studioAddBtnIcon {
+    display: inline-flex;
+    margin-right: 10px;
+    height: 22px;
 
-		> svg {
-			width: 22px;
-			height: 22px;
-		}
+    >svg {
+      width: 22px;
+      height: 22px;
+    }
 
-		& ~ span {
-			margin-left: 0;
-		}
-	}
+    &~span {
+      margin-left: 0;
+    }
+  }
 }
 
 .studioFormFooter {
-	position: fixed;
-	left: 0;
-	bottom: 0;
-	z-index: 10;
-	width: 100%;
-	height: 98px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background: #fff;
-	box-shadow: 0 -4px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 10;
+  width: 100%;
+  height: 98px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  box-shadow: 0 -4px 4px rgba(0, 0, 0, 0.1);
 
-	button {
-		width: 236px;
+  button {
+    width: 236px;
 
-		&:not(:last-child) {
-			margin-right: 50px;
-		}
-	}
+    &:not(:last-child) {
+      margin-right: 50px;
+    }
+  }
 }
 
 .ant-form-item-label label {
-	font-family: Roboto-Bold, sans-serif;
+  font-family: Roboto-Bold, sans-serif;
 }
 
 .ant-table .ant-table-row {
-	background: #fff;
+  background: #fff;
 }
 
 // for thoes who use command pattern to create a Modal and other components
 // just `ConfigProvider` is not enough
 .ant-modal .ant-modal-content {
-	padding: 0;
-	.ant-modal-header {
-		padding: 16px 24px;
-		border-bottom: 1px solid #f0f0f0;
-		margin-bottom: 0;
-	}
-	.ant-modal-body {
-		padding: 24px;
-		.ant-modal-confirm-body-wrapper {
-			padding: 24px 0;
-		}
-	}
-	.ant-modal-footer {
-		padding: 10px 16px;
-		border-top: 1px solid #f0f0f0;
-	}
+  padding: 0;
+
+  .ant-modal-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 0;
+  }
+
+  .ant-modal-body {
+    padding: 24px;
+
+    .ant-modal-confirm-body-wrapper {
+      padding: 24px 0;
+    }
+  }
+
+  .ant-modal-footer {
+    padding: 10px 16px;
+    border-top: 1px solid #f0f0f0;
+  }
+}
+
+.ant-btn-default {
+  border: 1px solid @blue;
+  border-radius: 3px;
+  color: @blue;
 }

@@ -219,6 +219,7 @@ type GetImportTaskData struct {
 	UpdateTime    int64           `json:"updateTime"`
 	Stats         ImportTaskStats `json:"stats"`
 	RawConfig     string          `json:"rawConfig"`
+	LLMJob        interface{}     `json:"llmJob"`
 }
 
 type ImportTaskStats struct {
@@ -464,4 +465,52 @@ type DatasourcePreviewFileRequest struct {
 
 type DatasourcePreviewFileData struct {
 	Contents []string `json:"contents"`
+}
+
+type LLMRequest struct {
+	Data map[string]interface{} `json:"data"`
+}
+
+type LLMResponse struct {
+	Data interface{} `json:"data"`
+}
+
+type LLMConfigRequest struct {
+	URL              string `json:"url"`
+	Key              string `json:"key,optional"`
+	APIType          string `json:"apiType"`
+	MaxContextLength int    `json:"maxContextLength"`
+	Config           string `json:"config,optional"`
+}
+
+type LLMImportRequest struct {
+	Space             string `json:"space"`
+	File              string `json:"file,optional"`
+	FilePath          string `json:"filePath,optional"`
+	Type              string `json:"type"`
+	PromptTemplate    string `json:"promptTemplate"`
+	SpaceSchemaString string `json:"spaceSchemaString"`
+}
+
+type LLMImportJobsRequest struct {
+	Page     int    `json:"page"`
+	PageSize int    `json:"pageSize"`
+	Space    string `json:"space,optional"`
+}
+
+type LLMImportLogRequest struct {
+	JobID string `json:"jobId"`
+}
+
+type HandleLLMImportRequest struct {
+	JobID  string `json:"jobId"`
+	Action string `path:"action"`
+}
+
+type DeleteLLMImportRequest struct {
+	JobID string `path:"jobId"`
+}
+
+type DownloadLLMImportNgqlRequest struct {
+	JobID string `json:"jobId"`
 }

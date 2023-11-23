@@ -10,6 +10,7 @@ import (
 	gateway "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/gateway"
 	health "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/health"
 	importtask "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/importtask"
+	llm "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/llm"
 	schema "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/schema"
 	sketches "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/handler/sketches"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
@@ -251,6 +252,56 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/api/datasources/:id/file-preview",
 				Handler: datasource.DatasourcePreviewFileHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/llm",
+				Handler: llm.LLMProxyHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/config/llm",
+				Handler: llm.LLMConfigHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/config/llm",
+				Handler: llm.GetLLMConfigHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/llm/import/job",
+				Handler: llm.AddLLMImportJobHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/llm/import/jobs",
+				Handler: llm.GetLLMImportJobsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/llm/import/job/log",
+				Handler: llm.GetLLMImportJobLogHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/llm/import/job/:action",
+				Handler: llm.HandleLLMImportJobHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/api/llm/import/job/:jobId",
+				Handler: llm.DeleteLLMImportJobHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/llm/import/ngql",
+				Handler: llm.DownloadLLMImportNgqlHandler(serverCtx),
 			},
 		},
 	)

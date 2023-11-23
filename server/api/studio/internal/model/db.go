@@ -120,6 +120,8 @@ func InitDB(config *config.Config, db *gorm.DB) {
 			&SchemaSnapshot{},
 			&Favorite{},
 			&File{},
+			&LLMConfig{},
+			&LLMJob{},
 		)
 		if err != nil {
 			zap.L().Fatal(fmt.Sprintf("init taskInfo table fail: %s", err))

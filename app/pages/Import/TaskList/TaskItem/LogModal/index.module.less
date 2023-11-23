@@ -1,15 +1,18 @@
 @import '@app/common.less';
+
 .logModal {
   height: 100vh;
+
   :global {
     .ant-modal {
       height: 80%;
+
       .ant-modal-content {
         height: 100%;
       }
     }
   }
-  
+
   .importModalTitle {
     display: flex;
     align-items: center;
@@ -25,22 +28,25 @@
         border-bottom: none;
         padding-right: 80px;
         padding-top: 15px;
+
         .ant-modal-title {
           display: flex;
           align-items: center;
           justify-content: space-between;
         }
+
         .ant-modal-close {
           top: 5px;
         }
       }
+
       .ant-modal-body {
         display: flex;
         height: 91%;
       }
     }
   }
-  
+
   .logContainer {
     width: calc(100% - 200px);
     height: 100%;
@@ -51,23 +57,34 @@
     background: #333;
     color: #fff;
     white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
+
   .full {
     width: 100%;
   }
-  code {
+
+  pre {
     font-size: 12px;
     font-family: inherit;
+    overflow: visible;
+    margin: 0;
   }
 }
+
 .logTab {
   height: 100%;
+
   :global {
     .ant-tabs-nav {
       width: 200px;
+
       .ant-tabs-tab {
         background-color: @lightGray;
         color: @darkBlue;
+
         .ant-tabs-tab-btn {
           word-break: break-all;
           width: 100%;
@@ -75,20 +92,24 @@
           text-align: left;
         }
       }
+
       .ant-tabs-tab-active {
         background-color: @blue;
         color: #fff;
+
         .ant-tabs-tab-btn {
           color: #fff;
         }
       }
+
       .ant-tabs-nav-list {
         background-color: @lightGray;
       }
     }
-    .ant-tabs-content-holder > .ant-tabs-content {
+
+    .ant-tabs-content-holder>.ant-tabs-content {
       display: none
     }
-  
+
   }
 }

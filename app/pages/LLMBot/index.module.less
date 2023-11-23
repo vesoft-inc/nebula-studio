@@ -1,0 +1,64 @@
+.llmBot {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 5px;
+  cursor: pointer;
+}
+
+.llmBotTitle {
+  font-size: 16px;
+
+  .llmBotHandler {
+    font-size: 14px;
+    color: #828282;
+  }
+}
+
+@size: 60px;
+
+.ball {
+  transition: all 0.3s;
+  position: relative;
+  border-radius: 50%;
+  width: @size;
+  height: @size;
+  background: transparent;
+  backdrop-filter: blur(3px);
+  box-shadow: 0 1px 10px 1px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    font-size: 40px;
+  }
+
+  .open svg {
+    fill: url(#llm-icon);
+  }
+}
+
+:global {
+  #icon-studio-btn-consoleGTP {
+    fill: url(#llm-icon) !important;
+  }
+}
+
+
+@keyframes inner-roll {
+  0% {
+    transform: rotate3d(0, 1, 1, 90deg) rotateZ(-572.4deg)
+  }
+
+  100% {
+    transform: rotate3d(1, 0, 0 90deg) rotateZ(572.4deg)
+  }
+}
+
+.llmBotTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}

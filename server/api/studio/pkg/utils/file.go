@@ -28,8 +28,8 @@ func ReadPartFile(path string) ([]string, error) {
 	defer file.Close()
 
 	const (
-		TopLineNum    = 50
-		BottomLineNum = 50
+		TopLineNum    = 1000
+		BottomLineNum = 1000
 	)
 	var (
 		topLines    []string
