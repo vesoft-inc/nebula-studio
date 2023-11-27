@@ -266,29 +266,8 @@ const OutputBox = (props: IProps) => {
       dataSource.length &&
       !isDot;
     return [
-    resultSuccess && {
-      key: 'table',
-      label: (
-        <>
-          <Icon type="icon-studio-console-table" />
-          {intl.get('common.table')}
-        </>
-      ),
-      children: (
-        <Table
-          bordered={true}
-          columns={columns}
-          dataSource={dataSource}
-          pagination={{
-            showTotal: () => `${intl.get('common.total')} ${dataSource.length}`,
-          }}
-          rowKey={() => uuidv4()}
-        />
-      ),
-    },
-    resultSuccess &&
-      isExplainRaw && {
-        key: 'explain',
+      resultSuccess && {
+        key: 'table',
         label: (
           <>
             <Icon type="icon-studio-console-table" />
