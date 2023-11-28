@@ -3,7 +3,7 @@ import Icon from '@app/components/Icon';
 import { useCallback, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import CodeMirror from '@app/components/CodeMirror';
+import MonacoEditor from '@app/components/MonacoEditor';
 
 import { useStore } from '@app/stores';
 import { handleKeyword } from '@app/utils/function';
@@ -15,14 +15,9 @@ interface IProps {
   open: boolean;
   onCancel?: () => void;
 }
-const options = {
-  keyMap: 'sublime',
-  fullScreen: true,
-  mode: 'nebula',
-  readOnly: true,
-};
+
 const sleepGql = `:sleep 20;`;
-const DDLButton = (props: IProps) => {
+const DDLModal = (props: IProps) => {
   const { space, open, onCancel } = props;
   const { intl } = useI18n();
   const [loading, setLoading] = useState(false);
@@ -114,7 +109,7 @@ const DDLButton = (props: IProps) => {
                 {intl.get('common.duplicate')}
               </Button>
             </CopyToClipboard>
-            <CodeMirror value={ddl} options={options} />
+            <MonacoEditor value={ddl} readOnly />
           </div>
         )}
       </Spin>
@@ -122,4 +117,4 @@ const DDLButton = (props: IProps) => {
   );
 };
 
-export default observer(DDLButton);
+export default observer(DDLModal);

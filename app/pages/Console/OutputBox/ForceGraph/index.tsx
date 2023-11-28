@@ -19,8 +19,10 @@ interface IProps {
   onGraphInit: (graph: GraphStore) => void;
 }
 const ForceGraphBox = (props: IProps) => {
-  const [uuid ] = useState(uuidv4());
-  const { graphInstances: { graphs, initGraph, clearGraph, renderData } } = useStore();
+  const [uuid] = useState(uuidv4());
+  const {
+    graphInstances: { graphs, initGraph, clearGraph, renderData },
+  } = useStore();
   const grapfDomRef = useRef<any>();
   const { data, spaceVidType, onGraphInit, space } = props;
   const [loading, setLoading] = useState(false);
@@ -51,23 +53,29 @@ const ForceGraphBox = (props: IProps) => {
   const { nodes, links, nodesSelected, linksSelected } = currentGraph || {};
   const selected = nodesSelected && (nodesSelected.size > 0 || linksSelected.size > 0);
   return (
-    <div className="explore-main-canvas">
+    <div className={styles.forceGraphCanvas}>
       {loading && <Spin className={styles.graphLoading} />}
       <div id={uuid} className={styles.forceGraph} ref={grapfDomRef} />
-      {currentGraph && <>
-        <OperationPanel graph={currentGraph} />
-        <Menu id={uuid} />
-        <DisplayPanel
-          data={
-            selected ? {
-              nodes: [...nodesSelected],
-              links: [...linksSelected]
-            } : {
-              nodes: [...nodes || []],
-              links: [...links || []]
-            }} 
-          spaceVidType={spaceVidType} />
-      </>}
+      {currentGraph && (
+        <>
+          <OperationPanel graph={currentGraph} />
+          <Menu id={uuid} />
+          <DisplayPanel
+            data={
+              selected
+                ? {
+                    nodes: [...nodesSelected],
+                    links: [...linksSelected],
+                  }
+                : {
+                    nodes: [...(nodes || [])],
+                    links: [...(links || [])],
+                  }
+            }
+            spaceVidType={spaceVidType}
+          />
+        </>
+      )}
     </div>
   );
 };

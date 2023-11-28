@@ -400,11 +400,21 @@ export class GraphStore {
 
   destroyGraph() {
     this.twoGraph?.destroy();
+    window.removeEventListener('resize', this.resize);
   }
+
+  resize = () => {
+    if (!this.twoGraph) return;
+    const rect = this.twoGraph.container.getBoundingClientRect();
+    this.width = rect.width;
+    this.height = rect.height;
+    this.twoGraph.resize();
+  };
 
   // init ForceGraph instance ,it will be called only once
   initGraph = ({ container }: { container: HTMLElement }) => {
     this.twoGraph = new TwoGraph(this, container);
+    window.addEventListener('resize', this.resize);
   };
 }
 

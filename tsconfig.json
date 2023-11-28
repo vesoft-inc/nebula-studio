@@ -16,6 +16,7 @@
     "allowUnusedLabels": true,
     "strictPropertyInitialization": false,
     "noFallthroughCasesInSwitch": true,
+    "allowImportingTsExtensions": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "strictNullChecks": false,

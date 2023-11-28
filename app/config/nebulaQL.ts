@@ -1,4 +1,4 @@
-const nebulaWordsUppercase = [
+export const nebulaWordsUppercase = [
   'ACROSS',
   'ADD',
   'ALTER',
@@ -23,6 +23,7 @@ const nebulaWordsUppercase = [
   'DOUBLE',
   'DOWNLOAD',
   'DROP',
+  'DURATION',
   'EDGE',
   'EDGES',
   'EXISTS',
@@ -205,8 +206,6 @@ const nebulaWordsUppercase = [
   'ZONES',
   'FALSE',
   'TRUE',
-  ':PARAM',
-  ':PARAMS',
 ];
 
 export const ban = ['use', 'USE'];
@@ -293,9 +292,132 @@ export const operators = [
   'uuid',
   // assignment
   '=>',
+  'IS Null',
+  'IS NOT NULL',
+  'IS EMPTY',
+  'IS NOT EMPTY',
 ];
 
-const nebulaWordsLowercase = nebulaWordsUppercase.map(w => w.toLowerCase());
+export const propertyReference = ['$^', '$$', '$-'];
+
+export const parameterDeclaration = [':PARAM', ':PARAMS'];
+const mathFunctions = [
+  'abs',
+  'floor',
+  'ceil',
+  'round',
+  'sqrt',
+  'cbrt',
+  'hypot',
+  'pow',
+  'exp',
+  'exp2',
+  'log',
+  'log2',
+  'log10',
+  'sin',
+  'asin',
+  'cos',
+  'acos',
+  'tan',
+  'atan',
+  'rand',
+  'rand32',
+  'rand64',
+  'bit_and',
+  'bit_or',
+  'bit_xor',
+  'size',
+  'range',
+  'sign',
+  'e',
+  'pi',
+  'radians',
+];
+const staticFunctions = ['avg', 'count', 'max', 'min', 'collect', 'std', 'sum'];
+
+const stringFunctions = [
+  'strcasecmp',
+  'lower',
+  'toLower',
+  'upper',
+  'toUpper',
+  'length',
+  'trim',
+  'ltrim',
+  'rtrim',
+  'left',
+  'right',
+  'lpad',
+  'rpad',
+  'substr',
+  'substring',
+  'reverse',
+  'replace',
+  'split',
+  'concat',
+  'concat_ws',
+  'extract',
+  'json_extract',
+];
+const dateFunctions = ['now', 'date', 'time', 'datetime', 'timestamp', 'duration'];
+const schemaFunctions = [
+  'id',
+  'properties',
+  'type',
+  'rank',
+  'src',
+  'dst',
+  'tags',
+  'labels',
+  'typeid',
+  'startNode',
+  'endNode',
+];
+const listFunctions = [
+  'range',
+  'reverse',
+  'tail',
+  'head',
+  'last',
+  'reduce',
+  'keys',
+  'labels',
+  'nodes',
+  'relationships',
+];
+
+const typeConvertFunctions = ['toBoolean', 'toFloat', 'toString', 'toInteger', 'toSet', 'hash'];
+const conditionalFunctions = ['coallesce'];
+const predicateFunctions = ['exists', 'any', 'all', 'none', 'single'];
+const geoFunctions = [
+  'ST_Point',
+  'ST_GeogFromText',
+  'ST_ASText',
+  'ST_Centroid',
+  'ST_ISValid',
+  'ST_Intersects',
+  'ST_Covers',
+  'ST_CoveredBy',
+  'ST_DWithin',
+  'ST_Distance',
+  'S2_CellIdFromPoint',
+  'S2_CoveringCellIds',
+];
+
+export const nebulaFunction = [
+  ...mathFunctions,
+  ...staticFunctions,
+  ...stringFunctions,
+  ...dateFunctions,
+  ...schemaFunctions,
+  ...listFunctions,
+  ...typeConvertFunctions,
+  ...conditionalFunctions,
+  ...predicateFunctions,
+  ...geoFunctions,
+];
+const nebulaWordsLowercase = nebulaWordsUppercase.map((w) => w.toLowerCase());
 
 export const keyWords = [...nebulaWordsUppercase, ...nebulaWordsLowercase];
 
