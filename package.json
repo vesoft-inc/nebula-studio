@@ -22,7 +22,7 @@
     "@monaco-editor/react": "^4.6.0",
     "@vesoft-inc/force-graph": "2.0.7",
     "@vesoft-inc/i18n": "^1.0.1",
-    "@vesoft-inc/icons": "^1.0.0-beta.5",
+    "@vesoft-inc/icons": "^1.1.0",
     "@vesoft-inc/nebula-explain-graph": "^1.0.2-beta.2",
     "@vesoft-inc/veditor": "^4.4.12",
     "antd": "^5.8.4",

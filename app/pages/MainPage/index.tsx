@@ -21,7 +21,7 @@ const MainPage = () => {
               path={route.path}
               render={() => (
                 <>
-                  <Suspense fallback={<Spin />}>
+                  <Suspense fallback={<Spin style={{ marginTop: 32 }} />}>
                     <Content>
                       <Route component={route.component} />
                     </Content>

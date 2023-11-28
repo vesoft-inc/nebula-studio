@@ -1,4 +1,4 @@
-import { Button, Select, Tooltip, message } from 'antd';
+import { Button, Select, Spin, Tooltip, message } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { trackEvent, trackPageView } from '@app/utils/stat';
@@ -6,13 +6,14 @@ import { useStore } from '@app/stores';
 import Icon from '@app/components/Icon';
 import MonacoEditor from '@app/components/MonacoEditor';
 import { useI18n } from '@vesoft-inc/i18n';
+import { safeParse } from '@app/utils/function';
 import OutputBox from './OutputBox';
 import HistoryBtn from './HistoryBtn';
 import FavoriteBtn from './FavoriteBtn';
 import CypherParameterBox from './CypherParameterBox';
 import ExportModal from './ExportModal';
 import SchemaDrawer from './Drawer/SchemaDrawer';
-import NgqlDrawer from './Drawer/NgqlDrawer';
+// import NgqlDrawer from './Drawer/NgqlDrawer';
 import styles from './index.module.less';
 import { SchemaItemOverview } from '@app/stores/console';
 
@@ -24,7 +25,7 @@ const SEMICOLON_REG = /((?:[^;'"]*(?:"(?:\\.|[^"])*"|'(?:\\.|[^'])*')[^;'"]*)+)|
 const getHistory = () => {
   const value: string | null = localStorage.getItem('history');
   if (value && value !== 'undefined' && value !== 'null') {
-    return JSON.parse(value).slice(0, 15);
+    return safeParse<string[]>(value)?.slice(0, 15) || [];
   }
   return [];
 };
@@ -57,6 +58,7 @@ const Console = (props: IProps) => {
     [key: string]: any;
   }>(null);
   const [schemaTree, setSchemaTree] = useState<SchemaItemOverview>({} as SchemaItemOverview);
+  const [editorLoading, setEditorLoading] = useState(false);
   const editor = useRef<any>(null);
   const ref = useRef(null);
   const historyProviderRef = useRef(null);
@@ -200,11 +202,16 @@ const Console = (props: IProps) => {
     });
     setHistoryProvider();
   };
-  const handleEditorChange = useCallback((value) => update({ currentGQL: value }), []);
-  const handleSwitchSpace = useCallback(async (space) => {
-    await updateCurrentSpace(space);
-    const data = await schema.getSchemaTree(space);
-    data && setSchemaTree(data);
+  const handleEditorChange = useCallback((value: string) => update({ currentGQL: value }), []);
+  const handleSwitchSpace = useCallback(async (space: string) => {
+    setEditorLoading(true);
+    try {
+      await updateCurrentSpace(space);
+      const data = await schema.getSchemaTree(space);
+      data && setSchemaTree(data);
+    } finally {
+      setEditorLoading(false);
+    }
   }, []);
   return (
     <div className={styles.nebulaConsole}>
@@ -247,16 +254,18 @@ const Console = (props: IProps) => {
               </div>
             </div>
           </div>
-          <div className={styles.codeInput}>
-            <CypherParameterBox onSelect={addParam} data={paramsMap} />
-            <MonacoEditor
-              onInstanceChange={onInstanceMount}
-              schema={schemaTree}
-              value={currentGQL}
-              onChange={handleEditorChange}
-              onShiftEnter={handleRun}
-            />
-          </div>
+          <Spin spinning={editorLoading} delay={200}>
+            <div className={styles.codeInput}>
+              <CypherParameterBox onSelect={addParam} data={paramsMap} />
+              <MonacoEditor
+                onInstanceChange={onInstanceMount}
+                schema={schemaTree}
+                value={currentGQL}
+                onChange={handleEditorChange}
+                onShiftEnter={handleRun}
+              />
+            </div>
+          </Spin>
         </div>
         <div className={styles.resultContainer}>
           {results.length > 0 ? (
@@ -281,7 +290,7 @@ const Console = (props: IProps) => {
           )}
         </div>
       </div>
-      <NgqlDrawer onItemClick={(v) => updateGql(currentGQL + v)} />
+      {/* <NgqlDrawer onItemClick={(v) => updateGql(currentGQL + v)} /> */}
       {modalVisible && (
         <ExportModal
           visible={modalVisible}
