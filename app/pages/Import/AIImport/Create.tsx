@@ -1,11 +1,11 @@
 import { useStore } from '@app/stores';
 import { useI18n } from '@vesoft-inc/i18n';
-import { Button, Form, Input, Modal, Radio, Select, Tabs, message } from 'antd';
+import { Button, Form, Input, Modal, Radio, Select, message } from 'antd';
 import { observer } from 'mobx-react-lite';
 import styles from './index.module.less';
 import Icon from '@app/components/Icon';
 import { useEffect, useMemo, useState } from 'react';
-import { llmImportTask, llmImportPrompt } from '@app/stores/llm';
+import { llmImportPrompt } from '@app/stores/llm';
 import { getByteLength } from '@app/utils/function';
 import { post } from '@app/utils/http';
 
@@ -35,7 +35,7 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
   }, [props.visible]);
 
   const onNext = () => {
-    form.validateFields().then((values) => {
+    form.validateFields().then(() => {
       setStep(1);
     });
   };
