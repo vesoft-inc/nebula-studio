@@ -25,4 +25,7 @@ export const ngqlMap = ngqlDoc.reduce((acc, item) => {
 });
 //@ts-ignore
 window.ngqlMap = ngqlMap;
-export const categoryString = ngqlDoc.map((item) => item.title).join(',');
+export const NGQLCategoryString = ngqlDoc
+  .filter((item) => item.url.indexOf('ngql-guide') >= 0)
+  .map((item) => item.title)
+  .join(',');

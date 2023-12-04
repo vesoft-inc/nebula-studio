@@ -34,16 +34,16 @@ async function getDocIndex(host = 'https://docs.nebula-graph.io') {
     const href = `${host}/${link}`;
     let name = 'doc';
     try {
-      if (link.indexOf('ngql-guide') >= 0 || link.indexOf('FAQ' >= 0)) {
-        name = 'ngql';
-        if (!res[name]) {
-          res[name] = []
-        }
-        console.log(link)
-
-      } else {
-        continue;
-      }
+      // if (link.indexOf('ngql-guide') >= 0 || link.indexOf('FAQ') >= 0) {
+      //   name = 'ngql';
+      //   if (!res[name]) {
+      //     res[name] = []
+      //   }
+      //   console.log("get:", link)
+      // } else {
+      //   console.log("skip:", link)
+      //   continue;
+      // }
       const data = await axios.get(href);
       const html = data.data;
       const $ = cheerio.load(html);
@@ -78,6 +78,7 @@ async function getDocIndex(host = 'https://docs.nebula-graph.io') {
 }
 
 async function makeDocTextForLLM(content) {
+  //todo: make doc more short and clear with LLM
   let contentArr = content.split('\n').filter(item => item.trim().length > 1);
   contentArr = contentArr.filter(item => !/(^\+-+.*-+\+$)|(^\|.*\|$)/.test(item.replaceAll("\n", '')));
   const contentFinal = contentArr.join('\n').replaceAll('nebula>', '');

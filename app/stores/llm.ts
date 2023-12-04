@@ -3,7 +3,6 @@ import schema from './schema';
 import { get } from '@app/utils/http';
 import rootStore from '.';
 import ws from '@app/utils/websocket';
-import tck from '../utils/tck';
 import { safeParse } from '@app/utils/function';
 import * as ngqlDoc from '@app/utils/ngql';
 
@@ -169,7 +168,7 @@ class LLM {
           messages: [
             {
               role: 'user',
-              content: `From the following graph database book categories: "${ngqlDoc.categoryString}" find top two useful categories to solve the question:"${text}",don't explain,just return the two combined categories, separated by ',' is:`,
+              content: `From the following graph database book categories: "${ngqlDoc.NGQLCategoryString}" find top two useful categories to solve the question:"${text}",don't explain,just return the two combined categories, separated by ',' is:`,
             },
           ],
         },
@@ -228,7 +227,7 @@ class LLM {
       if (line.length < 3) return;
       const tokens = line.split(' ');
       const firstToken = tokens.find((item) => item.replaceAll(' ', '').length > 0);
-      const hits = tck.allNGQL.filter((each) => each.toLowerCase().indexOf(firstToken.toLowerCase()) === 0);
+      const hits = ngqlDoc.ngqlDoc.filter((each) => each.title.toLowerCase().indexOf(firstToken.toLowerCase()) === 0);
       let doc = '';
       if (this.mode == 'text2cypher' && firstToken.toLowerCase() == 'match') {
         doc += matchPrompt;
