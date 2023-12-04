@@ -3,7 +3,7 @@ import styles from './index.module.less';
 import Chat from './chat';
 import Icon from '@app/components/Icon';
 import { observer } from 'mobx-react-lite';
-import rootStore, { useStore } from '@app/stores';
+import { useStore } from '@app/stores';
 // float llm bot window
 function LLMBot() {
   const { global, llm } = useStore();

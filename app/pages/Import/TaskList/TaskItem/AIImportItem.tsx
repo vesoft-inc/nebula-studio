@@ -6,7 +6,6 @@ import { getFileSize } from '@app/utils/file';
 import Icon from '@app/components/Icon';
 import { useI18n } from '@vesoft-inc/i18n';
 import { observer } from 'mobx-react-lite';
-import { useStore } from '@app/stores';
 import styles from './index.module.less';
 import { _delete, post } from '@app/utils/http';
 import React from 'react';
@@ -50,16 +49,11 @@ const COLOR_MAP = {
 const loadingStatus = [ILLMStatus.Running, ILLMStatus.Pending];
 const AIImportItem = observer((props: IProps) => {
   const {
-    data: { createTime, space, llmJob, id },
+    data: { createTime, space, llmJob },
     onViewLog,
   } = props;
   const { intl } = useI18n();
-  const {
-    dataImport: { downloadTaskConfig },
-    moduleConfiguration,
-  } = useStore();
   const [rerunLoading, setRerunLoading] = React.useState(false);
-  const { disableConfigDownload } = moduleConfiguration.dataImport;
 
   const progressStatus = llmStatusMap[llmJob.status];
 

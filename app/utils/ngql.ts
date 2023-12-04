@@ -1,4 +1,4 @@
-import ngqlJson from './ngql.json';
+import ngqlJson from './doc.json';
 
 const urlTransformerMap = {
   FETCH: 'FETCHProps',

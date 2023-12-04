@@ -34,7 +34,7 @@ please extract relationship data from the text below, referring to the schema of
   "edges":[{ "src":"","dst":"","edgeType":"","props":{} }]
 }
 The schema of the graph is: {spaceSchema}
-The text is: {text}
+The text is: {text} 
 The result is:
 `;
 export const llmImportTask = `please excute the task below,and return the result,dont' explain,just return the result directly.
