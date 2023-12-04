@@ -2,6 +2,7 @@ import { Button, Table, Tabs, Tooltip, Popover } from 'antd';
 import { BigNumber } from 'bignumber.js';
 import { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
+import { ExpandAltOutlined } from '@ant-design/icons';
 import { useStore } from '@app/stores';
 import { trackEvent } from '@app/utils/stat';
 import { v4 as uuidv4 } from 'uuid';
@@ -31,7 +32,7 @@ const OutputBox = (props: IProps) => {
   const { console } = useStore();
   const { intl } = useI18n();
   const [visible, setVisible] = useState(true);
-  const { results, update, favorites, saveFavorite, deleteFavorite, getFavoriteList } = console;
+  const { results, update, favorites, saveFavorite, deleteFavorite, getFavoriteList, updateResultsStorage } = console;
   const { code, data, message, gql, space, spaceVidType } = result;
   const [columns, setColumns] = useState<any>([]);
   const [dataSource, setDataSource] = useState<any>([]);
@@ -137,6 +138,7 @@ const OutputBox = (props: IProps) => {
     update({
       results: results.filter((_, i) => i !== index),
     });
+    updateResultsStorage();
   }, [results, index]);
 
   const downloadCsv = () => {
@@ -291,7 +293,7 @@ const OutputBox = (props: IProps) => {
           key: 'explain',
           label: (
             <>
-              <Icon type="icon-studio-console-graphviz" />
+              <Icon type="icon-vesoft-sitemap-outline" />
               {intl.get('console.planTree')}
             </>
           ),
@@ -303,7 +305,7 @@ const OutputBox = (props: IProps) => {
           key: 'profile',
           label: (
             <>
-              <Icon type="icon-studio-console-graphviz" />
+              <Icon type="icon-vesoft-sitemap-outline" />
               {intl.get('console.planTree')}
             </>
           ),
@@ -408,7 +410,7 @@ const OutputBox = (props: IProps) => {
                 )}
               </div>
               <div className={styles.resizeBtn} draggable onMouseDown={onDragStart}>
-                <Icon type="icon-rightclickmenu-fitToSelection" />
+                <ExpandAltOutlined rotate={90} />
               </div>
             </div>
           )}

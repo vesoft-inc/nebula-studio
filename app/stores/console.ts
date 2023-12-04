@@ -2,6 +2,7 @@ import { makeAutoObservable, observable } from 'mobx';
 import service from '@app/config/service';
 import { v4 as uuidv4 } from 'uuid';
 import { message } from 'antd';
+import { debounce } from 'lodash';
 import { getI18n } from '@vesoft-inc/i18n';
 import { safeParse } from '@app/utils/function';
 import { NgqlRes } from '@app/utils/websocket';
@@ -139,6 +140,10 @@ export class ConsoleStore {
       window.setTimeout(() => this.update({ runGQLLoading: false }), 300);
     }
   };
+
+  updateResultsStorage = debounce(() => {
+    sessionStorage.setItem('consoleResults', JSON.stringify(this.results));
+  }, 200);
 
   getParams = async () => {
     const results = await service.execNGQL({ gql: ':params' });

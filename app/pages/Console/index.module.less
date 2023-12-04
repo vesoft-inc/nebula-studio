@@ -11,14 +11,18 @@
   .resultContainer {
     overflow: auto;
     margin-bottom: 30px;
+    flex: 1 1 auto;
   }
   
   .consoleContainer {
     overflow-x: hidden;
+    overflow-y: auto;
     flex: 1 1 auto; 
     width: auto; 
     border-left: 1px solid #D4D4D8;
     border-right: 1px solid #D4D4D8;
+    // display: flex;
+    // flex-direction: column;
   }
   .spaceSelect {
     display: flex;
@@ -50,6 +54,11 @@
     background: #FFFFFF;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     padding: 14px 30px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    overflow: auto;
+    height: auto;
     .panelHeader {
       margin-bottom: 15px;
       .title {
@@ -84,6 +93,7 @@
       position: relative;
       border: 1px solid @gray;
       border-radius: 3px;
+      min-height: 120px;
       .btnOpenParam {
         display: flex;
         align-items: center;
@@ -268,7 +278,7 @@
   border-left: 1px solid #E0E0E0;
   animation: panelOut 400ms;
   animation-fill-mode: forwards;
-  flex: 0 0 auto;
+  // flex: 0 0 auto;
   .header {
     display: flex;
     height: 60px;
@@ -352,4 +362,11 @@
     width: 24px;
     height: 24px;
   }
+}
+
+.monacoEditor {
+  min-height: 120px;
+  height: 120px;
+  overflow-y: auto;
+  resize: vertical;
 }
