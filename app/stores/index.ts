@@ -9,6 +9,7 @@ import sketchModel from './sketchModel';
 import welcome from './welcome';
 import datasource from './datasource';
 import moduleConfiguration from './moduleConfiguration';
+import llm from './llm';
 
 const rootStore = {
   global,
@@ -21,6 +22,7 @@ const rootStore = {
   welcome,
   datasource,
   moduleConfiguration,
+  llm,
 };
 const rootStoreRef = { current: rootStore };
 // @ts-ignore

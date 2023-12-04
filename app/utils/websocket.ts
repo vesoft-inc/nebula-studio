@@ -218,7 +218,9 @@ export class NgqlRunner {
         message.error(content.message);
       }
       messageReceiver.resolve(content);
-      this.messageReceiverMap.delete(msgReceive.header.msgId);
+      if (messageReceiver?.config?.notClear !== true) {
+        this.messageReceiverMap.delete(msgReceive.header.msgId);
+      }
     }
   };
 
@@ -306,6 +308,30 @@ export class NgqlRunner {
         config,
         msgType: MsgType.BatchNGQL,
       });
+
+      this.socket.send(JSON.stringify(messageReceiver.messageSend));
+      this.messageReceiverMap.set(messageReceiver.messageSend.header.msgId, messageReceiver);
+    });
+  };
+
+  runChat = async ({ req, callback }: { req: any; callback?: (str: any) => void }, config: Recordable = {}) => {
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+      await this.reConnect();
+    }
+
+    return new Promise((resolve, reject) => {
+      if (req.stream) {
+        resolve(req.stream);
+      }
+      const messageReceiver = new MessageReceiver<any>({
+        resolve: req.stream ? callback : resolve, // when stream don't use promise to reveive data
+        reject,
+        product: this.product,
+        content: req,
+        config,
+        msgType: 'llm',
+      });
+      config['notClear'] = true;
 
       this.socket.send(JSON.stringify(messageReceiver.messageSend));
       this.messageReceiverMap.set(messageReceiver.messageSend.header.msgId, messageReceiver);

@@ -270,7 +270,10 @@ export class SchemaStore {
           };
           const { code, data } = await this.getTagOrEdgeInfo(ISchemaEnum.Edge, item, space);
           if (code === 0) {
-            edge.fields = data.tables;
+            edge.fields = data.tables.map((item) => ({
+              Field: item.Field,
+              Type: item.Type,
+            }));
           }
           edgeList.push(edge);
         }),

@@ -2,29 +2,20 @@ import { Button, Modal, Tabs } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import Icon from '@app/components/Icon';
 import { useStore } from '@app/stores';
-import { ITaskStatus } from '@app/interfaces/import';
+import { ITaskItem, ITaskStatus } from '@app/interfaces/import';
 import classnames from 'classnames';
 import { useI18n } from '@vesoft-inc/i18n';
 import styles from './index.module.less';
 
-interface ILogDimension {
-  space: string;
-  id: string;
-  status: ITaskStatus;
-}
-
 interface IProps {
-  logDimension: ILogDimension;
+  task: ITaskItem;
   visible: boolean;
   onCancel: () => void;
 }
 
 const LogModal = (props: IProps) => {
-  const {
-    visible,
-    onCancel,
-    logDimension: { space, id, status },
-  } = props;
+  const { visible, onCancel, task } = props;
+  const { id, space, status, llmJob } = task;
   const {
     dataImport: { getLogs, downloadTaskLog, getLogDetail },
     moduleConfiguration,
@@ -35,24 +26,30 @@ const LogModal = (props: IProps) => {
   const [logs, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentLog, setCurrentLog] = useState<string | null>(null);
+  const [logData, setLogData] = useState<string[]>([]);
 
   const handleTabChange = (key: string) => {
     setCurrentLog(logs.filter((item) => item === key)[0]);
   };
 
   const getAllLogs = async () => {
-    const { code, data } = await getLogs(id);
-    if (code === 0) {
-      const logs = data.names || [];
-      setLogs(logs);
-      setCurrentLog(logs[0]);
+    if (!llmJob) {
+      const { code, data } = await getLogs(id);
+      if (code === 0) {
+        const logs = data.names || [];
+        setLogs(logs);
+        setCurrentLog(logs[0]);
+      }
+    } else {
+      setLogs(['all.log']);
+      setCurrentLog('all.log');
     }
   };
 
   const handleLogDownload = () => currentLog && downloadTaskLog({ id, name: currentLog });
 
   const readLog = async () => {
-    const data = await getLogDetail({ id });
+    const data = await getLogDetail(task);
     handleLogData(data);
   };
 
@@ -61,6 +58,7 @@ const LogModal = (props: IProps) => {
     if (!logs.length) {
       return;
     }
+    setLogData(logs.split('\n'));
     /**
      * {"level":"info",...}
      * {"level":"info",...}
@@ -72,11 +70,11 @@ const LogModal = (props: IProps) => {
      * {"level":"info",...}
      * {"level":"info",...}
      */
-    logRef.current.innerHTML = logs
-      .split('\n')
-      .map((log) => `<code style="color:${/^(\.\.\.)|^\(\d+/.test(log) ? '#fff' : '#e8c18b'}">${log}</code>`)
-      .join('<br/>');
-    logRef.current.scrollTop = logRef.current.scrollHeight;
+    // logRef.current.innerHTML = logs
+    //   .split('\n')
+    //   .map((log) => `<code style="color:${/^(\.\.\.)|^\(\d+/.test(log) ? '#fff' : '#e8c18b'}">${log}</code>`)
+    //   .join('<br/>');
+    // logRef.current.scrollTop = logRef.current.scrollHeight;
   };
 
   const initLog = async () => {
@@ -128,7 +126,15 @@ const LogModal = (props: IProps) => {
       footer={false}
     >
       <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange} items={items} />
-      <div className={classnames(styles.logContainer, !disableLogDownload && styles.full)} ref={logRef} />
+      <div className={classnames(styles.logContainer, !disableLogDownload && styles.full)}>
+        {logData.map((log, index) => {
+          return (
+            <pre key={index} style={{ color: /^(\.\.\.)|^\(\d+/.test(log) ? '#fff' : '#e8c18b' }}>
+              {log}
+            </pre>
+          );
+        })}
+      </div>
     </Modal>
   );
 };

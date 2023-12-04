@@ -76,7 +76,7 @@ func getValue(valWarp *nebula.ValueWrapper) (Any, error) {
 }
 
 func getBasicValue(valWarp *nebula.ValueWrapper) (Any, error) {
-	var valType = valWarp.GetType()
+	valType := valWarp.GetType()
 	if valType == "null" {
 		value, err := valWarp.AsNull()
 		switch value {
@@ -121,6 +121,7 @@ func getBasicValue(valWarp *nebula.ValueWrapper) (Any, error) {
 	}
 	return "", nil
 }
+
 func getID(idWarp nebula.ValueWrapper) Any {
 	idType := idWarp.GetType()
 	var vid Any
@@ -230,7 +231,7 @@ func getListInfo(valWarp *nebula.ValueWrapper, listType string, _verticesParsedL
 		return err
 	}
 	for _, v := range valueList {
-		var props = make(map[string]Any)
+		props := make(map[string]Any)
 		vType := v.GetType()
 		props["type"] = vType
 		if vType == "vertex" {
@@ -496,7 +497,7 @@ func parseExecuteData(response SingleResponse) (ParsedResult, error) {
 			result.Headers = []string{"id", "name", "dependencies", "profiling data", "operator info"}
 			rows := res.MakePlanByRow()
 			for i := 0; i < len(rows); i++ {
-				var rowValue = make(map[string]Any)
+				rowValue := make(map[string]Any)
 				rowValue["id"] = rows[i][0]
 				rowValue["name"] = rows[i][1]
 				rowValue["dependencies"] = rows[i][2]
@@ -506,7 +507,7 @@ func parseExecuteData(response SingleResponse) (ParsedResult, error) {
 			}
 			return result, nil
 		} else {
-			var rowValue = make(map[string]Any)
+			rowValue := make(map[string]Any)
 			result.Headers = append(result.Headers, "format")
 			if format == "dot" {
 				rowValue["format"] = res.MakeDotGraph()
@@ -525,10 +526,10 @@ func parseExecuteData(response SingleResponse) (ParsedResult, error) {
 		result.Headers = colNames
 
 		for i := 0; i < rowSize; i++ {
-			var rowValue = make(map[string]Any)
-			var _verticesParsedList = make(list, 0)
-			var _edgesParsedList = make(list, 0)
-			var _pathsParsedList = make(list, 0)
+			rowValue := make(map[string]Any)
+			_verticesParsedList := make(list, 0)
+			_edgesParsedList := make(list, 0)
+			_pathsParsedList := make(list, 0)
 
 			for j := 0; j < colSize; j++ {
 				record, err := res.GetRowValuesByIndex(i)
@@ -546,17 +547,17 @@ func parseExecuteData(response SingleResponse) (ParsedResult, error) {
 				rowValue[result.Headers[j]] = value
 				valueType := rowData.GetType()
 				if valueType == "vertex" {
-					var parseValue = make(map[string]Any)
+					parseValue := make(map[string]Any)
 					parseValue, err = getVertexInfo(rowData, parseValue)
 					parseValue["type"] = "vertex"
 					_verticesParsedList = append(_verticesParsedList, parseValue)
 				} else if valueType == "edge" {
-					var parseValue = make(map[string]Any)
+					parseValue := make(map[string]Any)
 					parseValue, err = getEdgeInfo(rowData, parseValue)
 					parseValue["type"] = "edge"
 					_edgesParsedList = append(_edgesParsedList, parseValue)
 				} else if valueType == "path" {
-					var parseValue = make(map[string]Any)
+					parseValue := make(map[string]Any)
 					parseValue, err = getPathInfo(rowData, parseValue)
 					parseValue["type"] = "path"
 					_pathsParsedList = append(_pathsParsedList, parseValue)

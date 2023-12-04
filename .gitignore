@@ -11,7 +11,7 @@ node_modules/
 *.lock
 *.map
 .github/workflows/nodejs.yml
-
+go.work.sum
 
 app/**/*.map
 config/**/*.map

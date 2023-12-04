@@ -10,11 +10,14 @@ export function readFileContent(file) {
 export function getFileSize(size: number) {
   const units = ['B', 'KB', 'MB', 'GB', 'TB'] as const;
   const gap = 1 << 10;
+  if (!size) {
+    return '0 B';
+  }
 
   for (let i = 0, byte = gap; i < units.length; i++, byte *= gap) {
     if (size < byte || i === units.length - 1) {
       const unitSize = ((size * gap) / byte).toFixed(2);
-      return `${unitSize} ${units[i]}` as `${number} ${typeof units[number]}`;
+      return `${unitSize} ${units[i]}` as `${number} ${(typeof units)[number]}`;
     }
   }
 }

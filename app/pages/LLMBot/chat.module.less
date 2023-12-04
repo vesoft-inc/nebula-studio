@@ -1,0 +1,125 @@
+.chat {
+  height: calc(100vh - 300px);
+  width: 444px;
+  display: flex;
+  flex-direction: column;
+
+
+  .chatContent {
+    flex: 1;
+    overflow-y: auto;
+
+    .chatContentInner {
+      padding: 20px;
+
+      .chatMessage {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 20px;
+
+        .chatMessageInner {
+          display: flex;
+          flex-direction: column;
+          max-width: 90%;
+
+          .chatMessageContent {
+            padding: 10px;
+            font-size: 14px;
+            line-height: 20px;
+            border-radius: 5px;
+            letter-spacing: 1px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+            p {
+              margin: 5px 0;
+              line-height: 20px;
+            }
+          }
+        }
+      }
+
+      .fromUser {
+        justify-content: flex-end;
+
+        .chatMessageContent {
+          background-color: #0084ff;
+          color: #fff;
+        }
+      }
+
+      .fromBot {
+        justify-content: flex-start;
+
+        .chatMessageContent {
+          background-color: #f2f2f2;
+          color: #333;
+        }
+      }
+    }
+  }
+
+  .codeWrapper {
+    position: relative;
+
+    :global {
+      .CodeMirror {
+        background-color: #092332;
+        color: #AAAAAA
+      }
+
+      .CodeMirror-gutters {
+        background-color: #092332;
+        color: #AAAAAA;
+        border: none;
+        color: #828282;
+      }
+
+      .CodeMirror-cursor {
+        border-color: #828282;
+      }
+
+      .cm-keyword {
+        color: #19DBFF;
+      }
+
+      .cm-def {
+        color: #AE9AFF;
+      }
+    }
+
+    >div {
+      margin: 10px 0;
+    }
+
+    >.copyBtn {
+      height: 30px;
+      border-radius: 6px;
+      border-color: #CFCFCF;
+      line-height: 30px;
+      padding: 0 15px;
+      background-color: transparent;
+      color: #0D8BFF;
+
+      &:hover {
+        background-color: #0D8BFF;
+        color: #fff;
+      }
+    }
+  }
+
+  .chatInput {
+    flex: 0;
+    position: relative;
+    display: flex;
+
+    textarea {
+      padding-right: 80px;
+    }
+
+    button {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+    }
+  }
+}

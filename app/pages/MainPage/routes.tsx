@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import Setting from '../Setting';
 
 const Schema = lazy(() => import('@app/pages/Schema'));
 const Console = lazy(() => import('@app/pages/Console'));
@@ -8,7 +9,6 @@ const Import = lazy(() => import('@app/pages/Import'));
 const TaskCreate = lazy(() => import('@app/pages/Import/TaskCreate'));
 const SketchModeling = lazy(() => import('@app/pages/SketchModeling'));
 const Welcome = lazy(() => import('@app/pages/Welcome'));
-
 
 export const RoutesList = [
   {
@@ -54,6 +54,11 @@ export const RoutesList = [
     component: Welcome,
     exact: true,
   },
+  {
+    path: '/setting',
+    component: Setting,
+    exact: true,
+  },
 ];
 
 export const MENU_LIST = [
@@ -63,10 +68,10 @@ export const MENU_LIST = [
     track: {
       category: 'navigation',
       action: 'view_schema',
-      label: 'from_navigation'
+      label: 'from_navigation',
     },
     icon: 'icon-studio-nav-schema',
-    intlKey: 'common.schema'
+    intlKey: 'common.schema',
   },
   {
     key: 'import',
@@ -74,10 +79,10 @@ export const MENU_LIST = [
     track: {
       category: 'navigation',
       action: 'view_import',
-      label: 'from_navigation'
+      label: 'from_navigation',
     },
     icon: 'icon-studio-nav-import',
-    intlKey: 'common.import'
+    intlKey: 'common.import',
   },
   {
     key: 'console',
@@ -85,10 +90,10 @@ export const MENU_LIST = [
     track: {
       category: 'navigation',
       action: 'view_console',
-      label: 'from_navigation'
+      label: 'from_navigation',
     },
     icon: 'icon-studio-nav-console',
-    intlKey: 'common.console'
+    intlKey: 'common.console',
   },
   {
     key: 'sketch',
@@ -96,9 +101,9 @@ export const MENU_LIST = [
     track: {
       category: 'navigation',
       action: 'view_sketch',
-      label: 'from_navigation'
+      label: 'from_navigation',
     },
     icon: 'icon-navbar-sketch',
-    intlKey: 'common.sketch'
+    intlKey: 'common.sketch',
   },
 ];

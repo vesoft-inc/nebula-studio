@@ -9,8 +9,8 @@ import { getFileSize } from '@app/utils/file';
 import FileConfigSetting from '@app/components/FileConfigSetting';
 import styles from './index.module.less';
 type IUploadBtnProps = PropsWithChildren<{
-  onUpload?: () => void
-}>
+  onUpload?: () => void;
+}>;
 
 const SizeLimit = 200 * 1024 * 1024;
 const UploadBtn = (props: IUploadBtnProps) => {
@@ -21,12 +21,17 @@ const UploadBtn = (props: IUploadBtnProps) => {
   const { fileList, uploadFile } = files;
   const [visible, setVisible] = useState(false);
   const transformFile = async (_file: StudioFile, fileList: StudioFile[]) => {
-    const bigFiles = fileList.filter(file => file.size > SizeLimit);
-    if(bigFiles.length > 0) {
-      message.error(intl.get('import.fileSizeLimit', { name: bigFiles.map(i => i.name).join(', '), size: getFileSize(SizeLimit) }));
+    const bigFiles = fileList.filter((file) => file.size > SizeLimit);
+    if (bigFiles.length > 0) {
+      message.error(
+        intl.get('import.fileSizeLimit', {
+          name: bigFiles.map((i) => i.name).join(', '),
+          size: getFileSize(SizeLimit),
+        }),
+      );
       return false;
     }
-    fileList.forEach(file => {
+    fileList.forEach((file) => {
       file.path = `${file.name}`;
       file.withHeader = false;
       file.delimiter = ',';
@@ -46,7 +51,6 @@ const UploadBtn = (props: IUploadBtnProps) => {
     <>
       <Upload
         multiple={true}
-        accept=".csv"
         showUploadList={false}
         fileList={fileList}
         customRequest={() => {}}
@@ -63,11 +67,12 @@ const UploadBtn = (props: IUploadBtnProps) => {
         className={styles.uploadModal}
         footer={false}
       >
-        <FileConfigSetting 
-          preUploadList={previewList} 
-          onConfirm={handleConfirm} 
+        <FileConfigSetting
+          preUploadList={previewList}
+          onConfirm={handleConfirm}
           duplicateCheckList={fileList}
-          onCancel={() => setVisible(false)} />
+          onCancel={() => setVisible(false)}
+        />
       </Modal>
     </>
   );

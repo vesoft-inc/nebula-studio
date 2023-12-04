@@ -12,6 +12,7 @@ import (
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/client"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/llm"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/logging"
 	studioMiddleware "github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/middleware"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/server"
@@ -103,7 +104,7 @@ func main() {
 	httpx.SetErrorHandler(func(err error) (int, interface{}) {
 		return svcCtx.ResponseHandler.GetStatusBody(nil, nil, err)
 	})
-
+	go llm.InitSchedule()
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()
 }

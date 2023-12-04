@@ -171,6 +171,7 @@ type (
 		UpdateTime    int64           `json:"updateTime"`
 		Stats         ImportTaskStats `json:"stats"`
 		RawConfig     string          `json:"rawConfig"`
+		LLMJob        interface{}     `json:"llmJob"`
 	}
 
 	ImportTaskStats {

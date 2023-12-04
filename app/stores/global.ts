@@ -4,15 +4,18 @@ import { Base64 } from 'js-base64';
 import { BrowserHistory } from 'history';
 import service from '@app/config/service';
 import ngqlRunner from '@app/utils/websocket';
-import { isValidIP } from '@app/utils/function';
+import { isValidIP, safeParse } from '@app/utils/function';
 import { getRootStore, resetStore } from '.';
 
 export class GlobalStore {
   gConfig = window.gConfig;
   appSetting = {
     beta: {
+      open: true,
       functions: {
         viewSchema: { open: true },
+        text2query: { open: true },
+        llmImport: { open: true },
       },
     },
   };
@@ -28,10 +31,21 @@ export class GlobalStore {
       _username: observable,
       _host: observable,
       ngqlRunner: observable.ref,
+      appSetting: observable.ref,
       update: action,
+      saveAppSetting: action,
     });
     this.ngqlRunner.logoutFun = this.logout;
+    const cacheAppSetting = localStorage.getItem('appSetting');
+    if (cacheAppSetting) {
+      this.appSetting = safeParse(cacheAppSetting);
+    }
   }
+
+  saveAppSetting = (payload: any) => {
+    this.appSetting = payload;
+    localStorage.setItem('appSetting', JSON.stringify(payload));
+  };
 
   get rootStore() {
     return getRootStore();
@@ -43,6 +57,8 @@ export class GlobalStore {
   get host() {
     return this._host || cookies.get('nh');
   }
+
+  useLocalObservable;
 
   resetModel = () => {
     this.update({

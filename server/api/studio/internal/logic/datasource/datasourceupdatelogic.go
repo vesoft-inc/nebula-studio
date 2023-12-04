@@ -27,5 +27,4 @@ func NewDatasourceUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) D
 
 func (l *DatasourceUpdateLogic) DatasourceUpdate(req types.DatasourceUpdateRequest) error {
 	return service.NewDatasourceService(l.ctx, l.svcCtx).Update(req)
-
 }

@@ -1,0 +1,84 @@
+syntax = "v1"
+
+type (
+	LLMRequest {
+		Data map[string]interface{} `json:"data"`
+	}
+	LLMResponse {
+		Data interface{} `json:"data"`
+	}
+	LLMConfigRequest {
+		URL              string `json:"url"`
+		Key              string `json:"key,optional"`
+		APIType          string `json:"apiType"`
+		MaxContextLength int    `json:"maxContextLength"`
+		Config           string `json:"config,optional"`
+	}
+
+	LLMImportRequest {
+		Space             string `json:"space"`
+		File              string `json:"file,optional"`
+		FilePath          string `json:"filePath,optional"`
+		Type              string `json:"type"`
+		PromptTemplate    string `json:"promptTemplate"`
+		SpaceSchemaString string `json:"spaceSchemaString"`
+	}
+
+	LLMImportJobsRequest {
+		Page     int    `json:"page"`
+		PageSize int    `json:"pageSize"`
+		Space    string `json:"space,optional"`
+	}
+
+	LLMImportLogRequest {
+		JobID string `json:"jobId"`
+	}
+
+	HandleLLMImportRequest {
+		JobID  string `json:"jobId"`
+		Action string `path:"action"`
+	}
+
+	DeleteLLMImportRequest {
+		JobID string `path:"jobId"`
+	}
+	DownloadLLMImportNgqlRequest {
+		JobID string `json:"jobId"`
+	}
+)
+
+@server(
+	group: llm
+)
+
+service studio-api {
+	
+	@doc "LLMProxy"
+	@handler LLMProxy
+	post /api/llm (LLMRequest) returns (LLMResponse)
+	
+	@doc "LLMConfig"
+	@handler LLMConfig
+	post /api/config/llm(LLMConfigRequest)
+	
+	@handler GetLLMConfig
+	get /api/config/llm returns (LLMResponse)
+	
+	@handler AddLLMImportJob
+	post /api/llm/import/job (LLMImportRequest) returns (LLMResponse)
+	
+	@handler GetLLMImportJobs
+	get /api/llm/import/jobs (LLMImportJobsRequest) returns (LLMResponse)
+	
+	@handler GetLLMImportJobLog
+	get /api/llm/import/job/log (LLMImportLogRequest) returns (LLMResponse)
+	
+	@handler HandleLLMImportJob
+	post /api/llm/import/job/:action (HandleLLMImportRequest) returns (LLMResponse)
+	
+	@handler DeleteLLMImportJob
+	delete /api/llm/import/job/:jobId (DeleteLLMImportRequest) returns (LLMResponse)
+	
+	@handler DownloadLLMImportNgql
+	get /api/llm/import/ngql (DownloadLLMImportNgqlRequest) returns (LLMResponse)
+}

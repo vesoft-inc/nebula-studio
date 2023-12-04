@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 
 	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
@@ -15,6 +16,7 @@ import (
 	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/vesoft-inc/nebula-importer/v4/pkg/config"
 	configv3 "github.com/vesoft-inc/nebula-importer/v4/pkg/config/v3"
+	studioConfig "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/service/importer"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
@@ -142,6 +144,7 @@ func (i *importService) updateDatasourceConfig(conf *types.CreateImportTaskReque
 	}
 	return &config, nil
 }
+
 func updateConfig(conf config.Configurator, taskDir, uploadDir string) {
 	confv3 := conf.(*configv3.Config)
 	if confv3.Log == nil {
@@ -331,12 +334,38 @@ func (i *importService) GetImportTaskLogNames(req *types.GetImportTaskLogNamesRe
 }
 
 func (i *importService) GetManyImportTaskLog(req *types.GetManyImportTaskLogRequest) (*types.GetManyImportTaskLogData, error) {
+	task := db.TaskInfo{
+		BID: req.Id,
+	}
+	if err := db.CtxDB.Where(task).First(&task).Error; err != nil {
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalDatabase, err)
+	}
+	if task.LLMJobID != 0 {
+		return i.GetAIImportLog(&task)
+	}
+
 	var taskEffect db.TaskEffect
 	if err := db.CtxDB.Select("log").Where("task_id = ?", req.Id).First(&taskEffect).Error; err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalDatabase, err)
 	}
 
 	data := &types.GetManyImportTaskLogData{Logs: taskEffect.Log}
+	return data, nil
+}
+
+func (i *importService) GetAIImportLog(task *db.TaskInfo) (*types.GetManyImportTaskLogData, error) {
+	task.LLMJob.ID = task.LLMJobID
+	err := db.CtxDB.Where(task.LLMJob).First(&task.LLMJob).Error
+	if err != nil {
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalDatabase, err)
+	}
+	jobPath := filepath.Join(studioConfig.GetConfig().LLM.GQLPath, fmt.Sprintf("%s/all.log", task.LLMJob.JobID))
+	// read log
+	log, err := utils.ReadPartFile(jobPath)
+	if err != nil {
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err)
+	}
+	data := &types.GetManyImportTaskLogData{Logs: strings.Join(log, "\n")}
 	return data, nil
 }
 

@@ -5,20 +5,17 @@ import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
-import { ITaskStatus } from '@app/interfaces/import';
+import { ITaskItem, ITaskStatus } from '@app/interfaces/import';
 import { useI18n } from '@vesoft-inc/i18n';
 import DatasourceConfigModal from '../DatasourceList/DatasourceConfig/PlatformConfig';
 import LogModal from './TaskItem/LogModal';
 import TemplateModal from './TemplateModal';
 import styles from './index.module.less';
 import TaskItem from './TaskItem';
+import Create from '../AIImport/Create';
+import AIImportItem, { ILLMStatus } from './TaskItem/AIImportItem';
 
 const Option = Select.Option;
-interface ILogDimension {
-  space: string;
-  id: string;
-  status: ITaskStatus;
-}
 
 const TaskList = () => {
   const timer = useRef<any>(null);
@@ -30,13 +27,13 @@ const TaskList = () => {
   const history = useHistory();
   const { taskList, getTaskList, stopTask, deleteTask } = dataImport;
   const { username, host } = global;
-  const [modalVisible, setVisible] = useState(false);
+  const [logTaskItem, setLogTaskItem] = useState<ITaskItem | undefined>();
   const [importModalVisible, setImportModalVisible] = useState(false);
   const [sourceModalVisible, setSourceModalVisible] = useState(false);
+  const [aiImportModalVisible, setAiImportModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const { disableTemplateImport } = moduleConfiguration.dataImport;
   const modalKey = useMemo(() => Math.random(), [sourceModalVisible]);
-  const [logDimension, setLogDimension] = useState<ILogDimension>({} as ILogDimension);
   const getData = useCallback(
     (params?: Partial<typeof filter>) => {
       const _filter = { ...filter, ...params };
@@ -60,13 +57,8 @@ const TaskList = () => {
     }
   }, []);
 
-  const handleLogView = useCallback((id: string, space: string, status: ITaskStatus) => {
-    setLogDimension({
-      space,
-      id,
-      status,
-    });
-    setVisible(true);
+  const handleLogView = useCallback((item: ITaskItem) => {
+    setLogTaskItem(item);
   }, []);
   const initList = useCallback(async () => {
     setLoading(true);
@@ -87,17 +79,11 @@ const TaskList = () => {
     };
   }, []);
   useEffect(() => {
-    const loadingStatus = [ITaskStatus.Processing, ITaskStatus.Pending];
+    const loadingStatus = [ITaskStatus.Processing, ITaskStatus.Pending, ILLMStatus.Pending, ILLMStatus.Running];
     const needRefresh = taskList.list?.filter((item) => loadingStatus.includes(item.status)).length > 0;
-    if (logDimension.id !== undefined && loadingStatus.includes(logDimension.status)) {
-      const status = taskList.list?.filter((item) => item.id === logDimension.id)[0]?.status;
-      if (!loadingStatus.includes(status)) {
-        setLogDimension({
-          id: logDimension.id,
-          space: logDimension.space,
-          status,
-        });
-      }
+    if (logTaskItem?.id !== undefined) {
+      const task = taskList.list?.find((item) => item.id === logTaskItem.id);
+      task && setLogTaskItem(task);
     }
     if (needRefresh && isMounted.current) {
       clearTimeout(timer.current);
@@ -107,11 +93,6 @@ const TaskList = () => {
     }
   }, [taskList]);
 
-  useEffect(() => {
-    if (modalVisible === false) {
-      setLogDimension({} as ILogDimension);
-    }
-  }, [modalVisible]);
   const emptyTips = useMemo(
     () => [
       {
@@ -140,6 +121,13 @@ const TaskList = () => {
           {!disableTemplateImport && (
             <Button type="default" onClick={() => setImportModalVisible(true)}>
               {intl.get('import.uploadTemp')}
+            </Button>
+          )}
+          {global.appSetting.beta.functions.llmImport && (
+            <Button className="studioAddBtn" onClick={() => setAiImportModalVisible(true)}>
+              <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
+              {intl.get('llm.aiImport')}
+              <span className={styles.beta}>beta</span>
             </Button>
           )}
         </div>
@@ -192,16 +180,27 @@ const TaskList = () => {
         </div>
       ) : (
         <Spin spinning={loading}>
-          {taskList.list.map((item) => (
-            <TaskItem
-              key={item.id}
-              data={item}
-              onRerun={handleRerun}
-              onViewLog={handleLogView}
-              onTaskStop={handleTaskStop}
-              onTaskDelete={handleTaskDelete}
-            />
-          ))}
+          {taskList.list.map((item) =>
+            !item.llmJob ? (
+              <TaskItem
+                key={item.id}
+                data={item}
+                onRerun={handleRerun}
+                onViewLog={handleLogView}
+                onTaskStop={handleTaskStop}
+                onTaskDelete={handleTaskDelete}
+              />
+            ) : (
+              <AIImportItem
+                onRefresh={() => {
+                  getData();
+                }}
+                key={item.id}
+                data={item}
+                onViewLog={handleLogView}
+              />
+            ),
+          )}
           <Pagination
             className={styles.taskPagination}
             hideOnSinglePage
@@ -211,9 +210,7 @@ const TaskList = () => {
           />
         </Spin>
       )}
-      {modalVisible && (
-        <LogModal logDimension={logDimension} onCancel={() => setVisible(false)} visible={modalVisible} />
-      )}
+      {logTaskItem && <LogModal task={logTaskItem} onCancel={() => setLogTaskItem(undefined)} visible={true} />}
       {importModalVisible && (
         <TemplateModal
           onClose={() => setImportModalVisible(false)}
@@ -228,6 +225,13 @@ const TaskList = () => {
         visible={sourceModalVisible}
         onCancel={() => setSourceModalVisible(false)}
         onConfirm={() => setSourceModalVisible(false)}
+      />
+      <Create
+        visible={aiImportModalVisible}
+        onCancel={() => {
+          setAiImportModalVisible(false);
+          getData();
+        }}
       />
     </div>
   );
