@@ -7,6 +7,14 @@
     padding: 15px 0 20px;
     display: flex;
 
+    :global {
+      .ant-btn-default {
+        border: 1px solid @blue;
+        border-radius: 3px;
+        color: @blue;
+      }
+    }
+
     &>button:not(:last-child) {
       margin-right: 15px;
     }

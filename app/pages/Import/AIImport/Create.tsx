@@ -32,6 +32,7 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
       type: 'file',
       promptTemplate: llmImportPrompt,
     });
+    setTokens(null);
   }, [props.visible]);
 
   const onNext = () => {

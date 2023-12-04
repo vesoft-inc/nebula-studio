@@ -42,7 +42,8 @@ const FileSelect = observer((props: IFileSelect) => {
   const getLocalFiles = useCallback(async () => {
     const files = await getFiles();
     setState({
-      directory: files,
+      // filter csv file
+      directory: files.filter((file) => file.name.endsWith('.csv')),
       path: '/',
       loading: false,
       activeId: IDatasourceType.Local,

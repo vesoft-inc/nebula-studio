@@ -18,6 +18,7 @@ import SchemaDrawer from './Drawer/SchemaDrawer';
 // import NgqlDrawer from './Drawer/NgqlDrawer';
 import styles from './index.module.less';
 import { SchemaItemOverview } from '@app/stores/console';
+import LLMBot from '../LLMBot';
 
 const Option = Select.Option;
 
@@ -323,6 +324,7 @@ const Console = (props: IProps) => {
           onExplorer={handleExplorer}
         />
       )}
+      <LLMBot />
     </div>
   );
 };

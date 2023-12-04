@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -277,6 +279,33 @@ func (i *importService) DownloadLogs(req *types.DownloadLogsRequest) error {
 	httpResp, ok := middleware.GetResponseWriter(i.ctx)
 	if !ok {
 		return ecode.WithInternalServer(fmt.Errorf("unset KeepResponse Writer"))
+	}
+
+	task := db.TaskInfo{
+		BID: id,
+	}
+	if err := db.CtxDB.Where(task).First(&task).Error; err != nil {
+		return ecode.WithErrorMessage(ecode.ErrInternalDatabase, err)
+	}
+	if task.LLMJobID != 0 {
+		llmJob := db.LLMJob{
+			ID: task.LLMJobID,
+		}
+		if err := db.CtxDB.Where(llmJob).First(&llmJob).Error; err != nil {
+			return ecode.WithErrorMessage(ecode.ErrInternalDatabase, err)
+		}
+		filePath := filepath.Join(studioConfig.GetConfig().LLM.GQLPath, fmt.Sprintf("%s/%s", llmJob.JobID, req.Name))
+		httpResp.WriteHeader(http.StatusOK)
+		httpResp.Header().Set("Content-Type", "application/octet-stream")
+		httpResp.Header().Set("Content-Disposition", "attachment;filename="+req.Name)
+		// download log
+		file, err := os.Open(filePath)
+		if err != nil {
+			return ecode.WithInternalServer(err)
+		}
+		defer file.Close()
+		io.Copy(httpResp, file)
+		return nil
 	}
 
 	fileName := req.Name

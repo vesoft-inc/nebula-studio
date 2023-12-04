@@ -72,6 +72,7 @@ export default {
     language: 'Language',
     switchOn: 'On',
     switchOff: 'Off',
+    succcess: 'Success',
   },
   doc: {
     welcome: 'Welcome to',
@@ -562,5 +563,6 @@ export default {
     previous: 'Previous',
     start: 'Start',
     aiImport: 'AI Import',
+    pleaseConfigLLMFirst: 'Please configure LLM API first',
   },
 };

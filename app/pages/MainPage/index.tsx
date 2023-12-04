@@ -4,7 +4,6 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import { shouldAlwaysShowWelcome } from '@app/pages/Welcome';
 import ErrorBoundary from '@app/components/ErrorBoundary';
 import { MENU_LIST, RoutesList } from './routes';
-import LLMBot from '../LLMBot';
 import './index.less';
 
 import Header from './Header';
@@ -36,7 +35,6 @@ const MainPage = () => {
           <Redirect from="/" to={{ pathname: redirectPath, search: location.search }} />
         </Switch>
       </ErrorBoundary>
-      <LLMBot />
     </Layout>
   );
 };
