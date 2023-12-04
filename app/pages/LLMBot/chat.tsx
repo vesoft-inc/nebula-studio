@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import ws from '@app/utils/websocket';
 import { debounce } from 'lodash';
 import rootStore from '@app/stores';
-import CodeMirror from '@app/components/CodeMirror';
 import { observer } from 'mobx-react-lite';
 import { useI18n } from '@vesoft-inc/i18n';
 import { LoadingOutlined } from '@ant-design/icons';
+import MonacoEditor from '@app/components/MonacoEditor';
 
 function Chat() {
   const { intl } = useI18n();
@@ -112,18 +112,13 @@ function Chat() {
         return <p key={index}>{item}</p>;
       } else {
         item = item.replace(/^(\n|ngql|gql|cypher)/g, '').replace(/\n$/g, '');
+        item = item.replace(/\n\n/, '\n');
         if (message.status !== 'done') {
           return <code key={index}>{item}</code>;
         }
         return (
           <div key={index} className={styles.codeWrapper}>
-            <CodeMirror
-              height="120"
-              value={item}
-              options={{
-                mode: 'nebula',
-              }}
-            />
+            <MonacoEditor readOnly height="120px" value={item} />
             <Button
               className={styles.copyBtn}
               onClick={() => {
