@@ -19,7 +19,7 @@ const Option = Select.Option;
 
 const TaskList = () => {
   const timer = useRef<any>(null);
-  const { dataImport, global, moduleConfiguration, schema } = useStore();
+  const { dataImport, global, moduleConfiguration, schema, llm } = useStore();
   const { spaces, getSpaces } = schema;
   const isMounted = useRef(true);
   const [filter, setFilter] = useState({ page: 1, pageSize: 10, space: undefined });
@@ -68,6 +68,13 @@ const TaskList = () => {
   const handleRerun = () => {
     clearTimeout(timer.current);
     getData();
+  };
+  const onCreateAIIMport = () => {
+    if (llm.config.gqlPath) {
+      setAiImportModalVisible(true);
+    } else {
+      message.error(intl.get('llm.pleaseConfigLLMFirst'));
+    }
   };
   useEffect(() => {
     getSpaces();
@@ -123,8 +130,8 @@ const TaskList = () => {
               {intl.get('import.uploadTemp')}
             </Button>
           )}
-          {global.appSetting.beta.functions.llmImport && (
-            <Button className="studioAddBtn" onClick={() => setAiImportModalVisible(true)}>
+          {global.appSetting.beta.open && global.appSetting.beta.functions.llmImport.open && (
+            <Button className="studioAddBtn" onClick={onCreateAIIMport}>
               <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
               {intl.get('llm.aiImport')}
               <span className={styles.beta}>beta</span>

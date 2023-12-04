@@ -7,7 +7,7 @@ import { useStore } from '@app/stores';
 // float llm bot window
 function LLMBot() {
   const { global, llm } = useStore();
-  if (global.appSetting?.beta?.functions?.text2query.open != true) {
+  if (global.appSetting?.beta?.open && global.appSetting?.beta?.functions?.text2query.open != true) {
     return null;
   }
   const { open } = llm;

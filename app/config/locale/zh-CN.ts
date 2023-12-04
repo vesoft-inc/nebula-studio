@@ -72,6 +72,7 @@ export default {
     language: '语言',
     switchOn: '开启',
     switchOff: '关闭',
+    pleaseConfigLLMFirst: '请先配置 LLM 接口地址',
   },
   doc: {
     welcome: '欢迎使用',
