@@ -4,7 +4,6 @@ LABEL stage=nodebuilder
 WORKDIR /web
 # Copy the current directory contents into the container at /web
 COPY package.json /web/
-COPY .npmrc /web/
 
 # Install any needed packages
 RUN npm cache clear --force
