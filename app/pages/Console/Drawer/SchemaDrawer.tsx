@@ -92,6 +92,7 @@ const SchemaDrawer = () => {
   const onLoadData = async (node) => {
     const { name, space, type, children, isLeaf } = node;
     if (children.length || isLeaf) return;
+    await new Promise((resolve) => setTimeout(resolve, 300));
     if (type === 'space') {
       const [tags, edges] = await Promise.all([schema.getTags(name), schema.getEdges(name)]);
       update({

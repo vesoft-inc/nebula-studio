@@ -50,6 +50,7 @@
       margin-left: 22px;
 
       > :global(span.anticon) {
+        cursor: pointer;
         svg {
           color: @darkBlue;
           width: 22px;
@@ -142,7 +143,7 @@
               padding-left: 0;
               position: relative;
               background-color: @lightBlue;
-              max-height: 700px;
+              max-height: 720px;
               overflow: auto;
               height: 100%;
             }
@@ -183,6 +184,7 @@
     .btns {
       display: flex;
       align-items: center;
+      padding-right: 24px;
 
       svg {
         width: 24px;
@@ -197,22 +199,18 @@
 
     .resizeBtn {
       position: absolute;
-      bottom: 5px;
+      bottom: 6px;
       right: 10px;
       cursor: ns-resize;
       transition: none;
-
-      svg {
-        width: 28px;
-        height: 28px;
-      }
+      color: rgba(0, 0, 0, 0.2);
     }
   }
 }
 
 .exportPopover {
-  :global(.ant-popover-inner-content) {
-    padding: 0;
+  :global(.ant-popover-content > .ant-popover-inner) {
+    padding: 4px 0;
     border-radius: 3px;
   }
 

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import * as monaco from 'monaco-editor';
-import Editor, { useMonaco, loader } from '@monaco-editor/react';
+import type { editor as TMonacoEditor } from 'monaco-editor';
+import Editor, { useMonaco, loader, type Monaco } from '@monaco-editor/react';
 import {
   keyWords,
   operators,
@@ -12,7 +13,6 @@ import {
 import { useI18n } from '@vesoft-inc/i18n';
 import { handleEscape } from '@app/utils/function';
 import { SchemaItemOverview } from '@app/stores/console';
-import styles from './index.module.less';
 
 // avoid loading monaco twice
 if (!loader.__getMonacoInstance()) {
@@ -23,11 +23,12 @@ if (!loader.__getMonacoInstance()) {
 interface IProps {
   schema?: SchemaItemOverview;
   height?: string;
-  onInstanceChange?: (instance, monaco) => void;
+  onInstanceChange?: (instance: TMonacoEditor.IStandaloneCodeEditor, monaco: Monaco) => void;
   value: string;
   readOnly?: boolean;
   onChange?: (value: string) => void;
   onShiftEnter?: () => void;
+  className?: string;
 }
 
 const checkNeedEscape = (str) => {
@@ -70,7 +71,7 @@ const MonacoEditor = (props: IProps) => {
   const { intl, currentLocale } = useI18n();
   const monaco = useMonaco();
   const providersRef = useRef([]);
-  const { onShiftEnter, schema, value, onChange, readOnly, onInstanceChange, height } = props;
+  const { onShiftEnter, schema, value, onChange, readOnly, onInstanceChange, height, className } = props;
   const [tags, edges] = useMemo(
     () =>
       schema?.children?.reduce(
@@ -304,7 +305,7 @@ const MonacoEditor = (props: IProps) => {
     setMonacoProvider();
   }, [monaco]);
 
-  const onMount = (editor, monaco) => {
+  const onMount = (editor: TMonacoEditor.IStandaloneCodeEditor, monaco: Monaco) => {
     editor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
       onShiftEnter?.();
     });
@@ -324,7 +325,6 @@ const MonacoEditor = (props: IProps) => {
     <Editor
       height={height || '300px'}
       defaultLanguage="ngql"
-      className={styles.editor}
       value={value}
       onChange={onChange}
       theme="studio"
@@ -345,8 +345,11 @@ const MonacoEditor = (props: IProps) => {
         renderLineHighlight: 'none',
         readOnly,
         minimap: { enabled: false },
+        fontSize: 13,
+        automaticLayout: true,
       }}
       onMount={onMount}
+      className={className}
     />
   );
 };

@@ -2,6 +2,8 @@ import { Button, Select, Spin, Tooltip, message } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { trackEvent, trackPageView } from '@app/utils/stat';
+import type { editor as TMonacoEditor } from 'monaco-editor';
+import { type Monaco } from '@monaco-editor/react';
 import { useStore } from '@app/stores';
 import Icon from '@app/components/Icon';
 import MonacoEditor from '@app/components/MonacoEditor';
@@ -35,7 +37,7 @@ interface IProps {
   templateRender?: (data?) => JSX.Element;
 }
 const Console = (props: IProps) => {
-  const { schema, console } = useStore();
+  const { schema, console: consoleStore } = useStore();
   const { intl } = useI18n();
   const { onExplorer, templateRender } = props;
   const { spaces, getSpaces } = schema;
@@ -50,7 +52,7 @@ const Console = (props: IProps) => {
     getFavoriteList,
     currentSpace,
     updateCurrentSpace,
-  } = console;
+  } = consoleStore;
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState<{
     space: string;
@@ -59,8 +61,8 @@ const Console = (props: IProps) => {
   }>(null);
   const [schemaTree, setSchemaTree] = useState<SchemaItemOverview>({} as SchemaItemOverview);
   const [editorLoading, setEditorLoading] = useState(false);
-  const editor = useRef<any>(null);
-  const ref = useRef(null);
+  const editor = useRef<{ monaco: Monaco; editor: TMonacoEditor.IStandaloneCodeEditor }>();
+  const resultContainerRef = useRef<HTMLDivElement>();
   const historyProviderRef = useRef(null);
   useEffect(() => {
     trackPageView('/console');
@@ -83,7 +85,6 @@ const Console = (props: IProps) => {
 
   const updateGql = (value: string, space?: string) => {
     update({ currentGQL: value, currentSpace: space || currentSpace });
-    ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const handleSaveQuery = (query: string) => {
@@ -139,33 +140,49 @@ const Console = (props: IProps) => {
   };
   const setHistoryProvider = () => {
     historyProviderRef.current?.dispose();
-    const { monaco } = editor.current;
-    let history = getHistory();
-    history = history.map((i) => `/${i}`);
-    if (!history.length) return;
+    const { monaco, editor: _editor } = editor.current;
+    const history = getHistory();
+    if (!history?.length) {
+      return;
+    }
     historyProviderRef.current = monaco?.languages.registerCompletionItemProvider('ngql', {
       provideCompletionItems: (model, position) => {
-        const word = model.getWordUntilPosition(position);
-        if (word.word !== '') return;
+        const lineContent = model.getLineContent(position.lineNumber);
+        if (lineContent !== '/') {
+          return;
+        }
         const suggestions = [
           ...Array.from(new Set(history)).map((k: string, index) => {
             const sortText = String(index + 1);
             return {
               label: k,
               kind: monaco.languages.CompletionItemKind.Text,
-              insertText: k.slice(1),
+              insertText: k,
               detail: intl.get('common.historyRecord'),
               sortText,
               range: {
                 startLineNumber: position.lineNumber,
                 endLineNumber: position.lineNumber,
-                startColumn: position.column - 1,
+                startColumn: position.column,
                 endColumn: position.column,
               },
             };
           }),
         ];
-        return { suggestions: suggestions };
+        return {
+          suggestions: suggestions,
+          dispose: () => {
+            const line = position.lineNumber;
+            const column = position.column;
+            const range = new monaco.Range(line, column - 1, line, column);
+            if (model.getValueInRange(range) !== '/') {
+              return;
+            }
+            const text = model.getValue().replace('/', '');
+            _editor.setValue(text);
+            _editor.setPosition({ lineNumber: line, column: text.length + 1 });
+          },
+        };
       },
       triggerCharacters: ['/'],
     });
@@ -213,11 +230,16 @@ const Console = (props: IProps) => {
       setEditorLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    !runGQLLoading && resultContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [runGQLLoading]);
+
   return (
     <div className={styles.nebulaConsole}>
       <SchemaDrawer />
-      <div className={styles.consoleContainer}>
-        <div className={styles.consolePanel} ref={ref}>
+      <div className={styles.consoleContainer} ref={resultContainerRef}>
+        <div className={styles.consolePanel}>
           <div className={styles.panelHeader}>
             <span className={styles.title}>{`${window.gConfig.databaseName} ${intl.get('common.console')}`}</span>
             <div className={styles.operations}>
@@ -254,7 +276,7 @@ const Console = (props: IProps) => {
               </div>
             </div>
           </div>
-          <Spin spinning={editorLoading} delay={200}>
+          <Spin spinning={editorLoading || runGQLLoading} delay={200}>
             <div className={styles.codeInput}>
               <CypherParameterBox onSelect={addParam} data={paramsMap} />
               <MonacoEditor
@@ -263,6 +285,8 @@ const Console = (props: IProps) => {
                 value={currentGQL}
                 onChange={handleEditorChange}
                 onShiftEnter={handleRun}
+                height="100%"
+                className={styles.monacoEditor}
               />
             </div>
           </Spin>
@@ -302,4 +326,5 @@ const Console = (props: IProps) => {
     </div>
   );
 };
+
 export default observer(Console);
