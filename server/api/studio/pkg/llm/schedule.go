@@ -6,6 +6,9 @@ import (
 	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
 )
 
+type LLMJob = db.LLMJob
+type LLMConfig = db.LLMConfig
+
 func InitSchedule() {
 	// TODO
 	for {
