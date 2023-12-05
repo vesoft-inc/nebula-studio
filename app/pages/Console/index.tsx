@@ -224,7 +224,11 @@ const Console = (props: IProps) => {
   const handleSwitchSpace = useCallback(async (space: string) => {
     setEditorLoading(true);
     try {
-      await updateCurrentSpace(space);
+      updateCurrentSpace(space);
+      if (!space) {
+        return;
+      }
+
       const data = await schema.getSchemaTree(space);
       data && setSchemaTree(data);
     } finally {
