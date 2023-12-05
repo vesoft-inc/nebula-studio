@@ -94,6 +94,8 @@
       border: 1px solid @gray;
       border-radius: 3px;
       min-height: 120px;
+      resize: vertical;
+      overflow-y: hidden;
       .btnOpenParam {
         display: flex;
         align-items: center;
@@ -218,7 +220,8 @@
 }
 
 .toggleDrawer {
-  width: 53px;
+  width: 54px;
+  flex: 0 0 54px;
   padding: 10px;
   background-color: #fff;
   display: flex;
@@ -366,7 +369,5 @@
 
 .monacoEditor {
   min-height: 120px;
-  height: 120px;
-  overflow-y: auto;
-  resize: vertical;
+  height: 100%;
 }
