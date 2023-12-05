@@ -57,6 +57,7 @@ func (o *OpenAI) HandleResponse(resp *http.Response, callback func(str string)) 
 		if err := scanner.Err(); err != nil {
 			fmt.Println("reading standard input:", err)
 		}
+		callback("[DONE]")
 		return nil, nil
 	}
 	// Read the response data
