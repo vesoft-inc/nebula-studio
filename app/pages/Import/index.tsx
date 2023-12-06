@@ -4,10 +4,10 @@ import { Route, useHistory, useLocation } from 'react-router-dom';
 import { trackPageView } from '@app/utils/stat';
 import cls from 'classnames';
 import { useI18n } from '@vesoft-inc/i18n';
+import llm from '@app/stores/llm';
 import DatasourceList from './DatasourceList';
 import styles from './index.module.less';
 import TaskList from './TaskList';
-import llm from '@app/stores/llm';
 
 const Import = () => {
   const history = useHistory();

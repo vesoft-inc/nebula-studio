@@ -6,9 +6,9 @@ import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
 import EmptyTableTip from '@app/components/EmptyTableTip';
 import { IndexType } from '@app/interfaces/schema';
+import cls from 'classnames';
 import Search from '../Search';
 import styles from './index.module.less';
-import cls from 'classnames';
 
 interface IProps {
   onSearch: (value) => void;

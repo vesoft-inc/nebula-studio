@@ -6,8 +6,8 @@ import { debounce } from 'lodash';
 import { getI18n } from '@vesoft-inc/i18n';
 import { safeParse } from '@app/utils/function';
 import { NgqlRes } from '@app/utils/websocket';
-import { getRootStore } from '.';
 import { IField } from '@app/interfaces/schema';
+import { getRootStore } from '.';
 
 const { intl } = getI18n();
 

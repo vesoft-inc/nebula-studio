@@ -4,8 +4,8 @@ import { useStore } from '@app/stores';
 import { nameRulesFn, numberRulesFn, replicaRulesFn, stringByteRulesFn } from '@app/config/rules';
 import { useI18n } from '@vesoft-inc/i18n';
 import { DEFAULT_PARTITION_NUM } from '@app/utils/constant';
-import styles from './index.module.less';
 import { observer } from 'mobx-react-lite';
+import styles from './index.module.less';
 const Option = Select.Option;
 
 const defaultFormItemLayout = {

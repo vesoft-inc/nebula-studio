@@ -8,11 +8,11 @@ import { trackPageView } from '@app/utils/stat';
 import { ITaskItem, ITaskStatus } from '@app/interfaces/import';
 import { useI18n } from '@vesoft-inc/i18n';
 import DatasourceConfigModal from '../DatasourceList/DatasourceConfig/PlatformConfig';
+import Create from '../AIImport/Create';
 import LogModal from './TaskItem/LogModal';
 import TemplateModal from './TemplateModal';
 import styles from './index.module.less';
 import TaskItem from './TaskItem';
-import Create from '../AIImport/Create';
 import AIImportItem, { ILLMStatus } from './TaskItem/AIImportItem';
 
 const Option = Select.Option;

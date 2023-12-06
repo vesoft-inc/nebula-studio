@@ -4,8 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { ES3Platform } from '@app/interfaces/datasource';
 import Instruction from '@app/components/Instruction';
-import styles from './index.module.less';
 import { useStore } from '@app/stores';
+import styles from './index.module.less';
 const FormItem = Form.Item;
 interface IProps {
   formRef: FormInstance;

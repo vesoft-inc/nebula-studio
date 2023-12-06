@@ -4,9 +4,9 @@ import { InstanceNode } from '@vesoft-inc/veditor/types/Shape/Node';
 import { createRoot } from 'react-dom/client';
 import { ISchemaEnum } from '@app/interfaces/schema';
 import { NODE_RADIUS } from '@app/config/sketch';
+import { flushSync } from 'react-dom';
 import Path from './Path';
 import styles from './index.module.less';
-import { flushSync } from 'react-dom';
 export default function initShapes(editor: VEditor) {
   const node = {
     ...DefaultNode.default,
