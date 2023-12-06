@@ -1,5 +1,4 @@
 import { Button, Input } from 'antd';
-import styles from './chat.module.less';
 import { useEffect, useRef, useState } from 'react';
 import ws from '@app/utils/websocket';
 import { debounce } from 'lodash';
@@ -8,6 +7,7 @@ import { observer } from 'mobx-react-lite';
 import { useI18n } from '@vesoft-inc/i18n';
 import { LoadingOutlined } from '@ant-design/icons';
 import MonacoEditor from '@app/components/MonacoEditor';
+import styles from './chat.module.less';
 
 function Chat() {
   const { intl } = useI18n();
@@ -149,7 +149,7 @@ function Chat() {
             return (
               <div
                 key={index}
-                className={styles.chatMessage + ' ' + styles[item.role == 'user' ? 'fromUser' : 'fromBot']}
+                className={styles.chatMessage + ' ' + styles[item.role === 'user' ? 'fromUser' : 'fromBot']}
               >
                 <div className={styles.chatMessageInner}>
                   <div className={styles.chatMessageContent}>{renderContent(item)}</div>

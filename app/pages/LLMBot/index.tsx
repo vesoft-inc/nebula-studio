@@ -1,13 +1,13 @@
 import { Popover, Switch } from 'antd';
-import styles from './index.module.less';
-import Chat from './chat';
 import Icon from '@app/components/Icon';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
+import Chat from './chat';
+import styles from './index.module.less';
 // float llm bot window
 function LLMBot() {
   const { global, llm } = useStore();
-  if (!global.appSetting?.beta?.open || global.appSetting?.beta?.functions?.text2query?.open != true) {
+  if (!global.appSetting?.beta?.open || global.appSetting?.beta?.functions?.text2query?.open !== true) {
     return null;
   }
   const { open } = llm;
@@ -36,7 +36,7 @@ function LLMBot() {
                     mode: checked ? 'text2cypher' : 'text2ngql',
                   });
                 }}
-                checked={llm.mode == 'text2cypher'}
+                checked={llm.mode === 'text2cypher'}
               />
             </div>
           </div>
@@ -56,8 +56,8 @@ function LLMBot() {
       <svg style={{ width: 0, height: 0 }}>
         <defs>
           <linearGradient id="llm-icon" x1="50%" y1="0%" x2="50%" y2="100%">
-            <stop offset="0%" stopColor="#127BB8"></stop>
-            <stop offset="100%" stopColor="#12AEB8"></stop>
+            <stop offset="0%" stopColor="#127BB8" />
+            <stop offset="100%" stopColor="#12AEB8" />
           </linearGradient>
         </defs>
       </svg>

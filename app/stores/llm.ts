@@ -1,10 +1,10 @@
 import { makeAutoObservable } from 'mobx';
-import schema from './schema';
 import { get } from '@app/utils/http';
-import rootStore from '.';
 import ws from '@app/utils/websocket';
 import { safeParse } from '@app/utils/function';
 import * as ngqlDoc from '@app/utils/ngql';
+import schema from './schema';
+import rootStore from '.';
 
 export const matchPrompt = `Use NebulaGraph match knowledge to help me answer question.
 Use only the provided relationship types and properties in the schema.
@@ -101,7 +101,7 @@ class LLM {
 
   fetchConfig() {
     return get('/api/config/llm')().then((res) => {
-      if (res.code != 0 || !res.data) return;
+      if (res.code !== 0 || !res.data) return;
       const { config, ...values } = res.data.config;
       const configMap = config ? safeParse<LLMConfig>(config) : {};
       this.setConfig({
@@ -236,7 +236,7 @@ class LLM {
       const firstToken = tokens.find((item) => item.replaceAll(' ', '').length > 0);
       const hits = ngqlDoc.ngqlDoc.filter((each) => each.title.toLowerCase().indexOf(firstToken.toLowerCase()) === 0);
       let doc = '';
-      if (this.mode == 'text2cypher' && firstToken.toLowerCase() == 'match') {
+      if (this.mode === 'text2cypher' && firstToken.toLowerCase() === 'match') {
         doc += matchPrompt;
       } else {
         if (hits.length) {

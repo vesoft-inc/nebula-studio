@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import * as monaco from 'monaco-editor';
 import type { editor as TMonacoEditor } from 'monaco-editor';
 import Editor, { useMonaco, loader, type Monaco } from '@monaco-editor/react';
@@ -109,7 +110,7 @@ const MonacoEditor = (props: IProps) => {
       edges,
       propertyReference,
       tokenizer: {
-        //@ts-ignore
+        // @ts-ignore
         root: [
           ...createSchemaRegex(patterns, regexFormat(tags), 'tag'),
           ...createSchemaRegex(patterns, regexFormat(edges), 'edge'),
@@ -130,7 +131,7 @@ const MonacoEditor = (props: IProps) => {
     });
     // register a completion item provider for keywords
     const keywordProvider = monaco?.languages.registerCompletionItemProvider('ngql', {
-      //@ts-ignore
+      // @ts-ignore
       provideCompletionItems: () => {
         const suggestions = [
           ...nebulaWordsUppercase.map((k) => ({
@@ -141,11 +142,11 @@ const MonacoEditor = (props: IProps) => {
             sortText: '1', // monaco completion suggestions sort by sortText, 1: keyword 2: tag 3: edge 4: field 5: function
           })),
         ];
-        return { suggestions: suggestions };
+        return { suggestions };
       },
     });
     const parameterProvider = monaco?.languages.registerCompletionItemProvider('ngql', {
-      //@ts-ignore
+      // @ts-ignore
       provideCompletionItems: () => {
         const suggestions = [
           ...parameterDeclaration.map((k) => ({
@@ -155,13 +156,13 @@ const MonacoEditor = (props: IProps) => {
             sortText: '5',
           })),
         ];
-        return { suggestions: suggestions };
+        return { suggestions };
       },
       triggerCharacters: [':'],
     });
 
     const propertyReferenceProvider = monaco?.languages.registerCompletionItemProvider('ngql', {
-      //@ts-ignore
+      // @ts-ignore
       provideCompletionItems: () => {
         const suggestions = [
           ...propertyReference.map((k) => ({
@@ -171,13 +172,13 @@ const MonacoEditor = (props: IProps) => {
             sortText: '1', // monaco completion suggestions sort by sortText, 1: keyword 2: tag 3: edge 4: field 5: function
           })),
         ];
-        return { suggestions: suggestions };
+        return { suggestions };
       },
       triggerCharacters: ['$'],
     });
     // register a completion item provider for tags and edges, can trigger by ':' and '.'
     const schemaInfoProvider = monaco?.languages.registerCompletionItemProvider('ngql', {
-      //@ts-ignore
+      // @ts-ignore
       provideCompletionItems: () => {
         const suggestions = [
           ...tags.map((k: string) => ({
@@ -209,7 +210,7 @@ const MonacoEditor = (props: IProps) => {
     const regex = /^properties\(.*\)$/g; // match properties()
     // register a completion item provider for fields, can trigger by '.'
     const schemaInfoTriggerProvider = monaco?.languages.registerCompletionItemProvider('ngql', {
-      //@ts-ignore
+      // @ts-ignore
       provideCompletionItems: (model, position) => {
         const textUntilPosition = model.getValueInRange({
           startLineNumber: position.lineNumber,
@@ -236,7 +237,7 @@ const MonacoEditor = (props: IProps) => {
     });
     // register a completion item provider for functions
     const funcProvider = monaco?.languages.registerCompletionItemProvider('ngql', {
-      //@ts-ignore
+      // @ts-ignore
       provideCompletionItems: () => {
         const suggestions = nebulaFunction.map((f) => ({
           label: `${f}()`,
@@ -271,7 +272,7 @@ const MonacoEditor = (props: IProps) => {
   useEffect(() => {
     if (!monaco) return;
     const languages = monaco.languages.getLanguages();
-    if (languages.some((i) => i.id == 'ngql')) return;
+    if (languages.some((i) => i.id === 'ngql')) return;
     monaco?.languages.register({ id: 'ngql' });
     monaco?.editor.defineTheme('studio', {
       base: 'vs',
