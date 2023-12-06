@@ -27,22 +27,22 @@ diff
 > RETURN p.person.name;
 Question:{query_str}
 `;
-export const llmImportPrompt = `As a knowledge graph expert, your task is to extract relationship data from the following text:
-----
+export const llmImportPrompt = `As a knowledge graph AI importer, your task is to extract relationship data from the following text:
+----text
 {text}
 ----
 
 Please proceed according to the schema of the knowledge graph:
-----
+----graph schema
 {spaceSchema}
 ----
 
-Return the results directly, without interpretation. The results should be in the following JSON format:
+Return the results directly, without explain and comment. The results should be in the following JSON format:
 {
   "nodes":[{ "name":string,"type":string,"props":object }],
   "edges":[{ "src":string,"dst":string,"edgeType":string,"props":object }]
 }
-The result is:
+Result:
 `;
 export const llmImportTask = `please excute the task below,and return the result,dont' explain,just return the result directly.
 {

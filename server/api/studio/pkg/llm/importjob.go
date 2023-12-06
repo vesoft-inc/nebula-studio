@@ -283,18 +283,27 @@ func (i *ImportJob) ParseSchema(text string) error {
 	}
 	i.Schema = schema
 	i.SchemaMap = make(map[string]map[string]Field)
+	nodeSchemaString := ""
+	edgeSchemaString := ""
 	for _, tag := range schema.NodeTypes {
+		nodeSchemaString += fmt.Sprintf("NodeType \"%s\" {", tag.Type)
 		i.SchemaMap[tag.Type] = make(map[string]Field)
 		for _, field := range tag.Props {
 			i.SchemaMap[tag.Type][field.Name] = field
+			nodeSchemaString += fmt.Sprintf("\"%s\":%s ", field.Name, field.DataType)
 		}
+		nodeSchemaString += "}\n"
 	}
 	for _, edge := range schema.EdgeTypes {
+		edgeSchemaString += fmt.Sprintf("EdgeType \"%s\" { ", edge.Type)
 		i.SchemaMap[edge.Type] = make(map[string]Field)
 		for _, field := range edge.Props {
 			i.SchemaMap[edge.Type][field.Name] = field
+			edgeSchemaString += fmt.Sprintf("\"%s\":%s ", field.Name, field.DataType)
 		}
+		edgeSchemaString += "}\n"
 	}
+	i.LLMJob.SpaceSchemaString = nodeSchemaString + edgeSchemaString
 	return nil
 }
 
