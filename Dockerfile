@@ -14,7 +14,7 @@ COPY . /web/
 ENV NODE_OPTIONS=--max_old_space_size=2048
 RUN npm run build
 
-FROM golang:alpine AS gobuilder
+FROM golang:1.21-alpine AS gobuilder
 
 LABEL stage=gobuilder
 
