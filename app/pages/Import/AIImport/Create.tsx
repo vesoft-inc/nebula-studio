@@ -157,7 +157,7 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
 
       <Form layout="vertical" style={{ display: step == 1 ? 'block' : 'none' }}>
         <Form.Item label={intl.get('llm.file')}>
-          <span>{type === 'file' ? valuse.file : valuse.filePath}</span>
+          <span>{valuse.file}</span>
         </Form.Item>
         <Form.Item label={intl.get('llm.url')}>
           <Input disabled value={llm.config.url} />

@@ -16,6 +16,7 @@ import (
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/base"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/client"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/pdf"
 	"gorm.io/datatypes"
@@ -48,7 +49,7 @@ type ImportJob struct {
 	LLMConfig  *db.LLMConfig
 	AuthData   *auth.AuthData
 	NSID       string
-	Process    *db.Process
+	Process    *base.Process
 	logFile    *os.File
 	Schema     Schema
 	SchemaMap  map[string]map[string]Field
@@ -59,7 +60,7 @@ func RunFileJob(job *db.LLMJob) {
 		CacheNodes: make(map[string]Node),
 		CacheEdges: make(map[string]map[string]Edge),
 		LLMJob:     job,
-		Process: &db.Process{
+		Process: &base.Process{
 			TotalSize:        0,
 			CurrentSize:      0,
 			Ratio:            0,
@@ -73,7 +74,6 @@ func RunFileJob(job *db.LLMJob) {
 		return
 	}
 	defer llmJob.CloseLogFile()
-	go llmJob.SyncProcess()
 	defer func() {
 		if err := recover(); err != nil {
 			llmJob.WriteLogFile(fmt.Sprintf("panic: %v", err), "error")
@@ -92,6 +92,7 @@ func RunFileJob(job *db.LLMJob) {
 			return
 		}
 	}()
+	go llmJob.SyncProcess(job)
 
 	llmJob.Process.Ratio = 0.01
 	err = llmJob.ParseSchema(job.SpaceSchemaString)
@@ -116,7 +117,8 @@ func RunFileJob(job *db.LLMJob) {
 
 	connectInfo, ok := auth.CtxUserInfoMap[fmt.Sprintf("%s:%s", job.Host, job.UserName)]
 	if !ok {
-		llmJob.WriteLogFile(fmt.Sprintf("get connect info error: %v", err), "error")
+		err := fmt.Errorf("get connect info error: %s", job.Host+" "+job.UserName)
+		llmJob.WriteLogFile(err.Error(), "error")
 		llmJob.SetJobFailed(err)
 		return
 	}
@@ -152,7 +154,9 @@ func RunFileJob(job *db.LLMJob) {
 		return
 	}
 	llmJob.Process.Ratio = 0.8
-	gqls, err := llmJob.MakeGQLFile()
+
+	gqlPath := filepath.Join(config.GetConfig().LLM.GQLPath, fmt.Sprintf("%s/%s.ngql", llmJob.LLMJob.JobID, llmJob.LLMJob.File))
+	gqls, err := llmJob.MakeGQLFile(gqlPath)
 	if err != nil {
 		llmJob.WriteLogFile(fmt.Sprintf("make gql file error: %v", err), "error")
 		llmJob.SetJobFailed(err)
@@ -165,13 +169,13 @@ func RunFileJob(job *db.LLMJob) {
 
 	llmJob.RunGQLFile(gqls)
 	llmJob.Process.Ratio = 1
-	llmJob.LLMJob.Status = db.LLMStatusSuccess
+	llmJob.LLMJob.Status = base.LLMStatusSuccess
 }
 
-func (i *ImportJob) SyncProcess() {
+func (i *ImportJob) SyncProcess(job *db.LLMJob) {
 	for {
 		// stop
-		if i.LLMJob.Status != db.LLMStatusRunning {
+		if job.Status != base.LLMStatusRunning {
 			return
 		}
 		jsonStr, err := json.Marshal(i.Process)
@@ -179,13 +183,13 @@ func (i *ImportJob) SyncProcess() {
 			i.WriteLogFile(fmt.Sprintf("marshal process error: %v", err), "error")
 			continue
 		}
-		i.LLMJob.Process = datatypes.JSON(jsonStr)
+		job.Process = datatypes.JSON(jsonStr)
 		time.Sleep(time.Second)
 	}
 }
 
 func (i *ImportJob) SetJobFailed(failedErr any) {
-	i.LLMJob.Status = db.LLMStatusFailed
+	i.LLMJob.Status = base.LLMStatusFailed
 	i.Process.FailedReason = fmt.Sprintf("%v", failedErr)
 }
 
@@ -227,6 +231,8 @@ func (i *ImportJob) ReadFile(filePath string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("open file error: %v", err)
 	}
+	defer file.Close()
+
 	stat, err := file.Stat()
 	if err != nil {
 		return "", fmt.Errorf("get file stat error: %v", err)
@@ -238,7 +244,6 @@ func (i *ImportJob) ReadFile(filePath string) (string, error) {
 		file.Close()
 		return pdf.ReadPDFFile(filePath)
 	}
-	defer file.Close()
 	bytes, err := io.ReadAll(file)
 	if err != nil {
 		return "", fmt.Errorf("read file error: %v", err)
@@ -311,6 +316,11 @@ type Edge struct {
 }
 
 func (i *ImportJob) ParseText(text string) {
+	// remove ```json and ``` in text
+	text = strings.ReplaceAll(text, "```json", "")
+	text = strings.ReplaceAll(text, "```", "")
+	text = strings.ReplaceAll(text, "\n", "")
+
 	jsonObj := LLMResult{}
 	err := json.Unmarshal([]byte(text), &jsonObj)
 	if err != nil {
@@ -400,7 +410,7 @@ func (i *ImportJob) Query(prompt string) (string, error) {
 	return text, nil
 }
 
-func (i *ImportJob) MakeGQLFile() ([]string, error) {
+func (i *ImportJob) MakeGQLFile(filePath string) ([]string, error) {
 	i.WriteLogFile(fmt.Sprintf("start make gql file, nodes length: %d, edges length: %d", len(i.CacheNodes), len(i.CacheEdges)), "info")
 	gqls := make([]string, 0)
 	spaceVIDType := i.Schema.VidType
@@ -490,7 +500,6 @@ func (i *ImportJob) MakeGQLFile() ([]string, error) {
 	}
 
 	gqlStr := strings.Join(gqls, "\n")
-	filePath := filepath.Join(config.GetConfig().LLM.GQLPath, fmt.Sprintf("%s/%s.gql", i.LLMJob.JobID, i.LLMJob.File))
 	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return nil, err
@@ -500,7 +509,7 @@ func (i *ImportJob) MakeGQLFile() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	i.WriteLogFile(fmt.Sprintf("make gql file success, gqls length: %d", len(gqls)), "info")
+	i.WriteLogFile(fmt.Sprintf("make gql file success, path:%s, gqls length: %d", filePath, len(gqls)), "info")
 	return gqls, nil
 }
 
@@ -508,6 +517,9 @@ func (i *ImportJob) RunGQLFile(gqls []string) error {
 	i.WriteLogFile(fmt.Sprintf("start run gql, gqls length: %d", len(gqls)), "info")
 	batchSize := config.GetConfig().LLM.GQLBatchSize
 	for index := 0; index < len(gqls); index += batchSize {
+		if IsRunningJobStopped(i.LLMJob.JobID) {
+			return fmt.Errorf("job stopped")
+		}
 		maxEnd := index + batchSize
 		if maxEnd > len(gqls) {
 			maxEnd = len(gqls)
@@ -527,10 +539,10 @@ func (i *ImportJob) RunGQLFile(gqls []string) error {
 				}
 			}
 			if len(success) > 0 {
-				i.WriteLogFile(fmt.Sprintf("run gql success:\n %v ", success), "info")
+				i.WriteLogFile(fmt.Sprintf("run gql success:\n %s ", strings.Join(success, "\n")), "info")
 			}
 			if len(errors) > 0 {
-				i.WriteLogFile(fmt.Sprintf("run gql error:\n %v ", errors), "error")
+				i.WriteLogFile(fmt.Sprintf("run gql error:\n %s ", strings.Join(errors, "\n")), "error")
 			}
 		}
 	}

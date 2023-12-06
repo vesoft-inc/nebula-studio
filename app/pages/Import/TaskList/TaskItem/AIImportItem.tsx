@@ -60,7 +60,7 @@ const AIImportItem = observer((props: IProps) => {
   const onTaskDelete = () => {
     _delete('/api/llm/import/job/' + llmJob.job_id)().then((res) => {
       if (res.code === 0) {
-        antMsg.success(intl.get('import.deleteSuccess'));
+        antMsg.success(intl.get('common.success'));
         props.onRefresh();
       }
     });
@@ -69,7 +69,7 @@ const AIImportItem = observer((props: IProps) => {
   const onTaskStop = () => {
     post('/api/llm/import/job/cancel')({ jobId: llmJob.job_id }).then((res) => {
       if (res.code === 0) {
-        antMsg.success(intl.get('import.stopImportingSuccess'));
+        antMsg.success(intl.get('common.success'));
         props.onRefresh();
       }
     });
@@ -78,7 +78,7 @@ const AIImportItem = observer((props: IProps) => {
     setRerunLoading(true);
     const res = await post('/api/llm/import/job/rerun')({ jobId: llmJob.job_id });
     if (res.code === 0) {
-      antMsg.success(intl.get('common.rerunSuccess'));
+      antMsg.success(intl.get('common.success'));
       props.onRefresh();
     }
     setRerunLoading(false);
@@ -172,11 +172,13 @@ const AIImportItem = observer((props: IProps) => {
             />
           </div>
           <div className={styles.operations}>
-            <Button className="primaryBtn" onClick={() => onViewLog(props.data)}>
-              <Tooltip title={intl.get('import.viewLogs')}>
-                <Icon type="icon-studio-btn-ddl" />
-              </Tooltip>
-            </Button>
+            {llmJob.status !== ILLMStatus.Pending && (
+              <Button className="primaryBtn" onClick={() => onViewLog(props.data)}>
+                <Tooltip title={intl.get('import.viewLogs')}>
+                  <Icon type="icon-studio-btn-ddl" />
+                </Tooltip>
+              </Button>
+            )}
             {llmJob.status === ILLMStatus.Running && (
               <Popconfirm
                 placement="left"

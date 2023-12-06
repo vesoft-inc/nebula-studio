@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Layout, Spin } from 'antd';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { shouldAlwaysShowWelcome } from '@app/pages/Welcome';

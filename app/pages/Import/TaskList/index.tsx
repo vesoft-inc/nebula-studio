@@ -130,7 +130,7 @@ const TaskList = () => {
               {intl.get('import.uploadTemp')}
             </Button>
           )}
-          {global.appSetting.beta.open && global.appSetting.beta.functions.llmImport.open && (
+          {global.appSetting.beta.open && global.appSetting.beta.functions?.llmImport.open && (
             <Button className="studioAddBtn" onClick={onCreateAIIMport}>
               <Icon className="studioAddBtnIcon" type="icon-studio-btn-add" />
               {intl.get('llm.aiImport')}
