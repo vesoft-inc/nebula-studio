@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/base"
 	"github.com/zeromicro/go-zero/core/logx"
 	"gorm.io/gorm"
 )
@@ -15,7 +16,7 @@ var (
 
 func RunJobs(jobs []*db.LLMJob, JobRunnerMap map[string]func(job *db.LLMJob)) {
 	for _, job := range jobs {
-		job.Status = db.LLMStatusRunning
+		job.Status = base.LLMStatusRunning
 		err := db.CtxDB.Save(job).Error
 		if err != nil {
 			logx.Errorf("failed to update job status: %v", err)
@@ -42,12 +43,12 @@ func IsRunningJobStopped(jobID string) bool {
 	defer mu.Unlock()
 	job, ok := RunningJobMap[jobID]
 	if ok {
-		return job.Status == db.LLMStatusCancel
+		return job.Status == base.LLMStatusCancel
 	}
 	return false
 }
 
-func ChangeRunningJobStatus(jobID string, status db.LLMStatus) {
+func ChangeRunningJobStatus(jobID string, status base.LLMStatus) {
 	mu.Lock()
 	defer mu.Unlock()
 	job, ok := RunningJobMap[jobID]
@@ -68,7 +69,7 @@ func GetRunningJob(jobID string) *db.LLMJob {
 
 func GetPendingJobs() []*db.LLMJob {
 	var jobs []*db.LLMJob
-	err := db.CtxDB.Where("status = ?", db.LLMStatusPending).Find(&jobs).Error
+	err := db.CtxDB.Where("status = ?", base.LLMStatusPending).Find(&jobs).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		logx.Errorf("failed to get pending jobs: %v", err)
 	}

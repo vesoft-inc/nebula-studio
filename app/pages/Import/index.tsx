@@ -7,6 +7,7 @@ import { useI18n } from '@vesoft-inc/i18n';
 import DatasourceList from './DatasourceList';
 import styles from './index.module.less';
 import TaskList from './TaskList';
+import llm from '@app/stores/llm';
 
 const Import = () => {
   const history = useHistory();
@@ -15,6 +16,7 @@ const Import = () => {
   const { intl } = useI18n();
   useEffect(() => {
     trackPageView('/import');
+    llm.fetchConfig();
   }, []);
   useEffect(() => {
     const path = location.pathname;
@@ -27,28 +29,15 @@ const Import = () => {
   return (
     <div className={cls(styles.nebuaImportPage, 'studioCenterLayout')}>
       <div className="studioTabHeader">
-        <Radio.Group
-          className="studioTabGroup"
-          value={tab}
-          buttonStyle="solid"
-          onChange={handleTabChange}
-        >
+        <Radio.Group className="studioTabGroup" value={tab} buttonStyle="solid" onChange={handleTabChange}>
           <Radio.Button value="tasks">{intl.get('import.importData')}</Radio.Button>
           <Radio.Button value="datasources">{intl.get('import.dataSourceManagement')}</Radio.Button>
         </Radio.Group>
       </div>
       <div>
-        <Route
-          path={`/import/datasources`}
-          exact={true}
-          component={DatasourceList}
-        />
+        <Route path={`/import/datasources`} exact={true} component={DatasourceList} />
 
-        <Route
-          path={`/import/tasks`}
-          exact={true}
-          component={TaskList}
-        />
+        <Route path={`/import/tasks`} exact={true} component={TaskList} />
       </div>
     </div>
   );

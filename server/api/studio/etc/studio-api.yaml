@@ -61,5 +61,5 @@ DB:
   MaxIdleConns: 10
 LLM:
   GQLPath: "./data/llm"
-  GQLBatchSize: 1
-  MaxBlockSize: 1
+  GQLBatchSize: 100
+  MaxBlockSize: 0

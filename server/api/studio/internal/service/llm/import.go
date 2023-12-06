@@ -11,6 +11,7 @@ import (
 	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/types"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/base"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/llm"
 	"gorm.io/datatypes"
 )
@@ -35,7 +36,7 @@ func (g *llmService) AddImportJob(req *types.LLMImportRequest) (resp *types.LLMR
 		Space:             req.Space,
 		File:              req.File,
 		JobType:           req.Type,
-		Status:            db.LLMStatusPending,
+		Status:            base.LLMStatusPending,
 		Host:              config.Host,
 		UserName:          config.UserName,
 		PromptTemplate:    req.PromptTemplate,
@@ -95,11 +96,11 @@ func (g *llmService) HandleLLMImportJob(req *types.HandleLLMImportRequest) (resp
 	}
 
 	if req.Action == "cancel" {
-		job.Status = db.LLMStatusCancel
-		llm.ChangeRunningJobStatus(job.JobID, db.LLMStatusCancel)
+		job.Status = base.LLMStatusCancel
+		llm.ChangeRunningJobStatus(job.JobID, base.LLMStatusCancel)
 	}
 	if req.Action == "rerun" {
-		job.Status = db.LLMStatusPending
+		job.Status = base.LLMStatusPending
 		// datatypes.JSON
 		job.Process = datatypes.JSON("{}")
 		//delete log & ngql

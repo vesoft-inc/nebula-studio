@@ -36,7 +36,7 @@ const SchemaConfig = () => {
   const { schema, global } = useStore();
   const { spaces, getSpaces, switchSpace, currentSpace } = schema;
   const { currentLocale } = useI18n();
-  const showViewSchemaBetaFunc = global.appSetting.beta.open && global.appSetting.beta.functions.viewSchema.open;
+  const showViewSchemaBetaFunc = global.appSetting.beta.open && global.appSetting.beta.functions?.viewSchema?.open;
   const spaceInUrl = useMemo(() => {
     const params = new URLSearchParams(location.search);
     return params.get('space');
