@@ -10,7 +10,7 @@ const isIncluded = (a: string, b: string) => {
   return a.toLowerCase().includes(b.toLowerCase());
 };
 
-//TODO modify the content
+// TODO modify the content
 const Doc = [
   {
     title:

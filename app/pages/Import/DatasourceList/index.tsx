@@ -2,10 +2,10 @@ import { observer } from 'mobx-react-lite';
 import { Tabs, TabsProps } from 'antd';
 import { useI18n } from '@vesoft-inc/i18n';
 import { IDatasourceType } from '@app/interfaces/datasource';
+import { useStore } from '@app/stores';
 import LocalFileList from './LocalFileList';
 import RemoteList from './RemoteList';
 import styles from './index.module.less';
-import { useStore } from '@app/stores';
 
 const DatasourceList = () => {
   const { intl } = useI18n();

@@ -61,6 +61,7 @@ func ReadPDFFile(filePath string) (string, error) {
 		regex := regexp.MustCompile(`(\n(\n|\s){1,})|\.{6,}`)
 		text.S = regex.ReplaceAllString(text.S, "\n")
 		text.S = strings.ReplaceAll(text.S, "�", " ")
+		text.S = strings.Trim(text.S, " ")
 		if len(text.S) == 0 || text.S == " " {
 			continue
 		}

@@ -5,10 +5,10 @@ import { useI18n } from '@vesoft-inc/i18n';
 import { useStore } from '@app/stores';
 // import LanguageSelect from '@app/components/LanguageSelect';
 import { trackEvent } from '@app/utils/stat';
-import styles from './index.module.less';
-import LanguageSelect from '../Login/LanguageSelect';
 import { useForm } from 'antd/lib/form/Form';
 import { post } from '@app/utils/http';
+import LanguageSelect from '../Login/LanguageSelect';
+import styles from './index.module.less';
 
 const Setting = observer(() => {
   const { intl } = useI18n();

@@ -13,10 +13,10 @@ import Icon from '@app/components/Icon';
 import Instruction from '@app/components/Instruction';
 import { isEmpty } from '@app/utils/function';
 import { ImportStore } from '@app/stores/import';
+import { IDatasourceType } from '@app/interfaces/datasource';
 import styles from './index.module.less';
 import ConfigConfirmModal from './ConfigConfirmModal';
 import SchemaConfig from './SchemaConfig';
-import { IDatasourceType } from '@app/interfaces/datasource';
 const Option = Select.Option;
 const formItemLayout = {
   wrapperCol: {

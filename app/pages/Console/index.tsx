@@ -9,6 +9,8 @@ import Icon from '@app/components/Icon';
 import MonacoEditor from '@app/components/MonacoEditor';
 import { useI18n } from '@vesoft-inc/i18n';
 import { safeParse } from '@app/utils/function';
+import { SchemaItemOverview } from '@app/stores/console';
+import LLMBot from '../LLMBot';
 import OutputBox from './OutputBox';
 import HistoryBtn from './HistoryBtn';
 import FavoriteBtn from './FavoriteBtn';
@@ -17,8 +19,6 @@ import ExportModal from './ExportModal';
 import SchemaDrawer from './Drawer/SchemaDrawer';
 // import NgqlDrawer from './Drawer/NgqlDrawer';
 import styles from './index.module.less';
-import { SchemaItemOverview } from '@app/stores/console';
-import LLMBot from '../LLMBot';
 
 const Option = Select.Option;
 
@@ -171,7 +171,7 @@ const Console = (props: IProps) => {
           }),
         ];
         return {
-          suggestions: suggestions,
+          suggestions,
           dispose: () => {
             const line = position.lineNumber;
             const column = position.column;
@@ -192,7 +192,7 @@ const Console = (props: IProps) => {
   const onInstanceMount = (instance, monaco) => {
     editor.current = {
       editor: instance,
-      monaco: monaco,
+      monaco,
     };
     instance.addAction({
       id: 'my-unique-id',
@@ -202,7 +202,7 @@ const Console = (props: IProps) => {
       // ],
       contextMenuGroupId: 'myMenu',
       contextMenuOrder: 1.5,
-      run: function () {
+      run() {
         const _editor = editor.current.editor;
         let value = '';
         const selection = _editor.getSelection();

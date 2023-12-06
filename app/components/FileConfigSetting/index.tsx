@@ -66,7 +66,7 @@ const FileConfigSetting = (props: IProps) => {
   const readFile = useCallback(
     debounce(() => {
       const { activeItem, setState } = state;
-      if (!activeItem || !(activeItem.path.indexOf('.csv') > -1)) return;
+      if (!activeItem || !(activeItem.name.indexOf('.csv') > -1)) return;
       setState({ loading: true });
       let content = [];
       if (activeItem.sample !== undefined) {
@@ -230,7 +230,7 @@ const FileConfigSetting = (props: IProps) => {
       key: 'withHeader',
       width: '30%',
       render: (record) =>
-        record.path.indexOf('.csv') > -1 && (
+        record.name.indexOf('.csv') > -1 && (
           <Checkbox checked={record.withHeader} onChange={(e) => updateItem(e, record)}>
             {intl.get('import.hasHeader')}
           </Checkbox>
@@ -253,7 +253,7 @@ const FileConfigSetting = (props: IProps) => {
       key: 'delimiter',
       width: '30%',
       render: (record) =>
-        record.path.indexOf('.csv') > -1 && (
+        record.name.indexOf('.csv') > -1 && (
           <Input value={record.delimiter} placeholder="," onChange={(e) => updateDelimiter(e, record)} />
         ),
     },

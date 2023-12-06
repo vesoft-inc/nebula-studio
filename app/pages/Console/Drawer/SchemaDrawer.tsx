@@ -2,10 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Input, Tree } from 'antd';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
-import styles from './index.module.less';
 import Icon from '@app/components/Icon';
 import { DownOutlined, SearchOutlined } from '@ant-design/icons';
 import { useI18n } from '@vesoft-inc/i18n';
+import styles from './index.module.less';
 
 const isIncluded = (a: string, b: string) => {
   return a.toLowerCase().includes(b.toLowerCase());

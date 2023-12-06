@@ -6,9 +6,9 @@ import { getFileSize } from '@app/utils/file';
 import Icon from '@app/components/Icon';
 import { useI18n } from '@vesoft-inc/i18n';
 import { observer } from 'mobx-react-lite';
-import styles from './index.module.less';
 import { _delete, post } from '@app/utils/http';
 import React from 'react';
+import styles from './index.module.less';
 interface IProps {
   data: ITaskItem;
   onViewLog: (data: ITaskItem) => void;

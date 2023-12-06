@@ -23,7 +23,7 @@ export const ngqlMap = ngqlDoc.reduce((acc, item) => {
   acc[item.title.toLowerCase()] = item;
   return acc;
 });
-//@ts-ignore
+// @ts-ignore
 window.ngqlMap = ngqlMap;
 export const NGQLCategoryString = ngqlDoc
   .filter((item) => item.url.indexOf('ngql-guide') >= 0)

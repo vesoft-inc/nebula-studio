@@ -2,12 +2,12 @@ import { useStore } from '@app/stores';
 import { useI18n } from '@vesoft-inc/i18n';
 import { Button, Form, Input, Modal, Radio, Select, message } from 'antd';
 import { observer } from 'mobx-react-lite';
-import styles from './index.module.less';
 import Icon from '@app/components/Icon';
 import { useEffect, useMemo, useState } from 'react';
 import { llmImportPrompt } from '@app/stores/llm';
 import { getByteLength } from '@app/utils/function';
 import { post } from '@app/utils/http';
+import styles from './index.module.less';
 
 const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
   const { llm, schema, files } = useStore();
@@ -91,7 +91,7 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
           <Icon type="icon-vesoft-numeric-1-circle" />
           {intl.get('llm.setup')}
         </div>
-        <span></span>
+        <span />
         <div>
           <Icon type="icon-vesoft-numeric-2-circle" />
           {intl.get('llm.confirm')}
@@ -103,7 +103,7 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
           {Math.ceil(tokens / 10000)}w
         </div>
       )}
-      <Form form={form} layout="vertical" style={{ display: step == 0 ? 'block' : 'none' }}>
+      <Form form={form} layout="vertical" style={{ display: step === 0 ? 'block' : 'none' }}>
         <Form.Item label={intl.get('llm.file')} required>
           {llm.config.features.includes('aiImportFilePath') && (
             <Form.Item noStyle name="type">
@@ -128,7 +128,7 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
                 }}
               >
                 {fileList.map((item) => (
-                  <Select.Option value={item.name} data={item}>
+                  <Select.Option key={item.name} value={item.name} data={item}>
                     {item.name}
                   </Select.Option>
                 ))}
@@ -143,7 +143,9 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
         <Form.Item label={intl.get('llm.importGraphSpace')} name="space" required>
           <Select onChange={(v) => setSpace(v)}>
             {schema.spaces.map((item) => (
-              <Select.Option value={item}>{item}</Select.Option>
+              <Select.Option key={item} value={item}>
+                {item}
+              </Select.Option>
             ))}
           </Select>
         </Form.Item>
@@ -155,7 +157,7 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
         </Form.Item>
       </Form>
 
-      <Form layout="vertical" style={{ display: step == 1 ? 'block' : 'none' }}>
+      <Form layout="vertical" style={{ display: step === 1 ? 'block' : 'none' }}>
         <Form.Item label={intl.get('llm.file')}>
           <span>{valuse.file}</span>
         </Form.Item>
@@ -165,13 +167,13 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
       </Form>
       <div className={styles.buttonArea}>
         <Button onClick={props.onCancel}>{intl.get('common.cancel')}</Button>
-        {step == 1 && <Button onClick={() => setStep(0)}>{intl.get('llm.previous')}</Button>}
-        {step == 0 && (
+        {step === 1 && <Button onClick={() => setStep(0)}>{intl.get('llm.previous')}</Button>}
+        {step === 0 && (
           <Button onClick={onNext} type="primary">
             {intl.get('llm.next')}
           </Button>
         )}
-        {step == 1 && (
+        {step === 1 && (
           <Button type="primary" onClick={onConfirm}>
             {intl.get('llm.start')}
           </Button>

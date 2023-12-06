@@ -331,7 +331,7 @@ export class NgqlRunner {
         config,
         msgType: 'llm',
       });
-      config['notClear'] = true;
+      config.notClear = true;
 
       this.socket.send(JSON.stringify(messageReceiver.messageSend));
       this.messageReceiverMap.set(messageReceiver.messageSend.header.msgId, messageReceiver);
