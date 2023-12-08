@@ -12,8 +12,10 @@ cd $DIR
 case $3 in
   centos7)
     bash $STUDIO/scripts/pack_CentOS.sh
+    bash $STUDIO/scripts/pack_CentOS_aarch64.sh
     ;;
   ubuntu1604)
     bash $STUDIO/scripts/pack_Ubuntu.sh
+    bash $STUDIO/scripts/pack_Ubuntu_arrch64.sh
     ;;
 esac

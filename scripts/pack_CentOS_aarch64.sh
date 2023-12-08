@@ -21,6 +21,7 @@ cp -r $SERVER/etc $RPM_TARGET/
 cp -r $SERVER/server $RPM_TARGET/
 
 cd $RPM_TARGET
+sed -i 's/x86_64/aarch64/g' CMakeLists.txt
 mkdir -p tmp
 cmake . -B ./tmp
 cd ./tmp
@@ -35,7 +36,7 @@ cp -r $SERVER/etc $TAR_TARGET/
 cp -r $SERVER/server $TAR_TARGET/
 
 cd $DIR
-tar -czf nebula-graph-studio-$VERSION.x86_64.tar.gz nebula-graph-studio
+tar -czf nebula-graph-studio-$VERSION.arrch64.tar.gz nebula-graph-studio
 
 # build docker-compose dir
 cd $DIR

@@ -18,6 +18,7 @@ cp -r $SERVER/etc $PACKAGE/
 cp -r $SERVER/server $PACKAGE/
 
 cd $PACKAGE
+sed -i 's/x86_64/aarch64/g' CMakeLists.txt
 mkdir -p tmp
 cmake . -B ./tmp
 cd ./tmp
