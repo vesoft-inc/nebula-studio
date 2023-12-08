@@ -37,7 +37,7 @@ func FetchWithLLMConfig(config *db.LLMConfig, req map[string]any, callback func(
 	}
 	// Send the HTTP request
 	client := &http.Client{
-		Timeout: 60 * time.Second,
+		Timeout: 180 * time.Second,
 	}
 	resp, err := client.Do(httpReq)
 	if err != nil {
@@ -45,9 +45,6 @@ func FetchWithLLMConfig(config *db.LLMConfig, req map[string]any, callback func(
 	}
 	defer resp.Body.Close()
 	defer client.CloseIdleConnections()
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to send HTTP request: %v,%v", resp.StatusCode, resp.Body)
-	}
 	return transform.HandleResponse(resp, callback)
 }
 

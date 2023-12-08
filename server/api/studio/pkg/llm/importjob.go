@@ -468,7 +468,7 @@ func (i *ImportJob) MakeGQLFile(filePath string) ([]string, error) {
 			if valueStr != "" {
 				valueStr += ","
 			}
-			valueStr += fmt.Sprintf("`%v`", value)
+			valueStr += fmt.Sprintf(`"%v"`, value)
 		}
 
 		gql := fmt.Sprintf("INSERT VERTEX `%s` ({props}) VALUES \"%s\":({value});", typ, name)

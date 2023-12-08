@@ -6,6 +6,8 @@ const urlTransformerMap = {
   GO: 'GOFromVID',
   FIND: 'FindPath',
 };
+
+const extralPaths = ['graph-modeling', 'ngql-guide'];
 export const ngqlDoc = (ngqlJson as { url: string; content: string; title: string }[])
   .map((item) => {
     if (urlTransformerMap[item.title]) {
@@ -26,6 +28,6 @@ export const ngqlMap = ngqlDoc.reduce((acc, item) => {
 // @ts-ignore
 window.ngqlMap = ngqlMap;
 export const NGQLCategoryString = ngqlDoc
-  .filter((item) => item.url.indexOf('ngql-guide') >= 0)
+  .filter((item) => extralPaths.some((path) => item.url.indexOf(path) !== -1))
   .map((item) => item.title)
   .join(',');

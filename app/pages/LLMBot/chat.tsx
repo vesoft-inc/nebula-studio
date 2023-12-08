@@ -20,8 +20,7 @@ function Chat() {
     if (currentInput === '') return;
     setPending(true);
     // just use last 5 message
-    const beforeMessages =
-      rootStore.llm.mode === 'text2cypher' ? [] : [...messages.slice(messages.length - 5, messages.length)];
+    const beforeMessages = [...messages.slice(messages.length - 5, messages.length)];
     const newMessages = [
       ...messages,
       { role: 'user', content: currentInput },
@@ -31,63 +30,55 @@ function Chat() {
       currentInput: '',
     });
     setMessages(newMessages);
-    const systemPrompt = await rootStore.llm.getDocPrompt(currentInput);
+    const callback = (res) => {
+      if (res.message.done) {
+        newMessages[newMessages.length - 1].status = 'done';
+        setPending(false);
+        return;
+      }
+      try {
+        let text = '';
+        // special for qwen api, qwen api will return a hole message
+        if (llm.config.apiType === 'qwen') {
+          text = res.message.output.choices[0].message.content || '';
+          newMessages[newMessages.length - 1].content = text;
+          if (res.message.output.choices[0].finish_reason === 'stop') {
+            newMessages[newMessages.length - 1].status = 'done';
+            setPending(false);
+            return;
+          }
+        } else {
+          if (res.message.choices[0].message === 'stop') {
+            newMessages[newMessages.length - 1].status = 'done';
+            setPending(false);
+            return;
+          }
+          text = res.message.choices[0].delta?.content || '';
+          newMessages[newMessages.length - 1].content += text;
+        }
+        setMessages([...newMessages]);
+      } catch (e) {
+        setPending(false);
+      }
+    };
     const sendMessages = [
-      {
-        role: 'system',
-        content: 'You are a helpful NebulaGraph database assistant to help user.',
-      },
       // slice 100 char
       ...beforeMessages.map((item) => ({
         role: item.role,
         content: item.content.trim().slice(-100),
       })),
-      {
-        role: 'user',
-        content:
-          (/[\u4e00-\u9fa5]/.test(currentInput) ? '请使用中文' : 'Please use English') +
-          'you need use markdown to reply short and clearly. add ``` as markdown code block to write the ngql.one ngql need be one line ' +
-          systemPrompt,
-      },
     ];
+    const systemPrompt = await rootStore.llm.getDocPrompt(currentInput);
+    sendMessages.push({ role: 'user', content: systemPrompt });
     console.log(sendMessages);
+
     ws.runChat({
       req: {
         stream: true,
-        temperature: 0.2,
+        temperature: 0.7,
         messages: sendMessages,
       },
-      callback: (res) => {
-        if (res.message.done) {
-          newMessages[newMessages.length - 1].status = 'done';
-          setPending(false);
-          return;
-        }
-        try {
-          let text = '';
-          // special for qwen api, qwen api will return a hole message
-          if (llm.config.apiType === 'qwen') {
-            text = res.message.output.choices[0].message.content || '';
-            newMessages[newMessages.length - 1].content = text;
-            if (res.message.output.choices[0].finish_reason === 'stop') {
-              newMessages[newMessages.length - 1].status = 'done';
-              setPending(false);
-              return;
-            }
-          } else {
-            if (res.message.choices[0].message === 'stop') {
-              newMessages[newMessages.length - 1].status = 'done';
-              setPending(false);
-              return;
-            }
-            text = res.message.choices[0].delta?.content || '';
-            newMessages[newMessages.length - 1].content += text;
-          }
-          setMessages([...newMessages]);
-        } catch (e) {
-          setPending(false);
-        }
-      },
+      callback,
     });
   }, 200);
 

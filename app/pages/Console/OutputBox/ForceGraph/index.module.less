@@ -1,7 +1,9 @@
 @import '@app/common.less';
+
 .forceGraphCanvas {
   height: 100%;
 }
+
 .forceGraph {
   position: relative;
   width: 100%;
@@ -9,6 +11,7 @@
   flex: auto;
   overflow: hidden;
 }
+
 .graphLoading {
   position: absolute;
   top: 50%;
@@ -19,6 +22,7 @@
   position: absolute;
   right: 20px;
   bottom: 20px;
+
   :global {
     .anticon {
       width: 38px;
@@ -30,9 +34,11 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+
       svg {
         color: @darkBlue;
       }
+
       &:not(:last-child) {
         margin-right: 8px;
       }
