@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 
@@ -82,7 +81,6 @@ func (o *Qwen) HandleResponse(resp *http.Response, callback func(str string)) (m
 
 	// Read body text
 	bodyBytes, err := io.ReadAll(resp.Body)
-	log.Print("bodyBytes: ", string(bodyBytes))
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response body: %s %v", string(bodyBytes), err)
 	}
