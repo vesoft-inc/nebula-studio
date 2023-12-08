@@ -17,6 +17,7 @@ interface IProps {
   spaceVidType: string;
   space: string;
   onGraphInit: (graph: GraphStore) => void;
+  style?: React.CSSProperties;
 }
 const ForceGraphBox = (props: IProps) => {
   const [uuid] = useState(uuidv4());
@@ -53,7 +54,7 @@ const ForceGraphBox = (props: IProps) => {
   const { nodes, links, nodesSelected, linksSelected } = currentGraph || {};
   const selected = nodesSelected && (nodesSelected.size > 0 || linksSelected.size > 0);
   return (
-    <div className={styles.forceGraphCanvas}>
+    <div className={styles.forceGraphCanvas} style={props.style}>
       {loading && <Spin className={styles.graphLoading} />}
       <div id={uuid} className={styles.forceGraph} ref={grapfDomRef} />
       {currentGraph && (

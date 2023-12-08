@@ -51,6 +51,7 @@
 
       > :global(span.anticon) {
         cursor: pointer;
+
         svg {
           color: @darkBlue;
           width: 22px;
@@ -84,7 +85,7 @@
     overflow: auto;
 
     .outputTab {
-      height: 100%;
+      height: 300px;
 
       &> :global(.ant-tabs-nav) {
         width: 80px;
@@ -130,10 +131,11 @@
         position: relative;
         background-color: #fff;
         overflow: auto;
-        
+
         :global {
           .ant-tabs-content {
             height: 100%;
+
             .ant-table,
             .ant-pagination {
               margin: 20px;
@@ -184,12 +186,10 @@
     .btns {
       display: flex;
       align-items: center;
-      padding-right: 24px;
 
       svg {
         width: 24px;
         height: 24px;
-        margin-right: 16px;
       }
 
       button:not(:last-child) {
@@ -226,5 +226,19 @@
     &[disabled] {
       color: rgba(0, 0, 0, 0.25);
     }
+  }
+}
+
+.fullscreen {
+  position: fixed;
+  z-index: 888;
+  width: 100vw;
+  height: calc(100vh - 60px);
+  left: 0;
+  top: 60px;
+  margin: 0;
+
+  .tabContainer .outputTab {
+    height: 100%;
   }
 }

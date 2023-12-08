@@ -27,12 +27,12 @@ diff
 > RETURN p.person.name;
 Question:{query_str}
 `;
-export const llmImportPrompt = `As a knowledge graph AI importer, your task is to extract relationship data from the following text:
+export const llmImportPrompt = `As a knowledge graph AI importer, your task is to extract useful data from the following text:
 ----text
 {text}
 ----
 
-Please proceed according to the schema of the knowledge graph:
+the knowledge graph has following schema and node name must be a real :
 ----graph schema
 {spaceSchema}
 ----
@@ -42,30 +42,26 @@ Return the results directly, without explain and comment. The results should be 
   "nodes":[{ "name":string,"type":string,"props":object }],
   "edges":[{ "src":string,"dst":string,"edgeType":string,"props":object }]
 }
+The name of the nodes should be an actual object and a noun.
 Result:
 `;
-export const llmImportTask = `please excute the task below,and return the result,dont' explain,just return the result directly.
-{
-  "task": "extract relationships",
-  "instructions": {
-    "text": "{text}",
-    "graphSchema": "{spaceSchema}",
-    "format": {
-      "nodes": [{
-        "name": "",
-        "type": "",
-        "props": {}
-      }],
-      "edges": [{
-        "src": "",
-        "dst": "",
-        "type": "",
-        "props": "{props}"
-      }]
-    }
-  }
-}
-reuslt:`;
+export const AgentTask = `Assume you are a NebulaGraph AI chat asistant. You need to help the user to write NGQL or solve other question. 
+You have access to the following information:
+1. The user's console NGQL context is: {current_ngql}
+2. The user's current graph space is: {space_name}
+3. Your last memory is: {memory}
+4. The user's question is: {query_str}
+
+You can use command to get extra information which will be added to your memory for answering the next question. then you can use the memory to solve the question.
+You can just use the following command:
+\\get-doc-categories: Retrieve the list of the NebulaGraph document categories.
+\\get-doc category_name: Obtain the document via category name.
+\\run-ngql ngql_command: Execute NGQL.
+\\get-schema: Retrieve the schema of the user's current graph space.
+\\finish result: Complete the task and return the result in the language of the user's question to reply to the user.if you reply ngql,you need wrap it with \`\`\`ngql
+
+Command:
+`;
 
 export interface LLMConfig {
   url: string;
@@ -123,7 +119,7 @@ class LLM {
 
   async getSpaceSchema(space: string) {
     let finalPrompt: any = {
-      spaceName: space,
+      currentUsedSpaceName: space,
     };
     if (this.config.features.includes('spaceSchema')) {
       await schema.switchSpace(space);
@@ -163,6 +159,96 @@ class LLM {
     return JSON.stringify(finalPrompt);
   }
 
+  async getAgentPrompt(query_str: string, historyMessages: any, callback: (res: any) => void) {
+    //      {current_ngql}
+    // 2. The user's current graph space is: {space_name}
+    // 3. Your last memory is: {memory}
+    // 4. The user's question is: {query_str}
+    let memory = '';
+    const finish = async (text: string) => {
+      if (text.indexOf('\\finish') > -1) {
+        return;
+      }
+      memory = '';
+      const command = text.match(/\\([\w|-]+)(\s+([\s\S]*))?/);
+      if (command) {
+        const [, cmd, , args] = command;
+        switch (cmd) {
+          case 'get-doc-categories':
+            memory += `(get-doc-categories: ${ngqlDoc.NGQLCategoryString})\n`;
+            break;
+          case 'get-doc':
+            memory += `(get-doc : ${ngqlDoc.ngqlMap[args.toLowerCase()]?.content || 'no doc'})\n`;
+            break;
+          case 'run-ngql':
+            // eslint-disable-next-line no-case-declarations
+            const res = (await ws.runNgql({ gql: args, space: rootStore.console.currentSpace })) as any;
+            memory += `(run-ngql :${JSON.stringify(res?.data?.tables)})\n`;
+            break;
+          case 'get-schema':
+            // eslint-disable-next-line no-case-declarations
+            const schema = await this.getSpaceSchema(rootStore.console.currentSpace);
+            memory += `(get-schema: ${schema})\n`;
+            break;
+          default:
+            return;
+        }
+        run();
+      }
+    };
+    const run = async () => {
+      let prompt = AgentTask;
+      let message = '';
+      prompt = prompt.replace('{current_ngql}', rootStore.console.currentGQL);
+      prompt = prompt.replace('{space_name}', rootStore.console.currentSpace);
+      prompt = prompt.replace('{memory}', memory || 'empty');
+      prompt = prompt.replace('{query_str}', query_str);
+      console.log(prompt);
+      await ws.runChat({
+        req: {
+          temperature: 0.5,
+          stream: true,
+          max_tokens: 20,
+
+          messages: [
+            ...historyMessages,
+            {
+              role: 'user',
+              content: prompt,
+            },
+          ],
+        },
+        callback: (res) => {
+          if ((message.length && message.indexOf('\\') !== 0) || message.indexOf('\\finish') > -1) {
+            return callback(res);
+          }
+          if (res.message.done) {
+            finish(message);
+            return;
+          }
+          let text = '';
+          // special for qwen api, qwen api will return a hole message
+          if (this.config.apiType === 'qwen') {
+            text = res.message.output.choices[0].message.content || '';
+            if (res.message.output.choices[0].finish_reason === 'stop') {
+              finish(message);
+              return;
+            }
+            message = text;
+          } else {
+            if (res.message.choices?.[0].message === 'stop') {
+              finish(message);
+              return;
+            }
+            text = res.message.choices[0].delta?.content || '';
+            message += text;
+          }
+        },
+      });
+    };
+    run();
+  }
+
   async getDocPrompt(text: string) {
     let prompt = matchPrompt; // default use text2cypher
     if (this.mode !== 'text2cypher') {
@@ -175,7 +261,11 @@ class LLM {
           messages: [
             {
               role: 'user',
-              content: `From the following graph database book categories: "${ngqlDoc.NGQLCategoryString}" find top two useful categories to solve the question:"${text}",don't explain,just return the two combined categories, separated by ',' is:`,
+              content: `Assume your are doc finder,from the following graph database book categories:
+               "${ngqlDoc.NGQLCategoryString}"
+              find top two useful categories to solve the question:"${text}",
+              don't explain, if you can't find, return "Sorry".
+              just return the two combined categories, separated by ',' is:`,
             },
           ],
         },
@@ -208,6 +298,11 @@ class LLM {
       }
     }
     prompt = prompt.replace('{query_str}', text);
+    prompt = `you need use markdown to reply short and clearly. 
+    add \`\`\` for markdown code block to write the ngql.
+    one ngql need be one line. use user question language to reply.
+    ${prompt}`;
+
     const pathname = window.location.pathname;
     const space = pathname.indexOf('schema') > -1 ? rootStore.schema.currentSpace : rootStore.console.currentSpace;
     if (!space) {

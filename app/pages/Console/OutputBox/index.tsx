@@ -1,6 +1,6 @@
 import { Button, Table, Tabs, Tooltip, Popover } from 'antd';
 import { BigNumber } from 'bignumber.js';
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { trackEvent } from '@app/utils/stat';
@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Icon from '@app/components/Icon';
 import { parseSubGraph } from '@app/utils/parseData';
 import cls from 'classnames';
+import domtoimage from 'dom-to-image';
 import { GraphStore } from '@app/stores/graph';
 import { useI18n } from '@vesoft-inc/i18n';
 import type { HistoryResult } from '@app/stores/console';
@@ -31,6 +32,7 @@ const OutputBox = (props: IProps) => {
   const { console } = useStore();
   const { intl } = useI18n();
   const [visible, setVisible] = useState(true);
+  const nowOutputRef = useRef<HTMLDivElement>(null);
   const { results, update, favorites, saveFavorite, deleteFavorite, getFavoriteList, updateResultsStorage } = console;
   const { code, data, message, gql, space, spaceVidType } = result;
   const [columns, setColumns] = useState<any>([]);
@@ -39,6 +41,7 @@ const OutputBox = (props: IProps) => {
   const [showGraph, setShowGraph] = useState(false);
   const [graph, setGraph] = useState<GraphStore | null>(null);
   const [tab, setTab] = useState('');
+  const [fullscreen, setFullscreen] = useState(false);
 
   const initData = useCallback(() => {
     let _columns = [] as any;
@@ -162,8 +165,8 @@ const OutputBox = (props: IProps) => {
     link.click();
   };
 
-  const downloadPng = () => {
-    if (graph) {
+  const downloadPng = async () => {
+    if (graph && tab === 'graph') {
       let canvas = graph.twoGraph.canvas;
       const shadowCanvas = document.createElement('canvas');
       shadowCanvas.width = canvas.width;
@@ -183,7 +186,16 @@ const OutputBox = (props: IProps) => {
           window.URL.revokeObjectURL(url);
         });
       }, 0);
+    } else {
+      // use canvg to convert svg to canvas
+      const svg = nowOutputRef.current?.querySelector('.ve-editor');
+      const url = await domtoimage.toPng(svg, { bgcolor: '#ddd' });
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'explain-graph.png';
+      a.click();
     }
+
     trackEvent('console', 'export_graph_png');
   };
 
@@ -262,7 +274,12 @@ const OutputBox = (props: IProps) => {
               {intl.get('console.planTree')}
             </>
           ),
-          children: <Explain style={{ height: 600 }} data={dataSource.map((item) => convertExplainData(item))} />,
+          children: (
+            <Explain
+              style={{ height: fullscreen ? window.innerHeight - 190 : 300 }}
+              data={dataSource.map((item) => convertExplainData(item))}
+            />
+          ),
         },
 
       resultSuccess &&
@@ -274,7 +291,12 @@ const OutputBox = (props: IProps) => {
               {intl.get('console.planTree')}
             </>
           ),
-          children: <Explain style={{ height: 600 }} data={dataSource.map((item) => convertExplainData(item))} />,
+          children: (
+            <Explain
+              style={{ height: fullscreen ? window.innerHeight - 190 : 300 }}
+              data={dataSource.map((item) => convertExplainData(item))}
+            />
+          ),
         },
       showGraph && {
         key: 'graph',
@@ -284,7 +306,17 @@ const OutputBox = (props: IProps) => {
             {intl.get('common.graph')}
           </>
         ),
-        children: <ForceGraph space={space} data={dataSource} spaceVidType={spaceVidType} onGraphInit={setGraph} />,
+        children: (
+          <ForceGraph
+            style={{
+              height: fullscreen ? window.innerHeight - 190 : 300,
+            }}
+            space={space}
+            data={dataSource}
+            spaceVidType={spaceVidType}
+            onGraphInit={setGraph}
+          />
+        ),
       },
       !resultSuccess && {
         key: 'log',
@@ -297,9 +329,12 @@ const OutputBox = (props: IProps) => {
         children: <div className={styles.errContainer}>{message}</div>,
       },
     ].filter(Boolean);
-  }, [gql, data, dataSource, columns]);
+  }, [gql, data, dataSource, columns, fullscreen]);
+  const onFullScreen = () => {
+    setFullscreen(!fullscreen);
+  };
   return (
-    <div className={styles.outputBox}>
+    <div className={styles.outputBox + ` ${fullscreen ? `${styles.fullscreen}` : ''}`} ref={nowOutputRef}>
       <div className={styles.outputHeader}>
         <p
           className={cls(styles.gql, { [styles.errorInfo]: !resultSuccess })}
@@ -328,12 +363,7 @@ const OutputBox = (props: IProps) => {
                 <Button type="link" className={styles.downloadItem} onClick={downloadCsv}>
                   {intl.get('schema.csvDownload')}
                 </Button>
-                <Button
-                  disabled={!graph || tab !== 'graph'}
-                  type="link"
-                  className={styles.downloadItem}
-                  onClick={downloadPng}
-                >
+                <Button disabled={tab === 'table'} type="link" className={styles.downloadItem} onClick={downloadPng}>
                   {intl.get('schema.pngDownload')}
                 </Button>
               </>
@@ -357,18 +387,24 @@ const OutputBox = (props: IProps) => {
               items={items}
             />
           </div>
-          {resultSuccess && data.timeCost !== undefined && (
-            <div className={styles.outputFooter} onClick={handleRemoveMenu}>
-              <span>{`${intl.get('console.execTime')} ${data.timeCost / 1000000} (s)`}</span>
-              <div className={styles.btns}>
-                {onExplorer && !!space && (
-                  <Button className="primaryBtn" type="text" onClick={handleExplore}>
-                    {intl.get('common.openInExplore')}
-                  </Button>
-                )}
-              </div>
+          <div className={styles.outputFooter} onClick={handleRemoveMenu}>
+            <span>
+              {resultSuccess &&
+                data.timeCost !== undefined &&
+                `${intl.get('console.execTime')} ${data.timeCost / 1000000} (s)`}
+            </span>
+            <div className={styles.btns}>
+              {onExplorer && !!space && (
+                <Button className="primaryBtn" type="text" onClick={handleExplore}>
+                  {intl.get('common.openInExplore')}
+                </Button>
+              )}
+              <Icon
+                type={fullscreen ? 'icon-vesoft-arrow-collapse-all' : 'icon-vesoft-arrow-expand-all'}
+                onClick={onFullScreen}
+              />
             </div>
-          )}
+          </div>
         </>
       )}
     </div>

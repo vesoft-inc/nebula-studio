@@ -1,47 +1,57 @@
 @import '@app/common.less';
+
 .nebulaConsole {
   display: flex;
   position: relative;
   height: calc(100vh - 60px);
   overflow: auto;
   width: 100%;
-  &::-webkit-scrollbar{
+
+  &::-webkit-scrollbar {
     display: none;
   }
+
   .resultContainer {
     overflow: auto;
     margin-bottom: 30px;
     flex: 1 1 auto;
   }
-  
+
   .consoleContainer {
     overflow-x: hidden;
     overflow-y: auto;
-    flex: 1 1 auto; 
-    width: auto; 
+    flex: 1 1 auto;
+    width: auto;
     border-left: 1px solid #D4D4D8;
     border-right: 1px solid #D4D4D8;
     // display: flex;
     // flex-direction: column;
   }
+
   .spaceSelect {
     display: flex;
     align-items: center;
+
     :global {
       .ant-select {
         width: 306px;
+
         .ant-select-selector {
           border-radius: 3px;
         }
+
         .ant-select-selection-item {
           color: @darkBlue;
         }
+
         .ant-select-arrow {
           color: @darkBlue;
         }
       }
+
       .studioIconInstruction {
         margin-left: 15px;
+
         svg {
           width: 22px;
           height: 22px;
@@ -50,6 +60,7 @@
       }
     }
   }
+
   .consolePanel {
     background: #FFFFFF;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
@@ -59,36 +70,44 @@
     z-index: 10;
     overflow: auto;
     height: auto;
+
     .panelHeader {
       margin-bottom: 15px;
+
       .title {
         font-family: Roboto-Regular, sans-serif;
         font-weight: 500;
         font-size: 18px;
         color: @lightBlack;
       }
+
       .operations {
         margin-top: 10px;
         display: flex;
         align-items: center;
         justify-content: space-between;
       }
+
       .btnOperations {
         display: flex;
         align-items: center;
+
         .btnOperations {
           margin: 0 16px;
+
           svg {
             width: 24px;
             height: 24px;
             color: @darkBlue;
           }
         }
+
         :global(.ant-btn) {
           margin-left: 10px;
         }
       }
     }
+
     .codeInput {
       position: relative;
       border: 1px solid @gray;
@@ -96,6 +115,7 @@
       min-height: 120px;
       resize: vertical;
       overflow-y: hidden;
+
       .btnOpenParam {
         display: flex;
         align-items: center;
@@ -111,10 +131,12 @@
         border-top: none;
         cursor: pointer;
         opacity: 0.7;
+
         svg {
           color: @darkBlue;
         }
       }
+
       .paramContainer {
         min-height: 44px;
         padding: 0 10px;
@@ -122,8 +144,10 @@
         align-items: center;
         justify-content: space-between;
         border-bottom: 1px solid @gray;
+
         .paramBox {
           padding-top: 8px;
+
           .paramItem {
             display: inline-flex;
             align-items: center;
@@ -139,11 +163,13 @@
             margin-bottom: 8px;
           }
         }
+
         .btnCloseBox {
           cursor: pointer;
           color: @darkBlue;
           flex-shrink: 0;
           margin-right: 10px;
+
           svg {
             color: @darkBlue;
             margin-right: 10px;
@@ -158,6 +184,7 @@
   .selectType {
     display: inline-flex;
   }
+
   :global(.ant-modal-body) {
     text-align: center;
   }
@@ -169,10 +196,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     .type {
       color: @darkGray;
       font-size: 12px;
     }
+
     .value {
       font-family: Roboto-Bold, sans-serif;
       max-width: 50%;
@@ -182,36 +211,44 @@
   }
 }
 
-.historyList, .favoriteList {
-	height: 80%;
-	overflow: hidden;
-	position: relative;
+.historyList,
+.favoriteList {
+  height: 80%;
+  overflow: hidden;
+  position: relative;
+
   .tips {
     border-radius: 11px;
     background: #D4EBFF;
     padding: 10px 20px;
     margin-bottom: 10px;
+
     .tipContent {
       color: #0D8BFF;
     }
   }
+
   &:global(.ant-modal .ant-modal-content) {
     position: relative;
     height: 100%;
     overflow: auto;
+
     :global {
       .ant-modal-header {
         border-bottom: none;
       }
+
       .ant-modal-body {
         padding-top: 0px;
       }
+
       .ant-modal-title {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding-right: 20px;
       }
+
       .ant-modal-close {
         top: 22px;
       }
@@ -255,20 +292,22 @@
   display: block;
   cursor: pointer;
   padding: 0 5px;
+
   &:hover {
     background: @lightBlue;
   }
 }
 
 @keyframes panelOut {
-  0%{
+  0% {
     left: 0px;
     opacity: 0;
     width: 0;
   }
-  100%{
+
+  100% {
     left: 0;
-    opacity: 1; 
+    opacity: 1;
     width: 280px;
   }
 }
@@ -281,6 +320,7 @@
   border-left: 1px solid #E0E0E0;
   animation: panelOut 400ms;
   animation-fill-mode: forwards;
+
   // flex: 0 0 auto;
   .header {
     display: flex;
@@ -289,23 +329,28 @@
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #D4D4D8;
+
     .label {
       display: flex;
       align-items: flex-end;
       font-size: 16px;
       font-style: normal;
       font-weight: 600;
-      & > span:not(:last-child) {
+
+      &>span:not(:last-child) {
         margin-right: 5px;
       }
     }
   }
+
   .content {
     overflow: auto;
-    &::-webkit-scrollbar{
+
+    &::-webkit-scrollbar {
       display: none;
     }
   }
+
   .footer {
     display: flex;
     padding: 10px;
@@ -314,18 +359,22 @@
     gap: 10px;
     align-self: stretch;
   }
+
   :global {
     .ant-tree-treenode {
       padding: 12px 10px;
       border-bottom: 1px solid #E4E4E7;
     }
+
     .ant-tree-node-content-wrapper {
       display: flex;
       align-items: center;
+
       &:hover {
         background-color: #fff;
       }
     }
+
     .ant-tree-title {
       text-overflow: ellipsis;
       overflow: hidden;
@@ -336,10 +385,12 @@
       text-align: left;
       word-break: break-all;
     }
+
     .ant-tree-switcher-noop {
       display: none;
     }
   }
+
   .fieldTypeTag {
     margin-left: 5px;
     padding: 2px 10px;
@@ -347,13 +398,14 @@
     background-color: #8383831A;
     color: #0961B3;
   }
-  .treeNodeIcon > svg{
+
+  .treeNodeIcon>svg {
     width: 28px;
     height: 28px;
   }
 }
 
-.toggleBtn > svg {
+.toggleBtn>svg {
   width: 24px;
   height: 24px;
   cursor: pointer;
@@ -361,7 +413,8 @@
 
 .closeBtn {
   cursor: pointer;
-  & > svg {
+
+  &>svg {
     width: 24px;
     height: 24px;
   }
