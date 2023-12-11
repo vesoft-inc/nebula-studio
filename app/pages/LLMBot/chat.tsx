@@ -97,7 +97,7 @@ function Chat() {
         </div>
       );
     }
-    const gqls = message.content.split(/```([^`]+)```/);
+    const gqls = message.content.split(/```\w*\n([^`]+)```/);
     return gqls.map((item, index) => {
       if (index % 2 === 0) {
         return <p key={index}>{item}</p>;
