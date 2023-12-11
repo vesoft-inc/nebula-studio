@@ -45,8 +45,13 @@ const ForceGraphBox = (props: IProps) => {
 
   useEffect(() => {
     init();
+    const resizeObserver = new ResizeObserver(() => {
+      graphs[uuid].resize();
+    });
+    resizeObserver.observe(grapfDomRef.current);
     return () => {
       clearGraph(uuid);
+      resizeObserver.disconnect();
     };
   }, []);
 

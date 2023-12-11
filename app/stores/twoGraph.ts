@@ -84,7 +84,7 @@ class TwoGraph {
     Graph.d3Force('x', forceX().strength(0.0085));
     Graph.d3Force('y', forceY().strength(0.0085));
     Graph.d3Force('charge')!.strength(-100);
-    Graph.width(rect.width).height(700);
+    Graph.width(rect.width).height(rect.height);
     Graph.onZoom((v) => {
       this.setTransform(v);
       graph.setPointer({

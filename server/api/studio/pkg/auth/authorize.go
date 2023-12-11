@@ -29,7 +29,7 @@ type (
 		Port     int    `json:"port"`
 		Username string `json:"username"`
 		Password string `json:"password"`
-		NSID     string `json:"nsid"`
+		NSID     string `json:"nsid,optional"`
 	}
 
 	authClaims struct {

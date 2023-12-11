@@ -5,9 +5,10 @@ const urlTransformerMap = {
   MATCH: 'MatchOrCypherOrPatternOrScan',
   GO: 'GOFromVID',
   FIND: 'FindPath',
+  'Schema-related functions': 'type_src_dst_rank_edge-functions',
 };
 
-const extralPaths = ['graph-modeling', 'ngql-guide'];
+const extralPaths = ['graph-modeling', 'ngql-guide', 'use-importer'];
 export const ngqlDoc = (ngqlJson as { url: string; content: string; title: string }[])
   .map((item) => {
     if (urlTransformerMap[item.title]) {
