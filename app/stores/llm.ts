@@ -45,6 +45,27 @@ Return the results directly, without explain and comment. The results should be 
 The name of the nodes should be an actual object and a noun.
 Result:
 `;
+
+export const docFinderPrompt = `Assume your are doc finder,from the following graph database book categories:
+"{category_string}"
+user current space is: {space_name}
+find top two useful categories to solve the question:"{query_str}",
+don't explain, if you can't find, return "Sorry".
+just return the two combined categories, separated by ',' is:`;
+
+export const text2queryPrompt = `Assume you are a NebulaGraph AI chat asistant to help user write NGQL.
+You have access to the following information:
+the user space schema is:
+----
+{schema}
+ ----
+the doc is: \n
+----
+{doc}
+----
+you need use markdown to reply short and clearly.  add \`\`\` for markdown code block to write the ngql. one ngql need be one line.
+please use user's language to answer the question: {query_str}`;
+
 export const AgentTask = `Assume you are a NebulaGraph AI chat asistant. You need to help the user to write NGQL or solve other question. 
 You have access to the following information:
 1. The user's console NGQL context is: {current_ngql}
@@ -261,11 +282,10 @@ class LLM {
           messages: [
             {
               role: 'user',
-              content: `Assume your are doc finder,from the following graph database book categories:
-               "${ngqlDoc.NGQLCategoryString}"
-              find top two useful categories to solve the question:"${text}",
-              don't explain, if you can't find, return "Sorry".
-              just return the two combined categories, separated by ',' is:`,
+              content: docFinderPrompt
+                .replace('{category_string}', ngqlDoc.NGQLCategoryString)
+                .replace('{query_str}', text)
+                .replace('{space_name}', rootStore.console.currentSpace),
             },
           ],
         },
@@ -289,19 +309,12 @@ class LLM {
           doc = doc.replaceAll(/\n\n+/g, '');
           if (doc.length) {
             console.log('docString:', doc);
-            prompt = `learn the below doc, and use it to help user ,the user space schema is "{schema}" the doc is: \n${doc.slice(
-              0,
-              this.config.maxContextLength,
-            )} the question is "{query_str}"`;
+            prompt = text2queryPrompt.replace('{doc}', doc.slice(0, this.config.maxContextLength));
           }
         }
       }
     }
     prompt = prompt.replace('{query_str}', text);
-    prompt = `you need use markdown to reply short and clearly. 
-    add \`\`\` for markdown code block to write the ngql.
-    one ngql need be one line. use user question language to reply.
-    ${prompt}`;
 
     const pathname = window.location.pathname;
     const space = pathname.indexOf('schema') > -1 ? rootStore.schema.currentSpace : rootStore.console.currentSpace;

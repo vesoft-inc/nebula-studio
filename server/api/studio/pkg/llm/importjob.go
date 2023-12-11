@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -45,9 +46,9 @@ type ImportJob struct {
 	CacheNodes map[string]Node
 	CacheEdges map[string]map[string]Edge
 	Prompt     string
-	LLMJob     *db.LLMJob
-	LLMConfig  *db.LLMConfig
-	AuthData   *auth.AuthData
+	LLMJob     *db.LLMJob     `json:"llmJob"`
+	LLMConfig  *db.LLMConfig  `json:"llmConfig"`
+	AuthData   *auth.AuthData `json:"authData"`
 	NSID       string
 	Process    *base.Process
 	logFile    *os.File
@@ -220,6 +221,7 @@ func (i *ImportJob) WriteLogFile(str string, typ string) {
 	if i.logFile != nil {
 		i.logFile.WriteString(fmt.Sprintf("%s[%s] %s\n", time.Now().Format("2006-01-02 15:04:05"), typ, str))
 	}
+	log.Println(fmt.Sprintf("[%s]", typ), str)
 }
 
 func (i *ImportJob) ReadFile(filePath string) (string, error) {
@@ -282,6 +284,11 @@ func (i *ImportJob) ParseSchema(text string) error {
 		return err
 	}
 	i.Schema = schema
+	return i.GetSchemaMap()
+}
+
+func (i *ImportJob) GetSchemaMap() error {
+	schema := i.Schema
 	i.SchemaMap = make(map[string]map[string]Field)
 	nodeSchemaString := ""
 	edgeSchemaString := ""
@@ -404,7 +411,7 @@ func (i *ImportJob) Query(prompt string) (string, error) {
 		"role":    "user",
 		"content": prompt,
 	})
-	res, err := Fetch(i.AuthData, map[string]any{
+	res, err := FetchWithLLMConfig(i.LLMConfig, map[string]any{
 		"stream":     false,
 		"messages":   messages,
 		"max_tokens": i.LLMConfig.ContextLengthLimit,
@@ -555,5 +562,101 @@ func (i *ImportJob) RunGQLFile(gqls []string) error {
 			}
 		}
 	}
+	return nil
+}
+
+func (i *ImportJob) MakeSchema() error {
+	schema := Schema{
+		Space: i.LLMJob.Space,
+	}
+	gql := fmt.Sprintf("DESCRIBE SPACE `%s`", i.LLMJob.Space)
+	spaceInfo, err := client.Execute(i.NSID, i.LLMJob.Space, []string{gql})
+	if err != nil {
+		return err
+	}
+	result := spaceInfo[0]
+	if result.Error != nil {
+		return result.Error
+	}
+	row, ok := result.Result.Tables[0]["Vid Type"]
+	if !ok {
+		return fmt.Errorf("get space vid type error")
+	}
+	schema.VidType = row.(string)
+
+	gql = ("SHOW TAGS")
+	res, err := client.Execute(i.NSID, i.LLMJob.Space, []string{gql})
+	if err != nil {
+		return err
+	}
+	tagResult := res[0]
+	if tagResult.Error != nil {
+		return tagResult.Error
+	}
+	for _, row := range tagResult.Result.Tables {
+		tag := NodeType{
+			Type: row["Name"].(string),
+		}
+		gql = fmt.Sprintf("DESCRIBE TAG `%s`", tag.Type)
+		res, err := client.Execute(i.NSID, i.LLMJob.Space, []string{gql})
+		if err != nil {
+			return err
+		}
+		tagInfoResult := res[0]
+		if tagInfoResult.Error != nil {
+			return tagInfoResult.Error
+		}
+		for _, row := range tagInfoResult.Result.Tables {
+			field := Field{
+				Name:     row["Field"].(string),
+				DataType: row["Type"].(string),
+			}
+			if row["Null"].(string) == "YES" {
+				field.Nullable = true
+			} else {
+				field.Nullable = false
+			}
+			tag.Props = append(tag.Props, field)
+		}
+		schema.NodeTypes = append(schema.NodeTypes, tag)
+	}
+
+	gql = ("SHOW EDGES")
+	res, err = client.Execute(i.NSID, i.LLMJob.Space, []string{gql})
+	if err != nil {
+		return err
+	}
+	edgeResult := res[0]
+	if edgeResult.Error != nil {
+		return edgeResult.Error
+	}
+	for _, row := range edgeResult.Result.Tables {
+		edge := EdgeType{
+			Type: row["Name"].(string),
+		}
+		gql = fmt.Sprintf("DESCRIBE EDGE `%s`", edge.Type)
+		res, err := client.Execute(i.NSID, i.LLMJob.Space, []string{gql})
+		if err != nil {
+			return err
+		}
+		edgeInfoResult := res[0]
+		if edgeInfoResult.Error != nil {
+			return edgeInfoResult.Error
+		}
+		for _, row := range edgeInfoResult.Result.Tables {
+			field := Field{
+				Name:     row["Field"].(string),
+				DataType: row["Type"].(string),
+			}
+			if row["Null"].(string) == "YES" {
+				field.Nullable = true
+			} else {
+				field.Nullable = false
+			}
+			edge.Props = append(edge.Props, field)
+		}
+		schema.EdgeTypes = append(schema.EdgeTypes, edge)
+	}
+	i.Schema = schema
 	return nil
 }

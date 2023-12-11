@@ -19,6 +19,9 @@ all: build
 
 gen: gen-api
 
+build-ai-importer:
+	$(GO_BUILD) -ldflags '$(LDFLAGS)' -o bin/ai-importer ./cmd/ai_importer.go
+
 gen-api: $(GOBIN)/goctl
 	rm -rf internal/handler
 	goctl api format -dir ./restapi
