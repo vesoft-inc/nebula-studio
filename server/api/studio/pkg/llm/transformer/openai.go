@@ -20,6 +20,11 @@ type OpenAI struct {
 }
 
 func (o *OpenAI) HandleRequest(req map[string]any, config *db.LLMConfig) (*http.Request, error) {
+	configs := make(map[string]any)
+	err := json.Unmarshal([]byte(config.Config), &configs)
+	if err == nil {
+		req["model"] = configs["model"]
+	}
 	// Convert the request parameters to a JSON string
 	reqJSON, err := json.Marshal(req)
 	if err != nil {

@@ -475,12 +475,16 @@ func (i *ImportJob) MakeGQLFile(filePath string) ([]string, error) {
 			if valueStr != "" {
 				valueStr += ","
 			}
-			valueStr += fmt.Sprintf(`"%v"`, value)
+			if strings.Contains(strings.ToLower(field.DataType), "string") {
+				valueStr += fmt.Sprintf(`"%v"`, value)
+			} else {
+				valueStr += fmt.Sprintf(`%v`, value)
+			}
 		}
 
 		gql := fmt.Sprintf("INSERT VERTEX `%s` ({props}) VALUES \"%s\":({value});", typ, name)
 		gql = strings.ReplaceAll(gql, "{props}", propsStr)
-		gql = strings.ReplaceAll(gql, "{value}", propsStr)
+		gql = strings.ReplaceAll(gql, "{value}", valueStr)
 		gqls = append(gqls, gql)
 	}
 
@@ -508,7 +512,11 @@ func (i *ImportJob) MakeGQLFile(filePath string) ([]string, error) {
 				if propsValue != "" {
 					propsValue += ","
 				}
-				propsValue += fmt.Sprintf("\"%v\"", value)
+				if strings.Contains(strings.ToLower(field.DataType), "string") {
+					propsValue += fmt.Sprintf(`"%v"`, value)
+				} else {
+					propsValue += fmt.Sprintf(`%v`, value)
+				}
 			}
 			gql := fmt.Sprintf("INSERT EDGE `%s` (%s) VALUES \"%s\"->\"%s\":(%s);", dst.EdgeType, propsName, dst.Src, dst.Dst, propsValue)
 			gqls = append(gqls, gql)

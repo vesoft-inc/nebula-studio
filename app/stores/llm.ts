@@ -6,7 +6,9 @@ import * as ngqlDoc from '@app/utils/ngql';
 import schema from './schema';
 import rootStore from '.';
 
-export const matchPrompt = `Use NebulaGraph match knowledge to help me answer question.
+export const matchPrompt = `I want you to be a NebulaGraph database asistant.
+There are below document.
+----
 Use only the provided relationship types and properties in the schema.
 Do not use any other relationship types or properties that are not provided.
 Schema:
@@ -25,6 +27,7 @@ diff
 ---
 > MATCH (p:person)-[:directed]->(m:movie) WHERE m.movie.name == 'The Godfather'
 > RETURN p.person.name;
+---
 Question:{query_str}
 `;
 export const llmImportPrompt = `As a knowledge graph AI importer, your task is to extract useful data from the following text:
@@ -46,14 +49,12 @@ The name of the nodes should be an actual object and a noun.
 Result:
 `;
 
-export const docFinderPrompt = `Assume your are doc finder,from the following graph database book categories:
+export const docFinderPrompt = `Assuming you are a document navigator, within the following categories related to graph database books:
 "{category_string}"
-user current space is: {space_name}
-find top two useful categories to solve the question:"{query_str}",
-don't explain, if you can't find, return "Sorry".
-just return the two combined categories, separated by ',' is:`;
+please identify the most two relevant categories that could address the question: "{query_str}".,
+Please just return the two categories as a comma-separated list without any other word`;
 
-export const text2queryPrompt = `Assume you are a NebulaGraph AI chat asistant to help user write NGQL.
+export const text2queryPrompt = `Assume you are a NebulaGraph database AI chat asistant to help user write NGQL with NebulaGraph.
 You have access to the following information:
 the user space schema is:
 ----
@@ -227,10 +228,8 @@ class LLM {
       console.log(prompt);
       await ws.runChat({
         req: {
-          temperature: 0.5,
           stream: true,
           max_tokens: 20,
-
           messages: [
             ...historyMessages,
             {
@@ -274,18 +273,19 @@ class LLM {
     let prompt = matchPrompt; // default use text2cypher
     if (this.mode !== 'text2cypher') {
       text = text.replaceAll('"', "'");
+      const docPrompt = docFinderPrompt
+        .replace('{category_string}', ngqlDoc.NGQLCategoryString)
+        .replace('{query_str}', text)
+        .replace('{space_name}', rootStore.console.currentSpace);
+      console.log(docPrompt);
       const res = (await ws.runChat({
         req: {
-          temperature: 0.5,
           stream: false,
           max_tokens: 20,
           messages: [
             {
               role: 'user',
-              content: docFinderPrompt
-                .replace('{category_string}', ngqlDoc.NGQLCategoryString)
-                .replace('{query_str}', text)
-                .replace('{space_name}', rootStore.console.currentSpace),
+              content: docPrompt,
             },
           ],
         },
@@ -297,19 +297,19 @@ class LLM {
           .replaceAll(/\s|"|\\/g, '')
           .split(',');
         console.log('select doc url:', paths);
-        if (ngqlDoc.ngqlMap[paths[0]]) {
-          let doc = ngqlDoc.ngqlMap[paths[0]].content;
+        if (paths[0] !== 'sorry') {
+          let doc = ngqlDoc.ngqlMap[paths[0]]?.content;
           if (!doc) {
             doc = '';
           }
-          const doc2 = ngqlDoc.ngqlMap[paths[1]].content;
+          const doc2 = ngqlDoc.ngqlMap[paths[1]]?.content;
           if (doc2) {
-            doc += doc2;
+            doc =
+              doc.slice(0, this.config.maxContextLength / 2) + `\n` + doc2.slice(0, this.config.maxContextLength / 2);
           }
           doc = doc.replaceAll(/\n\n+/g, '');
           if (doc.length) {
-            console.log('docString:', doc);
-            prompt = text2queryPrompt.replace('{doc}', doc.slice(0, this.config.maxContextLength));
+            prompt = text2queryPrompt.replace('{doc}', doc);
           }
         }
       }
@@ -327,6 +327,7 @@ class LLM {
       schemaPrompt += `\nuser console ngql context: ${rootStore.console.currentGQL}`;
     }
     prompt = prompt.replace('{schema}', schemaPrompt);
+    console.log(prompt);
     return prompt;
   }
 
