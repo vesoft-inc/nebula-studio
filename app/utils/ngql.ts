@@ -14,7 +14,10 @@ export const ngqlDoc = (ngqlJson as { url: string; content: string; title: strin
     if (urlTransformerMap[item.title]) {
       item.title = urlTransformerMap[item.title];
     }
-    item.title = item.title.replaceAll(' ', '');
+    item.title = item.title
+      .split(' ')
+      .map((word) => word[0].toUpperCase() + word.slice(1))
+      .join('');
     item.content = item.content.replace(/nebula>/g, '');
 
     return item;

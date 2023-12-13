@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Col, Form, Input, InputNumber, Row, Select, Switch, message } from 'antd';
 import { useI18n } from '@vesoft-inc/i18n';
@@ -15,7 +15,6 @@ const Setting = observer(() => {
   const { global, llm } = useStore();
   const { appSetting, saveAppSetting } = global;
   const [form] = useForm();
-  const [apiType, setApiType] = useState('openai');
   useEffect(() => {
     initForm();
   }, []);
@@ -23,7 +22,6 @@ const Setting = observer(() => {
   const initForm = async () => {
     await llm.fetchConfig();
     form.setFieldsValue(llm.config);
-    setApiType(llm.config.apiType);
   };
 
   const updateAppSetting = useCallback(async (param: Partial<any['beta']>) => {
@@ -109,13 +107,7 @@ const Setting = observer(() => {
                 <div className={styles.tips}>{intl.get('setting.llmImportDesc')}</div>
                 <Form form={form} layout="vertical" style={{ marginTop: 20 }}>
                   <Form.Item label="API type" name="apiType" required={true}>
-                    <Select
-                      onChange={(value) => {
-                        setApiType(value);
-                      }}
-                      defaultValue="openai"
-                      style={{ width: 120 }}
-                    >
+                    <Select defaultValue="openai" style={{ width: 120 }}>
                       <Select.Option value="openai">OpenAI</Select.Option>
                       <Select.Option value="qwen">Aliyun</Select.Option>
                     </Select>
@@ -126,11 +118,9 @@ const Setting = observer(() => {
                   <Form.Item label="key" name="key">
                     <Input type="password" />
                   </Form.Item>
-                  {apiType === 'qwen' && (
-                    <Form.Item label="model" name="model" required={true}>
-                      <Input placeholder="qwen-max" />
-                    </Form.Item>
-                  )}
+                  <Form.Item label="model" name="model">
+                    <Input />
+                  </Form.Item>
                   <Form.Item label={intl.get('setting.maxTextLength')} name="maxContextLength" required={true}>
                     <InputNumber min={0} />
                   </Form.Item>
