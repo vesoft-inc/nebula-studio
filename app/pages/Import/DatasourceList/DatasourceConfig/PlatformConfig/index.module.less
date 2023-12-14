@@ -1,31 +1,26 @@
 @import '@app/common.less';
 
 .dataSourceModal {
-  :global {
-    .ant-modal-content {
-      .ant-modal-header {
-        border-bottom: none;
-      }
-      .ant-modal-body {
-        padding: 0 10px 35px;
-      }
-    }
-  }
+
   .btns {
     text-align: center;
+
     :global(.ant-btn) {
       width: 180px;
     }
   }
+
   .tip {
     font-weight: 400;
     font-size: 12px;
     margin-bottom: 20px;
     text-align: center;
   }
+
   .endpointFormItem {
     position: relative;
   }
+
   .safeTip {
     display: inline-block;
     margin: 0 10% 30px;
@@ -34,6 +29,7 @@
     font-weight: 400;
     color: #71717A;
   }
+
   :global(.studioIconInstruction) {
     position: absolute;
     top: 50%;
@@ -41,4 +37,3 @@
     transform: translateY(-50%);
   }
 }
-

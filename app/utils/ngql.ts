@@ -5,10 +5,11 @@ const urlTransformerMap = {
   MATCH: 'MatchOrCypherOrPatternOrScan',
   GO: 'GOFromVID',
   FIND: 'FindPath',
-  'Schema-related functions': 'type_src_dst_rank_edge-functions',
+  'Schema-related functions': 'type&src&dst&rank&edgeFunctions',
 };
 
 const extralPaths = ['graph-modeling', 'ngql-guide', 'use-importer'];
+const filterPaths = ['clauses-and-options/', 'operators/'];
 export const ngqlDoc = (ngqlJson as { url: string; content: string; title: string }[])
   .map((item) => {
     if (urlTransformerMap[item.title]) {
@@ -16,14 +17,16 @@ export const ngqlDoc = (ngqlJson as { url: string; content: string; title: strin
     }
     item.title = item.title
       .split(' ')
-      .map((word) => word[0].toUpperCase() + word.slice(1))
+      // camelCase
+      .map((word) => {
+        return word[0].toUpperCase() + word.slice(1).toLowerCase();
+      })
       .join('');
     item.content = item.content.replace(/nebula>/g, '');
-
     return item;
   })
   .filter((item) => {
-    return item.url.indexOf('clauses-and-options/') === -1;
+    return !filterPaths.some((path) => item.url.indexOf(path) !== -1);
   });
 export const ngqlMap = ngqlDoc.reduce((acc, item) => {
   acc[item.title.toLowerCase()] = item;
