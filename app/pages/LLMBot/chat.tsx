@@ -63,19 +63,23 @@ function Chat() {
     };
     const sendMessages = [
       // slice 100 char
-      ...beforeMessages.map((item) => ({
+      ...beforeMessages.slice(-5).map((item) => ({
         role: item.role,
-        content: item.content.trim().slice(-100),
+        content: item.content.trim().slice(0, 100) + '...',
       })),
     ];
-    const systemPrompt = await rootStore.llm.getDocPrompt(currentInput);
+    const systemPrompt = await rootStore.llm.getDocPrompt(currentInput, sendMessages);
     sendMessages.push({ role: 'user', content: systemPrompt });
     console.log(sendMessages);
 
     ws.runChat({
       req: {
         stream: true,
-        temperature: 0.7,
+        temperature: 1,
+        top_p: 0.95,
+        top_k: 40,
+        max_tokens: -1,
+        repeat_penalty: 1.1,
         messages: sendMessages,
       },
       callback,

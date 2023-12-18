@@ -49,23 +49,20 @@ The name of the nodes should be an actual object and a noun.
 Result:
 `;
 
-export const docFinderPrompt = `Assuming you are a document navigator, within the following categories related to graph database books:
-"{category_string}"
-please identify the most two relevant categories that could address the question: "{query_str}".,
-Please just return the two categories as a comma-separated list without any other word`;
+export const docFinderPrompt = `The task is to identify the two best words from "{category_string}"\n that answer the question "{query_str}" for NebulaGraph database.The output should be a a comma-separated list of these two words.Don't explain anything.`;
 
-export const text2queryPrompt = `Assume you are a NebulaGraph database AI chat asistant to help user write NGQL with NebulaGraph.
-You have access to the following information:
+export const text2queryPrompt = `Assuming you are an  NebulaGraph database AI assistant, your role is to assist users in crafting NGQL queries with NebulaGraph. You have access to the following details:
 the user space schema is:
 ----
 {schema}
  ----
-the doc is: \n
+the documentation provided is:: \n
 ----
 {doc}
 ----
-you need use markdown to reply short and clearly.  add \`\`\` for markdown code block to write the ngql. one ngql need be one line.
-please use user's language to answer the question: {query_str}`;
+Please marked(\`\`\`ngql) for markdown code block to write the ngql.
+
+Answer the user's question with the question language:"{query_str}" `;
 
 export const AgentTask = `Assume you are a NebulaGraph AI chat asistant. You need to help the user to write NGQL or solve other question. 
 You have access to the following information:
@@ -269,8 +266,8 @@ class LLM {
     run();
   }
 
-  async getDocPrompt(text: string) {
-    let prompt = matchPrompt; // default use text2cypher
+  async getDocPrompt(text: string, historyMessages: any) {
+    let prompt = this.mode === 'text2cypher' ? matchPrompt : text2queryPrompt;
     if (this.mode !== 'text2cypher') {
       text = text.replaceAll('"', "'");
       const docPrompt = docFinderPrompt
@@ -283,6 +280,7 @@ class LLM {
           stream: false,
           max_tokens: 20,
           messages: [
+            ...historyMessages,
             {
               role: 'user',
               content: docPrompt,
@@ -291,7 +289,7 @@ class LLM {
         },
       })) as any;
       if (res.code === 0) {
-        const url = res.message.choices[0].message?.content as string;
+        const url = (res.message.choices[0].message?.content as string)?.split('\n')[0];
         const paths = url
           .toLowerCase()
           .replaceAll(/\s|"|\\/g, '')
@@ -365,8 +363,10 @@ class LLM {
         req: {
           temperature: 1.0,
           stream: false,
-          presence_penalty: 0.6,
+          presence_penalty: 1.1,
           max_tokens: 30,
+          top_p: 0.8,
+          top_k: 40,
           messages: [
             {
               role: 'user',
