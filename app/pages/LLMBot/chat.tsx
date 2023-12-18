@@ -63,9 +63,9 @@ function Chat() {
     };
     const sendMessages = [
       // slice 100 char
-      ...beforeMessages.map((item) => ({
+      ...beforeMessages.slice(-5).map((item) => ({
         role: item.role,
-        content: item.content.trim().slice(-100),
+        content: item.content.trim().slice(0, 100) + '...',
       })),
     ];
     const systemPrompt = await rootStore.llm.getDocPrompt(currentInput, sendMessages);
