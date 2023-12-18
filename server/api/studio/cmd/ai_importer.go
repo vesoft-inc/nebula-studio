@@ -20,9 +20,8 @@ import (
 
 type Config struct {
 	LLMJob struct {
-		Space          string
-		File           string
-		PromptTemplate string
+		Space string
+		File  string
 	}
 	Auth struct {
 		Address  string
@@ -36,8 +35,9 @@ type Config struct {
 		APIType            db.APIType
 		ContextLengthLimit int
 	}
-	GQLBatchSize int `json:",default=100"`
-	MaxBlockSize int `json:",default=0"`
+	GQLBatchSize   int    `json:",default=100"`
+	MaxBlockSize   int    `json:",default=0"`
+	PromptTemplate string `json:",default="`
 }
 
 func main() {
@@ -55,10 +55,9 @@ func main() {
 		CacheNodes: make(map[string]llm.Node),
 		CacheEdges: make(map[string]map[string]llm.Edge),
 		LLMJob: &db.LLMJob{
-			JobID:          fmt.Sprintf("%d", time.Now().UnixNano()),
-			Space:          c.LLMJob.Space,
-			File:           c.LLMJob.File,
-			PromptTemplate: c.LLMJob.PromptTemplate,
+			JobID: fmt.Sprintf("%d", time.Now().UnixNano()),
+			Space: c.LLMJob.Space,
+			File:  c.LLMJob.File,
 		},
 		AuthData: &auth.AuthData{
 			Address:  c.Auth.Address,
@@ -75,13 +74,15 @@ func main() {
 	}
 	studioConfig := config.Config{
 		LLM: struct {
-			GQLPath      string `json:",default=./data/llm"`
-			GQLBatchSize int    `json:",default=100"`
-			MaxBlockSize int    `json:",default=0"`
+			GQLPath        string `json:",default=./data/llm"`
+			GQLBatchSize   int    `json:",default=100"`
+			MaxBlockSize   int    `json:",default=0"`
+			PromptTemplate string `json:",default="`
 		}{
-			GQLPath:      *outputPath,
-			GQLBatchSize: c.GQLBatchSize,
-			MaxBlockSize: c.MaxBlockSize,
+			GQLPath:        *outputPath,
+			GQLBatchSize:   c.GQLBatchSize,
+			MaxBlockSize:   c.MaxBlockSize,
+			PromptTemplate: c.PromptTemplate,
 		},
 	}
 	studioConfig.InitConfig()

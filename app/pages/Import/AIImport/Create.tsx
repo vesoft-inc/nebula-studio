@@ -4,7 +4,6 @@ import { Button, Form, Input, Modal, Radio, Select, message } from 'antd';
 import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
 import { useEffect, useMemo, useState } from 'react';
-import { llmImportPrompt } from '@app/stores/llm';
 import { getByteLength } from '@app/utils/function';
 import { post } from '@app/utils/http';
 import styles from './index.module.less';
@@ -30,7 +29,7 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
     form.resetFields();
     form.setFieldsValue({
       type: 'file',
-      promptTemplate: llmImportPrompt,
+      userPrompt: '',
     });
     setTokens(null);
   }, [props.visible]);
@@ -63,11 +62,9 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
 
   const onConfirm = async () => {
     const values = form.getFieldsValue();
-    const schema = await llm.getSpaceSchema(space);
     post('/api/llm/import/job')({
       type,
       ...values,
-      spaceSchemaString: schema,
     }).then((res) => {
       if (res.code === 0) {
         message.success(intl.get('common.success'));
@@ -152,8 +149,8 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
         <Form.Item required label={intl.get('llm.exportNGQLFilePath')}>
           <Input disabled value={llm.config.gqlPath} />
         </Form.Item>
-        <Form.Item required={true} label={intl.get('llm.prompt')} name="promptTemplate">
-          <Input.TextArea style={{ height: 200 }} />
+        <Form.Item label={intl.get('llm.attachPrompt')} name="userPrompt">
+          <Input.TextArea />
         </Form.Item>
       </Form>
 

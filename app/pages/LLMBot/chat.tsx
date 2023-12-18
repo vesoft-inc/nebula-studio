@@ -24,7 +24,7 @@ function Chat() {
     const newMessages = [
       ...messages,
       { role: 'user', content: currentInput },
-      { role: 'assistant', content: '', status: 'pending' },
+      { role: 'assistant', content: '', status: 'pending' }, // asistant can't be changed
     ];
     llm.update({
       currentInput: '',

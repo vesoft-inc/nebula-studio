@@ -484,12 +484,11 @@ type LLMConfigRequest struct {
 }
 
 type LLMImportRequest struct {
-	Space             string `json:"space"`
-	File              string `json:"file,optional"`
-	FilePath          string `json:"filePath,optional"`
-	Type              string `json:"type"`
-	PromptTemplate    string `json:"promptTemplate"`
-	SpaceSchemaString string `json:"spaceSchemaString"`
+	Space      string `json:"space"`
+	File       string `json:"file,optional"`
+	FilePath   string `json:"filePath,optional"`
+	Type       string `json:"type"`
+	UserPrompt string `json:"userPrompt"`
 }
 
 type LLMImportJobsRequest struct {

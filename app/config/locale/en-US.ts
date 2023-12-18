@@ -557,7 +557,7 @@ export default {
     filePath: 'File Path',
     importGraphSpace: 'Import Graph Space',
     exportNGQLFilePath: 'Export NGQL File Path',
-    prompt: 'Prompt',
+    attachPrompt: 'Attach Prompt',
     next: 'Next',
     url: 'URL',
     previous: 'Previous',

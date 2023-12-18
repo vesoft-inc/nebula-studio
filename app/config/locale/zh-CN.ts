@@ -537,7 +537,7 @@ export default {
     filePath: '文件路径',
     importGraphSpace: '导入图空间',
     exportNGQLFilePath: '导出 NGQL 文件路径',
-    prompt: '提示',
+    attachPrompt: '附加提示',
     next: '下一步',
     previous: '上一步',
     start: '开始',

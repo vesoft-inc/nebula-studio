@@ -63,3 +63,20 @@ LLM:
   GQLPath: "./data/llm"
   GQLBatchSize: 100
   MaxBlockSize: 0
+  PromptTemplate: |
+    As a knowledge graph AI importer, your task is to extract useful data from the following text:
+    ```text
+    {text}
+    ```
+    the knowledge graph has following schema and node name must be a real :
+    ```graph-schema
+    {spaceSchema}
+    ```
+    {userPrompt}
+    Return the results directly, without explain and comment. The results should be in the following JSON format:
+    {
+      "nodes":[{ "name":string,"type":string,"props":object }],
+      "edges":[{ "src":string,"dst":string,"edgeType":string,"props":object }]
+    }
+    The name of the nodes should be an actual object and a noun.
+    Result:
