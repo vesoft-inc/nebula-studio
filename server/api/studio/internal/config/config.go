@@ -10,6 +10,23 @@ import (
 
 var configIns *Config
 
+var PromptTemplate = `As a knowledge graph AI importer, your task is to extract useful data from the following text:` +
+	"```text\n" +
+	`{text}` +
+	"\n```\n" +
+	`the knowledge graph has following schema and node name must be a real :` +
+	"```graph-schema\n" +
+	`{spaceSchema}` +
+	"\n```\n" +
+	`{userPrompt}
+    Return the results directly, without explain and comment. The results should be in the following JSON format:
+    {
+      "nodes":[{ "name":string,"type":string,"props":object }],
+      "edges":[{ "src":string,"dst":string,"edgeType":string,"props":object }]
+    }
+    The name of the nodes should be an actual object and a noun.
+    Result:`
+
 func GetConfig() *Config {
 	return configIns
 }
@@ -65,9 +82,10 @@ type Config struct {
 	}
 
 	LLM struct {
-		GQLPath      string `json:",default=./data/llm"`
-		GQLBatchSize int    `json:",default=100"`
-		MaxBlockSize int    `json:",default=0"`
+		GQLPath        string `json:",default=./data/llm"`
+		GQLBatchSize   int    `json:",default=100"`
+		MaxBlockSize   int    `json:",default=0"`
+		PromptTemplate string `json:",default="`
 	}
 }
 
@@ -116,6 +134,9 @@ func (c *Config) Complete() {
 	}
 	if c.LLM.MaxBlockSize == 0 {
 		c.LLM.MaxBlockSize = 1024 * 1024 * 1024
+	}
+	if c.LLM.PromptTemplate == "" {
+		c.LLM.PromptTemplate = PromptTemplate
 	}
 }
 

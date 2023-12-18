@@ -43,17 +43,18 @@ type Schema struct {
 	EdgeTypes []EdgeType `json:"edgeTypes"`
 }
 type ImportJob struct {
-	CacheNodes map[string]Node
-	CacheEdges map[string]map[string]Edge
-	Prompt     string
-	LLMJob     *db.LLMJob     `json:"llmJob"`
-	LLMConfig  *db.LLMConfig  `json:"llmConfig"`
-	AuthData   *auth.AuthData `json:"authData"`
-	NSID       string
-	Process    *base.Process
-	logFile    *os.File
-	Schema     Schema
-	SchemaMap  map[string]map[string]Field
+	CacheNodes        map[string]Node
+	CacheEdges        map[string]map[string]Edge
+	Prompt            string
+	LLMJob            *db.LLMJob     `json:"llmJob"`
+	LLMConfig         *db.LLMConfig  `json:"llmConfig"`
+	AuthData          *auth.AuthData `json:"authData"`
+	NSID              string
+	Process           *base.Process
+	logFile           *os.File
+	Schema            Schema
+	SchemaMap         map[string]map[string]Field
+	SpaceSchemaString string
 }
 
 func RunFileJob(job *db.LLMJob) {
@@ -96,13 +97,6 @@ func RunFileJob(job *db.LLMJob) {
 	go llmJob.SyncProcess(job)
 
 	llmJob.Process.Ratio = 0.01
-	err = llmJob.ParseSchema(job.SpaceSchemaString)
-	if err != nil {
-		llmJob.WriteLogFile(fmt.Sprintf("parse schema error: %v", err), "error")
-		llmJob.SetJobFailed(err)
-		return
-	}
-
 	llmConfig := db.LLMConfig{
 		Host:     job.Host,
 		UserName: job.UserName,
@@ -131,6 +125,19 @@ func RunFileJob(job *db.LLMJob) {
 	}
 	llmJob.NSID = clientInfo.ClientID
 	llmJob.Process.Ratio = 0.05
+
+	err = llmJob.MakeSchema()
+	if err != nil {
+		llmJob.WriteLogFile(fmt.Sprintf("make schema error: %v", err), "error")
+		llmJob.SetJobFailed(err)
+		return
+	}
+	err = llmJob.GetSchemaMap()
+	if err != nil {
+		llmJob.WriteLogFile(fmt.Sprintf("get schema map error: %v", err), "error")
+		llmJob.SetJobFailed(err)
+		return
+	}
 
 	llmJob.WriteLogFile(fmt.Sprintf("start run file job, file path: %s", job.File), "info")
 
@@ -293,24 +300,24 @@ func (i *ImportJob) GetSchemaMap() error {
 	nodeSchemaString := ""
 	edgeSchemaString := ""
 	for _, tag := range schema.NodeTypes {
-		nodeSchemaString += fmt.Sprintf("NodeType \"%s\" {", tag.Type)
+		nodeSchemaString += fmt.Sprintf("NodeType \"%s\" (", tag.Type)
 		i.SchemaMap[tag.Type] = make(map[string]Field)
 		for _, field := range tag.Props {
 			i.SchemaMap[tag.Type][field.Name] = field
 			nodeSchemaString += fmt.Sprintf("\"%s\":%s ", field.Name, field.DataType)
 		}
-		nodeSchemaString += "}\n"
+		nodeSchemaString += ")\n"
 	}
 	for _, edge := range schema.EdgeTypes {
-		edgeSchemaString += fmt.Sprintf("EdgeType \"%s\" { ", edge.Type)
+		edgeSchemaString += fmt.Sprintf("EdgeType \"%s\" (", edge.Type)
 		i.SchemaMap[edge.Type] = make(map[string]Field)
 		for _, field := range edge.Props {
 			i.SchemaMap[edge.Type][field.Name] = field
 			edgeSchemaString += fmt.Sprintf("\"%s\":%s ", field.Name, field.DataType)
 		}
-		edgeSchemaString += "}\n"
+		edgeSchemaString += ")\n"
 	}
-	i.LLMJob.SpaceSchemaString = nodeSchemaString + edgeSchemaString
+	i.SpaceSchemaString = nodeSchemaString + edgeSchemaString
 	return nil
 }
 
@@ -372,9 +379,10 @@ func (i *ImportJob) ParseText(text string) {
 	}
 }
 
-// todo: get space schema
 func (i *ImportJob) GetPrompt(text string) string {
-	i.Prompt = strings.ReplaceAll(i.LLMJob.PromptTemplate, "{spaceSchema}", i.LLMJob.SpaceSchemaString)
+	promptTemplate := config.GetConfig().LLM.PromptTemplate
+	i.Prompt = strings.ReplaceAll(promptTemplate, "{userPrompt}", i.LLMJob.UserPrompt)
+	i.Prompt = strings.ReplaceAll(promptTemplate, "{spaceSchema}", i.SpaceSchemaString)
 	i.Prompt = strings.ReplaceAll(i.Prompt, "{text}", text)
 	return i.Prompt
 }
@@ -412,9 +420,8 @@ func (i *ImportJob) Query(prompt string) (string, error) {
 		"content": prompt,
 	})
 	res, err := FetchWithLLMConfig(i.LLMConfig, map[string]any{
-		"stream":     false,
-		"messages":   messages,
-		"max_tokens": i.LLMConfig.ContextLengthLimit,
+		"stream":   false,
+		"messages": messages,
 	}, func(str string) {})
 	if err != nil {
 		return "", err

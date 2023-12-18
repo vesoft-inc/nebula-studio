@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	"github.com/zeromicro/go-zero/core/logx"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
@@ -16,6 +15,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
+	"github.com/vesoft-inc/nebula-studio/server/api/studio/internal/config"
 	dbutil "github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/db"
 )
 

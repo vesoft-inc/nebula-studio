@@ -33,15 +33,14 @@ func (g *llmService) AddImportJob(req *types.LLMImportRequest) (resp *types.LLMR
 	}
 	space = string(runes)
 	job := db.LLMJob{
-		Space:             req.Space,
-		File:              req.File,
-		JobType:           req.Type,
-		Status:            base.LLMStatusPending,
-		Host:              config.Host,
-		UserName:          config.UserName,
-		PromptTemplate:    req.PromptTemplate,
-		SpaceSchemaString: req.SpaceSchemaString,
-		JobID:             space + "_" + time.Now().Format("20060102150405000"),
+		Space:      req.Space,
+		File:       req.File,
+		JobType:    req.Type,
+		Status:     base.LLMStatusPending,
+		Host:       config.Host,
+		UserName:   config.UserName,
+		UserPrompt: req.UserPrompt,
+		JobID:      space + "_" + time.Now().Format("20060102150405000"),
 	}
 	task := &db.TaskInfo{
 		BID:     job.JobID,

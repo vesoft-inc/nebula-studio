@@ -30,26 +30,13 @@ diff
 ---
 Question:{query_str}
 `;
-export const llmImportPrompt = `As a knowledge graph AI importer, your task is to extract useful data from the following text:
-----text
-{text}
-----
 
-the knowledge graph has following schema and node name must be a real :
-----graph schema
-{spaceSchema}
-----
-
-Return the results directly, without explain and comment. The results should be in the following JSON format:
-{
-  "nodes":[{ "name":string,"type":string,"props":object }],
-  "edges":[{ "src":string,"dst":string,"edgeType":string,"props":object }]
-}
-The name of the nodes should be an actual object and a noun.
-Result:
-`;
-
-export const docFinderPrompt = `The task is to identify the two best words from "{category_string}"\n that answer the question "{query_str}" for NebulaGraph database.The output should be a a comma-separated list of these two words.Don't explain anything.`;
+export const docFinderPrompt = `The task is to identify the top2 effectively categories from 
+\`\`\`categories
+{category_string}
+\`\`\`
+that answer the question "{query_str}" with the user's history ask is:"{history_str}" for NebulaGraph database.
+The output should be a comma-separated list like "category1,category2" and don't explain anything`;
 
 export const text2queryPrompt = `Assuming you are an  NebulaGraph database AI assistant, your role is to assist users in crafting NGQL queries with NebulaGraph. You have access to the following details:
 the user space schema is:
@@ -137,45 +124,28 @@ class LLM {
   }
 
   async getSpaceSchema(space: string) {
-    let finalPrompt: any = {
-      currentUsedSpaceName: space,
-    };
+    const finalPrompt = `The user's current graph space is: ${space} \n`;
     if (this.config.features.includes('spaceSchema')) {
       await schema.switchSpace(space);
       await schema.getTagList();
       await schema.getEdgeList();
       const tagList = schema.tagList;
       const edgeList = schema.edgeList;
-      finalPrompt = {
-        ...finalPrompt,
-        vidType: schema.spaceVidType,
-        nodeTypes: tagList.map((item) => {
-          return {
-            type: item.name,
-            props: item.fields.map((item) => {
-              return {
-                name: item.Field,
-                dataType: item.Type,
-                nullable: (item as any).Null === 'YES',
-              };
-            }),
-          };
-        }),
-        edgeTypes: edgeList.map((item) => {
-          return {
-            type: item.name,
-            props: item.fields.map((item) => {
-              return {
-                name: item.Field,
-                dataType: item.Type,
-                nullable: (item as any).Null === 'YES',
-              };
-            }),
-          };
-        }),
-      };
+      let nodeSchemaString = '';
+      const edgeSchemaString = '';
+      tagList.forEach((item) => {
+        nodeSchemaString += `NodeType ${item.name} (${item.fields
+          .map((field) => `${field.Field}:${field.Type}`)
+          .join(' ')})\n`;
+      });
+      edgeList.forEach((item) => {
+        nodeSchemaString += `EdgeType ${item.name} (${item.fields
+          .map((field) => `${field.Field}:${field.Type}`)
+          .join(' ')})\n`;
+      });
+      return finalPrompt + nodeSchemaString + edgeSchemaString;
     }
-    return JSON.stringify(finalPrompt);
+    return finalPrompt;
   }
 
   async getAgentPrompt(query_str: string, historyMessages: any, callback: (res: any) => void) {
@@ -270,17 +240,22 @@ class LLM {
     let prompt = this.mode === 'text2cypher' ? matchPrompt : text2queryPrompt;
     if (this.mode !== 'text2cypher') {
       text = text.replaceAll('"', "'");
+      const history = historyMessages
+        .filter((item) => item.role === 'user')
+        .map((item) => item.content)
+        .join(',');
       const docPrompt = docFinderPrompt
         .replace('{category_string}', ngqlDoc.NGQLCategoryString)
         .replace('{query_str}', text)
+        .replace('{history_str}', history)
         .replace('{space_name}', rootStore.console.currentSpace);
       console.log(docPrompt);
       const res = (await ws.runChat({
         req: {
           stream: false,
-          max_tokens: 20,
+          max_tokens: 40,
+          top_p: 0.8,
           messages: [
-            ...historyMessages,
             {
               role: 'user',
               content: docPrompt,

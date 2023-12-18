@@ -1,7 +1,19 @@
 LLMJob:
   Space: "" #space name
   File: "" #file path,support pdf,txt,json,csv and other text format
-  PromptTemplate: |
+Auth:
+  Address: "127.0.0.1" # nebula graphd address
+  Port: 9669
+  Username: "root"
+  Password: "nebula"
+LLMConfig:
+  URL: "" # openai api url
+  Key: "" # openai api key
+  APIType: "openai"
+  ContextLengthLimit: 1024
+MaxBlockSize: 0 # max request block num
+GQLBatchSize: 100 # max gql batch size
+PromptTemplate: |
     As a knowledge graph AI importer, your task is to extract useful data from the following text:
     ----text
     {text}
@@ -19,15 +31,3 @@ LLMJob:
     }
     The name of the nodes should be an actual object and a noun.
     Result:
-Auth:
-  Address: "127.0.0.1" # nebula graphd address
-  Port: 9669
-  Username: "root"
-  Password: "nebula"
-LLMConfig:
-  URL: "" # openai api url
-  Key: "" # openai api key
-  APIType: "openai"
-  ContextLengthLimit: 1024
-MaxBlockSize: 0 # max request block num
-GQLBatchSize: 100 # max gql batch size
