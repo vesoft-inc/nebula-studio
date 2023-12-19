@@ -29,5 +29,4 @@ PromptTemplate: |
       "nodes":[{ "name":string,"type":string,"props":object }],
       "edges":[{ "src":string,"dst":string,"edgeType":string,"props":object }]
     }
-    The name of the nodes should be an actual object and a noun.
-    Result:
+    the result json is:
