@@ -29,7 +29,8 @@ NebulaGraph Studio (Studio for short) is a web-based visualization tool for Nebu
 ### set up studio and server at the same time
 ```
 $ npm install
-$ npm run dev-all
+$ npm run dev
+$ npm run dev:go
 ```
 
 ### Set up nebula-graph-studio only
