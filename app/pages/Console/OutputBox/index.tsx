@@ -40,7 +40,7 @@ const OutputBox = (props: IProps) => {
   const [isFavorited, setIsFavorited] = useState(false);
   const [showGraph, setShowGraph] = useState(false);
   const [graph, setGraph] = useState<GraphStore | null>(null);
-  const [tab, setTab] = useState('');
+  const [tab, setTab] = useState('table');
   const [fullscreen, setFullscreen] = useState(false);
 
   const initData = useCallback(() => {
@@ -52,10 +52,15 @@ const OutputBox = (props: IProps) => {
     const { headers, tables, localParams } = data;
     if (tables.length > 0) {
       _dataSource = data.tables;
-      setShowGraph(
+      const hasGraphData =
         _dataSource.filter((item) => item._verticesParsedList || item._edgesParsedList || item._pathsParsedList)
-          .length > 0,
-      );
+          .length > 0;
+      if (hasGraphData) {
+        setTab('graph');
+        setShowGraph(hasGraphData);
+      } else {
+        setTab('table');
+      }
     }
     if (headers.length > 0) {
       _columns = data.headers.map((column) => {
@@ -244,7 +249,28 @@ const OutputBox = (props: IProps) => {
         .match(/^profile(\s+|\{)/) &&
       dataSource.length &&
       !isDot;
+
     return [
+      showGraph && {
+        key: 'graph',
+        label: (
+          <>
+            <Icon type="icon-studio-console-graph" />
+            {intl.get('common.graph')}
+          </>
+        ),
+        children: (
+          <ForceGraph
+            style={{
+              height: fullscreen ? window.innerHeight - 190 : 300,
+            }}
+            space={space}
+            data={dataSource}
+            spaceVidType={spaceVidType}
+            onGraphInit={setGraph}
+          />
+        ),
+      },
       resultSuccess && {
         key: 'table',
         label: (
@@ -281,7 +307,6 @@ const OutputBox = (props: IProps) => {
             />
           ),
         },
-
       resultSuccess &&
         isProfileRaw && {
           key: 'profile',
@@ -298,26 +323,6 @@ const OutputBox = (props: IProps) => {
             />
           ),
         },
-      showGraph && {
-        key: 'graph',
-        label: (
-          <>
-            <Icon type="icon-studio-console-graph" />
-            {intl.get('common.graph')}
-          </>
-        ),
-        children: (
-          <ForceGraph
-            style={{
-              height: fullscreen ? window.innerHeight - 190 : 300,
-            }}
-            space={space}
-            data={dataSource}
-            spaceVidType={spaceVidType}
-            onGraphInit={setGraph}
-          />
-        ),
-      },
       !resultSuccess && {
         key: 'log',
         label: (
@@ -330,9 +335,11 @@ const OutputBox = (props: IProps) => {
       },
     ].filter(Boolean);
   }, [gql, data, dataSource, columns, fullscreen]);
+
   const onFullScreen = () => {
     setFullscreen(!fullscreen);
   };
+
   return (
     <div className={styles.outputBox + ` ${fullscreen ? `${styles.fullscreen}` : ''}`} ref={nowOutputRef}>
       <div className={styles.outputHeader}>
@@ -372,6 +379,10 @@ const OutputBox = (props: IProps) => {
             <Icon className={styles.btnExport} type="icon-studio-btn-output" />
           </Popover>
           <Icon type={visible ? 'icon-studio-btn-up' : 'icon-studio-btn-down'} onClick={() => setVisible(!visible)} />
+          <Icon
+            type={fullscreen ? 'icon-vesoft-arrow-collapse-all' : 'icon-vesoft-arrow-expand-all'}
+            onClick={onFullScreen}
+          />
           <Icon type="icon-studio-btn-close" onClick={handleItemRemove} />
         </div>
       </div>
@@ -380,7 +391,7 @@ const OutputBox = (props: IProps) => {
           <div className={styles.tabContainer}>
             <Tabs
               className={styles.outputTab}
-              defaultActiveKey={'log'}
+              activeKey={resultSuccess ? tab : 'log'}
               size={'large'}
               tabPosition={'left'}
               onChange={handleTabChange}
@@ -399,10 +410,6 @@ const OutputBox = (props: IProps) => {
                   {intl.get('common.openInExplore')}
                 </Button>
               )}
-              <Icon
-                type={fullscreen ? 'icon-vesoft-arrow-collapse-all' : 'icon-vesoft-arrow-expand-all'}
-                onClick={onFullScreen}
-              />
             </div>
           </div>
         </>
