@@ -78,7 +78,6 @@ function Chat() {
         temperature: 1,
         top_p: 0.95,
         top_k: 40,
-        max_tokens: -1,
         repeat_penalty: 1.1,
         messages: sendMessages,
       },
