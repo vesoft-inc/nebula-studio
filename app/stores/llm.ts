@@ -267,8 +267,9 @@ class LLM {
         const url = (res.message.choices[0].message?.content as string)?.split('\n')[0];
         const paths = url
           .toLowerCase()
-          .replaceAll(/\s|"|\\/g, '')
-          .split(',');
+          .replaceAll('，', ',') // chinese comma
+          .split(',')
+          .map((path) => path.replaceAll(/\s|"|\\/g, ''));
         console.log('select doc url:', paths);
         if (paths[0] !== 'sorry') {
           let doc = ngqlDoc.ngqlMap[paths[0]]?.content;
@@ -278,7 +279,9 @@ class LLM {
           const doc2 = ngqlDoc.ngqlMap[paths[1]]?.content;
           if (doc2) {
             doc =
-              doc.slice(0, this.config.maxContextLength / 2) + `\n` + doc2.slice(0, this.config.maxContextLength / 2);
+              doc.slice(0, (this.config.maxContextLength * 2) / 3) +
+              `\n` +
+              doc2.slice(0, this.config.maxContextLength / 2);
           }
           doc = doc.replaceAll(/\n\n+/g, '');
           if (doc.length) {
