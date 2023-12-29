@@ -8,6 +8,7 @@ import (
 	db "github.com/vesoft-inc/nebula-studio/server/api/studio/internal/model"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/auth"
 	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/llm/transformer"
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 func Fetch(auth *auth.AuthData, req map[string]any, callback func(str string)) (map[string]any, error) {
@@ -23,7 +24,12 @@ func Fetch(auth *auth.AuthData, req map[string]any, callback func(str string)) (
 }
 
 func FetchWithLLMConfig(config *db.LLMConfig, req map[string]any, callback func(str string)) (map[string]any, error) {
-
+	defer func() {
+		if err := recover(); err != nil {
+			callback(fmt.Sprintf("panic: %v", err))
+			logx.Error(fmt.Sprintf("panic: %v", err))
+		}
+	}()
 	// Convert the request parameters to a JSON string
 	var transform transformer.Handler
 	if config.APIType == "openai" {

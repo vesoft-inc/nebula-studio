@@ -28,28 +28,26 @@ diff
 > MATCH (p:person)-[:directed]->(m:movie) WHERE m.movie.name == 'The Godfather'
 > RETURN p.person.name;
 ---
-Question:{query_str}
+answer the user's question with the question language
 `;
 
 export const docFinderPrompt = `The task is to identify the top2 effectively categories from 
 \`\`\`categories
 {category_string}
 \`\`\`
-that answer the question "{query_str}" with the user's history ask is:"{history_str}" for NebulaGraph database.
-The output should be a comma-separated list like "category1,category2" and don't explain anything`;
+that answer the question "{query_str}" with the user's history ask is:"{history_str}" for graph database write gql.
+just return the output that should be a comma-separated list like "category1,category2" and don't explain anything`;
 
 export const text2queryPrompt = `Assuming you are an  NebulaGraph database AI assistant, your role is to assist users in crafting NGQL queries with NebulaGraph. You have access to the following details:
 the user space schema is:
 ----
 {schema}
  ----
-the documentation provided is:: \n
+the reference documentation provided is: \n
 ----
 {doc}
 ----
-Please marked(\`\`\`ngql) for markdown code block to write the ngql.
-
-Answer the user's question with the question language:"{query_str}" `;
+Please marked(\`\`\`ngql) for markdown code block to write the ngql and answer the user's question with the question language`;
 
 export const AgentTask = `Assume you are a NebulaGraph AI chat asistant. You need to help the user to write NGQL or solve other question. 
 You have access to the following information:
@@ -237,7 +235,7 @@ class LLM {
   }
 
   async getDocPrompt(text: string, historyMessages: any) {
-    let prompt = this.mode === 'text2cypher' ? matchPrompt : text2queryPrompt;
+    let prompt = matchPrompt;
     if (this.mode !== 'text2cypher') {
       text = text.replaceAll('"', "'");
       const history = historyMessages
@@ -272,25 +270,22 @@ class LLM {
           .map((path) => path.replaceAll(/\s|"|\\/g, ''));
         console.log('select doc url:', paths);
         if (paths[0] !== 'sorry') {
+          prompt = text2queryPrompt;
           let doc = ngqlDoc.ngqlMap[paths[0]]?.content;
           if (!doc) {
             doc = '';
           }
           const doc2 = ngqlDoc.ngqlMap[paths[1]]?.content;
           if (doc2) {
-            doc =
-              doc.slice(0, (this.config.maxContextLength * 2) / 3) +
-              `\n` +
-              doc2.slice(0, this.config.maxContextLength / 2);
+            doc = (doc + `\n` + doc2).slice(0, this.config.maxContextLength);
           }
-          doc = doc.replaceAll(/\n\n+/g, '');
+          doc = doc.replaceAll(/\n\n\n+/g, '');
           if (doc.length) {
             prompt = text2queryPrompt.replace('{doc}', doc);
           }
         }
       }
     }
-    prompt = prompt.replace('{query_str}', text);
 
     const pathname = window.location.pathname;
     const space = pathname.indexOf('schema') > -1 ? rootStore.schema.currentSpace : rootStore.console.currentSpace;
