@@ -20,9 +20,9 @@ function Chat() {
     if (currentInput === '') return;
     setPending(true);
     // just use last 5 message
-    const beforeMessages = [...messages.slice(messages.length - 5, messages.length)];
+    const beforeMessages = messages;
     const newMessages = [
-      ...messages,
+      ...beforeMessages,
       { role: 'user', content: currentInput },
       { role: 'assistant', content: '', status: 'pending' }, // asistant can't be changed
     ];
@@ -62,24 +62,17 @@ function Chat() {
       }
     };
     const sendMessages = [
-      // slice 100 char
+      // slice 50 char for last 5 message
       ...beforeMessages.slice(-5).map((item) => ({
         role: item.role,
-        content: item.content.trim().slice(0, 100) + '...',
+        content: item.content.length > 50 ? item.content.trim().slice(0, 50) + '...' : item.content.trim(),
       })),
     ];
     const systemPrompt = await rootStore.llm.getDocPrompt(currentInput, sendMessages);
-    sendMessages.push({ role: 'user', content: systemPrompt });
-    console.log(sendMessages);
-
     ws.runChat({
       req: {
         stream: true,
-        temperature: 1,
-        top_p: 0.95,
-        top_k: 40,
-        repeat_penalty: 1.1,
-        messages: sendMessages,
+        messages: [{ role: 'system', content: systemPrompt }, ...sendMessages, { role: 'user', content: currentInput }],
       },
       callback,
     });
