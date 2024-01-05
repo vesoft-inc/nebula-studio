@@ -58,6 +58,8 @@ spec:
             - name: studio-config
               mountPath: /app/etc
               readOnly: true
+            - name: app-data-volume
+              mountPath: /app/data
       volumes:
         - name: studio-config
           configMap:
@@ -68,6 +70,8 @@ spec:
         - name: upload-data
           persistentVolumeClaim:
             claimName: {{ include "nebula-studio.name" . }}-data
+        - name: app-data-volume
+          emptyDir:
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
