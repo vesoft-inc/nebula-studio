@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import * as monaco from 'monaco-editor';
 import type { editor as TMonacoEditor } from 'monaco-editor';
 import Editor, { useMonaco, loader, type Monaco } from '@monaco-editor/react';

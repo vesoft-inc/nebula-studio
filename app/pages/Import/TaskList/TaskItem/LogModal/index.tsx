@@ -49,7 +49,9 @@ const LogModal = (props: IProps) => {
   const handleLogDownload = () => currentLog && downloadTaskLog({ id, name: currentLog });
 
   const readLog = async () => {
-    const data = await getLogDetail(task);
+    const data = await getLogDetail({
+      id:task.id
+    });
     handleLogData(data);
   };
 

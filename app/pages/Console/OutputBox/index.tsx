@@ -329,7 +329,7 @@ const OutputBox = (props: IProps) => {
         children: <div className={styles.errContainer}>{message}</div>,
       },
     ].filter(Boolean);
-  }, [gql, data, dataSource, columns, fullscreen]);
+  }, [gql, data, dataSource, columns, fullscreen, tab]);
   const onFullScreen = () => {
     setFullscreen(!fullscreen);
   };

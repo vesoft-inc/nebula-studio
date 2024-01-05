@@ -89,8 +89,16 @@ func (o *Qwen) HandleResponse(resp *http.Response, callback func(str string)) (m
 		return nil, fmt.Errorf("failed to parse response data: %s %v", string(bodyBytes), err)
 	}
 
-	respData["choices"] = respData["output"].(map[string]any)["choices"]
-	usage := respData["usage"].(map[string]any)
+	output, ok := respData["output"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("output is not a map[string]interface{},data: %s", string(bodyBytes))
+	}
+	respData["choices"] = output["choices"]
+
+	usage, ok := respData["usage"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("usage is not a map[string]interface{}, data:%s", string(bodyBytes))
+	}
 	usage["completion_tokens"] = usage["output_tokens"]
 	usage["prompt_tokens"] = usage["input_tokens"]
 	return respData, nil

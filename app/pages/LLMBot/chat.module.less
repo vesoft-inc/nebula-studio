@@ -33,7 +33,12 @@
             p {
               margin: 5px 0;
               line-height: 25px;
-              letter-spacing: 2px;
+
+              pre {
+                margin: 0;
+                white-space: break-spaces;
+                max-width: 100%;
+              }
             }
           }
         }
@@ -62,32 +67,6 @@
   .codeWrapper {
     position: relative;
     min-width: 360px;
-
-    :global {
-      .CodeMirror {
-        background-color: #092332;
-        color: #AAAAAA
-      }
-
-      .CodeMirror-gutters {
-        background-color: #092332;
-        color: #AAAAAA;
-        border: none;
-        color: #828282;
-      }
-
-      .CodeMirror-cursor {
-        border-color: #828282;
-      }
-
-      .cm-keyword {
-        color: #19DBFF;
-      }
-
-      .cm-def {
-        color: #AE9AFF;
-      }
-    }
 
     >div {
       margin: 10px 0;

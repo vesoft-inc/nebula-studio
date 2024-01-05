@@ -542,5 +542,8 @@ export default {
     previous: '上一步',
     start: '开始',
     aiImport: 'AI 导入',
+    pleaseConfigLLMFirst: '请先配置 LLM 接口地址',
+    tokenTip: '当前 token 消耗为预估值，最终消耗可能与实际消耗有所差异。',
+    fileRequired: '请先选择文件',
   },
 };

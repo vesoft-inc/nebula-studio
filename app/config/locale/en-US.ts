@@ -564,5 +564,7 @@ export default {
     start: 'Start',
     aiImport: 'AI Import',
     pleaseConfigLLMFirst: 'Please configure LLM API first',
+    tokenTip: "The current token consumption is an estimated value, and there may be some differences from the actual consumption in the end.",
+    fileRequired: 'Please select the file',
   },
 };
