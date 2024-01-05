@@ -101,7 +101,10 @@
     }
   },
   "lint-staged": {
-    "./app/**/*.{js,jsx,ts,tsx}": []
+    "./app/**/*.{js,jsx,ts,tsx}": [
+      "npx prettier --write",
+      "eslint './app/**/*.{js,jsx,ts,tsx}' --fix --quiet"
+    ]
   },
   "ci": {
     "version": "8"
