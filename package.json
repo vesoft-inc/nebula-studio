@@ -103,7 +103,7 @@
   "lint-staged": {
     "./app/**/*.{js,jsx,ts,tsx}": [
       "npx prettier --write",
-      "eslint './app/**/*.{js,jsx,ts,tsx}' --fix --quiet"
+      "eslint './app/**/*.{js,jsx,ts,tsx}' --fix "
     ]
   },
   "ci": {
