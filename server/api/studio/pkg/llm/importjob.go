@@ -467,7 +467,7 @@ func (i *ImportJob) MakeGQLFile(filePath string) ([]string, error) {
 
 		for key, field := range typeSchema {
 			value, ok := props[key]
-			if !ok {
+			if !ok || value == nil {
 				if field.Nullable {
 					continue
 				} else {
@@ -483,9 +483,13 @@ func (i *ImportJob) MakeGQLFile(filePath string) ([]string, error) {
 				valueStr += ","
 			}
 			if strings.Contains(strings.ToLower(field.DataType), "string") {
-				valueStr += fmt.Sprintf(`"%v"`, value)
+				valueStr += fmt.Sprintf(`"%s"`, value)
 			} else {
-				valueStr += fmt.Sprintf(`%v`, value)
+				if value == nil {
+					valueStr += "null"
+				} else {
+					valueStr += fmt.Sprintf(`%s`, value)
+				}
 			}
 		}
 
@@ -580,11 +584,15 @@ func (i *ImportJob) RunGQLFile(gqls []string) error {
 	return nil
 }
 
+func replaceBackslash(s string) string {
+	return strings.ReplaceAll(s, "\\", "\\\\")
+}
+
 func (i *ImportJob) MakeSchema() error {
 	schema := Schema{
 		Space: i.LLMJob.Space,
 	}
-	gql := fmt.Sprintf("DESCRIBE SPACE `%s`", i.LLMJob.Space)
+	gql := fmt.Sprintf("DESCRIBE SPACE `%s`", replaceBackslash(i.LLMJob.Space))
 	spaceInfo, err := client.Execute(i.NSID, i.LLMJob.Space, []string{gql})
 	if err != nil {
 		return err
@@ -612,7 +620,7 @@ func (i *ImportJob) MakeSchema() error {
 		tag := NodeType{
 			Type: row["Name"].(string),
 		}
-		gql = fmt.Sprintf("DESCRIBE TAG `%s`", tag.Type)
+		gql = fmt.Sprintf("DESCRIBE TAG `%s`", replaceBackslash(tag.Type))
 		res, err := client.Execute(i.NSID, i.LLMJob.Space, []string{gql})
 		if err != nil {
 			return err
@@ -649,7 +657,7 @@ func (i *ImportJob) MakeSchema() error {
 		edge := EdgeType{
 			Type: row["Name"].(string),
 		}
-		gql = fmt.Sprintf("DESCRIBE EDGE `%s`", edge.Type)
+		gql = fmt.Sprintf("DESCRIBE EDGE `%s`", replaceBackslash(edge.Type))
 		res, err := client.Execute(i.NSID, i.LLMJob.Space, []string{gql})
 		if err != nil {
 			return err

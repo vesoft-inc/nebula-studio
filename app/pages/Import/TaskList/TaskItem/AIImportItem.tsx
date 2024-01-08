@@ -124,7 +124,7 @@ const AIImportItem = observer((props: IProps) => {
                 >
                   {intl.get('llm.aiImport')}
                 </span>
-                {llmJob.space}
+                {llmJob.job_id}
                 {llmJob.status === ILLMStatus.Success && (
                   <span className={styles.completeInfo}>
                     <CheckCircleFilled />

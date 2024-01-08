@@ -2,8 +2,10 @@ package llm
 
 import (
 	"fmt"
+	"hash/fnv"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/vesoft-inc/go-pkg/response"
@@ -16,6 +18,11 @@ import (
 	"gorm.io/datatypes"
 )
 
+func hashString(s string) string {
+	h := fnv.New64a()
+	h.Write([]byte(s))
+	return strconv.FormatUint(h.Sum64(), 8)
+}
 func (g *llmService) AddImportJob(req *types.LLMImportRequest) (resp *types.LLMResponse, err error) {
 	auth := g.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	config := db.LLMConfig{
@@ -40,7 +47,7 @@ func (g *llmService) AddImportJob(req *types.LLMImportRequest) (resp *types.LLMR
 		Host:       config.Host,
 		UserName:   config.UserName,
 		UserPrompt: req.UserPrompt,
-		JobID:      space + "_" + time.Now().Format("20060102150405000"),
+		JobID:      time.Now().Format("20060102150405000") + "_" + hashString(space),
 	}
 	task := &db.TaskInfo{
 		BID:     job.JobID,

@@ -1,6 +1,6 @@
 import { useStore } from '@app/stores';
 import { useI18n } from '@vesoft-inc/i18n';
-import { Button, Form, Input, Modal, Radio, Select, message } from 'antd';
+import { Button, Form, Input, Modal, Radio, Select, Tooltip, message } from 'antd';
 import { observer } from 'mobx-react-lite';
 import Icon from '@app/components/Icon';
 import { useEffect, useMemo, useState } from 'react';
@@ -62,6 +62,10 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
 
   const onConfirm = async () => {
     const values = form.getFieldsValue();
+    if (!values.file) {
+      message.error(intl.get('llm.fileRequired'));
+      return;
+    }
     post('/api/llm/import/job')({
       type,
       ...values,
@@ -85,20 +89,22 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
             setStep(0);
           }}
         >
-          <Icon type="icon-vesoft-numeric-1-circle" />
+          <Icon type={step === 0 ? "icon-vesoft-numeric-1-circle":"icon-vesoft-check-circle-filled"} />
           {intl.get('llm.setup')}
         </div>
         <span />
-        <div>
+        <div style={{color:step===0?'#888':'#0D8BFF'}} >
           <Icon type="icon-vesoft-numeric-2-circle" />
           {intl.get('llm.confirm')}
         </div>
       </div>
-      {tokens !== 0 && (
-        <div className={styles.tokenNum}>
-          <span style={{ fontSize: 10, transform: 'translate(0px,1px)' }}>🅣</span> prompt token: ~
+      {tokens !== 0 && type!=="filePath" && (
+        <Tooltip title={intl.get("llm.tokenTip")} placement="bottom">
+          <div className={styles.tokenNum}>
+          <span style={{ fontSize: 14, transform: 'translate(0px,1px)' }}>🅣</span> prompt token: ~
           {Math.ceil(tokens / 10000)}w
-        </div>
+          </div>
+        </Tooltip>
       )}
       <Form form={form} layout="vertical" style={{ display: step === 0 ? 'block' : 'none' }}>
         <Form.Item label={intl.get('llm.file')} required>

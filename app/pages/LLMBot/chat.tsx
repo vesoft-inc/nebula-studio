@@ -1,5 +1,5 @@
-import { Button, Input } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { Button, Input, message } from 'antd';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ws from '@app/utils/websocket';
 import { debounce } from 'lodash';
 import rootStore from '@app/stores';
@@ -31,9 +31,12 @@ function Chat() {
     });
     setMessages(newMessages);
     const callback = (res) => {
+      if (res.code !== 0) {
+        resetPending(newMessages,res.message);
+        return;
+      }
       if (res.message.done) {
-        newMessages[newMessages.length - 1].status = 'done';
-        setPending(false);
+        resetPending(newMessages);
         return;
       }
       try {
@@ -58,7 +61,7 @@ function Chat() {
         }
         setMessages([...newMessages]);
       } catch (e) {
-        setPending(false);
+        resetPending(newMessages,e.message+"\n response: \n"+JSON.stringify(res.message,null,2));
       }
     };
     const sendMessages = [
@@ -69,14 +72,26 @@ function Chat() {
       })),
     ];
     const systemPrompt = await rootStore.llm.getDocPrompt(currentInput, sendMessages);
-    ws.runChat({
+    await ws.runChat({
       req: {
         stream: true,
         messages: [{ role: 'system', content: systemPrompt }, ...sendMessages, { role: 'user', content: currentInput }],
       },
       callback,
+    }).catch((e) => {
+      message.error(e.message);
+      resetPending(newMessages,e.message);
     });
   }, 200);
+  const resetPending =  useCallback((messages,msg?:string) => {
+    setPending(false);
+    setMessages(messages.map((item) => {
+      if(item.status !== 'pending') return item;
+      item.status = 'done';
+      item.content = msg ?(`[error] ${msg}`): item.content;
+      return item;
+    }))
+  },[])
 
   useEffect(() => {
     if (contentRef.current) {
@@ -96,7 +111,9 @@ function Chat() {
     const gqls = message.content.split(/```\w*\n([^`]+)```/);
     return gqls.map((item, index) => {
       if (index % 2 === 0) {
-        return <p key={index}>{item}</p>;
+        return <p key={index}>
+          <pre>{item}</pre>
+        </p>;
       } else {
         item = item.replace(/^(\n|ngql|gql|cypher)/g, '').replace(/\n$/g, '');
         item = item.replace(/\n\n/, '\n');
