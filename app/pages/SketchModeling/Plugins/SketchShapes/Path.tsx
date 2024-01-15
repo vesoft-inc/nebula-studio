@@ -198,7 +198,6 @@ const Path: LineRender = {
             width={width}
             height={20}
             textAnchor="middle"
-            // eslint-disable-next-line react/no-unknown-property
             transform-origin={`${x} ${y}`}
             style={{ transform: `rotate(${angle}deg)` }}
           >
