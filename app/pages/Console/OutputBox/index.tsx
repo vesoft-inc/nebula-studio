@@ -228,6 +228,9 @@ const OutputBox = (props: IProps) => {
   };
 
   const resultSuccess = code === 0;
+  const explainData = useMemo(() => {
+    return dataSource?.map((item) => convertExplainData(item));
+  }, [dataSource]);
   const items = useMemo(() => {
     const isDot = data.headers[0] === 'format';
     const isExplainRaw =
@@ -274,12 +277,7 @@ const OutputBox = (props: IProps) => {
               {intl.get('console.planTree')}
             </>
           ),
-          children: (
-            <Explain
-              style={{ height: fullscreen ? window.innerHeight - 190 : 300 }}
-              data={dataSource.map((item) => convertExplainData(item))}
-            />
-          ),
+          children: <Explain style={{ height: fullscreen ? window.innerHeight - 190 : 300 }} data={explainData} />,
         },
 
       resultSuccess &&
@@ -291,12 +289,7 @@ const OutputBox = (props: IProps) => {
               {intl.get('console.planTree')}
             </>
           ),
-          children: (
-            <Explain
-              style={{ height: fullscreen ? window.innerHeight - 190 : 300 }}
-              data={dataSource.map((item) => convertExplainData(item))}
-            />
-          ),
+          children: <Explain style={{ height: fullscreen ? window.innerHeight - 190 : 300 }} data={explainData} />,
         },
       showGraph && {
         key: 'graph',
