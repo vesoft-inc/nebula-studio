@@ -32,7 +32,7 @@ function Chat() {
     setMessages(newMessages);
     const callback = (res) => {
       if (res.code !== 0) {
-        resetPending(newMessages,res.message);
+        resetPending(newMessages, res.message);
         return;
       }
       if (res.message.done) {
@@ -61,7 +61,7 @@ function Chat() {
         }
         setMessages([...newMessages]);
       } catch (e) {
-        resetPending(newMessages,e.message+"\n response: \n"+JSON.stringify(res.message,null,2));
+        resetPending(newMessages, e.message + '\n response: \n' + JSON.stringify(res.message, null, 2));
       }
     };
     const sendMessages = [
@@ -71,27 +71,38 @@ function Chat() {
         content: item.content.length > 50 ? item.content.trim().slice(0, 50) + '...' : item.content.trim(),
       })),
     ];
-    const systemPrompt = await rootStore.llm.getDocPrompt(currentInput, sendMessages);
-    await ws.runChat({
-      req: {
-        stream: true,
-        messages: [{ role: 'system', content: systemPrompt }, ...sendMessages, { role: 'user', content: currentInput }],
-      },
-      callback,
-    }).catch((e) => {
-      message.error(e.message);
-      resetPending(newMessages,e.message);
+    const systemPrompt = await rootStore.llm.getDocPrompt(currentInput, sendMessages).catch((e) => {
+      resetPending(newMessages, e.message);
     });
+    if (!systemPrompt) return;
+    await ws
+      .runChat({
+        req: {
+          stream: true,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...sendMessages,
+            { role: 'user', content: currentInput },
+          ],
+        },
+        callback,
+      })
+      .catch((e) => {
+        message.error(e.message);
+        resetPending(newMessages, e.message);
+      });
   }, 200);
-  const resetPending =  useCallback((messages,msg?:string) => {
+  const resetPending = useCallback((messages, msg?: string) => {
     setPending(false);
-    setMessages(messages.map((item) => {
-      if(item.status !== 'pending') return item;
-      item.status = 'done';
-      item.content = msg ?(`[error] ${msg}`): item.content;
-      return item;
-    }))
-  },[])
+    setMessages(
+      messages.map((item) => {
+        if (item.status !== 'pending') return item;
+        item.status = 'done';
+        item.content = msg ? `[error] ${msg}` : item.content;
+        return item;
+      }),
+    );
+  }, []);
 
   useEffect(() => {
     if (contentRef.current) {
@@ -111,9 +122,11 @@ function Chat() {
     const gqls = message.content.split(/```\w*\n([^`]+)```/);
     return gqls.map((item, index) => {
       if (index % 2 === 0) {
-        return <p key={index}>
-          <pre>{item}</pre>
-        </p>;
+        return (
+          <p key={index}>
+            <pre>{item}</pre>
+          </p>
+        );
       } else {
         item = item.replace(/^(\n|ngql|gql|cypher)/g, '').replace(/\n$/g, '');
         item = item.replace(/\n\n/, '\n');

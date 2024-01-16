@@ -9,11 +9,13 @@ import { useBatchState } from '@app/utils';
 import { useStore } from '@app/stores';
 import styles from './index.module.less';
 
-type IProps = PropsWithChildren<{ file: StudioFile}>
+type IProps = PropsWithChildren<{ file: StudioFile }>;
 
 const PreviewFileModal = (props: IProps) => {
   const { children, file } = props;
-  const { files: { updateFileConfig, getFiles } } = useStore();
+  const {
+    files: { updateFileConfig, getFiles },
+  } = useStore();
   const [form] = Form.useForm();
   const { state, setState } = useBatchState({
     visible: false,
@@ -33,32 +35,36 @@ const PreviewFileModal = (props: IProps) => {
     parseColumn(withHeader);
   }, [data]);
   const parseColumn = (withHeader: boolean) => {
-    const columns = data[0]?.map((header, index) => {
-      const textIndex = index;
-      const title = withHeader ? header : `Column ${textIndex}`;
-      return {
-        title,
-        dataIndex: index,
-        render: value => <span className={styles.limitWidth}>{value}</span>,
-      };
-    }) || [];
+    const columns =
+      data[0]?.map((header, index) => {
+        const textIndex = index;
+        const title = withHeader ? header : `Column ${textIndex}`;
+        return {
+          title,
+          dataIndex: index,
+          render: (value) => <span className={styles.limitWidth}>{value}</span>,
+        };
+      }) || [];
     setState({ columns });
   };
-  const readFile = useCallback((delimiter?: string) => {
-    setState({ parseLoading: true });
-    let data = [];
-    readString(sample, { 
-      delimiter: delimiter || file.delimiter, 
-      worker: true, 
-      skipEmptyLines: true,
-      step: (row) => {
-        data = [...data, row.data];
-      },
-      complete: () => {
-        setState({ parseLoading: false, data });
-      } 
-    });
-  }, [sample, delimiter]);
+  const readFile = useCallback(
+    (delimiter?: string) => {
+      setState({ parseLoading: true });
+      let data = [];
+      readString(sample, {
+        delimiter: delimiter || file.delimiter,
+        worker: true,
+        skipEmptyLines: true,
+        step: (row) => {
+          data = [...data, row.data];
+        },
+        complete: () => {
+          setState({ parseLoading: false, data });
+        },
+      });
+    },
+    [sample, delimiter],
+  );
   const handleConfirm = async () => {
     setState({ uploading: true });
     const { withHeader, delimiter } = form.getFieldsValue();
@@ -87,22 +93,28 @@ const PreviewFileModal = (props: IProps) => {
         footer={false}
       >
         <div className={styles.container}>
-          <Form form={form} layout="horizontal" initialValues={{
-            withHeader,
-            delimiter,
-          }}>
-            <Row className={styles.configOperation}>
-              <Col span={3}>
-                <Form.Item name="withHeader" valuePropName="checked">
-                  <Checkbox onChange={updateHeader}>{intl.get('import.hasHeader')}</Checkbox>
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label={intl.get('import.delimiter')} name="delimiter" required={true}>
-                  <Input placeholder="," onChange={handlePreview} />
-                </Form.Item>
-              </Col>
-            </Row>
+          <Form
+            form={form}
+            layout="horizontal"
+            initialValues={{
+              withHeader,
+              delimiter,
+            }}
+          >
+            {file.name.endsWith('.csv') && (
+              <Row className={styles.configOperation}>
+                <Col span={3}>
+                  <Form.Item name="withHeader" valuePropName="checked">
+                    <Checkbox onChange={updateHeader}>{intl.get('import.hasHeader')}</Checkbox>
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label={intl.get('import.delimiter')} name="delimiter" required={true}>
+                    <Input placeholder="," onChange={handlePreview} />
+                  </Form.Item>
+                </Col>
+              </Row>
+            )}
             <Form.Item noStyle shouldUpdate={true}>
               {({ getFieldValue }) => {
                 const withHeader = getFieldValue('withHeader');
@@ -127,12 +139,7 @@ const PreviewFileModal = (props: IProps) => {
                 <Button disabled={uploading} onClick={() => handleCancel()}>
                   {intl.get('common.cancel')}
                 </Button>
-                <Button
-                  htmlType="submit"
-                  type="primary"
-                  loading={uploading}
-                  onClick={() => handleConfirm()}
-                >
+                <Button htmlType="submit" type="primary" loading={uploading} onClick={() => handleConfirm()}>
                   {intl.get('common.confirm')}
                 </Button>
               </div>
