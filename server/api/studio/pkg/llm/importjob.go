@@ -148,6 +148,7 @@ func RunFileJob(job *db.LLMJob) {
 		llmJob.SetJobFailed(err)
 		return
 	}
+	llmJob.WriteLogFile(fmt.Sprintf("read file success, file text length: %d", len(text)), "info")
 	blocks, err := llmJob.SplitText(text)
 	if err != nil {
 		llmJob.WriteLogFile(fmt.Sprintf("split text error: %v", err), "error")

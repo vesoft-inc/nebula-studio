@@ -262,7 +262,12 @@ class LLM {
         },
       })) as any;
       if (res.code === 0) {
-        const url = (res.message.choices[0].message?.content as string)?.split('\n')[0];
+        let url = '';
+        try {
+          url = (res.message.choices[0].message?.content as string)?.split('\n')[0];
+        } catch {
+          throw new Error(JSON.stringify(res.message));
+        }
         const paths = url
           .toLowerCase()
           .replaceAll('，', ',') // chinese comma

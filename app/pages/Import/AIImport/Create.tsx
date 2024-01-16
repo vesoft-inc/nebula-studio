@@ -44,17 +44,21 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
     (async () => {
       if (file && space) {
         const types = {
-          csv: 0.9,
-          json: 0.6,
+          csv: 1,
+          txt: 1,
+          json: 0.8,
           pdf: 0.05,
         };
         const subfix = file.name.split('.').pop();
-        const type = types[subfix] || 0.5;
-        const size = file.size;
+        const type = types[subfix] || 1;
+        const size = file.size * type;
         const schema = await llm.getSpaceSchema(space);
-        const schemaBytesLength = getByteLength(schema);
+        const schemaBytesLength = getByteLength(schema) + 500; //prompt length about 500
+        const splitNums = Math.ceil(size / llm.config.maxContextLength);
+        const splitBytesLength = Math.ceil(schemaBytesLength * splitNums);
+        const totalBytesLength = splitBytesLength + file.size;
         // full connection
-        const tokensNum = ((((schemaBytesLength * size) / 2000) * llm.config.maxContextLength) / 2000) * type;
+        const tokensNum = totalBytesLength / 4; //about 4 bytes per token
         setTokens(tokensNum);
       }
     })();
@@ -89,20 +93,20 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
             setStep(0);
           }}
         >
-          <Icon type={step === 0 ? "icon-vesoft-numeric-1-circle":"icon-vesoft-check-circle-filled"} />
+          <Icon type={step === 0 ? 'icon-vesoft-numeric-1-circle' : 'icon-vesoft-check-circle-filled'} />
           {intl.get('llm.setup')}
         </div>
         <span />
-        <div style={{color:step===0?'#888':'#0D8BFF'}} >
+        <div style={{ color: step === 0 ? '#888' : '#0D8BFF' }}>
           <Icon type="icon-vesoft-numeric-2-circle" />
           {intl.get('llm.confirm')}
         </div>
       </div>
-      {tokens !== 0 && type!=="filePath" && (
-        <Tooltip title={intl.get("llm.tokenTip")} placement="bottom">
+      {tokens !== 0 && type !== 'filePath' && (
+        <Tooltip title={intl.get('llm.tokenTip')} placement="bottom">
           <div className={styles.tokenNum}>
-          <span style={{ fontSize: 14, transform: 'translate(0px,1px)' }}>🅣</span> prompt token: ~
-          {Math.ceil(tokens / 10000)}w
+            <span style={{ fontSize: 14, transform: 'translate(0px,1px)' }}>🅣</span> prompt token: ~
+            {Math.ceil(tokens / 10000)}w
           </div>
         </Tooltip>
       )}
