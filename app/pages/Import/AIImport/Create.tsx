@@ -53,12 +53,12 @@ const Create = observer((props: { visible: boolean; onCancel: () => void }) => {
         const type = types[subfix] || 1;
         const size = file.size * type;
         const schema = await llm.getSpaceSchema(space);
-        const schemaBytesLength = getByteLength(schema) + 500; //prompt length about 500
+        const schemaBytesLength = getByteLength(schema) + 1000; //prompt length about 500
         const splitNums = Math.ceil(size / llm.config.maxContextLength);
         const splitBytesLength = Math.ceil(schemaBytesLength * splitNums);
         const totalBytesLength = splitBytesLength + file.size;
         // full connection
-        const tokensNum = totalBytesLength / 4; //about 4 bytes per token
+        const tokensNum = totalBytesLength / 2; //about 4 bytes per token
         setTokens(tokensNum);
       }
     })();
