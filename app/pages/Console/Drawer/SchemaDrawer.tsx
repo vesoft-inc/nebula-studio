@@ -19,7 +19,7 @@ const SchemaDrawer = () => {
   const [searchVal, setSearchVal] = useState('');
   const [expandedKeys, setExpandedKeys] = useState([]);
   const getSchemaInfo = useCallback(async () => {
-    if (schemaOverview.length) return;
+    // if (schemaOverview.length) return;
     const { code, data } = await schema.getSpaces();
     if (code === 0) {
       update({
