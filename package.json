@@ -23,7 +23,7 @@
     "@vesoft-inc/force-graph": "2.0.7",
     "@vesoft-inc/i18n": "^1.0.1",
     "@vesoft-inc/icons": "^1.7.0",
-    "@vesoft-inc/nebula-explain-graph": "^1.0.6",
+    "@vesoft-inc/nebula-explain-graph": "^1.0.10",
     "@vesoft-inc/veditor": "^4.4.14",
     "antd": "^5.8.4",
     "axios": "^0.23.0",
