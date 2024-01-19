@@ -15,18 +15,25 @@ MaxBlockSize: 0 # max request block num
 GQLBatchSize: 100 # max gql batch size
 PromptTemplate: |
     As a knowledge graph AI importer, your task is to extract useful data from the following text:
-    ----text
+    
+    ---
     {text}
-    ----
+    ---
 
-    the knowledge graph has following schema and node name must be a real :
-    ----graph schema
+    The knowledge graph should follow this schema (node name is mandatory):
+
+    ---
     {spaceSchema}
-    ----
+    ---
 
-    Return the results directly, without explain and comment. The results should be in the following JSON format:
+    Please return the results in JSON format only, without any explanations or comments. The JSON should include nodes and edges with their properties, as shown below:
+
+    ```json
     {
-      "nodes":[{ "name":string,"type":string,"props":object }],
-      "edges":[{ "src":string,"dst":string,"edgeType":string,"props":object }]
+      "nodes":[{ "name":"foo","type":"node_type_1","props":{"key_x":"85%"} }],
+      "edges":[{ "src":"foo","dst":"bar","edgeType":"edge_type_3","props":{"name":"is located in"} }]
     }
-    the result json is:
+    ```
+
+    Ensure the JSON is correctly formatted. Now, extract!
+    JSON:
