@@ -65,7 +65,7 @@ const createSchemaRegex = (patterns, words, type) => {
 const patterns = [
   '\\b(WORDS)\\b',
   '(^|\\s)(WORDS)(\\s|$)', // There can be spaces before and after the string
-  '(?<=^|\\s|\\.\\s|:\\s)(WORDS)', // There can be a '.' or ':' before the string.
+  '(?<=^|\\s|\\.\\s|:\\s)(WORDS)\\s', // There can be a '.' or ':' before the string.
 ];
 const MonacoEditor = (props: IProps) => {
   const { intl, currentLocale } = useI18n();
@@ -347,6 +347,7 @@ const MonacoEditor = (props: IProps) => {
         minimap: { enabled: false },
         fontSize: 13,
         automaticLayout: true,
+        fixedOverflowWidgets: true,
       }}
       onMount={onMount}
       className={className}
