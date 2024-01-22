@@ -9,6 +9,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"time"
@@ -70,15 +71,9 @@ func RunFileJob(job *db.LLMJob) {
 			CompletionTokens: 0,
 		},
 	}
-	err := llmJob.AddLogFile()
-	if err != nil {
-		llmJob.SetJobFailed(err)
-		return
-	}
-	defer llmJob.CloseLogFile()
 	defer func() {
 		if err := recover(); err != nil {
-			llmJob.WriteLogFile(fmt.Sprintf("panic: %v", err), "error")
+			llmJob.WriteLogFile(fmt.Sprintf("panic: %v , stack: %v", err, string(debug.Stack())), "error")
 			llmJob.SetJobFailed(err)
 		}
 		processJson, err := json.Marshal(llmJob.Process)
@@ -94,6 +89,12 @@ func RunFileJob(job *db.LLMJob) {
 			return
 		}
 	}()
+	err := llmJob.AddLogFile()
+	if err != nil {
+		llmJob.SetJobFailed(err)
+		return
+	}
+	defer llmJob.CloseLogFile()
 	go llmJob.SyncProcess(job)
 
 	llmJob.Process.Ratio = 0.01
@@ -357,6 +358,9 @@ func (i *ImportJob) ParseText(text string) {
 			i.CacheNodes[node.Name] = node
 			continue
 		}
+		if nowNode.Props == nil {
+			nowNode.Props = make(map[string]any)
+		}
 		for key, value := range node.Props {
 			nowNode.Props[key] = value
 		}
@@ -372,6 +376,9 @@ func (i *ImportJob) ParseText(text string) {
 			if !ok {
 				i.CacheEdges[src][dst] = edge
 				continue
+			}
+			if nowEdge.Props == nil {
+				nowEdge.Props = make(map[string]any)
 			}
 			for key, value := range edge.Props {
 				nowEdge.Props[key] = value
