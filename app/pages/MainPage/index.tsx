@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Layout, Spin } from 'antd';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { shouldAlwaysShowWelcome } from '@app/pages/Welcome';
@@ -7,10 +7,14 @@ import { MENU_LIST, RoutesList } from './routes';
 import './index.less';
 
 import Header from './Header';
+import llm from '@app/stores/llm';
 const { Content } = Layout;
 
 const MainPage = () => {
   const redirectPath = shouldAlwaysShowWelcome() ? '/welcome' : '/console';
+  useEffect(() => {
+    llm.fetchConfig();
+  }, []);
   return (
     <Layout className="nebulaStudioLayout">
       <Header menus={MENU_LIST} />
