@@ -77,6 +77,7 @@ export interface LLMConfig {
   enableCopilot: boolean;
   enableLLM2NGQLs: boolean;
   gqlPath: string;
+  model: string;
 }
 class LLM {
   currentInput = '';
