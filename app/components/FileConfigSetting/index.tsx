@@ -66,7 +66,10 @@ const FileConfigSetting = (props: IProps) => {
   const readFile = useCallback(
     debounce(() => {
       const { activeItem, setState } = state;
-      if (!activeItem || !(activeItem.name.indexOf('.csv') > -1)) return;
+      if (!activeItem || !(activeItem.name.indexOf('.csv') > -1)) {
+        setState({ previewContent: [] });
+        return;
+      }
       setState({ loading: true });
       let content = [];
       if (activeItem.sample !== undefined) {

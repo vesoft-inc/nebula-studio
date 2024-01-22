@@ -83,8 +83,9 @@ class LLM {
   open = false;
   config = {
     maxContextLength: 2000,
-    url: 'https://{your-resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version={api-version}',
+    url: 'https://api.openai.com/v1/chat/completions',
     apiType: 'openai',
+    model: 'gpt-3.5-turbo',
     features: ['spaceSchema', 'useConsoleNGQL'],
   } as LLMConfig;
   widget: HTMLSpanElement;
@@ -96,7 +97,6 @@ class LLM {
       editor: false,
       widget: false,
     });
-    this.fetchConfig();
   }
 
   fetchConfig() {

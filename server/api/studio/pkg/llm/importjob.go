@@ -381,9 +381,9 @@ func (i *ImportJob) ParseText(text string) {
 }
 
 func (i *ImportJob) GetPrompt(text string) string {
-	promptTemplate := config.GetConfig().LLM.PromptTemplate
-	i.Prompt = strings.ReplaceAll(promptTemplate, "{userPrompt}", i.LLMJob.UserPrompt)
-	i.Prompt = strings.ReplaceAll(promptTemplate, "{spaceSchema}", i.SpaceSchemaString)
+	i.Prompt = config.GetConfig().LLM.PromptTemplate
+	i.Prompt = strings.ReplaceAll(i.Prompt, "{userPrompt}", i.LLMJob.UserPrompt)
+	i.Prompt = strings.ReplaceAll(i.Prompt, "{spaceSchema}", i.SpaceSchemaString)
 	i.Prompt = strings.ReplaceAll(i.Prompt, "{text}", text)
 	return i.Prompt
 }
@@ -396,7 +396,7 @@ func (i *ImportJob) QueryBlocks(blocks []string) error {
 			break
 		}
 		if IsRunningJobStopped(job.JobID) {
-			return nil
+			return fmt.Errorf("job stopped")
 		}
 		prompt := i.GetPrompt(block)
 		text, err := i.Query(prompt)

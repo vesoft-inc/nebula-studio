@@ -11,7 +11,7 @@ interface IProps {
 
 const ColorPicker: React.FC<IProps> = (props: IProps) => {
   const { onChange, onChangeComplete } = props;
-  const handleChange = color => {
+  const handleChange = (color) => {
     if (onChange) {
       onChange(color);
     }
@@ -19,6 +19,9 @@ const ColorPicker: React.FC<IProps> = (props: IProps) => {
 
   const handleChangeComplete = (color, _event) => {
     if (onChangeComplete) {
+      if (_event.target.value && _event.target.value.length === 3) {
+        return;
+      }
       onChangeComplete(color);
     }
   };
