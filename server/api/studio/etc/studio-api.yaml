@@ -6,7 +6,7 @@ Timeout: 60000
 # single(single-instance) or multi(multi-instance), default is single
 # multi-instance: local data storage will be prohibited to ensure consistency across multiple instances
 # AppInstance: "multi"
-Log:
+Log: 
   Mode: file
   Level: info
   KeepDays: 7
@@ -30,12 +30,12 @@ WebSocket:
   # default: 8MB (8 * 1024 * 1024), 0 means no limit or system limit
   ReadLimit: 8388608
 Auth:
-  TokenName: 'studio_token'
-  AccessSecret: 'login_secret'
+  TokenName: "studio_token"
+  AccessSecret: "login_secret"
   AccessExpire: 259200
 File:
-  UploadDir: './data/upload/'
-  TasksDir: './data/tasks'
+  UploadDir: "./data/upload/"
+  TasksDir: "./data/tasks"
 CorsOrigins: []
 DB:
   # 1,2,3,4 corresponding to Silent, ERROR, Warn, INFO
@@ -44,23 +44,23 @@ DB:
   # AutoMigrate run auto migration for given models
   AutoMigrate: true
   # The database backend, either "mysql", "sqlite3".
-  Type: 'mysql'
+  Type: "sqlite3"
   # Database host
-  Host: '192.168.8.131:3306'
+  Host: "127.0.0.1:3306"
   # Database name
-  Name: 'gaokeyong'
+  Name: "nebula"
   # Database user
-  User: 'vesoft'
+  User: "root"
   # Database password
-  Password: 'nebula123'
+  Password: "123456"
   # For "sqlite3" only, database file path
-  SqliteDbFilePath: './data/tasks.db'
+  SqliteDbFilePath: "./data/tasks.db"
   # The maximum open connections of the pool.
   MaxOpenConns: 30
   # The maximum idle connections of the pool.
   MaxIdleConns: 10
 LLM:
-  GQLPath: './data/llm'
+  GQLPath: "./data/llm"
   GQLBatchSize: 100
   MaxBlockSize: 0
   PromptTemplate: |
@@ -86,6 +86,6 @@ LLM:
       "edges":[{ "src":"foo","dst":"bar","edgeType":"edge_type_3","props":{"name":"is located in"} }]
     }
     ```
-
+    
     Ensure the JSON is correctly formatted. Now, extract!
     JSON:
