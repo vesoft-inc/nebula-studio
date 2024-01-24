@@ -21,7 +21,7 @@ import (
 func hashString(s string) string {
 	h := fnv.New64a()
 	h.Write([]byte(s))
-	return strconv.FormatUint(h.Sum64(), 8)
+	return strconv.FormatUint(h.Sum64(), 36)
 }
 func (g *llmService) AddImportJob(req *types.LLMImportRequest) (resp *types.LLMResponse, err error) {
 	auth := g.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
