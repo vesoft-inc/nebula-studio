@@ -1,39 +1,39 @@
 LLMJob:
-  Space: "" #space name
-  File: "" #file path,support pdf,txt,json,csv and other text format
+  Space: '' #space name
+  File: '' #file path,support pdf,txt,json,csv and other text format
 Auth:
-  Address: "127.0.0.1" # nebula graphd address
+  Address: '127.0.0.1' # nebula graphd address
   Port: 9669
-  Username: "root"
-  Password: "nebula"
+  Username: 'root'
+  Password: 'nebula'
 LLMConfig:
-  URL: "" # openai api url
-  Key: "" # openai api key
-  APIType: "openai"
+  URL: '' # openai api url
+  Key: '' # openai api key
+  APIType: 'openai'
   ContextLengthLimit: 1024
 MaxBlockSize: 0 # max request block num
 GQLBatchSize: 100 # max gql batch size
 PromptTemplate: |
-    As a knowledge graph AI importer, your task is to extract useful data from the following text:
-    
-    ---
-    {text}
-    ---
+  As a knowledge graph AI importer, your task is to extract useful data from the following text:
 
-    The knowledge graph should follow this schema (node name is mandatory):
+  ---
+  {text}
+  ---
 
-    ---
-    {spaceSchema}
-    ---
+  The knowledge graph should follow this schema (node name is mandatory):
 
-    Please return the results in JSON format only, without any explanations or comments. The JSON should include nodes and edges with their properties, as shown below:
+  ---
+  {spaceSchema}
+  ---
 
-    ```json
-    {
-      "nodes":[{ "name":"foo","type":"node_type_1","props":{"key_x":"85%"} }],
-      "edges":[{ "src":"foo","dst":"bar","edgeType":"edge_type_3","props":{"name":"is located in"} }]
-    }
-    ```
+  Please return the results in JSON format only, without any explanations or comments. The JSON should include nodes and edges with their properties, as shown below:
 
-    Ensure the JSON is correctly formatted. Now, extract!
-    JSON:
+  ```json
+  {
+    "nodes":[{ "name":"foo","type":"node_type_1","props":{"key_x":"85%"} }],
+    "edges":[{ "src":"foo","dst":"bar","edgeType":"edge_type_3","props":{"name":"is located in"} }]
+  }
+  ```
+
+  Ensure the JSON is correctly formatted. Now, extract!
+  JSON:
