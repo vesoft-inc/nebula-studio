@@ -86,7 +86,7 @@ type Config struct {
 		GQLBatchSize   int    `json:",default=100"`
 		MaxBlockSize   int    `json:",default=0"`
 		PromptTemplate string `json:",default="`
-	}
+	} `json:",optional"`
 }
 
 type PathValidator struct {
