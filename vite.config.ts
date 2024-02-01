@@ -2,8 +2,6 @@ import path from 'node:path';
 import { defineConfig, loadEnv } from 'vite';
 import type { Plugin, ResolvedConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
-import autoprefixer from 'autoprefixer';
-import postCssPresetEnv from 'postcss-preset-env';
 import ejs from 'ejs';
 import SVGElement from '@vesoft-inc/icons/lib/NebulaGraph-Explorer/svg-tpl.cjs';
 // import legacy from '@vitejs/plugin-legacy';
@@ -34,12 +32,10 @@ const htmlPlugin = (data?: Record<string, unknown>): Plugin => {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  build: {
-    target: 'esnext',
-    sourcemap: true,
-  },
   plugins: [
-    react(),
+    react({
+      plugins: [['@swc/plugin-emotion', {}]],
+    }),
     // topLevelAwait(),
     htmlPlugin({ appInstance: appConfig.AppInstance || 'single' }),
     // legacy({
@@ -71,29 +67,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@app': path.join(__dirname, './app/'),
+      '@src': path.join(__dirname, './src/'),
       '@assets': '/src/assets',
     },
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json'],
-  },
-  css: {
-    preprocessorOptions: {
-      less: {
-        javascriptEnabled: true,
-      },
-    },
-    modules: {
-      localsConvention: 'camelCase',
-      generateScopedName: '[name]__[local]__[hash:base64:5]',
-    },
-    postcss: {
-      plugins: [
-        autoprefixer(),
-        postCssPresetEnv({
-          browsers: ['> 1%', 'Chrome >= 89', 'Firefox ESR', 'Safari >= 14'],
-        }),
-      ],
-    },
   },
   define: {
     'process.env': {

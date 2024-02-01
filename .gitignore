@@ -10,6 +10,7 @@ node_modules/
 *.log
 *.lock
 *.map
+.swc
 .github/workflows/nodejs.yml
 go.work.sum
 
