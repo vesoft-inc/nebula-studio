@@ -114,9 +114,11 @@ export const getTagOrEdgeCreateGQL = (params: {
           }
           const _type =
             item.type !== 'fixed_string' ? item.type : item.type + `(${item.fixedLength ? item.fixedLength : ''})`;
-          const _null = item.allowNull ? 'NULL' : 'NOT NULL';
+          // `[NULL | NOT NULL]` is not required
+          // in `CREATE TAG` or `CREATE EDGE` statement, the default value is `NULL` if not specified
+          const _null = item.allowNull === undefined ? '' : item.allowNull ? 'NULL' : 'NOT NULL';
           const _comment = item.comment ? `COMMENT "${handleEscape(item.comment)}"` : '';
-          const conbine = [handleKeyword(item.name), _type, _null, valueStr, _comment];
+          const conbine = [handleKeyword(item.name), _type, _null, valueStr, _comment].filter(Boolean);
           return conbine.join(' ');
         })
         .join(', ')
