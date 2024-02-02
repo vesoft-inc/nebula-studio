@@ -66,6 +66,9 @@
     }
   },
   "lint-staged": {
+    "*.{ts,tsx}": [
+      "tsc --noEmit"
+    ],
     "./src/**/*.{js,jsx,ts,tsx,json}": [
       "prettier --write './src/**/*.{js,jsx,ts,tsx,json}'",
       "eslint './src/**/*.{js,jsx,ts,tsx,json}' --fix --quiet"

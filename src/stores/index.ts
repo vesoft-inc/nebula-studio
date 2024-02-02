@@ -10,7 +10,7 @@ const rootStore = new RootStore();
 const rootStoreRef = { current: rootStore };
 
 // @ts-ignore
-window.rootStore = rootStore;
+window.studioStore = rootStore;
 
 export const getRootStore = () => rootStoreRef.current;
 export const storeContext = createContext(rootStore);

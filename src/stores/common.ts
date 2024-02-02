@@ -1,5 +1,5 @@
-import { type RootStore } from '@src/stores';
 import { action, makeObservable, observable } from 'mobx';
+import { type RootStore } from '.';
 
 export class CommonStore {
   rootStore: RootStore;
