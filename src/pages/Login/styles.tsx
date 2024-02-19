@@ -8,7 +8,7 @@ export const LoginContainer = styled(Box)`
   display: flex;
   flex-direction: row-reverse;
   justify-content: space-between;
-  background-image: url('/images/background_login.png');
+  background-image: url('/images/background-login.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;

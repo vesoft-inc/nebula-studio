@@ -29,7 +29,7 @@ export default function PageLayout() {
             height={38}
             width={115}
             alt="NebulaGraph Studio"
-            src={isDarkMode ? '/images/studio_logo_dark.png' : '/images/studio_logo_light.png'}
+            src={isDarkMode ? '/images/studio-logo-dark.png' : '/images/studio-logo-light.png'}
           />
           <Box sx={{ flexGrow: 1 }}></Box>
           <Box sx={{ flexGrow: 0 }}>

@@ -15,7 +15,7 @@ export default function Login() {
     <LoginContainer>
       <Content>
         <ContentHeader>
-          <HeaderLogo src="/vite.svg" />
+          <HeaderLogo src="/images/nebula-logo.png" />
           <HeaderTitle>悦数 图探索</HeaderTitle>
         </ContentHeader>
         <Footer>
