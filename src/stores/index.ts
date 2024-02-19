@@ -1,8 +1,10 @@
 import { createContext, useContext } from 'react';
 import { CommonStore } from './common';
+import { RouterStore } from './router';
 
 export class RootStore {
   commonStore = new CommonStore(this);
+  routerStore = new RouterStore(this);
 }
 
 const rootStore = new RootStore();

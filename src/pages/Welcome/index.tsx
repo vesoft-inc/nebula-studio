@@ -2,14 +2,12 @@ import { observer } from 'mobx-react-lite';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
-import ProTip from '@src/components/ProTip';
-import Copyright from '@src/components/Copyright';
-import { useStore } from '@src/stores';
+import ProTip from '@/components/ProTip';
+import Copyright from '@/components/Copyright';
 
 export default observer(function Welcome() {
-  const store = useStore();
-  console.log('store', store.commonStore.loading);
   return (
     <Container maxWidth="lg">
       <Box
@@ -25,7 +23,9 @@ export default observer(function Welcome() {
           MUI v5 + Next.js with TypeScript example
         </Typography>
         <Box maxWidth="sm">
-          <Button variant="contained">Go to the home page</Button>
+          <Link to="/login">
+            <Button variant="contained">Go to the home page</Button>
+          </Link>
         </Box>
         <ProTip />
         <Copyright />

@@ -2,10 +2,10 @@ import { action, makeObservable, observable } from 'mobx';
 import { type RootStore } from '.';
 
 export class CommonStore {
-  rootStore: RootStore;
+  rootStore?: RootStore;
   loading = false;
 
-  constructor(rootStore: RootStore) {
+  constructor(rootStore?: RootStore) {
     makeObservable(this, {
       rootStore: observable.ref,
       setLoading: action,

@@ -22,30 +22,33 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.6",
     "@mui/material": "^5.15.6",
+    "@mui/system": "^5.15.9",
     "@mui/x-date-pickers": "^6.19.2",
-    "@vesoft-inc/icons": "^1.9.0",
+    "@remix-run/router": "^1.15.0",
+    "@vesoft-inc/icons": "^2.0.0",
+    "@vesoft-inc/ui-components": "0.0.3-beta.7",
     "dayjs": "^1.11.10",
-    "i18next": "^23.7.19",
+    "i18next": "^23.8.2",
     "material-react-table": "^2.9.2",
     "mobx": "^6.12.0",
     "mobx-react-lite": "^4.0.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form-mui": "6.8.0",
+    "react-i18next": "^14.0.5",
     "react-router-dom": "^6.21.3"
   },
   "devDependencies": {
     "@emotion/eslint-plugin": "^11.11.0",
     "@emotion/react": "^11.11.3",
-    "@swc/plugin-emotion": "^2.5.116",
-    "@types/ejs": "^3.1.5",
+    "@swc/core": "^1.4.1",
+    "@swc/plugin-emotion": "^2.5.120",
     "@types/node": "^20.11.6",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^6.20.0",
     "@vitejs/plugin-react-swc": "^3.5.0",
-    "ejs": "^3.1.9",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react-hooks": "^4.6.0",
@@ -66,7 +69,7 @@
     }
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
+    "*./src/**/*.{ts,tsx}": [
       "tsc --noEmit"
     ],
     "./src/**/*.{js,jsx,ts,tsx,json}": [

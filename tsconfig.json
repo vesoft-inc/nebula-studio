@@ -35,16 +35,15 @@
       "@public/*": [
         "public/*"
       ],
-      "@src/*": [
+      "@/*": [
         "src/*"
       ]
     }
   },
   "include": [
-    "./**/*.ts",
-    "./**/*.tsx",
-    "./**/*.js",
-    "./**/*.json",
-    "scripts/readPdf.mjs"
-  ]
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "vite.config.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
 }
