@@ -1,10 +1,10 @@
 import { createContext, useContext } from 'react';
+import { RouterStore } from '@vesoft-inc/utils';
 import { CommonStore } from './common';
-import { RouterStore } from './router';
 
 export class RootStore {
   commonStore = new CommonStore(this);
-  routerStore = new RouterStore(this);
+  routerStore = new RouterStore();
 }
 
 const rootStore = new RootStore();
