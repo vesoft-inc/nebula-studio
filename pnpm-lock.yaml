@@ -33,8 +33,8 @@ dependencies:
     specifier: ^1.15.0
     version: 1.15.0
   '@vesoft-inc/icons':
-    specifier: ^2.0.0
-    version: 2.0.0(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^2.0.1
+    version: 2.0.1(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/ui-components':
     specifier: 0.0.3-beta.7
     version: 0.0.3-beta.7(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
@@ -1369,8 +1369,8 @@ packages:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
     dev: true
 
-  /@vesoft-inc/icons@2.0.0(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-eumDr72re7ikXKaeCxfHcikmQ4XbhNdaaB1wtvpbi4xAbREHkWG4VQPrfb/wJi4x9IYUbJ+XB+NiDZtTMVH0qw==}
+  /@vesoft-inc/icons@2.0.1(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-CQZyD0/249UPf1/j83eenRK18oZazc0mQ7rNKjQu3EViygzFWhrhuUK/atmiHKUoTyoFZRk9rCV3hWONNBibYA==}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'

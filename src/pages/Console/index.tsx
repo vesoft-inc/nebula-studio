@@ -12,14 +12,12 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
-import SendIcon from '@mui/icons-material/Send';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import Divider from '@mui/material/Divider';
-import { VectorTriangle, FileDocument, Play, ChevronRightFilled } from '@vesoft-inc/icons';
+import { VectorTriangle, FileDocument, Play, ChevronRightFilled, DotsHexagon, EdgeType } from '@vesoft-inc/icons';
 import styled from '@emotion/styled';
+import type { SxProps } from '@mui/material';
 import {
   ActionWrapper,
   EditorWrapper,
@@ -40,10 +38,11 @@ const StyledListItemIcon = styled(ListItemIcon)`
 export default function Console() {
   const theme = useTheme();
   const [activeMenu, setActive] = useState('Console');
-  const activeIcon = activeMenu === 'Console' ? <VectorTriangle /> : <FileDocument />;
   const [open, setOpen] = useState(true);
 
   const handleClick = useCallback(() => setOpen((open) => !open), []);
+  const activeIcon = activeMenu === 'Console' ? <VectorTriangle /> : <FileDocument />;
+  const schemaTextSx: SxProps = { color: theme.palette.vesoft?.textColor1, fontWeight: 600, fontSize: '16px' };
   return (
     <Box sx={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
       <StyledSider>
@@ -85,20 +84,20 @@ export default function Console() {
             <Divider />
             <ListItemButton>
               <ChevronRightFilled />
-              <StyledListItemIcon>
-                <SendIcon />
+              <StyledListItemIcon sx={schemaTextSx}>
+                <DotsHexagon />
               </StyledListItemIcon>
-              <ListItemText primary="Sent mail" />
+              <ListItemText primaryTypographyProps={{ sx: schemaTextSx }} primary="Sent mail" />
             </ListItemButton>
             <Divider />
             <ListItemButton onClick={handleClick}>
               <ChevronRightFilled
                 sx={{ transform: `rotate(${open ? 90 : 0}deg)`, transition: 'transform ease 0.25s' }}
               />
-              <StyledListItemIcon>
-                <InboxIcon />
+              <StyledListItemIcon sx={schemaTextSx}>
+                <DotsHexagon />
               </StyledListItemIcon>
-              <ListItemText primary="Inbox" />
+              <ListItemText primaryTypographyProps={{ sx: schemaTextSx }} primary="Inbox" />
             </ListItemButton>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <Divider />
@@ -113,10 +112,10 @@ export default function Console() {
             <Divider />
             <ListItemButton>
               <ChevronRightFilled />
-              <StyledListItemIcon>
-                <DraftsIcon />
+              <StyledListItemIcon sx={schemaTextSx}>
+                <EdgeType />
               </StyledListItemIcon>
-              <ListItemText primary="Drafts" />
+              <ListItemText primaryTypographyProps={{ sx: schemaTextSx }} primary="Drafts" />
             </ListItemButton>
           </List>
         </SiderItem>
