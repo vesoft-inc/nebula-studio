@@ -1,23 +1,30 @@
+import { observer } from 'mobx-react-lite';
+import { useCallback } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
 import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { AppBar, MainContentContainer } from './styles';
+import SettingsIcon from '@mui/icons-material/Settings';
+import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
+import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
+import Stack from '@mui/system/Stack';
+import { useStore } from '@/stores';
+import { AppBar, AppToolbar, MainContentContainer } from './styles';
 
-export default function PageLayout() {
+export default observer(function PageLayout() {
   const theme = useTheme();
+  const { themeStore } = useStore();
+  const toggleTheme = useCallback(() => themeStore.toggleMode(), [themeStore]);
   const isDarkMode = theme.palette.mode === 'dark';
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <AppBar>
-        <Toolbar sx={{ pr: '24px' }}>
+        <AppToolbar>
           <IconButton
             edge="start"
-            color="inherit"
+            color="primary"
             aria-label="open drawer"
             sx={{ marginRight: (theme) => theme.spacing(2) }}
           >
@@ -33,13 +40,19 @@ export default function PageLayout() {
           />
           <Box sx={{ flexGrow: 1 }}></Box>
           <Box sx={{ flexGrow: 0 }}>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
+            <Stack direction="row" spacing={1}>
+              <IconButton color="primary">
                 <NotificationsIcon />
-              </Badge>
-            </IconButton>
+              </IconButton>
+              <IconButton color="primary">
+                <SettingsIcon />
+              </IconButton>
+              <IconButton color="primary" onClick={toggleTheme}>
+                {isDarkMode ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
+              </IconButton>
+            </Stack>
           </Box>
-        </Toolbar>
+        </AppToolbar>
       </AppBar>
       <Box sx={{ display: 'flex' }}>
         <MainContentContainer>
@@ -48,4 +61,4 @@ export default function PageLayout() {
       </Box>
     </Box>
   );
-}
+});

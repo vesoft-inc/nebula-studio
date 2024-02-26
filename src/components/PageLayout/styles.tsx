@@ -1,4 +1,6 @@
-import { Box, BoxProps, styled } from '@mui/material';
+import Box, { type BoxProps } from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import styled from '@emotion/styled';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 
 interface AppBarProps extends MuiAppBarProps {
@@ -12,9 +14,13 @@ export const AppBar = styled(MuiAppBar, {
 })<AppBarProps>`
   position: relative;
   height: ${AppBarHeight}px;
-  background-color: ${({ theme }) =>
-    theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[900]};
-  color: ${({ theme }) => theme.palette.text.primary};
+  background-color: ${({ theme }) => theme.palette.vesoft.bgColor};
+  color: ${({ theme }) => theme.palette.vesoft.textColor2};
+`;
+
+export const AppToolbar = styled(Toolbar)`
+  padding-right: ${({ theme }) => theme.spacing(2)};
+  background-color: ${({ theme }) => theme.palette.vesoft.bgColor};
 `;
 
 export const MainContentContainer = styled(Box)<BoxProps>(({ theme }) => ({
