@@ -1,5 +1,5 @@
 import type { Theme } from '@emotion/react';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MenuItem from '@mui/material/MenuItem';
 

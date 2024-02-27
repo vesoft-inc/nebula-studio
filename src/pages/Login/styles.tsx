@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material/styles';
 import isPropValid from '@emotion/is-prop-valid';
 import Box from '@mui/material/Box';
 
@@ -33,13 +33,13 @@ export const ContentHeader = styled(Box)`
   flex-direction: column;
 `;
 
-export const HeaderLogo = styled.img`
+export const HeaderLogo = styled('img')`
   width: 128px;
   height: 128px;
   margin-bottom: 25px;
 `;
 
-export const HeaderTitle = styled.span`
+export const HeaderTitle = styled('span')`
   color: ${({ theme }) => theme.palette.text.primary};
   font-weight: 700;
   margin-bottom: 70px;
@@ -68,7 +68,7 @@ export const FooterInfo = styled(Box)`
   font-weight: 700;
 `;
 
-export const FooterVersion = styled.span`
+export const FooterVersion = styled('span')`
   font-size: 14px;
   color: ${({ theme }) => theme.palette.text.primary};
 `;

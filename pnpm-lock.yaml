@@ -39,8 +39,8 @@ dependencies:
     specifier: 0.0.3-beta.7
     version: 0.0.3-beta.7(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/utils':
-    specifier: 0.0.0-beta.3
-    version: 0.0.0-beta.3(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)
+    specifier: 0.0.0-beta.4
+    version: 0.0.0-beta.4(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)
   dayjs:
     specifier: ^1.11.10
     version: 1.11.10
@@ -106,6 +106,9 @@ devDependencies:
   '@vitejs/plugin-react-swc':
     specifier: ^3.5.0
     version: 3.6.0(vite@5.0.12)
+  chalk:
+    specifier: ^5.3.0
+    version: 5.3.0
   eslint:
     specifier: ^8.56.0
     version: 8.56.0
@@ -130,6 +133,9 @@ devDependencies:
   prettier:
     specifier: ^3.2.4
     version: 3.2.4
+  tsx:
+    specifier: ^4.7.1
+    version: 4.7.1
   typescript:
     specifier: ^5.3.3
     version: 5.3.3
@@ -785,6 +791,24 @@ packages:
       '@types/react': 18.2.51
     dev: false
 
+  /@mui/utils@5.15.11(@types/react@18.2.51)(react@18.2.0):
+    resolution: {integrity: sha512-D6bwqprUa9Stf8ft0dcMqWyWDKEo7D+6pB1k8WajbqlYIRA8J8Kw9Ra7PSZKKePGBGWO+/xxrX1U8HpG/aXQCw==}
+    engines: {node: '>=12.0.0'}
+    peerDependencies:
+      '@types/react': ^17.0.0 || ^18.0.0
+      react: ^17.0.0 || ^18.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.23.9
+      '@types/prop-types': 15.7.11
+      '@types/react': 18.2.51
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-is: 18.2.0
+    dev: false
+
   /@mui/utils@5.15.7(@types/react@18.2.51)(react@18.2.0):
     resolution: {integrity: sha512-8qhsxQRNV6aEOjjSk6YQIYJxkF5klhj8oG1FEEU4z6HV78TjNqRxMP08QGcdsibEbez+nihAaz6vu83b4XqbAg==}
     engines: {node: '>=12.0.0'}
@@ -1414,12 +1438,13 @@ packages:
       - moment-jalaali
     dev: false
 
-  /@vesoft-inc/utils@0.0.0-beta.3(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0):
-    resolution: {integrity: sha512-i/9EYGe856rKprl+swD6pXhuxZQofcx4fjuAjSWIiiqKPEnZ9lNjmOk/Urg3bZm2hDLCoaK05tedgcy+es8Rlw==}
+  /@vesoft-inc/utils@0.0.0-beta.4(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0):
+    resolution: {integrity: sha512-JG27ty4bqY1TvB3+oRvYMFP/+/qP3HV5PDAGLaNouxSG339NQFyloANboErZ+hBd8K2Zj9oWWWJBKQWNowlRRw==}
     dependencies:
       '@babel/runtime': 7.23.9
       '@emotion/react': 11.11.3(@types/react@18.2.51)(react@18.2.0)
       '@mui/material': 5.15.7(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
+      '@mui/utils': 5.15.11(@types/react@18.2.51)(react@18.2.0)
       '@remix-run/router': 1.15.0
       axios: 1.6.7
       core-js: 3.36.0
@@ -2014,6 +2039,12 @@ packages:
   /get-stream@8.0.1:
     resolution: {integrity: sha512-VaUJspBffn/LMCJVoMvSAdmscJyS1auj5Zulnn5UoYcY531UWmdwhRWkcGKnGU93m5HSXP9LP2usOryrBtQowA==}
     engines: {node: '>=16'}
+    dev: true
+
+  /get-tsconfig@4.7.2:
+    resolution: {integrity: sha512-wuMsz4leaj5hbGgg4IvDU0bqJagpftG5l5cXIAvo8uZrqn0NJqwtfupTN00VnkQJPcIRrxYrm1Ue24btpCha2A==}
+    dependencies:
+      resolve-pkg-maps: 1.0.0
     dev: true
 
   /glob-parent@5.1.2:
@@ -2700,6 +2731,10 @@ packages:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}
     engines: {node: '>=4'}
 
+  /resolve-pkg-maps@1.0.0:
+    resolution: {integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==}
+    dev: true
+
   /resolve@1.22.8:
     resolution: {integrity: sha512-oKWePCxqpd6FlLvGV1VU0x7bkPmmCNolxzjMf4NczoDnQcIWrAF+cPtZn5i6n+RfD2d9i0tzpKnG6Yk168yIyw==}
     hasBin: true
@@ -2910,6 +2945,17 @@ packages:
       typescript: '>=4.2.0'
     dependencies:
       typescript: 5.3.3
+    dev: true
+
+  /tsx@4.7.1:
+    resolution: {integrity: sha512-8d6VuibXHtlN5E3zFkgY8u4DX7Y3Z27zvvPKVmLon/D4AjuKzarkUBTLDBgj9iTQ0hg5xM7c/mYiRVM+HETf0g==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+    dependencies:
+      esbuild: 0.19.12
+      get-tsconfig: 4.7.2
+    optionalDependencies:
+      fsevents: 2.3.3
     dev: true
 
   /type-check@0.4.0:

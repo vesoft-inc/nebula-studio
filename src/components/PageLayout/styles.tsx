@@ -1,6 +1,6 @@
 import Box, { type BoxProps } from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 
 interface AppBarProps extends MuiAppBarProps {

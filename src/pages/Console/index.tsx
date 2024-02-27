@@ -16,7 +16,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import Divider from '@mui/material/Divider';
 import { VectorTriangle, FileDocument, Play, ChevronRightFilled, DotsHexagon, EdgeType } from '@vesoft-inc/icons';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material/styles';
 import type { SxProps } from '@mui/material';
 import {
   ActionWrapper,
