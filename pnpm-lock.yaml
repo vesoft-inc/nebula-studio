@@ -36,11 +36,11 @@ dependencies:
     specifier: ^2.0.1
     version: 2.0.1(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/ui-components':
-    specifier: 0.0.3-beta.7
-    version: 0.0.3-beta.7(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
+    specifier: 0.0.3-beta.14
+    version: 0.0.3-beta.14(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/utils':
-    specifier: 0.0.0-beta.4
-    version: 0.0.0-beta.4(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)
+    specifier: 0.0.0-beta.5
+    version: 0.0.0-beta.5(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)
   dayjs:
     specifier: ^1.11.10
     version: 1.11.10
@@ -1409,20 +1409,26 @@ packages:
       - '@types/react'
     dev: false
 
-  /@vesoft-inc/ui-components@0.0.3-beta.7(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-4dCWAdkc3B7KXhLGo1JiJqZeiF5ko8ISTBinQ/61n+wjpFB4kDmtd7VNCmD2QnjPVamMVaZzmPImHvVlO2AnYg==}
+  /@vesoft-inc/ui-components@0.0.3-beta.14(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-mDCiHm6l3vS2w3DMaKAxK4GO73slo0yZrySWUqk1YwbBm/lIJ+1fM6puYTdr7MDg9sXw0vCK7lsOt5UkfWKFEQ==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^17 || ^18
       react-dom: ^17 || ^18
     dependencies:
+      '@emotion/is-prop-valid': 1.2.1
       '@emotion/react': 11.11.3(@types/react@18.2.51)(react@18.2.0)
       '@emotion/styled': 11.11.0(@emotion/react@11.11.3)(@types/react@18.2.51)(react@18.2.0)
       '@mui/icons-material': 5.15.7(@mui/material@5.15.7)(@types/react@18.2.51)(react@18.2.0)
       '@mui/material': 5.15.7(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
+      '@mui/utils': 5.15.11(@types/react@18.2.51)(react@18.2.0)
       '@mui/x-date-pickers': 6.19.2(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.7)(@mui/system@5.15.9)(@types/react@18.2.51)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0)
+      '@types/prop-types': 15.7.11
+      '@vesoft-inc/icons': 2.0.1(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
+      '@vesoft-inc/utils': 0.0.0-beta.1(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)
       dayjs: 1.11.10
       material-react-table: 2.10.0(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/icons-material@5.15.7)(@mui/material@5.15.7)(@mui/x-date-pickers@6.19.2)(react-dom@18.2.0)(react@18.2.0)
+      prop-types: 15.8.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       react-hook-form: 7.50.1(react@18.2.0)
@@ -1432,14 +1438,34 @@ packages:
       - '@types/react'
       - date-fns
       - date-fns-jalali
+      - debug
       - luxon
       - moment
       - moment-hijri
       - moment-jalaali
     dev: false
 
-  /@vesoft-inc/utils@0.0.0-beta.4(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0):
-    resolution: {integrity: sha512-JG27ty4bqY1TvB3+oRvYMFP/+/qP3HV5PDAGLaNouxSG339NQFyloANboErZ+hBd8K2Zj9oWWWJBKQWNowlRRw==}
+  /@vesoft-inc/utils@0.0.0-beta.1(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0):
+    resolution: {integrity: sha512-4YiukFdib1DYP4ESCC/ZMZM9kaaHWxUTd5YO8ZI937kBxtUgL4Uz4vkgrJETP6ibWC9Vth/dDbWjRbRVV/t0/g==}
+    dependencies:
+      '@babel/runtime': 7.23.9
+      '@emotion/react': 11.11.3(@types/react@18.2.51)(react@18.2.0)
+      '@mui/material': 5.15.7(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
+      '@remix-run/router': 1.15.0
+      axios: 1.6.7
+      core-js: 3.36.0
+      mobx: 6.12.0
+      react: 18.2.0
+      react-router-dom: 6.21.3(react-dom@18.2.0)(react@18.2.0)
+    transitivePeerDependencies:
+      - '@emotion/styled'
+      - '@types/react'
+      - debug
+      - react-dom
+    dev: false
+
+  /@vesoft-inc/utils@0.0.0-beta.5(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0):
+    resolution: {integrity: sha512-colC6JcaNgo7G5juS6NDppWJ4iTBPNHRTos3i+eD+a8csNmsgaiRD87mo/5yyJ3Uoz8gxtQArvvAwvOFIxgJ/g==}
     dependencies:
       '@babel/runtime': 7.23.9
       '@emotion/react': 11.11.3(@types/react@18.2.51)(react@18.2.0)
