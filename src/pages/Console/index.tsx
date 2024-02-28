@@ -1,7 +1,6 @@
 import { Suspense, lazy, useCallback, useState } from 'react';
 import { useTheme } from '@emotion/react';
 import Box from '@mui/material/Box';
-import MenuList from '@mui/material/MenuList';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -18,15 +17,8 @@ import Divider from '@mui/material/Divider';
 import { VectorTriangle, FileDocument, Play, ChevronRightFilled, DotsHexagon, EdgeType } from '@vesoft-inc/icons';
 import { styled } from '@mui/material/styles';
 import type { SxProps } from '@mui/material';
-import {
-  ActionWrapper,
-  EditorWrapper,
-  InputArea,
-  SiderItem,
-  SiderItemHeader,
-  StyledMenuItem,
-  StyledSider,
-} from './styles';
+import { ActionWrapper, EditorWrapper, InputArea, SiderItem, SiderItemHeader, StyledSider } from './styles';
+import { IMenuRouteItem, Menu } from '@vesoft-inc/ui-components';
 
 const MonacoEditor = lazy(() => import('@/components/MonacoEditor'));
 
@@ -37,28 +29,78 @@ const StyledListItemIcon = styled(ListItemIcon)`
 
 export default function Console() {
   const theme = useTheme();
-  const [activeMenu, setActive] = useState('Console');
+  const [activeMenu, setActiveMenu] = useState('console');
   const [open, setOpen] = useState(true);
 
   const handleClick = useCallback(() => setOpen((open) => !open), []);
-  const activeIcon = activeMenu === 'Console' ? <VectorTriangle /> : <FileDocument />;
+  const activeIcon = activeMenu === 'console' ? <VectorTriangle /> : <FileDocument />;
   const schemaTextSx: SxProps = { color: theme.palette.vesoft?.textColor1, fontWeight: 600, fontSize: '16px' };
+
+  const handleMenuClick = useCallback((menuItem: IMenuRouteItem, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.preventDefault();
+    setActiveMenu(menuItem.key);
+  }, []);
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
       <StyledSider>
         <SiderItem sx={{ width: (theme) => theme.spacing(8) }}>
-          <MenuList sx={{ padding: 0 }}>
-            <StyledMenuItem value="Console" selected={'Console' === activeMenu} onClick={() => setActive('Console')}>
-              <VectorTriangle />
-            </StyledMenuItem>
-            <StyledMenuItem
-              value="Templates"
-              selected={'Templates' === activeMenu}
-              onClick={() => setActive('Templates')}
-            >
-              <FileDocument />
-            </StyledMenuItem>
-          </MenuList>
+          <Menu
+            canToggle={false}
+            items={[
+              {
+                key: 'console',
+                label: 'Console',
+                icon: <VectorTriangle />,
+              },
+              {
+                key: 'template',
+                label: 'template',
+                icon: <FileDocument />,
+              },
+            ]}
+            selectedKeys={activeMenu ? [activeMenu] : []}
+            onMenuClick={handleMenuClick}
+            activeSlotProps={{
+              menuListItemButton: {
+                sx: {
+                  backgroundColor: theme.palette.vesoft.themeColor1,
+                  height: theme.spacing(8),
+                  borderRadius: 0,
+                  '&:hover': {
+                    borderRadius: 0,
+                    backgroundColor: theme.palette.vesoft.themeColor1,
+                  },
+                },
+              },
+              menuItemText: {
+                sx: {
+                  color: theme.palette.vesoft.textColor8,
+                },
+              },
+              menuItemIcon: {
+                sx: {
+                  color: theme.palette.vesoft.textColor8,
+                },
+              },
+            }}
+            slotProps={{
+              drawer: {
+                sx: {
+                  width: theme.spacing(8),
+                },
+              },
+              menuListItemButton: {
+                sx: {
+                  height: theme.spacing(8),
+                  '&:hover': {
+                    borderRadius: 0,
+                    backgroundColor: theme.palette.vesoft.themeColor6,
+                  },
+                },
+              },
+            }}
+          />
         </SiderItem>
         <SiderItem sx={{ width: (theme) => theme.spacing(36) }}>
           <SiderItemHeader>
