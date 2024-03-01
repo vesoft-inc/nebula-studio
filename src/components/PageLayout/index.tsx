@@ -4,7 +4,6 @@ import { Outlet } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
@@ -20,16 +19,8 @@ export default observer(function PageLayout() {
   const isDarkMode = theme.palette.mode === 'dark';
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      <AppBar>
+      <AppBar position="static">
         <AppToolbar>
-          <IconButton
-            edge="start"
-            color="primary"
-            aria-label="open drawer"
-            sx={{ marginRight: (theme) => theme.spacing(2) }}
-          >
-            <MenuIcon />
-          </IconButton>
           <Box
             component="img"
             loading="lazy"

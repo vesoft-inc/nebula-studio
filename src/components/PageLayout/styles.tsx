@@ -16,6 +16,7 @@ export const AppBar = styled(MuiAppBar, {
   height: ${AppBarHeight}px;
   background-color: ${({ theme }) => theme.palette.vesoft.bgColor};
   color: ${({ theme }) => theme.palette.vesoft.textColor2};
+  z-index: ${({ theme }) => theme.zIndex.drawer + 1};
 `;
 
 export const AppToolbar = styled(Toolbar)`

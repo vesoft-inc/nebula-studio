@@ -19,6 +19,7 @@ export const SiderItem = styled(Box)`
 `;
 
 export const SiderItemHeader = styled(Box)`
+  flex: 0 0 60px;
   height: 60px;
   display: flex;
   align-items: center;

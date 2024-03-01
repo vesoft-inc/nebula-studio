@@ -18,7 +18,7 @@ export const LoginContainer = styled(Box)`
 export const Content = styled(Box)`
   width: 360px;
   height: 100vh;
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.palette.vesoft.bgColor};
   padding: 70px 30px 0;
   text-align: center;
   display: flex;

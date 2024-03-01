@@ -51,12 +51,12 @@ export default function Console() {
               {
                 key: 'console',
                 label: 'Console',
-                icon: <VectorTriangle />,
+                icon: <VectorTriangle fontSize="medium" />,
               },
               {
                 key: 'template',
                 label: 'template',
-                icon: <FileDocument />,
+                icon: <FileDocument fontSize="medium" />,
               },
             ]}
             selectedKeys={activeMenu ? [activeMenu] : []}
@@ -73,11 +73,6 @@ export default function Console() {
                   },
                 },
               },
-              menuItemText: {
-                sx: {
-                  color: theme.palette.vesoft.textColor8,
-                },
-              },
               menuItemIcon: {
                 sx: {
                   color: theme.palette.vesoft.textColor8,
@@ -86,6 +81,14 @@ export default function Console() {
             }}
             slotProps={{
               drawer: {
+                variant: 'permanent',
+                PaperProps: {
+                  sx: {
+                    borderRight: 'none',
+                    display: 'block',
+                    backgroundColor: 'inherit',
+                  },
+                },
                 sx: {
                   width: theme.spacing(8),
                 },
@@ -95,8 +98,13 @@ export default function Console() {
                   height: theme.spacing(8),
                   '&:hover': {
                     borderRadius: 0,
-                    backgroundColor: theme.palette.vesoft.themeColor6,
+                    backgroundColor: theme.palette.vesoft.themeColor1,
                   },
+                },
+              },
+              menuItemIcon: {
+                sx: {
+                  color: theme.palette.vesoft.textColor1,
                 },
               },
             }}
@@ -110,15 +118,11 @@ export default function Console() {
             </Box>
           </SiderItemHeader>
           <List
-            sx={{ width: '100%' }}
+            sx={{ width: '100%', overflowY: 'auto' }}
             component="nav"
             aria-labelledby="nested-list-subheader"
             subheader={
-              <ListSubheader
-                component="div"
-                id="nested-list-subheader"
-                sx={{ bgcolor: (theme) => theme.palette.vesoft.bgColor2 }}
-              >
+              <ListSubheader component="div" id="nested-list-subheader">
                 NebulaGraph Schema
               </ListSubheader>
             }
