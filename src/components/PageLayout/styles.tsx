@@ -2,6 +2,7 @@ import Box, { type BoxProps } from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import { styled } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import { Tab, Tabs } from '@mui/material';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -31,3 +32,27 @@ export const MainContentContainer = styled(Box)<BoxProps>(({ theme }) => ({
   height: `calc(100vh - ${AppBarHeight}px)`,
   overflow: 'auto',
 }));
+
+export const ActionContentContainer = styled(Box)`
+  height: 100%;
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+`;
+
+export const MenuTabs = styled(Tabs)`
+  margin-left: ${({ theme }) => theme.spacing(2)};
+`;
+
+export const MenuTab = styled(Tab, { shouldForwardProp: (prop) => prop !== 'active' })<
+  AppBarProps & { active?: boolean }
+>`
+  font-weight: bold;
+  height: ${AppBarHeight}px;
+`;
+
+export enum TabMenu {
+  GraphType = 'graphType',
+  ImportData = 'importer',
+  Console = 'console',
+}

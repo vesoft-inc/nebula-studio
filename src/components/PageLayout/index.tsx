@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
-import { Outlet } from 'react-router-dom';
+import { useCallback, useState } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -10,13 +10,23 @@ import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import Stack from '@mui/system/Stack';
 import { useStore } from '@/stores';
-import { AppBar, AppToolbar, MainContentContainer } from './styles';
+import { ActionContentContainer, AppBar, AppToolbar, MainContentContainer, MenuTab, MenuTabs, TabMenu } from './styles';
+import { useTranslation } from 'react-i18next';
 
 export default observer(function PageLayout() {
   const theme = useTheme();
   const { themeStore } = useStore();
   const toggleTheme = useCallback(() => themeStore.toggleMode(), [themeStore]);
   const isDarkMode = theme.palette.mode === 'dark';
+  const [curTab, setCurTab] = useState<TabMenu>(TabMenu.GraphType);
+  const { t } = useTranslation(['common']);
+  const navigate = useNavigate();
+  const hanldeTabChange = (event: React.SyntheticEvent, tab: TabMenu) => {
+    event.stopPropagation();
+    setCurTab(tab);
+    navigate(`${tab}`);
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <AppBar position="static">
@@ -29,7 +39,21 @@ export default observer(function PageLayout() {
             alt="NebulaGraph Studio"
             src={isDarkMode ? '/images/studio-logo-dark.png' : '/images/studio-logo-light.png'}
           />
-          <Box sx={{ flexGrow: 1 }}></Box>
+          <ActionContentContainer>
+            <MenuTabs
+              value={curTab}
+              TabIndicatorProps={{
+                sx: {
+                  backgroundColor: theme.palette.vesoft?.themeColor1,
+                },
+              }}
+              onChange={hanldeTabChange}
+            >
+              {Object.values(TabMenu).map((tab, index) => (
+                <MenuTab key={index} active={curTab === tab} label={t(tab, { ns: 'common' })} value={tab} />
+              ))}
+            </MenuTabs>
+          </ActionContentContainer>
           <Box sx={{ flexGrow: 0 }}>
             <Stack direction="row" spacing={1}>
               <IconButton color="primary">

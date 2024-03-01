@@ -36,11 +36,11 @@ dependencies:
     specifier: ^2.0.1
     version: 2.0.1(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/ui-components':
-    specifier: 0.0.3-beta.16
-    version: 0.0.3-beta.16(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
+    specifier: 0.0.3-beta.19
+    version: 0.0.3-beta.19(@mui/system@5.15.9)(@types/react@18.2.51)(mobx@6.12.0)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/utils':
-    specifier: 0.0.0-beta.5
-    version: 0.0.0-beta.5(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)
+    specifier: 0.0.0-beta.7
+    version: 0.0.0-beta.7(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)
   dayjs:
     specifier: ^1.11.10
     version: 1.11.10
@@ -1409,8 +1409,8 @@ packages:
       - '@types/react'
     dev: false
 
-  /@vesoft-inc/ui-components@0.0.3-beta.16(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-xNoEmV9unkBEuq3bXDacj9wTxNMSqSfk7HKQrFrfWw5br0zzfUK0Ib4M4Fj96pr/pPdBLU7DcYXQOOw/IesTWA==}
+  /@vesoft-inc/ui-components@0.0.3-beta.19(@mui/system@5.15.9)(@types/react@18.2.51)(mobx@6.12.0)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-/qwYPYm7YApV2IbecTA3sFHOyUaTsdUBZ0Xe59GWvg2Ka+o9p4b0hch9O02WhG3WPPuwyssTEFp1Ao0cHnAJHA==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^17 || ^18
@@ -1428,6 +1428,7 @@ packages:
       '@vesoft-inc/utils': 0.0.0-beta.1(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)
       dayjs: 1.11.10
       material-react-table: 2.10.0(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/icons-material@5.15.7)(@mui/material@5.15.7)(@mui/x-date-pickers@6.19.2)(react-dom@18.2.0)(react@18.2.0)
+      mobx-react-lite: 4.0.5(mobx@6.12.0)(react-dom@18.2.0)(react@18.2.0)
       prop-types: 15.8.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -1440,9 +1441,11 @@ packages:
       - date-fns-jalali
       - debug
       - luxon
+      - mobx
       - moment
       - moment-hijri
       - moment-jalaali
+      - react-native
     dev: false
 
   /@vesoft-inc/utils@0.0.0-beta.1(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0):
@@ -1464,8 +1467,8 @@ packages:
       - react-dom
     dev: false
 
-  /@vesoft-inc/utils@0.0.0-beta.5(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0):
-    resolution: {integrity: sha512-colC6JcaNgo7G5juS6NDppWJ4iTBPNHRTos3i+eD+a8csNmsgaiRD87mo/5yyJ3Uoz8gxtQArvvAwvOFIxgJ/g==}
+  /@vesoft-inc/utils@0.0.0-beta.7(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0):
+    resolution: {integrity: sha512-r3Y99c7f2obPDtEAP7x5IO1zqTzxkMhAg1YtNwPoMz0PfK7WsU5k/rq/nGnxaTTWnoAdrGcLYConI+0aiiQcXw==}
     dependencies:
       '@babel/runtime': 7.23.9
       '@emotion/react': 11.11.3(@types/react@18.2.51)(react@18.2.0)
