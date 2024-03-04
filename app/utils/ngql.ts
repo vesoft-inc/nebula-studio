@@ -1,5 +1,4 @@
 import ngqlsheet from './ngqlsheet.json';
-import doc from './doc.json';
 const urlTransformerMap = {
   FETCH: 'FETCHProps',
   Match: 'MatchOrScanOrQuery',
@@ -18,7 +17,7 @@ const ngqlDocs = Object.keys(ngqlsheet).map((key) => ({
   url: '/2.quick-start/6.cheatsheet-for-ngql/',
   content: ngqlsheet[key],
 }));
-export const ngqlDoc = [...ngqlDocs, ...doc]
+export const ngqlDoc = [...ngqlDocs]
   .map((item) => {
     item.title = item.title
       .split(' ')
