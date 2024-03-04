@@ -83,7 +83,7 @@ class LLM {
   currentInput = '';
   open = false;
   config = {
-    maxContextLength: 2000,
+    maxContextLength: 4096,
     url: 'https://api.openai.com/v1/chat/completions',
     apiType: 'openai',
     model: 'gpt-3.5-turbo',
@@ -108,6 +108,7 @@ class LLM {
       this.setConfig({
         ...configMap,
         ...values,
+        maxContextLength: values.contextLengthLimit,
         gqlPath: res.data.gqlPath,
       });
       return this.config;
@@ -123,7 +124,7 @@ class LLM {
   }
 
   async getSpaceSchema(space: string) {
-    const finalPrompt = `The user's current graph space is: ${space} \n`;
+    const finalPrompt = `The user's current graph space is: ${space} \nschema:\n`;
     if (this.config.features.includes('spaceSchema')) {
       await schema.switchSpace(space);
       await schema.getTagList();
