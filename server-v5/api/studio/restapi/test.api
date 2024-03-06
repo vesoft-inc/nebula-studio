@@ -1,0 +1,18 @@
+syntax = "v1"
+
+type (
+	GetTestReq  {}
+	GetTestResp {
+		Data interface{} `json:"data,omitempty"`
+	}
+)
+
+@server (
+	group: test // is used to put related logic in the same package
+)
+service studio-api {
+	@doc "test hello world"
+	@handler TestHellworld
+	get /api-studio/test returns (GetTestResp)
+}
+

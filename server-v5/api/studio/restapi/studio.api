@@ -1,0 +1,11 @@
+syntax = "v1"
+
+info (
+	title: "NebulaGraph Studio InitTemplate API"
+	desc:  "NebulaGraph Studio InitTemplate API"
+)
+
+import (
+	"test.api"
+)
+
