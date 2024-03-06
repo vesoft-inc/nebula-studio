@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { I18nextProvider } from 'react-i18next';
+import { GlobalModal } from '@vesoft-inc/ui-components';
 import { BrowserRouter, ThemeWrapper } from '@vesoft-inc/utils';
 import { StoreProvider, getRootStore } from '@/stores';
 import i18n from '@/utils/i18n';
@@ -15,6 +16,7 @@ export default function PageRoot() {
           <ThemeWrapper>
             <BrowserRouter store={rootStore.routerStore}>
               <App />
+              <GlobalModal store={rootStore.modalStore} />
             </BrowserRouter>
           </ThemeWrapper>
         </I18nextProvider>

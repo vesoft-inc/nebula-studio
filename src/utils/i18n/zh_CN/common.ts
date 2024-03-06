@@ -6,6 +6,8 @@ const conmmon = {
   graphType: '图类型',
   importer: '导入数据',
   console: '控制台',
+  cancel: '取消',
+  create: '创建',
 };
 
 export default conmmon;

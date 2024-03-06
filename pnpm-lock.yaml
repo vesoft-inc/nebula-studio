@@ -36,11 +36,11 @@ dependencies:
     specifier: ^2.0.1
     version: 2.0.1(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/ui-components':
-    specifier: 0.0.3-beta.19
-    version: 0.0.3-beta.19(@mui/system@5.15.9)(@types/react@18.2.51)(mobx@6.12.0)(react-dom@18.2.0)(react@18.2.0)
+    specifier: 0.0.3-beta.25
+    version: 0.0.3-beta.25(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/utils':
-    specifier: 0.0.0-beta.7
-    version: 0.0.0-beta.7(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)
+    specifier: 0.0.0-beta.10
+    version: 0.0.0-beta.10(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)
   dayjs:
     specifier: ^1.11.10
     version: 1.11.10
@@ -67,7 +67,7 @@ dependencies:
     version: 18.2.0(react@18.2.0)
   react-hook-form-mui:
     specifier: 6.8.0
-    version: 6.8.0(@mui/icons-material@5.15.7)(@mui/material@5.15.7)(@mui/x-date-pickers@6.19.2)(react-hook-form@7.50.1)(react@18.2.0)
+    version: 6.8.0(@mui/icons-material@5.15.7)(@mui/material@5.15.7)(@mui/x-date-pickers@6.19.2)(react-hook-form@7.51.0)(react@18.2.0)
   react-i18next:
     specifier: ^14.0.5
     version: 14.0.5(i18next@23.8.1)(react-dom@18.2.0)(react@18.2.0)
@@ -184,6 +184,13 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.14.1
+
+  /@babel/runtime@7.24.0:
+    resolution: {integrity: sha512-Chk32uHMg6TnQdvw2e9IlqPpFX/6NLuK0Ys2PqLb7/gL5uFn9mXvK715FGLlOLQrcO4qIkNHkvPGktzzXexsFw==}
+    engines: {node: '>=6.9.0'}
+    dependencies:
+      regenerator-runtime: 0.14.1
+    dev: false
 
   /@babel/types@7.23.9:
     resolution: {integrity: sha512-dQjSq/7HaSjRM43FFGnv5keM2HsxpmyV1PfaSVm0nzzjwwTmjOe6J4bC8e3+pTEIgHaHj+1ZlLThRJ2auc/w1Q==}
@@ -809,6 +816,24 @@ packages:
       react-is: 18.2.0
     dev: false
 
+  /@mui/utils@5.15.12(@types/react@18.2.51)(react@18.2.0):
+    resolution: {integrity: sha512-8SDGCnO2DY9Yy+5bGzu00NZowSDtuyHP4H8gunhHGQoIlhlY2Z3w64wBzAOLpYw/ZhJNzksDTnS/i8qdJvxuow==}
+    engines: {node: '>=12.0.0'}
+    peerDependencies:
+      '@types/react': ^17.0.0 || ^18.0.0
+      react: ^17.0.0 || ^18.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.24.0
+      '@types/prop-types': 15.7.11
+      '@types/react': 18.2.51
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-is: 18.2.0
+    dev: false
+
   /@mui/utils@5.15.7(@types/react@18.2.51)(react@18.2.0):
     resolution: {integrity: sha512-8qhsxQRNV6aEOjjSk6YQIYJxkF5klhj8oG1FEEU4z6HV78TjNqRxMP08QGcdsibEbez+nihAaz6vu83b4XqbAg==}
     engines: {node: '>=12.0.0'}
@@ -1409,8 +1434,8 @@ packages:
       - '@types/react'
     dev: false
 
-  /@vesoft-inc/ui-components@0.0.3-beta.19(@mui/system@5.15.9)(@types/react@18.2.51)(mobx@6.12.0)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-/qwYPYm7YApV2IbecTA3sFHOyUaTsdUBZ0Xe59GWvg2Ka+o9p4b0hch9O02WhG3WPPuwyssTEFp1Ao0cHnAJHA==}
+  /@vesoft-inc/ui-components@0.0.3-beta.25(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-QlL31EiqUGZ52f1MA7Jn/aDE/a3lC/dOoGwZSMO8DFkoDlr7jv+KnniZWyd7tub2mkbRLzUrHC5aDOkEMtkyDQ==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^17 || ^18
@@ -1421,19 +1446,20 @@ packages:
       '@emotion/styled': 11.11.0(@emotion/react@11.11.3)(@types/react@18.2.51)(react@18.2.0)
       '@mui/icons-material': 5.15.7(@mui/material@5.15.7)(@types/react@18.2.51)(react@18.2.0)
       '@mui/material': 5.15.7(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
-      '@mui/utils': 5.15.11(@types/react@18.2.51)(react@18.2.0)
+      '@mui/utils': 5.15.12(@types/react@18.2.51)(react@18.2.0)
       '@mui/x-date-pickers': 6.19.2(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.7)(@mui/system@5.15.9)(@types/react@18.2.51)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0)
       '@types/prop-types': 15.7.11
       '@vesoft-inc/icons': 2.0.1(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
       '@vesoft-inc/utils': 0.0.0-beta.1(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)
       dayjs: 1.11.10
       material-react-table: 2.10.0(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/icons-material@5.15.7)(@mui/material@5.15.7)(@mui/x-date-pickers@6.19.2)(react-dom@18.2.0)(react@18.2.0)
+      mobx: 6.12.0
       mobx-react-lite: 4.0.5(mobx@6.12.0)(react-dom@18.2.0)(react@18.2.0)
       prop-types: 15.8.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-      react-hook-form: 7.50.1(react@18.2.0)
-      react-hook-form-mui: 6.8.0(@mui/icons-material@5.15.7)(@mui/material@5.15.7)(@mui/x-date-pickers@6.19.2)(react-hook-form@7.50.1)(react@18.2.0)
+      react-hook-form: 7.51.0(react@18.2.0)
+      react-hook-form-mui: 6.8.0(@mui/icons-material@5.15.7)(@mui/material@5.15.7)(@mui/x-date-pickers@6.19.2)(react-hook-form@7.51.0)(react@18.2.0)
     transitivePeerDependencies:
       - '@mui/system'
       - '@types/react'
@@ -1441,7 +1467,6 @@ packages:
       - date-fns-jalali
       - debug
       - luxon
-      - mobx
       - moment
       - moment-hijri
       - moment-jalaali
@@ -1451,7 +1476,7 @@ packages:
   /@vesoft-inc/utils@0.0.0-beta.1(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0):
     resolution: {integrity: sha512-4YiukFdib1DYP4ESCC/ZMZM9kaaHWxUTd5YO8ZI937kBxtUgL4Uz4vkgrJETP6ibWC9Vth/dDbWjRbRVV/t0/g==}
     dependencies:
-      '@babel/runtime': 7.23.9
+      '@babel/runtime': 7.24.0
       '@emotion/react': 11.11.3(@types/react@18.2.51)(react@18.2.0)
       '@mui/material': 5.15.7(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
       '@remix-run/router': 1.15.0
@@ -1467,8 +1492,8 @@ packages:
       - react-dom
     dev: false
 
-  /@vesoft-inc/utils@0.0.0-beta.7(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0):
-    resolution: {integrity: sha512-r3Y99c7f2obPDtEAP7x5IO1zqTzxkMhAg1YtNwPoMz0PfK7WsU5k/rq/nGnxaTTWnoAdrGcLYConI+0aiiQcXw==}
+  /@vesoft-inc/utils@0.0.0-beta.10(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0):
+    resolution: {integrity: sha512-wiVZ5C5csJqjN1K1YjL3H/wbnX5HXlsY7dfYxMd2gpkyTbzKcBxx/UIBuN1ZEXPGjTIS5OLcTUhGj56/sAf5Xw==}
     dependencies:
       '@babel/runtime': 7.23.9
       '@emotion/react': 11.11.3(@types/react@18.2.51)(react@18.2.0)
@@ -2648,7 +2673,7 @@ packages:
       scheduler: 0.23.0
     dev: false
 
-  /react-hook-form-mui@6.8.0(@mui/icons-material@5.15.7)(@mui/material@5.15.7)(@mui/x-date-pickers@6.19.2)(react-hook-form@7.50.1)(react@18.2.0):
+  /react-hook-form-mui@6.8.0(@mui/icons-material@5.15.7)(@mui/material@5.15.7)(@mui/x-date-pickers@6.19.2)(react-hook-form@7.51.0)(react@18.2.0):
     resolution: {integrity: sha512-p+Hu/z+nVgSoCXEijs1aXjOUmGoGX0oWzgyBJR4Xgay+il3c6E0HdSHd94XxcmC6i08a88u/+zJ96tuDDjjzRw==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -2667,11 +2692,11 @@ packages:
       '@mui/material': 5.15.7(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
       '@mui/x-date-pickers': 6.19.2(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.7)(@mui/system@5.15.9)(@types/react@18.2.51)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
-      react-hook-form: 7.50.1(react@18.2.0)
+      react-hook-form: 7.51.0(react@18.2.0)
     dev: false
 
-  /react-hook-form@7.50.1(react@18.2.0):
-    resolution: {integrity: sha512-3PCY82oE0WgeOgUtIr3nYNNtNvqtJ7BZjsbxh6TnYNbXButaD5WpjOmTjdxZfheuHKR68qfeFnEDVYoSSFPMTQ==}
+  /react-hook-form@7.51.0(react@18.2.0):
+    resolution: {integrity: sha512-BggOy5j58RdhdMzzRUHGOYhSz1oeylFAv6jUSG86OvCIvlAvS7KvnRY7yoAf2pfEiPN7BesnR0xx73nEk3qIiw==}
     engines: {node: '>=12.22.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18
