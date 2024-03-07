@@ -1,4 +1,4 @@
-import { Card, Typography } from '@mui/material';
+import { Box, Card, Typography } from '@mui/material';
 import styled from '@mui/material/styles/styled';
 
 export const TypeCountTypography = styled(Typography)`
@@ -19,4 +19,15 @@ export const GraphCard = styled(Card)`
     box-shadow: ${({ theme }) => theme.shadows[8]};
     cursor: pointer;
   }
+`;
+
+export const HeaderContainer = styled(Box)`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  margin-bottom: 20px;
+`;
+
+export const buttonList = styled(Box)`
+  display: flex;
 `;

@@ -1,4 +1,5 @@
 export default {
+  graphTypeList: 'Graph Type List',
   graphType: 'Graph Type',
   draft: '草稿 ({{ number }})',
   graphName: 'Graph Name',

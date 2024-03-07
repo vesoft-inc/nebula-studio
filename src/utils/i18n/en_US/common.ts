@@ -3,7 +3,7 @@ const conmmon = {
   password: 'Password',
   success: 'Success',
   error: 'Error',
-  graphType: 'Graph Type',
+  graphTypeList: 'Graph Type',
   importer: 'Import Data',
   console: 'Console',
   cancel: 'Cancel',

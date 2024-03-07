@@ -1,4 +1,5 @@
 export default {
+  graphTypeList: 'Graph Type List',
   graphType: 'Graph Type',
   draft: 'Draft',
   graphName: 'Graph Name',
