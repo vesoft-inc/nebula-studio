@@ -27,7 +27,7 @@ function GraphType() {
   const navigate = useNavigate();
 
   const handleCreateGraphType = () => {
-    navigate('/graphType/create');
+    navigate('create');
   };
 
   const handleCreateGraph = () => {

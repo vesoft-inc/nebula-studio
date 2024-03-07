@@ -52,7 +52,7 @@ export const MenuTab = styled(Tab, { shouldForwardProp: (prop) => prop !== 'acti
 `;
 
 export enum TabMenu {
-  GraphType = 'graphType',
+  GraphType = 'graphtype',
   ImportData = 'importer',
   Console = 'console',
 }
