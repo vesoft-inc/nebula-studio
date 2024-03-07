@@ -17,8 +17,10 @@ import Divider from '@mui/material/Divider';
 import { VectorTriangle, FileDocument, Play, ChevronRightFilled, DotsHexagon, EdgeType } from '@vesoft-inc/icons';
 import { styled } from '@mui/material/styles';
 import type { SxProps } from '@mui/material';
-import { ActionWrapper, EditorWrapper, InputArea, SiderItem, SiderItemHeader, StyledSider } from './styles';
 import { IMenuRouteItem, Menu } from '@vesoft-inc/ui-components';
+import { execGql } from '@/services';
+import { OutputBox } from './OutputBox';
+import { ActionWrapper, EditorWrapper, InputArea, SiderItem, SiderItemHeader, StyledSider } from './styles';
 
 const MonacoEditor = lazy(() => import('@/components/MonacoEditor'));
 
@@ -36,9 +38,14 @@ export default function Console() {
   const activeIcon = activeMenu === 'console' ? <VectorTriangle /> : <FileDocument />;
   const schemaTextSx: SxProps = { color: theme.palette.vesoft?.textColor1, fontWeight: 600, fontSize: '16px' };
 
-  const handleMenuClick = useCallback((menuItem: IMenuRouteItem, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    e.preventDefault();
+  const handleMenuClick = useCallback((menuItem: IMenuRouteItem) => {
     setActiveMenu(menuItem.key);
+  }, []);
+
+  const handleRunGql = useCallback(() => {
+    execGql('RETURN 9223372036854775807').then((r) => {
+      console.log('=====r', r);
+    });
   }, []);
 
   return (
@@ -166,7 +173,7 @@ export default function Console() {
           </List>
         </SiderItem>
       </StyledSider>
-      <Box sx={{ flex: 1 }}>
+      <Box sx={{ flex: 1, overflowY: 'auto' }}>
         <InputArea>
           <ActionWrapper sx={{ height: (theme) => theme.spacing(8) }}>
             <FormControl sx={{ width: 200 }} size="small">
@@ -182,10 +189,11 @@ export default function Console() {
                 variant="contained"
                 disableElevation
                 startIcon={<Play />}
-                sx={{
-                  backgroundColor: (theme) => theme.palette.vesoft.themeColor1,
-                  color: (theme) => theme.palette.vesoft.textColor8,
-                }}
+                sx={({ palette }) => ({
+                  backgroundColor: palette.vesoft.themeColor1,
+                  color: palette.vesoft.textColor8,
+                })}
+                onClick={handleRunGql}
               >
                 RUN
               </Button>
@@ -204,6 +212,9 @@ export default function Console() {
             </Box>
           </ActionWrapper>
         </InputArea>
+        <Box>
+          <OutputBox />
+        </Box>
       </Box>
     </Box>
   );

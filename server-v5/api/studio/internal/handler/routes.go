@@ -4,6 +4,7 @@ package handler
 import (
 	"net/http"
 
+	gateway "github.com/vesoft-inc/nebula-studio/server-v5/api/studio/internal/handler/gateway"
 	test "github.com/vesoft-inc/nebula-studio/server-v5/api/studio/internal/handler/test"
 	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/internal/svc"
 
@@ -14,10 +15,38 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				Method:  http.MethodPost,
+				Path:    "/connect",
+				Handler: gateway.ConnectHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/disconnect",
+				Handler: gateway.DisonnectHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/api-studio/db"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/exec",
+				Handler: gateway.ExecGQLHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/api-studio/gql"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
 				Method:  http.MethodGet,
-				Path:    "/api-studio/test",
+				Path:    "/test",
 				Handler: test.TestHellworldHandler(serverCtx),
 			},
 		},
+		rest.WithPrefix("/api-studio"),
 	)
 }

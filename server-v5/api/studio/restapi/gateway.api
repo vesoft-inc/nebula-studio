@@ -1,0 +1,46 @@
+syntax = "v1"
+
+type (
+	ExecGQLParams {
+		Gql string `json:"gql"`
+	}
+	BatchExecGQLParams {
+		Gqls []string `json:"gqls"`
+	}
+	ConnectDBParams {
+		Address       string `json:"address"`
+		Port          int    `json:"port"`
+		Authorization string `header:"Authorization"`
+	}
+	AnyResp {
+		Data interface{} `json:"data"`
+	}
+)
+
+@server (
+	group:  gateway
+	prefix: /api-studio/db
+)
+service studio-api {
+	@doc "Connect DB"
+	@handler Connect
+	post /connect (ConnectDBParams)
+
+	@doc "Disonnect DB"
+	@handler Disonnect
+	post /disconnect returns (AnyResp)
+}
+
+@server (
+	group:  gateway
+	prefix: /api-studio/gql
+)
+service studio-api {
+	@doc "Exec GQL"
+	@handler ExecGQL
+	post /exec (ExecGQLParams) returns (AnyResp)
+// @doc "BatchExec GQL"
+// @handler BatchExecGQL
+// post /batchExec (BatchExecGQLParams) returns (AnyResp)
+}
+

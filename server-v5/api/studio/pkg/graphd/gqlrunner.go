@@ -1,9 +1,9 @@
-package graph
+package graphd
 
 import (
 	nebula "github.com/vesoft-inc/nebula-ng-tools/golang"
-	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/pkg/graph/resultparser"
-	types "github.com/vesoft-inc/nebula-studio/server-v5/api/studio/pkg/graph/types"
+	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/pkg/graphd/resultparser"
+	types "github.com/vesoft-inc/nebula-studio/server-v5/api/studio/pkg/graphd/types"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 

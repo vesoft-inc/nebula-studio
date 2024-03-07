@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	nebula "github.com/vesoft-inc/nebula-ng-tools/golang"
-	types "github.com/vesoft-inc/nebula-studio/server-v5/api/studio/pkg/graph/types"
+	types "github.com/vesoft-inc/nebula-studio/server-v5/api/studio/pkg/graphd/types"
 )
 
 type dataParser struct{}
@@ -153,7 +153,16 @@ func (p *dataParser) RECORD(v nebula.Value) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	return val, nil
+	record := make(map[string]any, 0)
+	for k, v := range val.GetValues() {
+		propType := v.GetType().String()
+		propVal, err := p.callProxyMethod(propType, v)
+		if err != nil {
+			return nil, err
+		}
+		record[k] = propVal
+	}
+	return record, nil
 }
 
 func (p *dataParser) NODE(v nebula.Value) (any, error) {
@@ -200,7 +209,8 @@ func (p *dataParser) EDGE(v nebula.Value) (any, error) {
 		parsedProps[k] = propVal
 	}
 	result := types.ElementResult[types.EdgeParsed]{
-		Raw: edge.String(),
+		Raw:  edge.String(),
+		Type: v.GetType().String(),
 		Value: types.EdgeParsed{
 			Properties: parsedProps,
 		},
@@ -213,7 +223,30 @@ func (p *dataParser) PATH(v nebula.Value) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	return val, nil
+	paths := make([]any, 0)
+	for _, v := range val.GetValues() {
+		valType := v.GetType()
+		valTypeStr := v.GetType().String()
+		val, err := p.callProxyMethod(valTypeStr, v)
+		if err != nil {
+			return nil, err
+		}
+		if valType == nebula.ValueTypeNode {
+			eleVal := val.(types.ElementResult[types.NodeParsed])
+			paths = append(paths, eleVal.Value)
+		} else if valType == nebula.ValueTypeEdge {
+			eleVal := val.(types.ElementResult[types.EdgeParsed])
+			paths = append(paths, eleVal.Value)
+		} else {
+			paths = append(paths, val)
+		}
+	}
+	retult := types.ElementResult[any]{
+		Raw:   val.String(),
+		Type:  v.GetType().String(),
+		Value: paths,
+	}
+	return retult, nil
 }
 
 func (p *dataParser) DURATION(v nebula.Value) (any, error) {

@@ -42,7 +42,7 @@ export const StyledMenuItem = styled(MenuItem)`
 `;
 
 export const InputArea = styled(Box)`
-  padding: 0 ${({ theme }) => theme.spacing(2)};
+  padding: ${({ theme }) => theme.spacing(0, 2)};
   background-color: ${({ theme }) => theme.palette.vesoft.bgColor};
   border-bottom: 1px solid ${getVesoftBorderColor};
 `;

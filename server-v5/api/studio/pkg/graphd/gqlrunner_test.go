@@ -1,4 +1,4 @@
-package graph
+package graphd
 
 import (
 	"encoding/json"
@@ -68,7 +68,8 @@ func TestRunShow(t *testing.T) {
 	}
 	defer client.Close()
 
-	gql := `SHOW GRAPHS`
+	// gql := `SHOW GRAPHS`
+	gql := `DESCRIBE GRAPH nba_demo`
 	res, err := RunGql(client, gql)
 	if err != nil {
 		t.Error(err)
@@ -88,7 +89,8 @@ func TestRunMatch(t *testing.T) {
 
 	// gql := `USE nba_demo MATCH (v) RETURN v limit 1`
 	// gql := `USE nba_demo MATCH (v:team) RETURN v`
-	gql := `USE nba_demo MATCH ()-[e]-() RETURN e limit 10`
+	// gql := `USE nba_demo MATCH ()-[e]-() RETURN e limit 10`
+	gql := `USE nba_demo MATCH p=()-[e]-() RETURN p,e limit 2`
 	// gql := `for i in LIST [1,2,3,4,5] RETURN collect(i) GROUP BY ()`
 	// gql := `RETURN "123" as num`
 	res, err := RunGql(client, gql)

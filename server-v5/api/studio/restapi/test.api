@@ -8,11 +8,12 @@ type (
 )
 
 @server (
-	group: test // is used to put related logic in the same package
+	group:  test // is used to put related logic in the same package
+	prefix: /api-studio
 )
 service studio-api {
 	@doc "test hello world"
 	@handler TestHellworld
-	get /api-studio/test returns (GetTestResp)
+	get /test returns (GetTestResp)
 }
 
