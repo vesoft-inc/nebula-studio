@@ -10,6 +10,7 @@ import {
   CodeBracesBox,
   ExplorerDataOutline,
   Stethoscope,
+  Sitemap,
 } from '@vesoft-inc/icons';
 import {
   OutputContainer,
@@ -20,12 +21,17 @@ import {
   ContentSider,
   ContentMain,
 } from './styles';
+import Explain from '@vesoft-inc/nebula-explain-graph';
+import { ExplainData } from '@vesoft-inc/nebula-explain-graph/types/Shape';
+import '@vesoft-inc/nebula-explain-graph/dist/Explain.css';
 
 export function OutputBox() {
   const theme = useTheme();
   const [activeMenu, setActiveMenu] = useState('Table');
+  const [explainData, setExplainData] = useState<ExplainData | undefined>();
   const handleMenuClick = useCallback((menuItem: IMenuRouteItem) => {
     setActiveMenu(menuItem.key);
+    setExplainData(undefined);
   }, []);
   return (
     <OutputContainer sx={{ flex: 1 }}>
@@ -64,7 +70,17 @@ export function OutputBox() {
                 label: 'Stethoscope',
                 icon: <Stethoscope fontSize="medium" />,
               },
-            ]}
+            ].concat(
+              explainData
+                ? [
+                    {
+                      key: 'Plan',
+                      label: 'Plan',
+                      icon: <Sitemap fontSize="medium" />,
+                    },
+                  ]
+                : []
+            )}
             selectedKeys={activeMenu ? [activeMenu] : []}
             onMenuClick={handleMenuClick}
             activeSlotProps={{
@@ -120,7 +136,16 @@ export function OutputBox() {
             }}
           />
         </ContentSider>
-        <ContentMain />
+        <ContentMain>
+          {activeMenu === 'Plan' && (
+            <Explain
+              data={explainData}
+              style={{
+                height: '100%',
+              }}
+            />
+          )}
+        </ContentMain>
       </OutputContent>
     </OutputContainer>
   );

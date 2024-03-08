@@ -30,6 +30,7 @@
     "@remix-run/router": "^1.15.0",
     "@types/bezier-js": "^4.1.3",
     "@vesoft-inc/icons": "^2.0.1",
+    "@vesoft-inc/nebula-explain-graph": "5.0.0-beta.1",
     "@vesoft-inc/ui-components": "0.0.3-beta.27",
     "@vesoft-inc/utils": "0.0.0-beta.10",
     "@vesoft-inc/veditor": "^4.4.14",
