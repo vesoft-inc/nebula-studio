@@ -1,0 +1,112 @@
+@shadowBlue: rgba(0, 194, 255, 0.6) !important;
+@pathBlue: rgba(0, 145, 255, 0.7);
+
+.labelContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .label {
+    text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 70%;
+    font-size: 12px;
+    user-select: none;
+  }
+}
+
+.activeNode {
+  opacity: 0;
+  fill: transparent;
+}
+
+.edgeLabel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-height: 100%;
+  font-size: 12px;
+  height: 100%;
+
+  >span {
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 10px;
+    white-space: nowrap;
+    user-select: none;
+    padding: 0 3px;
+    background-color: #eeeeee;
+  }
+
+  .invalid {
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    position: absolute;
+    top: 0px;
+    background-image: url('@app/static/images/invalid.svg');
+  }
+}
+
+:global(.ve-node.active) {
+  .activeNode {
+    opacity: 1;
+    fill: rgba(0, 145, 255, 0.8);
+  }
+}
+
+.arrow {
+  stroke: rgba(99, 111, 129, 0.8);
+  stroke-width: 1.6px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: transparent !important;
+}
+
+.arrowShadow {
+  stroke: transparent;
+  stroke-width: 3.6px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: transparent !important;
+}
+
+:global(.ve-line.active),
+:global(.ve-line:hover) {
+  .edgeLabel {
+    color: #0088ff;
+
+    span {
+      background-color: #eeeeee;
+    }
+  }
+
+  .arrow {
+    stroke: @pathBlue;
+  }
+
+  .arrowShadow {
+    stroke: @shadowBlue;
+  }
+}
+
+
+.tooltipContainer {
+  :global {
+    .ant-tooltip-arrow {
+      display: none;
+    }
+
+    .ant-tooltip-inner {
+      padding: 0;
+      background-color: transparent;
+      // min-height: 0;
+      // min-width: 0;
+    }
+  }
+}
