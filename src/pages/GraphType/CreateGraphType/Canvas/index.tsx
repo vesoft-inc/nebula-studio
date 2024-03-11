@@ -6,12 +6,12 @@ import initShapes from './Shapes/Shapers';
 import { COLOR_LIST, NODE_RADIUS } from './Shapes/config';
 import { NodeTypeListContainer, TagItem, CanvasContainer, TagListContainer, TagsContainer, shadowItem } from './styles';
 import { useTheme } from '@emotion/react';
+import { DraggingTag } from '@/interfaces';
 
 function Canvas() {
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<VEditor>();
-  // @ts-ignore
-  const [draggingNewTag, setDraggingNewTag] = useState<typeof {}>({});
+  const [draggingNewTag, setDraggingNewTag] = useState<Partial<DraggingTag>>({});
   const [draggingPosition, setDraggingPosition] = useState({ x: 0, y: 0 });
   const theme = useTheme();
 
