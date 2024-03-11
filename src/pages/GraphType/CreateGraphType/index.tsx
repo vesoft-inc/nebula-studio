@@ -1,129 +1,107 @@
-// @ts-nocheck
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useI18n } from '@vesoft-inc/i18n';
-import VEditor from '@vesoft-inc/veditor';
-import { InstanceNode } from '@vesoft-inc/veditor/types/Shape/Node';
-import cls from 'classnames';
-import styles from './index.module.less';
-import initShapes, { initShadowFilter } from './Shapes/Shapers';
-import { NODE_RADIUS, COLOR_LIST } from './config';
+import { Button, Container } from '@mui/material';
+import { CheckboxElement, Form, Stepper, TextFieldElement } from '@vesoft-inc/ui-components';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ActionContainer, ContentContainer, FooterContainer, MainContainer } from './styles';
+import Canvas from './Canvas';
 
-const SketchPage: React.FC = () => {
-  const editorRef = useRef<VEditor>();
-  const editorDOMRef = useRef<HTMLDivElement>(null);
-  const { currentLocale } = useI18n();
-  const [draggingNewTag, setDraggingNewTag] = useState<Record<string, unknown>>({});
-  const [draggingPosition, setDraggingPosition] = useState({ x: 0, y: 0 });
+enum CreateGraphTypeStep {
+  create,
+  preview,
+}
 
-  useEffect(() => {
-    editorRef.current = new VEditor({
-      dom: editorDOMRef.current!,
-      showBackGrid: false,
-      disableCopy: true,
-    });
-    initShapes(editorRef.current);
-    initShadowFilter(editorRef.current);
-    editorRef.current.graph.on('node:click', (node: InstanceNode) => {
-      console.log('node:click', node);
-    });
-    return () => {
-      editorRef.current!.destroy();
-    };
-  }, []);
+function CreateGraphType() {
+  const { t } = useTranslation(['graphtype']);
+  const [curStep, setCurStep] = useState<CreateGraphTypeStep>(CreateGraphTypeStep.create);
 
-  const onDrag = (e: React.MouseEvent, item) => {
-    e.preventDefault();
-    setDraggingNewTag({
-      ...item,
-      type: 'tag',
-      name: undefined,
-      comment: undefined,
-      properties: [],
-      invalid: false,
-    });
-    setDraggingPosition({
-      x: e.nativeEvent.pageX - 25,
-      y: e.nativeEvent.pageY - 25,
-    });
-    addDragEvents();
+  const form = Form.useForm({
+    defaultValues: {
+      graphTypeName: '',
+      ifNotExists: true,
+    },
+  });
+
+  const handeNextClick = () => {
+    setCurStep(curStep + 1);
   };
 
-  const addDragEvents = useCallback(() => {
-    const mousemove = (e: MouseEvent) => {
-      if (draggingNewTag) {
-        setDraggingPosition({ x: (e.pageX - 25) as number, y: e.pageY - 25 });
-      }
-    };
-    const mouseup = (e: MouseEvent) => {
-      if (e.target?.tagName === 'svg') {
-        const controller = editorRef.current!.controller;
-        const rect = editorDOMRef.current!.getBoundingClientRect();
-        if (e.clientX - rect.x < 0 || e.clientY - rect.y < 0) {
-          setDraggingNewTag({});
-          return;
-        }
-        const x = (e.clientX - rect.x - controller.x) / controller.scale - 25 * controller.scale;
-        const y = (e.clientY - rect.y - controller.y) / controller.scale - 25 * controller.scale;
-        const node = {
-          x,
-          y,
-          width: NODE_RADIUS * 2,
-          height: NODE_RADIUS * 2,
-          name: undefined,
-          type: 'tag',
-          ...draggingNewTag,
-        };
-        editorRef.current!.graph.node.addNode(node);
-      }
-      setDraggingNewTag({});
-
-      window.document.removeEventListener('mousemove', mousemove);
-      window.document.removeEventListener('mouseup', mouseup);
-    };
-
-    window.document.addEventListener('mousemove', mousemove);
-    window.document.addEventListener('mouseup', mouseup);
-    window.document.addEventListener('mouseleave', mouseup);
-  }, []);
+  const handlePreviousClick = () => {
+    setCurStep(curStep - 1);
+  };
 
   return (
-    <div className={styles.sketchModeling} key={currentLocale}>
-      <div className={styles.sketchCanvas}>
-        <div id="sketchContainer" className={styles.content} ref={editorDOMRef} />
-        <div className={cls(styles.tagBar, draggingNewTag.uuid && styles.offsetBar)}>
-          <div className={styles.tags}>
-            <span className={styles.tagLabel}>Tag</span>
-            <div className={styles.tagList}>
-              {COLOR_LIST.map((item, index) => (
-                <div
-                  key={index}
-                  style={{
-                    borderColor: item.strokeColor,
-                    backgroundColor: item.fill,
-                    boxShadow: `0 1px 6px ${item.shadow}`,
-                  }}
-                  onMouseDown={(e) => onDrag(e, item)}
-                  className={styles.tagItem}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-        {draggingNewTag.type && (
-          <div
-            className={cls(styles.tagItem, styles.shadowItem)}
-            style={{
-              borderColor: draggingNewTag?.strokeColor,
-              background: draggingNewTag?.fill,
-              display: draggingNewTag ? 'block' : 'none',
-              left: draggingPosition.x,
-              top: draggingPosition.y,
+    <ContentContainer>
+      <Container maxWidth="md">
+        <Stepper
+          activeStep={curStep}
+          items={[
+            {
+              name: t('createGraphType', { ns: 'graphtype' }),
+            },
+            {
+              name: t('preview', { ns: 'graphtype' }),
+            },
+          ]}
+        />
+      </Container>
+      <ActionContainer>
+        <Form
+          form={form}
+          layout={{
+            rowSpacing: 2,
+            columnSpacing: 3,
+          }}
+          FormProps={{
+            style: {
+              width: '100%',
+            },
+          }}
+        >
+          <Form.Item
+            label={t('graphTypeName', { ns: 'graphtype' })}
+            name="graphTypeName"
+            required
+            layout={{
+              xs: 4,
             }}
-          />
-        )}
-      </div>
-    </div>
+          >
+            <TextFieldElement size="small" sx={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item
+            label={t('ifNotExsits', { ns: 'graphtype' })}
+            name="ifNotExists"
+            layout={{
+              xs: 4,
+            }}
+            required
+          >
+            <CheckboxElement />
+          </Form.Item>
+        </Form>
+      </ActionContainer>
+      <MainContainer>
+        <Canvas />
+      </MainContainer>
+      <FooterContainer>
+        <Button
+          disabled={curStep === CreateGraphTypeStep.create}
+          variant="outlined"
+          onClick={handlePreviousClick}
+          sx={{ width: '120px' }}
+        >
+          {t('previous', { ns: 'graphtype' })}
+        </Button>
+        <Button
+          disabled={curStep === CreateGraphTypeStep.preview}
+          variant="contained"
+          sx={{ ml: '10px', width: '120px' }}
+          onClick={handeNextClick}
+        >
+          {t('next', { ns: 'graphtype' })}
+        </Button>
+      </FooterContainer>
+    </ContentContainer>
   );
-};
+}
 
-export default SketchPage;
+export default CreateGraphType;

@@ -1,11 +1,12 @@
 import VEditor, { DefaultNode } from '@vesoft-inc/veditor';
 import { InstanceNode } from '@vesoft-inc/veditor/types/Shape/Node';
+import { Box, Theme } from '@mui/material';
 import { createRoot } from 'react-dom/client';
-import { NODE_RADIUS } from '../config';
+import { NODE_RADIUS } from './config';
 import { flushSync } from 'react-dom';
 import Path from './Path';
-import styles from './index.module.less';
-export default function initShapes(editor: VEditor) {
+import { ActiveNodeCicle, LabelContainer } from './styles';
+export default function initShapes(editor: VEditor, theme: Theme) {
   const node = {
     ...DefaultNode.default,
 
@@ -27,9 +28,7 @@ export default function initShapes(editor: VEditor) {
       flushSync(() => {
         root.render(
           <>
-            {!data.hideActive && (
-              <circle className={styles.activeNode} r={NODE_RADIUS + 8} cx={NODE_RADIUS} cy={NODE_RADIUS} />
-            )}
+            {!data.hideActive && <ActiveNodeCicle r={NODE_RADIUS + 8} cx={NODE_RADIUS} cy={NODE_RADIUS} />}
             <circle
               className="svg-item"
               r={NODE_RADIUS - 1}
@@ -54,21 +53,21 @@ export default function initShapes(editor: VEditor) {
 
             {data.name ? (
               <foreignObject x={0} y={0} width={NODE_RADIUS * 2} height={NODE_RADIUS * 2}>
-                <div className={styles.labelContainer}>
-                  <span className={styles.label}>{data.name}</span>
-                </div>
+                <LabelContainer>
+                  <Box component="span">{data.name}</Box>
+                </LabelContainer>
               </foreignObject>
             ) : null}
             {data.invalid && (
               <>
-                <circle cx={NODE_RADIUS * 2 - 10} cy={10} r={12} fill="#EB5757" />
+                <circle cx={NODE_RADIUS * 2 - 10} cy={10} r={12} fill={theme.palette.vesoft.status3} />
                 <text
                   style={{ userSelect: 'none' }}
                   x={NODE_RADIUS * 2 - 10}
                   y={10}
                   textAnchor="middle"
                   fontSize={16}
-                  fill="#fff"
+                  fill={theme.palette.vesoft.bgColor}
                   dy=".3em"
                 >
                   !

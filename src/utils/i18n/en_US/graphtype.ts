@@ -1,6 +1,7 @@
 export default {
   graphTypeList: 'Graph Type List',
   graphType: 'Graph Type',
+  graphTypeName: 'Graph Type Name',
   draft: 'Draft',
   graphName: 'Graph Name',
   createGraphType: 'Create Graph Type',
@@ -9,4 +10,7 @@ export default {
   edgeTypeCount: 'Edge Type: {{count}}',
   delete: 'Delete',
   ifNotExsits: 'IF NOT EXISTS',
+  preview: 'Preview',
+  previous: 'Previous',
+  next: 'Next',
 };

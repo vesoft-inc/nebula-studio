@@ -1,17 +1,22 @@
 // @ts-nocheck
+import { Box } from '@mui/material';
 import { createRoot } from 'react-dom/client';
 import { LineRender } from '@vesoft-inc/veditor/types/Shape/Lines/Line';
 import { DefaultLine } from '@vesoft-inc/veditor';
 import { InstanceLine } from '@vesoft-inc/veditor/types/Shape/Line';
-import { getLinkCurvature, NODE_RADIUS } from '../config';
+import Graph from '@vesoft-inc/veditor/types/Shape/Graph';
 import { Bezier } from 'bezier-js';
 import { InstanceNodePoint } from '@vesoft-inc/veditor/types/Shape/Node';
 import { mat2d } from 'gl-matrix';
-import styles from './index.module.less';
+
+import { getLinkCurvature, NODE_RADIUS } from './config';
+import { EdgeLabelContainer, InvalidContainer } from './styles';
 
 // get Angle for point in svg coordinate system
-const getPointAngle = (pointNode: InstanceNodePoint, graph): number => {
+const getPointAngle = (pointNode: InstanceNodePoint, graph: Graph): number => {
+  if (!pointNode.data) return Math.PI;
   const node = graph.node.nodes[pointNode.nodeId];
+  if (!node.shapeBBox) return Math.PI;
   const p = [pointNode.data.x, pointNode.data.y];
   let c = [0.5, 0.5];
   if (pointNode.data.isPixel) {
@@ -31,7 +36,7 @@ const getPointAngle = (pointNode: InstanceNodePoint, graph): number => {
     return Math.PI;
   }
 };
-const getSelfLoopLineIndex = (line: InstanceLine, graph) => {
+const getSelfLoopLineIndex = (line: InstanceLine, graph: Graph) => {
   const { from, to } = line;
   let index = 0;
   for (const lineId in graph.line.lines) {
@@ -56,13 +61,16 @@ const Path: LineRender = {
   arcRatio: 4,
   ...DefaultLine,
 
-  makePath(from, to, line) {
-    const fromNode = this.graph.node.nodes[from.nodeId];
+  makePath(from: InstanceNodePoint, to: InstanceNodePoint, line: InstanceLine) {
+    if (!this.graph) return;
+    const fromNode = this.graph.node.nodes[from.nodeId as string];
+    if (!fromNode.data.x || !fromNode.data.y) return;
     const src = {
       x: fromNode.data.x + NODE_RADIUS,
       y: fromNode.data.y + NODE_RADIUS,
     };
     const toNode = this.graph.node.nodes[to.nodeId];
+    if (!toNode.data.x || !toNode.data.y) return;
     const dst = {
       x: toNode.data.x + NODE_RADIUS,
       y: toNode.data.y + NODE_RADIUS,
@@ -99,8 +107,8 @@ const Path: LineRender = {
       );
       const lineLen = bzLine ? bzLine.length() : Math.sqrt(Math.pow(dst.x - src.x, 2) + Math.pow(dst.y - src.y, 2));
       const getCoordsAlongLine = bzLine
-        ? (t) => bzLine.get(t)
-        : (t) => ({
+        ? (t: number) => bzLine.get(t)
+        : (t: number) => ({
             x: src.x + (dst.x - src.x) * t || 0,
             y: src.y + (dst.y - src.y) * t || 0,
           });
@@ -148,8 +156,9 @@ const Path: LineRender = {
     line.data.toY = dst.y;
     return path;
   },
-  renderLabel(line: InstanceLine): SVGGElement {
-    const { name, invalid, textBackgroundColor } = line.data;
+
+  renderLabel(line?: InstanceLine): SVGGElement {
+    const { name, invalid, textBackgroundColor } = line!.data;
     if (!name) {
       if (line.label) {
         line.label.labelGroup.remove();
@@ -160,18 +169,18 @@ const Path: LineRender = {
         textRect: null,
         labelGroup: document.createElementNS('http://www.w3.org/2000/svg', 'g'),
       };
-    } else if (!line.label) {
-      line.label = {
+    } else if (!line!.label) {
+      line!.label = {
         text: null,
         textRect: null,
         labelGroup: document.createElementNS('http://www.w3.org/2000/svg', 'g'),
       };
     }
     // to append to last
-    line.shape?.appendChild(line.label.labelGroup);
+    line!.shape?.appendChild(line!.label.labelGroup);
 
-    const totalLen = line.pathData.getTotalLength();
-    const pointLen = line.pathData.getPointAtLength(totalLen / 2);
+    const totalLen = line!.pathData.getTotalLength();
+    const pointLen = line!.pathData.getPointAtLength(totalLen / 2);
     // eslint-disable-next-line prefer-const
     let { x, y } = pointLen || {};
     const fromPoint = line.bezierData ? line.bezierData.from : line.from;
@@ -195,8 +204,9 @@ const Path: LineRender = {
             transform-origin={`${x} ${y}`}
             style={{ transform: `rotate(${angle}deg)` }}
           >
-            <div className={styles.edgeLabel}>
-              <span
+            <EdgeLabelContainer>
+              <Box
+                component="span"
                 style={{
                   paddingRight: invalid ? '10px' : undefined,
                   maxWidth: width,
@@ -205,8 +215,8 @@ const Path: LineRender = {
               >
                 {name}
                 {invalid && (
-                  <span
-                    className={styles.invalid}
+                  <InvalidContainer
+                    component="span"
                     style={
                       !name
                         ? {
@@ -218,8 +228,8 @@ const Path: LineRender = {
                     }
                   />
                 )}
-              </span>
-            </div>
+              </Box>
+            </EdgeLabelContainer>
           </foreignObject>
         </>
       );
@@ -299,8 +309,26 @@ const Path: LineRender = {
     arrow.setAttribute('d', path);
     arrowShadow.setAttribute('d', path);
     if (!line.arrow) {
-      arrow.setAttribute('class', styles.arrow);
-      arrowShadow.setAttribute('class', styles.arrowShadow);
+      arrow.setAttribute(
+        'style',
+        JSON.stringify({
+          stroke: 'rgba(99, 111, 129, 0.8)',
+          strokeWidth: '1.6px',
+          strokeLinecap: 'round',
+          strokeLinejoin: 'round',
+          fill: 'transparent !important',
+        })
+      );
+      arrowShadow.setAttribute(
+        'class',
+        JSON.stringify({
+          stroke: 'transparent',
+          strokeWidth: '3.6px',
+          strokeLinecap: 'round',
+          strokeLinejoin: 'round',
+          fill: 'transparent !important',
+        })
+      );
       svgEl.appendChild(arrow);
       svgEl.appendChild(arrowShadow);
     }

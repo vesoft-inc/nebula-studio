@@ -119,6 +119,7 @@ function GraphType() {
                   </Grid>
                 ))}
               </Grid>
+              <Divider sx={{ mt: theme.spacing(4), mb: theme.spacing(4) }} />
             </Box>
           );
         })}

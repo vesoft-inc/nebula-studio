@@ -1,6 +1,7 @@
 export default {
   graphTypeList: 'Graph Type List',
   graphType: 'Graph Type',
+  graphTypeName: 'Graph Type Name',
   draft: '草稿 ({{ number }})',
   graphName: 'Graph Name',
   createGraphType: '创建 Graph Type',
@@ -9,4 +10,7 @@ export default {
   edgeTypeCount: 'Edge Type: {{count}}',
   delete: '删除',
   ifNotExsits: 'IF NOT EXISTS',
+  preview: '预览',
+  previous: '上一步',
+  next: '下一步',
 };
