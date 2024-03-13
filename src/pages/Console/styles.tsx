@@ -1,7 +1,8 @@
 import type { Theme } from '@emotion/react';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import MenuItem from '@mui/material/MenuItem';
+import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
 
 const getVesoftBorderColor = ({ theme }: { theme: Theme }) => theme.palette.vesoft.textColor6;
 
@@ -30,27 +31,26 @@ export const SiderItemHeader = styled(Box)`
   font-weight: 600;
 `;
 
-export const StyledMenuItem = styled(MenuItem)`
-  height: 60px;
-  justify-content: center;
-  transition: background-color ${({ theme }) => theme.transitions.easing.easeInOut} 0.25s;
-  color: ${({ theme }) => theme.palette.vesoft.textColor1};
-  &.Mui-selected,
-  &.Mui-selected:hover {
-    background-color: ${({ theme }) => theme.palette.vesoft.themeColor1};
-  }
-`;
-
 export const InputArea = styled(Box)`
-  padding: ${({ theme }) => theme.spacing(0, 2)};
+  padding: ${({ theme }) => theme.spacing(0.5, 2, 0)};
   background-color: ${({ theme }) => theme.palette.vesoft.bgColor};
   border-bottom: 1px solid ${getVesoftBorderColor};
 `;
 
 export const ActionWrapper = styled(Box)`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
+`;
+
+export const StyledIconButton = styled(IconButton)`
+  color: ${({ theme }) => theme.palette.vesoft.textColor1};
+`;
+
+export const RunButton = styled(Button)`
+  background-color: ${({ theme }) => theme.palette.vesoft.themeColor1};
+  color: ${({ theme }) => theme.palette.vesoft.textColor8};
+  height: '36px';
 `;
 
 export const EditorWrapper = styled(Box)`

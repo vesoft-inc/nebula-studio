@@ -26,4 +26,8 @@ export default function PageRoot() {
 }
 
 const rootElement = document.getElementById('studioApp');
-createRoot(rootElement!).render(<PageRoot />);
+const root = import.meta.hot?.data?.root || createRoot(rootElement!);
+import.meta.hot?.dispose(() => {
+  import.meta.hot!.data.root = root;
+});
+root.render(<PageRoot />);

@@ -1,11 +1,7 @@
-import { Suspense, lazy, useCallback, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
+import { observer } from 'mobx-react-lite';
 import { useTheme } from '@emotion/react';
 import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Button from '@mui/material/Button';
-import Select from '@mui/material/Select';
 import Collapse from '@mui/material/Collapse';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -14,13 +10,35 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import Divider from '@mui/material/Divider';
-import { VectorTriangle, FileDocument, Play, ChevronRightFilled, DotsHexagon, EdgeType } from '@vesoft-inc/icons';
+import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import type { SxProps } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import {
+  VectorTriangle,
+  FileDocument,
+  Play,
+  ChevronRightFilled,
+  DotsHexagon,
+  EdgeType,
+  QueryTemplate,
+  RestoreFilled,
+  DeleteOutline,
+} from '@vesoft-inc/icons';
 import { IMenuRouteItem, Menu } from '@vesoft-inc/ui-components';
 import { execGql } from '@/services';
+import { useStore } from '@/stores';
 import { OutputBox } from './OutputBox';
-import { ActionWrapper, EditorWrapper, InputArea, SiderItem, SiderItemHeader, StyledSider } from './styles';
+import {
+  ActionWrapper,
+  EditorWrapper,
+  InputArea,
+  SiderItem,
+  SiderItemHeader,
+  StyledSider,
+  StyledIconButton,
+  RunButton,
+} from './styles';
 
 const MonacoEditor = lazy(() => import('@/components/MonacoEditor'));
 
@@ -29,11 +47,12 @@ const StyledListItemIcon = styled(ListItemIcon)`
   margin: ${({ theme }) => theme.spacing(0, 1.5, 0, 1)};
 `;
 
-export default function Console() {
+export default observer(function Console() {
   const theme = useTheme();
+  const { consoleStore } = useStore();
+  const { t } = useTranslation(['console', 'common']);
   const [activeMenu, setActiveMenu] = useState('console');
   const [open, setOpen] = useState(true);
-
   const handleClick = useCallback(() => setOpen((open) => !open), []);
   const activeIcon = activeMenu === 'console' ? <VectorTriangle /> : <FileDocument />;
   const schemaTextSx: SxProps = { color: theme.palette.vesoft?.textColor1, fontWeight: 600, fontSize: '16px' };
@@ -43,9 +62,15 @@ export default function Console() {
   }, []);
 
   const handleRunGql = useCallback(() => {
-    execGql('RETURN 9223372036854775807').then((r) => {
+    execGql(
+      'CALL show_graphs() YIELD `graph_name` AS gn CALL describe_graph(gn) YIELD `graph_type_name` AS gtn return gn, gtn'
+    ).then((r) => {
       console.log('=====r', r);
     });
+  }, []);
+
+  useEffect(() => {
+    consoleStore.getGraphTypes();
   }, []);
 
   return (
@@ -176,27 +201,21 @@ export default function Console() {
       <Box sx={{ flex: 1, overflowY: 'auto' }}>
         <InputArea>
           <ActionWrapper sx={{ height: (theme) => theme.spacing(8) }}>
-            <FormControl sx={{ width: 200 }} size="small">
-              <InputLabel id="console-space-select-label">Age</InputLabel>
-              <Select labelId="console-space-select-label" id="console-space-select" label="Age" size="small" value="">
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
-              </Select>
-            </FormControl>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Button
-                variant="contained"
-                disableElevation
-                startIcon={<Play />}
-                sx={({ palette }) => ({
-                  backgroundColor: palette.vesoft.themeColor1,
-                  color: palette.vesoft.textColor8,
-                })}
-                onClick={handleRunGql}
-              >
-                RUN
-              </Button>
+              <Stack direction="row" spacing={1} sx={{ mr: 2 }}>
+                <StyledIconButton aria-label="template">
+                  <QueryTemplate fontSize="medium" />
+                </StyledIconButton>
+                <StyledIconButton aria-label="restore">
+                  <RestoreFilled fontSize="medium" />
+                </StyledIconButton>
+                <StyledIconButton aria-label="delete">
+                  <DeleteOutline fontSize="medium" />
+                </StyledIconButton>
+              </Stack>
+              <RunButton variant="contained" disableElevation startIcon={<Play />} onClick={handleRunGql}>
+                {t('run', { ns: 'console' })}
+              </RunButton>
             </Box>
           </ActionWrapper>
           <EditorWrapper>
@@ -218,4 +237,4 @@ export default function Console() {
       </Box>
     </Box>
   );
-}
+});

@@ -12,23 +12,19 @@ const fetcher = new FetchService({
           return parser(data);
         } catch (e) {
           console.error('json-bigint parse error: ', e);
-          return data;
+          try {
+            return JSON.parse(data);
+          } catch (e) {
+            console.error('JSON.parse error: ', e);
+            throw e;
+          }
         }
       },
     ],
   },
-  interceptorsEjectors(ins) {
-    ins.interceptors.response.use(
-      (res) => {
-        return res.data;
-      },
-      (error) => {
-        return Promise.reject(error);
-      }
-    );
-  },
 });
 
-export const execGql = (gql: string) => {
-  return fetcher.post('/gql/exec', { gql });
+export const execGql = async <T = unknown>(gql: string): Promise<T> => {
+  const res = await fetcher.post('/gql/exec', { gql });
+  return res.data?.data;
 };
