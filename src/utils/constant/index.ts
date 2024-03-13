@@ -3,3 +3,8 @@ export enum PageRoute {
   ImportData = 'importer',
   Console = 'console',
 }
+
+export enum VisualEditorType {
+  Tag = 'tag',
+  Edge = 'edge',
+}

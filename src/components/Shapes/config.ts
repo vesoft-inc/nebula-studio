@@ -1,4 +1,5 @@
-// @ts-nocheck
+import { VisualEditorLine } from '@/interfaces';
+
 export const NODE_RADIUS = 40;
 
 export const COLOR_LIST = [
@@ -58,10 +59,10 @@ export const ARROW_STYLE = {
   'stroke-linecap': 'round',
 };
 
-export function makeLineSort(links) {
+export function makeLineSort(links: VisualEditorLine[] = []) {
   // update link sort
-  const sourceMap = {};
-  links?.forEach((link) => {
+  const sourceMap: Record<string, VisualEditorLine[]> = {};
+  links.forEach((link) => {
     const sourceId = link.from;
     const targetId = link.to;
     const sourceCommonId = `${sourceId}=>${targetId}`;
@@ -82,10 +83,12 @@ export function makeLineSort(links) {
       let number = sourceMap[key].length % 2 === 0 ? 1 : 0;
       while (sourceMap[key].length) {
         const link = status ? sourceMap[key].pop() : sourceMap[key].shift();
-        link.graphIndex = number;
-        // check direction
-        if (link.from !== source) {
-          link.graphIndex *= -1;
+        if (link) {
+          link.graphIndex = number;
+          // check direction
+          if (link.from !== source) {
+            link.graphIndex *= -1;
+          }
         }
         number++;
         status = !status;
@@ -101,14 +104,14 @@ export function makeLineSort(links) {
   });
 }
 
-export function getLinkCurvature(link) {
+export function getLinkCurvature(link: VisualEditorLine) {
   let curvature = 0;
   const data = link.data;
   if (data.from === data.to) {
     curvature = link.graphIndex;
   } else {
     const { graphIndex } = data;
-    if (graphIndex !== 0) {
+    if (graphIndex && graphIndex !== 0) {
       const direction = graphIndex % 2 === 0;
       curvature = (direction ? 1 : -1) * (graphIndex > 0 ? 1 : -1) * (Math.ceil(Math.abs(graphIndex) / 2) * 0.1);
     }

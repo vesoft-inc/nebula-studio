@@ -16,6 +16,7 @@ export default function initShapes(editor: VEditor, theme: Theme) {
       { x: 2 * (NODE_RADIUS - 1), y: NODE_RADIUS - 1, isPixel: true },
       { x: 0, y: NODE_RADIUS - 1, isPixel: true },
     ],
+
     render: (node: InstanceNode) => {
       const data = node.data;
       // popOver

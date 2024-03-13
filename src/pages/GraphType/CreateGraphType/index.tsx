@@ -1,9 +1,12 @@
 import { Button, Container } from '@mui/material';
 import { CheckboxElement, Form, Stepper, TextFieldElement } from '@vesoft-inc/ui-components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { observer } from 'mobx-react-lite';
+
+import { useStore } from '@/stores';
 import { ActionContainer, ContentContainer, FooterContainer, MainContainer } from './styles';
-import Canvas from './Canvas';
+import SchemaEditor from './SchemaEditor';
 
 enum CreateGraphTypeStep {
   create,
@@ -13,6 +16,16 @@ enum CreateGraphTypeStep {
 function CreateGraphType() {
   const { t } = useTranslation(['graphtype']);
   const [curStep, setCurStep] = useState<CreateGraphTypeStep>(CreateGraphTypeStep.create);
+  const { graphtypeStore } = useStore();
+
+  useEffect(() => {
+    graphtypeStore.initSchemaStore();
+    console.log('initSchemaStore');
+    return () => {
+      graphtypeStore.destroySchemaStore();
+      console.log('destroySchemaStore');
+    };
+  }, []);
 
   const form = Form.useForm({
     defaultValues: {
@@ -80,7 +93,7 @@ function CreateGraphType() {
         </Form>
       </ActionContainer>
       <MainContainer>
-        <Canvas />
+        <SchemaEditor />
       </MainContainer>
       <FooterContainer>
         <Button
@@ -104,4 +117,4 @@ function CreateGraphType() {
   );
 }
 
-export default CreateGraphType;
+export default observer(CreateGraphType);

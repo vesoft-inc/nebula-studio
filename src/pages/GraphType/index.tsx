@@ -1,9 +1,9 @@
 import { Box, Container, useTheme } from '@mui/material';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { BreadCrumbs } from '@vesoft-inc/ui-components';
+import { useTranslation } from 'react-i18next';
 import CreateGraphType from './CreateGraphType';
 import GraphTypeDraftList from './GraphTypeDraftList';
-import { useTranslation } from 'react-i18next';
 
 function GraphType() {
   const navigate = useNavigate();
@@ -11,6 +11,7 @@ function GraphType() {
   const theme = useTheme();
   const paths = location.pathname.split('/').filter((path) => path.length > 0);
   const { t } = useTranslation(['route', 'common']);
+
   return (
     <Container maxWidth="xl" sx={{ pt: theme.spacing(4) }}>
       <BreadCrumbs

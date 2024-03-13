@@ -3,28 +3,26 @@ import { useTranslation } from 'react-i18next';
 import { Dropdown } from '@vesoft-inc/ui-components';
 import { useTheme } from '@emotion/react';
 import { AddFilled, DeleteOutline, EditFilled, MoreHorizFilled } from '@vesoft-inc/icons';
-import { useModal } from '@/stores';
+import { useModal, useStore } from '@/stores';
 import { GraphCard, TypeCountTypography } from './styles';
 import CreateGraphForm from './CreateGraphForm';
 import { HeaderContainer } from './styles';
 import { useNavigate } from 'react-router-dom';
-
-const graphtypes = [
-  {
-    name: 'graphtype-111',
-    graphList: ['graph-1', 'graph-2', 'graph-2', 'graph-2'],
-  },
-  {
-    name: 'graphtype-222',
-    graphList: ['graph-3', 'graph-4'],
-  },
-];
+import { useEffect } from 'react';
+import { observer } from 'mobx-react-lite';
 
 function GraphType() {
   const { t } = useTranslation(['graphtype', 'common']);
   const theme = useTheme();
   const modal = useModal();
   const navigate = useNavigate();
+  const { graphtypeStore } = useStore();
+
+  const { graphTypeList, getGraphTypeList } = graphtypeStore;
+
+  useEffect(() => {
+    getGraphTypeList();
+  }, []);
 
   const handleCreateGraphType = () => {
     navigate('create');
@@ -54,7 +52,7 @@ function GraphType() {
       </HeaderContainer>
       <Divider />
       <Box>
-        {graphtypes.map((graphtype, index) => {
+        {graphTypeList.map((graphtype, index) => {
           return (
             <Box key={index}>
               <Box sx={{ marginTop: 2, marginBottom: 2, display: 'flex', justifyContent: 'space-between' }}>
@@ -128,4 +126,4 @@ function GraphType() {
   );
 }
 
-export default GraphType;
+export default observer(GraphType);

@@ -2,32 +2,12 @@ import { createContext, useContext } from 'react';
 import { RouterStore, themeStore } from '@vesoft-inc/utils';
 import { ModalStore } from '@vesoft-inc/ui-components';
 import { CommonStore } from './common';
-
-// themeStore.updateThemeOptions({
-//   components: {
-//     MuiButton: {
-//       variants: [
-//         {
-//           props: { variant: 'outlined' },
-//           style: {
-//             borderColor: themeStore.palette.vesoft.textColor5,
-//             color: themeStore.palette.vesoft.themeColor1,
-//           },
-//         },
-//         {
-//           props: { variant: 'contained' },
-//           style: {
-//             backgroundColor: themeStore.palette.vesoft.themeColor1,
-//           },
-//         },
-//       ]
-//     }
-//   }
-// })
+import GraphTypeStore from './graphtype';
 
 export class RootStore {
   commonStore = new CommonStore(this);
   routerStore = new RouterStore();
+  graphtypeStore = new GraphTypeStore(this);
   themeStore = themeStore;
   modalStore = new ModalStore();
 }

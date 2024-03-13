@@ -38,5 +38,6 @@ export const FooterContainer = styled(Box)`
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: ${({ theme }) => theme.palette.vesoft.bgColor};
   border-top: 1px solid ${({ theme }) => theme.palette.vesoft.bgColor11};
 `;
