@@ -3,7 +3,6 @@ import { Box, Typography } from '@mui/material';
 import { observer } from 'mobx-react-lite';
 
 import { COLOR_LIST, NODE_RADIUS } from '@/components/Shapes/config';
-// import { VisualEditorNode } from '@/interfaces';
 import { VisualEditorType } from '@/utils/constant';
 import {
   NodeTypeListContainer,
@@ -19,6 +18,7 @@ import { useStore } from '@/stores';
 import ConfigDrawer from './ConfigDrawer';
 import { VEditorNode } from '@vesoft-inc/veditor/types/Model/Schema';
 import { VisualNodeCustomizeInfo } from '@/interfaces';
+import { useTranslation } from 'react-i18next';
 
 function SchemaEditor() {
   const canvasContainer = useRef<HTMLDivElement>(null);
@@ -26,8 +26,9 @@ function SchemaEditor() {
   const draggingTagRef = useRef<VisualNodeCustomizeInfo>({});
   const [draggingPosition, setDraggingPosition] = useState({ x: 0, y: 0 });
   const [showDragTag, setShowDragTag] = useState<boolean>(false);
-
   const { graphtypeStore } = useStore();
+  const { t } = useTranslation(['graphtype']);
+
   const { schemaStore } = graphtypeStore;
 
   useEffect(() => {
@@ -116,7 +117,7 @@ function SchemaEditor() {
     <CanvasContainer ref={canvasContainer}>
       <NodeTypeListContainer>
         <TagsContainer>
-          <Typography sx={{ mb: 1.25 }}>Node Type</Typography>
+          <Typography sx={{ mb: 1.25 }}>{t('graphType', { ns: 'graphtype' })}</Typography>
           <TagListContainer>
             {COLOR_LIST.map((item, index) => (
               <TagItem

@@ -3,6 +3,7 @@ export default {
   graphType: 'Graph Type',
   graphTypeName: 'Graph Type Name',
   draft: 'Draft',
+  nodeType: 'Node Type',
   graphName: 'Graph Name',
   createGraphType: 'Create Graph Type',
   createGraph: 'Create Graph',
@@ -13,4 +14,5 @@ export default {
   preview: 'Preview',
   previous: 'Previous',
   next: 'Next',
+  duplicate: 'Duplicate',
 };

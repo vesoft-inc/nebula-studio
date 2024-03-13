@@ -3,6 +3,7 @@ export default {
   graphType: 'Graph Type',
   graphTypeName: 'Graph Type Name',
   draft: '草稿 ({{ number }})',
+  nodeType: 'Node Type',
   graphName: 'Graph Name',
   createGraphType: '创建 Graph Type',
   createGraph: '创建图',
@@ -13,4 +14,5 @@ export default {
   preview: '预览',
   previous: '上一步',
   next: '下一步',
+  duplicate: '复制',
 };
