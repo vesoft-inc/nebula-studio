@@ -1,4 +1,4 @@
-import { VisualEditorLine } from '@/interfaces';
+import { InstanceLine } from '@vesoft-inc/veditor/types/Shape/Line';
 
 export const NODE_RADIUS = 40;
 
@@ -59,9 +59,8 @@ export const ARROW_STYLE = {
   'stroke-linecap': 'round',
 };
 
-export function makeLineSort(links: VisualEditorLine[] = []) {
-  // update link sort
-  const sourceMap: Record<string, VisualEditorLine[]> = {};
+export function makeLineSort(links: InstanceLine[] = []) {
+  const sourceMap: Record<string, InstanceLine[]> = {};
   links.forEach((link) => {
     const sourceId = link.from;
     const targetId = link.to;
@@ -87,6 +86,7 @@ export function makeLineSort(links: VisualEditorLine[] = []) {
           link.graphIndex = number;
           // check direction
           if (link.from !== source) {
+            // @ts-ignore
             link.graphIndex *= -1;
           }
         }
@@ -104,10 +104,11 @@ export function makeLineSort(links: VisualEditorLine[] = []) {
   });
 }
 
-export function getLinkCurvature(link: VisualEditorLine) {
+export function getLinkCurvature(link: InstanceLine) {
   let curvature = 0;
   const data = link.data;
   if (data.from === data.to) {
+    // @ts-ignore
     curvature = link.graphIndex;
   } else {
     const { graphIndex } = data;

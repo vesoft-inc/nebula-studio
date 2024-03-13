@@ -1,20 +1,26 @@
 import initShapes, { initShadowFilter } from '@/components/Shapes/Shapers';
-// import { ARROW_STYLE, LINE_STYLE, makeLineSort } from "@/components/Shapes/config";
-import { VisualEditorLine, VisualEditorNode } from '@/interfaces';
+import { ARROW_STYLE, LINE_STYLE } from '@/components/Shapes/config';
 import { RootStore } from '@/stores/index';
-// import { VisualEditorType } from "@/utils/constant";
+import { VisualEditorType } from '@/utils/constant';
 import VEditor, { VEditorOptions } from '@vesoft-inc/veditor';
+import { InstanceLine } from '@vesoft-inc/veditor/types/Shape/Line';
+import { InstanceNode } from '@vesoft-inc/veditor/types/Shape/Node';
 import { makeObservable, observable } from 'mobx';
 
-type VisualEditorItem = VisualEditorNode | VisualEditorLine;
+type VEditorItem = InstanceNode | InstanceLine;
+
+type UpdatePayload = Partial<{
+  hoveringItem: VEditorItem;
+  activeItem: VEditorItem;
+}>;
 
 class SchemaStore {
   rootStore?: RootStore;
   zoomFrame?: number;
   editor?: VEditor;
   container?: HTMLDivElement;
-  hoveringItem?: VisualEditorItem;
-  activeItem?: VisualEditorItem;
+  hoveringItem?: VEditorItem;
+  activeItem?: VEditorItem;
 
   constructor(rootStore?: RootStore) {
     this.rootStore = rootStore;
@@ -22,11 +28,20 @@ class SchemaStore {
       editor: observable.ref,
       container: observable.ref,
       hoveringItem: observable.ref,
+      activeItem: observable.shallow,
       zoomFrame: false,
     });
   }
 
-  initEditor(params: { container: HTMLDivElement; schema?: string; options?: VEditorOptions }) {
+  setActiveItem = (item?: VEditorItem) => {
+    this.activeItem = item;
+  };
+
+  setHoveringItem = (item: VEditorItem) => {
+    this.hoveringItem = item;
+  };
+
+  initEditor(params: { container: HTMLDivElement; schema?: string; options?: Partial<VEditorOptions> }) {
     const { container, schema, options } = params;
     this.editor = new VEditor({
       dom: container,
@@ -40,23 +55,8 @@ class SchemaStore {
     if (schema) {
       // todo set schema
     }
-    // this.initEvents(options?.mode);
+    this.initEvents(options?.mode);
   }
-
-  update = (
-    payload: Partial<{
-      hoveringItem: VisualEditorItem;
-      activeItem: VisualEditorItem;
-    }>
-  ) => {
-    const { hoveringItem, activeItem } = payload;
-    if (hoveringItem) {
-      this.hoveringItem = hoveringItem;
-    }
-    if (activeItem) {
-      this.activeItem = activeItem;
-    }
-  };
 
   zoomIn = () => {
     if (!this.editor) return;
@@ -89,73 +89,57 @@ class SchemaStore {
     document.removeEventListener('mouseup', this.zoomMouseUp);
   };
 
-  // initEvents = (mode: VEditorOptions['mode']) => {
-  //   if (!this.editor) return;
-  //   this.editor.graph.on('node:mouseenter', ({ node }) => {
-  //     this.update({ hoveringItem: node });
-  //   });
-  //   this.editor.graph.on('line:mouseenter', ({ line }) => {
-  //     this.update({ hoveringItem: line });
-  //   });
-  //   this.editor.graph.on('node:mouseleave', () => {
-  //     this.update({ hoveringItem: undefined });
-  //   });
-  //   this.editor.graph.on('line:mouseleave', () => {
-  //     this.update({ hoveringItem: undefined });
-  //   });
-  //   if (mode !== 'view') {
-  //     this.editor.graph.on('node:click', ({ node }) => {
-  //       this.update({ activeItem: node.data });
-  //     });
-  //     this.editor.graph.on('node:change', ({ node }) => {
-  //       if (!this.editor) return;
-  //       this.update({ activeItem: node.data });
-  //       this.clearActive();
-  //       this.editor.graph.node.setActive(node);
-  //     });
-  //     this.editor.graph.on('line:click', ({ line }) => {
-  //       this.update({ activeItem: line.data });
-  //     });
-  //     this.editor.graph.on('line:add', ({ line }) => {
-  //       if (!this.editor) return;
-  //       this.editor.graph.line.update();
-  //       this.update({ activeItem: line.data });
-  //       this.clearActive();
-  //       this.editor.graph.line.setActiveLine(line);
-  //     });
-  //     this.editor.graph.on('paper:click', () => {
-  //       this.update({ activeItem: undefined });
-  //     });
-  //     this.editor.graph.on('line:beforeadd', ({ data: line }: { data: any }) => {
-  //       if (!this.editor) return;
-  //       const data = this.editor.schema.getData();
-  //       makeLineSort([...data.lines, line]);
-  //       line.type = VisualEditorType.Edge;
-  //       line.style = LINE_STYLE;
-  //       line.arrowStyle = ARROW_STYLE;
-  //     });
-  //     this.editor.graph.on('node:remove', ({ node }) => {
-  //       const param = { active: undefined } as any;
-  //       if (this.hoveringItem?.data.uuid === node.data.uuid) {
-  //         param.hoveringItem = undefined;
-  //       }
-  //       this.update(param);
-  //       // this.validateSameNameData();
-  //     });
-  //     this.editor.graph.on('line:remove', ({ line }) => {
-  //       if (!this.editor) return;
-  //       const data = this.editor.schema.getData();
-  //       makeLineSort(data.lines);
-  //       this.editor.graph.line.update();
-  //       const param = { active: undefined } as any;
-  //       if (this.hoveringItem?.data.uuid === line.data.uuid) {
-  //         param.hoveringItem = undefined;
-  //       }
-  //       this.update(param);
-  //       // this.validateSameNameData();
-  //     });
-  //   }
-  // };
+  initEvents = (mode: VEditorOptions['mode']) => {
+    if (!this.editor) return;
+    if (mode === 'edit') {
+      this.editor.graph.on('node:click', ({ node }: { node: InstanceNode }) => {
+        this.setActiveItem(node);
+      });
+      this.editor.graph.on('line:click', ({ line }: { line: InstanceLine }) => {
+        this.setActiveItem(line);
+      });
+      this.editor.graph.on('line:add', ({ line }: { line: InstanceLine }) => {
+        if (!this.editor) return;
+        this.editor.graph.line.update();
+        this.setActiveItem(line);
+        this.clearActive();
+        this.editor.graph.line.setActiveLine(line);
+      });
+      this.editor.graph.on('paper:click', () => {
+        this.setActiveItem(undefined);
+      });
+      this.editor.graph.on('line:beforeadd', ({ line }: { line: InstanceLine }) => {
+        if (!this.editor) return;
+        // const data = this.editor.schema.getData();
+        // makeLineSort([...data.lines, line]);
+        line.type = VisualEditorType.Edge;
+        line.style = LINE_STYLE;
+        line.arrowStyle = ARROW_STYLE;
+      });
+      this.editor.graph.on('node:remove', ({ node }: { node: InstanceNode }) => {
+        const param: UpdatePayload = { activeItem: undefined };
+        if (this.hoveringItem?.data.uuid === node.data.uuid) {
+          param.hoveringItem = undefined;
+        }
+        this.setActiveItem(param.activeItem);
+        this.setHoveringItem(param.hoveringItem!);
+        // this.validateSameNameData();
+      });
+      this.editor.graph.on('line:remove', ({ line }: { line: InstanceLine }) => {
+        if (!this.editor) return;
+        // const data = this.editor.schema.getData();
+        // makeLineSort(data.lines);
+        this.editor.graph.line.update();
+        const param: UpdatePayload = { activeItem: undefined };
+        if (this.hoveringItem?.data.uuid === line.data.uuid) {
+          param.hoveringItem = undefined;
+        }
+        this.setActiveItem(param.activeItem);
+        this.setHoveringItem(param.hoveringItem!);
+        // this.validateSameNameData();
+      });
+    }
+  };
 
   clearActive = () => {
     if (!this.editor) return;

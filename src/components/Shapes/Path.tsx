@@ -156,7 +156,6 @@ const Path: LineRender = {
     line.data.toY = dst.y;
     return path;
   },
-
   renderLabel(line?: InstanceLine): SVGGElement {
     const { name, invalid, textBackgroundColor } = line!.data;
     if (!name) {

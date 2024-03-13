@@ -2,16 +2,28 @@ import { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { observer } from 'mobx-react-lite';
 
-import { COLOR_LIST, NODE_RADIUS } from '../../../../components/Shapes/config';
-import { VisualEditorNode } from '@/interfaces';
+import { COLOR_LIST, NODE_RADIUS } from '@/components/Shapes/config';
+// import { VisualEditorNode } from '@/interfaces';
 import { VisualEditorType } from '@/utils/constant';
-import { NodeTypeListContainer, TagItem, CanvasContainer, TagListContainer, TagsContainer, shadowItem } from './styles';
+import {
+  NodeTypeListContainer,
+  TagItem,
+  CanvasContainer,
+  TagListContainer,
+  TagsContainer,
+  shadowItem,
+  ScaleBtnContainer,
+} from './styles';
 import ScaleBtns from '@/components/ScaleBtns';
 import { useStore } from '@/stores';
+import ConfigDrawer from './ConfigDrawer';
+import { VEditorNode } from '@vesoft-inc/veditor/types/Model/Schema';
+import { VisualNodeCustomizeInfo } from '@/interfaces';
 
 function SchemaEditor() {
+  const canvasContainer = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const draggingTagRef = useRef<Partial<VisualEditorNode>>({});
+  const draggingTagRef = useRef<VisualNodeCustomizeInfo>({});
   const [draggingPosition, setDraggingPosition] = useState({ x: 0, y: 0 });
   const [showDragTag, setShowDragTag] = useState<boolean>(false);
 
@@ -22,6 +34,9 @@ function SchemaEditor() {
     if (containerRef.current === null) return;
     schemaStore?.initEditor({
       container: containerRef.current,
+      options: {
+        mode: 'edit',
+      },
     });
     return () => {
       schemaStore?.destroy();
@@ -67,7 +82,7 @@ function SchemaEditor() {
         }
         const x = (e.clientX - rect.x - controller.x) / controller.scale - 25 * controller.scale;
         const y = (e.clientY - rect.y - controller.y) / controller.scale - 25 * controller.scale;
-        const node = {
+        const node: VEditorNode = {
           x,
           y,
           width: NODE_RADIUS * 2,
@@ -75,7 +90,8 @@ function SchemaEditor() {
           type: VisualEditorType.Tag,
           ...draggingTagRef.current,
         };
-        schemaStore.editor.graph.node.addNode(node);
+        const addedNode = schemaStore.editor.graph.node.addNode(node);
+        schemaStore?.setActiveItem(addedNode);
       }
       draggingTagRef.current = {};
       setShowDragTag(false);
@@ -97,7 +113,7 @@ function SchemaEditor() {
   };
 
   return (
-    <CanvasContainer>
+    <CanvasContainer ref={canvasContainer}>
       <NodeTypeListContainer>
         <TagsContainer>
           <Typography sx={{ mb: 1.25 }}>Node Type</Typography>
@@ -129,15 +145,10 @@ function SchemaEditor() {
           }}
         />
       )}
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: '20px',
-          right: '20px',
-        }}
-      >
+      <ConfigDrawer />
+      <ScaleBtnContainer active={Boolean(schemaStore?.activeItem)}>
         <ScaleBtns onZoomIn={handleZoom('in')} onZoomOut={handleZoom('out')} />
-      </Box>
+      </ScaleBtnContainer>
     </CanvasContainer>
   );
 }
