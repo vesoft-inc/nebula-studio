@@ -22,12 +22,13 @@ if (!loader.__getMonacoInstance()) {
 
 interface MonacoEditorProps {
   value?: string;
-  onChange?: (value: string) => void;
+  onChange?: (value?: string) => void;
+  /** dark | light */
   themeMode?: string;
 }
 
 export default function MonacoEditor(props: MonacoEditorProps) {
-  const { themeMode } = props;
+  const { themeMode = 'light', onChange, value } = props;
   const monaco = useMonaco();
   const isDark = themeMode === 'dark';
   const className = css`
@@ -71,6 +72,7 @@ export default function MonacoEditor(props: MonacoEditorProps) {
     <Editor
       height="100%"
       theme={monacoTheme}
+      value={value}
       defaultLanguage="javascript"
       language="javascript"
       options={{
@@ -97,6 +99,7 @@ export default function MonacoEditor(props: MonacoEditorProps) {
         fixedOverflowWidgets: true,
       }}
       className={className}
+      onChange={onChange}
     />
   );
 }

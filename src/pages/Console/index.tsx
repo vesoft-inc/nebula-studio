@@ -1,4 +1,4 @@
-import { Fragment, Suspense, lazy, useCallback, useEffect, useState } from 'react';
+import { Fragment, Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useTheme } from '@emotion/react';
 import Box from '@mui/material/Box';
@@ -7,9 +7,9 @@ import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import { useTranslation } from 'react-i18next';
 import { VectorTriangle, FileDocument, Play, QueryTemplate, RestoreFilled, DeleteOutline } from '@vesoft-inc/icons';
-import { IMenuRouteItem, Menu } from '@vesoft-inc/ui-components';
 import { execGql } from '@/services';
 import { useStore } from '@/stores';
+import SiderMenu from '@/components/SiderMenu';
 import { OutputBox } from './OutputBox';
 import SchemaItem from './SchemaItem';
 import {
@@ -25,99 +25,59 @@ import {
 
 const MonacoEditor = lazy(() => import('@/components/MonacoEditor'));
 
-export default observer(function Console() {
+const ConsoleEditor = observer(function ConsoleEditor() {
   const theme = useTheme();
+  const { consoleStore } = useStore();
+  const { editorValue, updateEditorValue } = consoleStore;
+  return (
+    <Suspense>
+      <MonacoEditor themeMode={theme.palette.mode} value={editorValue} onChange={updateEditorValue} />
+    </Suspense>
+  );
+});
+
+export default observer(function Console() {
   const { consoleStore } = useStore();
   const { t } = useTranslation(['console', 'common']);
   const [activeMenu, setActiveMenu] = useState('Schema');
-  const activeIcon = activeMenu === 'Schema' ? <VectorTriangle /> : <FileDocument />;
-
-  const handleMenuClick = useCallback((menuItem: IMenuRouteItem) => {
-    setActiveMenu(menuItem.key);
-  }, []);
+  const siderItems = useMemo(
+    () => [
+      {
+        key: 'Schema',
+        label: 'Schema',
+        icon: <VectorTriangle fontSize="medium" />,
+        sx: { height: 60 },
+      },
+      {
+        key: 'Template',
+        label: 'Template',
+        icon: <FileDocument fontSize="medium" />,
+        sx: { height: 60 },
+      },
+    ],
+    []
+  );
 
   const handleRunGql = useCallback(() => {
-    execGql(
-      'CALL show_graphs() YIELD `graph_name` AS gn CALL describe_graph(gn) YIELD `graph_type_name` AS gtn return gn, gtn'
-    ).then((r) => {
+    // CALL show_graphs() YIELD `graph_name` AS gn CALL describe_graph(gn) YIELD `graph_type_name` AS gtn return gn, gtn
+    const gql = consoleStore.editorValue;
+    execGql(gql).then((r) => {
       console.log('=====r', r);
     });
-  }, []);
+  }, [consoleStore]);
 
   useEffect(() => {
     consoleStore.getGraphTypes();
   }, []);
 
+  const activeIcon = activeMenu === 'Schema' ? <VectorTriangle /> : <FileDocument />;
   const groups = Object.groupBy(consoleStore.graphTypeElements || [], (ele) => ele.name);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
       <StyledSider>
         <SiderItem sx={{ width: (theme) => theme.spacing(8) }}>
-          <Menu
-            canToggle={false}
-            items={[
-              {
-                key: 'Schema',
-                label: 'Schema',
-                icon: <VectorTriangle fontSize="medium" />,
-              },
-              {
-                key: 'Template',
-                label: 'Template',
-                icon: <FileDocument fontSize="medium" />,
-              },
-            ]}
-            selectedKeys={activeMenu ? [activeMenu] : []}
-            onMenuClick={handleMenuClick}
-            activeSlotProps={{
-              menuListItemButton: {
-                sx: {
-                  backgroundColor: theme.palette.vesoft.themeColor1,
-                  height: theme.spacing(8),
-                  borderRadius: 0,
-                  '&:hover': {
-                    borderRadius: 0,
-                    backgroundColor: theme.palette.vesoft.themeColor1,
-                  },
-                },
-              },
-              menuItemIcon: {
-                sx: {
-                  color: theme.palette.vesoft.textColor8,
-                },
-              },
-            }}
-            slotProps={{
-              drawer: {
-                variant: 'permanent',
-                PaperProps: {
-                  sx: {
-                    borderRight: 'none',
-                    display: 'block',
-                    backgroundColor: 'inherit',
-                  },
-                },
-                sx: {
-                  width: theme.spacing(8),
-                },
-              },
-              menuListItemButton: {
-                sx: {
-                  height: theme.spacing(8),
-                  '&:hover': {
-                    borderRadius: 0,
-                    backgroundColor: theme.palette.vesoft.themeColor1,
-                  },
-                },
-              },
-              menuItemIcon: {
-                sx: {
-                  color: theme.palette.vesoft.textColor1,
-                },
-              },
-            }}
-          />
+          <SiderMenu items={siderItems} onMenuClick={setActiveMenu} activeKey={activeMenu} />
         </SiderItem>
         <SiderItem sx={{ width: (theme) => theme.spacing(36) }}>
           <SiderItemHeader>
@@ -157,9 +117,7 @@ export default observer(function Console() {
             </Box>
           </ActionWrapper>
           <EditorWrapper>
-            <Suspense>
-              <MonacoEditor themeMode={theme.palette.mode} />
-            </Suspense>
+            <ConsoleEditor />
           </EditorWrapper>
           <ActionWrapper sx={{ height: (theme) => theme.spacing(4), fontSize: (theme) => theme.typography.fontSize }}>
             <Box sx={{ flexGrow: 1 }}></Box>
