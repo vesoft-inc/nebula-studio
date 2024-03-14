@@ -1,8 +1,9 @@
-import { Button, Container } from '@mui/material';
-import { CheckboxElement, Form, Stepper, TextFieldElement } from '@vesoft-inc/ui-components';
+import { Button, Container, Grid } from '@mui/material';
+import { Stepper } from '@vesoft-inc/ui-components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { observer } from 'mobx-react-lite';
+import { CheckboxElement, FormContainer, TextFieldElement, useForm } from 'react-hook-form-mui';
 
 import { useStore } from '@/stores';
 import { ActionContainer, ContentContainer, FooterContainer, MainContainer } from './styles';
@@ -27,7 +28,7 @@ function CreateGraphType() {
     };
   }, []);
 
-  const form = Form.useForm({
+  const form = useForm({
     defaultValues: {
       graphTypeName: '',
       ifNotExists: true,
@@ -58,39 +59,29 @@ function CreateGraphType() {
         />
       </Container>
       <ActionContainer>
-        <Form
-          form={form}
-          layout={{
-            rowSpacing: 2,
-            columnSpacing: 3,
-          }}
+        <FormContainer
+          formContext={form}
           FormProps={{
             style: {
               width: '100%',
             },
           }}
         >
-          <Form.Item
-            label={t('graphTypeName', { ns: 'graphtype' })}
-            name="graphTypeName"
-            required
-            layout={{
-              xs: 4,
-            }}
-          >
-            <TextFieldElement size="small" sx={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item
-            label={t('ifNotExsits', { ns: 'graphtype' })}
-            name="ifNotExists"
-            layout={{
-              xs: 4,
-            }}
-            required
-          >
-            <CheckboxElement />
-          </Form.Item>
-        </Form>
+          <Grid container rowSpacing={2} columnSpacing={3}>
+            <Grid item xs={4}>
+              <TextFieldElement
+                label={t('graphTypeName', { ns: 'graphtype' })}
+                name="graphTypeName"
+                required
+                size="small"
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <CheckboxElement label={t('ifNotExsits', { ns: 'graphtype' })} required name="ifNotExists" />
+            </Grid>
+          </Grid>
+        </FormContainer>
       </ActionContainer>
       <MainContainer>
         <SchemaEditor />

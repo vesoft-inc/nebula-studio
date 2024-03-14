@@ -12,15 +12,20 @@ function GraphType() {
   const paths = location.pathname.split('/').filter((path) => path.length > 0);
   const { t } = useTranslation(['route', 'common']);
 
+  const pathI18nMap = {
+    graphtype: t('graphtype', { ns: 'route' }),
+    create: t('create', { ns: 'route' }),
+    draft: t('draft', { ns: 'route' }),
+  };
+
   return (
     <Container maxWidth="xl" sx={{ pt: theme.spacing(4) }}>
       <BreadCrumbs
         onBack={() => {
-          navigate(-1);
+          navigate('/graphtype');
         }}
         items={paths.map((item, index) => ({
-          // @ts-ignore
-          name: t(`graphtype.${item}`, { ns: 'route' }),
+          name: pathI18nMap[item as keyof typeof pathI18nMap],
           href: `/${paths.slice(0, index + 1).join('/')}`,
         }))}
       />

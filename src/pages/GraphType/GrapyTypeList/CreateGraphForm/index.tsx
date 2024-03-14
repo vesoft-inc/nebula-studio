@@ -1,13 +1,10 @@
 import { useModal } from '@/stores';
-import { DialogContent } from '@mui/material';
-import { CheckboxElement, Form, ModalFooter, TextFieldElement } from '@vesoft-inc/ui-components';
+import { DialogContent, Grid } from '@mui/material';
+import { ModalFooter } from '@vesoft-inc/ui-components';
 
 import { Box, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-
-const { useForm } = Form;
-
-const formItemLayout = { xs: 12, xl: 12, lg: 12 };
+import { CheckboxElement, FormContainer, TextFieldElement, useForm } from 'react-hook-form-mui';
 
 export interface CreateGraphFormValues {
   graphType: string;
@@ -36,35 +33,25 @@ const CreateGraphForm = () => {
     <>
       <DialogContent dividers>
         <Box sx={{ padding: `${theme.spacing(2)} ${theme.spacing(3)}` }} width={500}>
-          <Form
-            form={form}
-            layout={{
-              rowSpacing: 2,
-            }}
-          >
-            <Form.Item
-              label={t('graphType', { ns: 'graphtype' })}
-              name="graphType"
-              disabled
-              required
-              layout={formItemLayout}
-            >
-              <TextFieldElement sx={{ width: '100%' }} />
-            </Form.Item>
-            <Form.Item label={t('graphName', { ns: 'graphtype' })} name="graphName" required layout={formItemLayout}>
-              <TextFieldElement sx={{ width: '100%' }} />
-            </Form.Item>
-            <Form.Item
-              label={t('ifNotExsits', { ns: 'graphtype' })}
-              name="ifNotExists"
-              layout={{
-                xs: 12,
-              }}
-              required
-            >
-              <CheckboxElement />
-            </Form.Item>
-          </Form>
+          <FormContainer formContext={form}>
+            <Grid container rowSpacing={2}>
+              <Grid item md={12}>
+                <TextFieldElement
+                  label={t('graphType', { ns: 'graphtype' })}
+                  name="graphType"
+                  disabled
+                  required
+                  fullWidth
+                />
+              </Grid>
+              <Grid item md={12} rowSpacing={2}>
+                <TextFieldElement label={t('graphName', { ns: 'graphtype' })} name="graphName" required fullWidth />
+              </Grid>
+              <Grid item md={12}>
+                <CheckboxElement label={t('ifNotExsits', { ns: 'graphtype' })} name="ifNotExists" required />
+              </Grid>
+            </Grid>
+          </FormContainer>
         </Box>
       </DialogContent>
       <ModalFooter

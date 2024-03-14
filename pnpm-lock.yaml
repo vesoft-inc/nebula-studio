@@ -42,8 +42,8 @@ dependencies:
     specifier: 5.0.0-beta.1
     version: 5.0.0-beta.1(@vesoft-inc/veditor@4.4.14)(antd@5.15.2)(color@4.2.3)(copy-to-clipboard@3.3.3)(gl-matrix@3.4.3)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/ui-components':
-    specifier: 0.0.3-beta.27
-    version: 0.0.3-beta.27(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
+    specifier: 0.0.3-beta.28
+    version: 0.0.3-beta.28(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/utils':
     specifier: 0.0.0-beta.10
     version: 0.0.0-beta.10(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)
@@ -2839,8 +2839,8 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@vesoft-inc/ui-components@0.0.3-beta.27(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-vaMWnZ/V/njOvXMZ71jskkXKlrNwQUXf5SQ+xDfBTur03EwrKRgNZloOqWIvpX/Ht/ms0kG9b4weH9p/JecLTw==}
+  /@vesoft-inc/ui-components@0.0.3-beta.28(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-R3zM6A2mc13rqzj2ZMwrT/4AjvVt7rIVUN1uCEvaVR7dlBJ48k/rMz1hvf0EivpQihrNhCWjkj9f8M1oSC28Vw==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^17 || ^18

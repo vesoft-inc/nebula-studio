@@ -2,8 +2,6 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import { Form } from '@vesoft-inc/ui-components';
 import {
   LoginContainer,
   Content,
@@ -15,9 +13,8 @@ import {
   FooterVersion,
   FooterCopyright,
 } from './styles';
-
-const FormItem = Form.Item;
-const useForm = Form.useForm;
+import { FormContainer, PasswordElement, TextFieldElement, useForm } from 'react-hook-form-mui';
+import { Grid } from '@mui/material';
 
 interface LoginFormData {
   username: string;
@@ -38,26 +35,28 @@ export default function Login() {
         <ContentHeader>
           <HeaderLogo src="/images/nebula-logo.png" />
           <HeaderTitle>悦数 图探索</HeaderTitle>
-          <Form form={form} layout={{ spacing: 1, rowSpacing: 3, columns: 12 }} onFinish={onSubmit}>
-            <FormItem
-              label={t('username', { ns: 'common' })}
-              name="username"
-              required
-              layout={{ xs: 12 }}
-              validation={{ required: 'username required' }}
-            >
-              <TextField size="small" />
-            </FormItem>
-            <FormItem
-              label="密码"
-              name="password"
-              required
-              layout={{ xs: 12 }}
-              validation={{ required: 'passward required' }}
-            >
-              <TextField size="small" type="password" />
-            </FormItem>
-          </Form>
+          <FormContainer formContext={form} onSuccess={onSubmit}>
+            <Grid container spacing={1} rowSpacing={3} columns={12}>
+              <TextFieldElement
+                label={t('username', { ns: 'common' })}
+                name="username"
+                required
+                size="small"
+                validation={{ required: 'username required' }}
+              />
+            </Grid>
+            <Grid xs={12}>
+              <PasswordElement
+                label="密码"
+                name="password"
+                required
+                size="small"
+                type="password"
+                fullWidth
+                validation={{ required: 'passward required' }}
+              />
+            </Grid>
+          </FormContainer>
           <Button onClick={form.handleSubmit(onSubmit)} variant="contained" fullWidth sx={{ marginTop: 4 }}>
             登录
           </Button>
