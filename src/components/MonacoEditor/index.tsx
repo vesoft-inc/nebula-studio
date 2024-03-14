@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { css } from '@emotion/css';
-import * as monaco from 'monaco-editor';
+import * as monaco from './monaco';
 import Editor, { loader, useMonaco } from '@monaco-editor/react';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
@@ -72,6 +72,7 @@ export default function MonacoEditor(props: MonacoEditorProps) {
       height="100%"
       theme={monacoTheme}
       defaultLanguage="javascript"
+      language="javascript"
       options={{
         scrollbar: {
           vertical: 'hidden',

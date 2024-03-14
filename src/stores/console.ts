@@ -1,5 +1,5 @@
 import { action, makeObservable, observable } from 'mobx';
-import type { Graph, GraphType } from '@/interfaces';
+import type { Graph, GraphTypeElement } from '@/interfaces';
 import { execGql } from '@/services';
 import { type RootStore } from '.';
 
@@ -7,7 +7,7 @@ export class ConsoleStore {
   rootStore?: RootStore;
 
   graphs = observable.array<Graph>([]);
-  graphTypes = observable.array<GraphType>([]);
+  graphTypeElements = observable.array<GraphTypeElement>([]);
 
   constructor(rootStore?: RootStore) {
     makeObservable(this, {
@@ -23,13 +23,12 @@ export class ConsoleStore {
   }
 
   updateGraphs = (graphs: Graph[]) => this.graphs.replace(graphs);
-  updateGraphTypes = (graphTypes: GraphType[]) => this.graphTypes.replace(graphTypes);
+  updateGraphTypes = (elements: GraphTypeElement[]) => this.graphTypeElements.replace(elements);
 
   getGraphTypes = async () => {
     const gql = `CALL show_graph_types() YIELD \`graph_type_name\` AS name CALL describe_graph_type(name) RETURN *`;
-    const res = await execGql<{ tables: GraphType[] }>(gql);
-    const graphTypes = res?.tables || [];
-    // const graphTypeGroups = Object.groupBy(graphTypes, (item) => item.name);
-    this.updateGraphTypes(graphTypes);
+    const res = await execGql<{ tables: GraphTypeElement[] }>(gql);
+    const elements = res?.tables || [];
+    this.updateGraphTypes(elements);
   };
 }

@@ -49,7 +49,7 @@ export interface Graph {
  * }
  * ```
  */
-export interface GraphType {
+export interface GraphTypeElement {
   name: string;
   kind: 'Node' | 'Edge';
   labels: string[];

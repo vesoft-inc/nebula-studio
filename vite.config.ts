@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
+import legacy from '@vitejs/plugin-legacy';
 import pkg from './package.json';
 
 const proxyHost = '127.0.0.1:7001';
@@ -32,11 +33,11 @@ export default defineConfig({
       ],
     }),
     // topLevelAwait(),
-    // legacy({
-    //   targets: ['chrome >= 87', 'safari >= 14', 'firefox >= 78'],
-    //   polyfills: ['es.promise.finally', 'es/map', 'es/set', 'es/array'],
-    //   modernPolyfills: ['es.promise.finally'],
-    // }),
+    legacy({
+      targets: ['chrome >= 90', 'safari >= 15', 'firefox >= 90'],
+      modernPolyfills: ['es/promise', 'es/array', 'es/object', 'es/string'],
+      renderLegacyChunks: false,
+    }),
   ],
   server: {
     port: 3000,

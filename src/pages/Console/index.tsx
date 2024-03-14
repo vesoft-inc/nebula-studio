@@ -1,34 +1,17 @@
-import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
+import { Fragment, Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useTheme } from '@emotion/react';
 import Box from '@mui/material/Box';
-import Collapse from '@mui/material/Collapse';
 import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListSubheader from '@mui/material/ListSubheader';
-import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
-import { styled } from '@mui/material/styles';
-import type { SxProps } from '@mui/material';
+import Divider from '@mui/material/Divider';
 import { useTranslation } from 'react-i18next';
-import {
-  VectorTriangle,
-  FileDocument,
-  Play,
-  ChevronRightFilled,
-  DotsHexagon,
-  EdgeType,
-  QueryTemplate,
-  RestoreFilled,
-  DeleteOutline,
-} from '@vesoft-inc/icons';
+import { VectorTriangle, FileDocument, Play, QueryTemplate, RestoreFilled, DeleteOutline } from '@vesoft-inc/icons';
 import { IMenuRouteItem, Menu } from '@vesoft-inc/ui-components';
 import { execGql } from '@/services';
 import { useStore } from '@/stores';
 import { OutputBox } from './OutputBox';
+import SchemaItem from './SchemaItem';
 import {
   ActionWrapper,
   EditorWrapper,
@@ -42,20 +25,12 @@ import {
 
 const MonacoEditor = lazy(() => import('@/components/MonacoEditor'));
 
-const StyledListItemIcon = styled(ListItemIcon)`
-  min-width: auto;
-  margin: ${({ theme }) => theme.spacing(0, 1.5, 0, 1)};
-`;
-
 export default observer(function Console() {
   const theme = useTheme();
   const { consoleStore } = useStore();
   const { t } = useTranslation(['console', 'common']);
-  const [activeMenu, setActiveMenu] = useState('console');
-  const [open, setOpen] = useState(true);
-  const handleClick = useCallback(() => setOpen((open) => !open), []);
-  const activeIcon = activeMenu === 'console' ? <VectorTriangle /> : <FileDocument />;
-  const schemaTextSx: SxProps = { color: theme.palette.vesoft?.textColor1, fontWeight: 600, fontSize: '16px' };
+  const [activeMenu, setActiveMenu] = useState('Schema');
+  const activeIcon = activeMenu === 'Schema' ? <VectorTriangle /> : <FileDocument />;
 
   const handleMenuClick = useCallback((menuItem: IMenuRouteItem) => {
     setActiveMenu(menuItem.key);
@@ -73,6 +48,8 @@ export default observer(function Console() {
     consoleStore.getGraphTypes();
   }, []);
 
+  const groups = Object.groupBy(consoleStore.graphTypeElements || [], (ele) => ele.name);
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
       <StyledSider>
@@ -81,13 +58,13 @@ export default observer(function Console() {
             canToggle={false}
             items={[
               {
-                key: 'console',
-                label: 'Console',
+                key: 'Schema',
+                label: 'Schema',
                 icon: <VectorTriangle fontSize="medium" />,
               },
               {
-                key: 'template',
-                label: 'template',
+                key: 'Template',
+                label: 'Template',
                 icon: <FileDocument fontSize="medium" />,
               },
             ]}
@@ -149,52 +126,13 @@ export default observer(function Console() {
               {activeMenu}
             </Box>
           </SiderItemHeader>
-          <List
-            sx={{ width: '100%', overflowY: 'auto' }}
-            component="nav"
-            aria-labelledby="nested-list-subheader"
-            subheader={
-              <ListSubheader component="div" id="nested-list-subheader">
-                NebulaGraph Schema
-              </ListSubheader>
-            }
-          >
-            <Divider />
-            <ListItemButton>
-              <ChevronRightFilled />
-              <StyledListItemIcon sx={schemaTextSx}>
-                <DotsHexagon />
-              </StyledListItemIcon>
-              <ListItemText primaryTypographyProps={{ sx: schemaTextSx }} primary="Sent mail" />
-            </ListItemButton>
-            <Divider />
-            <ListItemButton onClick={handleClick}>
-              <ChevronRightFilled
-                sx={{ transform: `rotate(${open ? 90 : 0}deg)`, transition: 'transform ease 0.25s' }}
-              />
-              <StyledListItemIcon sx={schemaTextSx}>
-                <DotsHexagon />
-              </StyledListItemIcon>
-              <ListItemText primaryTypographyProps={{ sx: schemaTextSx }} primary="Inbox" />
-            </ListItemButton>
-            <Collapse in={open} timeout="auto" unmountOnExit>
-              <Divider />
-              <ListItem sx={{ pl: 6 }}>
-                <ListItemText primary="Starred" />
-              </ListItem>
-              <Divider />
-              <ListItem sx={{ pl: 6 }}>
-                <ListItemText primary="Starred" />
-              </ListItem>
-            </Collapse>
-            <Divider />
-            <ListItemButton>
-              <ChevronRightFilled />
-              <StyledListItemIcon sx={schemaTextSx}>
-                <EdgeType />
-              </StyledListItemIcon>
-              <ListItemText primaryTypographyProps={{ sx: schemaTextSx }} primary="Drafts" />
-            </ListItemButton>
+          <List sx={{ width: '100%', overflowY: 'auto', paddingTop: 0 }} component="nav">
+            {Object.entries(groups).map(([name, elements]) => (
+              <Fragment key={name}>
+                <SchemaItem name={name} elements={elements || []} />
+                <Divider />
+              </Fragment>
+            ))}
           </List>
         </SiderItem>
       </StyledSider>
