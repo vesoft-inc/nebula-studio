@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/vesoft-inc/go-pkg/response"
 	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/internal/types"
+	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/pkg/ecode"
 	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/pkg/graphd"
 
 	nebula "github.com/vesoft-inc/nebula-ng-tools/golang"
@@ -61,7 +63,7 @@ func (g *gatewayService) ExecGQL(request *types.ExecGQLParams) (*types.AnyResp, 
 
 	resp, err := graphd.RunGql(client, request.Gql)
 	if err != nil {
-		return nil, err
+		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err, "run gql failed")
 	}
-	return &types.AnyResp{Data: resp}, nil
+	return &types.AnyResp{Data: response.StandardHandlerDataFieldAny(resp)}, nil
 }

@@ -9,7 +9,10 @@ import {
   ExplorerDataOutline,
   Stethoscope,
   Sitemap,
+  Console as CosoleIcon,
 } from '@vesoft-inc/icons';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
 import SiderMenu, { type SiderMenuItem } from '@/components/SiderMenu';
 import {
   OutputContainer,
@@ -20,62 +23,97 @@ import {
   ContentSider,
   ContentMain,
 } from './styles';
+import { ConsoleResult } from '@/interfaces/console';
 import Explain from '@vesoft-inc/nebula-explain-graph';
 import { ExplainData } from '@vesoft-inc/nebula-explain-graph/types/Shape';
 import '@vesoft-inc/nebula-explain-graph/dist/Explain.css';
+import { safeParse } from '@/utils';
+import { useStore } from '@/stores';
 
-export function OutputBox() {
-  const [activeMenu, setActiveMenu] = useState('Table');
+enum OutputMenu {
+  Table = 'Table',
+  CodeBraces = 'CodeBraces',
+  ExplorerData = 'ExplorerData',
+  Stethoscope = 'Stethoscope',
+  Plan = 'Plan',
+}
+
+export function OutputBox({ result }: { result: ConsoleResult }) {
+  const { consoleStore } = useStore();
+  const [activeMenu, setActiveMenu] = useState(OutputMenu.Table);
+  const { planDesc } = result.data || {};
   const [explainData, setExplainData] = useState<ExplainData | undefined>();
   const handleMenuClick = useCallback((key: string) => {
-    setActiveMenu(key);
-    setExplainData(undefined);
+    setActiveMenu(key as OutputMenu);
+    if (key === OutputMenu.Plan && planDesc) {
+      const [explainData] = safeParse<ExplainData>(planDesc);
+      explainData && setExplainData(explainData);
+    }
   }, []);
 
+  const removeResult = useCallback(() => {
+    consoleStore.unsafeAction(() => {
+      consoleStore.results.remove(result);
+    });
+  }, [result]);
+
   const planMenuItem: SiderMenuItem = {
-    key: 'Plan',
-    label: 'Plan',
+    key: OutputMenu.Plan,
+    label: OutputMenu.Plan,
     icon: <Sitemap fontSize="medium" />,
     sx: { height: 50 },
   };
 
   const siderMenuItems: SiderMenuItem[] = [
     {
-      key: 'Table',
-      label: 'Table',
+      key: OutputMenu.Table,
+      label: OutputMenu.Table,
       icon: <Table fontSize="medium" />,
       sx: { height: 50 },
     },
     {
-      key: 'CodeBraces',
-      label: 'CodeBraces',
+      key: OutputMenu.CodeBraces,
+      label: OutputMenu.CodeBraces,
       icon: <CodeBracesBox fontSize="medium" />,
       sx: { height: 50 },
     },
     {
-      key: 'ExplorerData',
-      label: 'ExplorerData',
+      key: OutputMenu.ExplorerData,
+      label: OutputMenu.ExplorerData,
       icon: <ExplorerDataOutline fontSize="medium" />,
       sx: { height: 50 },
     },
     {
-      key: 'Stethoscope',
-      label: 'Stethoscope',
+      key: OutputMenu.Stethoscope,
+      label: OutputMenu.Stethoscope,
       icon: <Stethoscope fontSize="medium" />,
       sx: { height: 50 },
     },
-    ...(explainData ? [planMenuItem] : []),
+    ...(planDesc ? [planMenuItem] : []),
   ];
 
   return (
     <OutputContainer sx={{ flex: 1 }}>
       <OutputHeader>
-        <HeaderTitle>111</HeaderTitle>
+        <HeaderTitle success={!result.code}>
+          <CosoleIcon fontSize="medium" sx={{ mr: 1.5 }} />
+          <Box component="span" textOverflow="ellipsis">
+            {result.gql}
+          </Box>
+        </HeaderTitle>
         <HeaderAction>
-          <QueryTemplate />
-          <TrayArrowUp />
-          <ExpandLessFilled />
-          <CloseFilled />
+          <IconButton>
+            <QueryTemplate />
+          </IconButton>
+          <IconButton>
+            <TrayArrowUp />
+          </IconButton>
+          <IconButton>
+            <ExpandLessFilled />
+          </IconButton>
+          <IconButton>
+            <CloseFilled onClick={removeResult} />
+          </IconButton>
         </HeaderAction>
       </OutputHeader>
       <OutputContent>

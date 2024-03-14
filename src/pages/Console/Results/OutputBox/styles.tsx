@@ -1,5 +1,5 @@
 import { styled } from '@mui/material/styles';
-import Box from '@mui/system/Box';
+import Box, { BoxProps } from '@mui/system/Box';
 import type { Theme } from '@emotion/react';
 
 const getVesoftBorderColor = ({ theme }: { theme: Theme }) => theme.palette.vesoft.textColor6;
@@ -19,16 +19,21 @@ export const OutputHeader = styled(Box)`
   padding: ${({ theme }) => theme.spacing(1.5, 2)};
 `;
 
-export const HeaderTitle = styled(Box)`
-  flex: 1;
-  height: 42px;
-  background-color: ${({ theme }) => theme.palette.vesoft.status6Bg};
-  border-radius: ${({ theme }) => theme.shape.borderRadius}px;
-  padding: ${({ theme }) => theme.spacing(0, 2)};
-  margin-right: ${({ theme }) => theme.spacing(2)};
-  display: flex;
-  align-items: center;
-`;
+export const HeaderTitle = styled(Box, { shouldForwardProp: (propName) => propName !== 'success' })<
+  BoxProps & { success?: boolean }
+>(({ theme, success }) => ({
+  flex: 1,
+  height: '42px',
+  fontWeight: 500,
+  backgroundColor: success ? theme.palette.vesoft.status6Bg : theme.palette.error.main,
+  color: success ? theme.palette.vesoft.status2 : theme.palette.error.contrastText,
+  borderRadius: theme.shape.borderRadius,
+  padding: theme.spacing(0, 2),
+  marginRight: theme.spacing(2),
+  display: 'flex',
+  alignItems: 'center',
+  overflow: 'hidden',
+}));
 
 export const HeaderAction = styled(Box)`
   width: 160px;

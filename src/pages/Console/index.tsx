@@ -7,10 +7,9 @@ import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import { useTranslation } from 'react-i18next';
 import { VectorTriangle, FileDocument, Play, QueryTemplate, RestoreFilled, DeleteOutline } from '@vesoft-inc/icons';
-import { execGql } from '@/services';
 import { useStore } from '@/stores';
 import SiderMenu from '@/components/SiderMenu';
-import { OutputBox } from './OutputBox';
+import Results from './Results';
 import SchemaItem from './SchemaItem';
 import {
   ActionWrapper,
@@ -61,9 +60,7 @@ export default observer(function Console() {
   const handleRunGql = useCallback(() => {
     // CALL show_graphs() YIELD `graph_name` AS gn CALL describe_graph(gn) YIELD `graph_type_name` AS gtn return gn, gtn
     const gql = consoleStore.editorValue;
-    execGql(gql).then((r) => {
-      console.log('=====r', r);
-    });
+    consoleStore.runGql(gql);
   }, [consoleStore]);
 
   useEffect(() => {
@@ -127,9 +124,7 @@ export default observer(function Console() {
             </Box>
           </ActionWrapper>
         </InputArea>
-        <Box>
-          <OutputBox />
-        </Box>
+        <Results />
       </Box>
     </Box>
   );

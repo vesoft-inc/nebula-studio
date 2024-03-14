@@ -20,11 +20,28 @@ const fetcher = new FetchService({
           }
         }
       },
+      (data) => {
+        return data;
+      },
     ],
+  },
+  interceptorsEjectors(ins) {
+    ins.interceptors.request.use((config) => {
+      config.headers['Content-Type'] = 'application/json';
+      return config;
+    });
+    ins.interceptors.response.use(
+      (response) => {
+        return response;
+      },
+      (error) => {
+        return error?.response || {};
+      }
+    );
   },
 });
 
-export const execGql = async <T = unknown>(gql: string): Promise<T> => {
+export const execGql = async <T = unknown>(gql: string): Promise<{ code: number; data: T; message: string }> => {
   const res = await fetcher.post('/gql/exec', { gql });
-  return res.data?.data;
+  return res.data;
 };

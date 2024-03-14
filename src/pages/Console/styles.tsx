@@ -50,7 +50,7 @@ export const StyledIconButton = styled(IconButton)`
 export const RunButton = styled(Button)`
   background-color: ${({ theme }) => theme.palette.vesoft.themeColor1};
   color: ${({ theme }) => theme.palette.vesoft.textColor8};
-  height: '36px';
+  height: 36px;
 `;
 
 export const EditorWrapper = styled(Box)`

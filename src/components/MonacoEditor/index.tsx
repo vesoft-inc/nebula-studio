@@ -73,8 +73,6 @@ export default function MonacoEditor(props: MonacoEditorProps) {
       height="100%"
       theme={monacoTheme}
       value={value}
-      defaultLanguage="javascript"
-      language="javascript"
       options={{
         scrollbar: {
           vertical: 'hidden',
