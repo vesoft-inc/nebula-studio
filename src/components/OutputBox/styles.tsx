@@ -1,5 +1,6 @@
 import { styled } from '@mui/material/styles';
-import Box, { BoxProps } from '@mui/system/Box';
+import Box, { BoxProps } from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
 import type { Theme } from '@emotion/react';
 
 const getVesoftBorderColor = ({ theme }: { theme: Theme }) => theme.palette.vesoft.textColor6;
@@ -21,19 +22,22 @@ export const OutputHeader = styled(Box)`
 
 export const HeaderTitle = styled(Box, { shouldForwardProp: (propName) => propName !== 'success' })<
   BoxProps & { success?: boolean }
->(({ theme, success }) => ({
-  flex: 1,
-  height: '42px',
-  fontWeight: 500,
-  backgroundColor: success ? theme.palette.vesoft.status6Bg : theme.palette.error.main,
-  color: success ? theme.palette.vesoft.status2 : theme.palette.error.contrastText,
-  borderRadius: theme.shape.borderRadius,
-  padding: theme.spacing(0, 2),
-  marginRight: theme.spacing(2),
-  display: 'flex',
-  alignItems: 'center',
-  overflow: 'hidden',
-}));
+>(({ theme, success }) => {
+  const { vesoft } = theme.palette;
+  return {
+    flex: 1,
+    height: '42px',
+    fontWeight: 500,
+    backgroundColor: success ? vesoft.status6Bg : vesoft.status8Bg,
+    color: success ? vesoft.status2 : vesoft.status4,
+    borderRadius: theme.shape.borderRadius,
+    padding: theme.spacing(0, 2),
+    marginRight: theme.spacing(2),
+    display: 'flex',
+    alignItems: 'center',
+    overflow: 'hidden',
+  };
+});
 
 export const HeaderAction = styled(Box)`
   width: 160px;
@@ -46,6 +50,10 @@ export const HeaderAction = styled(Box)`
   & > svg {
     cursor: pointer;
   }
+`;
+
+export const StyledIconButton = styled(IconButton)`
+  color: ${({ theme }) => theme.palette.vesoft.textColor1};
 `;
 
 export const OutputContent = styled(Box)`
@@ -62,4 +70,5 @@ export const ContentSider = styled(Box)`
 export const ContentMain = styled(Box)`
   flex: 1;
   border-left: 1px solid ${getVesoftBorderColor};
+  overflow: hidden;
 `;

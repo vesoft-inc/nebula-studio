@@ -12,4 +12,5 @@ export type ConsoleResult<T extends object = Record<string, unknown>> = {
   code: number;
   message: string;
   data?: GQLResult<T>;
+  destroy: () => void;
 };

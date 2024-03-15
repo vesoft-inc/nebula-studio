@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, FunctionComponent, lazy, Suspense } from 'react';
 import {
   QueryTemplate,
   TrayArrowUp,
@@ -10,9 +10,9 @@ import {
   Stethoscope,
   Sitemap,
   Console as CosoleIcon,
+  ErrorOutline,
 } from '@vesoft-inc/icons';
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
 import SiderMenu, { type SiderMenuItem } from '@/components/SiderMenu';
 import {
   OutputContainer,
@@ -22,40 +22,44 @@ import {
   OutputContent,
   ContentSider,
   ContentMain,
+  StyledIconButton,
 } from './styles';
 import { ConsoleResult } from '@/interfaces/console';
-import Explain from '@vesoft-inc/nebula-explain-graph';
-import { ExplainData } from '@vesoft-inc/nebula-explain-graph/types/Shape';
-import '@vesoft-inc/nebula-explain-graph/dist/Explain.css';
-import { safeParse } from '@/utils';
-import { useStore } from '@/stores';
 
 enum OutputMenu {
   Table = 'Table',
-  CodeBraces = 'CodeBraces',
+  Raw = 'Raw',
   ExplorerData = 'ExplorerData',
   Stethoscope = 'Stethoscope',
   Plan = 'Plan',
+  Error = 'Error',
 }
 
+const MenuResultMap: Record<OutputMenu, FunctionComponent<{ result: ConsoleResult }>> = {
+  [OutputMenu.Table]: () => null,
+  [OutputMenu.Raw]: lazy(() => import('./RawResult')),
+  [OutputMenu.ExplorerData]: () => null,
+  [OutputMenu.Stethoscope]: () => null,
+  [OutputMenu.Plan]: lazy(() => import('./PlanResult')),
+  [OutputMenu.Error]: lazy(() => import('./ErrorResult')),
+};
+
+// const Spinning: FunctionComponent = () => (
+//   <Box sx={{ p: 2, width: '100%', height: '100%' }}>
+//     <Skeleton animation="wave" height="20%" />
+//     <Skeleton animation="wave" height="20%" />
+//     <Skeleton animation="wave" height="20%" />
+//     <Skeleton animation="wave" height="20%" />
+//     <Skeleton animation="wave" height="20%" />
+//   </Box>
+// );
+
 export function OutputBox({ result }: { result: ConsoleResult }) {
-  const { consoleStore } = useStore();
-  const [activeMenu, setActiveMenu] = useState(OutputMenu.Table);
+  const [activeMenu, setActiveMenu] = useState(() => (result.code ? OutputMenu.Error : OutputMenu.Table));
   const { planDesc } = result.data || {};
-  const [explainData, setExplainData] = useState<ExplainData | undefined>();
   const handleMenuClick = useCallback((key: string) => {
     setActiveMenu(key as OutputMenu);
-    if (key === OutputMenu.Plan && planDesc) {
-      const [explainData] = safeParse<ExplainData>(planDesc);
-      explainData && setExplainData(explainData);
-    }
   }, []);
-
-  const removeResult = useCallback(() => {
-    consoleStore.unsafeAction(() => {
-      consoleStore.results.remove(result);
-    });
-  }, [result]);
 
   const planMenuItem: SiderMenuItem = {
     key: OutputMenu.Plan,
@@ -63,6 +67,15 @@ export function OutputBox({ result }: { result: ConsoleResult }) {
     icon: <Sitemap fontSize="medium" />,
     sx: { height: 50 },
   };
+
+  const errorSiderMenuItems: SiderMenuItem[] = [
+    {
+      key: OutputMenu.Error,
+      label: OutputMenu.Error,
+      icon: <ErrorOutline fontSize="medium" />,
+      sx: { height: 50 },
+    },
+  ];
 
   const siderMenuItems: SiderMenuItem[] = [
     {
@@ -72,8 +85,8 @@ export function OutputBox({ result }: { result: ConsoleResult }) {
       sx: { height: 50 },
     },
     {
-      key: OutputMenu.CodeBraces,
-      label: OutputMenu.CodeBraces,
+      key: OutputMenu.Raw,
+      label: OutputMenu.Raw,
       icon: <CodeBracesBox fontSize="medium" />,
       sx: { height: 50 },
     },
@@ -92,6 +105,9 @@ export function OutputBox({ result }: { result: ConsoleResult }) {
     ...(planDesc ? [planMenuItem] : []),
   ];
 
+  const menuItems = result.code ? errorSiderMenuItems : siderMenuItems;
+  const ResultComp = MenuResultMap[activeMenu] || (() => null);
+
   return (
     <OutputContainer sx={{ flex: 1 }}>
       <OutputHeader>
@@ -102,33 +118,28 @@ export function OutputBox({ result }: { result: ConsoleResult }) {
           </Box>
         </HeaderTitle>
         <HeaderAction>
-          <IconButton>
+          <StyledIconButton>
             <QueryTemplate />
-          </IconButton>
-          <IconButton>
+          </StyledIconButton>
+          <StyledIconButton>
             <TrayArrowUp />
-          </IconButton>
-          <IconButton>
+          </StyledIconButton>
+          <StyledIconButton>
             <ExpandLessFilled />
-          </IconButton>
-          <IconButton>
-            <CloseFilled onClick={removeResult} />
-          </IconButton>
+          </StyledIconButton>
+          <StyledIconButton onClick={result.destroy}>
+            <CloseFilled />
+          </StyledIconButton>
         </HeaderAction>
       </OutputHeader>
       <OutputContent>
         <ContentSider>
-          <SiderMenu items={siderMenuItems} onMenuClick={handleMenuClick} activeKey={activeMenu} />
+          <SiderMenu items={menuItems} onMenuClick={handleMenuClick} activeKey={activeMenu} />
         </ContentSider>
         <ContentMain>
-          {activeMenu === 'Plan' && (
-            <Explain
-              data={explainData}
-              style={{
-                height: '100%',
-              }}
-            />
-          )}
+          <Suspense /**fallback={<Spinning />*/>
+            <ResultComp result={result} />
+          </Suspense>
         </ContentMain>
       </OutputContent>
     </OutputContainer>

@@ -26,7 +26,8 @@ export class ConsoleStore {
       updateGraphTypes: action,
       updateEditorValue: action,
       updateResults: action,
-      unsafeAction: action,
+      addResult: action,
+      removeResult: action,
     });
     this.rootStore = rootStore;
   }
@@ -68,7 +69,8 @@ export class ConsoleStore {
     const res = await execGql<GQLResult>(gql);
     this.unsafeAction(() => {
       const message = res.message.replace(/^\w+::/, '');
-      this.results.unshift({ ...res, message, id: uuid(), gql });
+      const result = { ...res, message, id: uuid(), gql, destroy: () => this.removeResult(result) };
+      this.results.unshift(result);
     });
   };
 }

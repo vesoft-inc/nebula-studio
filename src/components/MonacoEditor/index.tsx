@@ -25,10 +25,12 @@ interface MonacoEditorProps {
   onChange?: (value?: string) => void;
   /** dark | light */
   themeMode?: string;
+  readOnly?: boolean;
+  language?: string;
 }
 
 export default function MonacoEditor(props: MonacoEditorProps) {
-  const { themeMode = 'light', onChange, value } = props;
+  const { themeMode = 'light', onChange, value, readOnly = false, language } = props;
   const monaco = useMonaco();
   const isDark = themeMode === 'dark';
   const className = css`
@@ -73,6 +75,7 @@ export default function MonacoEditor(props: MonacoEditorProps) {
       height="100%"
       theme={monacoTheme}
       value={value}
+      language={language}
       options={{
         scrollbar: {
           vertical: 'hidden',
@@ -87,7 +90,7 @@ export default function MonacoEditor(props: MonacoEditorProps) {
         // glyphMargin: true,
         lineDecorationsWidth: 0,
         renderLineHighlight: 'none',
-        readOnly: false,
+        readOnly,
         minimap: { enabled: false },
         fontSize: 14,
         tabSize: 2,

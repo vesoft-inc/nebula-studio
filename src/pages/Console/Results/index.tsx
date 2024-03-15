@@ -3,7 +3,7 @@ import List from '@mui/material/List';
 import Collapse from '@mui/material/Collapse';
 import { TransitionGroup } from 'react-transition-group';
 import { useStore } from '@/stores';
-import { OutputBox } from './OutputBox';
+import { OutputBox } from '@/components/OutputBox';
 
 export default observer(function Results() {
   const { consoleStore } = useStore();
