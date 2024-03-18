@@ -22,6 +22,7 @@ const CloneSpacePopover = (props: ICloneOperations) => {
   const { space, onClone } = props;
   const [visible, setVisible] = useState(false);
   const { intl } = useI18n();
+
   const handleClone = (values) => {
     const { name } = values;
     onClone(name, space);
@@ -35,6 +36,7 @@ const CloneSpacePopover = (props: ICloneOperations) => {
     stopPropagation(e);
     setVisible(true);
   }, []);
+
   return (
     <Popover
       overlayClassName={styles.clonePopover}
@@ -102,7 +104,8 @@ const DangerButton = (props: { onConfirm: () => void; text: React.ReactNode }) =
 };
 
 const Schema = () => {
-  const { schema, moduleConfiguration } = useStore();
+  const { schema, moduleConfiguration, global } = useStore();
+  const { platform } = global;
   const state = useLocalObservable(
     () => {
       const initState = {
@@ -254,7 +257,6 @@ const Schema = () => {
   }, []);
 
   const closeDDLModal = useCallback(() => setState({ ddlModal: { open: false, space: '' } }), []);
-
   const columns: TableColumnType<ISpace>[] = [
     {
       title: intl.get('schema.No'),
@@ -351,28 +353,32 @@ const Schema = () => {
                       </Button>
                     ),
                   },
-                  {
-                    key: 'clone',
-                    label: <CloneSpacePopover space={space.Name} onClone={handleCloneSpace} />,
-                  },
-                  {
-                    key: 'clear',
-                    label: (
-                      <DangerButton
-                        onConfirm={() => handleClearSpace(space.Name)}
-                        text={intl.get('schema.clearSpace')}
-                      />
-                    ),
-                  },
-                  {
-                    key: 'delete',
-                    label: (
-                      <DangerButton
-                        onConfirm={() => handleDeleteSpace(space.Name)}
-                        text={intl.get('schema.deleteSpace')}
-                      />
-                    ),
-                  },
+                  ...(
+                    platform !== 'cloud' ? [
+                      {
+                        key: 'clone',
+                        label: <CloneSpacePopover space={space.Name} onClone={handleCloneSpace} />,
+                      },
+                      {
+                        key: 'clear',
+                        label: (
+                          <DangerButton
+                            onConfirm={() => handleClearSpace(space.Name)}
+                            text={intl.get('schema.clearSpace')}
+                          />
+                        ),
+                      },
+                      {
+                        key: 'delete',
+                        label: (
+                          <DangerButton
+                            onConfirm={() => handleDeleteSpace(space.Name)}
+                            text={intl.get('schema.deleteSpace')}
+                          />
+                        ),
+                      },
+                    ] : []
+                  )
                 ],
               }}
               placement="bottomRight"
