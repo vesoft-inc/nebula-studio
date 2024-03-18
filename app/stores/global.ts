@@ -19,6 +19,7 @@ export class GlobalStore {
       },
     },
   };
+  platform: string = process.env.PLATFORM || 'local';
   history: BrowserHistory;
   _username = cookies.get('nu');
   _host = cookies.get('nh');
