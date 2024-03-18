@@ -6,11 +6,11 @@ import {
   CloseFilled,
   Table,
   CodeBracesBox,
-  ExplorerDataOutline,
-  Stethoscope,
   Sitemap,
   Console as CosoleIcon,
   ErrorOutline,
+  ExplorerDataOutline,
+  Stethoscope,
 } from '@vesoft-inc/icons';
 import Box from '@mui/material/Box';
 import SiderMenu, { type SiderMenuItem } from '@/components/SiderMenu';
@@ -36,7 +36,7 @@ enum OutputMenu {
 }
 
 const MenuResultMap: Record<OutputMenu, FunctionComponent<{ result: ConsoleResult }>> = {
-  [OutputMenu.Table]: () => null,
+  [OutputMenu.Table]: lazy(() => import('./TableResult')),
   [OutputMenu.Raw]: lazy(() => import('./RawResult')),
   [OutputMenu.ExplorerData]: () => null,
   [OutputMenu.Stethoscope]: () => null,
@@ -95,12 +95,14 @@ export function OutputBox({ result }: { result: ConsoleResult }) {
       label: OutputMenu.ExplorerData,
       icon: <ExplorerDataOutline fontSize="medium" />,
       sx: { height: 50 },
+      disabled: true,
     },
     {
       key: OutputMenu.Stethoscope,
       label: OutputMenu.Stethoscope,
       icon: <Stethoscope fontSize="medium" />,
       sx: { height: 50 },
+      disabled: true,
     },
     ...(planDesc ? [planMenuItem] : []),
   ];
@@ -118,13 +120,13 @@ export function OutputBox({ result }: { result: ConsoleResult }) {
           </Box>
         </HeaderTitle>
         <HeaderAction>
-          <StyledIconButton>
+          <StyledIconButton disabled>
             <QueryTemplate />
           </StyledIconButton>
-          <StyledIconButton>
+          <StyledIconButton disabled>
             <TrayArrowUp />
           </StyledIconButton>
-          <StyledIconButton>
+          <StyledIconButton disabled>
             <ExpandLessFilled />
           </StyledIconButton>
           <StyledIconButton onClick={result.destroy}>

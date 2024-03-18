@@ -24,6 +24,7 @@
     "@emotion/styled": "^11.11.0",
     "@monaco-editor/react": "^4.6.0",
     "@mui/icons-material": "^5.15.6",
+    "@mui/lab": "5.0.0-alpha.168",
     "@mui/material": "^5.15.6",
     "@mui/system": "^5.15.9",
     "@mui/x-date-pickers": "^6.19.2",

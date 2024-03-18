@@ -1,9 +1,12 @@
 import { useEffect } from 'react';
+import Typography from '@mui/material/Typography';
 import { css } from '@emotion/css';
 import * as monaco from './monaco';
 import Editor, { loader, useMonaco } from '@monaco-editor/react';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+
+type Monaco = typeof monaco;
 
 // avoid loading monaco twice
 if (!loader.__getMonacoInstance()) {
@@ -20,17 +23,19 @@ if (!loader.__getMonacoInstance()) {
   };
 }
 
-interface MonacoEditorProps {
+export interface MonacoEditorProps {
   value?: string;
   onChange?: (value?: string) => void;
   /** dark | light */
   themeMode?: string;
   readOnly?: boolean;
   language?: string;
+  onMount?: (editor: monaco.editor.IStandaloneCodeEditor, monaco?: Monaco) => void;
+  placeholder?: React.ReactNode;
 }
 
 export default function MonacoEditor(props: MonacoEditorProps) {
-  const { themeMode = 'light', onChange, value, readOnly = false, language } = props;
+  const { themeMode = 'light', onChange, value, readOnly = false, language, onMount, placeholder } = props;
   const monaco = useMonaco();
   const isDark = themeMode === 'dark';
   const className = css`
@@ -71,36 +76,55 @@ export default function MonacoEditor(props: MonacoEditorProps) {
 
   const monacoTheme = isDark ? 'vs-dark' : 'light';
   return (
-    <Editor
-      height="100%"
-      theme={monacoTheme}
-      value={value}
-      language={language}
-      options={{
-        scrollbar: {
-          vertical: 'hidden',
-          horizontal: 'hidden',
-        },
-        roundedSelection: false,
-        scrollBeyondLastLine: false,
-        overviewRulerBorder: false,
-        hideCursorInOverviewRuler: true,
-        overviewRulerLanes: 0,
-        lineNumbersMinChars: 3,
-        // glyphMargin: true,
-        lineDecorationsWidth: 0,
-        renderLineHighlight: 'none',
-        readOnly,
-        minimap: { enabled: false },
-        fontSize: 14,
-        tabSize: 2,
-        padding: { top: 4, bottom: 4 },
-        fontFamily: 'Menlo, Monaco',
-        automaticLayout: true,
-        fixedOverflowWidgets: true,
-      }}
-      className={className}
-      onChange={onChange}
-    />
+    <>
+      <Editor
+        height="100%"
+        theme={monacoTheme}
+        value={value}
+        language={language}
+        options={{
+          scrollbar: {
+            vertical: 'hidden',
+            horizontal: 'hidden',
+          },
+          roundedSelection: false,
+          scrollBeyondLastLine: false,
+          overviewRulerBorder: false,
+          hideCursorInOverviewRuler: true,
+          overviewRulerLanes: 0,
+          lineNumbersMinChars: 3,
+          // glyphMargin: true,
+          lineDecorationsWidth: 0,
+          renderLineHighlight: 'none',
+          readOnly,
+          minimap: { enabled: false },
+          fontSize: 14,
+          tabSize: 2,
+          padding: { top: 4, bottom: 4 },
+          fontFamily: 'Menlo, Monaco',
+          automaticLayout: true,
+          fixedOverflowWidgets: true,
+        }}
+        className={className}
+        onChange={onChange}
+        onMount={onMount}
+      />
+      {placeholder && (
+        <Typography
+          sx={{
+            position: 'absolute',
+            left: '40px',
+            top: '2px',
+            color: ({ palette }) => palette.action.disabled,
+            display: value ? 'none' : 'inherit',
+            userSelect: 'none',
+          }}
+          component="code"
+          variant="subtitle1"
+        >
+          {placeholder}
+        </Typography>
+      )}
+    </>
   );
 }

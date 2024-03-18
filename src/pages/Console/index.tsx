@@ -1,6 +1,5 @@
-import { Fragment, Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { useTheme } from '@emotion/react';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import Stack from '@mui/material/Stack';
@@ -11,6 +10,8 @@ import { useStore } from '@/stores';
 import SiderMenu from '@/components/SiderMenu';
 import Results from './Results';
 import SchemaItem from './SchemaItem';
+import GQLEditor from './GQLEditor';
+import QuickActionModal from './QuickActionModal';
 import {
   ActionWrapper,
   EditorWrapper,
@@ -21,19 +22,6 @@ import {
   StyledIconButton,
   RunButton,
 } from './styles';
-
-const MonacoEditor = lazy(() => import('@/components/MonacoEditor'));
-
-const ConsoleEditor = observer(function ConsoleEditor() {
-  const theme = useTheme();
-  const { consoleStore } = useStore();
-  const { editorValue, updateEditorValue } = consoleStore;
-  return (
-    <Suspense>
-      <MonacoEditor themeMode={theme.palette.mode} value={editorValue} onChange={updateEditorValue} />
-    </Suspense>
-  );
-});
 
 export default observer(function Console() {
   const { consoleStore } = useStore();
@@ -63,12 +51,27 @@ export default observer(function Console() {
     consoleStore.runGql(gql);
   }, [consoleStore]);
 
+  const onKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.metaKey && e.key === 'k') {
+      e.preventDefault();
+      consoleStore.setQuickActionModalOpen(true);
+    } else if (e.key === '/') {
+      e.preventDefault();
+      consoleStore.editorRef?.focus();
+    }
+  }, []);
+
   useEffect(() => {
     consoleStore.getGraphTypes();
+    consoleStore.getGraphs();
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
   }, []);
 
   const activeIcon = activeMenu === 'Schema' ? <VectorTriangle /> : <FileDocument />;
   const groups = Object.groupBy(consoleStore.graphTypeElements || [], (ele) => ele.name);
+  const loading = consoleStore.editorRunning;
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
@@ -98,23 +101,30 @@ export default observer(function Console() {
           <ActionWrapper sx={{ height: (theme) => theme.spacing(8) }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Stack direction="row" spacing={1} sx={{ mr: 2 }}>
-                <StyledIconButton aria-label="template">
+                <StyledIconButton aria-label="template" disabled>
                   <QueryTemplate fontSize="medium" />
                 </StyledIconButton>
-                <StyledIconButton aria-label="restore">
+                <StyledIconButton aria-label="restore" disabled>
                   <RestoreFilled fontSize="medium" />
                 </StyledIconButton>
-                <StyledIconButton aria-label="delete">
+                <StyledIconButton aria-label="delete" disabled>
                   <DeleteOutline fontSize="medium" />
                 </StyledIconButton>
               </Stack>
-              <RunButton variant="contained" disableElevation startIcon={<Play />} onClick={handleRunGql}>
+              <RunButton
+                variant="contained"
+                disableElevation
+                startIcon={<Play />}
+                onClick={handleRunGql}
+                loadingPosition="start"
+                loading={loading}
+              >
                 {t('run', { ns: 'console' })}
               </RunButton>
             </Box>
           </ActionWrapper>
           <EditorWrapper>
-            <ConsoleEditor />
+            <GQLEditor />
           </EditorWrapper>
           <ActionWrapper sx={{ height: (theme) => theme.spacing(4), fontSize: (theme) => theme.typography.fontSize }}>
             <Box sx={{ flexGrow: 1 }}></Box>
@@ -126,6 +136,7 @@ export default observer(function Console() {
         </InputArea>
         <Results />
       </Box>
+      <QuickActionModal />
     </Box>
   );
 });

@@ -2,7 +2,7 @@ import type { Theme } from '@emotion/react';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import Button from '@mui/material/Button';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const getVesoftBorderColor = ({ theme }: { theme: Theme }) => theme.palette.vesoft.textColor6;
 
@@ -47,7 +47,7 @@ export const StyledIconButton = styled(IconButton)`
   color: ${({ theme }) => theme.palette.vesoft.textColor1};
 `;
 
-export const RunButton = styled(Button)`
+export const RunButton = styled(LoadingButton)`
   background-color: ${({ theme }) => theme.palette.vesoft.themeColor1};
   color: ${({ theme }) => theme.palette.vesoft.textColor8};
   height: 36px;

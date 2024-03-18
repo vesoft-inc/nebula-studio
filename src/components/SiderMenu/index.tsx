@@ -12,6 +12,7 @@ export interface SiderMenuItem {
   label?: ReactNode;
   icon?: ReactNode;
   sx?: SxProps<Theme>;
+  disabled?: boolean;
 }
 
 export interface SiderMenuProps {
@@ -32,6 +33,7 @@ export default function SiderMenu(props: SiderMenuProps) {
         <StyledListItem key={item.key} disablePadding active={item.key === activeKey}>
           <Tooltip title={isTinyMode ? item.label : undefined} placement="right">
             <ListItemButton
+              disabled={item.disabled}
               sx={Array.isArray(item.sx) ? [defaultItemSx, ...item.sx] : [defaultItemSx, item.sx]}
               onClick={(e) => onMenuClick?.(item.key, item, e)}
             >
