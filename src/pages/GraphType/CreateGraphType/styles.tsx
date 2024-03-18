@@ -10,7 +10,6 @@ export const ContentContainer = styled(Box)`
 
 export const ActionContainer = styled(Box)`
   display: flex;
-  margin-top: 20px;
   align-items: center;
 `;
 
@@ -20,7 +19,6 @@ export const MainContainer = styled(Box)`
   position: relative;
   width: 100%;
   flex: 1;
-  border: 1px solid ${({ theme }) => theme.palette.vesoft.bgColor11};
   margin-bottom: ${FooterHeight + 30}px;
   margin-top: 20px;
   min-height: 660px;

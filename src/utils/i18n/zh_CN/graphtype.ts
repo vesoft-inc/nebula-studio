@@ -18,4 +18,6 @@ export default {
   duplicate: '复制',
   label: '标签',
   primaryKey: '主键',
+  properties: '属性',
+  addProperty: '添加属性',
 };

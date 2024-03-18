@@ -8,3 +8,10 @@ export enum VisualEditorType {
   Tag = 'tag',
   Edge = 'edge',
 }
+
+export enum PropertyDataType {
+  STRING = 'STRING',
+  DATE = 'DATE',
+  INT = 'INT',
+  BOOL = 'BOOL',
+}

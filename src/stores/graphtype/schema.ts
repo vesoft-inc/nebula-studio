@@ -1,5 +1,6 @@
 import initShapes, { initShadowFilter } from '@/components/Shapes/Shapers';
 import { ARROW_STYLE, LINE_STYLE } from '@/components/Shapes/config';
+import { GraphTypeElement } from '@/interfaces';
 import { RootStore } from '@/stores/index';
 import { VisualEditorType } from '@/utils/constant';
 import VEditor, { VEditorOptions } from '@vesoft-inc/veditor';
@@ -22,16 +23,45 @@ class SchemaStore {
   hoveringItem?: VEditorItem;
   activeItem?: VEditorItem;
 
+  nodeTypeList: GraphTypeElement[];
+  edgeTypeList: GraphTypeElement[];
+
   constructor(rootStore?: RootStore) {
     this.rootStore = rootStore;
+    this.nodeTypeList = [];
+    this.edgeTypeList = [];
     makeObservable(this, {
       editor: observable.ref,
       container: observable.ref,
       hoveringItem: observable.ref,
       activeItem: observable.shallow,
       zoomFrame: false,
+      nodeTypeList: observable.shallow,
+      edgeTypeList: observable.shallow,
     });
   }
+
+  addNodeType = (node: GraphTypeElement) => {
+    this.nodeTypeList.push(node);
+  };
+
+  addEdgeType = (edge: GraphTypeElement) => {
+    this.edgeTypeList.push(edge);
+  };
+
+  deleteNodeType = (name: string) => {
+    const index = this.nodeTypeList.findIndex((node) => node.name === name);
+    if (index !== -1) {
+      this.nodeTypeList.splice(index, 1);
+    }
+  };
+
+  deleteEdgeType = (name: string) => {
+    const index = this.edgeTypeList.findIndex((edge) => edge.name === name);
+    if (index !== -1) {
+      this.edgeTypeList.splice(index, 1);
+    }
+  };
 
   setActiveItem = (item?: VEditorItem) => {
     this.activeItem = item;

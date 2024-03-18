@@ -18,4 +18,6 @@ export default {
   duplicate: 'Duplicate',
   label: 'Label',
   primaryKey: 'Primary Key',
+  properties: 'Properties',
+  addProperty: 'Add Property',
 };
