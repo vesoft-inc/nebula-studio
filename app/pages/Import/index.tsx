@@ -5,6 +5,7 @@ import { trackPageView } from '@app/utils/stat';
 import cls from 'classnames';
 import { useI18n } from '@vesoft-inc/i18n';
 import llm from '@app/stores/llm';
+import { useStore } from '@app/stores';
 import DatasourceList from './DatasourceList';
 import styles from './index.module.less';
 import TaskList from './TaskList';
@@ -14,9 +15,12 @@ const Import = () => {
   const location = useLocation();
   const [tab, setTab] = useState('tasks');
   const { intl } = useI18n();
+  const { global: { platform }} = useStore();
   useEffect(() => {
     trackPageView('/import');
-    llm.fetchConfig();
+    if (platform !== 'cloud') {
+      llm.fetchConfig();
+    }
   }, []);
   useEffect(() => {
     const path = location.pathname;
