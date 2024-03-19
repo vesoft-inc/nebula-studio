@@ -1,7 +1,7 @@
 import { Suspense, lazy, useCallback, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useTheme } from '@emotion/react';
-import { KeyMod, KeyCode, Range, type languages, IDisposable } from 'monaco-editor';
+import { KeyMod, KeyCode, Range, type languages, IDisposable } from '@/components/MonacoEditor/monaco';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import * as monaco from '@/components/MonacoEditor/monaco';

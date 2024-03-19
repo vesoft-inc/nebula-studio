@@ -5,32 +5,26 @@ import legacy from '@vitejs/plugin-legacy';
 import pkg from './package.json';
 
 const proxyHost = '127.0.0.1:7001';
+const importMap = {
+  '@mui/system': {
+    styled: {
+      canonicalImport: ['@emotion/styled', 'default'],
+      styledBaseImport: ['@mui/system', 'styled'],
+    },
+  },
+  '@mui/material/styles': {
+    styled: {
+      canonicalImport: ['@emotion/styled', 'default'],
+      styledBaseImport: ['@mui/material/styles', 'styled'],
+    },
+  },
+};
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react({
-      plugins: [
-        [
-          '@swc/plugin-emotion',
-          {
-            importMap: {
-              '@mui/system': {
-                styled: {
-                  canonicalImport: ['@emotion/styled', 'default'],
-                  styledBaseImport: ['@mui/system', 'styled'],
-                },
-              },
-              '@mui/material/styles': {
-                styled: {
-                  canonicalImport: ['@emotion/styled', 'default'],
-                  styledBaseImport: ['@mui/material/styles', 'styled'],
-                },
-              },
-            },
-          },
-        ],
-      ],
+      plugins: [['@swc/plugin-emotion', { importMap }]],
     }),
     // topLevelAwait(),
     legacy({

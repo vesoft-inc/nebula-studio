@@ -99,7 +99,7 @@ export default observer(function Console() {
           </List>
         </SiderItem>
       </StyledSider>
-      <Box sx={{ flex: 1, overflowY: 'auto' }}>
+      <Box sx={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
         <InputArea>
           <ActionWrapper sx={{ height: (theme) => theme.spacing(8) }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
