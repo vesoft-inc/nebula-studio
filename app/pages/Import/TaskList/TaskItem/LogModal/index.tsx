@@ -129,7 +129,7 @@ const LogModal = (props: IProps) => {
       footer={false}
     >
       {platform !== 'cloud' && <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange} items={items} />}
-      <div className={classnames(styles.logContainer, !disableLogDownload && styles.full)}>
+      <div className={classnames(platform === 'cloud' ? styles.cloudLogContainer : styles.logContainer, !disableLogDownload && styles.full)}>
         {logData.map((log, index) => {
           return (
             <pre key={index} style={{ color: /^(\.\.\.)|^\(\d+/.test(log) ? '#fff' : '#e8c18b' }}>

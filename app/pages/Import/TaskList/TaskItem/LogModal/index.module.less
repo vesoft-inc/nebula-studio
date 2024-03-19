@@ -47,8 +47,7 @@
     }
   }
 
-  .logContainer {
-    width: calc(100% - 200px);
+  .logContainer, .cloudLogContainer {
     height: 100%;
     overflow: auto;
     padding: 10px 20px 120px;
@@ -60,6 +59,14 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+  }
+
+  .cloudLogContainer {
+    width: 100%;
+  }
+
+  .logContainer {
+    width: calc(100% - 200px);
   }
 
   .full {
