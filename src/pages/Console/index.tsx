@@ -56,8 +56,11 @@ export default observer(function Console() {
       e.preventDefault();
       consoleStore.setQuickActionModalOpen(true);
     } else if (e.key === '/') {
-      e.preventDefault();
-      consoleStore.editorRef?.focus();
+      const tagName = document.activeElement?.tagName;
+      if (tagName !== 'TEXTAREA' && tagName !== 'INPUT') {
+        e.preventDefault();
+        consoleStore.editorRef?.focus();
+      }
     }
   }, []);
 

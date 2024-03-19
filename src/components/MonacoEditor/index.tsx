@@ -41,9 +41,13 @@ export default function MonacoEditor(props: MonacoEditorProps) {
   const className = css`
     min-height: 120px;
     height: 100%;
+    .lines-content.monaco-editor-background {
+      padding-left: 4px;
+    }
   `;
 
   useEffect(() => {
+    monaco?.editor;
     if (isDark) {
       monaco?.editor.defineTheme('vs-dark', {
         base: 'vs-dark',
@@ -113,14 +117,18 @@ export default function MonacoEditor(props: MonacoEditorProps) {
         <Typography
           sx={{
             position: 'absolute',
-            left: '40px',
+            left: '44px',
             top: '2px',
             color: ({ palette }) => palette.action.disabled,
             display: value ? 'none' : 'inherit',
             userSelect: 'none',
+            cursor: 'text',
+            fontSize: '14px',
+            opacity: 0.5,
           }}
           component="code"
           variant="subtitle1"
+          onClick={() => monaco?.editor.getEditors()?.[0]?.focus()}
         >
           {placeholder}
         </Typography>

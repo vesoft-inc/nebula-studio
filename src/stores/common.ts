@@ -3,6 +3,9 @@ import i18n, { Language } from '@/utils/i18n';
 import { type RootStore } from '.';
 
 export class CommonStore {
+  dbName = 'NebulaGraph';
+  prodName = 'Studio';
+
   rootStore?: RootStore;
   loading = false;
   language = i18n.language;

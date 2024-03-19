@@ -2,6 +2,8 @@ import { Suspense, lazy, useCallback, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useTheme } from '@emotion/react';
 import { KeyMod, KeyCode, Range, type languages, IDisposable } from 'monaco-editor';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
 import * as monaco from '@/components/MonacoEditor/monaco';
 import { useStore } from '@/stores';
 import type { MonacoEditorProps } from '@/components/MonacoEditor';
@@ -30,6 +32,7 @@ export default observer(function GQLEditor() {
     // open quick action modal
     editor?.onKeyDown((e) => {
       if (e.metaKey && e.code === 'KeyK') {
+        e.preventDefault();
         rootStore?.consoleStore?.setQuickActionModalOpen(true);
       }
     });
@@ -52,7 +55,7 @@ export default observer(function GQLEditor() {
     const highlightProvider = monaco?.languages.setMonarchTokensProvider(langId, {
       keywords,
       tokenizer: {
-        root: [[/[a-zA-Z_$][\w$]*/, { cases: { '@keywords': { token: 'keyword' } } }]],
+        root: [[/[a-zA-Z_$][\w$]*/i, { cases: { '@keywords': { token: 'keyword' } } }]],
       },
     });
     const keywordProvider = monaco?.languages.registerCompletionItemProvider(langId, {
@@ -79,9 +82,23 @@ export default observer(function GQLEditor() {
         return { suggestions: [...keywordSuggestions, ...procedureSuggestions] };
       },
     });
+    const inlineSuggestionProvider = monaco?.languages.registerInlineCompletionsProvider(langId, {
+      async provideInlineCompletions(model, position, _context, _token) {
+        const lineContent = model.getLineContent(position.lineNumber);
+        if (/use$/i.test(lineContent)) {
+          const firstGraph = consoleStore.graphs[0]?.name;
+          return { items: firstGraph ? [{ insertText: `USE ${firstGraph} MATCH (v) RETURN v LIMIT 1` }] : [] };
+        } else if (/show$/i.test(lineContent)) {
+          return { items: [{ insertText: 'SHOW GRAPH TYPES' }] };
+        }
+        return { items: [] };
+      },
+      freeInlineCompletions() {},
+    });
     disposeRef.current.push(
       { name: 'highlightProvider', disposer: highlightProvider! },
-      { name: 'keywordProvider', disposer: keywordProvider! }
+      { name: 'keywordProvider', disposer: keywordProvider! },
+      { name: 'inlineSuggestionProvider', disposer: inlineSuggestionProvider! }
     );
     rootStore?.consoleStore?.setEditorRef(editor);
   }, []);
@@ -141,7 +158,19 @@ export default observer(function GQLEditor() {
         value={editorValue}
         onChange={updateEditorValue}
         onMount={onMount}
-        placeholder="Shift + Enter to run, / to focus editor, code example: USE graph MATCH (v) RETURN v LIMIT 10"
+        placeholder={
+          <>
+            <Box>
+              Input <Chip label="USE / SHOW" size="small" /> to quick query
+            </Box>
+            <Box>
+              Run GQL <Chip label="Shift + Enter" size="small" />
+            </Box>
+            <Box>
+              Focus Editor <Chip label="/" size="small" />
+            </Box>
+          </>
+        }
       />
     </Suspense>
   );

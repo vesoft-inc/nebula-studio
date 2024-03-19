@@ -39,18 +39,19 @@ export const HeaderLogo = styled('img')`
   margin-bottom: 25px;
 `;
 
-export const HeaderTitle = styled('span')`
+export const HeaderTitle = styled(Box)`
   color: ${({ theme }) => theme.palette.text.primary};
   font-weight: 700;
-  margin-bottom: 70px;
   text-align: center;
   font-size: 24px;
-  margin-bottom: 22px;
-  font-weight: 700;
-  ${ContentHeader} &:hover {
-    cursor: pointer;
-    color: ${({ theme }) => theme.palette.success.main};
-  }
+  margin-bottom: ${({ theme }) => theme.spacing(3)};
+`;
+
+export const HeaderSubTitle = styled(Box)`
+  color: ${({ theme }) => theme.palette.text.primary};
+  text-align: center;
+  font-size: 20px;
+  margin-bottom: ${({ theme }) => theme.spacing(6)};
 `;
 
 export const Footer = styled(Box)`
