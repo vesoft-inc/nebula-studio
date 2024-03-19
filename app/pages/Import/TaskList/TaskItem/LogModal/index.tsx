@@ -19,6 +19,7 @@ const LogModal = (props: IProps) => {
   const {
     dataImport: { getLogs, downloadTaskLog, getLogDetail },
     moduleConfiguration,
+    global: { platform },
   } = useStore();
   const { disableLogDownload } = moduleConfiguration.dataImport;
   const { intl } = useI18n();
@@ -127,7 +128,7 @@ const LogModal = (props: IProps) => {
       destroyOnClose={true}
       footer={false}
     >
-      <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange} items={items} />
+      {platform !== 'cloud' && <Tabs className={styles.logTab} tabBarGutter={0} tabPosition="left" onChange={handleTabChange} items={items} />}
       <div className={classnames(styles.logContainer, !disableLogDownload && styles.full)}>
         {logData.map((log, index) => {
           return (
