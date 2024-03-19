@@ -3,12 +3,12 @@ import { observer } from 'mobx-react-lite';
 import { useTheme } from '@emotion/react';
 import { KeyMod, KeyCode, Range, type languages, IDisposable } from '@/components/MonacoEditor/monaco';
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
 import * as monaco from '@/components/MonacoEditor/monaco';
 import { useStore } from '@/stores';
 import type { MonacoEditorProps } from '@/components/MonacoEditor';
 import { GQL_LANG_ID as langId } from '@/utils/constant/editor';
 import { GQL_KEYWORDS, GQL_PROCEDURES } from '@/utils/constant/nebula';
+import { StyledChip } from './styles';
 
 const MonacoEditor = lazy(() => import('@/components/MonacoEditor'));
 const keywords = [...GQL_KEYWORDS, ...GQL_KEYWORDS.map((k) => k.toLowerCase()), ...GQL_PROCEDURES];
@@ -161,13 +161,13 @@ export default observer(function GQLEditor() {
         placeholder={
           <>
             <Box>
-              Input <Chip label="USE / SHOW" size="small" /> to quick query
+              Input <StyledChip label="USE / SHOW" size="small" /> to quick query
             </Box>
             <Box>
-              Run GQL <Chip label="Shift + Enter" size="small" />
+              Run GQL <StyledChip label="Shift + Enter" size="small" />
             </Box>
             <Box>
-              Focus Editor <Chip label="/" size="small" />
+              Focus Editor <StyledChip label="/" size="small" />
             </Box>
           </>
         }
