@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import { PropertyDataType, VisualEditorType } from '@/utils/constant';
 // import { SystemStyleObject } from '@mui/system';
 // import { InstanceLine } from '@vesoft-inc/veditor/types/Shape/Line';
@@ -8,21 +9,70 @@ const idSymbol = Symbol('id');
 export class IProperty {
   name: string;
   type: PropertyDataType;
-  value?: string;
-  allowNull?: boolean;
-  fixedLength?: string;
-  comment?: string;
-  showType?: string;
+  isPrimaryKey?: boolean = false;
   [idSymbol]: string;
 
-  constructor({ name, type }: { name: string; type: PropertyDataType }) {
-    this.name = name;
-    this.type = type;
-    this[idSymbol] = Math.random().toString();
+  constructor(params?: Omit<IProperty, typeof idSymbol | 'id'>) {
+    this.name = params?.name || '';
+    this.type = params?.type || PropertyDataType.STRING;
+    this.isPrimaryKey = params?.isPrimaryKey;
+    this[idSymbol] = uuid();
   }
 
   get id() {
     return this[idSymbol];
+  }
+}
+
+export class INodeTypeItem {
+  [idSymbol]: string;
+  name: string;
+  properties: IProperty[] = [];
+  labels: string[] = [];
+  constructor(params?: Omit<INodeTypeItem, typeof idSymbol | 'id' | 'updateValues'>) {
+    this[idSymbol] = uuid();
+    this.name = params?.name || '';
+    this.properties = params?.properties || [];
+    this.labels = params?.labels || [];
+  }
+
+  get id() {
+    return this[idSymbol];
+  }
+
+  updateValues(values: Omit<INodeTypeItem, typeof idSymbol | 'id'>) {
+    const { name, properties, labels } = values || {};
+    this.name = name || '';
+    this.properties = properties || [];
+    this.labels = labels || [];
+  }
+}
+
+export class IEdgeTypeItem {
+  [idSymbol]: string;
+  name: string;
+  properties: IProperty[] = [];
+  labels: string[] = [];
+  srcNode: INodeTypeItem;
+  dstNode: INodeTypeItem;
+  constructor(params: Omit<IEdgeTypeItem, typeof idSymbol | 'id' | 'updateValues'>) {
+    this[idSymbol] = uuid();
+    this.name = params.name || '';
+    this.srcNode = params.srcNode;
+    this.dstNode = params.dstNode;
+  }
+
+  get id() {
+    return this[idSymbol];
+  }
+
+  updateValues(values: Omit<IEdgeTypeItem, typeof idSymbol | 'id'>) {
+    const { name, properties, labels, srcNode, dstNode } = values;
+    this.name = name;
+    this.properties = properties;
+    this.labels = labels;
+    this.srcNode = srcNode;
+    this.dstNode = dstNode;
   }
 }
 
@@ -42,13 +92,6 @@ export interface Graph {
   name: string;
   /** Graph Type Name */
   typeName: string;
-}
-
-export interface INodeTypeItem {
-  name: string;
-  primaryKey: string;
-  properties: IProperty[];
-  labels: string[];
 }
 
 /**

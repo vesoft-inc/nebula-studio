@@ -1,41 +1,85 @@
-import { Box, Button, Typography } from '@mui/material';
-import { AddFilled } from '@vesoft-inc/icons';
+import { Box, Button, Chip, IconButton, Typography } from '@mui/material';
+import { AddFilled, Delete, EditFilled } from '@vesoft-inc/icons';
 import { useTranslation } from 'react-i18next';
 import { Table } from '@vesoft-inc/ui-components';
 import { observer } from 'mobx-react-lite';
 import { type MRT_ColumnDef } from 'material-react-table';
 
 import { ActionContainer } from './styles';
-import CreateNodeTypeModal from '../CreateNodeTypeModal';
+import NodeTypeConfigModal from '../NodeTypeConfigModal';
 import { useModal, useStore } from '@/stores';
 import { INodeTypeItem, IProperty } from '@/interfaces';
 import { useCallback, useMemo } from 'react';
 import { useTheme } from '@emotion/react';
+import { getLabelColor } from '@/utils';
 
 function NodeTypeTable() {
   const { schemaStore } = useStore().graphtypeStore;
   const dataSource = schemaStore?.nodeTypeList || [];
+  const { t } = useTranslation(['graphtype']);
+  const modal = useModal();
+
+  const handleEditNodeType = (nodeType: INodeTypeItem) => () => {
+    modal.show({
+      title: t('editNodeType', { ns: 'graphtype' }),
+      content: <NodeTypeConfigModal nodeTypeItem={nodeType} />,
+    });
+  };
+
+  const handleDeleteNodeType = (nodeType: INodeTypeItem) => () => {
+    schemaStore?.deleteNodeType(nodeType.id);
+  };
 
   const columns = useMemo<MRT_ColumnDef<INodeTypeItem>[]>(
     () => [
       {
         accessorKey: 'name', //access nested data with dot notation
         header: 'Node Type',
-        // size: 150,
       },
       {
-        accessorKey: 'primaryKey',
+        accessorKey: 'primaryKeys',
         header: 'Primary Key',
-        // size: 150,
+        Cell: ({ row }) =>
+          row.original.properties
+            .filter((property) => property.isPrimaryKey)
+            .map((property, index) => (
+              <Chip sx={{ minWidth: 40, '&:not(:first-of-type)': { ml: 1 } }} key={index} label={property.name} />
+            )),
       },
       {
         accessorKey: 'labels', //normal accessorKey
         header: 'Labels',
-        // size: 200,
+        Cell: ({ row }) =>
+          row.original.labels.map((label, index) => {
+            const [color, backgroundColor] = getLabelColor(index, theme);
+            return (
+              <Chip
+                sx={{
+                  borderColor: color,
+                  backgroundColor,
+                  color,
+                  minWidth: 40,
+                  '&:not(:first-of-type)': { ml: 1 },
+                }}
+                key={index}
+                label={label}
+                variant="outlined"
+              />
+            );
+          }),
       },
       {
         header: 'Operation',
-        // size: 200,
+        Cell: ({ row }) => (
+          <Box display="flex" alignItems="center">
+            <IconButton size="small" onClick={handleEditNodeType(row.original)}>
+              <EditFilled />
+            </IconButton>
+            <IconButton size="small" onClick={handleDeleteNodeType(row.original)} sx={{ marginLeft: 2 }}>
+              <Delete />
+            </IconButton>
+          </Box>
+        ),
       },
     ],
     []
@@ -62,13 +106,10 @@ function NodeTypeTable() {
     []
   );
 
-  const { t } = useTranslation(['graphtype']);
-  const modal = useModal();
-
   const handleCreateNodeType = () => {
     modal.show({
       title: t('createNodeType', { ns: 'graphtype' }),
-      content: <CreateNodeTypeModal />,
+      content: <NodeTypeConfigModal />,
     });
   };
 
@@ -78,14 +119,13 @@ function NodeTypeTable() {
     <>
       <ActionContainer>
         <Button onClick={handleCreateNodeType} variant="outlined" startIcon={<AddFilled />}>
-          {t('createGraphType', { ns: 'graphtype' })}
+          {t('createNodeType', { ns: 'graphtype' })}
         </Button>
       </ActionContainer>
       <Box mt={2}>
         <Table
           columns={columns}
           data={dataSource}
-          // enableExpandAll={false}
           renderDetailPanel={({ row }) => {
             const { properties } = row.original;
             return (
@@ -96,7 +136,7 @@ function NodeTypeTable() {
                 enableBottomToolbar={false}
                 muiTableHeadCellProps={{
                   sx: {
-                    height: '30px',
+                    height: '35px',
                     paddingTop: 0,
                     paddingBottom: 0,
                     paddingLeft: theme.spacing(2),
@@ -104,7 +144,7 @@ function NodeTypeTable() {
                 }}
                 muiTableBodyCellProps={{
                   sx: {
-                    height: '30px',
+                    height: '35px',
                     padding: 0,
                     paddingLeft: theme.spacing(2),
                   },
@@ -123,9 +163,6 @@ function NodeTypeTable() {
               />
             );
           }}
-          // muiExpandButtonProps={({ row, table }) => ({
-          //   onClick: () => table.setExpanded({ [row.id]: !row.getIsExpanded() }), //set only this row to be expanded
-          // })}
         />
       </Box>
     </>

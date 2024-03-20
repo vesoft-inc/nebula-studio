@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form-mui';
 
 import { ActionsContainer, SchemaDrawerontainer } from './styles';
 import { useStore } from '@/stores';
-import NodeTypeConfigForm from '@/pages/GraphType/CreateGraphType/NodeTypeConfigForm';
+import NodeTypeConfigForm from '@/pages/GraphType/CreateGraphType/NodeType/NodeTypeConfigForm';
 import { INodeTypeItem, IProperty } from '@/interfaces';
 import { PropertyDataType } from '@/utils/constant';
 

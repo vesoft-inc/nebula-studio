@@ -4,26 +4,30 @@ import { useTranslation } from 'react-i18next';
 import NodeTypeConfigForm from '../NodeTypeConfigForm';
 import { useModal, useStore } from '@/stores';
 import { useForm } from 'react-hook-form-mui';
-import { INodeTypeItem, IProperty } from '@/interfaces';
-import { PropertyDataType } from '@/utils/constant';
+import { INodeTypeItem } from '@/interfaces';
+// import { PropertyDataType } from '@/utils/constant';
 
-function CreateNodeTypeModal() {
+interface NodeTypeModalProps {
+  nodeTypeItem?: INodeTypeItem;
+}
+
+function NodeTypeConfigModal(props: NodeTypeModalProps) {
+  const { nodeTypeItem } = props;
   const { t } = useTranslation(['graphtype', 'common']);
   const modal = useModal();
   const { schemaStore } = useStore().graphtypeStore;
+
   const form = useForm<INodeTypeItem>({
+    values: nodeTypeItem,
     defaultValues: {
-      properties: [
-        new IProperty({
-          name: '',
-          type: PropertyDataType.STRING,
-        }),
-      ],
+      properties: [],
     },
   });
 
   const onSubmit = (values: INodeTypeItem) => {
-    schemaStore?.addNodeType(values);
+    if (nodeTypeItem) {
+      schemaStore?.updateNodeType(nodeTypeItem.id, values);
+    }
     modal.hide();
   };
 
@@ -34,7 +38,7 @@ function CreateNodeTypeModal() {
       </DialogContent>
       <ModalFooter
         cancelText={t('cancel', { ns: 'common' })}
-        okText={t('create', { ns: 'common' })}
+        okText={nodeTypeItem ? t('update', { ns: 'common' }) : t('create', { ns: 'common' })}
         onCancel={() => {
           modal.hide();
         }}
@@ -44,4 +48,4 @@ function CreateNodeTypeModal() {
   );
 }
 
-export default CreateNodeTypeModal;
+export default NodeTypeConfigModal;

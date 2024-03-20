@@ -8,7 +8,8 @@ import { CheckboxElement, FormContainer, TextFieldElement, useForm } from 'react
 import { useStore } from '@/stores';
 import { ActionContainer, ContentContainer, FooterContainer, MainContainer } from './styles';
 import SchemaEditor from './SchemaEditor';
-import NodeTypeForm from './NodeTypeTable';
+import NodeTypeTable from './NodeType/NodeTypeTable';
+import EdgeTypeTable from './EdgeType/EdgeTypeTable';
 
 enum CreateGraphTypeStep {
   create,
@@ -135,7 +136,12 @@ function CreateGraphType() {
       )}
       {curTab === CreateFunction.NodeTyppe && (
         <MainContainer>
-          <NodeTypeForm />
+          <NodeTypeTable />
+        </MainContainer>
+      )}
+      {curTab === CreateFunction.EdgeType && (
+        <MainContainer>
+          <EdgeTypeTable />
         </MainContainer>
       )}
       <FooterContainer>

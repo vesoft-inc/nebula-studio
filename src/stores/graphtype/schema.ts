@@ -1,6 +1,6 @@
 import initShapes, { initShadowFilter } from '@/components/Shapes/Shapers';
 import { ARROW_STYLE, LINE_STYLE } from '@/components/Shapes/config';
-import { GraphTypeElement, INodeTypeItem, IProperty } from '@/interfaces';
+import { IEdgeTypeItem, INodeTypeItem, IProperty } from '@/interfaces';
 import { RootStore } from '@/stores/index';
 import { PropertyDataType, VisualEditorType } from '@/utils/constant';
 import VEditor, { VEditorOptions } from '@vesoft-inc/veditor';
@@ -15,6 +15,22 @@ type UpdatePayload = Partial<{
   activeItem: VEditorItem;
 }>;
 
+const mockNodeType = new INodeTypeItem({
+  name: 'nba_type',
+  properties: [
+    new IProperty({
+      name: 'id',
+      type: PropertyDataType.INT,
+      isPrimaryKey: true,
+    }),
+    new IProperty({
+      name: 'name',
+      type: PropertyDataType.STRING,
+    }),
+  ],
+  labels: ['player', 'team'],
+});
+
 class SchemaStore {
   rootStore?: RootStore;
   zoomFrame?: number;
@@ -24,45 +40,14 @@ class SchemaStore {
   activeItem?: VEditorItem;
 
   nodeTypeList: INodeTypeItem[];
-  edgeTypeList: GraphTypeElement[];
+  edgeTypeList: IEdgeTypeItem[];
 
   labelOptions: string[];
 
   constructor(rootStore?: RootStore) {
     this.rootStore = rootStore;
     // this.nodeTypeList = [];
-    this.nodeTypeList = [
-      {
-        name: 'nba_type',
-        primaryKey: 'id',
-        properties: [
-          new IProperty({
-            name: 'id',
-            type: PropertyDataType.INT,
-          }),
-          new IProperty({
-            name: 'name',
-            type: PropertyDataType.STRING,
-          }),
-        ],
-        labels: ['player', 'team'],
-      },
-      {
-        name: 'nba_type',
-        primaryKey: 'id',
-        properties: [
-          new IProperty({
-            name: 'id',
-            type: PropertyDataType.INT,
-          }),
-          new IProperty({
-            name: 'name',
-            type: PropertyDataType.STRING,
-          }),
-        ],
-        labels: ['player', 'team'],
-      },
-    ];
+    this.nodeTypeList = [mockNodeType];
     this.edgeTypeList = [];
     this.labelOptions = [];
     makeObservable(this, {
@@ -81,7 +66,23 @@ class SchemaStore {
     this.nodeTypeList = this.nodeTypeList.concat(node);
   };
 
-  addEdgeType = (edge: GraphTypeElement) => {
+  updateNodeType = (id: string, node: Omit<INodeTypeItem, 'id'>) => {
+    const nodeTypeItem = this.nodeTypeList.find((item) => item.id === id);
+    if (nodeTypeItem) {
+      nodeTypeItem.updateValues(node);
+    }
+    this.nodeTypeList = this.nodeTypeList.slice();
+  };
+
+  updateEdgeType = (id: string, edge: Omit<IEdgeTypeItem, 'id'>) => {
+    const edgeTypeItem = this.edgeTypeList.find((item) => item.id === id);
+    if (edgeTypeItem) {
+      edgeTypeItem.updateValues(edge);
+    }
+    this.edgeTypeList = this.edgeTypeList.slice();
+  };
+
+  addEdgeType = (edge: IEdgeTypeItem) => {
     this.edgeTypeList = this.edgeTypeList.concat(edge);
   };
 
@@ -89,18 +90,20 @@ class SchemaStore {
     this.labelOptions = this.labelOptions.concat(label);
   };
 
-  deleteNodeType = (name: string) => {
-    const index = this.nodeTypeList.findIndex((node) => node.name === name);
+  deleteNodeType = (id: string) => {
+    const index = this.nodeTypeList.findIndex((node) => node.id === id);
     if (index !== -1) {
       this.nodeTypeList.splice(index, 1);
     }
+    this.nodeTypeList = this.nodeTypeList.slice();
   };
 
-  deleteEdgeType = (name: string) => {
-    const index = this.edgeTypeList.findIndex((edge) => edge.name === name);
+  deleteEdgeType = (id: string) => {
+    const index = this.edgeTypeList.findIndex((edge) => edge.id === id);
     if (index !== -1) {
       this.edgeTypeList.splice(index, 1);
     }
+    this.edgeTypeList = this.edgeTypeList.slice();
   };
 
   setActiveItem = (item?: VEditorItem) => {

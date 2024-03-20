@@ -18,12 +18,13 @@ import {
   useForm,
   SelectElement,
   useWatch,
+  CheckboxElement,
 } from 'react-hook-form-mui';
 import { useTheme } from '@emotion/react';
 import { useTranslation } from 'react-i18next';
 import { TransitionGroup } from 'react-transition-group';
 
-import { NodeTypeInfoContainer } from './styles';
+import { NodeTypeInfoContainer, PropertyBodyCell, PropertyHeaderCell } from './styles';
 import { INodeTypeItem, IProperty } from '@/interfaces';
 import { PropertyDataType } from '@/utils/constant';
 import { CloseFilled, AddFilled } from '@vesoft-inc/icons';
@@ -63,10 +64,6 @@ function NodeTypeConfigForm(props: NodeTypeConfigFormProps) {
       'properties',
       properties.filter((_, i) => i !== index)
     );
-  };
-
-  const getPropertyOptions = () => {
-    return form.getValues('properties');
   };
 
   const properties = useWatch({
@@ -133,58 +130,64 @@ function NodeTypeConfigForm(props: NodeTypeConfigFormProps) {
                 }}
               />
             </Grid>
-            <Grid item xs={6} md={12}>
-              <SelectElement
-                options={properties}
-                label={t('primaryKey', { ns: 'graphtype' })}
-                name="primaryKey"
-                fullWidth
-                size="small"
-                required
-                labelKey="name"
-                valueKey="name"
-              />
-            </Grid>
           </Grid>
         </NodeTypeInfoContainer>
         <Divider />
         <NodeTypeInfoContainer>
           <Typography sx={{ mb: theme.spacing(2) }}>{t('properties', { ns: 'graphtype' })}</Typography>
+          <Stack direction="row" sx={{ mt: 1 }}>
+            <PropertyHeaderCell>
+              <Typography>{t('propName', { ns: 'graphtype' })}</Typography>
+            </PropertyHeaderCell>
+            <PropertyHeaderCell>
+              <Typography>{t('propType', { ns: 'graphtype' })}</Typography>
+            </PropertyHeaderCell>
+            <PropertyHeaderCell>
+              <Typography>{t('primaryKey', { ns: 'graphtype' })}</Typography>
+            </PropertyHeaderCell>
+          </Stack>
           <List>
             <TransitionGroup>
-              {getPropertyOptions().map((property, index) => (
+              {properties.map((property, index) => (
                 <Collapse key={property.id} sx={{ mb: 2.5 }}>
-                  <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
-                    <TextFieldElement
-                      required
-                      size="small"
-                      fullWidth
-                      label={t('propName', { ns: 'graphtype' })}
-                      validation={{
-                        required: 'Required',
-                        validate: (value) => {
-                          return form.getValues('properties').find((p, i) => i !== index && p.name === value)
-                            ? 'Duplicate'
-                            : true;
-                        },
-                      }}
-                      name={`properties.${index}.name`}
-                    >
-                      {property.name}
-                    </TextFieldElement>
-                    <SelectElement
-                      name={`properties.${index}.type`}
-                      label={t('propType', { ns: 'graphtype' })}
-                      required
-                      options={Object.values(PropertyDataType).map((type) => ({ label: type }))}
-                      valueKey="label"
-                      labelKey="label"
-                      size="small"
-                      fullWidth
-                    />
-                    <IconButton onClick={handleDelete(index)}>
-                      <CloseFilled />
-                    </IconButton>
+                  <Stack direction="row" sx={{ mt: 1 }}>
+                    <PropertyBodyCell>
+                      <TextFieldElement
+                        required
+                        size="small"
+                        fullWidth
+                        label={t('propName', { ns: 'graphtype' })}
+                        validation={{
+                          required: 'Required',
+                          validate: (value) => {
+                            return form.getValues('properties').find((p, i) => i !== index && p.name === value)
+                              ? 'Duplicate'
+                              : true;
+                          },
+                        }}
+                        name={`properties.${index}.name`}
+                      >
+                        {property.name}
+                      </TextFieldElement>
+                    </PropertyBodyCell>
+                    <PropertyBodyCell>
+                      <SelectElement
+                        name={`properties.${index}.type`}
+                        label={t('propType', { ns: 'graphtype' })}
+                        required
+                        options={Object.values(PropertyDataType).map((type) => ({ label: type }))}
+                        valueKey="label"
+                        labelKey="label"
+                        size="small"
+                        fullWidth
+                      />
+                    </PropertyBodyCell>
+                    <PropertyBodyCell display="flex" justifyContent="space-between">
+                      <CheckboxElement name={`properties.${index}.isPrimaryKey`} />
+                      <IconButton onClick={handleDelete(index)}>
+                        <CloseFilled />
+                      </IconButton>
+                    </PropertyBodyCell>
                   </Stack>
                 </Collapse>
               ))}

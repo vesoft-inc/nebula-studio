@@ -8,8 +8,12 @@ const conmmon = {
   console: '控制台',
   cancel: '取消',
   create: '创建',
+<<<<<<< HEAD
   version: '版本',
   clearConnect: '清空连接',
+=======
+  update: '更新',
+>>>>>>> fec35ae (feat: update)
 };
 
 export default conmmon;

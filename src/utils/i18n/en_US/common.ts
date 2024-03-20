@@ -8,8 +8,12 @@ const conmmon = {
   console: 'Console',
   cancel: 'Cancel',
   create: 'Create',
+<<<<<<< HEAD
   version: 'Version',
   clearConnect: 'Clear Connection',
+=======
+  update: 'Update',
+>>>>>>> fec35ae (feat: update)
 };
 
 export default conmmon;
