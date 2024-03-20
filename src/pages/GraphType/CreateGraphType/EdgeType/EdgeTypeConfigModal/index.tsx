@@ -18,16 +18,23 @@ function EdgeTypeConfigModal(props: EdgeTypeModalProps) {
   const { schemaStore } = useStore().graphtypeStore;
 
   const form = useForm<IEdgeTypeItem>({
-    values: edgeTypeItem,
-    defaultValues: {
-      properties: [],
-    },
+    defaultValues: edgeTypeItem
+      ? new IEdgeTypeItem(edgeTypeItem)
+      : {
+          properties: [],
+        },
   });
 
   const onSubmit = (values: IEdgeTypeItem) => {
     if (edgeTypeItem) {
       schemaStore?.updateEdgeType(edgeTypeItem.id, values);
+    } else {
+      schemaStore?.addEdgeType(new IEdgeTypeItem(values));
     }
+    modal.hide();
+  };
+
+  const handleCancel = () => {
     modal.hide();
   };
 
@@ -39,9 +46,7 @@ function EdgeTypeConfigModal(props: EdgeTypeModalProps) {
       <ModalFooter
         cancelText={t('cancel', { ns: 'common' })}
         okText={edgeTypeItem ? t('update', { ns: 'common' }) : t('create', { ns: 'common' })}
-        onCancel={() => {
-          modal.hide();
-        }}
+        onCancel={handleCancel}
         onOk={form.handleSubmit(onSubmit)}
       />
     </>

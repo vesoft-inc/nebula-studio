@@ -24,7 +24,7 @@ import { useTheme } from '@emotion/react';
 import { useTranslation } from 'react-i18next';
 import { TransitionGroup } from 'react-transition-group';
 
-import { EdgeTypeInfoContainer, PropertyBodyCell, PropertyHeaderCell } from './styles';
+import { TypeInfoContainer, PropertyBodyCell, PropertyHeaderCell } from '@/pages/GraphType/CreateGraphType/styles';
 import { IEdgeTypeItem, IProperty } from '@/interfaces';
 import { PropertyDataType } from '@/utils/constant';
 import { CloseFilled, AddFilled } from '@vesoft-inc/icons';
@@ -69,13 +69,11 @@ function EdgeTypeConfigForm(props: EdgeTypeConfigFormProps) {
   const properties = useWatch({
     control: form.control,
     name: 'properties',
-    defaultValue: [],
   });
 
   const selectedLabelOptions = useWatch({
     control: form.control,
     name: 'labels',
-    defaultValue: [],
   });
 
   const getLabelOptions = (): string[] => {
@@ -83,9 +81,9 @@ function EdgeTypeConfigForm(props: EdgeTypeConfigFormProps) {
   };
 
   return (
-    <Box maxHeight={600} sx={{ overflowY: 'auto' }}>
+    <Box height={600} sx={{ overflowY: 'auto' }}>
       <FormContainer formContext={form}>
-        <EdgeTypeInfoContainer>
+        <TypeInfoContainer>
           <Typography sx={{ mb: theme.spacing(2) }}>{t('edgeType', { ns: 'graphtype' })}</Typography>
           <Grid container rowSpacing={3}>
             <Grid item xs={6} md={12}>
@@ -104,11 +102,7 @@ function EdgeTypeConfigForm(props: EdgeTypeConfigFormProps) {
                     size="small"
                     label={t('srcNodeType', { ns: 'graphtype' })}
                     required
-                    options={
-                      schemaStore?.nodeTypeList.map((node) => ({
-                        ...node,
-                      })) || []
-                    }
+                    options={schemaStore?.nodeTypeList || []}
                     labelKey="name"
                     valueKey="id"
                     name="srcNode"
@@ -119,11 +113,7 @@ function EdgeTypeConfigForm(props: EdgeTypeConfigFormProps) {
                   <SelectElement
                     size="small"
                     label={t('dstNodeType', { ns: 'graphtype' })}
-                    options={
-                      schemaStore?.nodeTypeList.map((node) => ({
-                        ...node,
-                      })) || []
-                    }
+                    options={schemaStore?.nodeTypeList || []}
                     labelKey="name"
                     valueKey="id"
                     required
@@ -167,9 +157,9 @@ function EdgeTypeConfigForm(props: EdgeTypeConfigFormProps) {
               />
             </Grid>
           </Grid>
-        </EdgeTypeInfoContainer>
+        </TypeInfoContainer>
         <Divider />
-        <EdgeTypeInfoContainer>
+        <TypeInfoContainer>
           <Typography sx={{ mb: theme.spacing(2) }}>{t('properties', { ns: 'graphtype' })}</Typography>
           <Stack direction="row" sx={{ mt: 1 }}>
             <PropertyHeaderCell>
@@ -234,7 +224,7 @@ function EdgeTypeConfigForm(props: EdgeTypeConfigFormProps) {
               </Button>
             </Box>
           </List>
-        </EdgeTypeInfoContainer>
+        </TypeInfoContainer>
       </FormContainer>
     </Box>
   );

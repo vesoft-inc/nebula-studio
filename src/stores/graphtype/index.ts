@@ -1,4 +1,4 @@
-import { action, makeObservable, observable } from 'mobx';
+import { action, makeAutoObservable, observable } from 'mobx';
 import type { RootStore } from '..';
 import SchemaStore from './schema';
 
@@ -16,7 +16,7 @@ class GraphTypeStore {
   graphTypeList: IGraphTypeItem[] = [];
 
   constructor(rootStore?: RootStore) {
-    makeObservable(this, {
+    makeAutoObservable(this, {
       rootStore: observable.ref,
       setLoading: action,
       graphTypeList: observable,

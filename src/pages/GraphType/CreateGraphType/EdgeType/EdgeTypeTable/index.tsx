@@ -1,12 +1,11 @@
-import { Box, Button, Chip, IconButton, Typography } from '@mui/material';
-import { AddFilled, Delete, EditFilled } from '@vesoft-inc/icons';
+import { Box, Button, Chip, IconButton, Stack, Typography } from '@mui/material';
+import { AddFilled, ArrowForwardFilled, Delete, EditFilled } from '@vesoft-inc/icons';
 import { useTranslation } from 'react-i18next';
 import { Table } from '@vesoft-inc/ui-components';
 import { observer } from 'mobx-react-lite';
 import { type MRT_ColumnDef } from 'material-react-table';
 
 import { ActionContainer } from './styles';
-// import EdgeTypeConfigModal from '../EdgeTypeConfigModal';
 import { useModal, useStore } from '@/stores';
 import { IEdgeTypeItem, IProperty } from '@/interfaces';
 import { useCallback, useMemo } from 'react';
@@ -39,6 +38,15 @@ function EdgeTypeTable() {
       },
       {
         header: 'Relation',
+        Cell: ({ row }) => (
+          <Stack direction="row" spacing={2} display="flex" alignItems="center">
+            <Typography>{row.original.srcNode.name}</Typography>
+            <Typography display="flex" alignItems="center">
+              <ArrowForwardFilled />
+            </Typography>
+            <Typography>{row.original.dstNode.name}</Typography>
+          </Stack>
+        ),
       },
       {
         accessorKey: 'labels', //normal accessorKey

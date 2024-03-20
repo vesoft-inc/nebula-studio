@@ -24,7 +24,7 @@ import { useTheme } from '@emotion/react';
 import { useTranslation } from 'react-i18next';
 import { TransitionGroup } from 'react-transition-group';
 
-import { NodeTypeInfoContainer, PropertyBodyCell, PropertyHeaderCell } from './styles';
+import { TypeInfoContainer, PropertyBodyCell, PropertyHeaderCell } from '@/pages/GraphType/CreateGraphType/styles';
 import { INodeTypeItem, IProperty } from '@/interfaces';
 import { PropertyDataType } from '@/utils/constant';
 import { CloseFilled, AddFilled } from '@vesoft-inc/icons';
@@ -69,13 +69,11 @@ function NodeTypeConfigForm(props: NodeTypeConfigFormProps) {
   const properties = useWatch({
     control: form.control,
     name: 'properties',
-    defaultValue: [],
   });
 
   const selectedLabelOptions = useWatch({
     control: form.control,
     name: 'labels',
-    defaultValue: [],
   });
 
   const getLabelOptions = (): string[] => {
@@ -83,9 +81,9 @@ function NodeTypeConfigForm(props: NodeTypeConfigFormProps) {
   };
 
   return (
-    <Box maxHeight={600} sx={{ overflowY: 'auto' }}>
+    <Box height={600} sx={{ overflowY: 'auto' }}>
       <FormContainer formContext={form}>
-        <NodeTypeInfoContainer>
+        <TypeInfoContainer>
           <Typography sx={{ mb: theme.spacing(2) }}>{t('nodeType', { ns: 'graphtype' })}</Typography>
           <Grid container spacing={2}>
             <Grid item xs={6} md={12}>
@@ -131,9 +129,9 @@ function NodeTypeConfigForm(props: NodeTypeConfigFormProps) {
               />
             </Grid>
           </Grid>
-        </NodeTypeInfoContainer>
+        </TypeInfoContainer>
         <Divider />
-        <NodeTypeInfoContainer>
+        <TypeInfoContainer>
           <Typography sx={{ mb: theme.spacing(2) }}>{t('properties', { ns: 'graphtype' })}</Typography>
           <Stack direction="row" sx={{ mt: 1 }}>
             <PropertyHeaderCell>
@@ -198,7 +196,7 @@ function NodeTypeConfigForm(props: NodeTypeConfigFormProps) {
               </Button>
             </Box>
           </List>
-        </NodeTypeInfoContainer>
+        </TypeInfoContainer>
       </FormContainer>
     </Box>
   );

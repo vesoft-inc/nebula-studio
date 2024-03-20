@@ -6,7 +6,7 @@ import { PropertyDataType, VisualEditorType } from '@/utils/constant';
 import VEditor, { VEditorOptions } from '@vesoft-inc/veditor';
 import { InstanceLine } from '@vesoft-inc/veditor/types/Shape/Line';
 import { InstanceNode } from '@vesoft-inc/veditor/types/Shape/Node';
-import { makeObservable, observable } from 'mobx';
+import { makeAutoObservable, observable } from 'mobx';
 
 type VEditorItem = InstanceNode | InstanceLine;
 
@@ -31,6 +31,24 @@ const mockNodeType = new INodeTypeItem({
   labels: ['player', 'team'],
 });
 
+const mockEdgeType = new IEdgeTypeItem({
+  name: 'nba_edge',
+  properties: [
+    new IProperty({
+      name: 'id',
+      type: PropertyDataType.INT,
+      isPrimaryKey: true,
+    }),
+    new IProperty({
+      name: 'name',
+      type: PropertyDataType.STRING,
+    }),
+  ],
+  labels: ['player', 'team'],
+  srcNode: mockNodeType,
+  dstNode: mockNodeType,
+});
+
 class SchemaStore {
   rootStore?: RootStore;
   zoomFrame?: number;
@@ -41,16 +59,14 @@ class SchemaStore {
 
   nodeTypeList: INodeTypeItem[];
   edgeTypeList: IEdgeTypeItem[];
-
   labelOptions: string[];
 
   constructor(rootStore?: RootStore) {
     this.rootStore = rootStore;
-    // this.nodeTypeList = [];
     this.nodeTypeList = [mockNodeType];
-    this.edgeTypeList = [];
+    this.edgeTypeList = [mockEdgeType];
     this.labelOptions = [];
-    makeObservable(this, {
+    makeAutoObservable(this, {
       editor: observable.ref,
       container: observable.ref,
       hoveringItem: observable.ref,

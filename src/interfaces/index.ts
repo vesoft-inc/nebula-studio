@@ -60,6 +60,8 @@ export class IEdgeTypeItem {
     this.name = params.name || '';
     this.srcNode = params.srcNode;
     this.dstNode = params.dstNode;
+    this.properties = params?.properties || [];
+    this.labels = params?.labels || [];
   }
 
   get id() {
