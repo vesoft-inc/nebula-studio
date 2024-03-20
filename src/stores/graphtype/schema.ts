@@ -1,8 +1,8 @@
 import initShapes, { initShadowFilter } from '@/components/Shapes/Shapers';
 import { ARROW_STYLE, LINE_STYLE } from '@/components/Shapes/config';
-import { GraphTypeElement } from '@/interfaces';
+import { GraphTypeElement, INodeTypeItem, IProperty } from '@/interfaces';
 import { RootStore } from '@/stores/index';
-import { VisualEditorType } from '@/utils/constant';
+import { PropertyDataType, VisualEditorType } from '@/utils/constant';
 import VEditor, { VEditorOptions } from '@vesoft-inc/veditor';
 import { InstanceLine } from '@vesoft-inc/veditor/types/Shape/Line';
 import { InstanceNode } from '@vesoft-inc/veditor/types/Shape/Node';
@@ -23,13 +23,48 @@ class SchemaStore {
   hoveringItem?: VEditorItem;
   activeItem?: VEditorItem;
 
-  nodeTypeList: GraphTypeElement[];
+  nodeTypeList: INodeTypeItem[];
   edgeTypeList: GraphTypeElement[];
+
+  labelOptions: string[];
 
   constructor(rootStore?: RootStore) {
     this.rootStore = rootStore;
-    this.nodeTypeList = [];
+    // this.nodeTypeList = [];
+    this.nodeTypeList = [
+      {
+        name: 'nba_type',
+        primaryKey: 'id',
+        properties: [
+          new IProperty({
+            name: 'id',
+            type: PropertyDataType.INT,
+          }),
+          new IProperty({
+            name: 'name',
+            type: PropertyDataType.STRING,
+          }),
+        ],
+        labels: ['player', 'team'],
+      },
+      {
+        name: 'nba_type',
+        primaryKey: 'id',
+        properties: [
+          new IProperty({
+            name: 'id',
+            type: PropertyDataType.INT,
+          }),
+          new IProperty({
+            name: 'name',
+            type: PropertyDataType.STRING,
+          }),
+        ],
+        labels: ['player', 'team'],
+      },
+    ];
     this.edgeTypeList = [];
+    this.labelOptions = [];
     makeObservable(this, {
       editor: observable.ref,
       container: observable.ref,
@@ -38,15 +73,20 @@ class SchemaStore {
       zoomFrame: false,
       nodeTypeList: observable.shallow,
       edgeTypeList: observable.shallow,
+      labelOptions: observable.shallow,
     });
   }
 
-  addNodeType = (node: GraphTypeElement) => {
-    this.nodeTypeList.push(node);
+  addNodeType = (node: INodeTypeItem) => {
+    this.nodeTypeList = this.nodeTypeList.concat(node);
   };
 
   addEdgeType = (edge: GraphTypeElement) => {
-    this.edgeTypeList.push(edge);
+    this.edgeTypeList = this.edgeTypeList.concat(edge);
+  };
+
+  addLabelOption = (label: string) => {
+    this.labelOptions = this.labelOptions.concat(label);
   };
 
   deleteNodeType = (name: string) => {

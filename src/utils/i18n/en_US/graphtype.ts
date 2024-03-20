@@ -20,4 +20,7 @@ export default {
   primaryKey: 'Primary Key',
   properties: 'Properties',
   addProperty: 'Add Property',
+  propName: 'Prop Name',
+  propType: 'Prop Type',
+  createNodeType: 'Create Node Type',
 };

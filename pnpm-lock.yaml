@@ -42,11 +42,11 @@ dependencies:
     specifier: ^2.0.1
     version: 2.0.1(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/nebula-explain-graph':
-    specifier: 5.0.0-beta.1
-    version: 5.0.0-beta.1(@vesoft-inc/veditor@4.4.14)(antd@5.15.3)(color@4.2.3)(copy-to-clipboard@3.3.3)(gl-matrix@3.4.3)(react-dom@18.2.0)(react@18.2.0)
+    specifier: 5.0.0-beta.3
+    version: 5.0.0-beta.3(@vesoft-inc/veditor@4.4.14)(antd@5.15.3)(color@4.2.3)(copy-to-clipboard@3.3.3)(gl-matrix@3.4.3)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/ui-components':
-    specifier: 0.0.3-beta.28
-    version: 0.0.3-beta.28(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
+    specifier: 0.0.3-beta.29
+    version: 0.0.3-beta.29(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/utils':
     specifier: 0.0.0-beta.13
     version: 0.0.0-beta.13(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)
@@ -72,7 +72,7 @@ dependencies:
     specifier: ^1.0.0
     version: 1.0.0
   material-react-table:
-    specifier: ^2.9.2
+    specifier: ^2.10.0
     version: 2.10.0(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/icons-material@5.15.7)(@mui/material@5.15.7)(@mui/x-date-pickers@6.19.2)(react-dom@18.2.0)(react@18.2.0)
   mobx:
     specifier: ^6.12.0
@@ -2224,44 +2224,8 @@ packages:
       '@types/react': 18.2.51
     dev: false
 
-  /@mui/utils@5.15.12(@types/react@18.2.51)(react@18.2.0):
-    resolution: {integrity: sha512-8SDGCnO2DY9Yy+5bGzu00NZowSDtuyHP4H8gunhHGQoIlhlY2Z3w64wBzAOLpYw/ZhJNzksDTnS/i8qdJvxuow==}
-    engines: {node: '>=12.0.0'}
-    peerDependencies:
-      '@types/react': ^17.0.0 || ^18.0.0
-      react: ^17.0.0 || ^18.0.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-    dependencies:
-      '@babel/runtime': 7.24.0
-      '@types/prop-types': 15.7.11
-      '@types/react': 18.2.51
-      prop-types: 15.8.1
-      react: 18.2.0
-      react-is: 18.2.0
-    dev: false
-
   /@mui/utils@5.15.13(@types/react@18.2.51)(react@18.2.0):
     resolution: {integrity: sha512-qNlR9FLEhORC4zVZ3fzF48213EhP/92N71AcFbhHN73lPJjAbq9lUv+71P7uEdRHdrrOlm8+1zE8/OBy6MUqdg==}
-    engines: {node: '>=12.0.0'}
-    peerDependencies:
-      '@types/react': ^17.0.0 || ^18.0.0
-      react: ^17.0.0 || ^18.0.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-    dependencies:
-      '@babel/runtime': 7.24.0
-      '@types/prop-types': 15.7.11
-      '@types/react': 18.2.51
-      prop-types: 15.8.1
-      react: 18.2.0
-      react-is: 18.2.0
-    dev: false
-
-  /@mui/utils@5.15.14(@types/react@18.2.51)(react@18.2.0):
-    resolution: {integrity: sha512-0lF/7Hh/ezDv5X7Pry6enMsbYyGKjADzvHyo3Qrc/SSlTsQ1VkbDMbH0m2t3OR5iIVLwMoxwM7yGd+6FCMtTFA==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
       '@types/react': ^17.0.0 || ^18.0.0
@@ -3008,8 +2972,8 @@ packages:
       - '@types/react'
     dev: false
 
-  /@vesoft-inc/nebula-explain-graph@5.0.0-beta.1(@vesoft-inc/veditor@4.4.14)(antd@5.15.3)(color@4.2.3)(copy-to-clipboard@3.3.3)(gl-matrix@3.4.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-FUU5z2k5dayBpUhpxYwYDvf7FbSma74vutyVMoDyoQyatQSXQoAf0QG1VaxR+jYTdk4aTRzFsLtoxUGceYIwWQ==}
+  /@vesoft-inc/nebula-explain-graph@5.0.0-beta.3(@vesoft-inc/veditor@4.4.14)(antd@5.15.3)(color@4.2.3)(copy-to-clipboard@3.3.3)(gl-matrix@3.4.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-+adgahuhdJPPb/m7R26kGSP9+DqQt26fAKurCh1jU6NvDwhCMy/v3HXGFwyeRVxsFEDISMVDflU/gxNWMtOz8w==}
     peerDependencies:
       '@vesoft-inc/veditor': ^4.4.13
       antd: ^4||^5
@@ -3028,8 +2992,8 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@vesoft-inc/ui-components@0.0.3-beta.28(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-R3zM6A2mc13rqzj2ZMwrT/4AjvVt7rIVUN1uCEvaVR7dlBJ48k/rMz1hvf0EivpQihrNhCWjkj9f8M1oSC28Vw==}
+  /@vesoft-inc/ui-components@0.0.3-beta.29(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-rjMg3ZW5KDCCqVduiTilXWVlxdP7k6PjOsrVUkBzgd+rdCneKp3kYdxuykenoneprBgro093se4mG4qPcvVfxA==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^17 || ^18
@@ -3040,7 +3004,7 @@ packages:
       '@emotion/styled': 11.11.0(@emotion/react@11.11.3)(@types/react@18.2.51)(react@18.2.0)
       '@mui/icons-material': 5.15.7(@mui/material@5.15.7)(@types/react@18.2.51)(react@18.2.0)
       '@mui/material': 5.15.7(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
-      '@mui/utils': 5.15.12(@types/react@18.2.51)(react@18.2.0)
+      '@mui/utils': 5.15.13(@types/react@18.2.51)(react@18.2.0)
       '@mui/x-date-pickers': 6.19.2(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.7)(@mui/system@5.15.9)(@types/react@18.2.51)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0)
       '@types/prop-types': 15.7.11
       '@vesoft-inc/icons': 2.0.1(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
@@ -3092,7 +3056,7 @@ packages:
       '@babel/runtime': 7.24.1
       '@emotion/react': 11.11.3(@types/react@18.2.51)(react@18.2.0)
       '@mui/material': 5.15.7(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
-      '@mui/utils': 5.15.14(@types/react@18.2.51)(react@18.2.0)
+      '@mui/utils': 5.15.13(@types/react@18.2.51)(react@18.2.0)
       '@remix-run/router': 1.15.0
       axios: 1.6.8
       core-js: 3.36.1

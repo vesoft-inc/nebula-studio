@@ -20,4 +20,7 @@ export default {
   primaryKey: '主键',
   properties: '属性',
   addProperty: '添加属性',
+  propName: '属性名',
+  propType: '属性',
+  createNodeType: '创建Node Type',
 };

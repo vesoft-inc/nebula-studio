@@ -18,6 +18,25 @@ const rootStore = new RootStore();
 
 const rootStoreRef = { current: rootStore };
 
+rootStore.themeStore.updateThemeOptions({
+  components: {
+    MuiSelect: {
+      styleOverrides: {
+        icon: {
+          width: '1.5rem',
+          height: '1.5rem',
+          top: 'calc(50% - .75rem)',
+        },
+        iconOpen: {
+          width: '1.5rem',
+          height: '1.5rem',
+          top: 'calc(50% - .75rem)',
+        },
+      },
+    },
+  },
+});
+
 // @ts-ignore
 window.studioStore = rootStore;
 

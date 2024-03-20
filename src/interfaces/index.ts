@@ -1,16 +1,29 @@
-import { VisualEditorType } from '@/utils/constant';
+import { PropertyDataType, VisualEditorType } from '@/utils/constant';
 // import { SystemStyleObject } from '@mui/system';
 // import { InstanceLine } from '@vesoft-inc/veditor/types/Shape/Line';
 // import { InstanceNodePoint } from '@vesoft-inc/veditor/types/Shape/Node';
 
-export interface IProperty {
+const idSymbol = Symbol('id');
+
+export class IProperty {
   name: string;
-  type: string;
+  type: PropertyDataType;
   value?: string;
   allowNull?: boolean;
   fixedLength?: string;
   comment?: string;
   showType?: string;
+  [idSymbol]: string;
+
+  constructor({ name, type }: { name: string; type: PropertyDataType }) {
+    this.name = name;
+    this.type = type;
+    this[idSymbol] = Math.random().toString();
+  }
+
+  get id() {
+    return this[idSymbol];
+  }
 }
 
 export interface VisualNodeCustomizeInfo {
@@ -29,6 +42,13 @@ export interface Graph {
   name: string;
   /** Graph Type Name */
   typeName: string;
+}
+
+export interface INodeTypeItem {
+  name: string;
+  primaryKey: string;
+  properties: IProperty[];
+  labels: string[];
 }
 
 /**

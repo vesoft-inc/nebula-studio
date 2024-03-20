@@ -1,90 +1,92 @@
-import { Button, Collapse, Divider, Grid, IconButton, List, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Collapse,
+  Divider,
+  Grid,
+  IconButton,
+  List,
+  Stack,
+  Typography,
+  createFilterOptions,
+  type FilterOptionsState,
+} from '@mui/material';
 import {
   AutocompleteElement,
   FormContainer,
   TextFieldElement,
   useForm,
   SelectElement,
-  FieldValues,
-  Path,
-  PathValue,
+  useWatch,
 } from 'react-hook-form-mui';
 import { useTheme } from '@emotion/react';
 import { useTranslation } from 'react-i18next';
 import { TransitionGroup } from 'react-transition-group';
 
 import { NodeTypeInfoContainer } from './styles';
-import { IProperty } from '@/interfaces';
+import { INodeTypeItem, IProperty } from '@/interfaces';
 import { PropertyDataType } from '@/utils/constant';
-import { useMemo, useState } from 'react';
 import { CloseFilled, AddFilled } from '@vesoft-inc/icons';
+import { getDuplicateValues } from '@/utils';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '@/stores';
 
-const top100Films = [
-  { title: 'The Shawshank Redemption', year: 1994 },
-  { title: 'The Godfather', year: 1972 },
-  { title: 'The Godfather: Part II', year: 1974 },
-  { title: 'The Dark Knight', year: 2008 },
-  { title: '12 Angry Men', year: 1957 },
-  { title: "Schindler's List", year: 1993 },
-  { title: 'Pulp Fiction', year: 1994 },
-];
-
-const PROPERTY_PREFIX = '$property_';
-
-interface NodeTypeConfigFormProps<T extends FieldValues> {
-  form: ReturnType<typeof useForm<T>>;
+interface NodeTypeConfigFormProps {
+  form: ReturnType<typeof useForm<INodeTypeItem>>;
 }
 
-function NodeTypeConfigForm<T extends FieldValues>(props: NodeTypeConfigFormProps<T>) {
+const labelOptionFilter = createFilterOptions<string>();
+
+function NodeTypeConfigForm(props: NodeTypeConfigFormProps) {
   const { form } = props;
   const theme = useTheme();
   const { t } = useTranslation(['graphtype']);
-  const [propertyNum, setPropertyNum] = useState<number>(0);
 
-  const properties = useMemo(() => {
-    const values = form.getValues();
-    const properties: IProperty[] = [];
-    const propertyNum = Object.keys(values).filter((key) => key.startsWith(PROPERTY_PREFIX)).length / 2;
-    for (let i = 0; i < propertyNum; i++) {
-      const name = values[`${PROPERTY_PREFIX}name_${i + 1}`];
-      const type = values[`${PROPERTY_PREFIX}type_${i + 1}`];
-      properties.push({ name, type });
-    }
-    return properties;
-  }, [form, propertyNum]);
+  const { schemaStore } = useStore().graphtypeStore;
 
   const handleAddProperty = () => {
-    const property: IProperty = {
-      name: '',
-      type: PropertyDataType.STRING,
-    };
-    setPropertyNum(propertyNum + 1);
-    updatePropertyForm(propertyNum + 1, property);
-  };
-
-  const updatePropertyForm = (index: number, property: IProperty) => {
-    const namePath = `${PROPERTY_PREFIX}name_${index}` as Path<T>;
-    const typePath = `${PROPERTY_PREFIX}type_${index}` as Path<T>;
-    form.setValue(namePath, property.name as PathValue<T, Path<T>>);
-    form.setValue(typePath, property.type as PathValue<T, Path<T>>);
-  };
-
-  const unRegistProperty = (index: number) => {
-    const namePath = `${PROPERTY_PREFIX}name_${index + 1}` as Path<T>;
-    const typePath = `${PROPERTY_PREFIX}type_${index + 1}` as Path<T>;
-    form.unregister(namePath);
-    form.unregister(typePath);
+    const properties = form.getValues('properties') as IProperty[];
+    form.setValue(
+      'properties',
+      properties.concat([
+        new IProperty({
+          name: '',
+          type: PropertyDataType.STRING,
+        }),
+      ])
+    );
   };
 
   const handleDelete = (index: number) => () => {
-    const newProperties = [...properties];
-    newProperties.splice(index, 1);
-    unRegistProperty(index);
-    setPropertyNum(propertyNum - 1);
+    const properties = form.getValues('properties') as IProperty[];
+    form.setValue(
+      'properties',
+      properties.filter((_, i) => i !== index)
+    );
+  };
+
+  const getPropertyOptions = () => {
+    return form.getValues('properties');
+  };
+
+  const properties = useWatch({
+    control: form.control,
+    name: 'properties',
+    defaultValue: [],
+  });
+
+  const selectedLabelOptions = useWatch({
+    control: form.control,
+    name: 'labels',
+    defaultValue: [],
+  });
+
+  const getLabelOptions = (): string[] => {
+    return schemaStore?.labelOptions.filter((label) => !selectedLabelOptions.includes(label)) || [];
   };
 
   return (
-    <>
+    <Box maxHeight={600} sx={{ overflowY: 'auto' }}>
       <FormContainer formContext={form}>
         <NodeTypeInfoContainer>
           <Typography sx={{ mb: theme.spacing(2) }}>{t('nodeType', { ns: 'graphtype' })}</Typography>
@@ -94,7 +96,7 @@ function NodeTypeConfigForm<T extends FieldValues>(props: NodeTypeConfigFormProp
                 size="small"
                 label={t('nodeTypeName', { ns: 'graphtype' })}
                 required
-                name="graphType"
+                name="name"
                 fullWidth
               />
             </Grid>
@@ -103,17 +105,45 @@ function NodeTypeConfigForm<T extends FieldValues>(props: NodeTypeConfigFormProp
                 name="labels"
                 label={t('label', { ns: 'graphtype' })}
                 multiple
-                options={top100Films}
+                options={getLabelOptions()}
+                rules={{
+                  required: true,
+                  validate: (values: string[]) => {
+                    const duplicateValues = getDuplicateValues(values);
+                    return duplicateValues.length ? `Duplicate: ${duplicateValues.join(', ')}` : true;
+                  },
+                }}
                 autocompleteProps={{
                   limitTags: 2,
                   size: 'small',
-                  getOptionLabel: (option) => option.title,
                   fullWidth: true,
+                  onChange: (_, values: string[]) => {
+                    form.setValue('labels', values);
+                  },
+                  handleHomeEndKeys: true,
+                  filterOptions: (options: string[], params: FilterOptionsState<string>) => {
+                    const filtered = labelOptionFilter(options, params);
+                    const { inputValue } = params;
+                    const isExisting = options.some((option) => inputValue === option);
+                    if (inputValue !== '' && !isExisting) {
+                      filtered.push(inputValue);
+                    }
+                    return filtered;
+                  },
                 }}
               />
             </Grid>
             <Grid item xs={6} md={12}>
-              <SelectElement label={t('primaryKey', { ns: 'graphtype' })} name="primaryKey" fullWidth size="small" />
+              <SelectElement
+                options={properties}
+                label={t('primaryKey', { ns: 'graphtype' })}
+                name="primaryKey"
+                fullWidth
+                size="small"
+                required
+                labelKey="name"
+                valueKey="name"
+              />
             </Grid>
           </Grid>
         </NodeTypeInfoContainer>
@@ -122,21 +152,29 @@ function NodeTypeConfigForm<T extends FieldValues>(props: NodeTypeConfigFormProp
           <Typography sx={{ mb: theme.spacing(2) }}>{t('properties', { ns: 'graphtype' })}</Typography>
           <List>
             <TransitionGroup>
-              {properties.map((property, index) => (
-                <Collapse key={index} sx={{ mb: 2.5 }}>
+              {getPropertyOptions().map((property, index) => (
+                <Collapse key={property.id} sx={{ mb: 2.5 }}>
                   <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
                     <TextFieldElement
                       required
                       size="small"
                       fullWidth
-                      label="Prop Name"
-                      name={`${PROPERTY_PREFIX}name_${index + 1}`}
+                      label={t('propName', { ns: 'graphtype' })}
+                      validation={{
+                        required: 'Required',
+                        validate: (value) => {
+                          return form.getValues('properties').find((p, i) => i !== index && p.name === value)
+                            ? 'Duplicate'
+                            : true;
+                        },
+                      }}
+                      name={`properties.${index}.name`}
                     >
                       {property.name}
                     </TextFieldElement>
                     <SelectElement
-                      name={`${PROPERTY_PREFIX}type_${index + 1}`}
-                      label="Prop Type"
+                      name={`properties.${index}.type`}
+                      label={t('propType', { ns: 'graphtype' })}
                       required
                       options={Object.values(PropertyDataType).map((type) => ({ label: type }))}
                       valueKey="label"
@@ -151,21 +189,16 @@ function NodeTypeConfigForm<T extends FieldValues>(props: NodeTypeConfigFormProp
                 </Collapse>
               ))}
             </TransitionGroup>
-            <Button onClick={handleAddProperty} variant="text" startIcon={<AddFilled fontSize="medium" />}>
-              {t('addProperty', { ns: 'graphtype' })}
-            </Button>
+            <Box width="100%" justifyContent="center" display="flex">
+              <Button onClick={handleAddProperty} variant="text" startIcon={<AddFilled fontSize="medium" />}>
+                {t('addProperty', { ns: 'graphtype' })}
+              </Button>
+            </Box>
           </List>
         </NodeTypeInfoContainer>
-        <Button
-          onClick={form.handleSubmit(() => {
-            console.log('hhh', form.getValues());
-          })}
-        >
-          submit
-        </Button>
       </FormContainer>
-    </>
+    </Box>
   );
 }
 
-export default NodeTypeConfigForm;
+export default observer(NodeTypeConfigForm);
