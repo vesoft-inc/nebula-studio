@@ -24,15 +24,14 @@ const schemaTextSx: SxProps<Theme> = {
 function ElementItem({ element }: { element: GraphTypeElement }) {
   const [open, setOpen] = useState(false);
   const handleClick = useCallback(() => setOpen((open) => !open), []);
-  const { properties, kind, types } = element;
-  const itemText = types?.join('-');
+  const { properties, type, type_name } = element;
   return (
     <>
       <Divider />
       <ListItemButton onClick={handleClick}>
         <ChevronRightFilled sx={{ transform: `rotate(${open ? 90 : 0}deg)`, transition: 'transform ease 0.25s' }} />
-        <StyledListItemIcon sx={schemaTextSx}>{kind === 'Node' ? <DotsHexagon /> : <EdgeType />}</StyledListItemIcon>
-        <ListItemText primaryTypographyProps={{ sx: schemaTextSx, title: itemText }} primary={itemText} />
+        <StyledListItemIcon sx={schemaTextSx}>{type === 'Node' ? <DotsHexagon /> : <EdgeType />}</StyledListItemIcon>
+        <ListItemText primaryTypographyProps={{ sx: schemaTextSx, title: type_name }} primary={type_name} />
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>
         {properties.map((prop, idx) => (
@@ -59,8 +58,8 @@ export default function SchemaItem(props: IProps) {
   return (
     <List sx={{ width: '100%', paddingTop: 0 }} component="nav">
       <ListSubheader sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</ListSubheader>
-      {elements.map((item, idx) => (
-        <ElementItem key={`${item.kind}-${idx}`} element={item} />
+      {elements.map((item) => (
+        <ElementItem key={`${item.type}-${item.type_name}`} element={item} />
       ))}
     </List>
   );

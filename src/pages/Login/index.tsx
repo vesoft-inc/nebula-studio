@@ -8,21 +8,21 @@ import { useStore } from '@/stores';
 import {
   LoginContainer,
   Content,
-  ContentHeader,
+  ContentBody,
   HeaderLogo,
-  HeaderTitle,
-  HeaderSubTitle,
+  ContentTitle,
   Footer,
   FooterInfo,
   FooterVersion,
   FooterCopyright,
   DelimiterBox,
+  WelcomeLogin,
 } from './styles';
 
 interface LoginFormData {
   username: string;
   password: string;
-  port: number;
+  port: string;
   address: string;
 }
 
@@ -30,18 +30,21 @@ export default function Login() {
   const navigate = useNavigate();
   const { commonStore } = useStore();
   const { t } = useTranslation(['login', 'common']);
-  const form = useForm<LoginFormData>({ defaultValues: { username: '', password: '', port: 9669 } });
-  const onSubmit = useCallback((data: LoginFormData) => {
-    console.log('=====data', data);
-    navigate('/console');
+  const form = useForm<LoginFormData>({ defaultValues: { address: '', username: '', password: '', port: '9669' } });
+  const onSubmit = useCallback(async (data: LoginFormData) => {
+    const flag = await commonStore.login(data);
+    flag && navigate('/console');
   }, []);
+
   return (
     <LoginContainer>
       <Content>
-        <ContentHeader>
-          <HeaderLogo src="/images/nebula-logo.png" />
-          <HeaderTitle>NebulaGraph Explorer</HeaderTitle>
-          <HeaderSubTitle>{t('subTitle', { ns: 'login', dbName: commonStore.dbName })}</HeaderSubTitle>
+        <ContentTitle>
+          <HeaderLogo src="/images/nebula-logo.png" loading="lazy" />
+          NebulaGraph Studio
+        </ContentTitle>
+        <ContentBody>
+          <WelcomeLogin>{t('loginTip', { ns: 'login' })}</WelcomeLogin>
           <FormContainer formContext={form} onSuccess={onSubmit}>
             <Grid container rowSpacing={2}>
               <Grid item md={6.5}>
@@ -49,7 +52,7 @@ export default function Login() {
                   label={t('address', { ns: 'login' })}
                   name="address"
                   required
-                  size="small"
+                  fullWidth
                   validation={{ required: 'address required' }}
                 />
               </Grid>
@@ -62,7 +65,6 @@ export default function Login() {
                   label={t('port', { ns: 'login' })}
                   required
                   fullWidth
-                  size="small"
                   validation={{ required: 'port required' }}
                 />
               </Grid>
@@ -71,7 +73,6 @@ export default function Login() {
                   label={t('username', { ns: 'common' })}
                   name="username"
                   required
-                  size="small"
                   fullWidth
                   validation={{ required: 'username required' }}
                 />
@@ -81,24 +82,32 @@ export default function Login() {
                   label={t('password', { ns: 'common' })}
                   name="password"
                   required
-                  size="small"
                   type="password"
                   fullWidth
                   validation={{ required: 'passward required' }}
                 />
               </Grid>
+              <Grid item md={12}>
+                <Button
+                  onClick={form.handleSubmit(onSubmit)}
+                  variant="contained"
+                  fullWidth
+                  size="large"
+                  sx={{ marginTop: ({ spacing }) => spacing(2) }}
+                  type="submit"
+                >
+                  {t('login', { ns: 'login' })}
+                </Button>
+              </Grid>
             </Grid>
           </FormContainer>
-          <Button onClick={form.handleSubmit(onSubmit)} variant="contained" fullWidth sx={{ marginTop: 4 }}>
-            {t('login', { ns: 'login' })}
-          </Button>
-        </ContentHeader>
-        <Footer>
-          <FooterInfo>
-            <FooterVersion>版本: v3.7</FooterVersion>
-          </FooterInfo>
-          <FooterCopyright active>Copyright © 杭州悦数科技有限公司</FooterCopyright>
-        </Footer>
+          <Footer>
+            <FooterInfo>
+              <FooterVersion>{t('version', { ns: 'common' })}: v5.0</FooterVersion>
+            </FooterInfo>
+            <FooterCopyright>Copyright © vesoft inc.</FooterCopyright>
+          </Footer>
+        </ContentBody>
       </Content>
     </LoginContainer>
   );

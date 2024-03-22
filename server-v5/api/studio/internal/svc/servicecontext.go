@@ -30,7 +30,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	}
 }
 
-func createResponseHandler(c config.Config) response.Handler { // nolint:gocritic
+func createResponseHandler(_ config.Config) response.Handler { // nolint:gocritic
 	return response.NewStandardHandler(response.StandardHandlerParams{
 		GetErrCode: func(err error) *ecode.ErrCode {
 			return ecode.TakeCodePriority(func() *ecode.ErrCode {

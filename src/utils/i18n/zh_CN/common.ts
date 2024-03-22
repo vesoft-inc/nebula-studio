@@ -8,6 +8,8 @@ const conmmon = {
   console: '控制台',
   cancel: '取消',
   create: '创建',
+  version: '版本',
+  clearConnect: '清空连接',
 };
 
 export default conmmon;

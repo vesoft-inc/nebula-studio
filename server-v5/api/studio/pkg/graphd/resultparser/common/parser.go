@@ -170,7 +170,6 @@ func (p *dataParser) NODE(v nebula.Value) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	// id := node.GetNodeId()
 	props := node.GetProperties()
 	parsedProps := make(map[string]any, 0)
 	for k, v := range props {
@@ -184,6 +183,10 @@ func (p *dataParser) NODE(v nebula.Value) (any, error) {
 	result := types.ElementResult[types.NodeParsed]{
 		Raw: node.String(),
 		Value: types.NodeParsed{
+			Id:         node.GetId(),
+			Type:       node.GetType(),
+			Labels:     node.GetLabels(),
+			Graph:      node.GetGraph(),
 			Properties: parsedProps,
 		},
 	}
@@ -195,9 +198,7 @@ func (p *dataParser) EDGE(v nebula.Value) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	// id := edge.GetEdgeId()
-	// srcId := edge.GetSrcId()
-	// dstId := edge.GetDstId()
+
 	props := edge.GetProperties()
 	parsedProps := make(map[string]any, 0)
 	for k, v := range props {
@@ -212,6 +213,13 @@ func (p *dataParser) EDGE(v nebula.Value) (any, error) {
 		Raw:  edge.String(),
 		Type: v.GetType().String(),
 		Value: types.EdgeParsed{
+			SrcId:      edge.GetSrcId(),
+			DstId:      edge.GetDstId(),
+			Labels:     edge.GetLabels(),
+			Rank:       edge.GetRank(),
+			IsDirected: edge.IsDirected(),
+			Type:       edge.GetType(),
+			Graph:      edge.GetGraph(),
 			Properties: parsedProps,
 		},
 	}
@@ -262,7 +270,7 @@ func (p *dataParser) DATE(v nebula.Value) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	return val, nil
+	return val.String(), nil
 }
 
 func (p *dataParser) LOCALTIME(v nebula.Value) (any, error) {
@@ -270,7 +278,7 @@ func (p *dataParser) LOCALTIME(v nebula.Value) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	return val, nil
+	return val.String(), nil
 }
 
 func (p *dataParser) LOCALDATETIME(v nebula.Value) (any, error) {
@@ -278,7 +286,7 @@ func (p *dataParser) LOCALDATETIME(v nebula.Value) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	return val, nil
+	return val.String(), nil
 }
 
 func (p *dataParser) ZONEDTIME(v nebula.Value) (any, error) {

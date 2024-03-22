@@ -3,6 +3,7 @@ package gateway
 import (
 	"context"
 
+	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/internal/service"
 	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/internal/svc"
 	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/internal/types"
 
@@ -24,7 +25,5 @@ func NewConnectLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ConnectLo
 }
 
 func (l *ConnectLogic) Connect(req *types.ConnectDBParams) error {
-	// todo: add your logic here and delete this line
-
-	return nil
+	return service.NewGatewayService(l.ctx, l.svcCtx).Connect(req)
 }

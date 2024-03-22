@@ -1,3 +1,8 @@
 Name: studio-api
 Host: 0.0.0.0
 Port: 7001
+Timeout: 10000
+Auth:
+  TokenName: "studio_token"
+  TokenSecret: "login_secret"
+  TokenMaxAge: 259200

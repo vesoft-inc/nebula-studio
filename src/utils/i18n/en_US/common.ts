@@ -8,6 +8,8 @@ const conmmon = {
   console: 'Console',
   cancel: 'Cancel',
   create: 'Create',
+  version: 'Version',
+  clearConnect: 'Clear Connection',
 };
 
 export default conmmon;

@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	address  = "192.168.8.145"
+	address  = "192.168.8.48"
 	port     = 9669
 	username = "root"
 	password = "nebula"
@@ -80,8 +80,8 @@ func TestRunShow(t *testing.T) {
 	// gql := "CALL show_graphs() YIELD `graph_name` AS gn CALL describe_graph(gn) YIELD `graph_type_name` AS gtn return gn, gtn"
 	gql := strings.Join([]string{
 		"CALL show_graph_types() YIELD `graph_type_name` AS gtn",
-		"CALL describe_graph_type(gtn) YIELD `kind`, `labels`, `primary_keys`, `properties`, `types`",
-		"RETURN kind, labels, primary_keys, properties, types",
+		"CALL describe_graph_type(gtn)",
+		"RETURN *",
 	}, " ")
 	res, err := RunGql(client, gql)
 	if err != nil {
@@ -120,11 +120,12 @@ func TestRunMatch(t *testing.T) {
 	// gql := `USE nba_demo MATCH p=()-[e]-() RETURN p,e limit 2`
 	// gql := `for i in LIST [1,2,3,4,5] RETURN collect(i) GROUP BY ()`
 	// gql := `RETURN "123" as num`
-	gql := `
-		USE nba_demo MATCH (v:player) filter v.id > 115 return v.name as name
-		NEXT
-		USE basketballplayer_demo MATCH (v:player)-[e]-() filter v.name = name return v,e
-	`
+	// gql := `
+	// 	USE nba_demo MATCH (v:player) filter v.id > 115 return v.name as name
+	// 	NEXT
+	// 	USE basketballplayer_demo MATCH (v:player)-[e]-() filter v.name = name return v,e
+	// `
+	gql := `RETURN local_datetime("2012-03-04T05:06:07.0890", "%Y-%m-%dT%H:%M:%S") AS localdatetime`
 	res, err := RunGql(client, gql)
 	if err != nil {
 		t.Error(err)

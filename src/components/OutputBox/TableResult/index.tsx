@@ -10,7 +10,7 @@ export default function TableResult({ result }: { result: ConsoleResult }) {
       (acc, key) => {
         const value = item[key];
         const isNebulaType = value && typeof value === 'object' && 'raw' in value;
-        acc[key] = isNebulaType ? value.raw : value;
+        acc[key] = isNebulaType ? value.raw : JSON.stringify(value);
         return acc;
       },
       {} as Record<string, unknown>

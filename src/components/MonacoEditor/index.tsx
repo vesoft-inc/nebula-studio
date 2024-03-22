@@ -41,9 +41,9 @@ export default function MonacoEditor(props: MonacoEditorProps) {
   const className = css`
     min-height: 120px;
     height: 100%;
-    .lines-content.monaco-editor-background {
+    /* .lines-content.monaco-editor-background {
       padding-left: 4px;
-    }
+    } */
   `;
 
   useEffect(() => {

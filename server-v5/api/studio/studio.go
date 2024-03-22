@@ -4,10 +4,13 @@ import (
 	"embed"
 	"flag"
 	"fmt"
+	"net/http"
 
+	"github.com/vesoft-inc/go-pkg/middleware"
 	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/internal/config"
 	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/internal/handler"
 	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/internal/svc"
+	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/pkg/auth"
 	studioMiddleware "github.com/vesoft-inc/nebula-studio/server-v5/api/studio/pkg/middleware"
 
 	"github.com/zeromicro/go-zero/core/conf"
@@ -37,6 +40,19 @@ func main() {
 
 	server := rest.MustNewServer(c.RestConf, opts...)
 	defer server.Stop()
+
+	// global middleware
+	server.Use(auth.AuthMiddlewareWithCtx(svcCtx))
+	server.Use(rest.ToMiddleware(middleware.ReserveRequest(middleware.ReserveRequestConfig{
+		Skipper: func(r *http.Request) bool {
+			return false
+		},
+	})))
+	server.Use(rest.ToMiddleware(middleware.ReserveResponseWriter(middleware.ReserveResponseWriterConfig{
+		Skipper: func(r *http.Request) bool {
+			return false
+		},
+	})))
 
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)

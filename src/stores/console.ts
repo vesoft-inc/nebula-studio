@@ -83,7 +83,7 @@ export class ConsoleStore {
   };
 
   getGraphTypes = async () => {
-    const gql = `CALL show_graph_types() YIELD \`graph_type_name\` AS name CALL describe_graph_type(name) RETURN *`;
+    const gql = `CALL show_graph_types() YIELD \`graph_type_name\` CALL describe_graph_type(graph_type_name) RETURN *`;
     const res = await execGql<GQLResult<GraphTypeElement>>(gql);
     const elements = res.data?.tables || [];
     this.updateGraphTypes(elements);

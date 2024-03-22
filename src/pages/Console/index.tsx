@@ -73,7 +73,7 @@ export default observer(function Console() {
   }, []);
 
   const activeIcon = activeMenu === 'Schema' ? <VectorTriangle /> : <FileDocument />;
-  const groups = Object.groupBy(consoleStore.graphTypeElements || [], (ele) => ele.name);
+  const groups = Object.groupBy(consoleStore.graphTypeElements || [], (ele) => ele.graph_type_name);
   const loading = consoleStore.editorRunning;
 
   return (

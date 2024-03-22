@@ -10,6 +10,7 @@ import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/system/Stack';
+import { PersonFilled } from '@vesoft-inc/icons';
 import { useStore } from '@/stores';
 import { PageRoute } from '@/utils/constant';
 import { Language } from '@/utils/i18n';
@@ -17,13 +18,14 @@ import { AbsoluteLink, ActionContentContainer, AppBar, AppToolbar, MenuTab, Menu
 
 export default observer(function PageHeader() {
   const { themeStore, commonStore } = useStore();
-  const [anchorEle, setAnchorEle] = useState<null | HTMLElement>(null);
+  const [langAnchorEle, setLangAnchorEle] = useState<null | HTMLElement>(null);
+  const [userAnchorEle, setUserAnchorEle] = useState<null | HTMLElement>(null);
   const { t } = useTranslation(['common']);
   const toggleTheme = useCallback(() => themeStore.toggleMode(), [themeStore]);
   const changeLang = useCallback(
     (lang: Language) => {
-      commonStore.setLanguage(lang);
-      setAnchorEle(null);
+      commonStore.changeLanguage(lang);
+      setLangAnchorEle(null);
     },
     [commonStore]
   );
@@ -64,23 +66,34 @@ export default observer(function PageHeader() {
         </ActionContentContainer>
         <Box sx={{ flexGrow: 0 }}>
           <Stack direction="row" spacing={1}>
-            <IconButton color="primary" aria-haspopup="menu" onClick={(e) => setAnchorEle(e.currentTarget)}>
+            <IconButton color="primary" aria-haspopup="menu" onClick={(e) => setLangAnchorEle(e.currentTarget)}>
               <LanguageIcon />
             </IconButton>
             <IconButton color="primary" onClick={toggleTheme}>
               {isDarkMode ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
             </IconButton>
+            <IconButton color="primary" onClick={(e) => setUserAnchorEle(e.currentTarget)}>
+              <PersonFilled />
+            </IconButton>
           </Stack>
         </Box>
       </AppToolbar>
       <Menu
-        anchorEl={anchorEle}
-        open={!!anchorEle}
-        onClose={() => setAnchorEle(null)}
+        anchorEl={langAnchorEle}
+        open={!!langAnchorEle}
+        onClose={() => setLangAnchorEle(null)}
         MenuListProps={{ 'aria-labelledby': 'basic-button' }}
       >
         <MenuItem onClick={() => changeLang(Language.EN_US)}>English</MenuItem>
         <MenuItem onClick={() => changeLang(Language.ZH_CN)}>中文</MenuItem>
+      </Menu>
+      <Menu
+        anchorEl={userAnchorEle}
+        open={!!userAnchorEle}
+        onClose={() => setUserAnchorEle(null)}
+        MenuListProps={{ 'aria-labelledby': 'basic-button' }}
+      >
+        <MenuItem onClick={commonStore.logout}>{t('clearConnect', { ns: 'common' })}</MenuItem>
       </Menu>
     </AppBar>
   );

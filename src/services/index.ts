@@ -1,23 +1,34 @@
 import { FetchService } from '@vesoft-inc/utils';
 import JSONBig from 'json-bigint';
 
+let controller = new AbortController();
 const parser = JSONBig({ useNativeBigInt: true }).parse;
+
+export enum HttpResCode {
+  ErrBadRequest = 40004000,
+  ErrParam = 40004001,
+  ErrUnauthorized = 40104000,
+  ErrSession = 40104001,
+  ErrForbidden = 40304000,
+  ErrNotFound = 40404000,
+  ErrInternalServer = 50004000,
+  ErrNotImplemented = 50104000,
+  ErrUnknown = 90004000,
+}
 
 const fetcher = new FetchService({
   config: {
     baseURL: '/api-studio',
     transformResponse: [
-      (data) => {
+      (data, _, code) => {
+        if (code === 503 && data === 'Request Timeout') {
+          return { code, message: data };
+        }
         try {
           return parser(data);
         } catch (e) {
           console.error('json-bigint parse error: ', e);
-          try {
-            return JSON.parse(data);
-          } catch (e) {
-            console.error('JSON.parse error: ', e);
-            throw e;
-          }
+          return { code: HttpResCode.ErrUnknown, message: `Unknown error: ${data}` };
         }
       },
       (data) => {
@@ -28,6 +39,7 @@ const fetcher = new FetchService({
   interceptorsEjectors(ins) {
     ins.interceptors.request.use((config) => {
       config.headers['Content-Type'] = 'application/json';
+      config.signal = controller.signal;
       return config;
     });
     ins.interceptors.response.use(
@@ -35,13 +47,32 @@ const fetcher = new FetchService({
         return response;
       },
       (error) => {
+        const response = error?.response || {};
+        if (response.data?.code === HttpResCode.ErrSession) {
+          controller.abort();
+          controller = new AbortController();
+          window.location.replace('/login');
+        }
         return error?.response || {};
       }
     );
   },
 });
 
-export const execGql = async <T = unknown>(gql: string): Promise<{ code: number; data: T; message: string }> => {
-  const res = await fetcher.post('/gql/exec', { gql });
+export const connect = async (
+  payload: { address: string; port: number },
+  config: { headers: { Authorization: string } }
+) => {
+  const res = await fetcher.post('/db/connect', payload, config);
+  return res.data;
+};
+
+export const disconnect = async () => {
+  const res = await fetcher.post('/db/disconnect');
+  return res.data;
+};
+
+export const execGql = async <T = unknown>(gql: string) => {
+  const res = await fetcher.post<T>('/gql/exec', { gql });
   return res.data;
 };

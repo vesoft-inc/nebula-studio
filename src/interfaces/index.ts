@@ -36,25 +36,23 @@ export interface Graph {
  * @description
  * ```json
  * {
- *   "kind": "Node",
- *   "labels": ["player"],
- *   "name": "nba_type",
- *   "primary_keys": ["id"],
+ *   "graph_type_name": "ldbc_type",
+ *   "labels": ["City","Place"],
  *   "properties": [
  *     "id: INT64",
  *     "name: STRING",
- *     "age: INT64"
+ *     "url: STRING"
  *   ],
- *   "types": ["player"]
- * }
+ *   "type": "Node",
+ *   "type_name": "City"
+ * },
  * ```
  */
 export interface GraphTypeElement {
-  name: string;
-  kind: 'Node' | 'Edge';
+  graph_type_name: string;
+  type: 'Node' | 'Edge';
+  type_name: string;
   labels: string[];
-  primary_keys: string[];
-  types: string[];
   /** currently `string[]` is used for `properties` field, but it should be `Property[]` */
   properties: string[];
 }

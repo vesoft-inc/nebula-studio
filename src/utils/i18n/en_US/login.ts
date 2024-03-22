@@ -3,6 +3,7 @@ const login = {
   port: 'Port',
   subTitle: 'Connect to {{dbName}}',
   login: 'Connect',
+  loginTip: 'Login in to your account',
   loginSuccess: 'Login Success',
 };
 
