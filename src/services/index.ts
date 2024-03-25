@@ -20,19 +20,22 @@ const fetcher = new FetchService({
   config: {
     baseURL: '/api-studio',
     transformResponse: [
-      (data, _, code) => {
-        if (code === 503 && data === 'Request Timeout') {
+      (data, header, code) => {
+        if (header['Content-Type'] !== 'application/json') {
+          if (code! >= 200 && code! < 300) {
+            return { code: 0, data };
+          }
+
+          // other http error status
+          // code === 503 && data === 'Request Timeout'
+          // return { code: 503, message: 'Request Timeout' }
           return { code, message: data };
         }
         try {
           return parser(data);
         } catch (e) {
-          console.error('json-bigint parse error: ', e);
-          return { code: HttpResCode.ErrUnknown, message: `Unknown error: ${data}` };
+          return { code: HttpResCode.ErrUnknown, message: `${e}`, data };
         }
-      },
-      (data) => {
-        return data;
       },
     ],
   },
@@ -43,17 +46,16 @@ const fetcher = new FetchService({
       return config;
     });
     ins.interceptors.response.use(
-      (response) => {
-        return response;
-      },
+      (response) => response,
       (error) => {
         const response = error?.response || {};
         if (response.data?.code === HttpResCode.ErrSession) {
           controller.abort();
           controller = new AbortController();
-          window.location.replace('/login');
+          const redirect = `${location.pathname}${location.search}`;
+          window.location.replace(`/login?redirect=${encodeURIComponent(redirect)}`);
         }
-        return error?.response || {};
+        return response;
       }
     );
   },
