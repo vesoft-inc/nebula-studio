@@ -1,11 +1,12 @@
-import { Box, Divider } from '@mui/material';
-import styled from '@mui/system/styled';
+import { getVesoftBorder } from '@/utils';
+import { Box, Divider, SxProps, Theme } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
 export const ContentContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  height: calc(100vh - 180px);
+  height: calc(100vh - 240px);
 `;
 
 export const ActionContainer = styled(Box)`
@@ -22,9 +23,28 @@ export const MainContainer = styled(Box)`
   margin-bottom: ${FooterHeight + 30}px;
   margin-top: 20px;
   min-height: 660px;
+`;
+
+export const CreateGraphContainer = styled(Box)`
+  position: relative;
+  width: 100%;
+  flex: 1;
   padding: ${({ theme }) => theme.spacing(2)};
+  height: 100%;
+  border: ${({ theme }) => `1px solid ${theme.palette.vesoft.bgColor11}`};
   background-color: ${({ theme }) => theme.palette.vesoft.bgColor};
-  /* height: calc(100% - ${FooterHeight}px); */
+`;
+
+export const StepContainer = styled(Box)`
+  width: 100%;
+  height: 100%;
+`;
+
+export const TableContainer = styled(Box)`
+  width: 100%;
+  flex: 1;
+  padding: ${({ theme }) => theme.spacing(2)};
+  height: 100%;
 `;
 
 export const FooterContainer = styled(Box)`
@@ -72,4 +92,22 @@ export const PropertyHeaderDivider = styled(Divider)`
   background-color: ${({ theme }) => theme.palette.vesoft.bgColor2};
   height: 50%;
   margin-top: 25%;
+`;
+
+export const schemaTextSx: SxProps<Theme> = {
+  color: (theme) => theme.palette.vesoft?.textColor1,
+  fontWeight: 600,
+  fontSize: '16px',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+};
+
+export const EditorWrapper = styled(Box)`
+  border: ${getVesoftBorder};
+  position: relative;
+  border-radius: ${({ theme }) => theme.shape.borderRadius}px;
+  height: 220px;
+  resize: vertical;
+  overflow: hidden;
 `;

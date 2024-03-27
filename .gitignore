@@ -27,3 +27,4 @@ server*/api/*/data
 server*/api/*/assets/*
 !server*/api/*/assets/.gitkeep
 bin/
+server-v5/api/studio/__debug_bin*

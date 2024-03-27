@@ -33,7 +33,7 @@
     "@vesoft-inc/icons": "^2.0.1",
     "@vesoft-inc/nebula-explain-graph": "5.0.0-beta.3",
     "@vesoft-inc/ui-components": "0.0.3-beta.29",
-    "@vesoft-inc/utils": "0.0.0-beta.13",
+    "@vesoft-inc/utils": "0.0.0-beta.14",
     "@vesoft-inc/veditor": "^4.4.14",
     "bezier-js": "^6.1.4",
     "dayjs": "^1.11.10",

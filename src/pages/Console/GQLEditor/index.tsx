@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useEffect, useRef } from 'react';
+import { Suspense, useCallback, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useTheme } from '@emotion/react';
 import { KeyMod, KeyCode, Range, type languages, IDisposable } from '@/components/MonacoEditor/monaco';
@@ -8,10 +8,8 @@ import { useStore } from '@/stores';
 import type { MonacoEditorProps } from '@/components/MonacoEditor';
 import { GQL_LANG_ID as langId } from '@/utils/constant/editor';
 import { GQL_KEYWORDS, GQL_PROCEDURES } from '@/utils/constant/nebula';
+import { highlightKeywords, LazyMonacoEditor } from '@/components/GQLEditorLite';
 import { StyledChip } from './styles';
-
-const MonacoEditor = lazy(() => import('@/components/MonacoEditor'));
-const keywords = [...GQL_KEYWORDS, ...GQL_KEYWORDS.map((k) => k.toLowerCase()), ...GQL_PROCEDURES];
 
 export default observer(function GQLEditor() {
   const theme = useTheme();
@@ -52,13 +50,13 @@ export default observer(function GQLEditor() {
         ],
       });
     }
-    const highlightProvider = monaco?.languages.setMonarchTokensProvider(langId, {
-      keywords,
+    const highlightDisposer = monaco?.languages.setMonarchTokensProvider(langId, {
+      keywords: highlightKeywords,
       tokenizer: {
         root: [[/[a-zA-Z_$][\w$]*/i, { cases: { '@keywords': { token: 'keyword' } } }]],
       },
     });
-    const keywordProvider = monaco?.languages.registerCompletionItemProvider(langId, {
+    const keywordDisposer = monaco?.languages.registerCompletionItemProvider(langId, {
       provideCompletionItems: (model, position) => {
         const wordInfo = model.getWordUntilPosition(position);
         const wordRange = new Range(position.lineNumber, wordInfo.startColumn, position.lineNumber, wordInfo.endColumn);
@@ -82,7 +80,7 @@ export default observer(function GQLEditor() {
         return { suggestions: [...keywordSuggestions, ...procedureSuggestions] };
       },
     });
-    const inlineSuggestionProvider = monaco?.languages.registerInlineCompletionsProvider(langId, {
+    const inlineSuggestionDisposer = monaco?.languages.registerInlineCompletionsProvider(langId, {
       async provideInlineCompletions(model, position, _context, _token) {
         const lineContent = model.getLineContent(position.lineNumber);
         if (/use$/i.test(lineContent)) {
@@ -96,9 +94,9 @@ export default observer(function GQLEditor() {
       freeInlineCompletions() {},
     });
     disposeRef.current.push(
-      { name: 'highlightProvider', disposer: highlightProvider! },
-      { name: 'keywordProvider', disposer: keywordProvider! },
-      { name: 'inlineSuggestionProvider', disposer: inlineSuggestionProvider! }
+      { name: 'highlightDisposer', disposer: highlightDisposer! },
+      { name: 'keywordDisposer', disposer: keywordDisposer! },
+      { name: 'inlineSuggestionDisposer', disposer: inlineSuggestionDisposer! }
     );
     rootStore?.consoleStore?.setEditorRef(editor);
   }, []);
@@ -152,7 +150,7 @@ export default observer(function GQLEditor() {
   const { editorValue, updateEditorValue } = consoleStore;
   return (
     <Suspense>
-      <MonacoEditor
+      <LazyMonacoEditor
         language={langId}
         themeMode={theme.palette.mode}
         value={editorValue}

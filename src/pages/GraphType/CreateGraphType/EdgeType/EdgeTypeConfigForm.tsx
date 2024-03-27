@@ -25,7 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { TransitionGroup } from 'react-transition-group';
 
 import { TypeInfoContainer, PropertyBodyCell, PropertyHeaderCell } from '@/pages/GraphType/CreateGraphType/styles';
-import { IEdgeTypeItem, IProperty } from '@/interfaces';
+import { IEdgeTypeItem, INodeTypeItem, IProperty } from '@/interfaces';
 import { PropertyDataType } from '@/utils/constant';
 import { CloseFilled, AddFilled } from '@vesoft-inc/icons';
 import { getDuplicateValues } from '@/utils';
@@ -97,25 +97,43 @@ function EdgeTypeConfigForm(props: EdgeTypeConfigFormProps) {
             </Grid>
             <Grid item xs={6} md={12}>
               <Grid container columnSpacing={2}>
-                <Grid item md={6}>
+                <Grid item md={4}>
                   <SelectElement
                     size="small"
                     label={t('srcNodeType', { ns: 'graphtype' })}
                     required
                     options={schemaStore?.nodeTypeList || []}
                     labelKey="name"
+                    objectOnChange
+                    onChange={(item: INodeTypeItem) => {
+                      form.setValue('srcNode', item);
+                    }}
                     valueKey="id"
                     name="srcNode"
                     fullWidth
                   />
                 </Grid>
-                <Grid item md={6}>
+                {/* <Grid item md={4}>
+                  <SelectElement
+                    size="small"
+                    label={t('direction', { ns: 'graphtype' })}
+                    options={[t('directed', { ns: 'graphtype' }), t('undirected', { ns: 'graphtype' })]}
+                    required
+                    name={t('direction', { ns: 'graphtype' })}
+                    fullWidth
+                  />
+                </Grid> */}
+                <Grid item md={4}>
                   <SelectElement
                     size="small"
                     label={t('dstNodeType', { ns: 'graphtype' })}
                     options={schemaStore?.nodeTypeList || []}
                     labelKey="name"
                     valueKey="id"
+                    objectOnChange
+                    onChange={(item: INodeTypeItem) => {
+                      form.setValue('dstNode', item);
+                    }}
                     required
                     name="dstNode"
                     fullWidth

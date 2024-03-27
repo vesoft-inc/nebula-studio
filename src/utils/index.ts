@@ -1,4 +1,5 @@
 import { Theme } from '@emotion/react';
+import { v4 as uuid } from 'uuid';
 
 export const safeParse = <T = unknown>(json: string): [T?, Error?] => {
   try {
@@ -37,3 +38,8 @@ export const getLabelColor = (index: number, theme: Theme): [string, string] => 
   ];
   return [colors[index % colors.length], bgColor[index % bgColor.length]];
 };
+
+// veditor's uuid should be a string without '-'
+export const createUuid = (): string => uuid().replaceAll('-', '');
+
+export const getVesoftBorder = ({ theme }: { theme: Theme }) => `${theme.palette.vesoft.textColor6} 1px solid`;

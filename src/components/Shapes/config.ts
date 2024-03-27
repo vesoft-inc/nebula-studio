@@ -2,22 +2,13 @@ import { InstanceLine } from '@vesoft-inc/veditor/types/Shape/Line';
 
 export const NODE_RADIUS = 40;
 
+export const ToolNodeColor = {
+  fill: '#E6E6E6',
+  strokeColor: 'rgba(60, 60, 60, 0.5)',
+  shadow: 'rgba(90, 90, 90, 0.25)',
+};
+
 export const COLOR_LIST = [
-  {
-    fill: '#E6E6E6',
-    strokeColor: 'rgba(60, 60, 60, 0.5)',
-    shadow: 'rgba(90, 90, 90, 0.25)',
-  },
-  {
-    fill: '#E4F1FF',
-    strokeColor: 'rgba(34, 135, 227, 0.5)',
-    shadow: 'rgba(0, 178, 255, 0.25)',
-  },
-  {
-    fill: '#EBE4FF',
-    strokeColor: 'rgba(84, 34, 227, 0.5)',
-    shadow: 'rgba(20, 0, 255, 0.25)',
-  },
   {
     fill: '#FEE4FF',
     strokeColor: 'rgba(227, 34, 196, 0.5)',
@@ -42,6 +33,21 @@ export const COLOR_LIST = [
     fill: '#E4FFF4',
     strokeColor: 'rgba(0, 184, 162, 0.5)',
     shadow: 'rgba(0, 255, 194, 0.25)',
+  },
+  {
+    fill: '#E6E6E6',
+    strokeColor: 'rgba(60, 60, 60, 0.5)',
+    shadow: 'rgba(90, 90, 90, 0.25)',
+  },
+  {
+    fill: '#E4F1FF',
+    strokeColor: 'rgba(34, 135, 227, 0.5)',
+    shadow: 'rgba(0, 178, 255, 0.25)',
+  },
+  {
+    fill: '#EBE4FF',
+    strokeColor: 'rgba(84, 34, 227, 0.5)',
+    shadow: 'rgba(20, 0, 255, 0.25)',
   },
 ];
 

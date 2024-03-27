@@ -1,50 +1,57 @@
-import { Box, Button, Chip, IconButton, Typography } from '@mui/material';
-import { AddFilled, Delete, EditFilled } from '@vesoft-inc/icons';
+import { Box, Button, Chip, IconButton, Stack, Typography } from '@mui/material';
+import { AddFilled, ArrowForwardFilled, Delete, EditFilled } from '@vesoft-inc/icons';
 import { useTranslation } from 'react-i18next';
 import { Table } from '@vesoft-inc/ui-components';
 import { observer } from 'mobx-react-lite';
 import { type MRT_ColumnDef } from 'material-react-table';
 
 import { ActionContainer } from './styles';
-import NodeTypeConfigModal from '../NodeTypeConfigModal';
 import { useModal, useStore } from '@/stores';
-import { INodeTypeItem, IProperty } from '@/interfaces';
-import { useCallback, useMemo } from 'react';
+import { IEdgeTypeItem, IProperty } from '@/interfaces';
+import { useCallback } from 'react';
 import { useTheme } from '@emotion/react';
 import { getLabelColor } from '@/utils';
+import EdgeTypeConfigModal from './EdgeTypeConfigModal';
 
-function NodeTypeTable() {
+interface EdgeTypeTableProps {
+  readonly?: boolean;
+}
+
+function EdgeTypeTable(props: EdgeTypeTableProps) {
+  const { readonly } = props;
   const { schemaStore } = useStore().graphtypeStore;
-  const dataSource = schemaStore?.nodeTypeList || [];
+  const dataSource = schemaStore?.edgeTypeList || [];
   const { t } = useTranslation(['graphtype']);
   const modal = useModal();
 
-  const handleEditNodeType = (nodeType: INodeTypeItem) => () => {
+  const handleEditEdgeType = (edgeType: IEdgeTypeItem) => () => {
     modal.show({
-      title: t('editNodeType', { ns: 'graphtype' }),
-      content: <NodeTypeConfigModal nodeTypeItem={nodeType} />,
+      title: t('editEdgeType', { ns: 'graphtype' }),
+      content: <EdgeTypeConfigModal edgeTypeItem={edgeType} />,
     });
   };
 
-  const handleDeleteNodeType = (nodeType: INodeTypeItem) => () => {
-    schemaStore?.deleteNodeType(nodeType.id);
+  const handleDeleteEdgeType = (edgeType: IEdgeTypeItem) => () => {
+    schemaStore?.deleteEdgeType(edgeType.id);
   };
 
-  const columns = useMemo<MRT_ColumnDef<INodeTypeItem>[]>(
-    () => [
+  const getColumns = useCallback((): MRT_ColumnDef<IEdgeTypeItem>[] => {
+    const columns: MRT_ColumnDef<IEdgeTypeItem>[] = [
       {
         accessorKey: 'name', //access nested data with dot notation
-        header: 'Node Type',
+        header: 'Edge Type Name',
       },
       {
-        accessorKey: 'primaryKeys',
-        header: 'Primary Key',
-        Cell: ({ row }) =>
-          row.original.properties
-            .filter((property) => property.isPrimaryKey)
-            .map((property, index) => (
-              <Chip sx={{ minWidth: 40, '&:not(:first-of-type)': { ml: 1 } }} key={index} label={property.name} />
-            )),
+        header: 'Relation',
+        Cell: ({ row }) => (
+          <Stack direction="row" spacing={2} display="flex" alignItems="center">
+            <Typography>{row.original.srcNode.name}</Typography>
+            <Typography display="flex" alignItems="center">
+              <ArrowForwardFilled />
+            </Typography>
+            <Typography>{row.original.dstNode.name}</Typography>
+          </Stack>
+        ),
       },
       {
         accessorKey: 'labels', //normal accessorKey
@@ -69,21 +76,33 @@ function NodeTypeTable() {
           }),
       },
       {
+        accessorKey: 'primaryKeys',
+        header: 'Primary Key',
+        Cell: ({ row }) =>
+          row.original.properties
+            .filter((property) => property.isPrimaryKey)
+            .map((property, index) => (
+              <Chip sx={{ minWidth: 40, '&:not(:first-of-type)': { ml: 1 } }} key={index} label={property.name} />
+            )),
+      },
+    ];
+    if (!readonly) {
+      columns.push({
         header: 'Operation',
         Cell: ({ row }) => (
           <Box display="flex" alignItems="center">
-            <IconButton size="small" onClick={handleEditNodeType(row.original)}>
+            <IconButton size="small" onClick={handleEditEdgeType(row.original)}>
               <EditFilled />
             </IconButton>
-            <IconButton size="small" onClick={handleDeleteNodeType(row.original)} sx={{ marginLeft: 2 }}>
+            <IconButton size="small" onClick={handleDeleteEdgeType(row.original)} sx={{ marginLeft: 2 }}>
               <Delete />
             </IconButton>
           </Box>
         ),
-      },
-    ],
-    []
-  );
+      });
+    }
+    return columns;
+  }, [readonly]);
 
   const getSubColumns = useCallback(
     (num: number) =>
@@ -106,10 +125,10 @@ function NodeTypeTable() {
     []
   );
 
-  const handleCreateNodeType = () => {
+  const handleCreateEdgeType = () => {
     modal.show({
-      title: t('createNodeType', { ns: 'graphtype' }),
-      content: <NodeTypeConfigModal />,
+      title: t('createEdgeType', { ns: 'graphtype' }),
+      content: <EdgeTypeConfigModal />,
     });
   };
 
@@ -117,14 +136,16 @@ function NodeTypeTable() {
 
   return (
     <>
-      <ActionContainer>
-        <Button onClick={handleCreateNodeType} variant="outlined" startIcon={<AddFilled />}>
-          {t('createNodeType', { ns: 'graphtype' })}
-        </Button>
-      </ActionContainer>
+      {!readonly && (
+        <ActionContainer>
+          <Button onClick={handleCreateEdgeType} variant="outlined" startIcon={<AddFilled />}>
+            {t('createEdgeType', { ns: 'graphtype' })}
+          </Button>
+        </ActionContainer>
+      )}
       <Box mt={2}>
         <Table
-          columns={columns}
+          columns={getColumns()}
           data={dataSource}
           renderDetailPanel={({ row }) => {
             const { properties } = row.original;
@@ -169,4 +190,4 @@ function NodeTypeTable() {
   );
 }
 
-export default observer(NodeTypeTable);
+export default observer(EdgeTypeTable);

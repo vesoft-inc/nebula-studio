@@ -1,22 +1,24 @@
 import initShapes, { initShadowFilter } from '@/components/Shapes/Shapers';
-import { ARROW_STYLE, LINE_STYLE } from '@/components/Shapes/config';
-import { IEdgeTypeItem, INodeTypeItem, IProperty } from '@/interfaces';
+import { ARROW_STYLE, COLOR_LIST, LINE_STYLE } from '@/components/Shapes/config';
+import { IEdgeTypeItem, INodeTypeItem, IProperty, VisualInfo } from '@/interfaces';
 import { RootStore } from '@/stores/index';
 import { PropertyDataType, VisualEditorType } from '@/utils/constant';
 import VEditor, { VEditorOptions } from '@vesoft-inc/veditor';
+import { VEditorLine, VEditorNode } from '@vesoft-inc/veditor/types/Model/Schema';
 import { InstanceLine } from '@vesoft-inc/veditor/types/Shape/Line';
 import { InstanceNode } from '@vesoft-inc/veditor/types/Shape/Node';
+import { AnyMap } from '@vesoft-inc/veditor/types/Utils';
 import { makeAutoObservable, observable } from 'mobx';
 
 type VEditorItem = InstanceNode | InstanceLine;
 
-type UpdatePayload = Partial<{
-  hoveringItem: VEditorItem;
-  activeItem: VEditorItem;
-}>;
+type SchemData = {
+  nodes: VEditorNode[];
+  lines: VEditorLine[];
+};
 
-const mockNodeType = new INodeTypeItem({
-  name: 'nba_type',
+const fromNode = new INodeTypeItem({
+  name: 'from_node',
   properties: [
     new IProperty({
       name: 'id',
@@ -25,6 +27,22 @@ const mockNodeType = new INodeTypeItem({
     }),
     new IProperty({
       name: 'name',
+      type: PropertyDataType.STRING,
+    }),
+  ],
+  labels: ['player', 'team'],
+});
+
+const toNode = new INodeTypeItem({
+  name: 'toNode',
+  properties: [
+    new IProperty({
+      name: 'id11',
+      type: PropertyDataType.INT,
+      isPrimaryKey: true,
+    }),
+    new IProperty({
+      name: 'name11',
       type: PropertyDataType.STRING,
     }),
   ],
@@ -45,8 +63,8 @@ const mockEdgeType = new IEdgeTypeItem({
     }),
   ],
   labels: ['player', 'team'],
-  srcNode: mockNodeType,
-  dstNode: mockNodeType,
+  srcNode: fromNode,
+  dstNode: toNode,
 });
 
 class SchemaStore {
@@ -55,7 +73,7 @@ class SchemaStore {
   editor?: VEditor;
   container?: HTMLDivElement;
   hoveringItem?: VEditorItem;
-  activeItem?: VEditorItem;
+  activeItem?: INodeTypeItem | IEdgeTypeItem;
 
   nodeTypeList: INodeTypeItem[];
   edgeTypeList: IEdgeTypeItem[];
@@ -63,14 +81,14 @@ class SchemaStore {
 
   constructor(rootStore?: RootStore) {
     this.rootStore = rootStore;
-    this.nodeTypeList = [mockNodeType];
+    this.nodeTypeList = [fromNode, toNode];
     this.edgeTypeList = [mockEdgeType];
     this.labelOptions = [];
     makeAutoObservable(this, {
       editor: observable.ref,
       container: observable.ref,
       hoveringItem: observable.ref,
-      activeItem: observable.shallow,
+      activeItem: observable.ref,
       zoomFrame: false,
       nodeTypeList: observable.shallow,
       edgeTypeList: observable.shallow,
@@ -80,6 +98,7 @@ class SchemaStore {
 
   addNodeType = (node: INodeTypeItem) => {
     this.nodeTypeList = this.nodeTypeList.concat(node);
+    this.editor?.graph.node.addNode(this.parseNodeTypeToVNode(node, { ...node.style }));
   };
 
   updateNodeType = (id: string, node: Omit<INodeTypeItem, 'id'>) => {
@@ -107,22 +126,14 @@ class SchemaStore {
   };
 
   deleteNodeType = (id: string) => {
-    const index = this.nodeTypeList.findIndex((node) => node.id === id);
-    if (index !== -1) {
-      this.nodeTypeList.splice(index, 1);
-    }
-    this.nodeTypeList = this.nodeTypeList.slice();
+    this.nodeTypeList = this.nodeTypeList.filter((node) => node.id !== id);
   };
 
   deleteEdgeType = (id: string) => {
-    const index = this.edgeTypeList.findIndex((edge) => edge.id === id);
-    if (index !== -1) {
-      this.edgeTypeList.splice(index, 1);
-    }
-    this.edgeTypeList = this.edgeTypeList.slice();
+    this.edgeTypeList = this.edgeTypeList.filter((edge) => edge.id !== id);
   };
 
-  setActiveItem = (item?: VEditorItem) => {
+  setActiveItem = (item?: INodeTypeItem | IEdgeTypeItem) => {
     this.activeItem = item;
   };
 
@@ -130,22 +141,89 @@ class SchemaStore {
     this.hoveringItem = item;
   };
 
-  initEditor(params: { container: HTMLDivElement; schema?: string; options?: Partial<VEditorOptions> }) {
-    const { container, schema, options } = params;
+  initEditor(params: { container: HTMLDivElement; options?: Partial<VEditorOptions> }) {
+    const { container, options } = params;
     this.editor = new VEditor({
       dom: container,
       showBackGrid: false,
-      disableCopy: true,
       ...options,
     });
     this.container = container;
     initShapes(this.editor, this.rootStore!.themeStore.theme);
     initShadowFilter(this.editor);
-    if (schema) {
-      // todo set schema
-    }
     this.initEvents(options?.mode);
+    this.initGraphData();
   }
+
+  updateEditor() {
+    if (!this.editor || !this.container) return;
+    const schemaData: SchemData = this.editor.schema.getData();
+    this.updateGraphNodes(schemaData);
+    this.updateGraphLines(schemaData);
+    this.editor?.graph.update();
+  }
+
+  initGraphData() {
+    if (!this.editor || !this.container) return;
+    const schemaData: SchemData = { nodes: [], lines: [] };
+    const controller = this.editor.controller;
+    const rect = this.container.getBoundingClientRect();
+    this.nodeTypeList.forEach((item, index) => {
+      const style = COLOR_LIST[index % COLOR_LIST.length];
+      const x = (rect.x - controller.x + index * 200) / controller.scale - 25 * controller.scale;
+      const y = (rect.y - controller.y) / controller.scale - 25 * controller.scale;
+      schemaData.nodes.push(this.parseNodeTypeToVNode(item, { x, y, ...style }));
+    });
+    this.edgeTypeList.forEach((item) => {
+      schemaData.lines.push(this.parseEdgeTypeToVLine(item));
+    });
+    this.editor.schema.setInitData(schemaData);
+  }
+
+  private updateGraphNodes = (schemaData: SchemData) => {
+    if (!this.editor || !this.container) return;
+    this.nodeTypeList.forEach((item) => {
+      const existNode = schemaData.nodes.find((n) => n.data?.id === item.id);
+      if (existNode) {
+        existNode.data = item as unknown as AnyMap;
+      }
+    });
+  };
+
+  private parseNodeTypeToVNode = (node: INodeTypeItem, style: VisualInfo = {}): VEditorNode => {
+    return {
+      uuid: node.id,
+      type: VisualEditorType.Tag,
+      name: node.name,
+      data: node as unknown as AnyMap,
+      ...style,
+    };
+  };
+
+  private parseEdgeTypeToVLine = (edge: IEdgeTypeItem): VEditorLine => {
+    return {
+      uuid: edge.id,
+      type: VisualEditorType.Edge,
+      from: edge.srcNode?.id,
+      to: edge.dstNode?.id,
+      name: edge.name,
+      data: edge as unknown as AnyMap,
+      fromPoint: 0,
+      toPoint: 0,
+    };
+  };
+
+  private updateGraphLines = (schemaData: SchemData) => {
+    if (!this.editor || !this.container) return;
+    this.edgeTypeList.forEach((item) => {
+      const existLine = schemaData.lines.find((n) => n.data?.id === item.id);
+      if (existLine) {
+        existLine.data = item as unknown as AnyMap;
+        existLine.from = item.srcNode?.id;
+        existLine.to = item.dstNode?.id;
+      }
+    });
+  };
 
   zoomIn = () => {
     if (!this.editor) return;
@@ -182,56 +260,53 @@ class SchemaStore {
     if (!this.editor) return;
     if (mode === 'edit') {
       this.editor.graph.on('node:click', ({ node }: { node: InstanceNode }) => {
-        this.setActiveItem(node);
+        this.setActiveItem(node.data.data as unknown as INodeTypeItem);
+      });
+      this.editor.graph.on('node:remove', ({ node }: { node: InstanceNode }) => {
+        const item = node.data.data as unknown as INodeTypeItem;
+        this.deleteNodeType(item.id);
       });
       this.editor.graph.on('line:click', ({ line }: { line: InstanceLine }) => {
-        this.setActiveItem(line);
+        this.setActiveItem(line.data.data as unknown as IEdgeTypeItem);
+      });
+      this.editor.graph.on('line:remove', ({ line }: { line: InstanceLine }) => {
+        const item = line.data.data as unknown as IEdgeTypeItem;
+        this.deleteNodeType(item.id);
       });
       this.editor.graph.on('line:add', ({ line }: { line: InstanceLine }) => {
         if (!this.editor) return;
-        this.editor.graph.line.update();
-        this.setActiveItem(line);
-        this.clearActive();
-        this.editor.graph.line.setActiveLine(line);
+        const fromNode = this.nodeTypeList.find((node) => node.id === line.from.nodeId);
+        const toNode = this.nodeTypeList.find((node) => node.id === line.to.nodeId);
+        if (fromNode && toNode) {
+          const edgeItem = new IEdgeTypeItem({
+            srcNode: fromNode,
+            dstNode: toNode,
+          });
+          line.data.data = edgeItem as unknown as AnyMap;
+          this.addEdgeType(edgeItem);
+          this.setActiveItem(edgeItem);
+        }
+        // this.editor.graph.line.setActiveLine(line);
       });
+
       this.editor.graph.on('paper:click', () => {
-        this.setActiveItem(undefined);
+        this.clearActive();
       });
-      this.editor.graph.on('line:beforeadd', ({ line }: { line: InstanceLine }) => {
+      this.editor.graph.on('line:beforeadd', (line: InstanceLine) => {
         if (!this.editor) return;
-        // const data = this.editor.schema.getData();
-        // makeLineSort([...data.lines, line]);
-        line.type = VisualEditorType.Edge;
-        line.style = LINE_STYLE;
-        line.arrowStyle = ARROW_STYLE;
-      });
-      this.editor.graph.on('node:remove', ({ node }: { node: InstanceNode }) => {
-        const param: UpdatePayload = { activeItem: undefined };
-        if (this.hoveringItem?.data.uuid === node.data.uuid) {
-          param.hoveringItem = undefined;
-        }
-        this.setActiveItem(param.activeItem);
-        this.setHoveringItem(param.hoveringItem!);
-        // this.validateSameNameData();
-      });
-      this.editor.graph.on('line:remove', ({ line }: { line: InstanceLine }) => {
-        if (!this.editor) return;
-        // const data = this.editor.schema.getData();
-        // makeLineSort(data.lines);
-        this.editor.graph.line.update();
-        const param: UpdatePayload = { activeItem: undefined };
-        if (this.hoveringItem?.data.uuid === line.data.uuid) {
-          param.hoveringItem = undefined;
-        }
-        this.setActiveItem(param.activeItem);
-        this.setHoveringItem(param.hoveringItem!);
-        // this.validateSameNameData();
+        line.data.type = VisualEditorType.Edge;
+        line.data.style = LINE_STYLE;
+        line.data.arrowStyle = ARROW_STYLE;
+        line.data.data = {
+          name: '',
+        };
       });
     }
   };
 
   clearActive = () => {
     if (!this.editor) return;
+    this.setActiveItem(undefined);
     this.editor.graph.node.unActive();
     this.editor.graph.line.unActiveLine();
   };

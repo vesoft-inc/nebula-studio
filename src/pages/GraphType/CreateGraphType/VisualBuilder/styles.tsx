@@ -36,12 +36,16 @@ export const TagListContainer = styled(Box)`
 `;
 
 export const TagItem = styled(Box)`
-  width: 40px;
-  height: 40px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  border: 3px solid slategray;
+  border: 2px dashed slategray;
   padding: 0 2px;
   user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.palette.vesoft.textColor3};
   cursor: move;
   &:not(:last-child) {
     margin-bottom: 15px;

@@ -43,13 +43,13 @@ dependencies:
     version: 2.0.1(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/nebula-explain-graph':
     specifier: 5.0.0-beta.3
-    version: 5.0.0-beta.3(@vesoft-inc/veditor@4.4.14)(antd@5.15.3)(color@4.2.3)(copy-to-clipboard@3.3.3)(gl-matrix@3.4.3)(react-dom@18.2.0)(react@18.2.0)
+    version: 5.0.0-beta.3(@vesoft-inc/veditor@4.4.14)(antd@5.15.4)(color@4.2.3)(copy-to-clipboard@3.3.3)(gl-matrix@3.4.3)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/ui-components':
     specifier: 0.0.3-beta.29
     version: 0.0.3-beta.29(@mui/system@5.15.9)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
   '@vesoft-inc/utils':
-    specifier: 0.0.0-beta.13
-    version: 0.0.0-beta.13(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)
+    specifier: 0.0.0-beta.14
+    version: 0.0.0-beta.14(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)
   '@vesoft-inc/veditor':
     specifier: ^4.4.14
     version: 4.4.14(webpack@5.91.0)
@@ -212,8 +212,8 @@ packages:
       '@ctrl/tinycolor': 3.6.1
     dev: false
 
-  /@ant-design/cssinjs@1.18.4(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-IrUAOj5TYuMG556C9gdbFuOrigyhzhU5ZYpWb3gYTxAwymVqRbvLzFCZg6OsjLBR6GhzcxYF3AhxKmjB+rA2xA==}
+  /@ant-design/cssinjs@1.18.5(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-Ub4n3d+MAX/qtE5S9PM8iOn5ocU7GUAIC4Adc2X8UCMXnsRRfpJBHsBdtQ1qoAuaQ7lU2M1BTCuJ+fkv4fOWiw==}
     peerDependencies:
       react: '>=16.0.0'
       react-dom: '>=16.0.0'
@@ -233,8 +233,8 @@ packages:
     resolution: {integrity: sha512-vHbT+zJEVzllwP+CM+ul7reTEfBR0vgxFe7+lREAsAA7YGsYpboiq2sQNeQeRvh09GfQgs/GyFEvZpJ9cLXpXA==}
     dev: false
 
-  /@ant-design/icons@5.3.4(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-U5eTSeSFr2V9SeJzYOo5mybAZfsoNuiIA8bvFoZUe+h9LBLs8UwrVaVwcMQC4AhBuojXkLMlmtnIlvUczXXHaQ==}
+  /@ant-design/icons@5.3.5(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-Vyv/OsKz56BsKBtcRlLP6G8RGaRW43f7G5dK3XNPCaeV4YyehLVaITuNKi2YJG9hMVURkBdzdGhveNQlnKTFqw==}
     engines: {node: '>=8'}
     peerDependencies:
       react: '>=16.0.0'
@@ -2242,6 +2242,24 @@ packages:
       react-is: 18.2.0
     dev: false
 
+  /@mui/utils@5.15.14(@types/react@18.2.51)(react@18.2.0):
+    resolution: {integrity: sha512-0lF/7Hh/ezDv5X7Pry6enMsbYyGKjADzvHyo3Qrc/SSlTsQ1VkbDMbH0m2t3OR5iIVLwMoxwM7yGd+6FCMtTFA==}
+    engines: {node: '>=12.0.0'}
+    peerDependencies:
+      '@types/react': ^17.0.0 || ^18.0.0
+      react: ^17.0.0 || ^18.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.24.1
+      '@types/prop-types': 15.7.12
+      '@types/react': 18.2.51
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-is: 18.2.0
+    dev: false
+
   /@mui/utils@5.15.7(@types/react@18.2.51)(react@18.2.0):
     resolution: {integrity: sha512-8qhsxQRNV6aEOjjSk6YQIYJxkF5klhj8oG1FEEU4z6HV78TjNqRxMP08QGcdsibEbez+nihAaz6vu83b4XqbAg==}
     engines: {node: '>=12.0.0'}
@@ -2787,6 +2805,10 @@ packages:
   /@types/prop-types@15.7.11:
     resolution: {integrity: sha512-ga8y9v9uyeiLdpKddhxYQkxNDrfvuPrlFb0N1qnZZByvcElJaXthF1UhvCh9TLWJBEHeNtdnbysW7Y6Uq8CVng==}
 
+  /@types/prop-types@15.7.12:
+    resolution: {integrity: sha512-5zvhXYtRNRluoE/jAp4GVsSduVUzNWKkOZrCDBWYtE7biZywwdC2AcEzg+cSMLFRfVgeAFqpfNabiPjxFddV1Q==}
+    dev: false
+
   /@types/raf@3.4.3:
     resolution: {integrity: sha512-c4YAvMedbPZ5tEyxzQdMoOhhJ4RD3rngZIdwC2/qDN3d7JpEhB6fiBRKVY1lg5B7Wk+uPBjn5f39j1/2MY1oOw==}
     dev: false
@@ -2972,7 +2994,7 @@ packages:
       - '@types/react'
     dev: false
 
-  /@vesoft-inc/nebula-explain-graph@5.0.0-beta.3(@vesoft-inc/veditor@4.4.14)(antd@5.15.3)(color@4.2.3)(copy-to-clipboard@3.3.3)(gl-matrix@3.4.3)(react-dom@18.2.0)(react@18.2.0):
+  /@vesoft-inc/nebula-explain-graph@5.0.0-beta.3(@vesoft-inc/veditor@4.4.14)(antd@5.15.4)(color@4.2.3)(copy-to-clipboard@3.3.3)(gl-matrix@3.4.3)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-+adgahuhdJPPb/m7R26kGSP9+DqQt26fAKurCh1jU6NvDwhCMy/v3HXGFwyeRVxsFEDISMVDflU/gxNWMtOz8w==}
     peerDependencies:
       '@vesoft-inc/veditor': ^4.4.13
@@ -2984,7 +3006,7 @@ packages:
       react-dom: ^17||^18
     dependencies:
       '@vesoft-inc/veditor': 4.4.14(webpack@5.91.0)
-      antd: 5.15.3(react-dom@18.2.0)(react@18.2.0)
+      antd: 5.15.4(react-dom@18.2.0)(react@18.2.0)
       color: 4.2.3
       copy-to-clipboard: 3.3.3
       gl-matrix: 3.4.3
@@ -3050,13 +3072,13 @@ packages:
       - react-dom
     dev: false
 
-  /@vesoft-inc/utils@0.0.0-beta.13(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0):
-    resolution: {integrity: sha512-jE5G+5s8k2zFqL8LtR/O542jXXF4JCnsm5Dg4/jshw7KJxntjhZee84/UMKkwGXQluKkhXMQKoGOUIFH+LPmYg==}
+  /@vesoft-inc/utils@0.0.0-beta.14(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0):
+    resolution: {integrity: sha512-SsNyUpueYxkgNC838gNLjJYRf9GQSzP3GBx4a/nruWucryInG3FwRC5gFfdnq7DqrqeAwl7ycDOAJ2RahZ3PhA==}
     dependencies:
       '@babel/runtime': 7.24.1
       '@emotion/react': 11.11.3(@types/react@18.2.51)(react@18.2.0)
       '@mui/material': 5.15.7(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
-      '@mui/utils': 5.15.13(@types/react@18.2.51)(react@18.2.0)
+      '@mui/utils': 5.15.14(@types/react@18.2.51)(react@18.2.0)
       '@remix-run/router': 1.15.0
       axios: 1.6.8
       core-js: 3.36.1
@@ -3303,15 +3325,15 @@ packages:
     engines: {node: '>=12'}
     dev: true
 
-  /antd@5.15.3(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-53dpdGbfwipHVbqITmppp8N16i+BscMzz8NUNwaJgxwSvO9VQh/NfC/90lqGq3I2oBmxQ8TzRIxzFVKD/9OhlQ==}
+  /antd@5.15.4(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-79eLOQW1DG92yzulx+ValfHFjvPnaaI41BffGquAnzx42Ws3eEcKofsa2jNRyJN5NWr9I5wqvABDq9rRRfGGsg==}
     peerDependencies:
       react: '>=16.9.0'
       react-dom: '>=16.9.0'
     dependencies:
       '@ant-design/colors': 7.0.2
-      '@ant-design/cssinjs': 1.18.4(react-dom@18.2.0)(react@18.2.0)
-      '@ant-design/icons': 5.3.4(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/cssinjs': 1.18.5(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.5(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/react-slick': 1.0.2(react@18.2.0)
       '@babel/runtime': 7.24.1
       '@ctrl/tinycolor': 3.6.1
@@ -3757,8 +3779,8 @@ packages:
     dependencies:
       is-arrayish: 0.2.1
 
-  /es-module-lexer@1.4.2:
-    resolution: {integrity: sha512-7nOqkomXZEaxUDJw21XZNtRk739QvrPSoZoRtbsEfcii00vdzZUh6zh1CQwHhrib8MdEtJfv5rJiGeb4KuV/vw==}
+  /es-module-lexer@1.5.0:
+    resolution: {integrity: sha512-pqrTKmwEIgafsYZAGw9kszYzmagcE/n4dbgwGWLEXg7J4QFJVQRBld8j3Q3GNez79jzxZshq0bcT962QHOghjw==}
     dev: false
 
   /esbuild@0.19.12:
@@ -6007,7 +6029,7 @@ packages:
       browserslist: 4.23.0
       chrome-trace-event: 1.0.3
       enhanced-resolve: 5.16.0
-      es-module-lexer: 1.4.2
+      es-module-lexer: 1.5.0
       eslint-scope: 5.1.1
       events: 3.3.0
       glob-to-regexp: 0.4.1

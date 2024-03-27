@@ -1,15 +1,13 @@
 import { styled } from '@mui/material/styles';
 import Box, { BoxProps } from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import type { Theme } from '@emotion/react';
-
-const getVesoftBorderColor = ({ theme }: { theme: Theme }) => theme.palette.vesoft.textColor6;
+import { getVesoftBorder } from '@/utils';
 
 export const OutputContainer = styled(Box)`
   margin-top: ${({ theme }) => theme.spacing(2)};
   background-color: ${({ theme }) => theme.palette.vesoft.bgColor};
-  border-top: 1px solid ${getVesoftBorderColor};
-  border-bottom: 1px solid ${getVesoftBorderColor};
+  border-top: ${getVesoftBorder};
+  border-bottom: ${getVesoftBorder};
   color: ${({ theme }) => theme.palette.vesoft.textColor1};
 `;
 
@@ -58,8 +56,8 @@ export const StyledIconButton = styled(IconButton)`
 
 export const OutputContent = styled(Box)`
   height: 300px;
-  border-top: 1px solid ${getVesoftBorderColor};
-  border-bottom: 1px solid ${getVesoftBorderColor};
+  border-top: ${getVesoftBorder};
+  border-bottom: ${getVesoftBorder};
   display: flex;
 `;
 
@@ -69,6 +67,6 @@ export const ContentSider = styled(Box)`
 
 export const ContentMain = styled(Box)`
   flex: 1;
-  border-left: 1px solid ${getVesoftBorderColor};
+  border-left: ${getVesoftBorder};
   overflow: hidden;
 `;

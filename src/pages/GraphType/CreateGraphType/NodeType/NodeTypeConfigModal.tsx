@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form-mui';
 
 import { useModal, useStore } from '@/stores';
 import { INodeTypeItem } from '@/interfaces';
-import NodeTypeConfigForm from '../NodeTypeConfigForm';
+import NodeTypeConfigForm from './NodeTypeConfigForm';
 
 interface NodeTypeModalProps {
   nodeTypeItem?: INodeTypeItem;

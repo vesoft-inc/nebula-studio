@@ -1,10 +1,11 @@
-import { v4 as uuid } from 'uuid';
+import { createUuid } from '@/utils';
 import { PropertyDataType, VisualEditorType } from '@/utils/constant';
 // import { SystemStyleObject } from '@mui/system';
 // import { InstanceLine } from '@vesoft-inc/veditor/types/Shape/Line';
 // import { InstanceNodePoint } from '@vesoft-inc/veditor/types/Shape/Node';
 
-const idSymbol = Symbol('id');
+export const idSymbol = Symbol('id');
+const styleSymbol = Symbol('style');
 
 export class IProperty {
   name: string;
@@ -16,7 +17,7 @@ export class IProperty {
     this.name = params?.name || '';
     this.type = params?.type || PropertyDataType.STRING;
     this.isPrimaryKey = params?.isPrimaryKey;
-    this[idSymbol] = uuid();
+    this[idSymbol] = createUuid();
   }
 
   get id() {
@@ -25,12 +26,14 @@ export class IProperty {
 }
 
 export class INodeTypeItem {
-  [idSymbol]: string;
+  private [idSymbol]: string;
+  private [styleSymbol]?: VisualInfo;
   name: string;
   properties: IProperty[] = [];
   labels: string[] = [];
-  constructor(params?: Omit<INodeTypeItem, typeof idSymbol | 'id' | 'updateValues'>) {
-    this[idSymbol] = uuid();
+
+  constructor(params?: Partial<Pick<INodeTypeItem, 'name' | 'properties' | 'labels'>>) {
+    this[idSymbol] = createUuid();
     this.name = params?.name || '';
     this.properties = params?.properties || [];
     this.labels = params?.labels || [];
@@ -38,6 +41,14 @@ export class INodeTypeItem {
 
   get id() {
     return this[idSymbol];
+  }
+
+  set style(info: VisualInfo) {
+    this[styleSymbol] = info;
+  }
+
+  get style(): VisualInfo | undefined {
+    return this[styleSymbol];
   }
 
   updateValues(values: Omit<INodeTypeItem, typeof idSymbol | 'id'>) {
@@ -49,17 +60,18 @@ export class INodeTypeItem {
 }
 
 export class IEdgeTypeItem {
-  [idSymbol]: string;
+  private [idSymbol]: string;
+  private [styleSymbol]?: VisualInfo;
   name: string;
   properties: IProperty[] = [];
   labels: string[] = [];
   srcNode: INodeTypeItem;
   dstNode: INodeTypeItem;
-  constructor(params: Omit<IEdgeTypeItem, typeof idSymbol | 'id' | 'updateValues'>) {
-    this[idSymbol] = uuid();
-    this.name = params.name || '';
-    this.srcNode = params.srcNode;
-    this.dstNode = params.dstNode;
+  constructor(params?: Partial<Pick<IEdgeTypeItem, 'name' | 'properties' | 'labels' | 'srcNode' | 'dstNode'>>) {
+    this[idSymbol] = createUuid();
+    this.name = params?.name || '';
+    this.srcNode = params?.srcNode || new INodeTypeItem();
+    this.dstNode = params?.dstNode || new INodeTypeItem();
     this.properties = params?.properties || [];
     this.labels = params?.labels || [];
   }
@@ -76,6 +88,44 @@ export class IEdgeTypeItem {
     this.srcNode = srcNode;
     this.dstNode = dstNode;
   }
+
+  set style(info: VisualInfo) {
+    this[styleSymbol] = info;
+  }
+
+  get style(): VisualInfo | undefined {
+    return this[styleSymbol];
+  }
+}
+
+export class IIndexTypeItem {
+  name: string;
+  forTarget: INodeTypeItem | IEdgeTypeItem;
+  on: Array<IProperty & { order: 'acs' | 'desc' }>;
+  ifNotExits: boolean;
+
+  constructor(params: Omit<IIndexTypeItem, typeof idSymbol | 'id' | 'updateValues'>) {
+    this.name = params.name;
+    this.forTarget = params.forTarget;
+    this.on = params.on;
+    this.ifNotExits = params.ifNotExits;
+  }
+
+  updateValues = (values: Omit<IIndexTypeItem, typeof idSymbol | 'id'>) => {
+    const { name, forTarget, on, ifNotExits } = values;
+    this.name = name;
+    this.forTarget = forTarget;
+    this.on = on;
+    this.ifNotExits = ifNotExits;
+  };
+}
+
+export interface VisualInfo {
+  fill?: string;
+  strokeColor?: string;
+  shadow?: string;
+  x?: number;
+  y?: number;
 }
 
 export interface VisualNodeCustomizeInfo {
@@ -85,7 +135,6 @@ export interface VisualNodeCustomizeInfo {
   type?: VisualEditorType.Tag;
   name?: string;
   comment?: string;
-  properties?: IProperty[];
   invalid?: false;
 }
 

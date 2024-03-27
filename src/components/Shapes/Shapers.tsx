@@ -3,7 +3,6 @@ import { InstanceNode } from '@vesoft-inc/veditor/types/Shape/Node';
 import { Box, Theme } from '@mui/material';
 import { createRoot } from 'react-dom/client';
 import { NODE_RADIUS } from './config';
-import { flushSync } from 'react-dom';
 import Path from './Path';
 import { ActiveNodeCicle, LabelContainer } from './styles';
 export default function initShapes(editor: VEditor, theme: Theme) {
@@ -26,58 +25,56 @@ export default function initShapes(editor: VEditor, theme: Theme) {
       // @ts-ignore
       // keep the root, avoid `react createroot multiple times` warning
       node.shape.__reactRoot = root;
-      flushSync(() => {
-        root.render(
-          <>
-            {!data.hideActive && <ActiveNodeCicle r={NODE_RADIUS + 8} cx={NODE_RADIUS} cy={NODE_RADIUS} />}
-            <circle
-              className="svg-item"
-              r={NODE_RADIUS - 1}
-              cx={NODE_RADIUS}
-              cy={NODE_RADIUS}
-              strokeDasharray={data.strokeDasharray as string}
-              style={{
-                strokeWidth: 3,
-                fill: data.fill as string,
-                stroke: data.strokeColor as string,
-              }}
-            >
-              <animate
-                attributeName="r"
-                from={24}
-                to={NODE_RADIUS - 1}
-                dur="0.2s"
-                begin="DOMNodeInsertedIntoDocument"
-                fill="freeze"
-              />
-            </circle>
+      root.render(
+        <>
+          {!data.hideActive && <ActiveNodeCicle r={NODE_RADIUS + 8} cx={NODE_RADIUS} cy={NODE_RADIUS} />}
+          <circle
+            className="svg-item"
+            r={NODE_RADIUS - 1}
+            cx={NODE_RADIUS}
+            cy={NODE_RADIUS}
+            strokeDasharray={data.strokeDasharray as string}
+            style={{
+              strokeWidth: 3,
+              fill: data.fill as string,
+              stroke: data.strokeColor as string,
+            }}
+          >
+            {/* <animate
+              attributeName="r"
+              from={24}
+              to={NODE_RADIUS - 1}
+              dur="0.2s"
+              begin="DOMNodeInsertedIntoDocument"
+              fill="freeze"
+            /> */}
+          </circle>
 
-            {data.name ? (
-              <foreignObject x={0} y={0} width={NODE_RADIUS * 2} height={NODE_RADIUS * 2}>
-                <LabelContainer>
-                  <Box component="span">{data.name}</Box>
-                </LabelContainer>
-              </foreignObject>
-            ) : null}
-            {data.invalid && (
-              <>
-                <circle cx={NODE_RADIUS * 2 - 10} cy={10} r={12} fill={theme.palette.vesoft.status3} />
-                <text
-                  style={{ userSelect: 'none' }}
-                  x={NODE_RADIUS * 2 - 10}
-                  y={10}
-                  textAnchor="middle"
-                  fontSize={16}
-                  fill={theme.palette.vesoft.bgColor}
-                  dy=".3em"
-                >
-                  !
-                </text>
-              </>
-            )}
-          </>
-        );
-      });
+          {data.data?.name ? (
+            <foreignObject x={0} y={0} width={NODE_RADIUS * 2} height={NODE_RADIUS * 2}>
+              <LabelContainer>
+                <Box component="span">{data.data?.name as string}</Box>
+              </LabelContainer>
+            </foreignObject>
+          ) : null}
+          {data.invalid && (
+            <>
+              <circle cx={NODE_RADIUS * 2 - 10} cy={10} r={12} fill={theme.palette.vesoft.status3} />
+              <text
+                style={{ userSelect: 'none' }}
+                x={NODE_RADIUS * 2 - 10}
+                y={10}
+                textAnchor="middle"
+                fontSize={16}
+                fill={theme.palette.vesoft.bgColor}
+                dy=".3em"
+              >
+                !
+              </text>
+            </>
+          )}
+        </>
+      );
       return node.shape;
     },
   };

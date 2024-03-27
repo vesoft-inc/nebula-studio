@@ -146,8 +146,8 @@ function NodeTypeConfigForm(props: NodeTypeConfigFormProps) {
           </Stack>
           <List>
             <TransitionGroup>
-              {properties.map((property, index) => (
-                <Collapse key={property.id} sx={{ mb: 2.5 }}>
+              {properties?.map((property, index) => (
+                <Collapse key={property.id}>
                   <Stack direction="row" sx={{ mt: 1 }}>
                     <PropertyBodyCell>
                       <TextFieldElement

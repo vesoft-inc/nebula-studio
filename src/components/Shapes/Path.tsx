@@ -157,7 +157,8 @@ const Path: LineRender = {
     return path;
   },
   renderLabel(line?: InstanceLine): SVGGElement {
-    const { name, invalid, textBackgroundColor } = line!.data;
+    const { invalid, textBackgroundColor } = line!.data;
+    const name = line!.data.data.name;
     if (!name) {
       if (line.label) {
         line.label.labelGroup.remove();
@@ -192,6 +193,7 @@ const Path: LineRender = {
       // @ts-ignore
       // keep the root, avoid `react createroot multiple times` warning
       line.label.labelGroup.__reactRoot = root;
+
       root.render(
         <>
           <foreignObject

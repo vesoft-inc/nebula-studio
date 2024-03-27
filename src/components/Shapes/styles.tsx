@@ -40,7 +40,6 @@ export const EdgeLabelContainer = styled(Box)`
     white-space: nowrap;
     user-select: none;
     padding: 0 3px;
-    background-color: ${({ theme }) => theme.palette.vesoft.bgColor};
   }
 `;
 

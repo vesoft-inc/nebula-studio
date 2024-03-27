@@ -1,11 +1,9 @@
-import type { Theme } from '@emotion/react';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { getVesoftPaletteColor } from '@vesoft-inc/utils';
-
-const getVesoftBorder = ({ theme }: { theme: Theme }) => `${theme.palette.vesoft.textColor6} 1px solid`;
+import { getVesoftBorder } from '@/utils';
 
 export const StyledSider = styled(Box)`
   flex: 0;

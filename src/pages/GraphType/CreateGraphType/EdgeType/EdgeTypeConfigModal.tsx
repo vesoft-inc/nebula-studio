@@ -1,7 +1,7 @@
 import { DialogContent } from '@mui/material';
 import { ModalFooter } from '@vesoft-inc/ui-components';
 import { useTranslation } from 'react-i18next';
-import EdgeTypeConfigForm from '../EdgeTypeConfigForm';
+import EdgeTypeConfigForm from './EdgeTypeConfigForm';
 import { useModal, useStore } from '@/stores';
 import { useForm } from 'react-hook-form-mui';
 import { IEdgeTypeItem } from '@/interfaces';

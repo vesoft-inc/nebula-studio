@@ -33,7 +33,9 @@ export default function Login() {
   const form = useForm<LoginFormData>({ defaultValues: { address: '', username: '', password: '', port: '9669' } });
   const onSubmit = useCallback(async (data: LoginFormData) => {
     const flag = await commonStore.login(data);
-    flag && navigate('/console');
+    const params = new URLSearchParams(location.search);
+    const redirect = params.get('redirect') || '/console';
+    flag && navigate(redirect);
   }, []);
 
   return (

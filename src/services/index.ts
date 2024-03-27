@@ -21,7 +21,7 @@ const fetcher = new FetchService({
     baseURL: '/api-studio',
     transformResponse: [
       (data, header, code) => {
-        if (header['Content-Type'] !== 'application/json') {
+        if (header.get('content-type') !== 'application/json') {
           if (code! >= 200 && code! < 300) {
             return { code: 0, data };
           }
