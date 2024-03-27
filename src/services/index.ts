@@ -1,8 +1,7 @@
 import { FetchService } from '@vesoft-inc/utils';
-import JSONBig from 'json-bigint';
+import { JSONBig } from '@/utils';
 
 let controller = new AbortController();
-const parser = JSONBig({ useNativeBigInt: true }).parse;
 
 export enum HttpResCode {
   ErrBadRequest = 40004000,
@@ -32,7 +31,7 @@ const fetcher = new FetchService({
           return { code, message: data };
         }
         try {
-          return parser(data);
+          return JSONBig.parse(data);
         } catch (e) {
           return { code: HttpResCode.ErrUnknown, message: `${e}`, data };
         }

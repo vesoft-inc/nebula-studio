@@ -1,5 +1,6 @@
 import { Theme } from '@emotion/react';
 import { v4 as uuid } from 'uuid';
+import JSONBigInt from 'json-bigint';
 
 export const safeParse = <T = unknown>(json: string): [T?, Error?] => {
   try {
@@ -43,3 +44,36 @@ export const getLabelColor = (index: number, theme: Theme): [string, string] => 
 export const createUuid = (): string => uuid().replaceAll('-', '');
 
 export const getVesoftBorder = ({ theme }: { theme: Theme }) => `${theme.palette.vesoft.textColor6} 1px solid`;
+
+/**
+ * ```
+ * JSONBig is a JSON parser that can handle bigInt
+ * for GQL result, always use JSONBig to parse and stringify data
+ * ```
+ */
+export const JSONBig = JSONBigInt();
+
+export const transformNebulaResult = (data: unknown, raw?: boolean): unknown => {
+  const isNebulaType = data && typeof data === 'object' && 'raw' in data && 'value' in data;
+  if (isNebulaType) {
+    return raw ? data.raw : transformNebulaResult(data.value);
+  }
+
+  if (isType<Array<unknown>>(data, 'array')) {
+    return data.map((val) => transformNebulaResult(val, raw));
+  }
+
+  if (isType<Object>(data, 'object')) {
+    // for numbers transformed by JSONBig, we need to check if it's a big number
+    if ('_isBigNumber' in data) {
+      return data;
+    }
+    return Object.fromEntries(
+      Object.entries(data).map(([key, val]) => {
+        return [key, transformNebulaResult(val, raw)];
+      })
+    );
+  }
+
+  return data;
+};

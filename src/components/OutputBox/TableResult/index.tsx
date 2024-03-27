@@ -1,6 +1,7 @@
-import type { ConsoleResult } from '@/interfaces/console';
 import Box from '@mui/material/Box';
 import { Table } from '@vesoft-inc/ui-components';
+import type { ConsoleResult } from '@/interfaces/console';
+import { JSONBig, transformNebulaResult } from '@/utils';
 
 export default function TableResult({ result }: { result: ConsoleResult }) {
   const { headers = [], tables = [] } = result.data || {};
@@ -8,9 +9,7 @@ export default function TableResult({ result }: { result: ConsoleResult }) {
   const data = tables.map((item) => {
     const obj = headers.reduce(
       (acc, key) => {
-        const value = item[key];
-        const isNebulaType = value && typeof value === 'object' && 'raw' in value;
-        acc[key] = isNebulaType ? value.raw : JSON.stringify(value);
+        acc[key] = JSONBig.stringify(transformNebulaResult(item[key]));
         return acc;
       },
       {} as Record<string, unknown>
