@@ -3,8 +3,9 @@ import Typography from '@mui/material/Typography';
 import { css } from '@emotion/css';
 import * as monaco from './monaco';
 import Editor, { loader, useMonaco } from '@monaco-editor/react';
-import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import TypeScriptWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+import JSONWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 
 type Monaco = typeof monaco;
 
@@ -16,9 +17,11 @@ if (!loader.__getMonacoInstance()) {
   self.MonacoEnvironment = {
     getWorker(_, label) {
       if (label === 'typescript' || label === 'javascript') {
-        return new tsWorker();
+        return new TypeScriptWorker();
+      } else if (label === 'json') {
+        return new JSONWorker();
       }
-      return new editorWorker();
+      return new EditorWorker();
     },
   };
 }

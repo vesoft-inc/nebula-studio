@@ -55,7 +55,7 @@ export const StyledIconButton = styled(IconButton)`
 `;
 
 export const OutputContent = styled(Box)`
-  height: 300px;
+  height: 360px;
   border-top: ${getVesoftBorder};
   border-bottom: ${getVesoftBorder};
   display: flex;

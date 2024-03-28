@@ -1,4 +1,4 @@
-import { makeAutoObservable, observable } from 'mobx';
+import { computed, makeAutoObservable, observable } from 'mobx';
 import { Base64 } from 'js-base64';
 import i18n, { Language } from '@/utils/i18n';
 import { connect, disconnect } from '@/services';
@@ -24,7 +24,7 @@ export class CommonStore {
       rootStore: observable.ref,
 
       // computed
-      // ...
+      isEnLang: computed,
 
       // actions, beging with 'set', 'add', 'delete', etc.
       changeLanguage: false,
@@ -33,6 +33,10 @@ export class CommonStore {
     this.rootStore = rootStore;
 
     i18n.on('languageChanged', this.setLanguage);
+  }
+
+  get isEnLang() {
+    return this.language === Language.EN_US;
   }
 
   setLoading = (loading: boolean) => {

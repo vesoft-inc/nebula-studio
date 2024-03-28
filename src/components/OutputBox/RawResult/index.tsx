@@ -24,7 +24,7 @@ export default function RawResult({ result }: { result: ConsoleResult }) {
 
   return (
     <Box m={0} p={1} height="100%" overflow="auto">
-      <MonacoEditor value={dstStr} readOnly language="javascript" themeMode={themeMode} />
+      <MonacoEditor value={dstStr} readOnly language="json" themeMode={themeMode} />
     </Box>
   );
 }
