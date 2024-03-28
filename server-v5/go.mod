@@ -8,7 +8,7 @@ require (
 	github.com/rs/xid v1.5.0
 	github.com/stretchr/testify v1.9.0
 	github.com/vesoft-inc/go-pkg v0.0.0-20231117110005-307b542ecb31
-	github.com/vesoft-inc/nebula-ng-tools/golang v0.0.0-20240320023956-bc633c3d5934
+	github.com/vesoft-inc/nebula-ng-tools/golang v0.0.0-20240328015426-7d541ef7a0ce
 	github.com/vesoft-inc/nebula-studio/server v0.0.0-20240304024657-9654817d0952
 	github.com/zeromicro/go-zero v1.6.3
 	gorm.io/gorm v1.25.7

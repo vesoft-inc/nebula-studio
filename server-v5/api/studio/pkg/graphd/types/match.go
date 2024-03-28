@@ -9,7 +9,6 @@ type NodeParsed struct {
 }
 
 type EdgeParsed struct {
-	Id         int64          `json:"id"`
 	SrcId      int64          `json:"srcId"`
 	DstId      int64          `json:"dstId"`
 	Labels     []string       `json:"labels"`

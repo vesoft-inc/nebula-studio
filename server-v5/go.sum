@@ -113,6 +113,8 @@ github.com/vesoft-inc/nebula-ng-tools/golang v0.0.0-20240305033637-d11c262d5fe4 
 github.com/vesoft-inc/nebula-ng-tools/golang v0.0.0-20240305033637-d11c262d5fe4/go.mod h1:Lz1q3qT/ByxroHgXvL+i7kHfpa32dXkdcDrg2xc/LVs=
 github.com/vesoft-inc/nebula-ng-tools/golang v0.0.0-20240320023956-bc633c3d5934 h1:o/RvU0fjwaWWmxb8OF6zgwAluUTCVsfIYuLgPJyd8Vc=
 github.com/vesoft-inc/nebula-ng-tools/golang v0.0.0-20240320023956-bc633c3d5934/go.mod h1:Lz1q3qT/ByxroHgXvL+i7kHfpa32dXkdcDrg2xc/LVs=
+github.com/vesoft-inc/nebula-ng-tools/golang v0.0.0-20240328015426-7d541ef7a0ce h1:HLT1ZLsIj+00xbHtPYW/TMzErn5h99PJH8OH5U3ZMI4=
+github.com/vesoft-inc/nebula-ng-tools/golang v0.0.0-20240328015426-7d541ef7a0ce/go.mod h1:Lz1q3qT/ByxroHgXvL+i7kHfpa32dXkdcDrg2xc/LVs=
 github.com/vesoft-inc/nebula-studio/server v0.0.0-20240304024657-9654817d0952 h1:3tC4GSVcxv7uCAGGFhaqbCQBp4eR/ZrpZqTBsE0ZYYs=
 github.com/vesoft-inc/nebula-studio/server v0.0.0-20240304024657-9654817d0952/go.mod h1:83Vwgp4o3vRBDSM7NbgpjHScmxtc6jna8Vr8SEiPo3I=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=

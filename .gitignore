@@ -13,6 +13,7 @@ node_modules/
 .swc
 .github/workflows/nodejs.yml
 go.work.sum
+__debug_bin*
 
 app/**/*.map
 config/**/*.map
@@ -27,4 +28,3 @@ server*/api/*/data
 server*/api/*/assets/*
 !server*/api/*/assets/.gitkeep
 bin/
-server-v5/api/studio/__debug_bin*
