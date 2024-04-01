@@ -6,6 +6,7 @@ import {
   Grid,
   IconButton,
   List,
+  Popover,
   Stack,
   Typography,
   createFilterOptions,
@@ -23,30 +24,33 @@ import {
 import { useTheme } from '@emotion/react';
 import { useTranslation } from 'react-i18next';
 import { TransitionGroup } from 'react-transition-group';
+import { usePopupState, bindFocus, bindPopover } from 'material-ui-popup-state/hooks';
+import { observer } from 'mobx-react-lite';
+import { CloseFilled, AddFilled } from '@vesoft-inc/icons';
 
 import { TypeInfoContainer, PropertyBodyCell, PropertyHeaderCell } from '@/pages/GraphType/CreateGraphType/styles';
 import { INodeTypeItem, IProperty } from '@/interfaces';
 import { PropertyDataType } from '@/utils/constant';
-import { CloseFilled, AddFilled } from '@vesoft-inc/icons';
 import { getDuplicateValues } from '@/utils';
-import { observer } from 'mobx-react-lite';
 import { useStore } from '@/stores';
+import ColorPicker from '@/components/ColorPicker';
+import { ColorBox } from '../VisualBuilder/styles';
 
 interface NodeTypeConfigFormProps {
   form: ReturnType<typeof useForm<INodeTypeItem>>;
+  colorPicker?: boolean;
 }
 
 const labelOptionFilter = createFilterOptions<string>();
 
 function NodeTypeConfigForm(props: NodeTypeConfigFormProps) {
-  const { form } = props;
+  const { form, colorPicker } = props;
   const theme = useTheme();
   const { t } = useTranslation(['graphtype']);
 
   const { schemaStore } = useStore().graphtypeStore;
 
   const handleAddProperty = () => {
-    const properties = form.getValues('properties') as IProperty[];
     form.setValue(
       'properties',
       properties.concat([
@@ -76,12 +80,20 @@ function NodeTypeConfigForm(props: NodeTypeConfigFormProps) {
     name: 'labels',
   });
 
-  const getLabelOptions = (): string[] => {
-    return schemaStore?.labelOptions.filter((label) => !selectedLabelOptions.includes(label)) || [];
-  };
+  const nodeStrokeColor = useWatch({
+    control: form.control,
+    name: 'style.strokeColor',
+  });
+
+  const labelOptions = schemaStore?.nodeTypeLabeList.filter((label) => !selectedLabelOptions?.includes(label)) || [];
+
+  const popupState = usePopupState({
+    variant: 'popover',
+    popupId: 'node-color-picker',
+  });
 
   return (
-    <Box height={600} sx={{ overflowY: 'auto' }}>
+    <Box minHeight={600} sx={{ overflowY: 'auto' }}>
       <FormContainer formContext={form}>
         <TypeInfoContainer>
           <Typography sx={{ mb: theme.spacing(2) }}>{t('nodeType', { ns: 'graphtype' })}</Typography>
@@ -95,14 +107,48 @@ function NodeTypeConfigForm(props: NodeTypeConfigFormProps) {
                 fullWidth
               />
             </Grid>
+            {colorPicker && (
+              <Grid item xs={6} md={12}>
+                <Box {...bindFocus(popupState)} width="100%">
+                  <TextFieldElement
+                    label={t('color', { ns: 'graphtype' })}
+                    InputProps={{
+                      startAdornment: <ColorBox sx={{ backgroundColor: nodeStrokeColor }} />,
+                    }}
+                    name="style.strokeColor"
+                    size="small"
+                    fullWidth
+                  />
+                </Box>
+                <Popover
+                  {...bindPopover(popupState)}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                >
+                  <ColorPicker
+                    color={nodeStrokeColor}
+                    onChangeComplete={(color) => {
+                      form.setValue('style.strokeColor', color);
+                      form.setValue('style.fill', `${color}60`);
+                    }}
+                  />
+                </Popover>
+              </Grid>
+            )}
             <Grid item xs={6} md={12}>
               <AutocompleteElement
                 name="labels"
                 label={t('label', { ns: 'graphtype' })}
                 multiple
-                options={getLabelOptions()}
+                options={labelOptions}
                 rules={{
-                  required: true,
+                  required: false,
                   validate: (values: string[]) => {
                     const duplicateValues = getDuplicateValues(values);
                     return duplicateValues.length ? `Duplicate: ${duplicateValues.join(', ')}` : true;
@@ -112,10 +158,10 @@ function NodeTypeConfigForm(props: NodeTypeConfigFormProps) {
                   limitTags: 2,
                   size: 'small',
                   fullWidth: true,
-                  onChange: (_, values: string[]) => {
-                    form.setValue('labels', values);
-                  },
+                  filterSelectedOptions: true,
                   handleHomeEndKeys: true,
+                  freeSolo: true,
+                  autoSelect: true,
                   filterOptions: (options: string[], params: FilterOptionsState<string>) => {
                     const filtered = labelOptionFilter(options, params);
                     const { inputValue } = params;
@@ -147,8 +193,8 @@ function NodeTypeConfigForm(props: NodeTypeConfigFormProps) {
           <List>
             <TransitionGroup>
               {properties?.map((property, index) => (
-                <Collapse key={property.id}>
-                  <Stack direction="row" sx={{ mt: 1 }}>
+                <Collapse key={property.id + index}>
+                  <Stack direction="row">
                     <PropertyBodyCell>
                       <TextFieldElement
                         required

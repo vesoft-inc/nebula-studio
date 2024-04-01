@@ -15,9 +15,12 @@ export const isType = <T>(value: unknown, type: string): value is T => {
   return typeString === type.toLowerCase();
 };
 
-export const getDuplicateValues = (values: string[]): string[] => {
+export const getDuplicateValues = <T>(values: T[], key?: keyof T): T[] => {
   const duplicateValues = values.filter((value, index) => {
-    return values.findIndex((v) => v === value) !== index;
+    if (key) {
+      return values.findIndex((v) => v[key] === value) !== index;
+    }
+    return values.indexOf(value) !== index;
   });
   return duplicateValues;
 };

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { observer } from 'mobx-react-lite';
 import { CheckboxElement, FormContainer, TextFieldElement, useForm } from 'react-hook-form-mui';
 
-import { useStore } from '@/stores';
+import { useModal, useStore } from '@/stores';
 import {
   ActionContainer,
   ContentContainer,
@@ -20,6 +20,9 @@ import NodeTypeTable from './NodeType';
 import EdgeTypeTable from './EdgeType';
 import Preview from './Preview';
 import { IEdgeTypeItem, INodeTypeItem } from '@/interfaces';
+import { EdgeDirectionType, MultiEdgeKeyMode } from '@/utils/constant';
+import { useNavigate } from 'react-router-dom';
+import LabelTable from './LabelTable';
 
 enum CreateGraphTypeStep {
   create,
@@ -47,10 +50,10 @@ const FunctionTabs = [
     name: 'Edge Type',
     type: CreateFunction.EdgeType,
   },
-  // {
-  //   name: 'Label',
-  //   type: CreateFunction.Label,
-  // },
+  {
+    name: 'Label',
+    type: CreateFunction.Label,
+  },
   // {
   //   name: 'Index',
   //   type: CreateFunction.Index,
@@ -62,7 +65,8 @@ function CreateGraphType() {
   const [curStep, setCurStep] = useState<CreateGraphTypeStep>(CreateGraphTypeStep.create);
   const { graphtypeStore } = useStore();
   const [curTab, setCurTab] = useState<CreateFunction>(CreateFunction.VisiualBuilder);
-
+  const message = useModal().message;
+  const navigate = useNavigate();
   useEffect(() => {
     graphtypeStore.initSchemaStore();
     return () => {
@@ -109,11 +113,25 @@ function CreateGraphType() {
         label += edgeType.labels.length > 1 ? 'LABELS ' : 'LABEL ';
         label += edgeType.labels.map((label) => `${label}`).join('&');
       }
+      let multiEdge = '';
+      if (edgeType.multiEdgeKeyMode === MultiEdgeKeyMode.Auto) {
+        multiEdge = ', MULTIEDGE KEY()';
+      } else if (edgeType.multiEdgeKeyMode === MultiEdgeKeyMode.Customize) {
+        multiEdge = `, MULTIEDGE KEY(${edgeType.properties.map((p) => p.name).join(',')})`;
+      }
       let property = ``;
       if (edgeType.properties.length > 0) {
-        property += `{${edgeType.properties.map((property) => `${property.name} ${property.type} ${property.isPrimaryKey ? 'PRIMARY KEY' : ''}`)}}`;
+        property += `${edgeType.properties.map((property) => `${property.name} ${property.type}`)}`;
       }
-      return `(${edgeType.srcNode.name}) -> [${edgeType.name} ${label} ${property}] -> (${edgeType.dstNode.name})`;
+      property = `{${property} ${multiEdge}}`;
+
+      let directions = ['-', '->'];
+      if (edgeType.direction === EdgeDirectionType.Backword) {
+        directions = ['<-', '-'];
+      } else if (edgeType.direction === EdgeDirectionType.Undirected) {
+        directions = ['-', '-'];
+      }
+      return `(${edgeType.srcNode.name})${directions[0]}[${edgeType.name} ${label} ${property}]${directions[1]}(${edgeType.dstNode.name})`;
     };
     const ngql = `CREATE GRAPH TYPE ${ifNotExists ? 'IF NOT EXISTS' : ''} ${graphTypeName} AS {
   ${nodeTypeList
@@ -123,6 +141,18 @@ function CreateGraphType() {
 }`;
     return ngql;
   };
+
+  const handleCreateGraphType = async () => {
+    const res = await graphtypeStore.createGraphType(getNgql());
+    if (res.code === 0) {
+      message.success(t('createGraphTypeSuccess', { ns: 'graphtype' }));
+      navigate('/graphtype');
+    } else {
+      message.error(res.message);
+    }
+  };
+
+  const handleSaveDraft = () => {};
 
   return (
     <ContentContainer>
@@ -184,9 +214,11 @@ function CreateGraphType() {
               ))}
             </ButtonGroup>
           </Container>
-          <CreateGraphContainer display={curTab === CreateFunction.VisiualBuilder ? 'block' : 'none'}>
-            <VisualBuilder />
-          </CreateGraphContainer>
+          {curTab === CreateFunction.VisiualBuilder && (
+            <CreateGraphContainer>
+              <VisualBuilder />
+            </CreateGraphContainer>
+          )}
           {curTab === CreateFunction.NodeTyppe && (
             <TableContainer>
               <NodeTypeTable />
@@ -197,12 +229,17 @@ function CreateGraphType() {
               <EdgeTypeTable />
             </TableContainer>
           )}
+          {curTab === CreateFunction.Label && (
+            <TableContainer>
+              <LabelTable />
+            </TableContainer>
+          )}
         </StepContainer>
         {curStep === CreateGraphTypeStep.preview && <Preview ngql={getNgql()} />}
       </MainContainer>
       <FooterContainer>
         {curStep === CreateGraphTypeStep.preview && (
-          <Button variant="text" sx={{ mr: '10px', width: '120px' }} onClick={handeNextClick}>
+          <Button variant="text" sx={{ mr: '10px', width: '120px' }} onClick={handleSaveDraft}>
             {t('saveAsDraft', { ns: 'graphtype' })}
           </Button>
         )}
@@ -220,7 +257,7 @@ function CreateGraphType() {
           </Button>
         )}
         {curStep === CreateGraphTypeStep.preview && (
-          <Button variant="contained" sx={{ ml: '10px', minWidth: '120px' }} onClick={handeNextClick}>
+          <Button variant="contained" sx={{ ml: '10px', minWidth: '120px' }} onClick={handleCreateGraphType}>
             {t('createGraphType', { ns: 'graphtype' })}
           </Button>
         )}

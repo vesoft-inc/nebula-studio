@@ -11,7 +11,7 @@ import NodeTypeConfigForm from '@/pages/GraphType/CreateGraphType/NodeType/NodeT
 import EdgeTypeConfigForm from '@/pages/GraphType/CreateGraphType/EdgeType/EdgeTypeConfigForm';
 import { IEdgeTypeItem, INodeTypeItem } from '@/interfaces';
 import { VisualEditorType } from '@/utils/constant';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 function ConfigDrawer() {
   const { graphtypeStore } = useStore();
@@ -20,23 +20,12 @@ function ConfigDrawer() {
   const theme = useTheme();
   const { t } = useTranslation(['graphtype']);
 
-  const getActiveItemType = (item?: INodeTypeItem | IEdgeTypeItem) => {
-    if (item instanceof INodeTypeItem) {
-      return VisualEditorType.Tag;
-    } else if (item instanceof IEdgeTypeItem) {
-      return VisualEditorType.Edge;
-    }
-    return undefined;
-  };
-
-  const activeItemTypeRef = useRef<VisualEditorType | undefined>(getActiveItemType(schemaStore?.activeItem));
-  const activeItemRef = useRef<INodeTypeItem | IEdgeTypeItem | undefined>();
-
   const getDefaultValues = (): INodeTypeItem | IEdgeTypeItem | undefined => {
-    if (activeItemTypeRef.current === VisualEditorType.Tag) {
-      return new INodeTypeItem(schemaStore?.activeItem);
-    } else if (activeItemTypeRef.current === VisualEditorType.Edge) {
-      return new IEdgeTypeItem(schemaStore?.activeItem);
+    if (!schemaStore?.activeItem) return;
+    if (schemaStore?.activeItem?.type === VisualEditorType.Tag) {
+      return new INodeTypeItem(schemaStore.activeItem.value);
+    } else if (schemaStore?.activeItem?.type === VisualEditorType.Edge) {
+      return new IEdgeTypeItem(schemaStore.activeItem.value);
     }
     return undefined;
   };
@@ -51,39 +40,37 @@ function ConfigDrawer() {
 
   useEffect(() => {
     if (values) {
-      if (schemaStore?.activeItem?.id) {
-        updateItemInfo(
-          schemaStore?.activeItem?.id,
-          values as INodeTypeItem | IEdgeTypeItem,
-          getActiveItemType(schemaStore?.activeItem)
-        );
-      }
+      updateItemInfo(values as INodeTypeItem | IEdgeTypeItem);
     }
   }, [values]);
 
   useEffect(() => {
     if (open === true) {
-      reset();
-      activeItemTypeRef.current = getActiveItemType(schemaStore?.activeItem);
-      activeItemRef.current = schemaStore?.activeItem;
       form.reset(getDefaultValues());
+    } else {
+      form.reset(new INodeTypeItem());
     }
-  }, [schemaStore?.activeItem, open]);
+  }, [schemaStore?.activeItem?.value?.id, open]);
 
-  const reset = () => {
-    form.reset();
-    activeItemTypeRef.current = undefined;
-    activeItemRef.current = undefined;
-  };
-
-  const updateItemInfo = (id: string, values: INodeTypeItem | IEdgeTypeItem, activeItemType?: VisualEditorType) => {
-    if (!id) return;
-    if (activeItemType === VisualEditorType.Tag) {
-      schemaStore?.updateNodeType(id, values as INodeTypeItem);
-    } else if (activeItemType === VisualEditorType.Edge) {
-      schemaStore?.updateEdgeType(id, values as IEdgeTypeItem);
+  const updateItemInfo = (values: INodeTypeItem | IEdgeTypeItem) => {
+    if (schemaStore?.activeItem?.type === VisualEditorType.Tag) {
+      schemaStore?.setActiveItem({
+        type: VisualEditorType.Tag,
+        value: {
+          ...values,
+          id: schemaStore?.activeItem?.value.id,
+        } as INodeTypeItem,
+      });
     }
-    schemaStore?.editor?.graph.update();
+    if (schemaStore?.activeItem?.type === VisualEditorType.Edge) {
+      schemaStore?.setActiveItem({
+        type: VisualEditorType.Edge,
+        value: {
+          ...values,
+          id: schemaStore?.activeItem?.value.id,
+        } as IEdgeTypeItem,
+      });
+    }
   };
 
   return (
@@ -102,11 +89,11 @@ function ConfigDrawer() {
             <Typography color="error">{t('delete', { ns: 'graphtype' })}</Typography>
           </Button>
         </ActionsContainer>
-        {activeItemTypeRef.current === VisualEditorType.Tag && (
-          <NodeTypeConfigForm form={form as UseFormReturn<INodeTypeItem>} />
+        {schemaStore?.activeItem?.type === VisualEditorType.Tag && (
+          <NodeTypeConfigForm form={form as UseFormReturn<INodeTypeItem>} colorPicker />
         )}
-        {activeItemTypeRef.current === VisualEditorType.Edge && (
-          <EdgeTypeConfigForm form={form as UseFormReturn<IEdgeTypeItem>} />
+        {schemaStore?.activeItem?.type === VisualEditorType.Edge && (
+          <EdgeTypeConfigForm form={form as UseFormReturn<IEdgeTypeItem>} colorPicker hasSrcAndDstNode />
         )}
       </>
     </SchemaDrawerontainer>

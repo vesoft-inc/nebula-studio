@@ -7,9 +7,9 @@ import { type MRT_ColumnDef } from 'material-react-table';
 
 import { ActionContainer } from './styles';
 import NodeTypeConfigModal from './NodeTypeConfigModal';
-import { useModal, useStore } from '@/stores';
+import { useStore } from '@/stores';
 import { INodeTypeItem, IProperty } from '@/interfaces';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useTheme } from '@emotion/react';
 import { getLabelColor } from '@/utils';
 
@@ -22,28 +22,27 @@ function NodeTypeTable(props: NodeTypeTableProps) {
   const { schemaStore } = useStore().graphtypeStore;
   const dataSource = schemaStore?.nodeTypeList || [];
   const { t } = useTranslation(['graphtype']);
-  const modal = useModal();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editNodeType, setEditNodeType] = useState<INodeTypeItem | undefined>();
 
   const handleEditNodeType = (nodeType: INodeTypeItem) => () => {
-    modal.show({
-      title: t('editNodeType', { ns: 'graphtype' }),
-      content: <NodeTypeConfigModal nodeTypeItem={nodeType} />,
-    });
+    setEditNodeType(nodeType);
+    setModalOpen(true);
   };
 
   const handleDeleteNodeType = (nodeType: INodeTypeItem) => () => {
-    schemaStore?.deleteNodeType(nodeType.id);
+    schemaStore?.deleteNodeType(nodeType);
   };
 
   const getColumns = useCallback((): MRT_ColumnDef<INodeTypeItem>[] => {
     const columns: MRT_ColumnDef<INodeTypeItem>[] = [
       {
         accessorKey: 'name', //access nested data with dot notation
-        header: 'Node Type',
+        header: t('nodeTypeName', { ns: 'graphtype' }),
       },
       {
         accessorKey: 'primaryKeys',
-        header: 'Primary Key',
+        header: t('primaryKey', { ns: 'graphtype' }),
         Cell: ({ row }) =>
           row.original.properties
             .filter((property) => property.isPrimaryKey)
@@ -53,7 +52,7 @@ function NodeTypeTable(props: NodeTypeTableProps) {
       },
       {
         accessorKey: 'labels', //normal accessorKey
-        header: 'Labels',
+        header: t('labels', { ns: 'graphtype' }),
         Cell: ({ row }) =>
           row.original.labels.map((label, index) => {
             const [color, backgroundColor] = getLabelColor(index, theme);
@@ -76,7 +75,7 @@ function NodeTypeTable(props: NodeTypeTableProps) {
     ];
     if (!readonly) {
       columns.push({
-        header: 'Operation',
+        header: t('operation', { ns: 'graphtype' }),
         Cell: ({ row }) => (
           <Box display="flex" alignItems="center">
             <IconButton size="small" onClick={handleEditNodeType(row.original)}>
@@ -97,7 +96,7 @@ function NodeTypeTable(props: NodeTypeTableProps) {
       [
         {
           accessorKey: 'name', //access nested data with dot notation
-          header: 'Property Name',
+          header: t('propertyName', { ns: 'graphtype' }),
           Header: ({ column }) => (
             <Typography>
               {column.columnDef.header} ({num})
@@ -106,7 +105,7 @@ function NodeTypeTable(props: NodeTypeTableProps) {
         },
         {
           accessorKey: 'type',
-          header: 'Property Type',
+          header: t('propertyType', { ns: 'graphtype' }),
           Header: ({ column }) => <Typography>{column.columnDef.header}</Typography>,
         },
       ] as MRT_ColumnDef<IProperty>[],
@@ -114,10 +113,8 @@ function NodeTypeTable(props: NodeTypeTableProps) {
   );
 
   const handleCreateNodeType = () => {
-    modal.show({
-      title: t('createNodeType', { ns: 'graphtype' }),
-      content: <NodeTypeConfigModal />,
-    });
+    setEditNodeType(undefined);
+    setModalOpen(true);
   };
 
   const theme = useTheme();
@@ -134,7 +131,7 @@ function NodeTypeTable(props: NodeTypeTableProps) {
       <Box mt={2}>
         <Table
           columns={getColumns()}
-          data={dataSource}
+          data={dataSource.slice()}
           renderDetailPanel={({ row }) => {
             const { properties } = row.original;
             return (
@@ -174,6 +171,7 @@ function NodeTypeTable(props: NodeTypeTableProps) {
           }}
         />
       </Box>
+      <NodeTypeConfigModal open={modalOpen} nodeTypeItem={editNodeType} onCancel={() => setModalOpen(false)} />
     </>
   );
 }

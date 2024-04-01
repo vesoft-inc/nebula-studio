@@ -10,6 +10,7 @@ import { INodeTypeItem, VisualInfo } from '@/interfaces';
 import { ToolNodeColor } from '@/components/Shapes/config';
 import { useTranslation } from 'react-i18next';
 import { AddFilled } from '@vesoft-inc/icons';
+import { VisualEditorType } from '@/utils/constant';
 
 function VisualBuilder() {
   const canvasContainer = useRef<HTMLDivElement>(null);
@@ -29,14 +30,9 @@ function VisualBuilder() {
       },
     });
     return () => {
-      schemaStore?.destroy();
+      schemaStore?.destroyEditor();
     };
   }, [schemaStore]);
-
-  useEffect(() => {
-    if (!schemaStore) return;
-    schemaStore.updateEditor();
-  }, [schemaStore?.nodeTypeList, schemaStore?.edgeTypeList]);
 
   const handleZoom = (type: 'in' | 'out') => () => {
     if (type === 'in') {
@@ -50,9 +46,12 @@ function VisualBuilder() {
     if (!schemaStore?.editor) return;
     const nodeTypeItem = new INodeTypeItem();
     nodeTypeItem.style = visualInfo;
-    schemaStore.addNodeType(nodeTypeItem);
     schemaStore.clearActive();
-    schemaStore.setActiveItem(nodeTypeItem);
+    schemaStore.addNodeType(nodeTypeItem);
+    schemaStore.setActiveItem({
+      type: VisualEditorType.Tag,
+      value: nodeTypeItem,
+    });
   };
 
   const onDrag = (e: React.MouseEvent) => {
@@ -80,7 +79,7 @@ function VisualBuilder() {
         }
         const x = (e.clientX - rect.x - controller.x) / controller.scale - 25 * controller.scale;
         const y = (e.clientY - rect.y - controller.y) / controller.scale - 25 * controller.scale;
-        addNodeType({ x, y, ...ToolNodeColor });
+        addNodeType({ x, y });
       }
       setShowDragTag(false);
       window.document.removeEventListener('mousemove', mousemove);

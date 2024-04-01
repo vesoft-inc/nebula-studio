@@ -29,19 +29,27 @@ class GraphTypeStore {
 
   getGraphTypeList = async () => {
     const gql = [
-      'CALL show_graphs() YIELD `graph_name` as name',
+      'CALL show_graph_types() YIELD `graph_type_name` as gtn',
+      'CALL show_graphs() YIELD `graph_name` as name ',
       'CALL describe_graph(name) YIELD `graph_name`, `graph_type_name`',
-      'RETURN graph_name, graph_type_name',
+      'RETURN graph_name, graph_type_name, gtn',
     ].join(' ');
-    const res = await execGql<GQLResult<{ graph_name: string; graph_type_name: string }>>(gql);
-    const graphTypes =
-      res.data?.tables?.map((item) => ({ name: item.graph_name, typeName: item.graph_type_name })) || [];
-    const groups = Object.groupBy(graphTypes || [], (ele) => ele.typeName);
+    const res = await execGql<GQLResult<{ graph_name: string; graph_type_name: string; gtn: string }>>(gql);
+    const tableData = res.data?.tables || [];
+    const groups = Object.groupBy(tableData, (ele) => ele.gtn);
     const graphtypes = Object.keys(groups).map((graphTypeName: string) => ({
       name: graphTypeName,
-      graphList: groups[graphTypeName]?.map((item) => item.name) || [],
+      graphList:
+        groups[graphTypeName]
+          ?.filter(({ graph_type_name }) => graphTypeName === graph_type_name)
+          .map((item) => item.graph_name) || [],
     }));
     this.updateGraphTypeList(graphtypes);
+  };
+
+  createGraphType = async (ngql: string) => {
+    const res = await execGql<GQLResult>(ngql);
+    return res;
   };
 
   updateGraphTypeList = (graphTypeList: IGraphTypeItem[]) => {
@@ -53,6 +61,7 @@ class GraphTypeStore {
   };
 
   destroySchemaStore = () => {
+    this.schemaStore?.disposeReaction();
     this.schemaStore = undefined;
   };
 

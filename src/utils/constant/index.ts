@@ -15,3 +15,21 @@ export enum PropertyDataType {
   INT = 'INT',
   BOOL = 'BOOL',
 }
+
+export enum EdgeDirectionType {
+  /** 正向 */
+  Forward = 1,
+  /** 无向 */
+  Undirected,
+  /** 反向 */
+  Backword,
+}
+
+export enum MultiEdgeKeyMode {
+  /** 不允许平行边 */
+  None = 1,
+  /** 允许平行边，自增长 */
+  Auto,
+  /** 允许平行边，自定义属性*/
+  Customize,
+}
