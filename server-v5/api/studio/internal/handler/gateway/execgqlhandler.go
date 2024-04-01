@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/vesoft-inc/go-pkg/validator"
-	"github.com/vesoft-inc/nebula-studio/server/api/studio/pkg/ecode"
+	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/pkg/ecode"
 
 	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/internal/logic/gateway"
 	"github.com/vesoft-inc/nebula-studio/server-v5/api/studio/internal/svc"
