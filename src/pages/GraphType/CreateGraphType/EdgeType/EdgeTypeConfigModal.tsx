@@ -1,29 +1,37 @@
-import { DialogContent } from '@mui/material';
-import { ModalFooter } from '@vesoft-inc/ui-components';
+import { Modal } from '@vesoft-inc/ui-components';
 import { useTranslation } from 'react-i18next';
 import EdgeTypeConfigForm from './EdgeTypeConfigForm';
-import { useModal, useStore } from '@/stores';
+import { useStore } from '@/stores';
 import { useForm } from 'react-hook-form-mui';
 import { IEdgeTypeItem } from '@/interfaces';
-// import { PropertyDataType } from '@/utils/constant';
+import { useEffect } from 'react';
 
 interface EdgeTypeModalProps {
   edgeTypeItem?: IEdgeTypeItem;
+  open: boolean;
+  onCancel: () => void;
 }
 
 function EdgeTypeConfigModal(props: EdgeTypeModalProps) {
-  const { edgeTypeItem } = props;
+  const { edgeTypeItem, open, onCancel } = props;
   const { t } = useTranslation(['graphtype', 'common']);
-  const modal = useModal();
   const { schemaStore } = useStore().graphtypeStore;
 
   const form = useForm<IEdgeTypeItem>({
-    defaultValues: edgeTypeItem
-      ? new IEdgeTypeItem(edgeTypeItem)
-      : {
-          properties: [],
-        },
+    defaultValues: {
+      properties: [],
+    },
   });
+
+  useEffect(() => {
+    if (open) {
+      if (edgeTypeItem) {
+        form.reset(new IEdgeTypeItem(edgeTypeItem));
+      } else {
+        form.reset();
+      }
+    }
+  }, [open]);
 
   const onSubmit = (values: IEdgeTypeItem) => {
     if (edgeTypeItem) {
@@ -31,25 +39,23 @@ function EdgeTypeConfigModal(props: EdgeTypeModalProps) {
     } else {
       schemaStore?.addEdgeType(new IEdgeTypeItem(values));
     }
-    modal.hide();
-  };
-
-  const handleCancel = () => {
-    modal.hide();
+    onCancel();
   };
 
   return (
-    <>
-      <DialogContent dividers sx={{ width: 600 }}>
-        <EdgeTypeConfigForm form={form} />
-      </DialogContent>
-      <ModalFooter
-        cancelText={t('cancel', { ns: 'common' })}
-        okText={edgeTypeItem ? t('update', { ns: 'common' }) : t('create', { ns: 'common' })}
-        onCancel={handleCancel}
-        onOk={form.handleSubmit(onSubmit)}
-      />
-    </>
+    <Modal
+      title={edgeTypeItem ? t('editEdgeType', { ns: 'graphtype' }) : t('createEdgeType', { ns: 'graphtype' })}
+      open={open}
+      onOk={form.handleSubmit(onSubmit)}
+      onCancel={onCancel}
+      slotProps={{
+        footer: {
+          okText: edgeTypeItem ? t('update', { ns: 'common' }) : t('create', { ns: 'common' }),
+        },
+      }}
+    >
+      <EdgeTypeConfigForm form={form} />
+    </Modal>
   );
 }
 

@@ -71,6 +71,13 @@ export const ScaleBtnContainer = styled(Box, {
   }),
 }));
 
+export const ColorBox = styled(Box)`
+  width: 24px;
+  height: 20px;
+  border-radius: 6px;
+  margin-right: ${({ theme }) => theme.spacing(1)};
+`;
+
 export const shadowItem = css`
   opacity: 0.5;
   position: fixed;

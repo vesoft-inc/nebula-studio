@@ -11,7 +11,8 @@ export const highlightKeywords = [...GQL_KEYWORDS, ...GQL_KEYWORDS.map((k) => k.
 
 interface IProps {
   value: string;
-  onChange: (value?: string) => void;
+  readOnly?: boolean;
+  onChange?: (value?: string) => void;
 }
 
 export default function GQLEditorLite(props: IProps) {
@@ -78,7 +79,7 @@ export default function GQLEditorLite(props: IProps) {
     []
   );
 
-  const { value, onChange } = props;
+  const { value, onChange, readOnly } = props;
 
   return (
     <Suspense>
@@ -86,6 +87,7 @@ export default function GQLEditorLite(props: IProps) {
         language={langId}
         themeMode={theme.palette.mode}
         value={value}
+        readOnly={readOnly}
         onChange={onChange}
         onMount={onMount}
       />

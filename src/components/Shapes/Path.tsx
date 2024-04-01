@@ -11,6 +11,7 @@ import { mat2d } from 'gl-matrix';
 
 import { getLinkCurvature, NODE_RADIUS } from './config';
 import { EdgeLabelContainer, InvalidContainer } from './styles';
+import { EdgeDirectionType } from '@/utils/constant';
 
 // get Angle for point in svg coordinate system
 const getPointAngle = (pointNode: InstanceNodePoint, graph: Graph): number => {
@@ -156,6 +157,7 @@ const Path: LineRender = {
     line.data.toY = dst.y;
     return path;
   },
+
   renderLabel(line?: InstanceLine): SVGGElement {
     const { invalid, textBackgroundColor } = line!.data;
     const name = line!.data.data.name;
@@ -237,8 +239,9 @@ const Path: LineRender = {
     }
     return line.label.labelGroup;
   },
+
   renderArrow(line: InstanceLine): SVGElement {
-    const { from, to } = line;
+    const { from, to, data } = line;
     let path;
     const svgEl = line.arrow ? line.arrow : window.document.createElementNS('http://www.w3.org/2000/svg', 'g');
     const arrow = line.arrow
@@ -333,8 +336,14 @@ const Path: LineRender = {
       svgEl.appendChild(arrow);
       svgEl.appendChild(arrowShadow);
     }
+    if (data.data.direction === EdgeDirectionType.Undirected) {
+      svgEl.style.display = 'none';
+    } else {
+      svgEl.style.display = 'block';
+    }
     return svgEl;
   },
+
   checkNewLine(data) {
     const { from, to, fromPoint, toPoint } = data;
     if (from === to && fromPoint === toPoint) {

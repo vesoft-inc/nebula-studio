@@ -1,22 +1,25 @@
+import { LINE_STYLE } from '@/components/Shapes/config';
 import { createUuid } from '@/utils';
-import { PropertyDataType, VisualEditorType } from '@/utils/constant';
+import { EdgeDirectionType, MultiEdgeKeyMode, PropertyDataType, VisualEditorType } from '@/utils/constant';
 // import { SystemStyleObject } from '@mui/system';
 // import { InstanceLine } from '@vesoft-inc/veditor/types/Shape/Line';
 // import { InstanceNodePoint } from '@vesoft-inc/veditor/types/Shape/Node';
 
 export const idSymbol = Symbol('id');
-const styleSymbol = Symbol('style');
+export const styleSymbol = Symbol('style');
 
 export class IProperty {
   name: string;
   type: PropertyDataType;
   isPrimaryKey?: boolean = false;
+  multiEdgeKey?: boolean = false;
   [idSymbol]: string;
 
   constructor(params?: Omit<IProperty, typeof idSymbol | 'id'>) {
     this.name = params?.name || '';
     this.type = params?.type || PropertyDataType.STRING;
     this.isPrimaryKey = params?.isPrimaryKey;
+    this.multiEdgeKey = params?.multiEdgeKey;
     this[idSymbol] = createUuid();
   }
 
@@ -27,28 +30,21 @@ export class IProperty {
 
 export class INodeTypeItem {
   private [idSymbol]: string;
-  private [styleSymbol]?: VisualInfo;
   name: string;
   properties: IProperty[] = [];
   labels: string[] = [];
+  style?: VisualInfo;
 
-  constructor(params?: Partial<Pick<INodeTypeItem, 'name' | 'properties' | 'labels'>>) {
+  constructor(params?: Partial<Pick<INodeTypeItem, 'name' | 'properties' | 'labels' | 'style'>>) {
     this[idSymbol] = createUuid();
-    this.name = params?.name || '';
-    this.properties = params?.properties || [];
-    this.labels = params?.labels || [];
+    this.name = params?.name ?? '';
+    this.properties = params?.properties ?? [];
+    this.labels = params?.labels ?? [];
+    this.style = params?.style ?? {};
   }
 
   get id() {
     return this[idSymbol];
-  }
-
-  set style(info: VisualInfo) {
-    this[styleSymbol] = info;
-  }
-
-  get style(): VisualInfo | undefined {
-    return this[styleSymbol];
   }
 
   updateValues(values: Omit<INodeTypeItem, typeof idSymbol | 'id'>) {
@@ -57,67 +53,63 @@ export class INodeTypeItem {
     this.properties = properties || [];
     this.labels = labels || [];
   }
+
+  setName = (name: string) => {
+    this.name = name;
+  };
 }
 
 export class IEdgeTypeItem {
   private [idSymbol]: string;
-  private [styleSymbol]?: VisualInfo;
   name: string;
   properties: IProperty[] = [];
   labels: string[] = [];
   srcNode: INodeTypeItem;
   dstNode: INodeTypeItem;
-  constructor(params?: Partial<Pick<IEdgeTypeItem, 'name' | 'properties' | 'labels' | 'srcNode' | 'dstNode'>>) {
+  direction: EdgeDirectionType;
+  multiEdgeKeyMode: MultiEdgeKeyMode;
+  style?: VisualInfo;
+
+  constructor(
+    params?: Partial<
+      Pick<
+        IEdgeTypeItem,
+        'name' | 'properties' | 'labels' | 'srcNode' | 'dstNode' | 'direction' | 'style' | 'multiEdgeKeyMode'
+      >
+    >
+  ) {
     this[idSymbol] = createUuid();
-    this.name = params?.name || '';
+    this.name = params?.name ?? '';
     this.srcNode = params?.srcNode || new INodeTypeItem();
     this.dstNode = params?.dstNode || new INodeTypeItem();
     this.properties = params?.properties || [];
     this.labels = params?.labels || [];
+    this.direction = params?.direction || EdgeDirectionType.Forward;
+    this.multiEdgeKeyMode = params?.multiEdgeKeyMode || MultiEdgeKeyMode.None;
+    this.style = params?.style || {
+      strokeColor: LINE_STYLE.stroke,
+    };
   }
 
   get id() {
     return this[idSymbol];
   }
 
+  setName = (name: string) => {
+    this.name = name;
+  };
+
   updateValues(values: Omit<IEdgeTypeItem, typeof idSymbol | 'id'>) {
-    const { name, properties, labels, srcNode, dstNode } = values;
+    const { name, properties, labels, srcNode, dstNode, direction, style, multiEdgeKeyMode } = values;
     this.name = name;
     this.properties = properties;
     this.labels = labels;
     this.srcNode = srcNode;
     this.dstNode = dstNode;
+    this.direction = direction;
+    this.multiEdgeKeyMode = multiEdgeKeyMode;
+    this.style = style;
   }
-
-  set style(info: VisualInfo) {
-    this[styleSymbol] = info;
-  }
-
-  get style(): VisualInfo | undefined {
-    return this[styleSymbol];
-  }
-}
-
-export class IIndexTypeItem {
-  name: string;
-  forTarget: INodeTypeItem | IEdgeTypeItem;
-  on: Array<IProperty & { order: 'acs' | 'desc' }>;
-  ifNotExits: boolean;
-
-  constructor(params: Omit<IIndexTypeItem, typeof idSymbol | 'id' | 'updateValues'>) {
-    this.name = params.name;
-    this.forTarget = params.forTarget;
-    this.on = params.on;
-    this.ifNotExits = params.ifNotExits;
-  }
-
-  updateValues = (values: Omit<IIndexTypeItem, typeof idSymbol | 'id'>) => {
-    const { name, forTarget, on, ifNotExits } = values;
-    this.name = name;
-    this.forTarget = forTarget;
-    this.on = on;
-    this.ifNotExits = ifNotExits;
-  };
 }
 
 export interface VisualInfo {
@@ -169,4 +161,9 @@ export interface GraphTypeElement {
   labels: string[];
   /** currently `string[]` is used for `properties` field, but it should be `Property[]` */
   properties: string[];
+}
+
+export interface ILabelItem {
+  name: string;
+  type: 'Node' | 'Edge';
 }

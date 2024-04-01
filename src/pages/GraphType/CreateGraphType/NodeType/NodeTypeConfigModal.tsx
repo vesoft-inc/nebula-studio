@@ -1,29 +1,38 @@
-import { DialogContent } from '@mui/material';
-import { ModalFooter } from '@vesoft-inc/ui-components';
+import { Modal } from '@vesoft-inc/ui-components';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form-mui';
 
-import { useModal, useStore } from '@/stores';
+import { useStore } from '@/stores';
 import { INodeTypeItem } from '@/interfaces';
 import NodeTypeConfigForm from './NodeTypeConfigForm';
+import { useEffect } from 'react';
 
 interface NodeTypeModalProps {
+  open: boolean;
+  onCancel: () => void;
   nodeTypeItem?: INodeTypeItem;
 }
 
 function NodeTypeConfigModal(props: NodeTypeModalProps) {
-  const { nodeTypeItem } = props;
+  const { nodeTypeItem, open, onCancel } = props;
   const { t } = useTranslation(['graphtype', 'common']);
-  const modal = useModal();
   const { schemaStore } = useStore().graphtypeStore;
 
   const form = useForm<INodeTypeItem>({
-    defaultValues: nodeTypeItem
-      ? new INodeTypeItem(nodeTypeItem)
-      : {
-          properties: [],
-        },
+    defaultValues: {
+      properties: [],
+    },
   });
+
+  useEffect(() => {
+    if (open) {
+      form.reset(new INodeTypeItem(nodeTypeItem));
+    }
+  }, [open]);
+
+  const hanleOk = () => {
+    form.handleSubmit(onSubmit)();
+  };
 
   const onSubmit = (values: INodeTypeItem) => {
     if (nodeTypeItem) {
@@ -31,25 +40,23 @@ function NodeTypeConfigModal(props: NodeTypeModalProps) {
     } else {
       schemaStore?.addNodeType(new INodeTypeItem(values));
     }
-    modal.hide();
-  };
-
-  const handleCancel = () => {
-    modal.hide();
+    onCancel();
   };
 
   return (
-    <>
-      <DialogContent dividers sx={{ width: 600 }}>
-        <NodeTypeConfigForm form={form} />
-      </DialogContent>
-      <ModalFooter
-        cancelText={t('cancel', { ns: 'common' })}
-        okText={nodeTypeItem ? t('update', { ns: 'common' }) : t('create', { ns: 'common' })}
-        onCancel={handleCancel}
-        onOk={form.handleSubmit(onSubmit)}
-      />
-    </>
+    <Modal
+      title={nodeTypeItem ? t('editNodeType', { ns: 'graphtype' }) : t('createNodeType', { ns: 'graphtype' })}
+      onCancel={onCancel}
+      open={open}
+      onOk={hanleOk}
+      slotProps={{
+        footer: {
+          okText: nodeTypeItem ? t('update', { ns: 'common' }) : t('create', { ns: 'common' }),
+        },
+      }}
+    >
+      <NodeTypeConfigForm form={form} />
+    </Modal>
   );
 }
 

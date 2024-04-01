@@ -3,20 +3,20 @@ import { useTranslation } from 'react-i18next';
 import { Dropdown } from '@vesoft-inc/ui-components';
 import { useTheme } from '@emotion/react';
 import { AddFilled, DeleteOutline, EditFilled, MoreHorizFilled } from '@vesoft-inc/icons';
-import { useModal, useStore } from '@/stores';
+import { useStore } from '@/stores';
 import { GraphCard, TypeCountTypography } from './styles';
-import CreateGraphForm from './CreateGraphForm';
 import { HeaderContainer } from './styles';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
+import CreateGraphModal from './CreateGraphModal';
 
 function GraphType() {
   const { t } = useTranslation(['graphtype', 'common']);
   const theme = useTheme();
-  const modal = useModal();
   const navigate = useNavigate();
   const { graphtypeStore } = useStore();
+  const [modalOpen, setModalOpen] = useState(false);
 
   const { graphTypeList, getGraphTypeList } = graphtypeStore;
 
@@ -29,10 +29,7 @@ function GraphType() {
   };
 
   const handleCreateGraph = () => {
-    modal.show({
-      title: 'Create Graph',
-      content: <CreateGraphForm />,
-    });
+    setModalOpen(true);
   };
 
   return (
@@ -122,6 +119,12 @@ function GraphType() {
           );
         })}
       </Box>
+      <CreateGraphModal
+        onCancel={() => {
+          setModalOpen(false);
+        }}
+        open={modalOpen}
+      />
     </Container>
   );
 }

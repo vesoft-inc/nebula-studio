@@ -1,17 +1,18 @@
 import { Box, Button, Chip, IconButton, Stack, Typography } from '@mui/material';
-import { AddFilled, ArrowForwardFilled, Delete, EditFilled } from '@vesoft-inc/icons';
+import { AddFilled, ArrowBackFilled, ArrowForwardFilled, Delete, EditFilled, Minus } from '@vesoft-inc/icons';
 import { useTranslation } from 'react-i18next';
 import { Table } from '@vesoft-inc/ui-components';
 import { observer } from 'mobx-react-lite';
 import { type MRT_ColumnDef } from 'material-react-table';
 
 import { ActionContainer } from './styles';
-import { useModal, useStore } from '@/stores';
+import { useStore } from '@/stores';
 import { IEdgeTypeItem, IProperty } from '@/interfaces';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useTheme } from '@emotion/react';
 import { getLabelColor } from '@/utils';
 import EdgeTypeConfigModal from './EdgeTypeConfigModal';
+import { EdgeDirectionType } from '@/utils/constant';
 
 interface EdgeTypeTableProps {
   readonly?: boolean;
@@ -22,32 +23,33 @@ function EdgeTypeTable(props: EdgeTypeTableProps) {
   const { schemaStore } = useStore().graphtypeStore;
   const dataSource = schemaStore?.edgeTypeList || [];
   const { t } = useTranslation(['graphtype']);
-  const modal = useModal();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editEdgeType, setEditEdgeType] = useState<IEdgeTypeItem | undefined>();
 
   const handleEditEdgeType = (edgeType: IEdgeTypeItem) => () => {
-    modal.show({
-      title: t('editEdgeType', { ns: 'graphtype' }),
-      content: <EdgeTypeConfigModal edgeTypeItem={edgeType} />,
-    });
+    setEditEdgeType(edgeType);
+    setModalOpen(true);
   };
 
   const handleDeleteEdgeType = (edgeType: IEdgeTypeItem) => () => {
-    schemaStore?.deleteEdgeType(edgeType.id);
+    schemaStore?.deleteEdgeType(edgeType);
   };
 
   const getColumns = useCallback((): MRT_ColumnDef<IEdgeTypeItem>[] => {
     const columns: MRT_ColumnDef<IEdgeTypeItem>[] = [
       {
         accessorKey: 'name', //access nested data with dot notation
-        header: 'Edge Type Name',
+        header: t('edgeTypeName', { ns: 'graphtype' }),
       },
       {
-        header: 'Relation',
+        header: t('relation', { ns: 'graphtype' }),
         Cell: ({ row }) => (
           <Stack direction="row" spacing={2} display="flex" alignItems="center">
             <Typography>{row.original.srcNode.name}</Typography>
             <Typography display="flex" alignItems="center">
-              <ArrowForwardFilled />
+              {row.original.direction === EdgeDirectionType.Forward && <ArrowForwardFilled />}
+              {row.original.direction === EdgeDirectionType.Backword && <ArrowBackFilled />}
+              {row.original.direction === EdgeDirectionType.Undirected && <Minus />}
             </Typography>
             <Typography>{row.original.dstNode.name}</Typography>
           </Stack>
@@ -55,7 +57,7 @@ function EdgeTypeTable(props: EdgeTypeTableProps) {
       },
       {
         accessorKey: 'labels', //normal accessorKey
-        header: 'Labels',
+        header: t('labels', { ns: 'graphtype' }),
         Cell: ({ row }) =>
           row.original.labels.map((label, index) => {
             const [color, backgroundColor] = getLabelColor(index, theme);
@@ -77,7 +79,7 @@ function EdgeTypeTable(props: EdgeTypeTableProps) {
       },
       {
         accessorKey: 'primaryKeys',
-        header: 'Primary Key',
+        header: t('primaryKey', { ns: 'graphtype' }),
         Cell: ({ row }) =>
           row.original.properties
             .filter((property) => property.isPrimaryKey)
@@ -88,7 +90,7 @@ function EdgeTypeTable(props: EdgeTypeTableProps) {
     ];
     if (!readonly) {
       columns.push({
-        header: 'Operation',
+        header: t('operation', { ns: 'graphtype' }),
         Cell: ({ row }) => (
           <Box display="flex" alignItems="center">
             <IconButton size="small" onClick={handleEditEdgeType(row.original)}>
@@ -109,7 +111,7 @@ function EdgeTypeTable(props: EdgeTypeTableProps) {
       [
         {
           accessorKey: 'name', //access nested data with dot notation
-          header: 'Property Name',
+          header: t('propertyName', { ns: 'graphtype' }),
           Header: ({ column }) => (
             <Typography>
               {column.columnDef.header} ({num})
@@ -118,7 +120,7 @@ function EdgeTypeTable(props: EdgeTypeTableProps) {
         },
         {
           accessorKey: 'type',
-          header: 'Property Type',
+          header: t('propertyType', { ns: 'graphtype' }),
           Header: ({ column }) => <Typography>{column.columnDef.header}</Typography>,
         },
       ] as MRT_ColumnDef<IProperty>[],
@@ -126,10 +128,8 @@ function EdgeTypeTable(props: EdgeTypeTableProps) {
   );
 
   const handleCreateEdgeType = () => {
-    modal.show({
-      title: t('createEdgeType', { ns: 'graphtype' }),
-      content: <EdgeTypeConfigModal />,
-    });
+    setEditEdgeType(undefined);
+    setModalOpen(true);
   };
 
   const theme = useTheme();
@@ -146,7 +146,7 @@ function EdgeTypeTable(props: EdgeTypeTableProps) {
       <Box mt={2}>
         <Table
           columns={getColumns()}
-          data={dataSource}
+          data={dataSource.slice()}
           renderDetailPanel={({ row }) => {
             const { properties } = row.original;
             return (
@@ -186,6 +186,7 @@ function EdgeTypeTable(props: EdgeTypeTableProps) {
           }}
         />
       </Box>
+      <EdgeTypeConfigModal open={modalOpen} onCancel={() => setModalOpen(false)} edgeTypeItem={editEdgeType} />
     </>
   );
 }
