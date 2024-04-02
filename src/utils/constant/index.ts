@@ -12,8 +12,10 @@ export enum VisualEditorType {
 export enum PropertyDataType {
   STRING = 'STRING',
   DATE = 'DATE',
-  INT = 'INT',
+  INT64 = 'INT64',
+  INT32 = 'INT32',
   BOOL = 'BOOL',
+  LOCAL_DATETIME = 'LOCAL DATETIME',
 }
 
 export enum EdgeDirectionType {

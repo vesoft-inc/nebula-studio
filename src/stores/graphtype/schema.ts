@@ -1,16 +1,31 @@
+import type { AnyMap } from '@vesoft-inc/veditor/types/Utils';
+import { type IReactionDisposer, computed, makeAutoObservable, observable, reaction } from 'mobx';
+import VEditor, { type VEditorOptions } from '@vesoft-inc/veditor';
+import type { VEditorLine, VEditorNode, VEditorSchema } from '@vesoft-inc/veditor/types/Model/Schema';
+import type { InstanceLine } from '@vesoft-inc/veditor/types/Shape/Line';
+import type { InstanceNode } from '@vesoft-inc/veditor/types/Shape/Node';
+
 import initShapes, { initShadowFilter } from '@/components/Shapes/Shapers';
 import { ARROW_STYLE, COLOR_LIST, LINE_STYLE } from '@/components/Shapes/config';
-import { IEdgeTypeItem, INodeTypeItem, VisualInfo } from '@/interfaces';
+import {
+  DescEdgeTypeResult,
+  DescGraphTypeResult,
+  DescNdoeTypeResult,
+  IEdgeTypeItem,
+  INodeTypeItem,
+  IProperty,
+  VisualInfo,
+} from '@/interfaces';
+import { GQLResult } from '@/interfaces/console';
+import { execGql } from '@/services';
 import { RootStore } from '@/stores/index';
-import { EdgeDirectionType, VisualEditorType } from '@/utils/constant';
-import VEditor, { VEditorOptions } from '@vesoft-inc/veditor';
-import { VEditorLine, VEditorNode, VEditorSchema } from '@vesoft-inc/veditor/types/Model/Schema';
-import { InstanceLine } from '@vesoft-inc/veditor/types/Shape/Line';
-import { InstanceNode } from '@vesoft-inc/veditor/types/Shape/Node';
-import { AnyMap } from '@vesoft-inc/veditor/types/Utils';
-import { IReactionDisposer, computed, makeAutoObservable, observable, reaction } from 'mobx';
+import { EdgeDirectionType, MultiEdgeKeyMode, VisualEditorType } from '@/utils/constant';
 
 type VEditorItem = InstanceNode | InstanceLine;
+
+const ForwardEdgePattern = /\((.*?)\)-\[(.*?)\]->\((.*?)\)/;
+const BackwordEdgePattern = /\((.*?)\)<-\[(.*?)\]-\((.*?)\)/;
+const UndirectedEdgePattern = /\((.*?)\)-\[(.*?)\]-\((.*?)\)/;
 
 export type ActiveItemInfo =
   | { type: VisualEditorType.Edge; value: IEdgeTypeItem }
@@ -29,7 +44,7 @@ class SchemaStore {
   reactionDisposer?: IReactionDisposer;
   activeItemDisposer?: IReactionDisposer;
 
-  constructor(rootStore?: RootStore) {
+  constructor(rootStore?: RootStore, graphtype?: string) {
     this.rootStore = rootStore;
     makeAutoObservable(this, {
       editor: observable.ref,
@@ -41,6 +56,9 @@ class SchemaStore {
       edgeTypeLabelList: computed,
     });
     this.initReactions();
+    if (graphtype) {
+      this.transformGrapTypeByDDL(graphtype);
+    }
   }
 
   get nodeTypeLabeList() {
@@ -50,6 +68,136 @@ class SchemaStore {
   get edgeTypeLabelList() {
     return Array.from(new Set(this.edgeTypeList.map((edge) => edge.labels).reduce((acc, cur) => acc.concat(cur), [])));
   }
+
+  updateNodeTypeList = (nodeTypeList: INodeTypeItem[]) => {
+    this.nodeTypeList.replace(nodeTypeList);
+  };
+
+  updateEdgeTypeList = (edgeTypeList: IEdgeTypeItem[]) => {
+    this.edgeTypeList.replace(edgeTypeList);
+  };
+
+  transformGrapTypeByDDL = async (graphType: string) => {
+    const gql = `CALL describe_graph_type("${graphType}") RETURN *`;
+    const res = await execGql<GQLResult<DescGraphTypeResult>>(gql);
+    if (res.code === 0) {
+      const nodeTypes: INodeTypeItem[] = [];
+      const edgeTypes: IEdgeTypeItem[] = [];
+      // get node type list
+      (res.data?.tables || []).forEach((item) => {
+        const { labels, type, type_name } = item;
+        if (type === 'Node') {
+          nodeTypes.push(
+            new INodeTypeItem({
+              name: type_name,
+              labels,
+              properties: [],
+              style: this.#getInitNodeStyle(nodeTypes.length),
+            })
+          );
+        }
+      });
+      // get edgeType List
+      (res.data?.tables || []).forEach((item) => {
+        const { labels, type, type_name } = item;
+        if (type === 'Edge') {
+          const info = this.#extractEdgeByEdgeTypeName(type_name);
+          if (info) {
+            edgeTypes.push(
+              new IEdgeTypeItem({
+                name: info.name,
+                srcNode: nodeTypes.find((node) => node.name === info.fromNodeName),
+                dstNode: nodeTypes.find((node) => node.name === info.dstNodeName),
+                direction: info.direction,
+                labels,
+                properties: [],
+              })
+            );
+          }
+        }
+      });
+
+      // desc node type
+      const descNodeTypePromises = nodeTypes.map(
+        (nodeType) =>
+          new Promise((resolve, reject) => {
+            const gql = `DESC NODE TYPE ${nodeType.name} of ${graphType}`;
+            execGql<GQLResult<DescNdoeTypeResult>>(gql)
+              .then((res) => {
+                if (res.code === 0) {
+                  const properties: IProperty[] = [];
+                  res.data?.tables?.forEach((item) => {
+                    const { property_name, data_type, primary_key, nullable, default: _default } = item;
+                    properties.push(
+                      new IProperty({
+                        name: property_name,
+                        type: data_type,
+                        isPrimaryKey: primary_key === 'Y',
+                        nullable,
+                        default: _default,
+                      })
+                    );
+                  });
+                  nodeType.properties = properties;
+                  resolve(0);
+                }
+              })
+              .catch((err) => reject(err));
+          })
+      );
+
+      const descEdgeTypePromises = edgeTypes.map(
+        (edgeType) =>
+          new Promise((resolve, reject) => {
+            const gql = `DESC EDGE TYPE ${edgeType.name} of ${graphType}`;
+            execGql<GQLResult<DescEdgeTypeResult>>(gql)
+              .then((res) => {
+                if (res.code === 0) {
+                  const properties: IProperty[] = [];
+                  res.data?.tables?.forEach((item) => {
+                    const { property_name, data_type, multi_edge_key, nullable, default: _default } = item;
+                    properties.push(
+                      new IProperty({
+                        name: property_name,
+                        type: data_type,
+                        multiEdgeKey: multi_edge_key === 'Y',
+                        nullable,
+                        default: _default,
+                      })
+                    );
+                  });
+                  edgeType.properties = properties;
+                  edgeType.multiEdgeKeyMode = MultiEdgeKeyMode.Auto;
+                  resolve(0);
+                }
+              })
+              .catch((err) => reject(err));
+          })
+      );
+
+      await Promise.all(descNodeTypePromises).then(() => {});
+      await Promise.all(descEdgeTypePromises).then(() => {});
+      this.updateNodeTypeList(nodeTypes);
+      this.updateEdgeTypeList(edgeTypes);
+    }
+  };
+
+  #extractEdgeByEdgeTypeName = (edgeTypeName: string) => {
+    const arrs = [ForwardEdgePattern, BackwordEdgePattern, UndirectedEdgePattern];
+    for (let i = 0; i < arrs.length; i++) {
+      const pattern = arrs[i];
+      const matched = edgeTypeName.match(pattern);
+      if (!matched) continue;
+      const [fromNodeName, name, dstNodeName] = matched.slice(1);
+      return {
+        fromNodeName,
+        name,
+        dstNodeName,
+        direction: [EdgeDirectionType.Forward, EdgeDirectionType.Backword, EdgeDirectionType.Undirected][i],
+      };
+    }
+    return undefined;
+  };
 
   addNodeType = (node: INodeTypeItem) => {
     const style = {
@@ -119,8 +267,7 @@ class SchemaStore {
     const linesMap = schema.linesMap;
     this.edgeTypeList.forEach((item) => {
       const vedgeId = Object.keys(linesMap).find((key) => linesMap[key].data?.id === item.id);
-      if (!vedgeId) return;
-      const existLine = linesMap[vedgeId];
+      const existLine = vedgeId ? linesMap[vedgeId] : undefined;
       if (existLine) {
         (existLine.data as unknown as IEdgeTypeItem)?.updateValues(item);
         existLine.from = item.srcNode?.id;
@@ -225,6 +372,10 @@ class SchemaStore {
   };
 
   #parseEdgeTypeToVLine = (edge: IEdgeTypeItem): VEditorLine => {
+    let ponits = { fromPoint: 0, toPoint: 0 };
+    if (edge.srcNode.id === edge.dstNode.id) {
+      ponits = { fromPoint: 0, toPoint: 1 };
+    }
     return {
       uuid: edge.id,
       type: VisualEditorType.Edge,
@@ -236,8 +387,7 @@ class SchemaStore {
         stroke: edge.style?.strokeColor,
         strokeWith: 1.6,
       },
-      fromPoint: 0,
-      toPoint: 0,
+      ...ponits,
     };
   };
 
@@ -315,6 +465,8 @@ class SchemaStore {
       });
       this.editor.graph.on('line:add', ({ line }: { line: InstanceLine }) => {
         if (!this.editor) return;
+        // if (this.edgeTypeList.find((edge) => edge.id === line.data.uuid)) return;
+        if (line.data.data) return;
         const schemaData = this.editor.schema.getData();
         const fromNode = schemaData.nodes.find((node) => node.data?.id === line.from.nodeId)
           ?.data as unknown as INodeTypeItem;
@@ -345,7 +497,7 @@ class SchemaStore {
         line.data.type = VisualEditorType.Edge;
         line.data.style = LINE_STYLE;
         line.data.arrowStyle = ARROW_STYLE;
-        (line.data.data as unknown as IEdgeTypeItem) = new IEdgeTypeItem();
+        // (line.data.data as unknown as IEdgeTypeItem) = new IEdgeTypeItem();
       });
 
       this.editor.graph.on('paper:click', () => {

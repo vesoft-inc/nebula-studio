@@ -160,7 +160,7 @@ const Path: LineRender = {
 
   renderLabel(line?: InstanceLine): SVGGElement {
     const { invalid, textBackgroundColor } = line!.data;
-    const name = line!.data.data.name;
+    const name = line!.data.data?.name;
     if (!name) {
       if (line.label) {
         line.label.labelGroup.remove();
@@ -336,7 +336,7 @@ const Path: LineRender = {
       svgEl.appendChild(arrow);
       svgEl.appendChild(arrowShadow);
     }
-    if (data.data.direction === EdgeDirectionType.Undirected) {
+    if (data.data?.direction === EdgeDirectionType.Undirected) {
       svgEl.style.display = 'none';
     } else {
       svgEl.style.display = 'block';

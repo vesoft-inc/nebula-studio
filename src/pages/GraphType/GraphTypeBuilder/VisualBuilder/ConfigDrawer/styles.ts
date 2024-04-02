@@ -4,6 +4,9 @@ import { styled } from '@mui/material/styles';
 export const SchemaDrawerontainer = styled(Drawer, {})`
   flex-shrink: 0;
   height: 100%;
+  position: absolute;
+  top: 0;
+  right: 0;
   & .MuiDrawer-paper {
     border-radius: 6px;
     position: relative;

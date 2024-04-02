@@ -7,8 +7,8 @@ import { UseFormReturn, useForm, useWatch } from 'react-hook-form-mui';
 
 import { ActionsContainer, SchemaDrawerontainer } from './styles';
 import { useStore } from '@/stores';
-import NodeTypeConfigForm from '@/pages/GraphType/CreateGraphType/NodeType/NodeTypeConfigForm';
-import EdgeTypeConfigForm from '@/pages/GraphType/CreateGraphType/EdgeType/EdgeTypeConfigForm';
+import NodeTypeConfigForm from '@/pages/GraphType/GraphTypeBuilder/NodeType/NodeTypeConfigForm';
+import EdgeTypeConfigForm from '@/pages/GraphType/GraphTypeBuilder/EdgeType/EdgeTypeConfigForm';
 import { IEdgeTypeItem, INodeTypeItem } from '@/interfaces';
 import { VisualEditorType } from '@/utils/constant';
 import { useEffect } from 'react';

@@ -30,7 +30,7 @@ import { usePopupState, bindFocus, bindPopover } from 'material-ui-popup-state/h
 import { observer } from 'mobx-react-lite';
 import { CloseFilled, AddFilled } from '@vesoft-inc/icons';
 
-import { TypeInfoContainer, PropertyBodyCell, PropertyHeaderCell } from '@/pages/GraphType/CreateGraphType/styles';
+import { TypeInfoContainer, PropertyBodyCell, PropertyHeaderCell } from '@/pages/GraphType/GraphTypeBuilder/styles';
 import { IEdgeTypeItem, ILabelItem, INodeTypeItem, IProperty } from '@/interfaces';
 import { EdgeDirectionType, MultiEdgeKeyMode, PropertyDataType } from '@/utils/constant';
 import { getDuplicateValues } from '@/utils';
@@ -157,7 +157,7 @@ function EdgeTypeConfigForm(props: EdgeTypeConfigFormProps) {
   });
 
   return (
-    <Box height={600} sx={{ overflowY: 'auto' }}>
+    <Box minHeight={600} sx={{ overflowY: 'auto' }}>
       <FormContainer formContext={form}>
         <TypeInfoContainer>
           <Typography sx={{ mb: theme.spacing(2) }}>{t('edgeType', { ns: 'graphtype' })}</Typography>

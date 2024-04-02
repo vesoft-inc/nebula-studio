@@ -52,4 +52,7 @@ export default {
   multiKeyMode_auto: '自动',
   multiKeyMode_customize: '自定义',
   multiEdgeKey: '平行边键值',
+  noGraph: 'No Graph',
+  createGraphSuccess: '创建图成功',
+  manageGraphType: '管理Graph Type',
 };

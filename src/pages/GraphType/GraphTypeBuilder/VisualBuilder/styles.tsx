@@ -9,12 +9,31 @@ export const NodeTypeListContainer = styled(Box)`
   height: 100%;
 `;
 
-export const CanvasContainer = styled(Box)`
+export const GraphContainer = styled(Box)`
   display: flex;
   flex: 1;
   height: 100%;
   margin-left: ${({ theme }) => theme.spacing(1)};
 `;
+
+export const GraphBox = styled(Box, {
+  shouldForwardProp: (prop: string) => isPropValid(prop) || prop === 'variant',
+})<BoxProps & { active?: boolean }>(({ theme, active }) => ({
+  width: '100%',
+  height: '100%',
+  zIndex: 1,
+  transition: theme.transitions.create('width', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen,
+  }),
+  ...(active && {
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    width: `calc(100% - 360px)`,
+  }),
+}));
 
 export const TagsContainer = styled(Box)`
   display: flex;
@@ -58,6 +77,7 @@ export const ScaleBtnContainer = styled(Box, {
   position: 'absolute',
   bottom: theme.spacing(3),
   right: theme.spacing(3),
+  zIndex: 1,
   transition: theme.transitions.create('right', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,

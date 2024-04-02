@@ -1,5 +1,5 @@
 import { getVesoftBorder } from '@/utils';
-import { Box, Divider, SxProps, Theme } from '@mui/material';
+import { Box, Divider } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 export const ContentContainer = styled(Box)`
@@ -93,15 +93,6 @@ export const PropertyHeaderDivider = styled(Divider)`
   height: 50%;
   margin-top: 25%;
 `;
-
-export const schemaTextSx: SxProps<Theme> = {
-  color: (theme) => theme.palette.vesoft?.textColor1,
-  fontWeight: 600,
-  fontSize: '16px',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-};
 
 export const EditorWrapper = styled(Box)`
   border: ${getVesoftBorder};

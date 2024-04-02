@@ -4,6 +4,8 @@ import { Modal } from '@vesoft-inc/ui-components';
 import { Box, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { CheckboxElement, FormContainer, TextFieldElement, useForm } from 'react-hook-form-mui';
+import { useEffect } from 'react';
+import { useModal, useStore } from '@/stores';
 
 export interface CreateGraphFormValues {
   graphType: string;
@@ -13,35 +15,50 @@ export interface CreateGraphFormValues {
 
 interface CreateGraphModalProps {
   open: boolean;
+  graphType: string;
   onCancel: () => void;
 }
 
 const CreateGraphModal = (props: CreateGraphModalProps) => {
+  const { open, onCancel, graphType } = props;
   const theme = useTheme();
-  const form = useForm<CreateGraphFormValues>({
-    defaultValues: {
-      graphType: 'GraphType-123',
-      graphName: '',
-      ifNotExists: true,
-    },
-  });
+  const form = useForm<CreateGraphFormValues>();
+
+  const { graphtypeStore } = useStore();
+  const { message } = useModal();
 
   const { t } = useTranslation(['graphtype', 'common']);
 
-  const onSubmit = (values: CreateGraphFormValues) => {
-    console.log('values', values);
+  const onSubmit = async (values: CreateGraphFormValues) => {
+    const { graphName, ifNotExists } = values;
+    const res = await graphtypeStore.createGraph(graphName, graphType, ifNotExists);
+    if (res.code === 0) {
+      message.success(t('createGraphSuccess', { ns: 'graphtype' }));
+      graphtypeStore.getGraphTypeList();
+      onCancel?.();
+    } else {
+      message.error(res.message);
+    }
   };
+
+  useEffect(() => {
+    form.reset({
+      graphType,
+      graphName: '',
+      ifNotExists: true,
+    });
+  }, [graphType]);
 
   return (
     <Modal
       title={t('createGraph', { ns: 'graphtype' })}
-      open={props.open}
+      open={open}
       slotProps={{
         footer: {
           onOk: form.handleSubmit(onSubmit),
         },
       }}
-      onCancel={props.onCancel}
+      onCancel={onCancel}
     >
       <Box sx={{ padding: `${theme.spacing(2)} ${theme.spacing(3)}` }}>
         <FormContainer formContext={form}>

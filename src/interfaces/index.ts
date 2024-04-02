@@ -13,6 +13,8 @@ export class IProperty {
   type: PropertyDataType;
   isPrimaryKey?: boolean = false;
   multiEdgeKey?: boolean = false;
+  default?: string;
+  nullable?: boolean;
   [idSymbol]: string;
 
   constructor(params?: Omit<IProperty, typeof idSymbol | 'id'>) {
@@ -20,6 +22,8 @@ export class IProperty {
     this.type = params?.type || PropertyDataType.STRING;
     this.isPrimaryKey = params?.isPrimaryKey;
     this.multiEdgeKey = params?.multiEdgeKey;
+    this.default = params?.default;
+    this.nullable = params?.nullable;
     this[idSymbol] = createUuid();
   }
 
@@ -154,9 +158,12 @@ export interface Graph {
  * },
  * ```
  */
+
+export type GraphItemType = 'Node' | 'Edge';
+
 export interface GraphTypeElement {
   graph_type_name: string;
-  type: 'Node' | 'Edge';
+  type: GraphItemType;
   type_name: string;
   labels: string[];
   /** currently `string[]` is used for `properties` field, but it should be `Property[]` */
@@ -165,5 +172,28 @@ export interface GraphTypeElement {
 
 export interface ILabelItem {
   name: string;
-  type: 'Node' | 'Edge';
+  type: GraphItemType;
+}
+
+export interface DescGraphTypeResult {
+  labels: string[];
+  properties: string[];
+  type: GraphItemType;
+  type_name: string;
+}
+
+export interface DescNdoeTypeResult {
+  property_name: string;
+  data_type: PropertyDataType;
+  primary_key: 'Y' | '';
+  nullable: boolean;
+  default: string;
+}
+
+export interface DescEdgeTypeResult {
+  property_name: string;
+  data_type: PropertyDataType;
+  multi_edge_key: string;
+  nullable: boolean;
+  default: string;
 }
