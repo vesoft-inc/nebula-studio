@@ -12,16 +12,14 @@ export interface IGraphTypeItem {
 class GraphTypeStore {
   rootStore?: RootStore;
   loading = false;
-
   schemaStore?: SchemaStore;
-
-  graphTypeList: IGraphTypeItem[] = [];
+  graphTypeList = observable.array<IGraphTypeItem>([]);
+  draftList = observable.array<string>([]);
 
   constructor(rootStore?: RootStore) {
     makeAutoObservable(this, {
       rootStore: observable.ref,
       setLoading: action,
-      graphTypeList: observable,
       schemaStore: observable.ref,
     });
     this.rootStore = rootStore;
@@ -52,12 +50,18 @@ class GraphTypeStore {
     return res;
   };
 
-  updateGraphTypeList = (graphTypeList: IGraphTypeItem[]) => {
-    this.graphTypeList = graphTypeList;
+  createGraph = async (graphName: string, graphType: string, ifNotExists: boolean) => {
+    const ngql = `CREATE GRAPH ${ifNotExists ? 'IF NOT EXISTS' : ''} ${graphName} :: ${graphType}`;
+    const res = await execGql<GQLResult>(ngql);
+    return res;
   };
 
-  initSchemaStore = () => {
-    this.schemaStore = new SchemaStore(this.rootStore);
+  updateGraphTypeList = (graphTypeList: IGraphTypeItem[]) => {
+    this.graphTypeList.replace(graphTypeList);
+  };
+
+  initSchemaStore = (graphtype?: string) => {
+    this.schemaStore = new SchemaStore(this.rootStore, graphtype);
   };
 
   destroySchemaStore = () => {

@@ -52,4 +52,7 @@ export default {
   multiKeyMode_auto: 'Auto',
   multiKeyMode_customize: 'Customize',
   multiEdgeKey: 'Multi Edge Key',
+  noGraph: 'No Graph',
+  createGraphSuccess: 'Create Graph Success',
+  manageGraphType: 'Manage Graph Type',
 };

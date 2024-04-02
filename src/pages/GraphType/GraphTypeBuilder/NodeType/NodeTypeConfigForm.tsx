@@ -28,7 +28,7 @@ import { usePopupState, bindFocus, bindPopover } from 'material-ui-popup-state/h
 import { observer } from 'mobx-react-lite';
 import { CloseFilled, AddFilled } from '@vesoft-inc/icons';
 
-import { TypeInfoContainer, PropertyBodyCell, PropertyHeaderCell } from '@/pages/GraphType/CreateGraphType/styles';
+import { TypeInfoContainer, PropertyBodyCell, PropertyHeaderCell } from '@/pages/GraphType/GraphTypeBuilder/styles';
 import { INodeTypeItem, IProperty } from '@/interfaces';
 import { PropertyDataType } from '@/utils/constant';
 import { getDuplicateValues } from '@/utils';

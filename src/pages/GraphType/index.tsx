@@ -2,8 +2,8 @@ import { Box, Container, useTheme } from '@mui/material';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { BreadCrumbs } from '@vesoft-inc/ui-components';
 import { useTranslation } from 'react-i18next';
-import CreateGraphType from './CreateGraphType';
-import GraphTypeDraftList from './GraphTypeDraftList';
+import GraphTypeBuilder from './GraphTypeBuilder';
+import DraftList from './DraftList';
 
 function GraphType() {
   const navigate = useNavigate();
@@ -31,8 +31,9 @@ function GraphType() {
       />
       <Box marginTop={theme.spacing(4)}>
         <Routes>
-          <Route path="create" element={<CreateGraphType />} />
-          <Route path="draft" element={<GraphTypeDraftList />} />
+          <Route path="create" element={<GraphTypeBuilder mode="create" />} />
+          <Route path="draft" element={<DraftList />} />
+          <Route path="manage/:graphType" element={<GraphTypeBuilder mode="edit" />} />
         </Routes>
       </Box>
     </Container>

@@ -21,7 +21,7 @@ import EdgeTypeTable from './EdgeType';
 import Preview from './Preview';
 import { IEdgeTypeItem, INodeTypeItem } from '@/interfaces';
 import { EdgeDirectionType, MultiEdgeKeyMode } from '@/utils/constant';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import LabelTable from './LabelTable';
 
 enum CreateGraphTypeStep {
@@ -60,15 +60,28 @@ const FunctionTabs = [
   // },
 ];
 
-function CreateGraphType() {
+interface GraphTypeBuilderProps {
+  mode: 'edit' | 'create' | 'readonly';
+}
+
+function GraphTypeBuilder(props: GraphTypeBuilderProps) {
+  const { mode } = props;
   const { t } = useTranslation(['graphtype']);
   const [curStep, setCurStep] = useState<CreateGraphTypeStep>(CreateGraphTypeStep.create);
   const { graphtypeStore } = useStore();
   const [curTab, setCurTab] = useState<CreateFunction>(CreateFunction.VisiualBuilder);
   const message = useModal().message;
   const navigate = useNavigate();
+
+  const location = useLocation();
+
   useEffect(() => {
-    graphtypeStore.initSchemaStore();
+    const graphTypeName = location.pathname.split('/').filter((path) => path.length > 0)?.[2];
+    if (mode === 'create') {
+      graphtypeStore.initSchemaStore();
+    } else if (mode === 'edit' && graphTypeName) {
+      graphtypeStore.initSchemaStore(graphTypeName);
+    }
     return () => {
       graphtypeStore.destroySchemaStore();
     };
@@ -266,4 +279,4 @@ function CreateGraphType() {
   );
 }
 
-export default observer(CreateGraphType);
+export default observer(GraphTypeBuilder);

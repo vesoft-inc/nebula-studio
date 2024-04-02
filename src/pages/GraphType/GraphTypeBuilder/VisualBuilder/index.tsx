@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Box } from '@mui/material';
 import { observer } from 'mobx-react-lite';
 
-import { CanvasContainer, ScaleBtnContainer, TagItem, shadowItem } from './styles';
+import { GraphBox, GraphContainer, ScaleBtnContainer, TagItem, shadowItem } from './styles';
 import ScaleBtns from '@/components/ScaleBtns';
 import { useStore } from '@/stores';
 import ConfigDrawer from './ConfigDrawer';
@@ -64,6 +63,8 @@ function VisualBuilder() {
     addDragEvents();
   };
 
+  const active = Boolean(schemaStore?.activeItem);
+
   const addDragEvents = () => {
     const mousemove = (e: MouseEvent) => {
       setDraggingPosition({ x: (e.pageX - 25) as number, y: e.pageY - 25 });
@@ -92,8 +93,8 @@ function VisualBuilder() {
   };
 
   return (
-    <CanvasContainer ref={canvasContainer}>
-      <Box sx={{ width: '100%', height: '100%' }} ref={containerRef} />
+    <GraphContainer ref={canvasContainer}>
+      <GraphBox active={active} ref={containerRef} />
       <TagItem
         sx={{
           borderColor: ToolNodeColor.strokeColor,
@@ -102,13 +103,14 @@ function VisualBuilder() {
           position: 'absolute',
           top: 16,
           left: 16,
+          zIndex: 1,
         }}
         onMouseDown={(e) => onDrag(e)}
       >
         <AddFilled /> {t('add', { ns: 'graphtype' })}
       </TagItem>
       <ConfigDrawer />
-      <ScaleBtnContainer active={Boolean(schemaStore?.activeItem)}>
+      <ScaleBtnContainer active={active}>
         <ScaleBtns onZoomIn={handleZoom('in')} onZoomOut={handleZoom('out')} />
       </ScaleBtnContainer>
       {showDragTag && (
@@ -122,7 +124,7 @@ function VisualBuilder() {
           }}
         />
       )}
-    </CanvasContainer>
+    </GraphContainer>
   );
 }
 
