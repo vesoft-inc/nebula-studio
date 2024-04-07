@@ -1,6 +1,18 @@
-import { Box, Button, Container, Divider, Grid, IconButton, List, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Container,
+  Divider,
+  Grid,
+  IconButton,
+  List,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Typography,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { Dropdown } from '@vesoft-inc/ui-components';
 import { useTheme } from '@emotion/react';
 import { AddFilled, DeleteOutline, EditFilled, MoreHorizFilled } from '@vesoft-inc/icons';
 import { useStore } from '@/stores';
@@ -11,6 +23,8 @@ import { SyntheticEvent, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import CreateGraphModal from './CreateGraphModal';
 import CollapseItem from '@/components/CollapseItem';
+import { bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
+import PopupState from 'material-ui-popup-state';
 
 function GraphType() {
   const { t } = useTranslation(['graphtype', 'common']);
@@ -44,6 +58,10 @@ function GraphType() {
     navigate('draft');
   };
 
+  const handleDropGraph = (graph: string, graphType: string) => {
+    console.log('drop graph', graph, graphType);
+  };
+
   return (
     <Container maxWidth="xl">
       <HeaderContainer>
@@ -75,18 +93,60 @@ function GraphType() {
                       startIcon={<EditFilled fontSize="medium" />}
                       variant="outlined"
                       onClick={handleManageGraphType(graphtype.name)}
-                      sx={{ marginRight: 2, height: theme.spacing(4.5) }}
+                      sx={{ mr: 2, height: theme.spacing(4.5) }}
                     >
                       {t('manageGraphType', { ns: 'graphtype' })}
                     </Button>
                     <Button
                       onClick={handleCreateGraph(graphtype.name)}
                       startIcon={<AddFilled />}
-                      sx={{ height: theme.spacing(4.5) }}
+                      sx={{ height: theme.spacing(4.5), mr: 2 }}
                       variant="outlined"
                     >
                       {t('createGraph', { ns: 'graphtype' })}
                     </Button>
+
+                    <PopupState variant="popover" popupId={`graph-type-more-${graphtype.name}`}>
+                      {(popupState) => {
+                        const { onClick, onTouchStart } = bindTrigger(popupState);
+                        return (
+                          <>
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onClick(e);
+                              }}
+                              onTouchStart={onTouchStart}
+                              variant="outlined"
+                            >
+                              <MoreHorizFilled fontSize="medium" />
+                            </Button>
+                            <Menu
+                              {...bindMenu(popupState)}
+                              anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'center',
+                              }}
+                              transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'center',
+                              }}
+                              sx={{ top: theme.spacing(1) }}
+                            >
+                              <MenuItem
+                                sx={{ width: 240, color: theme.palette.primary.main }}
+                                onClick={popupState.close}
+                              >
+                                <ListItemIcon>
+                                  <EditFilled />
+                                </ListItemIcon>
+                                <ListItemText primary={t('renameGraphType', { ns: 'graphtype' })} />
+                              </MenuItem>
+                            </Menu>
+                          </>
+                        );
+                      }}
+                    </PopupState>
                   </Box>
                 }
               >
@@ -110,35 +170,54 @@ function GraphType() {
                             >
                               {graph}
                             </Typography>
-                            <Dropdown
-                              items={[
-                                {
-                                  key: 'delete',
-                                  label: (
-                                    <Typography color={theme.palette.error.main}>
-                                      {t('delete', { ns: 'graphtype' })}
-                                    </Typography>
-                                  ),
-                                  icon: <DeleteOutline color="error" fontSize="medium" />,
-                                },
-                              ]}
-                              slotProps={{
-                                menuList: {
-                                  sx: {
-                                    width: '120px',
-                                  },
-                                },
+                            <PopupState variant="popover" popupId={`graph-more-${graph}`}>
+                              {(popupState) => {
+                                const { onClick, onTouchStart } = bindTrigger(popupState);
+                                return (
+                                  <>
+                                    <IconButton
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onClick(e);
+                                      }}
+                                      onTouchStart={onTouchStart}
+                                    >
+                                      <MoreHorizFilled
+                                        fontSize="medium"
+                                        sx={{
+                                          color: theme.palette.vesoft.textColor1,
+                                        }}
+                                      />
+                                    </IconButton>
+                                    <Menu
+                                      {...bindMenu(popupState)}
+                                      anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'left',
+                                      }}
+                                      transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'left',
+                                      }}
+                                      sx={{ top: theme.spacing(1) }}
+                                    >
+                                      <MenuItem
+                                        sx={{ width: 120, color: theme.palette.error.main }}
+                                        onClick={() => {
+                                          handleDropGraph(graph, graphtype.name);
+                                          popupState.close();
+                                        }}
+                                      >
+                                        <ListItemIcon>
+                                          <DeleteOutline color="error" />
+                                        </ListItemIcon>
+                                        <ListItemText primary={t('delete', { ns: 'graphtype' })} />
+                                      </MenuItem>
+                                    </Menu>
+                                  </>
+                                );
                               }}
-                            >
-                              <IconButton>
-                                <MoreHorizFilled
-                                  fontSize="medium"
-                                  sx={{
-                                    color: theme.palette.vesoft.textColor1,
-                                  }}
-                                />
-                              </IconButton>
-                            </Dropdown>
+                            </PopupState>
                           </Box>
                         </GraphCard>
                       </Grid>

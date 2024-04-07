@@ -28,7 +28,7 @@ class GraphTypeStore {
   getGraphTypeList = async () => {
     const gql = [
       'CALL show_graph_types() YIELD `graph_type_name` as gtn',
-      'CALL show_graphs() YIELD `graph_name` as name ',
+      'CALL show_graphs("") YIELD `graph_name` as name ',
       'CALL describe_graph(name) YIELD `graph_name`, `graph_type_name`',
       'RETURN graph_name, graph_type_name, gtn',
     ].join(' ');
@@ -53,6 +53,12 @@ class GraphTypeStore {
   createGraph = async (graphName: string, graphType: string, ifNotExists: boolean) => {
     const ngql = `CREATE GRAPH ${ifNotExists ? 'IF NOT EXISTS' : ''} ${graphName} :: ${graphType}`;
     const res = await execGql<GQLResult>(ngql);
+    return res;
+  };
+
+  getCreateGraphTypeDDL = async (graphType: string) => {
+    const ngql = `SHOW CREATE GRAPH TYPE ${graphType}`;
+    const res = await execGql<string>(ngql);
     return res;
   };
 

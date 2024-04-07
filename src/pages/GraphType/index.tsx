@@ -16,6 +16,7 @@ function GraphType() {
     graphtype: t('graphtype', { ns: 'route' }),
     create: t('create', { ns: 'route' }),
     draft: t('draft', { ns: 'route' }),
+    manage: t('manage', { ns: 'route' }),
   };
 
   return (
@@ -25,7 +26,7 @@ function GraphType() {
           navigate('/graphtype');
         }}
         items={paths.map((item, index) => ({
-          name: pathI18nMap[item as keyof typeof pathI18nMap],
+          name: pathI18nMap[item as keyof typeof pathI18nMap] || item,
           href: `/${paths.slice(0, index + 1).join('/')}`,
         }))}
       />

@@ -291,6 +291,9 @@ function EdgeTypeConfigForm(props: EdgeTypeConfigFormProps) {
                   limitTags: 2,
                   size: 'small',
                   fullWidth: true,
+                  freeSolo: true,
+                  autoSelect: true,
+                  handleHomeEndKeys: true,
                   onChange: (_, values: ILabelItem[]) => {
                     form.setValue(
                       'labels',
@@ -302,7 +305,6 @@ function EdgeTypeConfigForm(props: EdgeTypeConfigFormProps) {
                       })
                     );
                   },
-                  handleHomeEndKeys: true,
                   filterOptions: (options: string[], params: FilterOptionsState<string>) => {
                     const filtered = labelOptionFilter(options, params);
                     const { inputValue } = params;

@@ -194,45 +194,51 @@ function NodeTypeConfigForm(props: NodeTypeConfigFormProps) {
             <TransitionGroup>
               {properties?.map((property, index) => (
                 <Collapse key={property.id + index}>
-                  <Stack direction="row">
-                    <PropertyBodyCell>
-                      <TextFieldElement
-                        required
-                        size="small"
-                        fullWidth
-                        label={t('propName', { ns: 'graphtype' })}
-                        validation={{
-                          required: 'Required',
-                          validate: (value) => {
-                            return form.getValues('properties').find((p, i) => i !== index && p.name === value)
-                              ? 'Duplicate'
-                              : true;
-                          },
-                        }}
-                        name={`properties.${index}.name`}
-                      >
-                        {property.name}
-                      </TextFieldElement>
-                    </PropertyBodyCell>
-                    <PropertyBodyCell>
-                      <SelectElement
-                        name={`properties.${index}.type`}
-                        label={t('propType', { ns: 'graphtype' })}
-                        required
-                        options={Object.values(PropertyDataType).map((type) => ({ label: type }))}
-                        valueKey="label"
-                        labelKey="label"
-                        size="small"
-                        fullWidth
-                      />
-                    </PropertyBodyCell>
-                    <PropertyBodyCell display="flex" justifyContent="space-between">
-                      <CheckboxElement name={`properties.${index}.isPrimaryKey`} />
-                      <IconButton onClick={handleDelete(index)}>
-                        <CloseFilled />
-                      </IconButton>
-                    </PropertyBodyCell>
-                  </Stack>
+                  <Grid container direction="row">
+                    <Grid item xs={4}>
+                      <PropertyBodyCell>
+                        <TextFieldElement
+                          required
+                          size="small"
+                          fullWidth
+                          label={t('propName', { ns: 'graphtype' })}
+                          validation={{
+                            required: 'Required',
+                            validate: (value) => {
+                              return form.getValues('properties').find((p, i) => i !== index && p.name === value)
+                                ? 'Duplicate'
+                                : true;
+                            },
+                          }}
+                          name={`properties.${index}.name`}
+                        >
+                          {property.name}
+                        </TextFieldElement>
+                      </PropertyBodyCell>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <PropertyBodyCell>
+                        <SelectElement
+                          name={`properties.${index}.type`}
+                          label={t('propType', { ns: 'graphtype' })}
+                          required
+                          options={Object.values(PropertyDataType).map((type) => ({ label: type }))}
+                          valueKey="label"
+                          labelKey="label"
+                          size="small"
+                          fullWidth
+                        />
+                      </PropertyBodyCell>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <PropertyBodyCell display="flex" justifyContent="space-between">
+                        <CheckboxElement name={`properties.${index}.isPrimaryKey`} />
+                        <IconButton onClick={handleDelete(index)}>
+                          <CloseFilled />
+                        </IconButton>
+                      </PropertyBodyCell>
+                    </Grid>
+                  </Grid>
                 </Collapse>
               ))}
             </TransitionGroup>

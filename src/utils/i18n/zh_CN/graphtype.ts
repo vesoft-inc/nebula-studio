@@ -13,6 +13,7 @@ export default {
   graphName: '图名称',
   addNodeType: '添加 Node Type',
   createGraphType: '创建 Graph Type',
+  editGraphType: '编辑 Graph Type',
   createGraph: '创建图',
   saveAsDraft: '保存为草稿',
   nodeTypeCount: 'Node Type: {{count}}',
@@ -54,5 +55,6 @@ export default {
   multiEdgeKey: '平行边键值',
   noGraph: 'No Graph',
   createGraphSuccess: '创建图成功',
-  manageGraphType: '管理Graph Type',
+  manageGraphType: '管理 Graph Type',
+  renameGraphType: '重命名 Graph Type',
 };

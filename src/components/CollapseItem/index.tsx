@@ -31,7 +31,8 @@ function CollapseItem(props: CollapseItemProps) {
           />
           <ListItemText primaryTypographyProps={{ sx: schemaTextSx, title: title }} primary={title} />
         </Box>
-        {rightPart}
+
+        {rightPart && <Box onClick={(e) => e.stopPropagation()}>{rightPart}</Box>}
       </ListItem>
       <Collapse in={open} timeout="auto" unmountOnExit>
         {props.children}
