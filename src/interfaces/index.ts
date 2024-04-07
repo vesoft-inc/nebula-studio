@@ -7,7 +7,6 @@ import { EdgeDirectionType, MultiEdgeKeyMode, PropertyDataType, VisualEditorType
 
 export const idSymbol = Symbol('id');
 export const styleSymbol = Symbol('style');
-
 export class IProperty {
   name: string;
   type: PropertyDataType;
@@ -56,6 +55,7 @@ export class INodeTypeItem {
     this.name = name || '';
     this.properties = properties || [];
     this.labels = labels || [];
+    this.style = values.style || {};
   }
 
   setName = (name: string) => {
@@ -180,9 +180,15 @@ export interface DescGraphTypeResult {
   properties: string[];
   type: GraphItemType;
   type_name: string;
+  type_pattern?: string;
 }
 
-export interface DescNdoeTypeResult {
+export interface DescTypeItemResult {
+  type_name: string;
+  type: 'node' | 'edge';
+}
+
+export interface DescNodeTypeResult extends DescTypeItemResult {
   property_name: string;
   data_type: PropertyDataType;
   primary_key: 'Y' | '';
@@ -190,10 +196,10 @@ export interface DescNdoeTypeResult {
   default: string;
 }
 
-export interface DescEdgeTypeResult {
+export interface DescEdgeTypeResult extends DescTypeItemResult {
   property_name: string;
   data_type: PropertyDataType;
-  multi_edge_key: string;
+  multi_edge_key: 'Y' | '';
   nullable: boolean;
   default: string;
 }

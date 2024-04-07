@@ -23,9 +23,11 @@ function ConfigDrawer() {
   const getDefaultValues = (): INodeTypeItem | IEdgeTypeItem | undefined => {
     if (!schemaStore?.activeItem) return;
     if (schemaStore?.activeItem?.type === VisualEditorType.Tag) {
-      return new INodeTypeItem(schemaStore.activeItem.value);
+      const nodeItem = new INodeTypeItem(schemaStore.activeItem.value);
+      return nodeItem;
     } else if (schemaStore?.activeItem?.type === VisualEditorType.Edge) {
-      return new IEdgeTypeItem(schemaStore.activeItem.value);
+      const edgeItem = new IEdgeTypeItem(schemaStore.activeItem.value);
+      return edgeItem;
     }
     return undefined;
   };
@@ -74,7 +76,7 @@ function ConfigDrawer() {
   };
 
   return (
-    <SchemaDrawerontainer sx={{ width: '350px' }} variant="persistent" open={open} anchor="right">
+    <SchemaDrawerontainer sx={{ width: '450px' }} variant="persistent" open={open} anchor="right">
       <>
         <ActionsContainer>
           <Button variant="outlined" color="primary" startIcon={<ContentCopyFilled fontSize="medium" />}>

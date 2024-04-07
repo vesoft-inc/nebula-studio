@@ -15,6 +15,8 @@ export enum PropertyDataType {
   INT64 = 'INT64',
   INT32 = 'INT32',
   BOOL = 'BOOL',
+  FLOAT = 'FLOAT',
+  DOUBLE = 'DOUBLE',
   LOCAL_DATETIME = 'LOCAL DATETIME',
 }
 
@@ -34,4 +36,10 @@ export enum MultiEdgeKeyMode {
   Auto,
   /** 允许平行边，自定义属性*/
   Customize,
+}
+
+export enum GraphTypeAction {
+  Delete = 'delete',
+  Add = 'add',
+  Modify = 'modify',
 }

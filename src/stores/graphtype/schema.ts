@@ -5,12 +5,13 @@ import type { VEditorLine, VEditorNode, VEditorSchema } from '@vesoft-inc/vedito
 import type { InstanceLine } from '@vesoft-inc/veditor/types/Shape/Line';
 import type { InstanceNode } from '@vesoft-inc/veditor/types/Shape/Node';
 
+import cloneDeep from 'lodash.clonedeep';
 import initShapes, { initShadowFilter } from '@/components/Shapes/Shapers';
-import { ARROW_STYLE, COLOR_LIST, LINE_STYLE } from '@/components/Shapes/config';
+import { ARROW_STYLE, COLOR_LIST, LINE_STYLE, ToolNodeColor } from '@/components/Shapes/config';
 import {
   DescEdgeTypeResult,
   DescGraphTypeResult,
-  DescNdoeTypeResult,
+  DescNodeTypeResult,
   IEdgeTypeItem,
   INodeTypeItem,
   IProperty,
@@ -19,7 +20,7 @@ import {
 import { GQLResult } from '@/interfaces/console';
 import { execGql } from '@/services';
 import { RootStore } from '@/stores/index';
-import { EdgeDirectionType, MultiEdgeKeyMode, VisualEditorType } from '@/utils/constant';
+import { EdgeDirectionType, VisualEditorType } from '@/utils/constant';
 
 type VEditorItem = InstanceNode | InstanceLine;
 
@@ -38,11 +39,21 @@ class SchemaStore {
   container?: HTMLDivElement;
   hoveringItem?: VEditorItem;
   activeItem?: ActiveItemInfo;
+  originalNodeTypeList: INodeTypeItem[] = [];
+  originalEdgeTypeList: IEdgeTypeItem[] = [];
   nodeTypeList = observable.array<INodeTypeItem>([]);
   edgeTypeList = observable.array<IEdgeTypeItem>([]);
 
   reactionDisposer?: IReactionDisposer;
   activeItemDisposer?: IReactionDisposer;
+
+  mode: 'edit' | 'create' = 'create';
+
+  /**
+   * current edit graph type's name, used in edit mode
+   * @type {string}
+   */
+  graphtype?: string;
 
   constructor(rootStore?: RootStore, graphtype?: string) {
     this.rootStore = rootStore;
@@ -57,7 +68,14 @@ class SchemaStore {
     });
     this.initReactions();
     if (graphtype) {
-      this.transformGrapTypeByDDL(graphtype);
+      this.mode = 'edit';
+      this.graphtype = graphtype;
+      this.transformGrapTypeByDDL(graphtype).then(([nodeTypes, edgeTypes]) => {
+        this.updateNodeTypeList(nodeTypes);
+        this.updateEdgeTypeList(edgeTypes);
+        this.originalNodeTypeList = cloneDeep(nodeTypes);
+        this.originalEdgeTypeList = cloneDeep(edgeTypes);
+      });
     }
   }
 
@@ -77,13 +95,12 @@ class SchemaStore {
     this.edgeTypeList.replace(edgeTypeList);
   };
 
-  transformGrapTypeByDDL = async (graphType: string) => {
+  transformGrapTypeByDDL = async (graphType: string): Promise<[INodeTypeItem[], IEdgeTypeItem[]]> => {
     const gql = `CALL describe_graph_type("${graphType}") RETURN *`;
     const res = await execGql<GQLResult<DescGraphTypeResult>>(gql);
     if (res.code === 0) {
       const nodeTypes: INodeTypeItem[] = [];
       const edgeTypes: IEdgeTypeItem[] = [];
-      // get node type list
       (res.data?.tables || []).forEach((item) => {
         const { labels, type, type_name } = item;
         if (type === 'Node') {
@@ -97,15 +114,16 @@ class SchemaStore {
           );
         }
       });
+
       // get edgeType List
       (res.data?.tables || []).forEach((item) => {
-        const { labels, type, type_name } = item;
+        const { labels, type, type_name, type_pattern } = item;
         if (type === 'Edge') {
-          const info = this.#extractEdgeByEdgeTypeName(type_name);
+          const info = this.#extractEdgeByEdgeTypeName(type_pattern!);
           if (info) {
             edgeTypes.push(
               new IEdgeTypeItem({
-                name: info.name,
+                name: type_name,
                 srcNode: nodeTypes.find((node) => node.name === info.fromNodeName),
                 dstNode: nodeTypes.find((node) => node.name === info.dstNodeName),
                 direction: info.direction,
@@ -116,70 +134,69 @@ class SchemaStore {
           }
         }
       });
-
-      // desc node type
-      const descNodeTypePromises = nodeTypes.map(
-        (nodeType) =>
-          new Promise((resolve, reject) => {
-            const gql = `DESC NODE TYPE ${nodeType.name} of ${graphType}`;
-            execGql<GQLResult<DescNdoeTypeResult>>(gql)
-              .then((res) => {
-                if (res.code === 0) {
-                  const properties: IProperty[] = [];
-                  res.data?.tables?.forEach((item) => {
-                    const { property_name, data_type, primary_key, nullable, default: _default } = item;
-                    properties.push(
-                      new IProperty({
-                        name: property_name,
-                        type: data_type,
-                        isPrimaryKey: primary_key === 'Y',
-                        nullable,
-                        default: _default,
-                      })
-                    );
-                  });
-                  nodeType.properties = properties;
-                  resolve(0);
-                }
-              })
-              .catch((err) => reject(err));
-          })
-      );
-
-      const descEdgeTypePromises = edgeTypes.map(
-        (edgeType) =>
-          new Promise((resolve, reject) => {
-            const gql = `DESC EDGE TYPE ${edgeType.name} of ${graphType}`;
-            execGql<GQLResult<DescEdgeTypeResult>>(gql)
-              .then((res) => {
-                if (res.code === 0) {
-                  const properties: IProperty[] = [];
-                  res.data?.tables?.forEach((item) => {
-                    const { property_name, data_type, multi_edge_key, nullable, default: _default } = item;
-                    properties.push(
-                      new IProperty({
-                        name: property_name,
-                        type: data_type,
-                        multiEdgeKey: multi_edge_key === 'Y',
-                        nullable,
-                        default: _default,
-                      })
-                    );
-                  });
-                  edgeType.properties = properties;
-                  edgeType.multiEdgeKeyMode = MultiEdgeKeyMode.Auto;
-                  resolve(0);
-                }
-              })
-              .catch((err) => reject(err));
-          })
-      );
-
-      await Promise.all(descNodeTypePromises).then(() => {});
-      await Promise.all(descEdgeTypePromises).then(() => {});
-      this.updateNodeTypeList(nodeTypes);
-      this.updateEdgeTypeList(edgeTypes);
+      const [updatedNodeTypes, updatedEdgeTypes] = await Promise.all([
+        this.updateNodeTypeItemProperty(nodeTypes),
+        this.updateEdgeTypeItemProperty(edgeTypes),
+      ]);
+      return [updatedNodeTypes, updatedEdgeTypes];
     }
+    return [[], []];
+  };
+
+  updateNodeTypeItemProperty = async (nodeTypes: INodeTypeItem[]): Promise<INodeTypeItem[]> => {
+    const nodePropertyGql = [
+      `LET gtn = "${this.graphtype}"`,
+      `CALL describe_graph_type(gtn) YIELD type, type_name filter where type = "Node"`,
+      `CALL describe_node_type(gtn, type_name)`,
+      `RETURN *`,
+    ].join('');
+    const res = await execGql<GQLResult<DescNodeTypeResult>>(nodePropertyGql);
+    if (res.code === 0) {
+      const info = Object.groupBy(res.data?.tables || [], (item) => item.type_name);
+      Object.keys(info).forEach((type_name) => {
+        const nodeType = nodeTypes.find((node) => node.name === type_name);
+        if (nodeType && info[type_name]) {
+          nodeType.properties = ((info[type_name] || []) as DescNodeTypeResult[]).map((item) => {
+            return new IProperty({
+              name: item.property_name,
+              type: item.data_type,
+              isPrimaryKey: item.primary_key === 'Y',
+              nullable: item.nullable,
+              default: item.default,
+            });
+          });
+        }
+      });
+    }
+    return nodeTypes;
+  };
+
+  updateEdgeTypeItemProperty = async (edgeTypes: IEdgeTypeItem[]): Promise<IEdgeTypeItem[]> => {
+    const edgePropertyGql = [
+      `LET gtn = "${this.graphtype}"`,
+      `CALL describe_graph_type(gtn) YIELD type, type_name filter where type = "Edge"`,
+      `CALL describe_edge_type(gtn, type_name)`,
+      `RETURN *`,
+    ].join('');
+    const res = await execGql<GQLResult<DescEdgeTypeResult>>(edgePropertyGql);
+    if (res.code === 0) {
+      const info = Object.groupBy(res.data?.tables || [], (item) => item.type_name);
+      Object.keys(info).forEach((type_name) => {
+        const edgeType = edgeTypes.find((edge) => edge.name === type_name);
+        if (edgeType && info[type_name]) {
+          edgeType.properties = ((info[type_name] || []) as DescEdgeTypeResult[]).map((item) => {
+            return new IProperty({
+              name: item.property_name,
+              type: item.data_type,
+              isPrimaryKey: item.multi_edge_key === 'Y',
+              nullable: item.nullable,
+              default: item.default,
+            });
+          });
+        }
+      });
+    }
+    return edgeTypes;
   };
 
   #extractEdgeByEdgeTypeName = (edgeTypeName: string) => {
@@ -256,6 +273,10 @@ class SchemaStore {
       const existNode = nodesMap[item.id];
       if (existNode) {
         existNode.data = item as unknown as AnyMap;
+        existNode.name = item.name;
+        existNode['fill'] = item.style?.fill || ToolNodeColor.fill;
+        existNode['strokeColor'] = item.style?.strokeColor || ToolNodeColor.strokeColor;
+        existNode['shadow'] = item.style?.shadow || ToolNodeColor.shadow;
       } else {
         this.editor?.graph.node.addNode(this.#parseNodeTypeToVNode(item));
       }

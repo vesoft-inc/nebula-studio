@@ -13,6 +13,7 @@ export default {
   graphName: 'Graph Name',
   addNodeType: 'Add Node Type',
   createGraphType: 'Create Graph Type',
+  editGraphType: 'Edit Graph Type',
   createGraph: 'Create Graph',
   saveAsDraft: 'Save As Draft',
   nodeTypeCount: 'Node Type: {{count}}',
@@ -55,4 +56,5 @@ export default {
   noGraph: 'No Graph',
   createGraphSuccess: 'Create Graph Success',
   manageGraphType: 'Manage Graph Type',
+  renameGraphType: 'Rename Graph Type',
 };

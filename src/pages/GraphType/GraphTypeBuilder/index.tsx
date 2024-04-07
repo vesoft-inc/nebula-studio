@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { observer } from 'mobx-react-lite';
 import { CheckboxElement, FormContainer, TextFieldElement, useForm } from 'react-hook-form-mui';
+import { useLocation, useNavigate } from 'react-router-dom';
+import isEqual from 'lodash.isequal';
 
 import { useModal, useStore } from '@/stores';
 import {
@@ -21,7 +23,6 @@ import EdgeTypeTable from './EdgeType';
 import Preview from './Preview';
 import { IEdgeTypeItem, INodeTypeItem } from '@/interfaces';
 import { EdgeDirectionType, MultiEdgeKeyMode } from '@/utils/constant';
-import { useLocation, useNavigate } from 'react-router-dom';
 import LabelTable from './LabelTable';
 
 enum CreateGraphTypeStep {
@@ -75,24 +76,25 @@ function GraphTypeBuilder(props: GraphTypeBuilderProps) {
 
   const location = useLocation();
 
-  useEffect(() => {
-    const graphTypeName = location.pathname.split('/').filter((path) => path.length > 0)?.[2];
-    if (mode === 'create') {
-      graphtypeStore.initSchemaStore();
-    } else if (mode === 'edit' && graphTypeName) {
-      graphtypeStore.initSchemaStore(graphTypeName);
-    }
-    return () => {
-      graphtypeStore.destroySchemaStore();
-    };
-  }, []);
-
   const form = useForm({
     defaultValues: {
       graphTypeName: '',
       ifNotExists: true,
     },
   });
+
+  useEffect(() => {
+    const graphTypeName = location.pathname.split('/').filter((path) => path.length > 0)?.[2];
+    if (mode === 'create') {
+      graphtypeStore.initSchemaStore();
+    } else if (mode === 'edit' && graphTypeName) {
+      graphtypeStore.initSchemaStore(graphTypeName);
+      form.setValue('graphTypeName', graphTypeName);
+    }
+    return () => {
+      graphtypeStore.destroySchemaStore();
+    };
+  }, []);
 
   const handeNextClick = () => {
     form.handleSubmit(() => {
@@ -104,7 +106,7 @@ function GraphTypeBuilder(props: GraphTypeBuilderProps) {
     setCurStep(curStep - 1);
   };
 
-  const getNgql = () => {
+  const getCreateGraphNgql = () => {
     const { graphTypeName, ifNotExists } = form.getValues();
     const nodeTypeList = graphtypeStore.schemaStore?.nodeTypeList || [];
     const edgeTypeList = graphtypeStore.schemaStore?.edgeTypeList || [];
@@ -155,8 +157,58 @@ function GraphTypeBuilder(props: GraphTypeBuilderProps) {
     return ngql;
   };
 
+  const getEditGraphNgql = () => {
+    if (!graphtypeStore.schemaStore) return '';
+    const {
+      graphtype: original_graphType,
+      nodeTypeList,
+      edgeTypeList,
+      originalEdgeTypeList,
+      originalNodeTypeList,
+    } = graphtypeStore.schemaStore;
+    if (!original_graphType) return '';
+    let ngql = '';
+    // const [originalNodeTypeList, originalEdgeTypeList] = await transformGrapTypeByDDL(original_graphType);
+    const curGraphTypeName = form.getValues('graphTypeName');
+    if (curGraphTypeName !== original_graphType) {
+      ngql += `RENAME GRAPH TYPE ${original_graphType} to ${curGraphTypeName} \n`;
+    }
+    const createNodeTypeList = nodeTypeList.filter(
+      (nodeType) => !originalNodeTypeList.find((ot) => ot.name === nodeType.name)
+    );
+    const dropNodeTypeList = originalNodeTypeList.filter(
+      (nodeType) => !nodeTypeList.find((nt) => nt.name === nodeType.name)
+    );
+    const createEdgeTypeList = edgeTypeList.filter(
+      (edgeType) => !originalEdgeTypeList.find((ot) => ot.name === edgeType.name)
+    );
+    const dropEdgeTypeList = originalEdgeTypeList.filter(
+      (edgeType) => !edgeTypeList.find((et) => et.name === edgeType.name)
+    );
+    const alterNodeTypeList = nodeTypeList.filter((nodeType) => {
+      const originalNodeType = originalNodeTypeList.find((ot) => ot.name === nodeType.name);
+      if (!originalNodeType) return false;
+      return !isEqual(nodeType, originalNodeType);
+    });
+    const aleterEdgeTypeList = edgeTypeList.filter((edgeType) => {
+      const originalEdgeType = originalEdgeTypeList.find((ot) => ot.name === edgeType.name);
+      if (!originalEdgeType) return false;
+      return !isEqual(edgeType, originalEdgeType);
+    });
+    createNodeTypeList.forEach((node) => {
+      ngql += `CREATE NODE TYPE ${node.name} \n`;
+    });
+    console.log('createNodeTypeList', createNodeTypeList);
+    console.log('dropNodeTypeList', dropNodeTypeList);
+    console.log('createEdgeTypeList', createEdgeTypeList);
+    console.log('dropEdgeTypeList', dropEdgeTypeList);
+    console.log('alterNodeTypeList', alterNodeTypeList);
+    console.log('aleterEdgeTypeList', aleterEdgeTypeList);
+    return ngql;
+  };
+
   const handleCreateGraphType = async () => {
-    const res = await graphtypeStore.createGraphType(getNgql());
+    const res = await graphtypeStore.createGraphType(getCreateGraphNgql());
     if (res.code === 0) {
       message.success(t('createGraphTypeSuccess', { ns: 'graphtype' }));
       navigate('/graphtype');
@@ -200,7 +252,9 @@ function GraphTypeBuilder(props: GraphTypeBuilderProps) {
                   required
                   size="small"
                   fullWidth
-                  component={(props) => <TextField {...props} disabled={curStep === CreateGraphTypeStep.preview} />}
+                  component={(props) => (
+                    <TextField {...props} disabled={curStep === CreateGraphTypeStep.preview || mode === 'readonly'} />
+                  )}
                 />
               </Grid>
               <Grid item xs={4}>
@@ -248,7 +302,9 @@ function GraphTypeBuilder(props: GraphTypeBuilderProps) {
             </TableContainer>
           )}
         </StepContainer>
-        {curStep === CreateGraphTypeStep.preview && <Preview ngql={getNgql()} />}
+        {curStep === CreateGraphTypeStep.preview && (
+          <Preview ngql={mode === 'create' ? getCreateGraphNgql() : getEditGraphNgql()} />
+        )}
       </MainContainer>
       <FooterContainer>
         {curStep === CreateGraphTypeStep.preview && (
@@ -271,7 +327,8 @@ function GraphTypeBuilder(props: GraphTypeBuilderProps) {
         )}
         {curStep === CreateGraphTypeStep.preview && (
           <Button variant="contained" sx={{ ml: '10px', minWidth: '120px' }} onClick={handleCreateGraphType}>
-            {t('createGraphType', { ns: 'graphtype' })}
+            {mode === 'create' && t('createGraphType', { ns: 'graphtype' })}
+            {mode === 'edit' && t('editGraphType', { ns: 'graphtype' })}
           </Button>
         )}
       </FooterContainer>
