@@ -8,7 +8,7 @@ require (
 	github.com/rs/xid v1.5.0
 	github.com/stretchr/testify v1.9.0
 	github.com/vesoft-inc/go-pkg v0.0.0-20231117110005-307b542ecb31
-	github.com/vesoft-inc/nebula-ng-tools/golang v0.0.0-20240328015426-7d541ef7a0ce
+	github.com/vesoft-inc/nebula-ng-tools/golang v0.0.0-20240408053848-e595d9ac84bb
 	github.com/zeromicro/go-zero v1.6.3
 	gorm.io/gorm v1.25.7
 )
@@ -21,7 +21,6 @@ require (
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/go-logr/logr v1.3.0 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-playground/assert/v2 v2.2.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.10.1 // indirect

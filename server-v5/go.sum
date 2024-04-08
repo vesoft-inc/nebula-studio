@@ -105,8 +105,8 @@ github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsT
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/vesoft-inc/go-pkg v0.0.0-20231117110005-307b542ecb31 h1:bYwFepB7fc/hxVw2c47Q1fBEv2/6kf9A8K+LzfG57bs=
 github.com/vesoft-inc/go-pkg v0.0.0-20231117110005-307b542ecb31/go.mod h1:eLgC+U4ipJ1fxCYBxa1qkuocl5TPswpq192Pdo56lKY=
-github.com/vesoft-inc/nebula-ng-tools/golang v0.0.0-20240328015426-7d541ef7a0ce h1:HLT1ZLsIj+00xbHtPYW/TMzErn5h99PJH8OH5U3ZMI4=
-github.com/vesoft-inc/nebula-ng-tools/golang v0.0.0-20240328015426-7d541ef7a0ce/go.mod h1:Lz1q3qT/ByxroHgXvL+i7kHfpa32dXkdcDrg2xc/LVs=
+github.com/vesoft-inc/nebula-ng-tools/golang v0.0.0-20240408053848-e595d9ac84bb h1:hxBcjZ2ZlBTwq0CAua1q5DQJcp9NDeaIhrexXDIlkA8=
+github.com/vesoft-inc/nebula-ng-tools/golang v0.0.0-20240408053848-e595d9ac84bb/go.mod h1:N6cozbQ/y0ryBcgOwwZMaVHEyt82JcD78ZtxIsPcXRs=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 github.com/zeromicro/go-zero v1.6.3 h1:OL0NnHD5LdRNDolfcK9vUkJt7K8TcBE3RkzfM8poOVw=

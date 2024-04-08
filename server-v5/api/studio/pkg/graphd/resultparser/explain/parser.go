@@ -6,11 +6,5 @@ import (
 )
 
 func Parser(v nebula.Result, r *types.ParsedResult) error {
-	planDesce := v.PlanDesc()
-	if planDesce == nil {
-		return nil
-	}
-
-	r.PlanDesc = string(planDesce)
 	return nil
 }

@@ -20,13 +20,6 @@ import (
 
 var _ GatewayService = (*gatewayService)(nil)
 
-const (
-	address  = "192.168.8.145"
-	port     = 9669
-	username = "root"
-	password = "nebula"
-)
-
 type (
 	GatewayService interface {
 		Connect(req *types.ConnectDBParams) error
@@ -91,20 +84,12 @@ func (s *gatewayService) Disconnect() (*types.AnyResp, error) {
 func (g *gatewayService) ExecGQL(request *types.ExecGQLParams) (*types.AnyResp, error) {
 	authData := g.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	host := fmt.Sprintf("%s:%d", authData.Address, authData.Port)
-	client, err := nebula.NewNebulaClient(host, username, password)
+	client, err := nebula.NewNebulaClient(host, authData.Username, authData.Password)
 	if err != nil {
 		return nil, err
 	}
 	defer client.Close()
 
-	// gql := strconv.Quote(request.Gql)
-	// gql = gql[1 : len(gql)-1]
-	// gql = strings.ReplaceAll(gql, "\\n", " ")
-	// gql = strings.ReplaceAll(gql, "\\t", " ")
-	// gql = strings.ReplaceAll(gql, "\\r", " ")
-	// gql = strings.ReplaceAll(gql, "\\\\", " ")
-	// fmt.Println("=====request.Gql", request.Gql)
-	// fmt.Println("=====request.gql", gql)
 	resp, err := graphd.RunGql(client, request.Gql)
 	if err != nil {
 		return nil, ecode.WithErrorMessage(ecode.ErrInternalServer, err, "run gql failed")
