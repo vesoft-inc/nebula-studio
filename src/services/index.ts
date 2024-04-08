@@ -1,5 +1,6 @@
 import { FetchService } from '@vesoft-inc/utils';
 import { JSONBig } from '@/utils';
+import { getRootStore } from '@/stores/_ref';
 
 let controller = new AbortController();
 
@@ -15,8 +16,11 @@ export enum HttpResCode {
   ErrUnknown = 90004000,
 }
 
+export const HTTP_CANCEL_CODE = 499;
+
 const fetcher = new FetchService({
   config: {
+    errTip: true,
     baseURL: '/api-studio',
     transformResponse: [
       (data, header, code) => {
@@ -47,12 +51,26 @@ const fetcher = new FetchService({
     ins.interceptors.response.use(
       (response) => response,
       (error) => {
-        const response = error?.response || {};
+        // for cancel request, error.response is undefined,
+        // and `errTip` is unnecessary for cancel request to avoid multiple error tips
+        const isCancelError = error?.code === 'ERR_CANCELED';
+        const response = error?.response || {
+          data: { code: isCancelError ? HTTP_CANCEL_CODE : HttpResCode.ErrUnknown },
+        };
+        const errTip = response.config?.errTip;
         if (response.data?.code === HttpResCode.ErrSession) {
           controller.abort();
           controller = new AbortController();
           const redirect = `${location.pathname}${location.search}`;
-          window.location.replace(`/login?redirect=${encodeURIComponent(redirect)}`);
+          const loginUrl = `/login?redirect=${encodeURIComponent(redirect)}`;
+          const routerHistory = getRootStore()?.routerStore.history;
+          routerHistory ? routerHistory.replace(loginUrl) : window.location.replace(loginUrl);
+        }
+        if (errTip) {
+          const message = getRootStore()?.modalStore?.message;
+          const respMsg = response.data?.message?.replace(/^\w+::/, '');
+          const msgContent = respMsg || error?.message || 'Unknown error';
+          message ? message.error(msgContent) : console.error(msgContent);
         }
         return response;
       }

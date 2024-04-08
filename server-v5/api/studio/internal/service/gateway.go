@@ -44,9 +44,10 @@ type (
 
 func NewGatewayService(ctx context.Context, svcCtx *svc.ServiceContext) GatewayService {
 	return &gatewayService{
-		Logger: logx.WithContext(ctx),
-		ctx:    ctx,
-		svcCtx: svcCtx,
+		Logger:           logx.WithContext(ctx),
+		ctx:              ctx,
+		svcCtx:           svcCtx,
+		withErrorMessage: utils.ErrMsgWithLogger(ctx),
 	}
 }
 

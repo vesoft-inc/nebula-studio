@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 import { RouterStore, themeStore } from '@vesoft-inc/utils';
 import { ModalStore } from '@vesoft-inc/ui-components';
+import { setRootStore, getRootStore } from './_ref';
 import { CommonStore } from './common';
 import GraphTypeStore from './graphtype';
 import { ConsoleStore } from './console';
@@ -16,12 +17,12 @@ export class RootStore {
 
 const rootStore = new RootStore();
 
-const rootStoreRef = { current: rootStore };
+setRootStore(rootStore);
 
 // @ts-ignore
 window.studioStore = rootStore;
 
-export const getRootStore = () => rootStoreRef.current;
+export { getRootStore };
 export const storeContext = createContext(rootStore);
 export const StoreProvider = storeContext.Provider;
 export function useStore() {

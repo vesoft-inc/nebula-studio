@@ -102,6 +102,10 @@ func ParseConnectDBParams(params *types.ConnectDBParams, config *config.Config) 
 	if err != nil {
 		return "", err
 	}
+	err = client.Ping()
+	if err != nil {
+		return "", err
+	}
 	defer client.Close()
 
 	tokenString, err := CreateToken(
