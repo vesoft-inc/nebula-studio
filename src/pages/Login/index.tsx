@@ -1,7 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import Button from '@mui/material/Button';
+import LoadingButton from '@mui/lab/LoadingButton';
+import SaveIcon from '@mui/icons-material/Save';
 import { FormContainer, PasswordElement, TextFieldElement, useForm } from 'react-hook-form-mui';
 import { Grid } from '@mui/material';
 import { useStore } from '@/stores';
@@ -29,13 +30,18 @@ interface LoginFormData {
 export default function Login() {
   const navigate = useNavigate();
   const { commonStore } = useStore();
+  const [loading, setLoading] = useState(false);
   const { t } = useTranslation(['login', 'common']);
   const form = useForm<LoginFormData>({ defaultValues: { address: '', username: '', password: '', port: '9669' } });
   const onSubmit = useCallback(async (data: LoginFormData) => {
+    setLoading(true);
     const flag = await commonStore.login(data);
     const params = new URLSearchParams(location.search);
     const redirect = params.get('redirect') || '/console';
-    flag && navigate(redirect);
+    setTimeout(() => {
+      flag && navigate(redirect);
+      setLoading(false);
+    }, 300);
   }, []);
 
   return (
@@ -90,16 +96,19 @@ export default function Login() {
                 />
               </Grid>
               <Grid item md={12}>
-                <Button
+                <LoadingButton
                   onClick={form.handleSubmit(onSubmit)}
                   variant="contained"
                   fullWidth
                   size="large"
                   sx={{ marginTop: ({ spacing }) => spacing(2) }}
                   type="submit"
+                  loadingPosition="start"
+                  startIcon={<SaveIcon />}
+                  loading={loading}
                 >
                   {t('login', { ns: 'login' })}
-                </Button>
+                </LoadingButton>
               </Grid>
             </Grid>
           </FormContainer>
