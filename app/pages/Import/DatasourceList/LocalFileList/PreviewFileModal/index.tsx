@@ -53,7 +53,8 @@ const PreviewFileModal = (props: IProps) => {
       let data = [];
       readString(sample, {
         delimiter: delimiter || file.delimiter,
-        worker: true,
+        // @ts-ignore
+        worker: false,
         skipEmptyLines: true,
         step: (row) => {
           data = [...data, row.data];
