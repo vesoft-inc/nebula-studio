@@ -75,7 +75,8 @@ const FileConfigSetting = (props: IProps) => {
       if (activeItem.sample !== undefined) {
         readString(activeItem.sample, {
           delimiter: activeItem.delimiter || ',',
-          worker: true,
+          // @ts-ignore
+          worker: false,
           skipEmptyLines: true,
           step: (row) => {
             content = [...content, row.data];

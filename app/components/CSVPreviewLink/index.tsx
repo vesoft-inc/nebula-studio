@@ -31,7 +31,8 @@ const CSVPreviewLink = (props: IProps) => {
     let data = [];
     readString(sample, {
       delimiter,
-      worker: true,
+      // @ts-ignore
+      worker: false,
       skipEmptyLines: true,
       step: (row) => {
         data = [...data, row.data];
