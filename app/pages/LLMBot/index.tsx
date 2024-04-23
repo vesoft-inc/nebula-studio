@@ -26,7 +26,7 @@ function LLMBot() {
         content={<Chat />}
         title={
           <div className={styles.llmBotTitle}>
-            <div className={styles.llmBotTitleInner}>AI Asistant</div>
+            <div className={styles.llmBotTitleInner}>AI Assistant</div>
             <div className={styles.llmBotHandler}>
               text2match
               <Switch

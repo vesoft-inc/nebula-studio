@@ -6,7 +6,7 @@ import * as ngqlDoc from '@app/utils/ngql';
 import schema from './schema';
 import rootStore from '.';
 
-export const matchPrompt = `I want you to be a NebulaGraph database asistant.
+export const matchPrompt = `I want you to be a NebulaGraph database assistant.
 There are below document.
 ----
 Use only the provided relationship types and properties in the schema.
@@ -49,7 +49,7 @@ the reference documentation provided is: \n
 ----
 Please marked(\`\`\`ngql) for markdown code block to write the ngql and answer the user's question with the question language`;
 
-export const AgentTask = `Assume you are a NebulaGraph AI chat asistant. You need to help the user to write NGQL or solve other question. 
+export const AgentTask = `Assume you are a NebulaGraph AI chat assistant. You need to help the user to write NGQL or solve other question. 
 You have access to the following information:
 1. The user's console NGQL context is: {current_ngql}
 2. The user's current graph space is: {space_name}

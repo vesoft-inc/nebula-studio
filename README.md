@@ -73,7 +73,7 @@ Use when you want shutdown the web app
 kill -9 $(lsof -t -i :7001)
 ```
 
-## Documentation 3.9.0
+## Documentation 3.9.2
 [中文](https://docs.nebula-graph.com.cn/3.6.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/)
 [ENGLISH](https://docs.nebula-graph.io/3.6.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/)
 
