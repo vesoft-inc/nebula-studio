@@ -24,7 +24,8 @@ NebulaGraph Studio (Studio for short) is a web-based visualization tool for Nebu
 | 3.0.0 ～ 3.4.0       | v3.6.x                    |
 | 3.0.0 ～ 3.5.0       | v3.7.x                    |
 | 3.0.0 ～ 3.6.0       | v3.8.x                    |
-| 3.0.0 ～ latest      | v3.9.x                    |
+| 3.0.0 ～ 3.6.0       | v3.9.x                    |
+| 3.0.0 ～ 3.8.0       | v3.10.x                   |
 
 ## Development Quick Start
 
@@ -73,9 +74,9 @@ Use when you want shutdown the web app
 kill -9 $(lsof -t -i :7001)
 ```
 
-## Documentation 3.9.2
-[中文](https://docs.nebula-graph.com.cn/3.6.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/)
-[ENGLISH](https://docs.nebula-graph.io/3.6.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/)
+## Documentation 3.10.0
+[中文](https://docs.nebula-graph.com.cn/3.8.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/)
+[ENGLISH](https://docs.nebula-graph.io/3.8.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/)
 
 ## Contributing
 Contributions are warmly welcomed and greatly appreciated. Please see [Guide Docs](https://github.com/vesoft-inc/nebula-studio/blob/master/CONTRIBUTING.md) 
