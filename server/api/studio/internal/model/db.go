@@ -24,6 +24,10 @@ var CtxDB *gorm.DB
 func ParseDSN(opts config.Config) (dsn string, err error) {
 	switch opts.DB.Type {
 	case "mysql":
+		if opts.DB.DSN != "" {
+			return opts.DB.DSN, nil
+		}
+
 		concate := "?"
 		if strings.Contains(opts.DB.Name, concate) {
 			concate = "&"

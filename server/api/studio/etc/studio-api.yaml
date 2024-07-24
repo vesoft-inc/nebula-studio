@@ -38,6 +38,7 @@ File:
   TasksDir: "./data/tasks"
 CorsOrigins: []
 DB:
+  DSN: ""
   # 1,2,3,4 corresponding to Silent, ERROR, Warn, INFO
   LogLevel: 4
   IgnoreRecordNotFoundError: false

@@ -79,6 +79,7 @@ type Config struct {
 		SqliteDbFilePath          string `json:",default=./data/tasks.db"`
 		MaxOpenConns              int    `json:",default=30"`
 		MaxIdleConns              int    `json:",default=10"`
+		DSN                       string `json:",optional"`
 	}
 
 	LLM struct {
