@@ -53,6 +53,7 @@ const TaskItem = (props: IProps) => {
     dataImport: { downloadTaskConfig, importTask },
     schema,
     moduleConfiguration,
+    global: { platform }
   } = useStore();
   const history = useHistory();
   const { disableConfigDownload, needPwdConfirm } = moduleConfiguration.dataImport;
@@ -235,7 +236,7 @@ const TaskItem = (props: IProps) => {
                 <Icon type="icon-studio-btn-edit" />
               </Tooltip>
             </Button>
-            {!isDraft && !loadingStatus.includes(status) && (
+            {platform !== 'cloud' && !isDraft && !loadingStatus.includes(status) && (
               <Button className="primaryBtn" onClick={() => onViewLog(props.data)}>
                 <Tooltip title={intl.get('import.viewLogs')}>
                   <Icon type="icon-studio-btn-ddl" />
