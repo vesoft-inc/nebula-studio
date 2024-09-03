@@ -65,6 +65,9 @@ type Config struct {
 		// If a peer sends a message larger than this, websocket will close the connection.
 		// default: 8MB (8 * 1024 * 1024), 0 means no limit or system limit
 		ReadLimit int64 `json:",default=8388608"`
+
+		// Check Origin in websocket handshake
+		CheckOrigin bool `json:",default=true"`
 	} `json:",optional"`
 
 	DB struct {
