@@ -138,9 +138,15 @@ func (f *fileService) FileUpload() error {
 		return ecode.WithErrorMessage(ecode.ErrInternalServer, err, "upload failed")
 	}
 	for _, file := range files {
-		if file.Size == 0 {
+		// 检查文件后缀
+		ext := strings.ToLower(filepath.Ext(file.Filename))
+		if ext != ".txt" && ext != ".csv" {
+			return ecode.WithErrorMessage(ecode.ErrInvalidParameter, fmt.Errorf("unsupported file type: %s", ext), "Only .txt and .csv files are supported")
+		}
+		if file.Size == 0 || file.Header.Get("Content-Type") != "text/csv" {
 			continue
 		}
+
 		charSet, err := checkCharset(file)
 		if err != nil {
 			logx.Infof("upload file error, check charset fail:%v", err)
@@ -149,6 +155,7 @@ func (f *fileService) FileUpload() error {
 		if charSet == "UTF-8" {
 			continue
 		}
+
 		path := filepath.Join(dir, file.Filename)
 		if err = changeFileCharset2UTF8(path, charSet); err != nil {
 			logx.Infof("upload file error:%v", err)
