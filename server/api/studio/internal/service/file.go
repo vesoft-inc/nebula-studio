@@ -135,14 +135,9 @@ func (f *fileService) FileUpload() error {
 	files, _, err := UploadFormFiles(httpReq, dir)
 	if err != nil {
 		logx.Infof("upload file error:%v", err)
-		return ecode.WithErrorMessage(ecode.ErrInternalServer, err, "upload failed")
+		return err
 	}
 	for _, file := range files {
-		// 检查文件后缀
-		ext := strings.ToLower(filepath.Ext(file.Filename))
-		if ext != ".txt" && ext != ".csv" {
-			return ecode.WithErrorMessage(ecode.ErrInvalidParameter, fmt.Errorf("unsupported file type: %s", ext), "Only .txt and .csv files are supported")
-		}
 		if file.Size == 0 || file.Header.Get("Content-Type") != "text/csv" {
 			continue
 		}
@@ -171,14 +166,18 @@ func UploadFormFiles(r *http.Request, destDirectory string) (uploaded []*multipa
 	if err != nil {
 		return nil, 0, err
 	}
-
 	if r.MultipartForm != nil {
 		if fhs := r.MultipartForm.File; fhs != nil {
+			unsupportedFileNames := make([]string, 0)
 			for _, files := range fhs {
 				for _, file := range files {
 					file.Filename = strings.ReplaceAll(file.Filename, "../", "")
 					file.Filename = strings.ReplaceAll(file.Filename, "..\\", "")
-
+					ext := strings.ToLower(filepath.Ext(file.Filename))
+					if ext != ".txt" && ext != ".csv" {
+						unsupportedFileNames = append(unsupportedFileNames, file.Filename)
+						continue
+					}
 					n0, err0 := SaveFormFile(file, filepath.Join(destDirectory, file.Filename))
 					if err0 != nil {
 						return nil, 0, err0
@@ -187,6 +186,9 @@ func UploadFormFiles(r *http.Request, destDirectory string) (uploaded []*multipa
 
 					uploaded = append(uploaded, file)
 				}
+			}
+			if len(unsupportedFileNames) > 0 {
+				return uploaded, n, ecode.WithErrorMessage(ecode.ErrInvalidParameter, fmt.Errorf("exist unsupported file: %s", strings.Join(unsupportedFileNames, ",")), "Only .txt and .csv files are supported")
 			}
 			return uploaded, n, nil
 		}
