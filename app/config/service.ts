@@ -57,7 +57,7 @@ const service = {
     return get('/api/files')();
   },
   uploadFiles: (params?, config?) => {
-    return put('/api/files')(params, { ...config, headers: { 'Content-Type': 'multipart/form-data' } });
+    return post('/api/files')(params, { ...config, headers: { 'Content-Type': 'multipart/form-data' } });
   },
   initSketch: (params, config?) => {
     return post(`/api/sketches/sketch`)(params, config);
