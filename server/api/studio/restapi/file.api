@@ -30,7 +30,7 @@ type (
 service studio-api {
 	@doc "Upload File"
 	@handler FileUpload
-	put /api/files
+	post /api/files
 	@doc "delete file"
 	@handler FileDestroy
 	delete /api/files(FileDestroyRequest)
