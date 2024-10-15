@@ -221,7 +221,7 @@ service studio-api {
 	
 	@doc "Delete Import Task"
 	@handler DeleteImportTask
-	delete /api/import-tasks/:id(DeleteImportTaskRequest)
+	post /api/import-tasks/:id(DeleteImportTaskRequest)
 	
 	@doc "Stop Import Task"
 	@handler StopImportTask

@@ -54,10 +54,10 @@ service studio-api {
 	
 	@doc "Delete Sketch"
 	@handler Delete
-	delete /api/sketches/:id (DeleteSketchRequest)
+	post /api/sketches/:id (DeleteSketchRequest)
 	
 	@doc "Update Sketch Item"
 	@handler Update
-	put /api/sketches/:id (UpdateSketchRequest)
+	post /api/sketches/:id (UpdateSketchRequest)
 	
 }

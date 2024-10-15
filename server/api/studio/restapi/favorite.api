@@ -36,9 +36,9 @@ service studio-api {
 	
 	@doc "Delete Favorite"
 	@handler Delete
-	delete /api/favorites/:id (DeleteFavoriteRequest)
+	post /api/favorites/:id (DeleteFavoriteRequest)
 	
 	@doc "Clear Favorites"
 	@handler DeleteAll
-	delete /api/favorites
+	post /api/favorites
 }

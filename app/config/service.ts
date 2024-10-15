@@ -1,4 +1,4 @@
-import { _delete, get, post, put } from '../utils/http';
+import { post, get } from '../utils/http';
 import ngqlRunner from '@app/utils/websocket';
 
 const service = {
@@ -33,7 +33,7 @@ const service = {
     return get(`/api/import-tasks/${id}/stop`)();
   },
   deleteImportTask: (id: number) => {
-    return _delete(`/api/import-tasks/${id}`)();
+    return post(`/api/import-tasks/${id}`)();
   },
   getTaskList: (params?, config?) => {
     return get('/api/import-tasks')(params, config);
@@ -51,7 +51,7 @@ const service = {
   // files
   deteleFile: params => {
     const { filename } = params;
-    return _delete(`/api/files/${encodeURIComponent(filename)}`)();
+    return post(`/api/files/${encodeURIComponent(filename)}`)();
   },
   getFiles: () => {
     return get('/api/files')();
@@ -67,23 +67,23 @@ const service = {
   },
   updateSketch: (params, config?) => {
     const { id, ...restParams } = params;
-    return put(`/api/sketches/${id}`)(restParams, config);
+    return post(`/api/sketches/${id}`)(restParams, config);
   },
   deleteSketch: (id: string, config?) => {
-    return _delete(`/api/sketches/${id}`)(undefined, config);
+    return post(`/api/sketches/${id}`)(undefined, config);
   },
   getSchemaSnapshot: (params, config?) => {
     return get(`/api/schema/snapshot`)(params, config);
   },
   updateSchemaSnapshot: (params, config?) => {
     const { ...restParams } = params;
-    return put(`/api/schema/snapshot`)(restParams, config);
+    return post(`/api/schema/snapshot`)(restParams, config);
   },
   deleteFavorite: (id, config?) => {
-    return _delete(`/api/favorites/${id}`)(undefined, config);
+    return post(`/api/favorites/${id}`)(undefined, config);
   },
   deleteAllFavorites: () => {
-    return _delete(`/api/favorites`)();
+    return post(`/api/favorites`)();
   },
   getFavoriteList: () => {
     return get(`/api/favorites/list`)();

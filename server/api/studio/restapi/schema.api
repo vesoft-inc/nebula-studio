@@ -21,7 +21,7 @@ type (
 service studio-api {
 	@doc "Update Schema Snapshot"
 	@handler Update
-	put /api/schema/snapshot (UpdateSchemaSnapshotRequest)
+	post /api/schema/snapshot (UpdateSchemaSnapshotRequest)
 	
 	@doc "Get Schema Snapshot"
 	@handler GetSnapshot
