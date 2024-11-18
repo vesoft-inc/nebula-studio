@@ -35,28 +35,28 @@ export const getModuleList = (): ModuleItem[] => {
       title: intl.get('common.schema'),
       tip: intl.get('doc.schemaIntro'),
       startLink: '/schema',
-      docLink: intl.get('welcome.schemaModuleLink'),
+      docLink: '',
     },
     {
       icon: 'icon-studio-nav-import',
       title: intl.get('import.importData'),
       tip: intl.get('doc.importIntro'),
       startLink: '/import/tasks',
-      docLink: intl.get('welcome.importModuleLink'),
+      docLink: '',
     },
     {
       icon: 'icon-studio-nav-console',
       title: intl.get('common.console'),
       tip: intl.get('doc.consoleIntro'),
       startLink: '/console',
-      docLink: intl.get('welcome.consoleModuleLink'),
+      docLink: '',
     },
     {
       icon: 'icon-navbar-sketch',
       title: intl.get('common.sketch'),
       tip: intl.get('doc.sketchIntro'),
       startLink: '/sketch',
-      docLink: intl.get('welcome.sketchModuleLink'),
+      docLink: '',
     },
   ];
 };
@@ -120,7 +120,7 @@ const getDatasetList = (): DatasetItem[] => {
         edgeCount: 227,
       },
       coverImg: `${process.env.CDN_PATH || '/'}images/welcome/basketballplayer.png`,
-      docLink: intl.get('welcome.basketballplayerDocLink'),
+      docLink: '',
     },
     {
       type: 'solution',
@@ -134,7 +134,7 @@ const getDatasetList = (): DatasetItem[] => {
         edgeCount: 13130,
       },
       coverImg: `${process.env.CDN_PATH || '/'}images/welcome/shareholding.png`,
-      docLink: intl.get('welcome.shareholdingDocLink'),
+      docLink: '',
     },
     {
       type: 'starter',
@@ -148,7 +148,7 @@ const getDatasetList = (): DatasetItem[] => {
         edgeCount: 327,
       },
       coverImg: `${process.env.CDN_PATH || '/'}images/welcome/sns.png`,
-      docLink: intl.get('welcome.snsDocLink'),
+      docLink: '',
     },
     {
       type: 'solution',
@@ -162,7 +162,7 @@ const getDatasetList = (): DatasetItem[] => {
         edgeCount: 50,
       },
       coverImg: `${process.env.CDN_PATH || '/'}images/welcome/openstack.png`,
-      docLink: intl.get('welcome.openstackDocLink'),
+      docLink: '',
     },
     {
       type: 'starter',
@@ -176,7 +176,7 @@ const getDatasetList = (): DatasetItem[] => {
         edgeCount: 550,
       },
       coverImg: `${process.env.CDN_PATH || '/'}images/welcome/datalineage.png`,
-      docLink: intl.get('welcome.datalineageDocLink'),
+      docLink: '',
     },
     {
       type: 'starter',
@@ -190,7 +190,7 @@ const getDatasetList = (): DatasetItem[] => {
         edgeCount: 160000,
       },
       coverImg: `${process.env.CDN_PATH || '/'}images/welcome/movie.png`,
-      docLink: intl.get('welcome.movieDocLink'),
+      docLink: '',
     },
     {
       type: 'starter',
@@ -204,7 +204,7 @@ const getDatasetList = (): DatasetItem[] => {
         edgeCount: 133,
       },
       coverImg: `${process.env.CDN_PATH || '/'}images/welcome/id_mapping.png`,
-      docLink: intl.get('welcome.idMappingDocLink'),
+      docLink: '',
     },
     {
       type: 'solution',
@@ -218,7 +218,7 @@ const getDatasetList = (): DatasetItem[] => {
         edgeCount: 427,
       },
       coverImg: `${process.env.CDN_PATH || '/'}images/welcome/fraud_detection.png`,
-      docLink: intl.get('welcome.fraudDetectionDocLink'),
+      docLink: '',
     },
     {
       type: 'starter',
@@ -232,7 +232,7 @@ const getDatasetList = (): DatasetItem[] => {
         edgeCount: 1695,
       },
       coverImg: `${process.env.CDN_PATH || '/'}images/welcome/fifa2022.png`,
-      docLink: intl.get('welcome.fifa2022DocLink'),
+      docLink: '',
     },
     {
       type: 'solution',
@@ -246,7 +246,7 @@ const getDatasetList = (): DatasetItem[] => {
         edgeCount: 62,
       },
       coverImg: `${process.env.CDN_PATH || '/'}images/welcome/supplychain.png`,
-      docLink: intl.get('welcome.supplychainDocLink'),
+      docLink: '',
     },
   ];
 };
@@ -390,7 +390,7 @@ function Welcome(props: IProps) {
                     >
                       {intl.get('welcome.demoDownload')}
                     </Button>
-                    <Button
+                    {/* <Button
                       className={styles.link}
                       disabled={!dataset.docLink}
                       href={dataset.docLink}
@@ -398,7 +398,7 @@ function Welcome(props: IProps) {
                       type="link"
                     >
                       {intl.get('welcome.demoIntro')}
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               </div>
@@ -457,9 +457,9 @@ function Welcome(props: IProps) {
                     </Button>
                   )}
 
-                  <Button className={cls(styles.action, styles.sub)} href={module.docLink} target="_blank">
+                  {/* <Button className={cls(styles.action, styles.sub)} href={module.docLink} target="_blank">
                     {intl.get('welcome.quickStartDesc')}
-                  </Button>
+                  </Button> */}
                 </div>
                 {module.withOrder && <div className={styles.order}>{idx + 1}</div>}
               </div>
