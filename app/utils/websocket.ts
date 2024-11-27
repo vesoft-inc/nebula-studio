@@ -135,8 +135,9 @@ export class NgqlRunner {
     } = payload;
     if (!url) {
       logoutFun?.();
-      message.error('WebSocket URL is empty');
-      return Promise.reject('WebSocket URL is empty');
+      console.error('WebSocket URL is empty');
+      // return Promise.reject('WebSocket URL is empty');
+      return;
     }
 
     if (this.socketConnectingPromise) {
