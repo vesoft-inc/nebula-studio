@@ -64,7 +64,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
-				Method:  http.MethodPut,
+				Method:  http.MethodPost,
 				Path:    "/api/files",
 				Handler: file.FileUploadHandler(serverCtx),
 			},
