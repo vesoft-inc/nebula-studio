@@ -274,7 +274,7 @@ export class NgqlRunner {
           console.error('WebSocket reconnect failed');
         }
         // dont return error, because the user may not care about the error
-        return Promise.resolve({ code: 0, message: 'WebSocket reconnect failed' });
+        return Promise.resolve({ code: -1, message: 'WebSocket reconnect failed' });
       }
     }
 
