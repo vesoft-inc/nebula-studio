@@ -174,6 +174,8 @@ class TwoGraph {
         if (!graph.nodesSelected.has(node)) {
           return;
         }
+
+        // 对选中的节点应用平移
         graph.nodesSelected
           .toJSON()
           .filter((selNode) => selNode !== node) // don't touch node being dragged
@@ -182,13 +184,30 @@ class TwoGraph {
               node[`f${coord}`] = node[coord] + translate[coord];
             }),
           );
+
+        // 应用拖动时的磁力效应
+        if (graph.applyMagneticForcesDuringDrag) {
+          graph.applyMagneticForcesDuringDrag(node);
+        }
       })
-      .onNodeDragEnd(() => {
+      .onNodeDragEnd((node) => {
         graph.setDraggingNode(null);
-        graph.nodes.forEach((item) => {
-          item.fx = item.x;
-          item.fy = item.y;
-        });
+
+        // 只固定被拖动的节点和选中的节点，其他节点保持可移动
+        if (graph.nodesSelected.has(node)) {
+          graph.nodesSelected.forEach((selectedNode) => {
+            selectedNode.fx = selectedNode.x;
+            selectedNode.fy = selectedNode.y;
+          });
+        } else {
+          node.fx = node.x;
+          node.fy = node.y;
+        }
+
+        // 清理拖动时的磁力效应
+        if (graph.cleanupDragMagneticForces) {
+          graph.cleanupDragMagneticForces();
+        }
       })
       .linkCurvature((link) => {
         // cuclate link's curvature by graphIndex

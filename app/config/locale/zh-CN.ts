@@ -174,6 +174,11 @@ export default {
     notExist: '不存在',
     expandItem: '展开',
     collapseItem: '收起',
+    selectNodeFirst: '请先选择要扩展的节点',
+    noNewNeighbors: '没有发现新的邻居节点',
+    expandSuccess: '成功扩展 {vertexCount} 个节点和 {edgeCount} 条边',
+    expandFailed: '扩展节点失败',
+    queryFailed: '查询失败',
   },
   import: {
     uploadFile: '上传文件',
