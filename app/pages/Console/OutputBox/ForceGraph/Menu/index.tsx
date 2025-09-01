@@ -3,26 +3,32 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import styles from './index.module.less';
 import ColorChangeBtn from './ColorChangeBtn';
+import ExpandNodeBtn from './ExpandNodeBtn';
 interface IProps {
   id: string;
 }
 const Menu = (props: IProps) => {
   const { id } = props;
-  const { graphInstances: { graphs } } = useStore();
+  const {
+    graphInstances: { graphs },
+  } = useStore();
   const graph = graphs[id];
   const {
     pointer: { left: x, top: y, showContextMenu },
   } = graph;
-  if(!showContextMenu) {
+  if (!showContextMenu) {
     return null;
-  } 
+  }
   const hide = () => {
     graph.setPointer({
       showContextMenu: false,
     });
   };
-  
+
   const menuConfig = [
+    {
+      component: <ExpandNodeBtn graph={graph} onClose={hide} />,
+    },
     {
       component: <ColorChangeBtn graph={graph} onClose={hide} />,
     },
@@ -39,7 +45,7 @@ const Menu = (props: IProps) => {
   }
 
   return (
-    <div className={styles.contextMenu} style={style} onContextMenu={e => e.preventDefault()}>
+    <div className={styles.contextMenu} style={style} onContextMenu={(e) => e.preventDefault()}>
       {menuConfig.map((item, index) => (
         <Fragment key={index}>{item.component}</Fragment>
       ))}

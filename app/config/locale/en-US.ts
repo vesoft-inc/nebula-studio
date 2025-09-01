@@ -180,6 +180,11 @@ export default {
     notExist: 'Not exist',
     expandItem: 'Expand',
     collapseItem: 'Collapse',
+    selectNodeFirst: 'Please select nodes to expand first',
+    noNewNeighbors: 'No new neighbor nodes found',
+    expandSuccess: 'Successfully expanded {vertexCount} nodes and {edgeCount} edges',
+    expandFailed: 'Failed to expand nodes',
+    queryFailed: 'Query failed',
   },
   import: {
     uploadFile: 'Upload Files',
