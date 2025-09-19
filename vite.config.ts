@@ -34,6 +34,7 @@ const htmlPlugin = (data?: Record<string, unknown>): Plugin => {
 
 // https://vitejs.dev/config/
 export default defineConfig({
+   base: './', 
   build: {
     target: 'esnext',
     sourcemap: true,
