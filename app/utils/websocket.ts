@@ -85,6 +85,7 @@ export class NgqlRunner {
   socketProtocols: string | string[] | undefined;
   logoutFun: () => void = undefined;
   product = 'Studio';
+  reconnectTimer: number | undefined = undefined;
 
   socketMessageListeners: ((e: MessageEvent) => void)[] = [];
   messageReceiverMap = new Map<string, MessageReceiver>();
@@ -95,11 +96,13 @@ export class NgqlRunner {
   msgReceivedProcessors: MsgReceivedProcessor[] = [];
 
   constructor() {
-    const urlItem = localStorage.getItem('socketUrl');
-    const protocolsItem = localStorage.getItem('socketProtocols');
-
-    urlItem && (this.socketUrl = safeParse<string>(urlItem));
-    protocolsItem && (this.socketProtocols = safeParse<string>(protocolsItem));
+    // const urlItem = localStorage.getItem('socketUrl');
+    // const protocolsItem = localStorage.getItem('socketProtocols');
+    // urlItem && (this.socketUrl = safeParse<string>(urlItem));
+    // protocolsItem && (this.socketProtocols = safeParse<string>(protocolsItem));
+    /**
+     * 当socketUrl 的 登录信息过期后，这里仍从localStorage中获取，导致连接失败，所以这里不再从localStorage中获取
+     */
   }
 
   addSocketMessageListener = (listener: (e: MessageEvent) => void) => {
@@ -143,18 +146,20 @@ export class NgqlRunner {
     if (this.socketConnectingPromise) {
       return this.socketConnectingPromise;
     } else if (this.socket?.readyState === WebSocket.OPEN) {
-      this.desctory();
+      // 如果socket已经连接，先关闭它，但不要清除socketUrl（不调用desctory）
+      this.closeSocket();
     }
+    // 在连接开始时就设置 socketUrl，这样即使连接失败也能重连
+    this.socketUrl = url;
+    this.socketProtocols = protocols;
+    logoutFun && (this.logoutFun = logoutFun);
+    // 不再保存到 localStorage，避免 cookie 清除后残留数据导致问题
+
     this.socketConnectingPromise = new Promise<boolean>((resolve) => {
       const socket = new WebSocket(url, protocols);
       socket.onopen = () => {
         console.log('=====ngqlSocket open');
         this.socket = socket;
-        this.socketUrl = url;
-        this.socketProtocols = protocols;
-        logoutFun && (this.logoutFun = logoutFun);
-        localStorage.setItem('socketUrl', JSON.stringify(url));
-        protocols && localStorage.setItem('socketProtocols', JSON.stringify(protocols));
 
         if (this.socketPingTimeInterval) {
           clearTimeout(this.socketPingTimeInterval);
@@ -176,9 +181,12 @@ export class NgqlRunner {
         this.socketConnectingPromise = undefined;
         resolve(false);
       };
-      socket.onclose = () => {
-        console.log('=====ngqlSocket close');
+      socket.onclose = (e) => {
+        console.log('=====ngqlSocket close', e);
         this.socket = undefined;
+        this.socketConnectingPromise = undefined;
+        // 连接关闭时触发重连逻辑（包括连接失败的情况）
+        this.onDisconnect(e);
       };
     });
     return this.socketConnectingPromise;
@@ -233,6 +241,13 @@ export class NgqlRunner {
 
   onDisconnect = (e?: CloseEvent | Event) => {
     console.log('=====onDisconnect', e);
+
+    // 如果已经在重连中，避免重复处理
+    if (this.reconnectTimer) {
+      console.log('=====already reconnecting, skip');
+      return;
+    }
+
     this.socket?.removeEventListener('close', this.onDisconnect);
     this.socket?.removeEventListener('error', this.onError);
 
@@ -243,7 +258,12 @@ export class NgqlRunner {
     reason && message.error(`WebSocket closed unexpectedly, code: ${code}, reason: \`${reason}\`, try to reconnect...`);
 
     // try reconnect
-    this.socketUrl && setTimeout(this.reConnect, 3000);
+    if (this.socketUrl) {
+      this.reconnectTimer = window.setTimeout(() => {
+        this.reconnectTimer = undefined;
+        this.reConnect();
+      }, 3000);
+    }
   };
 
   closeSocket = () => {
@@ -252,6 +272,9 @@ export class NgqlRunner {
 
     clearTimeout(this.socketPingTimeInterval);
     this.socketPingTimeInterval = undefined;
+
+    clearTimeout(this.reconnectTimer);
+    this.reconnectTimer = undefined;
   };
 
   desctory = () => {
@@ -259,7 +282,13 @@ export class NgqlRunner {
     this.socketUrl = undefined;
     this.socketProtocols = undefined;
     this.logoutFun = undefined;
-    this.onDisconnect();
+    // 清除重连定时器
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = undefined;
+    }
+    // 直接关闭 socket，不触发 onDisconnect 避免无限循环
+    this.closeSocket();
   };
 
   ping = () => {

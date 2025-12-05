@@ -46,6 +46,7 @@
     "lodash.debounce": "^4.0.8",
     "mobx": "^6.9.0",
     "mobx-react-lite": "^3.4.3",
+    "monaco-editor": "^0.44.0",
     "pdfjs-dist": "^4.0.269",
     "query-string": "^7.1.1",
     "react": "^18.2.0",

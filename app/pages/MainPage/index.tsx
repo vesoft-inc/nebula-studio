@@ -3,11 +3,11 @@ import { Layout, Spin } from 'antd';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { shouldAlwaysShowWelcome } from '@app/pages/Welcome';
 import ErrorBoundary from '@app/components/ErrorBoundary';
+import llm from '@app/stores/llm';
 import { MENU_LIST, RoutesList } from './routes';
 import './index.less';
 
 import Header from './Header';
-import llm from '@app/stores/llm';
 const { Content } = Layout;
 
 const MainPage = () => {

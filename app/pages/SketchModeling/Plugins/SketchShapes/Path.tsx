@@ -198,8 +198,7 @@ const Path: LineRender = {
             width={width}
             height={20}
             textAnchor="middle"
-            transform-origin={`${x} ${y}`}
-            style={{ transform: `rotate(${angle}deg)` }}
+            style={{ transform: `rotate(${angle}deg)`, transformOrigin: `${x}px ${y}px` }}
           >
             <div className={styles.edgeLabel}>
               <span
