@@ -6,6 +6,7 @@ import { useStore } from '@app/stores';
 import { trackEvent } from '@app/utils/stat';
 import { v4 as uuidv4 } from 'uuid';
 import Icon from '@app/components/Icon';
+import { buildCSVBlob, downloadBlob } from '@app/config/explore';
 import { parseSubGraph } from '@app/utils/parseData';
 import cls from 'classnames';
 import domtoimage from 'dom-to-image';
@@ -14,6 +15,7 @@ import { useI18n } from '@vesoft-inc/i18n';
 import type { HistoryResult } from '@app/stores/console';
 import Explain, { convertExplainData } from '@vesoft-inc/nebula-explain-graph';
 import '@vesoft-inc/nebula-explain-graph/dist/Explain.css';
+import fileApprovalStore from '../../../../../../app/stores/fileApproval';
 import ForceGraph from './ForceGraph';
 
 import styles from './index.module.less';
@@ -135,34 +137,32 @@ const OutputBox = (props: IProps) => {
     updateResultsStorage();
   }, [results, index]);
 
+  const enqueueDownload = useCallback(
+    (blob: Blob, fileName: string, sourceType: 'console_csv' | 'console_png') => {
+      if (window.gConfig?.fileApproval?.Enable) {
+        fileApprovalStore.openGenerateModal({
+          fileName,
+          sourceType,
+          sourceName: gql || fileName,
+          space: space || '',
+          blob,
+        });
+        return;
+      }
+      downloadBlob(blob, fileName);
+    },
+    [gql, space],
+  );
+
   const downloadCsv = () => {
     if (!data) {
       return;
     }
-    let url = '#';
     const { headers = [], tables = [] } = data;
-    const csv = [headers, ...tables.map((values) => headers.map((field) => values[field]))]
-      .map((row) =>
-        // HACK: waiting for use case if there need to check int or string
-        row.map((value) => `"${value.toString().replace(/"/g, '""')}"`).join(','),
-      )
-      .join('\n');
-    if (!csv) {
+    if (!headers.length) {
       return;
     }
-
-    const _utf = '\uFEFF';
-    if (window.Blob && window.URL && window.URL.createObjectURL) {
-      const csvBlob = new Blob([_utf + csv], {
-        type: 'text/csv',
-      });
-      url = URL.createObjectURL(csvBlob);
-    }
-    url = 'data:attachment/csv;charset=utf-8,' + _utf + encodeURIComponent(csv);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `result.csv`;
-    link.click();
+    enqueueDownload(buildCSVBlob({ headers, tables }), 'result.csv', 'console_csv');
   };
 
   const downloadPng = async () => {
@@ -178,22 +178,15 @@ const OutputBox = (props: IProps) => {
       canvas = shadowCanvas;
       setTimeout(() => {
         canvas.toBlob((blob) => {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = canvas.toDataURL('image/png');
-          a.download = 'Image.png';
-          a.click();
-          window.URL.revokeObjectURL(url);
+          blob && enqueueDownload(blob, 'Image.png', 'console_png');
         });
       }, 0);
     } else {
       // use canvg to convert svg to canvas
       const svg = nowOutputRef.current?.querySelector('.ve-editor');
       const url = await domtoimage.toPng(svg, { bgcolor: '#ddd' });
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'explain-graph.png';
-      a.click();
+      const blob = await fetch(url).then((response) => response.blob());
+      enqueueDownload(blob, 'explain-graph.png', 'console_png');
     }
 
     trackEvent('console', 'export_graph_png');

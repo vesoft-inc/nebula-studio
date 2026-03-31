@@ -1,6 +1,7 @@
 import { NodeObject } from '@vesoft-inc/force-graph';
 import BigNumber from 'bignumber.js';
 import JSONBigint from 'json-bigint';
+import json2csv from 'json2csv';
 import { remove } from 'lodash';
 export const LINE_LENGTH = 150;
 export const FONT_SIZE = 10;
@@ -132,6 +133,25 @@ export const parseData = (data, type: 'vertex' | 'edge') => {
     }
   });
   return { tables, headers: fields };
+};
+
+export const buildCSVText = ({ headers, tables }: { headers: string[]; tables: any[] }) =>
+  json2csv.parse(tables, {
+    fields: headers,
+  });
+
+export const buildCSVBlob = ({ headers, tables }: { headers: string[]; tables: any[] }) => {
+  const result = buildCSVText({ headers, tables });
+  return new Blob(['\ufeff' + result], { type: 'text/csv;charset=utf-8;' });
+};
+
+export const downloadBlob = (blob: Blob, fileName: string) => {
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
 
 
