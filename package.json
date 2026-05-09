@@ -55,7 +55,8 @@
     "react-dom": "^18.2.0",
     "react-papaparse": "^4.1.0",
     "react-router-dom": "^5.3.0",
-    "uuid": "^8.3.1"
+    "uuid": "^8.3.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/bezier-js": "^4.1.0",

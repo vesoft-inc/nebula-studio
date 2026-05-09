@@ -426,7 +426,7 @@ export default {
     cloneSpace: 'Clone Graph Space',
     length: 'Length',
     selectVidTypeTip: 'Please select the type',
-    csvDownload: 'Export CSV File',
+    csvDownload: 'Export Excel File',
     pngDownload: 'Export PNG File',
     rebuildSuccess: '{names} rebuild successfully',
     rebuildFailed: '{names} rebuild failed',

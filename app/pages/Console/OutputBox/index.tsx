@@ -6,7 +6,7 @@ import { useStore } from '@app/stores';
 import { trackEvent } from '@app/utils/stat';
 import { v4 as uuidv4 } from 'uuid';
 import Icon from '@app/components/Icon';
-import { buildCSVBlob, downloadBlob } from '@app/config/explore';
+import { buildExcelBlob, downloadBlob } from '@app/config/explore';
 import { parseSubGraph } from '@app/utils/parseData';
 import cls from 'classnames';
 import domtoimage from 'dom-to-image';
@@ -15,7 +15,6 @@ import { useI18n } from '@vesoft-inc/i18n';
 import type { HistoryResult } from '@app/stores/console';
 import Explain, { convertExplainData } from '@vesoft-inc/nebula-explain-graph';
 import '@vesoft-inc/nebula-explain-graph/dist/Explain.css';
-import fileApprovalStore from '../../../../../../app/stores/fileApproval';
 import ForceGraph from './ForceGraph';
 
 import styles from './index.module.less';
@@ -138,20 +137,17 @@ const OutputBox = (props: IProps) => {
   }, [results, index]);
 
   const enqueueDownload = useCallback(
-    (blob: Blob, fileName: string, sourceType: 'console_csv' | 'console_png') => {
+    (blob: Blob, fileName: string) => {
       if (window.gConfig?.fileApproval?.Enable) {
-        fileApprovalStore.openGenerateModal({
+        window.__explorerFileApproval__?.openGenerateModal({
           fileName,
-          sourceType,
-          sourceName: gql || fileName,
-          space: space || '',
           blob,
         });
         return;
       }
       downloadBlob(blob, fileName);
     },
-    [gql, space],
+    [],
   );
 
   const downloadCsv = () => {
@@ -162,7 +158,7 @@ const OutputBox = (props: IProps) => {
     if (!headers.length) {
       return;
     }
-    enqueueDownload(buildCSVBlob({ headers, tables }), 'result.csv', 'console_csv');
+    enqueueDownload(buildExcelBlob({ headers, tables }), 'result.xlsx');
   };
 
   const downloadPng = async () => {
@@ -178,7 +174,7 @@ const OutputBox = (props: IProps) => {
       canvas = shadowCanvas;
       setTimeout(() => {
         canvas.toBlob((blob) => {
-          blob && enqueueDownload(blob, 'Image.png', 'console_png');
+          blob && enqueueDownload(blob, 'Image.png');
         });
       }, 0);
     } else {
@@ -186,7 +182,7 @@ const OutputBox = (props: IProps) => {
       const svg = nowOutputRef.current?.querySelector('.ve-editor');
       const url = await domtoimage.toPng(svg, { bgcolor: '#ddd' });
       const blob = await fetch(url).then((response) => response.blob());
-      enqueueDownload(blob, 'explain-graph.png', 'console_png');
+      enqueueDownload(blob, 'explain-graph.png');
     }
 
     trackEvent('console', 'export_graph_png');

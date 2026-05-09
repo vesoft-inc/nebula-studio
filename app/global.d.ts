@@ -11,6 +11,14 @@ interface Window {
   gConfig: {
     databaseName: string;
     appInstance: 'single' | 'multi';
+    basePath?: string;
+    fileApproval?: {
+      Enable: boolean;
+      PortalURL?: string;
+    };
   };
   __ngqlRunner__: any;
+  __explorerFileApproval__?: {
+    openGenerateModal: (payload: { fileName: string; blob: Blob }) => void;
+  };
 }

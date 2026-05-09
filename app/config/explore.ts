@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 import JSONBigint from 'json-bigint';
 import json2csv from 'json2csv';
 import { remove } from 'lodash';
+import * as XLSX from 'xlsx';
 export const LINE_LENGTH = 150;
 export const FONT_SIZE = 10;
 export const NODE_SIZE = 18;
@@ -140,9 +141,18 @@ export const buildCSVText = ({ headers, tables }: { headers: string[]; tables: a
     fields: headers,
   });
 
-export const buildCSVBlob = ({ headers, tables }: { headers: string[]; tables: any[] }) => {
-  const result = buildCSVText({ headers, tables });
-  return new Blob(['\ufeff' + result], { type: 'text/csv;charset=utf-8;' });
+export const buildExcelBlob = ({ headers, tables }: { headers: string[]; tables: any[] }) => {
+  const csv = buildCSVText({ headers, tables });
+  const parsedWorkbook = XLSX.read(csv, { type: 'string' });
+  const parsedSheet = parsedWorkbook.Sheets[parsedWorkbook.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(parsedSheet, { header: 1, raw: false, defval: '' }) as Array<Array<string>>;
+  const worksheet = XLSX.utils.aoa_to_sheet(rows);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+  const result = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  return new Blob([result], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
 };
 
 export const downloadBlob = (blob: Blob, fileName: string) => {

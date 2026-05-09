@@ -407,7 +407,7 @@ export default {
     cloneSpace: '克隆图空间',
     length: '长度',
     selectVidTypeTip: '选择 Vid 类型',
-    csvDownload: '导出 CSV',
+    csvDownload: '导出 Excel',
     pngDownload: ' 导出 PNG',
     rebuildSuccess: '{names}重建完成',
     rebuildFailed: '{names}重建失败',
