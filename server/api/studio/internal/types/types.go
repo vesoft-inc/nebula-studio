@@ -270,6 +270,10 @@ type StopImportTaskRequest struct {
 	Id string `path:"id"`
 }
 
+type RollbackImportTaskRequest struct {
+	Id string `path:"id" validate:"required"`
+}
+
 type DownloadLogsRequest struct {
 	Id   string `path:"id" validate:"required"`
 	Name string `form:"name" validate:"required"`
@@ -433,6 +437,7 @@ type DatasourceConfig struct {
 	ID         string                `json:"id"`
 	Type       string                `json:"type"`
 	Name       string                `json:"name"`
+	Creator    string                `json:"creator,optional"`
 	Platform   string                `json:"platform"`
 	S3Config   *DatasourceS3Config   `json:"s3Config,optional"`
 	SFTPConfig *DatasourceSFTPConfig `json:"sftpConfig,optional"`
@@ -456,6 +461,28 @@ type DatasourceListContentsData struct {
 
 type DatasourceData struct {
 	List []DatasourceConfig `json:"list"`
+}
+
+type DatasourceGrantsRequest struct {
+	DatasourceID string `path:"id"`
+}
+
+type DatasourceGrantItem struct {
+	Username string `json:"username"`
+}
+
+type DatasourceGrantsData struct {
+	List []DatasourceGrantItem `json:"list"`
+}
+
+type DatasourceGrantAddRequest struct {
+	DatasourceID string   `path:"id"`
+	Usernames    []string `json:"usernames"`
+}
+
+type DatasourceGrantRemoveRequest struct {
+	DatasourceID string   `path:"id"`
+	Usernames    []string `json:"usernames"`
 }
 
 type DatasourcePreviewFileRequest struct {

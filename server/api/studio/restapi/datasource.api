@@ -65,6 +65,7 @@ type (
 		ID         string                `json:"id"`
 		Type       string                `json:"type"`
 		Name       string                `json:"name"`
+		Creator    string                `json:"creator,optional"`
 		Platform   string                `json:"platform"`
 		S3Config   *DatasourceS3Config   `json:"s3Config,optional"`
 		SFTPConfig *DatasourceSFTPConfig `json:"sftpConfig,optional"`
@@ -88,6 +89,28 @@ type (
 
 	DatasourceData {
 		List []DatasourceConfig `json:"list"`
+	}
+
+	DatasourceGrantsRequest {
+		DatasourceID string `path:"id"`
+	}
+
+	DatasourceGrantItem {
+		Username string `json:"username"`
+	}
+
+	DatasourceGrantsData {
+		List []DatasourceGrantItem `json:"list"`
+	}
+
+	DatasourceGrantAddRequest {
+		DatasourceID string   `path:"id"`
+		Usernames    []string `json:"usernames"`
+	}
+
+	DatasourceGrantRemoveRequest {
+		DatasourceID string   `path:"id"`
+		Usernames    []string `json:"usernames"`
 	}
 
 	DatasourcePreviewFileRequest {
@@ -131,4 +154,16 @@ service studio-api {
 	@doc "Preview File"
 	@handler DatasourcePreviewFile
 	get /api/datasources/:id/file-preview(DatasourcePreviewFileRequest) returns(DatasourcePreviewFileData)
+
+	@doc "List Datasource Grants"
+	@handler DatasourceGrants
+	get /api/datasources/:id/grants(DatasourceGrantsRequest) returns(DatasourceGrantsData)
+
+	@doc "Add Datasource Grants"
+	@handler DatasourceGrantAdd
+	post /api/datasources/:id/grants(DatasourceGrantAddRequest)
+
+	@doc "Remove Datasource Grants"
+	@handler DatasourceGrantRemove
+	delete /api/datasources/:id/grants(DatasourceGrantRemoveRequest)
 }

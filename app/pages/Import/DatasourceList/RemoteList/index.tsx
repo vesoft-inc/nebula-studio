@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
 import { trackPageView } from '@app/utils/stat';
-import { Button, message, Popconfirm, Table, TableColumnType } from 'antd';
+import { Button, message, Popconfirm, Table, TableColumnType, Tooltip } from 'antd';
 import Icon from '@app/components/Icon';
 import cls from 'classnames';
 import { IDatasourceType, IDatasourceItem } from '@app/interfaces/datasource';
@@ -10,6 +10,7 @@ import { Translation, useI18n } from '@vesoft-inc/i18n';
 
 import dayjs from 'dayjs';
 import DatasourceConfigModal from '../DatasourceConfig/PlatformConfig';
+import GrantModal from './GrantModal';
 import styles from './index.module.less';
 
 interface IProps {
@@ -58,13 +59,17 @@ const sftpColumns: TableColumnType<IDatasourceItem>[] = [
 
 const DatasourceList = (props: IProps) => {
   const { type } = props;
-  const { datasource } = useStore();
+  const { datasource, global } = useStore();
   const { intl, currentLocale } = useI18n();
+  const username = global.username;
+  const isRootUser = username === 'root';
   const { getDatasourceList, deleteDataSource, batchDeleteDatasource } = datasource;
   const [data, setData] = useState<IDatasourceItem[]>([]);
   const [editData, setEditData] = useState<IDatasourceItem>(null);
+  const [grantData, setGrantData] = useState<IDatasourceItem>(null);
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [grantVisible, setGrantVisible] = useState(false);
   const [selectIds, setSelectIds] = useState<string[]>([]);
   const modalKey = useMemo(() => (visible ? Math.random() : undefined), [visible]);
   const create = useCallback(() => {
@@ -75,18 +80,32 @@ const DatasourceList = (props: IProps) => {
     setEditData(item);
     setVisible(true);
   }, []);
+  const openGrantModal = useCallback((item: IDatasourceItem) => {
+    setGrantData(item);
+    setGrantVisible(true);
+  }, []);
+  const canManageGrant = useCallback(
+    (item: IDatasourceItem) => isRootUser || item.creator === username,
+    [isRootUser, username],
+  );
+  const canEditOrDelete = useCallback((item: IDatasourceItem) => item.creator === username, [username]);
   const deleteItem = useCallback(async (id) => {
     const flag = await deleteDataSource(id);
     flag && (getList(), message.success(intl.get('common.deleteSuccess')));
   }, []);
   const tableColumns: TableColumnType<IDatasourceItem>[] = useMemo(() => {
     const columns = type === IDatasourceType.S3 ? s3Columns : sftpColumns;
-    return columns.concat({
+    return columns.concat(
+      {
+        title: intl.get('import.datasourceCreator'),
+        dataIndex: 'creator',
+      },
+      {
       title: intl.get('common.operation'),
       key: 'operation',
       render: (_, item) => (
         <div className={styles.operation}>
-          <Button className="primaryBtn" onClick={() => editItem(item)}>
+          <Button className="primaryBtn" onClick={() => editItem(item)} disabled={!canEditOrDelete(item)}>
             <Icon type="icon-studio-btn-detail" />
           </Button>
           <Popconfirm
@@ -94,15 +113,22 @@ const DatasourceList = (props: IProps) => {
             title={intl.get('common.ask')}
             okText={intl.get('common.confirm')}
             cancelText={intl.get('common.cancel')}
+            disabled={!canEditOrDelete(item)}
           >
-            <Button className="warningBtn">
+            <Button className="warningBtn" disabled={!canEditOrDelete(item)}>
               <Icon type="icon-studio-btn-delete" />
             </Button>
           </Popconfirm>
+          <Tooltip title={!canManageGrant(item) ? intl.get('import.datasourceGrantPermissionTip') : undefined}>
+            <Button className={styles.grantBtn} onClick={() => openGrantModal(item)} disabled={!canManageGrant(item)}>
+              {intl.get('import.datasourceGrant')}
+            </Button>
+          </Tooltip>
         </div>
       ),
-    });
-  }, [type, currentLocale]);
+      },
+    );
+  }, [type, currentLocale, username, canEditOrDelete, canManageGrant, editItem, deleteItem, openGrantModal]);
 
   const getList = async () => {
     !loading && setLoading(true);
@@ -157,6 +183,9 @@ const DatasourceList = (props: IProps) => {
             type: 'checkbox',
             selectedRowKeys: selectIds,
             onChange: (selectedRowKeys) => setSelectIds(selectedRowKeys as string[]),
+            getCheckboxProps: (record) => ({
+              disabled: !canEditOrDelete(record),
+            }),
           }}
           columns={tableColumns}
           rowKey="id"
@@ -170,6 +199,15 @@ const DatasourceList = (props: IProps) => {
         visible={visible}
         onCancel={() => setVisible(false)}
         onConfirm={handleRefresh}
+      />
+      <GrantModal
+        visible={grantVisible}
+        datasource={grantData}
+        onCancel={() => setGrantVisible(false)}
+        onSuccess={() => {
+          setGrantVisible(false);
+          getList();
+        }}
       />
     </div>
   );

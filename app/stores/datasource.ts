@@ -1,5 +1,5 @@
 import service from '@app/config/service';
-import { IDatasourceAdd, IDatasourceType, IDatasourceUpdate } from '@app/interfaces/datasource';
+import { IDatasourceAdd, IDatasourceGrantItem, IDatasourceType, IDatasourceUpdate } from '@app/interfaces/datasource';
 import { makeAutoObservable } from 'mobx';
 import { getRootStore } from '.';
 
@@ -84,6 +84,21 @@ export class DatasourceStore {
     if (code === 0) {
       return data;
     }
+  };
+  getDatasourceGrants = async (id: string): Promise<IDatasourceGrantItem[]> => {
+    const { code, data } = await service.getDatasourceGrants(id);
+    if (code === 0) {
+      return data.list;
+    }
+    return [];
+  };
+  addDatasourceGrants = async (id: string, usernames: string[]) => {
+    const { code } = await service.addDatasourceGrants({ id, usernames });
+    return code === 0;
+  };
+  removeDatasourceGrants = async (id: string, usernames: string[]) => {
+    const { code } = await service.removeDatasourceGrants({ id, usernames });
+    return code === 0;
   };
 }
 

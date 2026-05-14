@@ -26,6 +26,9 @@ type (
 		BatchRemove(request types.DatasourceBatchRemoveRequest) error
 		ListContents(request types.DatasourceListContentsRequest) (*types.DatasourceListContentsData, error)
 		PreviewFile(request types.DatasourcePreviewFileRequest) (*types.DatasourcePreviewFileData, error)
+		ListGrants(request types.DatasourceGrantsRequest) (*types.DatasourceGrantsData, error)
+		AddGrants(request types.DatasourceGrantAddRequest) error
+		RemoveGrants(request types.DatasourceGrantRemoveRequest) error
 	}
 
 	datasourceService struct {
@@ -79,6 +82,10 @@ func (d *datasourceService) Update(request types.DatasourceUpdateRequest) error 
 	if err != nil {
 		return ecode.WithErrorMessage(ecode.ErrBadRequest, err, "find data error")
 	}
+	user := d.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+	if dbs.Username != user.Username {
+		return ecode.WithErrorMessage(ecode.ErrForbidden, errors.New("permission denied"), "no permission to update datasource")
+	}
 	typ := request.Type
 	platform := request.Platform
 	var cfg interface{}
@@ -124,8 +131,14 @@ func (d *datasourceService) List(request types.DatasourceListRequest) (*types.Da
 	user := d.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
 	host := user.Address + ":" + strconv.Itoa(user.Port)
 	var dbsList []db.Datasource
-	result := db.CtxDB.Where("host = ?", host).
-		Where("username = ?", user.Username)
+	result := db.CtxDB.Where("host = ?", host)
+	if user.Username == "root" {
+		result = result.Where("type IN (?)", []string{"s3", "sftp"})
+	} else {
+		result = result.Where("username = ? OR b_id IN (?)", user.Username, db.CtxDB.Model(&db.DatasourceGrant{}).
+			Select("datasource_b_id").
+			Where("grantee_username = ? AND host = ?", user.Username, host))
+	}
 	if request.Type != "" {
 		result = result.Where("type = ?", request.Type)
 	}
@@ -140,6 +153,7 @@ func (d *datasourceService) List(request types.DatasourceListRequest) (*types.Da
 			Type:       item.Type,
 			Platform:   item.Platform,
 			Name:       item.Name,
+			Creator:    item.Username,
 			CreateTime: item.CreateTime.UnixMilli(),
 		}
 		switch config.Type {
@@ -175,6 +189,7 @@ func (d *datasourceService) Remove(request types.DatasourceRemoveRequest) error 
 	if result.RowsAffected == 0 {
 		return ecode.WithErrorMessage(ecode.ErrBadRequest, fmt.Errorf("test"), "there is available item to delete")
 	}
+	db.CtxDB.Where("datasource_b_id = ?", request.ID).Delete(&db.DatasourceGrant{})
 
 	return nil
 }
@@ -200,6 +215,7 @@ func (d *datasourceService) BatchRemove(request types.DatasourceBatchRemoveReque
 	if result.RowsAffected == 0 {
 		return ecode.WithErrorMessage(ecode.ErrBadRequest, fmt.Errorf("no data found"))
 	}
+	db.CtxDB.Where("datasource_b_id IN (?)", request.IDs).Delete(&db.DatasourceGrant{})
 
 	return nil
 }
@@ -208,6 +224,9 @@ func (d *datasourceService) ListContents(request types.DatasourceListContentsReq
 	datasourceId := request.DatasourceID
 	dbs, err := d.findOne(datasourceId)
 	if err != nil {
+		return nil, err
+	}
+	if err := d.checkReadablePermission(dbs); err != nil {
 		return nil, err
 	}
 	store, err := d.getFileStore(dbs)
@@ -235,6 +254,9 @@ func (d *datasourceService) ListContents(request types.DatasourceListContentsReq
 func (d *datasourceService) PreviewFile(request types.DatasourcePreviewFileRequest) (*types.DatasourcePreviewFileData, error) {
 	dbs, err := d.findOne(request.DatasourceID)
 	if err != nil {
+		return nil, err
+	}
+	if err := d.checkReadablePermission(dbs); err != nil {
 		return nil, err
 	}
 	store, err := d.getFileStore(dbs)
@@ -294,16 +316,12 @@ func (d *datasourceService) save(typ, name, platform, config, secret string) (id
 	return id, nil
 }
 func (d *datasourceService) update(id, typ, platform, name, config, secret string) (err error) {
-	user := d.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
-	host := user.Address + ":" + strconv.Itoa(user.Port)
 	result := db.CtxDB.Model(&db.Datasource{}).Where("b_id = ?", id).Updates(map[string]interface{}{
 		"type":     typ,
 		"name":     name,
 		"platform": platform,
 		"config":   config,
 		"secret":   secret,
-		"host":     host,
-		"username": user.Username,
 	})
 	if result.Error != nil {
 		return d.gormErrorWrapper(result.Error)

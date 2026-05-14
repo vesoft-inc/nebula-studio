@@ -25,7 +25,7 @@ const TaskList = () => {
   const [filter, setFilter] = useState({ page: 1, pageSize: 10, space: undefined });
   const { intl, currentLocale } = useI18n();
   const history = useHistory();
-  const { taskList, getTaskList, stopTask, deleteTask } = dataImport;
+  const { taskList, getTaskList, stopTask, rollbackTask, deleteTask } = dataImport;
   const { username, host } = global;
   const [logTaskItem, setLogTaskItem] = useState<ITaskItem | undefined>();
   const [importModalVisible, setImportModalVisible] = useState(false);
@@ -53,6 +53,14 @@ const TaskList = () => {
     const { code } = await deleteTask(id);
     if (code === 0) {
       message.success(intl.get('import.deleteSuccess'));
+      getData();
+    }
+  }, []);
+  const handleTaskRollback = useCallback(async (id: string) => {
+    clearTimeout(timer.current);
+    const { code } = await rollbackTask(id);
+    if (code === 0) {
+      message.success(intl.get('import.rollbackSuccess'));
       getData();
     }
   }, []);
@@ -195,6 +203,7 @@ const TaskList = () => {
                 onRerun={handleRerun}
                 onViewLog={handleLogView}
                 onTaskStop={handleTaskStop}
+                onTaskRollback={handleTaskRollback}
                 onTaskDelete={handleTaskDelete}
               />
             ) : (

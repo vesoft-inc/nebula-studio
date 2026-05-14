@@ -17,6 +17,7 @@ export interface IDatasourceItem {
   id: string;
   name: string;
   type: IDatasourceType;
+  creator?: string;
   platform?: string;
   createTime: string;
   s3Config?: {
@@ -32,4 +33,8 @@ export interface IDatasourceItem {
     username: string;
     password: string;
   };
+}
+
+export interface IDatasourceGrantItem {
+  username: string;
 }

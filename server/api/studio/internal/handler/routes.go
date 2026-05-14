@@ -134,6 +134,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: importtask.StopImportTaskHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodPost,
+				Path:    "/api/import-tasks/:id/rollback",
+				Handler: importtask.RollbackImportTaskHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodGet,
 				Path:    "/api/import-tasks/:id/download-logs",
 				Handler: importtask.DownloadLogsHandler(serverCtx),
@@ -252,6 +257,21 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/api/datasources/:id/file-preview",
 				Handler: datasource.DatasourcePreviewFileHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/datasources/:id/grants",
+				Handler: datasource.DatasourceGrantsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/datasources/:id/grants",
+				Handler: datasource.DatasourceGrantAddHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/api/datasources/:id/grants",
+				Handler: datasource.DatasourceGrantRemoveHandler(serverCtx),
 			},
 		},
 	)

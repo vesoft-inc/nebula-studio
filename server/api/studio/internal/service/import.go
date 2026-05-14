@@ -43,6 +43,7 @@ type (
 		CreateTaskDraft(*types.CreateTaskDraftRequest) error
 		UpdateTaskDraft(*types.UpdateTaskDraftRequest) error
 		StopImportTask(request *types.StopImportTaskRequest) error
+		RollbackImportTask(request *types.RollbackImportTaskRequest) error
 		DownloadConfig(*types.DownloadConfigsRequest) error
 		DownloadLogs(request *types.DownloadLogsRequest) error
 		DeleteImportTask(*types.DeleteImportTaskRequest) error
@@ -83,6 +84,19 @@ func (i *importService) updateDatasourceConfig(conf *types.CreateImportTaskReque
 			}
 			if result.RowsAffected == 0 {
 				return nil, ecode.WithErrorMessage(ecode.ErrBadRequest, nil, "datasource don't exist")
+			}
+			user := i.ctx.Value(auth.CtxKeyUserInfo{}).(*auth.AuthData)
+			if user.Username != "root" && dbs.Username != user.Username {
+				var grantCount int64
+				grantResult := db.CtxDB.Model(&db.DatasourceGrant{}).
+					Where("datasource_b_id = ? AND grantee_username = ? AND host = ?", dbs.BID, user.Username, dbs.Host).
+					Count(&grantCount)
+				if grantResult.Error != nil {
+					return nil, utils.GormErrorWithLogger(i.ctx)(grantResult.Error)
+				}
+				if grantCount == 0 {
+					return nil, ecode.WithErrorMessage(ecode.ErrForbidden, fmt.Errorf("permission denied"), "no permission to use datasource")
+				}
 			}
 
 			secret, err := utils.Decrypt(dbs.Secret, []byte(cipher))

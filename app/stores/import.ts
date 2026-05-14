@@ -171,7 +171,7 @@ export class ImportStore {
   };
 
   getTaskList = async (filter: { page: number; pageSize: number; space: string }) => {
-    const { code, data } = await service.getTaskList(filter);
+    const { code, data } = ((await service.getTaskList(filter)) || {}) as any;
     if (code === 0 && data) {
       this.update({
         taskList: data,
@@ -180,7 +180,7 @@ export class ImportStore {
   };
 
   getLogs = async (id: string) => {
-    const { code, data } = (await service.getTaskLogs({ id })) as any;
+    const { code, data } = ((await service.getTaskLogs({ id })) || {}) as any;
     return { code, data };
   };
   saveTaskDraft = async () => {
@@ -190,11 +190,11 @@ export class ImportStore {
       tagConfig: this.tagConfig,
       edgeConfig: this.edgeConfig,
     };
-    const { code } = (await service.saveTaskDraft({
+    const { code } = ((await service.saveTaskDraft({
       name: this.basicConfig.taskName,
       space: currentSpace,
       rawConfig: JSON.stringify(rawConfig),
-    })) as any;
+    })) || {}) as any;
     return code;
   };
   updateTaskDraft = async (id: string) => {
@@ -204,19 +204,19 @@ export class ImportStore {
       tagConfig: this.tagConfig,
       edgeConfig: this.edgeConfig,
     };
-    const { code } = (await service.updateTaskDraft({
+    const { code } = ((await service.updateTaskDraft({
       id,
       name: this.basicConfig.taskName,
       space: currentSpace,
       rawConfig: JSON.stringify(rawConfig),
-    })) as any;
+    })) || {}) as any;
     return code;
   };
   validateResource = async (resource) => {
     const cfg = typeof resource === 'string' ? JSON.parse(resource) : resource;
     const { tagConfig, edgeConfig } = cfg;
     const files = await this.rootStore.files.getFiles();
-    const datasources = await this.rootStore.datasource.getDatasourceList();
+    const datasources = (await this.rootStore.datasource.getDatasourceList()) || [];
     const missingResources = [];
     const missingFiles = [];
     [tagConfig, edgeConfig].forEach((cfg) => {
@@ -312,6 +312,14 @@ export class ImportStore {
     const res = await service.stopImportTask(id, {
       trackEventConfig: 'import',
       action: 'stop_task',
+    });
+    return res;
+  };
+
+  rollbackTask = async (id: string) => {
+    const res = await service.rollbackImportTask(id, {
+      trackEventConfig: 'import',
+      action: 'rollback_task',
     });
     return res;
   };

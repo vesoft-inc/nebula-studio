@@ -16,6 +16,7 @@ import styles from './index.module.less';
 interface IProps {
   data: ITaskItem;
   onTaskStop: (id: string) => void;
+  onTaskRollback: (id: string) => void;
   onTaskDelete: (id: string) => void;
   onViewLog: (task: ITaskItem) => void;
   onRerun: () => void;
@@ -46,6 +47,7 @@ const TaskItem = (props: IProps) => {
     onViewLog,
     onRerun,
     onTaskStop,
+    onTaskRollback,
     onTaskDelete,
   } = props;
   const { intl } = useI18n();
@@ -267,6 +269,21 @@ const TaskItem = (props: IProps) => {
                       <Icon type="icon-studio-btn-play" />
                     </Tooltip>
                   </Button>
+                )}
+                {!isDraft && (
+                  <Popconfirm
+                    placement="left"
+                    title={intl.get('import.rollbackConfirm')}
+                    onConfirm={() => onTaskRollback(id)}
+                    okText={intl.get('common.confirm')}
+                    cancelText={intl.get('common.cancel')}
+                  >
+                    <Button className="warningBtn">
+                      <Tooltip title={intl.get('common.rollback')}>
+                        <Icon type="icon-studio-btn-back" />
+                      </Tooltip>
+                    </Button>
+                  </Popconfirm>
                 )}
                 <Popconfirm
                   placement="left"

@@ -114,6 +114,7 @@ func InitDB(config *config.Config, db *gorm.DB) {
 		}
 		err = db.AutoMigrate(
 			&Datasource{},
+			&DatasourceGrant{},
 			&TaskInfo{},
 			&TaskEffect{},
 			&Sketch{},

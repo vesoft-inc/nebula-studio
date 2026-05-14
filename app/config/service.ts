@@ -29,6 +29,9 @@ const service = {
   stopImportTask: (id: string, config?) => {
     return get(`/api/import-tasks/${id}/stop`)(undefined, config);
   },
+  rollbackImportTask: (id: string, config?) => {
+    return post(`/api/import-tasks/${id}/rollback`)(undefined, config);
+  },
   saveTaskDraft: (params, config?) => {
     return post('/api/import-tasks/draft')(params, config);
   },
@@ -121,6 +124,17 @@ const service = {
   previewFile: (params, config?) => {
     const { id, ...restParams } = params;
     return get(`/api/datasources/${id}/file-preview`)(restParams, config);
+  },
+  getDatasourceGrants: (id: string, config?) => {
+    return get(`/api/datasources/${id}/grants`)(undefined, config);
+  },
+  addDatasourceGrants: (params: { id: string; usernames: string[] }, config?) => {
+    const { id, usernames } = params;
+    return post(`/api/datasources/${id}/grants`)({ usernames }, config);
+  },
+  removeDatasourceGrants: (params: { id: string; usernames: string[] }, config?) => {
+    const { id, usernames } = params;
+    return _delete(`/api/datasources/${id}/grants`)(undefined, { data: { usernames }, ...config });
   },
 };
 

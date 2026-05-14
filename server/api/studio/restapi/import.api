@@ -222,6 +222,10 @@ type (
 		Id string `path:"id"`
 	}
 
+	RollbackImportTaskRequest {
+		Id string `path:"id" validate:"required"`
+	}
+
 	DownloadLogsRequest {
 		Id   string `path:"id" validate:"required"`
 		Name string `form:"name" validate:"required"`
@@ -277,6 +281,10 @@ service studio-api {
 	@doc "Stop Import Task"
 	@handler StopImportTask
 	get /api/import-tasks/:id/stop(StopImportTaskRequest)
+
+	@doc "Rollback Import Task"
+	@handler RollbackImportTask
+	post /api/import-tasks/:id/rollback(RollbackImportTaskRequest)
 	
 	@doc "Download logs"
 	@handler DownloadLogs
