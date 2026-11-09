@@ -268,7 +268,7 @@ function Welcome(props: IProps) {
     moduleList = getModuleList(),
     docList = getDocList(),
     onDatasetLoad,
-    product = `${window.gConfig.databaseName} Studio`,
+    product = `${window.gConfig.databaseName}图管理`,
     onClosePage,
   } = props;
   const history = useHistory() as History;

@@ -1,19 +1,17 @@
 <!DOCTYPE html>
-<html lang="EN_US">
+<html lang="zh-CN">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>NebulaGraph Studio</title>
-  <script async defer src="https://buttons.github.io/buttons.js"></script>
-  <!-- Global Event Tracking -->
+  <title>悦数图管理</title>
   <script>var global = typeof global !== 'undefined' ? global : window;</script>
   <script>
     <% if (initProps.NODE_ENV === 'development') { %>
-      window.gConfig = { appInstance: <%- JSON.stringify(initProps.appInstance) %>, databaseName: "NebulaGraph" }
+      window.gConfig = { appInstance: <%- JSON.stringify(initProps.appInstance) %>, databaseName: "悦数" }
     <% } else { %>
-      window.gConfig = { appInstance: "{{.appInstance}}", databaseName: "NebulaGraph" }
+      window.gConfig = { appInstance: "{{.appInstance}}", databaseName: "悦数" }
     <% } %>
   </script>
   <style>

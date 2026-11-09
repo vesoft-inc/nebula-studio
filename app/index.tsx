@@ -26,7 +26,7 @@ message.config({ maxCount: 1 });
 const Login = lazy(() => import('@app/pages/Login'));
 const MainPage = lazy(() => import('@app/pages/MainPage'));
 
-const defaultLanguage = Cookie.get('lang') || document.documentElement.getAttribute('lang');
+const defaultLanguage = Cookie.get('lang') || process.env.LANGUAGE || 'ZH_CN';
 const { initI18n } = getI18n();
 initI18n(defaultLanguage, INTL_LOCALES);
 dayjs.locale(defaultLanguage === 'EN_US' ? 'en' : 'zh-cn');

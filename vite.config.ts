@@ -98,6 +98,10 @@ export default defineConfig({
   define: {
     'process.env': {
       VERSION: pkg.version,
+      LANGUAGE: process.env.LANGUAGE || 'ZH_CN',
+      COMPANY_NAME: process.env.COMPANY_NAME || '杭州悦数科技有限公司',
+      YUESHU_DOC_LINK:
+        process.env.YUESHU_DOC_LINK || 'https://ent-docs.nebula-graph.com.cn/3.5.0/pdf/NebulaGraph-CN.pdf',
     },
   },
   // build: {

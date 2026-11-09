@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import Icon from '@app/components/Icon';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@app/stores';
-import logo from '@app/static/images/studio_logo.png';
+import logo from '@app/static/images/studio_logo.svg';
 import { useI18n } from '@vesoft-inc/i18n';
 import HelpMenu from './HelpMenu';
 import styles from './index.module.less';
@@ -65,7 +65,7 @@ const PageHeader = (props: IProps) => {
   return (
     <Header className={styles.studioHeader}>
       <Link to="/welcome" className={styles.nebulaLogo}>
-        <img src={logo} alt="logo" height={40} />
+        <img src={logo} alt="logo" width={140} />
       </Link>
       {host && username ? (
         <>

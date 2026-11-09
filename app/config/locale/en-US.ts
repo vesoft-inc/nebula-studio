@@ -1,3 +1,6 @@
+const YueshuDocLink =
+  process.env.YUESHU_DOC_LINK || 'https://ent-docs.nebula-graph.com.cn/3.5.0/pdf/NebulaGraph-CN.pdf';
+
 export default {
   common: {
     requestError: 'Request Error',
@@ -461,15 +464,15 @@ export default {
     contact: 'Contact Us',
   },
   link: {
-    nGQLHref: 'https://docs.nebula-graph.io/3.6.0/3.ngql-guide/1.nGQL-overview/1.overview/',
-    mannualHref: 'https://docs.nebula-graph.io/3.8.0/nebula-studio/about-studio/st-ug-what-is-graph-studio/',
-    startStudioHref: 'https://docs.nebula-graph.io/3.8.0/nebula-studio/quick-start/st-ug-plan-schema/',
-    versionLogHref: 'https://docs.nebula-graph.io/3.6.0/20.appendix/release-notes/studio-release-note/',
+    nGQLHref: YueshuDocLink,
+    mannualHref: YueshuDocLink,
+    startStudioHref: YueshuDocLink,
+    versionLogHref: YueshuDocLink,
     forumHref: 'https://discuss.nebula-graph.io/',
-    feedback: 'https://app.slack.com/client/TJB3N2BPD/CJNFUM7AR',
-    trial: 'https://www.nebula-graph.io/visualization-tools-free-trial',
-    contact: 'https://www.nebula-graph.io/contact',
-    loginHref: 'https://docs.nebula-graph.io/3.8.0/nebula-studio/deploy-connect/st-ug-connect/',
+    feedback: 'https://yueshu.cn/contact',
+    trial: 'https://yueshu.cn/contact',
+    contact: 'https://yueshu.cn/contact',
+    loginHref: YueshuDocLink,
   },
   sketch: {
     dragTip: 'Drag and drop to the canvas',
@@ -519,10 +522,10 @@ export default {
     loadWaiting: 'Data is loading, please wait... It will end in {second}s',
     downloadSuccess: 'Dataset `{space}` has been downloaded successfully',
     spaceExist: 'The graph space `{space}` already exists',
-    schemaModuleLink: 'https://docs.nebula-graph.io/3.8.0/nebula-studio/quick-start/st-ug-create-schema/',
-    importModuleLink: 'https://docs.nebula-graph.io/3.8.0/nebula-studio/quick-start/st-ug-import-data/',
-    consoleModuleLink: 'https://docs.nebula-graph.io/3.8.0/nebula-studio/quick-start/st-ug-console/',
-    sketchModuleLink: 'https://docs.nebula-graph.io/3.8.0/nebula-studio/quick-start/draft/',
+    schemaModuleLink: YueshuDocLink,
+    importModuleLink: YueshuDocLink,
+    consoleModuleLink: YueshuDocLink,
+    sketchModuleLink: YueshuDocLink,
     basketballplayerDocLink: '',
     shareholdingDocLink: 'https://nebula-graph.io/demo/shared-holding',
     openstackDocLink: '',
@@ -544,7 +547,7 @@ export default {
     text2query: 'Text to Query',
     text2queryDesc: 'You can use the LLM capability to write query statements in the console',
     llmImport: 'AI Import',
-    llmImportDesc: 'Knowledge Graph Build with LLM and NebulaGraph, located at Import data -> New AI Import',
+    llmImportDesc: `Knowledge Graph Build with LLM and ${window.gConfig.databaseName}, located at Import data -> New AI Import`,
     maxTextLength: 'Max Text Length',
     verify: 'Verify',
   },
